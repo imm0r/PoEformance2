@@ -58,6 +58,11 @@ public sealed class PoiLayer
     // neighbour was dropped would make the map lie about which line goes where.
     private readonly Dictionary<ulong, int> _slots = [];
 
+    // The Active and Inactive cells each boss arena resolved to, and the area they were
+    // resolved for. See BossArt.
+    private readonly Dictionary<ulong, (int Active, int Inactive)> _art = [];
+    private uint _artArea;
+
     /// <summary>Which kinds are marked. Everything that is a destination rather than a thing.</summary>
     /// <remarks>
     /// EVERY kind but None, and it is worth saying why rather than leaving the list to be
@@ -85,6 +90,29 @@ public sealed class PoiLayer
     /// exactly as an exit does.
     /// </remarks>
     public IReadOnlyList<TerrainRoom> PickedRooms { get; set; } = [];
+
+    /// <summary>
+    /// Draw a boss arena as the game's own picture of its boss, where there is one.
+    /// </summary>
+    /// <remarks>
+    /// ON, because the picture says strictly more than the shape it replaces and costs a
+    /// dictionary lookup per arena per area to find. Off puts back the spiked star - and the
+    /// cell somebody chose for the boss row, which the picture otherwise stands in front of
+    /// for the same reason the game's own icon stands in front of one on the unrecognised row.
+    /// </remarks>
+    public bool ShowBossArt { get; set; } = true;
+
+    /// <summary>Which picture belongs to which arena. Empty until the file is handed over.</summary>
+    public BossIcons BossIcons { get; set; } = BossIcons.Empty;
+
+    /// <summary>
+    /// Which arenas have had their boss put down, or null while nothing is watching.
+    /// </summary>
+    /// <remarks>
+    /// Null draws every arena Active, which is what an arena with no Inactive picture does
+    /// anyway - so the watcher is an improvement on this layer rather than a dependency of it.
+    /// </remarks>
+    public BossArenas? Arenas { get; set; }
 
     /// <summary>Draw a name next to each marker.</summary>
     public bool ShowLabels { get; set; } = true;
@@ -199,9 +227,17 @@ public sealed class PoiLayer
     /// Whether this comes from the memory of a place rather than from this read. A terrain
     /// landmark is never one: it is read out of the ground, which does not go out of range.
     /// </param>
+    /// <param name="Art">
+    /// A sheet cell this place is drawn as, counted from ONE, or 0 for none. What a boss arena
+    /// found in the tiles resolves to - see <see cref="BossArt"/>. Separate from
+    /// <paramref name="Icon"/> because the two are different KINDS of claim: the icon is the
+    /// name the game itself put on the marker, while this is worked out from an area id and a
+    /// tile path, and folding an inference into a field that means "the game says so" is how
+    /// the two stop being tellable apart.
+    /// </param>
     private readonly record struct Place(
         ulong Id, string Name, PoiKind Kind, float WorldX, float WorldY, float Height, string Icon,
-        bool Spent = false, bool Remembered = false);
+        bool Spent = false, bool Remembered = false, int Art = 0);
 
     /// <summary>Everything markable in the area, from both sources.</summary>
     private List<Place> PlacesIn(WorldSnapshot snapshot)
@@ -221,6 +257,16 @@ public sealed class PoiLayer
 
         if (snapshot.Terrain is TerrainGrid terrain)
         {
+            // Everything the arenas resolved to belongs to ONE area: the tiles are read as the
+            // player walks, so the landmark list grows during a map, but a cell worked out for
+            // a landmark cannot change while the area does not. Cleared here and filled per
+            // landmark below, which follows that growth without rebuilding anything.
+            if (snapshot.AreaHash != _artArea)
+            {
+                _artArea = snapshot.AreaHash;
+                _art.Clear();
+            }
+
             foreach (TerrainLandmark landmark in terrain.Landmarks)
             {
                 if (!DrawnKinds.Contains(landmark.Kind))
@@ -229,11 +275,13 @@ public sealed class PoiLayer
                 }
 
                 // No icon: a landmark is found in the shape of the ground, long before the
-                // game has anything there to mark. Its kind picks the shape instead.
+                // game has anything there to mark. Its kind picks the shape - except for a
+                // boss arena, which the sheet may have the game's own picture of.
                 places.Add(new Place(
                     landmark.Id, landmark.Name, landmark.Kind,
                     landmark.GridX * MapView.WorldToGrid, landmark.GridY * MapView.WorldToGrid,
-                    terrain.HeightAt(landmark.GridX, landmark.GridY), string.Empty));
+                    terrain.HeightAt(landmark.GridX, landmark.GridY), string.Empty,
+                    Art: BossArt(landmark, snapshot.Area.Id)));
             }
 
             // The pinned rooms, on the same terms. No icon and no kind of their own beyond
@@ -419,6 +467,13 @@ public sealed class PoiLayer
     /// would give back exactly the map the game already draws. This fills the hole where there
     /// was no shape worth having, and touches nothing that was already working.
     ///
+    /// A BOSS ARENA ANSWERS FIRST WHERE IT HAS AN ANSWER, and it is the same argument one step
+    /// further on. The game has a picture for about thirty of its bosses and draws it on its
+    /// own map; the arena is found in the tiles before anything is standing in it, so the
+    /// marker can wear that picture from the moment the area loads. Which picture is
+    /// <see cref="BossArt"/>'s business - here it is a cell that was already worked out, and 0
+    /// everywhere nothing was.
+    ///
     /// 0 for everything else, including a name no cell carries - about half the sheet is not
     /// in the icon set at all - and those fall through to whatever was chosen for the
     /// unrecognised row, or to the shape, and go on being collected by UnrecognisedMarkers.
@@ -431,7 +486,77 @@ public sealed class PoiLayer
     /// says it is no longer unknown.
     /// </remarks>
     private static int GameIcon(PoiGlyph glyph, Place place)
-        => glyph == PoiGlyph.Marker ? IconNames.CellFor(place.Icon) : 0;
+        => place.Art > 0 ? place.Art
+            : glyph == PoiGlyph.Marker ? IconNames.CellFor(place.Icon)
+            : 0;
+
+    /// <summary>
+    /// The sheet cell for one boss arena: the game's own picture of whatever lives in it.
+    /// </summary>
+    /// <remarks>
+    /// TWO CELLS ARE RESOLVED AND ONE IS RETURNED, because the pair belongs to the arena while
+    /// the choice between them belongs to the frame: <see cref="BossArenas"/> flips to the
+    /// Inactive art once the boss has been put down, the way the game flips its own landmarks,
+    /// and a boss that comes back flips it straight back. Resolving both at once means that
+    /// costs a bool rather than a second walk through the candidates.
+    ///
+    /// NAMES, NEVER CELL NUMBERS, all the way down - see <see cref="BossIcons"/>. The sheet
+    /// grows when art is added and every number after the insertion point moves with it; a
+    /// name stays a name, so a boss whose picture arrives in a later release starts working
+    /// without anybody editing anything.
+    ///
+    /// A family with only ONE picture is used for both states. Some of them have no
+    /// Active/Inactive pair at all - BreachBoss, ExpeditionBoss - and showing that one twice
+    /// says less than the pair does, which is better than showing nothing.
+    ///
+    /// CACHED PER LANDMARK, because this walks up to half a dozen candidate names through the
+    /// sheet's name table and the answer cannot change while the area does not. The cache is
+    /// emptied when the area hash moves; see where it is filled in <see cref="PlacesIn"/>.
+    /// </remarks>
+    private int BossArt(TerrainLandmark landmark, string areaId)
+    {
+        if (!ShowBossArt || landmark.Kind != PoiKind.BossArena)
+        {
+            return 0;
+        }
+
+        if (!_art.TryGetValue(landmark.Id, out (int Active, int Inactive) art))
+        {
+            art = Resolve(areaId, landmark);
+            _art[landmark.Id] = art;
+        }
+
+        bool cleared = Arenas?.IsCleared(landmark.Id) == true;
+        return cleared && art.Inactive > 0 ? art.Inactive : art.Active;
+    }
+
+    /// <summary>
+    /// Walks the candidate names and takes the first the sheet actually carries.
+    /// </summary>
+    /// <remarks>
+    /// The sheet is the arbiter, which is what makes a DERIVED candidate safe to try at all:
+    /// "G4_3_1_Boss" only wins because there is a picture under exactly that name, and the
+    /// hundreds of names that could be built from a tile path resolve to nothing and are
+    /// dropped. An arena no candidate matched is written down rather than forgotten, so the
+    /// curated file can be filled from what was played - see <see cref="BossIcons.NoteMissing"/>.
+    /// </remarks>
+    private (int Active, int Inactive) Resolve(string areaId, TerrainLandmark landmark)
+    {
+        foreach (string family in BossIcons.Candidates(areaId, landmark.Path))
+        {
+            int active = IconNames.CellFor(BossIcons.Named(family, cleared: false));
+            int inactive = IconNames.CellFor(BossIcons.Named(family, cleared: true));
+            int plain = active > 0 || inactive > 0 ? 0 : IconNames.CellFor(family);
+
+            if (active > 0 || inactive > 0 || plain > 0)
+            {
+                return (active > 0 ? active : Math.Max(inactive, plain), inactive);
+            }
+        }
+
+        BossIcons.NoteMissing(areaId, landmark.Path, landmark.Name);
+        return (0, 0);
+    }
 
     /// <summary>
     /// What the GAME calls a marker this cannot classify, beside its label.

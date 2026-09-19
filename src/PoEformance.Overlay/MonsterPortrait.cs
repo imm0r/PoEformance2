@@ -126,6 +126,29 @@ public sealed class MonsterPortrait
     /// <summary>The line that says what the floor's squares are.</summary>
     private const string FloorSaid = "floor: 250 units to a tile, ten squares each · x red · y green";
 
+    /// <summary>What the greying slider is, said where somebody asks it.</summary>
+    /// <remarks>
+    /// The number and its evidence, because it is the one control here whose right value is not
+    /// obvious and the game itself is not consistent about it. See <see cref="PictureGrey"/>.
+    /// </remarks>
+    private const string GreySaid =
+        "how much of the colour's mean the grey keeps.\n"
+        + "the game's own Inactive icons run 0.47 to 1.14 of it;\n"
+        + "0.78 is the median over its 27 boss pairs.";
+
+    /// <summary>What the export button does, said where somebody asks it.</summary>
+    private const string SaveSaid =
+        "writes this pose as icon art: colour and greyed,\n"
+        + "cut out on transparency, at 64 px and at 1024.";
+
+    /// <summary>The side the export is drawn at, before the small pair is made from it.</summary>
+    /// <remarks>
+    /// FIXED, AND NOT THE PANE'S SIZE, so that what comes out does not depend on how big the
+    /// window happened to be - two icons made a week apart have to match. Sixteen times a sheet
+    /// cell each way, which is enough to downscale from without the filter inventing anything.
+    /// </remarks>
+    public const int Shot = 1024;
+
     /// <summary>What the pane is painted before anything else: Blender's viewport grey, 0x3D3D3D.</summary>
     /// <remarks>
     /// THE COLOURS ARE BLENDER'S DEFAULT THEME, read out of its userdef_default_theme.c rather than
@@ -137,6 +160,44 @@ public sealed class MonsterPortrait
     /// ImGui packs a colour: alpha in the top byte, red in the bottom one.
     /// </remarks>
     private const uint Backdrop = 0xFF3D3D3D;
+
+    /// <summary>The two greys of the transparency checkerboard, and how big one square is.</summary>
+    /// <remarks>
+    /// Mid greys rather than the white-and-light-grey a paint program uses: this sits in a dark
+    /// interface next to a dark model, and a white backdrop here is a lamp in the corner of the
+    /// eye. Both are far enough from Blender's 0x3D3D3D that nobody can mistake which backdrop
+    /// they are looking at.
+    /// </remarks>
+    private const uint CheckerLight = 0xFF7A7A7A;
+
+    /// <inheritdoc cref="CheckerLight"/>
+    private const uint CheckerDark = 0xFF5A5A5A;
+
+    /// <inheritdoc cref="CheckerLight"/>
+    private const float Checker = 16f;
+
+    /// <summary>A ceiling on the squares drawn, so a huge pane cannot turn into a wall of rectangles.</summary>
+    private const int CheckerMost = 4096;
+
+    /// <summary>
+    /// How much bigger the second row of previews is drawn than a sheet cell.
+    /// </summary>
+    /// <remarks>
+    /// THREE, WHICH IS TWO DECISIONS. The small pair is what the icon will really look like and
+    /// is the one being judged; this one is for seeing WHY it looks like that - which shape lost
+    /// its edge, where the weapon went. Bigger than four would make the window wider than the
+    /// model pane it sits beside, and a preview that has to be moved out of the way to see the
+    /// model is no longer a comparison.
+    /// </remarks>
+    private const int Closer = 3;
+
+    /// <summary>The hairline round an exported cell, so its edge can be told from the checkerboard.</summary>
+    /// <remarks>
+    /// A CELL IS JUDGED BY ITS EDGES as much as by what is in it - whether the model is cut off,
+    /// whether it is lost in the middle of too much space - and without a frame the picture and
+    /// the board it stands on run together at exactly the places that matter.
+    /// </remarks>
+    private const uint Edge = 0xFF9A9A9A;
 
     /// <inheritdoc cref="Backdrop"/>
     private const uint Grid = 0x00545454;
@@ -212,6 +273,40 @@ public sealed class MonsterPortrait
     private float _drawnFrame = float.NaN;
     private int _drawnAnimation = -1;
     private bool _drawnPosed;
+
+    /// <summary>The greying the shown picture was drawn with - 0 for none. See <see cref="Greyed"/>.</summary>
+    private float _drawnGrey = float.NaN;
+
+    /// <summary>
+    /// The two pictures the last export made, as the renderer knows them, and their keys.
+    /// </summary>
+    /// <remarks>
+    /// THE FILES' OWN PIXELS, not a second rendering of them: what is uploaded here is the
+    /// same 64-square buffer that is written to disk, so what is on screen is what is in the
+    /// file down to the last edge pixel. A preview drawn any other way could look right while
+    /// the file was wrong, which is the one thing a preview must not do.
+    /// </remarks>
+    private IntPtr _shotColour;
+    private IntPtr _shotGrey;
+    private string _shotColourKey = string.Empty;
+    private string _shotGreyKey = string.Empty;
+
+    /// <summary>Which monster the pair is of, for the window's title.</summary>
+    private string _shotStem = string.Empty;
+
+    /// <summary>Whether the window showing them is up. Opened by an export, closed by its cross.</summary>
+    private bool _shotsOpen;
+
+    /// <summary>
+    /// What the last export wrote, for the line under the picture. Empty until one happens.
+    /// </summary>
+    /// <remarks>
+    /// VOLATILE because the encoding runs on a task and this is how it reports back - see
+    /// <see cref="Save"/>. A reference assignment is atomic either way; what this buys is that
+    /// the draw thread is guaranteed to SEE it rather than reading a cached empty string for
+    /// as long as the loop keeps it in a register.
+    /// </remarks>
+    private volatile string _exported = string.Empty;
 
     private SkeletonPose? _pose;
     private AnimationTracks? _tracks;
@@ -298,11 +393,72 @@ public sealed class MonsterPortrait
     /// <summary>Whether a picture could be drawn at all - an install and a renderer.</summary>
     public bool Possible => _install is not null && _upload is not null;
 
+    /// <summary>Where exported icon art is written.</summary>
+    /// <remarks>
+    /// Beside the executable, next to logs/ and data/, because these are files somebody is
+    /// about to go and pick up - a folder they can find without being told where it is.
+    /// </remarks>
+    public static string Folder => Path.Combine(AppContext.BaseDirectory, "exports");
+
+    /// <summary>
+    /// The greying the picture is drawn with: the factor, or 0 while it is switched off.
+    /// </summary>
+    /// <remarks>
+    /// ONE NUMBER FOR BOTH QUESTIONS, so the redraw check has one thing to compare. Zero can
+    /// never collide with a real factor - <see cref="PictureGrey.Weakest"/> is well above it.
+    /// </remarks>
+    private float Greyed => Grey ? Math.Clamp(GreyFactor, PictureGrey.Weakest, PictureGrey.Strongest) : 0f;
+
     /// <summary>The biggest the model will be drawn, each way.</summary>
     public int Most => _sizes.Most;
 
     /// <summary>Whether the floor the model stands on is drawn. On, because it is what makes a turn legible.</summary>
     public bool Ground { get; set; } = true;
+
+    /// <summary>
+    /// Called when one of the capture settings moved, so the choice is written down.
+    /// </summary>
+    /// <remarks>
+    /// The same arrangement the place markers make: holding a value and announcing that it
+    /// moved are separate jobs, and a control that does only the first is indistinguishable
+    /// from one that does neither once the tool is restarted.
+    /// </remarks>
+    public Action? Changed { get; set; }
+
+    /// <summary>
+    /// Whether the model is drawn greyed, the way the game's own Inactive map icons are.
+    /// </summary>
+    /// <remarks>
+    /// WHAT IT IS FOR: a boss with no minimap icon of its own gets one made from its model, and
+    /// the game's landmarks come in pairs - the colour one while the thing is alive and a grey
+    /// one once it is not. This is the second of the pair, done to the same rule the game's art
+    /// follows (see <see cref="PictureGrey"/>), so the two halves of a made icon match the
+    /// hundreds the game shipped.
+    ///
+    /// ON THE PICTURE AND NOT ON THE SKIN, deliberately. Greying the texture once when a model
+    /// loads would be free per frame and would do nothing at all for the monsters drawn in plain
+    /// ink - <see cref="MonsterModel.Painted"/> is false for a good many - and it would leave
+    /// what is exported able to differ from what is on screen. One pass over the pixels of a
+    /// picture that was going to be uploaded anyway is the cost, and only while this is on.
+    /// </remarks>
+    public bool Grey { get; set; }
+
+    /// <summary>How much of the colour's mean the grey keeps. See <see cref="PictureGrey.Measured"/>.</summary>
+    public float GreyFactor { get; set; } = PictureGrey.Measured;
+
+    /// <summary>What is painted behind the model.</summary>
+    public ModelBackdrop Behind { get; set; } = ModelBackdrop.Viewport;
+
+    /// <summary>
+    /// The flat colour behind the model, when that is what is behind it.
+    /// </summary>
+    /// <remarks>
+    /// Magenta, because a flat backdrop is for keying out by hand and the useful colour for
+    /// that is the one no monster is made of. Nothing here depends on it - the picture's own
+    /// background is already transparent and the export writes that - so this is a convenience
+    /// for a screenshot rather than part of the pipeline.
+    /// </remarks>
+    public uint FlatBehind { get; set; } = 0xFFFF00FF;
 
     /// <summary>Why there is no picture, for the line that says so. Empty while there is one.</summary>
     public string Why { get; private set; } = string.Empty;
@@ -359,6 +515,7 @@ public sealed class MonsterPortrait
         // that plays it again, under the cap, and not only the reason. They draw nothing while
         // there is no skeleton to control, which is every frame the model is still loading.
         Controls(side);
+        Capture();
 
         if (_texture == IntPtr.Zero)
         {
@@ -401,7 +558,7 @@ public sealed class MonsterPortrait
         // taken, and a floor a frame ahead of its model would slide under the feet on every turn.
         ImDrawListPtr draw = ImGui.GetWindowDrawList();
         Vector2 corner = ImGui.GetItemRectMin();
-        draw.AddRectFilled(corner, ImGui.GetItemRectMax(), Backdrop);
+        Paint(draw, corner, ImGui.GetItemRectMax());
         MeshPicture.Camera camera = MeshPicture.Camera.Of(_model.Mesh, _drawnTurn, _drawnTilt, _drawnZoom, _drawnPan);
         bool under = ModelFloor.Under(camera);
         if (under)
@@ -446,6 +603,7 @@ public sealed class MonsterPortrait
 
         Overlays(corner, side);
         ImGui.SetCursorScreenPos(below);
+        Shots();
         Status();
     }
 
@@ -738,6 +896,13 @@ public sealed class MonsterPortrait
             _status.Add(FloorSaid);
         }
 
+        // WHERE THE FILES WENT, and it stays up until the next export rather than flashing: the
+        // whole point of the button is that somebody then goes and finds what it wrote.
+        if (_exported.Length > 0)
+        {
+            _status.Add(_exported);
+        }
+
         if (_paint.Length > 0)
         {
             _status.Add(_paint);
@@ -758,6 +923,11 @@ public sealed class MonsterPortrait
     private float Chrome(float wide)
     {
         float chrome = _pose is not null && _model.Moves ? ImGui.GetFrameHeightWithSpacing() : 0f;
+        if (_model.Ready)
+        {
+            chrome += ImGui.GetFrameHeightWithSpacing();
+        }
+
         float spacing = ImGui.GetStyle().ItemSpacing.Y;
         foreach (string line in _status)
         {
@@ -767,6 +937,96 @@ public sealed class MonsterPortrait
         }
 
         return chrome;
+    }
+
+    /// <summary>
+    /// The two pictures the last export made, at the size a sheet cell is.
+    /// </summary>
+    /// <remarks>
+    /// WHY IT IS HERE AT ALL: an exported icon is judged at 64 pixels and nowhere else. A pose
+    /// that reads beautifully across a 1200 px pane can be a smudge in a cell - a raised weapon
+    /// becomes two dark pixels, a head turned away loses the face - and the only way to know is
+    /// to look at the cell. Shown side by side so the pair can be judged together, which is how
+    /// they will be seen: the game draws one of them while its boss lives and the other after.
+    ///
+    /// ONE TO ONE, NOT SCALED UP, because a smoothed-up preview is a different picture from the
+    /// file. Hovering gives the same texture at four times the size for a closer look, which
+    /// costs nothing and changes nothing about what was written.
+    ///
+    /// ON A CHECKERBOARD, because what is being judged includes the cut-out: an edge that kept
+    /// a dark fringe, or a leg that vanished into the background, is invisible against grey.
+    /// </remarks>
+    private void Shots()
+    {
+        if (!_shotsOpen || (_shotColour == IntPtr.Zero && _shotGrey == IntPtr.Zero))
+        {
+            return;
+        }
+
+        // A WINDOW OF ITS OWN RATHER THAN A ROW IN THE PANE, which is the same call the icon
+        // picker makes. Two reasons, and the second is the one that decided it: a row under
+        // the picture takes 64 px off the model for as long as it is there - the picture is
+        // sized to what is left of the pane - and a window can be dragged next to the game's
+        // own minimap, which is the comparison somebody is actually making.
+        //
+        // The title carries the monster, because a window left open while another monster is
+        // posed would otherwise be two pictures with nothing saying what they are of.
+        bool open = _shotsOpen;
+        bool expanded = ImGui.Begin(
+            $"{(_shotStem.Length > 0 ? _shotStem : "exported")} icon###monster-shots",
+            ref open,
+            ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing);
+
+        if (expanded)
+        {
+            Pair(IconSheet.Tile, "at a sheet cell's size, one pixel to one");
+            ImGui.Dummy(new Vector2(0f, ImGui.GetStyle().ItemSpacing.Y));
+            Pair(IconSheet.Tile * Closer, $"{Closer} times that, to look at");
+
+            ImGuiText.Wrapped(OverlayInk.Quiet, _exported);
+        }
+
+        ImGui.End();
+        _shotsOpen = open;
+    }
+
+    /// <summary>The two halves side by side at one size, with a line saying what the size is.</summary>
+    private void Pair(float side, string said)
+    {
+        ImDrawListPtr draw = ImGui.GetWindowDrawList();
+        float gap = ImGui.GetStyle().ItemSpacing.X;
+        Vector2 at = ImGui.GetCursorScreenPos();
+
+        Preview(draw, at, side, _shotColour, "the colour half - the game's Active icon");
+        Preview(draw, at + new Vector2(side + gap, 0f), side, _shotGrey, "the grey half - its Inactive icon");
+
+        // The pictures are drawn straight into the draw list, so the layout is told how much
+        // room they took or everything after them is written over the top of them.
+        ImGui.Dummy(new Vector2((side * 2f) + gap, side));
+        ImGuiText.Wrapped(OverlayInk.Quiet, said);
+    }
+
+    /// <summary>One preview: the checkerboard, the picture, and a closer look on hover.</summary>
+    private static void Preview(ImDrawListPtr draw, Vector2 at, float side, IntPtr texture, string said)
+    {
+        Vector2 far = at + new Vector2(side, side);
+        Checkered(draw, at, far);
+
+        if (texture == IntPtr.Zero)
+        {
+            return;
+        }
+
+        draw.AddImage(texture, at, far);
+        draw.AddRect(at, far, Edge);
+
+        // WHICH HALF THIS IS, and nothing else. The window already shows the pair three times
+        // over, so a tooltip carrying a bigger copy of the picture would be the third one -
+        // what is missing at a glance is which of the two is which, and that is a sentence.
+        if (ImGui.IsMouseHoveringRect(at, far))
+        {
+            ImGui.SetTooltip(said);
+        }
     }
 
     /// <summary>The lines under the picture, in the quiet ink the rest of the pane's asides use.</summary>
@@ -913,6 +1173,7 @@ public sealed class MonsterPortrait
             _release?.Invoke(OrbitKey);
         }
 
+        DropShots();
         _texture = IntPtr.Zero;
         _key = string.Empty;
         _orbit = IntPtr.Zero;
@@ -957,6 +1218,12 @@ public sealed class MonsterPortrait
         _wanted = path;
         _model = MonsterModel.None;
         Why = string.Empty;
+
+        // The last monster's exported cells go with it. Left up they would sit under a
+        // different model saying "this is what you made", which is the kind of wrong that gets
+        // a file overwritten.
+        DropShots();
+        _exported = string.Empty;
         Rest();
 
         // A pan aimed at one monster's head is nowhere in particular on the next one.
@@ -1024,6 +1291,11 @@ public sealed class MonsterPortrait
             || _drawnPan != _pan
             || _drawnSize != size
             || _drawnPosed != posed
+
+            // The greying is done to the PIXELS, so a change to it is a change to the picture
+            // and has to redraw one - without this the switch and the slider do nothing at all
+            // until something else moves, which reads as neither working.
+            || _drawnGrey != Greyed
             || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen));
 
         if (!moved)
@@ -1175,6 +1447,7 @@ public sealed class MonsterPortrait
         _drawnPosed = posed;
         _drawnFrame = _frame;
         _drawnAnimation = _chosen;
+        _drawnGrey = Greyed;
 
         try
         {
@@ -1205,6 +1478,13 @@ public sealed class MonsterPortrait
                 Why = "the model drew nothing";
                 Drop();
                 return;
+            }
+
+            // IN PLACE, on the canvas's own pixels, which is safe because the next draw into it
+            // starts by clearing it - the picture is never greyed twice.
+            if (Grey)
+            {
+                PictureGrey.Apply(drawn.Rgba.AsSpan(0, drawn.Width * drawn.Height * 4), GreyFactor);
             }
 
             using var image = Image.LoadPixelData<Rgba32>(Contiguous, drawn.Rgba, drawn.Width, drawn.Height);
@@ -1256,6 +1536,378 @@ public sealed class MonsterPortrait
     }
 
     /// <summary>Works out this frame's floor from the camera the picture was drawn with, and draws it.</summary>
+    /// <summary>
+    /// The row that turns a model into icon art: the floor, the greying, the backdrop, the file.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THIS ROW IS FOR, in one line: a boss the game draws no map icon for still has a
+    /// model, so the icon is made from the model - pose it, pause it, press the button, and the
+    /// Active and Inactive halves are on disk, cut out, at the size a sheet cell is.
+    ///
+    /// SEPARATE FROM THE ANIMATION ROW ABOVE because it is there for every model, and that one
+    /// is not: a rig with no animations draws no animation row at all, and the monsters worth
+    /// making an icon of should not be the ones that happen to move.
+    ///
+    /// THE SLIDER HIDES WHILE THE GREYING IS OFF. It is the one control here that says nothing
+    /// until it is in use, and a pane can be narrow.
+    /// </remarks>
+    private void Capture()
+    {
+        if (!_model.Ready)
+        {
+            return;
+        }
+
+        float wide = ImGui.CalcTextSize("0.00").X * 4f;
+
+        bool ground = Ground;
+        if (ImGui.Checkbox("floor##monster-floor", ref ground))
+        {
+            Ground = ground;
+            Changed?.Invoke();
+        }
+
+        ImGui.SameLine();
+        bool grey = Grey;
+        if (ImGui.Checkbox("grey##monster-grey", ref grey))
+        {
+            Grey = grey;
+            Changed?.Invoke();
+        }
+
+        if (Grey)
+        {
+            ImGui.SameLine();
+            ImGui.SetNextItemWidth(wide);
+            float factor = GreyFactor;
+            if (ImGui.SliderFloat(
+                "##monster-grey-factor", ref factor, PictureGrey.Weakest, PictureGrey.Strongest, "%.2f"))
+            {
+                GreyFactor = factor;
+                Changed?.Invoke();
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(GreySaid);
+            }
+        }
+
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(wide * 1.6f);
+        int behind = (int)Behind;
+        if (ImGui.Combo("##monster-behind", ref behind, "viewport\0flat\0checker\0"))
+        {
+            Behind = (ModelBackdrop)behind;
+            Changed?.Invoke();
+        }
+
+        if (Behind == ModelBackdrop.Flat)
+        {
+            // NOT WRITTEN DOWN, unlike the three beside it, and the difference is what each is
+            // for: the keying colour only matters while a screenshot is being taken, and the
+            // export needs no key at all. Magenta is where it starts every session, which is
+            // the right answer for the one job it has.
+            ImGui.SameLine();
+            Vector4 flat = ImGui.ColorConvertU32ToFloat4(FlatBehind);
+            if (ImGui.ColorEdit4(
+                "##monster-flat", ref flat, ImGuiColorEditFlags.NoInputs | ImGuiColorEditFlags.NoAlpha))
+            {
+                FlatBehind = ImGui.ColorConvertFloat4ToU32(flat);
+            }
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("PNG##monster-export"))
+        {
+            Save();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(SaveSaid);
+        }
+    }
+
+    /// <summary>
+    /// Writes the pose on screen as icon art: colour and greyed, cut out, small and full size.
+    /// </summary>
+    /// <remarks>
+    /// DRAWN AGAIN AT ITS OWN SIZE rather than taken from the pane, and that is what makes the
+    /// result independent of how big somebody happened to have the window. <see cref="Shot"/>
+    /// square every time, from the same camera and the same frame, so two icons made a week
+    /// apart match.
+    ///
+    /// NOTHING IS KEYED OUT, because nothing has to be: the renderer clears its buffer to zero
+    /// and draws the model into it, so the background is already alpha 0 and the floor and the
+    /// widgets were never in the picture - they are drawn by the overlay around it. A screenshot
+    /// of the pane would need all three undone by hand, and would still carry the edge pixels
+    /// where the model blended into whatever was behind it.
+    ///
+    /// BOTH HALVES FROM ONE DRAW. The greying is a pass over the pixels, so the colour one is
+    /// copied off first and the grey is made from the same buffer - one render, two pictures,
+    /// and they cannot disagree about the pose.
+    ///
+    /// THE SMALL PAIR IS DOWNSCALED FROM THE BIG ONE with a proper filter and premultiplied
+    /// alpha. Drawing straight at 64 would alias every edge, and resizing without premultiplying
+    /// pulls the transparent background's black into the outline as a dark fringe - which is
+    /// exactly the fault that makes a hand-keyed icon look cheap next to the game's own.
+    /// </remarks>
+    private void Save()
+    {
+        if (!_model.Ready)
+        {
+            _exported = "there is no model to write";
+            return;
+        }
+
+        try
+        {
+            string folder = Folder;
+            Directory.CreateDirectory(folder);
+            string stem = Stem(_wanted);
+
+            var canvas = new MeshPicture.Canvas(Shot);
+            GamePicture shot = Taken(canvas);
+            if (!shot.Ready)
+            {
+                _exported = "the model drew nothing to write";
+                return;
+            }
+
+            int bytes = shot.Width * shot.Height * 4;
+            byte[] colour = shot.Rgba.AsSpan(0, bytes).ToArray();
+            PictureGrey.Apply(shot.Rgba.AsSpan(0, bytes), GreyFactor);
+            byte[] grey = shot.Rgba.AsSpan(0, bytes).ToArray();
+
+            int wide = shot.Width;
+            int tall = shot.Height;
+
+            // THE SMALL PAIR IS MADE ONCE AND USED TWICE - shown here and written to disk - so
+            // the preview cannot differ from the file. Downscaling on this thread rather than
+            // with the writing is what makes the preview appear on the frame the button was
+            // pressed, which is the whole point of having one.
+            byte[] cellColour = Cell(colour, wide, tall);
+            byte[] cellGrey = Cell(grey, wide, tall);
+            Shown(cellColour, cellGrey);
+            _shotStem = stem;
+            _shotsOpen = true;
+
+            // THE DRAW IS HERE AND THE WRITING IS NOT, which is the split that matters: the
+            // picture has to be taken from the pose that is on screen right now, and encoding
+            // two PNGs - one of them a megapixel - is a tenth of a second of somebody's frame
+            // for no reason. The pixels are copies, so nothing the pane does next can reach
+            // them, and the line under the picture arrives a frame or two later.
+            _exported = $"writing {stem}Active and {stem}Inactive…";
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    Png(Path.Combine(folder, $"{stem}Active.png"), cellColour, IconSheet.Tile, IconSheet.Tile);
+                    Png(Path.Combine(folder, $"{stem}Inactive.png"), cellGrey, IconSheet.Tile, IconSheet.Tile);
+                    Png(Path.Combine(folder, $"{stem}Active-{wide}.png"), colour, wide, tall);
+                    Png(Path.Combine(folder, $"{stem}Inactive-{wide}.png"), grey, wide, tall);
+
+                    _exported = $"wrote 4 files as {stem}Active/Inactive in {folder}";
+                }
+                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException
+                    or NotSupportedException or ImageFormatException)
+                {
+                    _exported = $"could not write the pictures: {exception.Message}";
+                }
+            });
+        }
+        catch (Exception exception) when (exception is not (OutOfMemoryException or StackOverflowException))
+        {
+            // The draw thread is the one place an exception costs the whole session, and this
+            // one touches a disk somebody else's software may have a lock on.
+            _exported = $"could not write the pictures: {exception.Message}";
+        }
+    }
+
+    /// <summary>Draws the model as it stands, at the export's own size.</summary>
+    private GamePicture Taken(MeshPicture.Canvas canvas)
+    {
+        if (_tracks is { Ready: true } && _pose is not null)
+        {
+            _pose.Take(_tracks, _frame);
+            _pose.Move(_model.Mesh, _posed, _posedNormals);
+            return MeshPicture.Of(
+                _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, default, _model.Skin, _zoom, _pan);
+        }
+
+        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, default, _model.Skin, _zoom, _pan);
+    }
+
+    /// <summary>
+    /// One picture shrunk to a sheet cell, as pixels.
+    /// </summary>
+    /// <remarks>
+    /// DOWNSCALED RATHER THAN DRAWN SMALL, with a proper filter: a model rasterised straight
+    /// at 64 aliases every edge it has, while sixteen times that shrunk down is the same
+    /// antialiasing the game's own art has.
+    ///
+    /// PREMULTIPLIED FIRST, which is the part that is easy to leave out and impossible to miss
+    /// afterwards. The background is transparent BLACK, and a filter that averages colour
+    /// without weighting by alpha pulls that black into every edge - a dark fringe all round
+    /// the model, which is exactly what makes a hand-made icon look cheap beside a real one.
+    /// </remarks>
+    private static byte[] Cell(byte[] rgba, int wide, int tall)
+    {
+        using Image<Rgba32> full = Image.LoadPixelData<Rgba32>(Contiguous, rgba, wide, tall);
+        using Image<Rgba32> cell = full.Clone(picture => picture.Resize(new ResizeOptions
+        {
+            Size = new Size(IconSheet.Tile, IconSheet.Tile),
+            Mode = ResizeMode.Stretch,
+            Sampler = KnownResamplers.Lanczos3,
+            PremultiplyAlpha = true,
+        }));
+
+        var pixels = new byte[IconSheet.Tile * IconSheet.Tile * 4];
+        cell.CopyPixelDataTo(pixels);
+        return pixels;
+    }
+
+    /// <summary>Writes pixels to a PNG, alpha and all.</summary>
+    private static void Png(string path, byte[] rgba, int wide, int tall)
+    {
+        using Image<Rgba32> picture = Image.LoadPixelData<Rgba32>(Contiguous, rgba, wide, tall);
+        picture.SaveAsPng(path);
+    }
+
+    /// <summary>
+    /// Hands the two finished cells to the renderer, so the pane can show what was written.
+    /// </summary>
+    /// <remarks>
+    /// A NEW KEY EACH TIME, for the reason the model's own upload gives: the renderer caches by
+    /// key, and reusing one would show the first export's pictures for the rest of the session.
+    /// The previous pair is given back first, or an evening of posing leaks a texture a click.
+    /// </remarks>
+    private void Shown(byte[] colour, byte[] grey)
+    {
+        if (_upload is null)
+        {
+            return;
+        }
+
+        DropShots();
+
+        using Image<Rgba32> shownColour =
+            Image.LoadPixelData<Rgba32>(Contiguous, colour, IconSheet.Tile, IconSheet.Tile);
+        using Image<Rgba32> shownGrey =
+            Image.LoadPixelData<Rgba32>(Contiguous, grey, IconSheet.Tile, IconSheet.Tile);
+
+        _shotColourKey = $"poeformance.monster.shot.{_keys++}";
+        _shotGreyKey = $"poeformance.monster.shot.{_keys++}";
+        _shotColour = _upload(_shotColourKey, shownColour, false);
+        _shotGrey = _upload(_shotGreyKey, shownGrey, false);
+    }
+
+    /// <summary>Gives the preview pair back to the renderer.</summary>
+    private void DropShots()
+    {
+        if (_shotColourKey.Length > 0)
+        {
+            _release?.Invoke(_shotColourKey);
+        }
+
+        if (_shotGreyKey.Length > 0)
+        {
+            _release?.Invoke(_shotGreyKey);
+        }
+
+        _shotColour = IntPtr.Zero;
+        _shotGrey = IntPtr.Zero;
+        _shotColourKey = string.Empty;
+        _shotGreyKey = string.Empty;
+        _shotStem = string.Empty;
+        _shotsOpen = false;
+    }
+
+    /// <summary>
+    /// What to call the files: the monster's own file name, with nothing in it a path dislikes.
+    /// </summary>
+    /// <remarks>
+    /// The LAST part of the metadata path, because that is what the monster is called in the
+    /// game's own files - BloodKnightBossMAP2 - and it is what somebody renaming these to match
+    /// a sheet cell will recognise. A trailing underscore goes: several of the boss varieties
+    /// carry one and it would end up in the middle of "…_Active".
+    /// </remarks>
+    private static string Stem(string path)
+    {
+        int slash = path.LastIndexOf('/');
+        string last = slash >= 0 && slash < path.Length - 1 ? path[(slash + 1)..] : path;
+
+        var clean = new System.Text.StringBuilder(last.Length);
+        foreach (char c in last)
+        {
+            if (char.IsAsciiLetterOrDigit(c))
+            {
+                clean.Append(c);
+            }
+        }
+
+        return clean.Length > 0 ? clean.ToString() : "monster";
+    }
+
+    /// <summary>
+    /// Paints what is behind the model.
+    /// </summary>
+    /// <remarks>
+    /// THREE, AND EACH ANSWERS A DIFFERENT QUESTION. Blender's viewport grey is what the pane
+    /// was built to look like and what a model reads best against. A flat colour is for a
+    /// screenshot somebody will key by hand. And the checkerboard answers "what will actually
+    /// be in the file" - the picture's background is transparent and always was, so this is the
+    /// only one of the three that shows the truth about it.
+    ///
+    /// THE CHECKERBOARD DRAWS ONLY ITS DARK SQUARES, over one filled rectangle of the light
+    /// one. Half the squares, and on a 1200 px pane that is the difference between twenty-eight
+    /// hundred rectangles a frame and fourteen hundred, for a picture that looks the same.
+    /// </remarks>
+    private void Paint(ImDrawListPtr draw, Vector2 corner, Vector2 far)
+    {
+        if (Behind != ModelBackdrop.Checker)
+        {
+            draw.AddRectFilled(corner, far, Behind == ModelBackdrop.Flat ? FlatBehind : Backdrop);
+            return;
+        }
+
+        Checkered(draw, corner, far);
+    }
+
+    /// <summary>
+    /// The transparency checkerboard, behind the pane's picture or behind a preview.
+    /// </summary>
+    /// <remarks>
+    /// ONLY THE DARK SQUARES ARE DRAWN, over one filled rectangle of the light one. Half the
+    /// squares, and on a 1200 px pane that is the difference between twenty-eight hundred
+    /// rectangles a frame and fourteen hundred, for a picture that looks the same.
+    /// </remarks>
+    private static void Checkered(ImDrawListPtr draw, Vector2 corner, Vector2 far)
+    {
+        draw.AddRectFilled(corner, far, CheckerLight);
+
+        var squares = 0;
+        for (float y = corner.Y; y < far.Y && squares < CheckerMost; y += Checker)
+        {
+            for (float x = corner.X; x < far.X && squares < CheckerMost; x += Checker)
+            {
+                // Every other square, offset row by row, which is what makes it a checkerboard
+                // rather than stripes.
+                if ((int)((x - corner.X) / Checker) % 2 != (int)((y - corner.Y) / Checker) % 2)
+                {
+                    continue;
+                }
+
+                draw.AddRectFilled(
+                    new Vector2(x, y),
+                    new Vector2(MathF.Min(x + Checker, far.X), MathF.Min(y + Checker, far.Y)),
+                    CheckerDark);
+                squares++;
+            }
+        }
+    }
+
     private void Floor(ImDrawListPtr draw, Vector2 corner, float side, in MeshPicture.Camera camera)
     {
         if (!Ground)
@@ -1369,4 +2021,23 @@ public sealed class MonsterPortrait
         configuration.PreferContiguousImageBuffers = true;
         return configuration;
     }
+}
+
+/// <summary>What is painted behind the model in the pane.</summary>
+/// <remarks>
+/// THREE, AND THE THIRD IS THE HONEST ONE. The picture itself has a transparent background and
+/// always did - the renderer clears its buffer to zero - so the viewport grey and a flat colour
+/// are both something the overlay paints UNDER it, and only the checkerboard shows what a file
+/// written from it will actually contain.
+/// </remarks>
+public enum ModelBackdrop
+{
+    /// <summary>Blender's viewport grey, which the pane was built around.</summary>
+    Viewport,
+
+    /// <summary>One flat colour, for a screenshot somebody will key out by hand.</summary>
+    Flat,
+
+    /// <summary>The transparency checkerboard: what is really behind the model, which is nothing.</summary>
+    Checker,
 }

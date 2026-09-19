@@ -37,6 +37,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
     /// <summary>The icon names the classifier gave up on, collected for later. See the type.</summary>
     private readonly UnrecognisedMarkers _unrecognised = new();
+
+    /// <summary>Which boss arenas have been cleared, so their markers can say so. See the type.</summary>
+    private readonly BossArenas _arenas = new();
     private ClientRect _tracked;
     private readonly TerrainLayer _terrain;
     private readonly IconCache _icons;
@@ -428,10 +431,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             _poi.ShowLabels = settings.PoiLabels;
             _poi.ShowRoutes = settings.PoiRoutes;
             _poi.ShowArrows = settings.PoiArrows;
+            _poi.ShowBossArt = settings.BossArt;
         }
 
         _roomWants = settings.RoomsOrDefault;
         _rooms?.Apply(_roomWants);
+
+        // The same handover as the rooms above, and for the same reason: the settings are read
+        // before the monster book is attached, so what they say is remembered here and pressed
+        // onto the pane whenever it turns up - see AttachMonsterBook.
+        _modelWants = settings;
+        Capture(_monsterBook?.Model);
 
         // No handover hole here, unlike the room layer above: the ground names need no route
         // planner, so the layer exists from the start and takes the settings directly.
@@ -489,6 +499,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 : basis.MonsterPanes,
             MonsterRail = _monsterBook?.RailOpen ?? basis.MonsterRail,
             MonsterModel = _monsterBook?.ModelOpen ?? basis.MonsterModel,
+            ModelGrey = _monsterBook?.Model?.Grey ?? basis.ModelGrey,
+            ModelGreyFactor = _monsterBook?.Model?.GreyFactor ?? basis.ModelGreyFactor,
+            ModelBackdrop = _monsterBook?.Model?.Behind.ToString() ?? basis.ModelBackdrop,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -527,6 +540,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             PoiLabels = _poi?.ShowLabels ?? basis.PoiLabels,
             PoiRoutes = _poi?.ShowRoutes ?? basis.PoiRoutes,
             PoiArrows = _poi?.ShowArrows ?? basis.PoiArrows,
+            BossArt = _poi?.ShowBossArt ?? basis.BossArt,
 
             // From the layer where there is one, and from what was loaded where there is not:
             // saving before the layer is attached must not write an empty pick list over a
@@ -641,6 +655,41 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// Same hole the stash switches fell into, kept shut the same way.
     /// </remarks>
     private RoomSettings _roomWants = RoomSettings.Default;
+
+    /// <summary>What the settings file said about the model pane, until there is a pane to say it to.</summary>
+    private OverlaySettings _modelWants = OverlaySettings.Default;
+
+    /// <summary>
+    /// Puts the capture settings onto the model pane, wherever it has got to.
+    /// </summary>
+    /// <remarks>
+    /// A ZERO FACTOR IS "NOT SET" rather than a factor of zero, which would draw every model
+    /// black. That is the convention every other number in the settings file follows, and here
+    /// it is what keeps the measured default in the code where a better measurement can correct
+    /// it - see <see cref="PictureGrey.Measured"/>.
+    ///
+    /// The backdrop is stored by NAME. An enum's numbers are an implementation detail and
+    /// reordering them would silently turn somebody's checkerboard into a flat colour; a name
+    /// that no longer exists simply leaves the default standing.
+    /// </remarks>
+    private void Capture(MonsterPortrait? pane)
+    {
+        if (pane is null)
+        {
+            return;
+        }
+
+        pane.Grey = _modelWants.ModelGrey;
+        if (_modelWants.ModelGreyFactor > 0f)
+        {
+            pane.GreyFactor = _modelWants.ModelGreyFactor;
+        }
+
+        if (Enum.TryParse(_modelWants.ModelBackdrop, ignoreCase: true, out ModelBackdrop behind))
+        {
+            pane.Behind = behind;
+        }
+    }
     private readonly RuleLayer _rules = new();
 
     /// <summary>What the rule engine decided to show this tick, or null when it is not wired.</summary>
@@ -746,6 +795,31 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     private MonsterVarieties _monsters = MonsterVarieties.Empty;
+
+    /// <summary>
+    /// Which boss picture belongs to which arena, for the arenas whose names do not say it.
+    /// </summary>
+    /// <remarks>
+    /// The same arrangement as <see cref="Monsters"/> and for the same reason - loaded by
+    /// whoever wires this up, with no fixed order against the Attach calls - except that this
+    /// one is handed ON as well: the layer that draws the markers may already exist, and a
+    /// table that arrived afterwards would otherwise sit here unread.
+    /// </remarks>
+    public BossIcons BossIcons
+    {
+        get => _bossIcons;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _bossIcons = value;
+            if (_poi is not null)
+            {
+                _poi.BossIcons = value;
+            }
+        }
+    }
+
+    private BossIcons _bossIcons = BossIcons.Empty;
 
     /// <summary>
     /// Where the game's own sentence for a stat comes from, asked per frame.
@@ -1068,6 +1142,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 // collected names are about - and a file nothing mentions is a file nobody
                 // opens. One line, and only once there is something in it to open.
                 DrawCollectedNames();
+                DrawBossArt();
                 places.Draw();
             },
             places.Idle,
@@ -1107,6 +1182,50 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 : $"{names} icon names the marker rules do not recognise have been collected,"
                     + " with an example path for each:");
         ImGuiText.Mono(OverlayInk.Quiet, UnrecognisedMarkers.LogPath);
+        ImGui.Separator();
+    }
+
+    /// <summary>
+    /// The switch for the boss arenas' own pictures, and what the sheet had nothing for.
+    /// </summary>
+    /// <remarks>
+    /// ON THIS TAB because the row it stands in front of is here: "Boss arena" is a style row
+    /// like any other, and a picture chosen there is what this overrides. A switch for that
+    /// hidden on another page would be the one thing somebody cannot find when they wonder why
+    /// their chosen icon stopped appearing.
+    ///
+    /// The second line is the same argument <see cref="DrawCollectedNames"/> makes: the arenas
+    /// nothing could name are collected whether or not anybody reads this, and an unmentioned
+    /// file is a file nobody opens - while this one is the list of pairs still to add.
+    /// </remarks>
+    private void DrawBossArt()
+    {
+        if (_poi is not PoiLayer poi)
+        {
+            return;
+        }
+
+        bool art = poi.ShowBossArt;
+        if (ImGui.Checkbox("boss arenas wear the game's own picture of their boss", ref art))
+        {
+            poi.ShowBossArt = art;
+            SettingsChanged?.Invoke();
+        }
+
+        int missing = poi.BossIcons.MissingCount;
+        if (art && missing > 0)
+        {
+            ImGuiText.Wrapped(
+                OverlayInk.Quiet,
+                missing == 1
+                    ? "1 boss arena has turned up that the sheet has no picture for; its area and"
+                        + " tile were written down, so the pair can be added to data/boss-icons.json:"
+                    : $"{missing} boss arenas have turned up that the sheet has no picture for;"
+                        + " their areas and tiles were written down, so the pairs can be added to"
+                        + " data/boss-icons.json:");
+            ImGuiText.Mono(OverlayInk.Quiet, BossIcons.LogPath);
+        }
+
         ImGui.Separator();
     }
 
@@ -2075,6 +2194,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         };
 
         window.Show(columns, rail, model, columnWidths, panes);
+
+        // What the settings file said about the pane, which was read before this existed.
+        Capture(window.Model);
         _monsterBook = window;
 
         _tools.Add(
@@ -2110,6 +2232,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Chrome = Chrome,
             SheetFor = _icons.Sheet,
             Changed = () => SettingsChanged?.Invoke(),
+
+            // Whatever was handed over before this ran, and the property hands over whatever
+            // arrives after - the same arrangement the style makes above, for the same reason:
+            // the data file is loaded by the app and the layer is built here, and neither
+            // order should be the one that works.
+            BossIcons = BossIcons,
+            Arenas = _arenas,
         };
 
         // Attached with the places rather than beside them: pinning a room is asking for a
@@ -2568,6 +2697,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // while a map is open - and an icon name nobody can classify is worth catching whether
         // or not somebody happened to have the map up when they walked past it.
         _unrecognised.Note(_snapshot);
+
+        // The same argument, one step stronger: an arena is cleared during a fight, which is
+        // the one moment nobody has their map up. Watched every frame so the marker has
+        // already changed by the time anybody opens it.
+        _arenas.Note(_snapshot, Environment.TickCount64);
 
         // Where the game's panels are, handed to the windows so one lying over an open panel can
         // take itself off screen until it is not. Published every frame including the empty

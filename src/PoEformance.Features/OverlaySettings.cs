@@ -34,6 +34,11 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("poiLabels")] bool PoiLabels = true,
     [property: JsonPropertyName("poiRoutes")] bool PoiRoutes = true,
     [property: JsonPropertyName("poiArrows")] bool PoiArrows = true,
+
+    // A boss arena drawn as the game's own picture of its boss rather than as the boss shape.
+    // On, because the picture says which boss it is and the shape only says that there is one -
+    // and where nothing is known the shape comes back by itself. See BossIcons.
+    [property: JsonPropertyName("bossArt")] bool BossArt = true,
     [property: JsonPropertyName("dotLabels")] bool DotLabels = false,
     [property: JsonPropertyName("healthBarsOnlyWhenHurt")] bool HealthBarsOnlyWhenHurt = false,
     [property: JsonPropertyName("hideBehindPanels")] bool HideBehindPanels = true,
@@ -153,6 +158,20 @@ public sealed record OverlaySettings(
     // somebody fits to their monitor once. Values outside what a drag can reach are ignored rather
     // than clamped, so a hand-edited file cannot hide a pane - see PaneSplit.Restore.
     [property: JsonPropertyName("monsterPanes")] IReadOnlyDictionary<string, double>? MonsterPanes = null,
+
+    // The model pane's capture settings, which are what turn a monster into icon art: whether it
+    // is drawn greyed the way the game's Inactive icons are, how much of the colour's mean that
+    // grey keeps, and what is painted behind it. KEPT because the factor goes into the FILE the
+    // export writes - somebody building a set of icons over several evenings must not have it
+    // silently back at the default on the second one. The backdrop is kept beside it because it
+    // is the same decision, made once. See MonsterPortrait and PictureGrey.
+    //
+    // ZERO MEANS "NOT SET" on the factor, the way every other number in this file does: the
+    // measured default lives in the code, where a better measurement can correct it for
+    // everybody who never moved the slider.
+    [property: JsonPropertyName("modelGrey")] bool ModelGrey = false,
+    [property: JsonPropertyName("modelGreyFactor")] float ModelGreyFactor = 0f,
+    [property: JsonPropertyName("modelBackdrop")] string ModelBackdrop = "",
 
     // Whether the monster book's facet rail has a pane of its own. ON by default, because a rail
     // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is
