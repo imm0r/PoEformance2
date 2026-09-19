@@ -10,9 +10,9 @@ namespace PoEformance.Game.Files;
 /// between them for nothing.
 ///
 /// THEY ROUGHLY DOUBLE ON PURPOSE, because the work grows with the AREA and not the edge: at 384
-/// a real rig costs 3.0 ms a frame, at 768 it costs 8.0 and at 1536 it costs 25.1. So stepping
-/// down ONE rung while a model is being dragged quarters the work rather than shaving a little
-/// off it, and that is the moment a dropped frame is actually felt.
+/// a real rig cost 3.0 ms a frame on one thread, at 768 it cost 8.0 and at 1536 it cost 25.1. A
+/// cap one rung lower is a quarter of the work, not a little less of it, and the cap is paid on
+/// every frame a model moves.
 ///
 /// IT LIVES IN THIS LAYER BECAUSE IT IS ARITHMETIC, and arithmetic inside the overlay cannot be
 /// tested: that project is Windows-only and the test project does not reference it. This was
@@ -24,18 +24,22 @@ namespace PoEformance.Game.Files;
 /// </remarks>
 public sealed class PictureLadder
 {
-    /// <summary>The default cap on what TURNING the model may cost, as a size.</summary>
+    /// <summary>The default cap on what MOVING the model may cost, as a size.</summary>
     /// <remarks>
-    /// MEASURED, at 8.0 ms a frame while turning against an overlay frame of about 10. One rung
-    /// up is 12.5 and two is 25.1, which a drag cannot keep up with. It is not a cap on how big
-    /// the picture may BE - see <see cref="For"/>. See also OverlaySettings.
+    /// THE RUNG A 1200 PX PANE PLAYS AT NEAR ENOUGH TO ITS OWN SIZE, which is the pane the live
+    /// client showed: at 1024 the picture is stretched by a sixth, where the 512 it used to play
+    /// at was stretched by more than two and reported as a blur. What it costs is measured in
+    /// MeshPicture: the rasteriser draws in bands on every core, and on four of them a rig-sized
+    /// mesh filling the whole frame is 19 ms at 1024 against 9 at 512 - a real monster covers a
+    /// third of the frame, and a desktop has more cores than that. It is not a cap on how big the
+    /// picture may BE - see <see cref="For"/>. See also OverlaySettings.
     /// </remarks>
-    public const int Usual = 768;
+    public const int Usual = 1024;
 
     /// <summary>The smallest a cap may be set to, and the bottom rung.</summary>
     public const int Smallest = 256;
 
-    private static readonly int[] Rungs = [Smallest, 384, 512, Usual, 1024, 1536, MeshPicture.Widest];
+    private static readonly int[] Rungs = [Smallest, 384, 512, 768, Usual, 1536, MeshPicture.Widest];
 
     /// <param name="most">The biggest size to allow, clamped and snapped to a rung.</param>
     public PictureLadder(int most = Usual)
@@ -47,27 +51,28 @@ public sealed class PictureLadder
     /// <summary>The biggest size this ladder allows.</summary>
     public int Most { get; }
 
-    /// <summary>What to draw at for a picture shown this wide, never above the cap.</summary>
+    /// <summary>What to draw at for a picture shown this wide, at rest: the cap does not apply.</summary>
     /// <remarks>
     /// THE CAP DOES NOT APPLY HERE, and that is what the measurement actually said. What was
-    /// measured is the cost of a frame WHILE TURNING - 8.0 ms at 768, 25.1 at 1536 - and a cost
-    /// per frame only matters when there are frames: at rest the picture is drawn ONCE, when the
-    /// monster changes or the drag ends, and one 25 ms frame is not something anybody sees. A cap
-    /// on the resting size buys nothing and shows as a picture that stops growing with its pane,
-    /// which is what it was reported as.
+    /// measured is the cost of a frame WHILE MOVING, and a cost per frame only matters when there
+    /// are frames: at rest the picture is drawn ONCE, when the monster changes or the drag ends,
+    /// and one slow frame is not something anybody sees. A cap on the resting size buys nothing
+    /// and shows as a picture that stops growing with its pane, which is what it was reported as.
     /// </remarks>
     public int For(float side) => Snap(Asked(side));
 
     /// <summary>
-    /// What a model being dragged is drawn at: capped, and then one rung lower.
+    /// What a model that is moving - dragged, or playing an animation - is drawn at: what the pane asks for, up to the cap.
     /// </summary>
     /// <remarks>
-    /// BOTH, because this is the only place the frame cost is paid. The cap is somebody's answer
-    /// to "how much processor may turning this cost", and the rung below it is the four-times
-    /// discount that makes the drag itself smooth; the sharp picture comes back the moment the
-    /// button is let go.
+    /// THE CAP, AND NOTHING UNDER IT ANY MORE. This used to be one rung under the cap as well, the
+    /// four-times discount that made a drag smooth while the rasteriser ran on one thread - and it
+    /// was what the live client saw as a blurred monster on a 1200 px pane, drawn at 512 and
+    /// stretched. The rasteriser draws in bands on every core now, and what that bought is spent
+    /// here: a moving picture at the pane's own rung. The cap is still somebody's answer to "how
+    /// much processor may moving this cost", and this is still the only place it is paid.
     /// </remarks>
-    public int Dragging(float side) => Down(Math.Min(For(side), Most));
+    public int Moving(float side) => Math.Min(For(side), Most);
 
     /// <summary>The smallest rung at or above what is asked for, or the top one.</summary>
     public static int Snap(int want)
@@ -81,20 +86,6 @@ public sealed class PictureLadder
         }
 
         return Rungs[^1];
-    }
-
-    /// <summary>One rung down from the one given, or the bottom rung.</summary>
-    public static int Down(int from)
-    {
-        for (int at = Rungs.Length - 1; at > 0; at--)
-        {
-            if (Rungs[at] <= from)
-            {
-                return Rungs[at - 1];
-            }
-        }
-
-        return Rungs[0];
     }
 
     /// <summary>

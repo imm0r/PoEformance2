@@ -125,31 +125,34 @@ public class IconDecodeTests
     }
 
     /// <summary>
-    /// The portrait rests on rungs past the size where this matters, and plays on one under it.
+    /// The portrait rests on rungs past the size where this matters, and plays at it under the usual cap.
     /// </summary>
     /// <remarks>
-    /// WHICH IS WHY IT SHOWED UP AS A PAUSE BUTTON THAT BROKE THE VIEWER. An animation is drawn
-    /// one rung down under the usual cap - 512 px, one megabyte - and half an hour of it uploads
-    /// fine. Pause goes back up to the rung that covers the pane, and on a pane wider than 1024 px
-    /// that is 1536 or 2048: nine and sixteen megabytes, which ImageSharp 3.1.12 splits into
-    /// four-megabyte pool blocks. Measured on every rung rather than read off a diagram: with the
-    /// default configuration each rung up to 1024 arrives whole and both above it arrive split,
-    /// and with the flag all seven arrive whole. So the flag is load-bearing on exactly the two
-    /// rungs a paused portrait can rest on, and on none a playing one is drawn at.
+    /// WHICH IS WHY IT SHOWED UP AS A PAUSE BUTTON THAT BROKE THE VIEWER. An animation was drawn
+    /// one rung down under the cap of the day - 512 px, one megabyte - and half an hour of it
+    /// uploaded fine. Pause went back up to the rung that covers the pane, and on a pane wider
+    /// than 1024 px that is 1536 or 2048: nine and sixteen megabytes, which ImageSharp 3.1.12
+    /// splits into four-megabyte pool blocks. Measured on every rung rather than read off a
+    /// diagram: with the default configuration each rung up to 1024 arrives whole and both above
+    /// it arrive split, and with the flag all seven arrive whole. A playing portrait now draws at
+    /// the cap itself, whose usual value is exactly the pool block - and one setting above it is
+    /// split too, so the flag is load-bearing for playing as well the moment the cap is raised.
     /// </remarks>
     [Fact]
-    public void ThePortraitRestsPastTheSizeWhereItMattersAndPlaysUnderIt()
+    public void ThePortraitRestsPastTheSizeWhereItMattersAndPlaysAtIt()
     {
         const long PoolBlock = 4L * 1024 * 1024;
         var ladder = new PictureLadder();
 
-        // Playing under the usual cap never reaches the threshold, however wide the pane is.
-        long playing = Bytes(ladder.Dragging(MeshPicture.Widest));
-        Assert.True(playing <= PoolBlock, $"playing draws {playing} bytes, which is past the pool block");
+        // Playing under the usual cap reaches the threshold exactly, however wide the pane is.
+        long playing = Bytes(ladder.Moving(MeshPicture.Widest));
+        Assert.Equal(PoolBlock, playing);
 
-        // Paused on a pane wider than 1024 px it is over it - which is the report exactly.
+        // Paused on a pane wider than 1024 px it is over it - which is the report exactly - and
+        // so is playing under a cap one rung higher.
         Assert.True(Bytes(ladder.For(1025f)) > PoolBlock);
         Assert.True(Bytes(ladder.For(MeshPicture.Widest)) > PoolBlock);
+        Assert.True(Bytes(new PictureLadder(1536).Moving(MeshPicture.Widest)) > PoolBlock);
 
         static long Bytes(int rung) => (long)rung * rung * 4;
     }

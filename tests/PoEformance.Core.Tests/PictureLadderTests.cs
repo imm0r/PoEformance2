@@ -41,7 +41,8 @@ public class PictureLadderTests
 
     /// <summary>A cap between rungs is raised to the next one, and a silly one is clamped.</summary>
     [Theory]
-    [InlineData(700, PictureLadder.Usual)]
+    [InlineData(700, 768)]
+    [InlineData(900, PictureLadder.Usual)]
     [InlineData(385, 512)]
     [InlineData(0, PictureLadder.Smallest)]
     [InlineData(-1000, PictureLadder.Smallest)]
@@ -92,8 +93,8 @@ public class PictureLadderTests
 
         foreach (float side in new[] { 300f, 1000f, 9000f })
         {
-            Assert.True(small.Dragging(side) <= PictureLadder.Smallest, "a drag stays under the cap");
-            Assert.True(middling.Dragging(side) <= 512, "and under a larger one");
+            Assert.True(small.Moving(side) <= PictureLadder.Smallest, "a drag stays under the cap");
+            Assert.True(middling.Moving(side) <= 512, "and under a larger one");
 
             // At rest the two ladders agree with each other and with the ladder that has no cap
             // worth speaking of: what is asked for is what is drawn.
@@ -103,25 +104,33 @@ public class PictureLadderTests
     }
 
     /// <summary>
-    /// Dragging draws one rung lower, and never below the bottom one.
+    /// Moving draws at the pane's own rung, and the cap is the only thing that lowers it.
     /// </summary>
     /// <remarks>
-    /// THE POINT IS THE AREA. Rungs roughly double, so one down is about a quarter of the work -
-    /// which is what buys a smooth drag at a high cap. A step that only shaved a little off would
-    /// not be worth the softer picture it costs.
+    /// THE RUNG UNDER THE CAP IS GONE, and this is what pins that it stays gone: the four-times
+    /// discount a drag used to take was what the live client saw as a blurred monster while an
+    /// animation played on a wide pane. With the rasteriser in bands on every core, a moving
+    /// picture is drawn at the size it is shown, up to the cap.
     /// </remarks>
     [Theory]
-    [InlineData(1000, 1024, PictureLadder.Usual)]
-    [InlineData(500, 512, 384)]
-    [InlineData(300, 384, 256)]
-    [InlineData(100, 256, 256)]
-    public void DraggingDrawsOneRungLower(float side, int still, int moving)
+    [InlineData(1000, 1024)]
+    [InlineData(500, 512)]
+    [InlineData(300, 384)]
+    [InlineData(100, 256)]
+    [InlineData(2000, MeshPicture.Widest)]
+    public void MovingDrawsAtThePanesRungUpToTheCap(float side, int still)
     {
-        var ladder = new PictureLadder(MeshPicture.Widest);
+        var open = new PictureLadder(MeshPicture.Widest);
+        Assert.Equal(still, open.For(side));
+        Assert.Equal(still, open.Moving(side));
 
-        Assert.Equal(still, ladder.For(side));
-        Assert.Equal(moving, ladder.Dragging(side));
-        Assert.True(ladder.Dragging(side) <= ladder.For(side));
+        var capped = new PictureLadder(512);
+        Assert.Equal(still, capped.For(side));
+        Assert.Equal(Math.Min(still, 512), capped.Moving(side));
+
+        // And the usual cap is the one a 1200 px pane plays under near enough to its own size.
+        Assert.Equal(1024, PictureLadder.Usual);
+        Assert.Equal(1024, new PictureLadder().Moving(1200f));
     }
 
     /// <summary>Every rung is a real size, in order, and within what the renderer will draw.</summary>

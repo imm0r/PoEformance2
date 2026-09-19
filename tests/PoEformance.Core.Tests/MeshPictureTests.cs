@@ -155,14 +155,22 @@ public class MeshPictureTests
     }
 
     /// <summary>Turning the model changes the picture, and a whole turn puts it back.</summary>
+    /// <remarks>
+    /// THE HALF TURN IS THE ONE THAT EARNS ITS KEEP: seen from behind, every triangle of the post
+    /// winds the other way on the picture, and a rasteriser that only fills triangles wound one
+    /// way draws nothing at all of it. The format's winding is not established, so both ways
+    /// have to fill - and the tests' own meshes happen to wind one way from the front.
+    /// </remarks>
     [Fact]
     public void AWholeTurnComesBackToWhereItStarted()
     {
         GamePicture start = MeshPicture.Of(Post(crossbar: true), 96);
         GamePicture quarter = MeshPicture.Of(Post(crossbar: true), 96, MathF.PI / 2f);
+        GamePicture half = MeshPicture.Of(Post(crossbar: true), 96, MathF.PI);
         GamePicture whole = MeshPicture.Of(Post(crossbar: true), 96, MathF.Tau);
 
         Assert.NotEqual(Silhouette(start).Right - Silhouette(start).Left, Silhouette(quarter).Right - Silhouette(quarter).Left);
+        Assert.Equal(Silhouette(start).Lit, Silhouette(half).Lit);
         Assert.Equal(Silhouette(start), Silhouette(whole));
     }
 
@@ -352,6 +360,35 @@ public class MeshPictureTests
     public void ACanvasClampsItsSizeToo(int asked, int given)
         => Assert.Equal(given, new MeshPicture.Canvas(asked).Size);
 
+    /// <summary>However many threads share a canvas, the picture is the one thread's to the byte.</summary>
+    /// <remarks>
+    /// THE TEST THAT EARNS THE BANDS. Each pixel belongs to one band and each band walks the
+    /// triangles in the mesh's order, so the depth test on a pixel never sees two threads - and
+    /// the proof is a picture that does not differ by a bit from the sequential one, on a mesh
+    /// whose triangles cross band boundaries and each other. A race would show as a scatter of
+    /// pixels where the far surface won.
+    /// </remarks>
+    [Fact]
+    public void AnyNumberOfThreadsDrawsTheSamePicture()
+    {
+        Mipmaps skin = Checkered(64);
+        SkinnedMesh mesh = Papered();
+        byte[] alone = [.. MeshPicture.Of(mesh, new MeshPicture.Canvas(96, 1), 0.5f, 0.4f, skin: skin).Rgba];
+
+        foreach (int threads in new[] { 2, 3, 7 })
+        {
+            var canvas = new MeshPicture.Canvas(96, threads);
+            Assert.Equal(threads, canvas.Threads);
+            Assert.Equal(0, Differing(alone, MeshPicture.Of(mesh, canvas, 0.5f, 0.4f, skin: skin).Rgba));
+            Assert.Equal(0, Differing(MeshPicture.Of(Pair(farLast: true), new MeshPicture.Canvas(96, 1)).Rgba, MeshPicture.Of(Pair(farLast: true), canvas).Rgba));
+        }
+
+        // Nothing sensible asked for is every processor, and nothing absurd is more than a few dozen.
+        Assert.Equal(Environment.ProcessorCount, new MeshPicture.Canvas(8, 0).Threads);
+        Assert.Equal(Environment.ProcessorCount, new MeshPicture.Canvas(8, -3).Threads);
+        Assert.Equal(64, new MeshPicture.Canvas(8, 1000).Threads);
+    }
+
     /// <summary>No canvas is a mistake in the caller, not a picture of nothing.</summary>
     [Fact]
     public void DrawingWithoutACanvasSaysSo()
@@ -448,6 +485,7 @@ public class MeshPictureTests
 
         MeshPicture.Camera camera = MeshPicture.Camera.Of(post, 0f, 0f, 1f, Vector2.Zero);
         Assert.True(camera.Ready);
+        Assert.Equal(40f, camera.Reach);
 
         Assert.InRange(camera.Place(new Vector3(0f, 0f, -40f)).Y * Side, seen.Top - 1f, seen.Top + 1f);
         Assert.InRange(camera.Place(Vector3.Zero).Y * Side, seen.Foot - 1f, seen.Foot + 1f);

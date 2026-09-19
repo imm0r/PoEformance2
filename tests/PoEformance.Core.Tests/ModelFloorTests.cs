@@ -24,6 +24,7 @@ public class ModelFloorTests
         Assert.Empty(Floor(Post(), side: 0f));
         Assert.Empty(Floor(Post(), tile: 0f));
         Assert.Empty(Floor(Post(), tile: float.NaN));
+        Assert.Empty(Floor(Post(), lens: 0f));
         Assert.NotEmpty(Floor(Post()));
 
         Assert.Throws<ArgumentNullException>(
@@ -39,7 +40,9 @@ public class ModelFloorTests
     /// past its origin, so the two places are forty pixels apart on the picture.
     ///
     /// WHICH AXIS IS WHICH IS THE OTHER HALF: the line of constant x runs ALONG y and is the y
-    /// axis. Swapped, the axes are drawn in each other's colour and nothing else changes.
+    /// axis. Swapped, the axes are drawn in each other's colour and nothing else changes. At the
+    /// origin the floor is drawn at the model's own scale, so the axes leave it the way the
+    /// orthographic model's axes do, and only bend away from that further out.
     /// </remarks>
     [Fact]
     public void TheAxesCrossAtTheOriginAndRunAlongTheModelsAxes()
@@ -58,14 +61,105 @@ public class ModelFloorTests
         Assert.NotEmpty(x);
         Assert.NotEmpty(y);
 
-        Assert.All(x, piece => Assert.True(On(piece, origin, alongX), "an x axis piece is off the x axis"));
-        Assert.All(y, piece => Assert.True(On(piece, origin, alongY), "a y axis piece is off the y axis"));
-        Assert.All(x, piece => Assert.False(On(piece, bottom, alongX), "the x axis runs through the box's bottom"));
+        Assert.All(x, piece => Assert.True(Through(piece, origin), "an x axis piece is off a line through the origin"));
+        Assert.All(y, piece => Assert.True(Through(piece, origin), "a y axis piece is off a line through the origin"));
+        Assert.All(x, piece => Assert.False(Through(piece, bottom), "the x axis runs through the box's bottom"));
 
-        // And the grid runs the same two ways, through nothing else.
-        Assert.All(
-            lines.Where(one => one.Stroke == ModelFloor.Stroke.Grid),
-            piece => Assert.True(Parallel(piece, alongX) || Parallel(piece, alongY), "a grid line runs askew"));
+        // Leaving the origin, each axis runs nearer the way the model's own axis does than the
+        // way the other one does - nearer rather than exactly, since a line's picture in
+        // perspective leans by how far its point is from the picture's centre.
+        Vector2 alongXUnit = Vector2.Normalize(alongX);
+        Vector2 alongYUnit = Vector2.Normalize(alongY);
+        ModelFloor.Line nearX = x.OrderBy(piece => Vector2.Distance(piece.From, origin)).First();
+        ModelFloor.Line nearY = y.OrderBy(piece => Vector2.Distance(piece.From, origin)).First();
+        Assert.True(
+            MathF.Abs(Cross(Direction(nearX), alongXUnit)) < MathF.Abs(Cross(Direction(nearX), alongYUnit)),
+            "the x axis leaves the origin nearer the model's y than its x");
+        Assert.True(
+            MathF.Abs(Cross(Direction(nearY), alongYUnit)) < MathF.Abs(Cross(Direction(nearY), alongXUnit)),
+            "the y axis leaves the origin nearer the model's x than its y");
+        Assert.True(MathF.Abs(Cross(Direction(nearX), alongXUnit)) < 0.05f, "the x axis leaves the origin far off the model's x");
+    }
+
+    /// <summary>The floor runs into the distance: lines of a family meet at one point, and fade towards it.</summary>
+    /// <remarks>
+    /// THE REPORT FROM THE LIVE CLIENT ON THE ORTHOGRAPHIC FLOOR: from a little above, where a
+    /// monster is actually looked at from, parallel lines pressed flat lose everything that made
+    /// the floor a floor. In perspective the lines of one family meet at a vanishing point - so,
+    /// looking along the model's y, every line of constant x crosses the y axis at the same place
+    /// - and along each of them the ink falls off towards that point as the lines crowd. With the
+    /// eye moved off to a great distance the same lines are parallel again, which is what shows
+    /// the lens is doing it.
+    /// </remarks>
+    [Fact]
+    public void TheFloorRunsIntoTheDistance()
+    {
+        MeshPicture.Camera camera = MeshPicture.Camera.Of(Post(), 0f, 0.4f, 0.5f, Vector2.Zero);
+        var lines = new List<ModelFloor.Line>();
+        ModelFloor.Of(lines, camera, 600f);
+
+        ModelFloor.Line axis = lines.First(piece => piece.Stroke == ModelFloor.Stroke.AxisY);
+        Vector2 axisDirection = Vector2.Normalize(axis.To - axis.From);
+        List<ModelFloor.Line> slanted = lines
+            .Where(piece => piece.Stroke == ModelFloor.Stroke.Grid && MathF.Abs(Direction(piece).Y) > 0.2f)
+            .ToList();
+        Assert.True(slanted.Count > 20, $"only {slanted.Count} slanted pieces to judge by");
+
+        Vector2? vanishing = null;
+        foreach (ModelFloor.Line piece in slanted)
+        {
+            Vector2 met = Meet(piece, axis.From, axisDirection);
+            vanishing ??= met;
+            Assert.True(Vector2.Distance(met, vanishing.Value) < 2e-3f, $"a line crosses the y axis at {met}, not {vanishing}");
+        }
+
+        // Along a line, the ink falls towards the vanishing point and never rises. A line's pieces
+        // are handed over in order from its near end, each starting where the last one ended,
+        // which is how they are told apart here; the frame's own fade is taken back out first.
+        var runs = 0;
+        var dropped = 0;
+        var last = float.MaxValue;
+        var first = float.NaN;
+        ModelFloor.Line? before = null;
+        foreach (ModelFloor.Line piece in slanted)
+        {
+            if (before is null || Vector2.Distance(before.Value.To, piece.From) > 1e-5f)
+            {
+                runs++;
+                dropped += first - last > 0.1f ? 1 : 0;
+                last = float.MaxValue;
+                first = float.NaN;
+            }
+
+            float fromFade = ModelFloor.Vignette(piece.From);
+            float toFade = ModelFloor.Vignette(piece.To);
+            if (fromFade > 0.05f && toFade > 0.05f)
+            {
+                float near = piece.FromAlpha / fromFade;
+                float far = piece.ToAlpha / toFade;
+                Assert.True(near <= last + 1e-3f && far <= near + 1e-3f, "the ink rises towards the vanishing point");
+                last = far;
+                if (float.IsNaN(first))
+                {
+                    first = near;
+                }
+            }
+
+            before = piece;
+        }
+
+        dropped += first - last > 0.1f ? 1 : 0;
+        Assert.True(runs > 5, $"only {runs} lines to follow");
+        Assert.True(dropped > 3, $"only {dropped} lines actually fade towards the distance");
+
+        // With the eye a million lengths away, the lines of a family are parallel.
+        ModelFloor.Of(lines, camera, 600f, ModelFloor.Tile, 1e6f);
+        List<ModelFloor.Line> flat = lines
+            .Where(piece => piece.Stroke == ModelFloor.Stroke.Grid && MathF.Abs(Direction(piece).Y) > 0.2f)
+            .ToList();
+        Assert.True(flat.Count > 20, $"only {flat.Count} slanted pieces far away");
+        ModelFloor.Line farAxis = lines.First(piece => piece.Stroke == ModelFloor.Stroke.AxisY);
+        Assert.All(flat, piece => Assert.True(Parallel(piece, farAxis.To - farAxis.From), "a distant eye still converges the lines"));
     }
 
     /// <summary>The squares are decades of the game's tile in the model's units, whatever the model's size.</summary>
@@ -169,7 +263,9 @@ public class ModelFloorTests
     /// picture were pressed into a solid band while the ones running into the depth stayed apart.
     /// Each family fades by its own spacing, so tilted most of the way down to level the family
     /// across is at a fraction of the other's ink - and straight down, where nothing is pressed,
-    /// the two are the same, which is what shows the check can fail.
+    /// the two are the same, which is what shows the check can fail. With the eye a million
+    /// lengths away, so that the spacing is the same at every place and a line can be found by
+    /// where the model's own camera puts it.
     /// </remarks>
     [Fact]
     public void AFamilyPressedTogetherByTheTiltIsFainterThanTheOneThatIsNot()
@@ -219,20 +315,23 @@ public class ModelFloorTests
         Assert.Equal(1f, ModelFloor.Vignette(new Vector2(0.5f)));
     }
 
-    /// <summary>Nearly level the floor all but goes, and looking down it is whole.</summary>
+    /// <summary>The floor is whole from a little above, and only lets go in the last degrees to edge on.</summary>
     /// <remarks>
-    /// Blender's fade at steep angles, cubed, and pinned at both ends of the range: without it a
-    /// nearly level view is stripes across the whole frame, since the family running into the
-    /// depth keeps its spacing under any tilt and only this takes it out.
+    /// THE SECOND REPORT ON THE FLOOR FROM THE LIVE CLIENT: Blender's fade by the cube of the
+    /// view's drop took the floor away at exactly the angles a monster is looked at from. So at
+    /// eight degrees the floor is whole, at three it is half way gone, and at one it is all but
+    /// gone - the axes say so, since nothing else fades them.
     /// </remarks>
-    [Fact]
-    public void NearlyLevelTheFloorAllButGoesAndLookingDownItIsWhole()
+    [Theory]
+    [InlineData(0.15f, 0.98f, 1f)]
+    [InlineData(0.05f, 0.45f, 0.55f)]
+    [InlineData(0.02f, 0.05f, 0.15f)]
+    public void TheFloorIsWholeFromALittleAboveAndOnlyGoesEdgeOn(float tilt, float least, float most)
     {
-        float level = Floor(Post(), tilt: 0.05f).Max(piece => MathF.Max(piece.FromAlpha, piece.ToAlpha));
-        Assert.InRange(level, 0.12f, 0.15f);
-
-        float down = Floor(Post(), tilt: 1f).Max(piece => MathF.Max(piece.FromAlpha, piece.ToAlpha));
-        Assert.True(down > 0.9f, $"looking down the floor should be whole, not {down:F3}");
+        float axes = Floor(Post(), tilt: tilt)
+            .Where(piece => piece.Stroke != ModelFloor.Stroke.Grid)
+            .Max(piece => MathF.Max(Raw(piece), 0f));
+        Assert.InRange(axes, least, most);
     }
 
     /// <summary>The floor is behind the model from above and in front of it from below.</summary>
@@ -317,7 +416,7 @@ public class ModelFloorTests
     {
         MeshPicture.Camera camera = MeshPicture.Camera.Of(Post(), 0f, tilt, 0.5f, Vector2.Zero);
         var lines = new List<ModelFloor.Line>();
-        ModelFloor.Of(lines, camera, 400f);
+        ModelFloor.Of(lines, camera, 400f, ModelFloor.Tile, 1e6f);
 
         float acrossAt = camera.Place(new Vector3(0f, 25f, 0f)).Y;
         float intoAt = camera.Place(new Vector3(25f, 0f, 0f)).X;
@@ -384,24 +483,39 @@ public class ModelFloorTests
         return at;
     }
 
-    private static bool On(ModelFloor.Line piece, Vector2 through, Vector2 along)
-        => Parallel(piece, along) && MathF.Abs(Cross(piece.From - through, along)) / along.Length() < 1e-4f;
+    /// <summary>Whether the line a piece lies on passes through a point.</summary>
+    private static bool Through(ModelFloor.Line piece, Vector2 point)
+    {
+        Vector2 run = piece.To - piece.From;
+        return MathF.Abs(Cross(point - piece.From, run)) / run.Length() < 1e-4f;
+    }
 
     private static bool Parallel(ModelFloor.Line piece, Vector2 along)
     {
         Vector2 run = piece.To - piece.From;
-        return MathF.Abs(Cross(run, along)) < 1e-4f * run.Length() * along.Length();
+        return MathF.Abs(Cross(run, along)) < 1e-3f * run.Length() * along.Length();
     }
+
+    /// <summary>Where the line a piece lies on crosses the line through <paramref name="at"/> along <paramref name="direction"/>.</summary>
+    private static Vector2 Meet(ModelFloor.Line piece, Vector2 at, Vector2 direction)
+    {
+        Vector2 run = piece.To - piece.From;
+        float t = Cross(at - piece.From, direction) / Cross(run, direction);
+        return piece.From + (run * t);
+    }
+
+    private static Vector2 Direction(ModelFloor.Line piece) => Vector2.Normalize(piece.To - piece.From);
 
     private static float Cross(Vector2 a, Vector2 b) => (a.X * b.Y) - (a.Y * b.X);
 
     private static Vector2 Flat(Vector3 placed) => new(placed.X, placed.Y);
 
     private static List<ModelFloor.Line> Floor(
-        SkinnedMesh? mesh, float turn = 0f, float tilt = 0.5f, float zoom = 1f, float side = 400f, float tile = ModelFloor.Tile)
+        SkinnedMesh? mesh, float turn = 0f, float tilt = 0.5f, float zoom = 1f, float side = 400f,
+        float tile = ModelFloor.Tile, float lens = ModelFloor.Lens)
     {
         var lines = new List<ModelFloor.Line>();
-        ModelFloor.Of(lines, MeshPicture.Camera.Of(mesh, turn, tilt, zoom, Vector2.Zero), side, tile);
+        ModelFloor.Of(lines, MeshPicture.Camera.Of(mesh, turn, tilt, zoom, Vector2.Zero), side, tile, lens);
         return lines;
     }
 
