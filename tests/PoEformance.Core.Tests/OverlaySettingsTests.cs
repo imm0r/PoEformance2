@@ -180,7 +180,9 @@ public class OverlaySettingsRoundTripTests
             ItemRarity.Magic,
             ModelGrey: true,
             ModelGreyFactor: 0.62f,
-            ModelBackdrop: "Checker");
+            ModelBackdrop: "Checker",
+            ModelOutline: "Inward",
+            ModelOutlineWidth: 0f);
 
         string path = TempPath();
         try
@@ -191,6 +193,12 @@ public class OverlaySettingsRoundTripTests
             Assert.True(read.ModelGrey);
             Assert.Equal(0.62f, read.ModelGreyFactor);
             Assert.Equal("Checker", read.ModelBackdrop);
+            Assert.Equal("Inward", read.ModelOutline);
+
+            // ZERO HAS TO SURVIVE, and it is the reason the unset value is negative: zero is
+            // how somebody switches the rim off, and a file that read it back as "nothing was
+            // said" would put the rim on again at every launch.
+            Assert.Equal(0f, read.ModelOutlineWidth);
         }
         finally
         {

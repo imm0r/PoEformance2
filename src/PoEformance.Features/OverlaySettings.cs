@@ -173,6 +173,16 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("modelGreyFactor")] float ModelGreyFactor = 0f,
     [property: JsonPropertyName("modelBackdrop")] string ModelBackdrop = "",
 
+    // The black rim an exported icon gets, which side of the silhouette it is on and how wide
+    // it is in CELL pixels. Kept for the same reason the greying factor is: both decide what
+    // ends up in the file, and an icon set made over several evenings has to keep matching.
+    //
+    // MINUS ONE MEANS "NOT SET" here rather than zero, because zero is a real answer - it is
+    // how the rim is switched off - and a file that has never been written must not read as
+    // somebody having turned it off. See MonsterPortrait.
+    [property: JsonPropertyName("modelOutline")] string ModelOutline = "",
+    [property: JsonPropertyName("modelOutlineWidth")] float ModelOutlineWidth = -1f,
+
     // Whether the monster book's facet rail has a pane of its own. ON by default, because a rail
     // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is
     // read WHILE PLAYING: three panes wide enough to read is most of a monitor, and the game wants

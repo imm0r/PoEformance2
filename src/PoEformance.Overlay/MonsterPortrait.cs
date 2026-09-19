@@ -136,6 +136,14 @@ public sealed class MonsterPortrait
         + "the game's own Inactive icons run 0.47 to 1.14 of it;\n"
         + "0.78 is the median over its 27 boss pairs.";
 
+    /// <summary>What the outline is, said where somebody asks it.</summary>
+    /// <remarks>The measurement, because the number is otherwise somebody's taste. See PictureOutline.</remarks>
+    private const string RimSaid =
+        "the black rim the game's own icons have.\n"
+        + "measured over its 27 boss icons: the outermost\n"
+        + "pixel is black, the second half way out of it,\n"
+        + "and the art starts at the third. zero draws none.";
+
     /// <summary>What the export button does, said where somebody asks it.</summary>
     private const string SaveSaid =
         "writes this pose as icon art: colour and greyed,\n"
@@ -294,6 +302,34 @@ public sealed class MonsterPortrait
     /// <summary>Which monster the pair is of, for the window's title.</summary>
     private string _shotStem = string.Empty;
 
+    /// <summary>
+    /// The export's own pictures, kept so the outline can be changed without drawing again.
+    /// </summary>
+    /// <remarks>
+    /// THE SOURCES ARE THE GREYED AND UNGREYED RENDERS WITH NO OUTLINE ON THEM, because the
+    /// outline is the one setting somebody changes while LOOKING at the result - and redrawing
+    /// a thousand-square model for a slider would be forty milliseconds a tick of something
+    /// the pose did not change. What is made from them is kept beside them, so the button that
+    /// writes the files and the pictures on screen cannot come from different pixels.
+    /// </remarks>
+    private byte[] _shotColourSource = [];
+    private byte[] _shotGreySource = [];
+    private byte[] _shotColourFull = [];
+    private byte[] _shotGreyFull = [];
+    private byte[] _shotColourCell = [];
+    private byte[] _shotGreyCell = [];
+    private int _shotWide;
+    private int _shotTall;
+    private string _shotFolder = string.Empty;
+
+    /// <summary>Whether the files on disk are what the window is showing.</summary>
+    /// <remarks>
+    /// The outline can be changed after an export, so the two can differ - and a preview that
+    /// silently disagreed with the file would be worse than no preview. False puts a line under
+    /// the pictures saying so, which is what the write button is for.
+    /// </remarks>
+    private bool _shotWritten;
+
     /// <summary>Whether the window showing them is up. Opened by an export, closed by its cross.</summary>
     private bool _shotsOpen;
 
@@ -445,6 +481,20 @@ public sealed class MonsterPortrait
 
     /// <summary>How much of the colour's mean the grey keeps. See <see cref="PictureGrey.Measured"/>.</summary>
     public float GreyFactor { get; set; } = PictureGrey.Measured;
+
+    /// <summary>
+    /// Which side of the model the black rim the game's icons have is drawn on.
+    /// </summary>
+    /// <remarks>
+    /// OUTWARDS by default, which is the side a rendered model can afford - see
+    /// <see cref="PictureOutline"/>. Both are offered because they lose different things, and
+    /// the switch is in the preview window rather than out here: which one is right depends on
+    /// what the icon looks like at 64 pixels, so it belongs where that is on screen.
+    /// </remarks>
+    public OutlineSide Outline { get; set; } = OutlineSide.Outward;
+
+    /// <summary>How wide that rim is, in CELL pixels. Zero draws none. See the same type.</summary>
+    public float OutlineWidth { get; set; } = PictureOutline.Measured;
 
     /// <summary>What is painted behind the model.</summary>
     public ModelBackdrop Behind { get; set; } = ModelBackdrop.Viewport;
@@ -983,11 +1033,80 @@ public sealed class MonsterPortrait
             ImGui.Dummy(new Vector2(0f, ImGui.GetStyle().ItemSpacing.Y));
             Pair(IconSheet.Tile * Closer, $"{Closer} times that, to look at");
 
+            ImGui.Separator();
+            Rim();
             ImGuiText.Wrapped(OverlayInk.Quiet, _exported);
         }
 
         ImGui.End();
         _shotsOpen = open;
+    }
+
+    /// <summary>
+    /// The black rim: how wide, which side, and the button that writes the result.
+    /// </summary>
+    /// <remarks>
+    /// IN THIS WINDOW AND NOT IN THE PANE, which is where it was asked for and is also where it
+    /// belongs: whether an outline helps is a question about what the icon looks like at 64
+    /// pixels, and the answer is two inches away from the control. Nothing is re-rendered when
+    /// it moves - the model's own pictures are kept - so the pair above changes as fast as the
+    /// slider is let go of.
+    ///
+    /// ON RELEASE RATHER THAN PER TICK, for the reason <see cref="Remake"/> gives: two distance
+    /// transforms and two downscales over a megapixel is a tenth of a second, which is once
+    /// worth paying and sixty times a second is not. The same rule the keep-out boxes use for
+    /// their drag.
+    ///
+    /// AND THE FILES DO NOT FOLLOW ON THEIR OWN. Writing four PNGs on every change would
+    /// hammer the disk while somebody is deciding; instead the line underneath says when what
+    /// is on screen is newer than what was written, and the button settles it.
+    /// </remarks>
+    private void Rim()
+    {
+        float wide = ImGui.CalcTextSize("0.00").X * 4f;
+
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextDisabled("outline");
+
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(wide);
+        float width = OutlineWidth;
+        if (ImGui.SliderFloat("##monster-outline-width", ref width, 0f, PictureOutline.Widest, "%.1f px"))
+        {
+            OutlineWidth = width;
+        }
+
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            Remake();
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(RimSaid);
+        }
+
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(wide * 1.6f);
+        int side = (int)Outline;
+        if (ImGui.Combo("##monster-outline-side", ref side, "none\0outward\0inward\0"))
+        {
+            Outline = (OutlineSide)side;
+            Remake();
+            Changed?.Invoke();
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("write##monster-rewrite"))
+        {
+            Write();
+        }
+
+        if (!_shotWritten)
+        {
+            ImGuiText.Wrapped(OverlayInk.Quiet, "what is shown is newer than what was written.");
+        }
     }
 
     /// <summary>The two halves side by side at one size, with a line saying what the size is.</summary>
@@ -1663,9 +1782,8 @@ public sealed class MonsterPortrait
 
         try
         {
-            string folder = Folder;
-            Directory.CreateDirectory(folder);
-            string stem = Stem(_wanted);
+            _shotFolder = Folder;
+            Directory.CreateDirectory(_shotFolder);
 
             var canvas = new MeshPicture.Canvas(Shot);
             GamePicture shot = Taken(canvas);
@@ -1675,54 +1793,115 @@ public sealed class MonsterPortrait
                 return;
             }
 
+            // THE SOURCES ARE KEPT WITHOUT AN OUTLINE, so the window can put one on, take it
+            // off and change its side without the model being drawn again - see the fields.
             int bytes = shot.Width * shot.Height * 4;
-            byte[] colour = shot.Rgba.AsSpan(0, bytes).ToArray();
+            _shotColourSource = shot.Rgba.AsSpan(0, bytes).ToArray();
             PictureGrey.Apply(shot.Rgba.AsSpan(0, bytes), GreyFactor);
-            byte[] grey = shot.Rgba.AsSpan(0, bytes).ToArray();
-
-            int wide = shot.Width;
-            int tall = shot.Height;
-
-            // THE SMALL PAIR IS MADE ONCE AND USED TWICE - shown here and written to disk - so
-            // the preview cannot differ from the file. Downscaling on this thread rather than
-            // with the writing is what makes the preview appear on the frame the button was
-            // pressed, which is the whole point of having one.
-            byte[] cellColour = Cell(colour, wide, tall);
-            byte[] cellGrey = Cell(grey, wide, tall);
-            Shown(cellColour, cellGrey);
-            _shotStem = stem;
+            _shotGreySource = shot.Rgba.AsSpan(0, bytes).ToArray();
+            _shotWide = shot.Width;
+            _shotTall = shot.Height;
+            _shotStem = Stem(_wanted);
             _shotsOpen = true;
 
-            // THE DRAW IS HERE AND THE WRITING IS NOT, which is the split that matters: the
-            // picture has to be taken from the pose that is on screen right now, and encoding
-            // two PNGs - one of them a megapixel - is a tenth of a second of somebody's frame
-            // for no reason. The pixels are copies, so nothing the pane does next can reach
-            // them, and the line under the picture arrives a frame or two later.
-            _exported = $"writing {stem}Active and {stem}Inactive…";
-            _ = Task.Run(() =>
-            {
-                try
-                {
-                    Png(Path.Combine(folder, $"{stem}Active.png"), cellColour, IconSheet.Tile, IconSheet.Tile);
-                    Png(Path.Combine(folder, $"{stem}Inactive.png"), cellGrey, IconSheet.Tile, IconSheet.Tile);
-                    Png(Path.Combine(folder, $"{stem}Active-{wide}.png"), colour, wide, tall);
-                    Png(Path.Combine(folder, $"{stem}Inactive-{wide}.png"), grey, wide, tall);
-
-                    _exported = $"wrote 4 files as {stem}Active/Inactive in {folder}";
-                }
-                catch (Exception exception) when (exception is IOException or UnauthorizedAccessException
-                    or NotSupportedException or ImageFormatException)
-                {
-                    _exported = $"could not write the pictures: {exception.Message}";
-                }
-            });
+            Remake();
+            Write();
         }
         catch (Exception exception) when (exception is not (OutOfMemoryException or StackOverflowException))
         {
             // The draw thread is the one place an exception costs the whole session, and this
             // one touches a disk somebody else's software may have a lock on.
-            _exported = $"could not write the pictures: {exception.Message}";
+            _exported = $"could not make the pictures: {exception.Message}";
         }
+    }
+
+    /// <summary>
+    /// Builds the four pictures from the kept renders, and shows the small pair.
+    /// </summary>
+    /// <remarks>
+    /// THE OUTLINE IS DRAWN AT THE RENDER'S OWN SIZE and the cell is made from the result,
+    /// which is what antialiases it: sixteen picture pixels to a cell pixel means the
+    /// downscale does the smoothing, and the width asked for is in CELL pixels because that is
+    /// the size the thing is judged at. Drawing it on the cell instead would give a hard edge
+    /// that no amount of care afterwards can soften.
+    ///
+    /// GREY FIRST, OUTLINE SECOND, and it is the order the measurement asks for: the game's
+    /// Inactive icons carry the same black rim as their Active pair, so the rim must not be
+    /// greyed. Black survives a multiply anyway; the order is what keeps that true if the
+    /// greying ever stops being one.
+    ///
+    /// Run when an export happens and whenever the outline is changed in the window - not per
+    /// frame, and not while a slider is being dragged: two distance transforms and two Lanczos
+    /// downscales over a megapixel each is a tenth of a second, which is fine once and awful
+    /// sixty times a second.
+    /// </remarks>
+    private void Remake()
+    {
+        if (_shotColourSource.Length == 0 || _shotWide <= 0 || _shotTall <= 0)
+        {
+            return;
+        }
+
+        float radius = OutlineWidth * _shotWide / IconSheet.Tile;
+
+        _shotColourFull = (byte[])_shotColourSource.Clone();
+        _shotGreyFull = (byte[])_shotGreySource.Clone();
+        PictureOutline.Apply(_shotColourFull, _shotWide, _shotTall, radius, Outline);
+        PictureOutline.Apply(_shotGreyFull, _shotWide, _shotTall, radius, Outline);
+
+        _shotColourCell = Cell(_shotColourFull, _shotWide, _shotTall);
+        _shotGreyCell = Cell(_shotGreyFull, _shotWide, _shotTall);
+
+        Shown(_shotColourCell, _shotGreyCell);
+        _shotWritten = false;
+    }
+
+    /// <summary>
+    /// Writes what the window is showing: the small pair and the big one, colour and greyed.
+    /// </summary>
+    /// <remarks>
+    /// THE DRAW IS NOT HERE, which is the split that matters. The pictures were made from the
+    /// pose that was on screen; encoding four PNGs - two of them a megapixel - is a tenth of a
+    /// second of somebody's frame for no reason, so it happens on a task. The arrays are the
+    /// ones the window is showing rather than copies of them, and nothing writes to them
+    /// except <see cref="Remake"/>, which replaces them wholesale.
+    /// </remarks>
+    private void Write()
+    {
+        if (_shotColourCell.Length == 0)
+        {
+            return;
+        }
+
+        string folder = _shotFolder;
+        string stem = _shotStem;
+        byte[] colourCell = _shotColourCell;
+        byte[] greyCell = _shotGreyCell;
+        byte[] colourFull = _shotColourFull;
+        byte[] greyFull = _shotGreyFull;
+        int wide = _shotWide;
+        int tall = _shotTall;
+
+        _exported = $"writing {stem}Active and {stem}Inactive…";
+        _shotWritten = true;
+
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                Png(Path.Combine(folder, $"{stem}Active.png"), colourCell, IconSheet.Tile, IconSheet.Tile);
+                Png(Path.Combine(folder, $"{stem}Inactive.png"), greyCell, IconSheet.Tile, IconSheet.Tile);
+                Png(Path.Combine(folder, $"{stem}Active-{wide}.png"), colourFull, wide, tall);
+                Png(Path.Combine(folder, $"{stem}Inactive-{wide}.png"), greyFull, wide, tall);
+
+                _exported = $"wrote 4 files as {stem}Active/Inactive in {folder}";
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException
+                or NotSupportedException or ImageFormatException)
+            {
+                _exported = $"could not write the pictures: {exception.Message}";
+            }
+        });
     }
 
     /// <summary>Draws the model as it stands, at the export's own size.</summary>
@@ -1822,6 +2001,16 @@ public sealed class MonsterPortrait
         _shotGreyKey = string.Empty;
         _shotStem = string.Empty;
         _shotsOpen = false;
+
+        // The kept renders go too. Six of these are a megapixel of RGBA each, which is worth
+        // holding while they are on screen and worth nothing at all once they are not.
+        _shotColourSource = [];
+        _shotGreySource = [];
+        _shotColourFull = [];
+        _shotGreyFull = [];
+        _shotColourCell = [];
+        _shotGreyCell = [];
+        _shotWritten = false;
     }
 
     /// <summary>
