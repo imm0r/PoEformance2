@@ -14,10 +14,18 @@ namespace PoEformance.Overlay;
 /// invisible button between the panes takes the drag, and the boundary moves with it.
 ///
 /// The position is kept as a SHARE of the window rather than as pixels, so resizing the
-/// window keeps the proportions instead of keeping the left pane. It lives for the session
-/// and starts each launch at the pane's old default: where a window SITS is a decision and
-/// is written down, but how the space inside it is dealt this hour is a working adjustment,
-/// like a scroll position.
+/// window keeps the proportions instead of keeping the left pane.
+///
+/// WHETHER IT OUTLIVES THE SESSION IS THE CALLER'S, and it used to be settled here: a boundary
+/// started every launch at its default, on the argument that how the space inside a window is
+/// dealt this hour is a working adjustment like a scroll position. That holds for a window with
+/// two panes and one obvious split. It does not hold for the monster book, which was reported
+/// from the live client: three panes, a table whose columns somebody has widened to fit, and a
+/// model pane sized to the monitor - that is a reading layout somebody sets up once, and having
+/// it thrown away on every launch is the whole complaint. So a caller that wants it kept reads
+/// <see cref="Share"/>, writes it down when <see cref="Settled"/> says a drag ended, and hands
+/// it back through <see cref="Restore"/>. A caller that does not simply leaves all three alone
+/// and gets exactly the old behaviour.
 /// </remarks>
 /// <param name="share">How much of the width the left pane starts with.</param>
 /// <param name="name">
@@ -51,6 +59,33 @@ public sealed class PaneSplit(float share, string name = "pane")
     /// <summary>The whole width at the moment it was dealt, for turning a drag into a share.</summary>
     private float _width;
 
+    /// <summary>Whether the boundary was being dragged last frame, and whether that drag moved it.</summary>
+    private bool _dragging;
+    private bool _moved;
+
+    /// <summary>How much of the width the left pane has, for a caller that writes it down.</summary>
+    public float Share => _share;
+
+    /// <summary>
+    /// Told once when a drag of this boundary ends, having moved it.
+    /// </summary>
+    /// <remarks>
+    /// WHEN THE DRAG ENDS AND NOT WHILE IT RUNS. The settings file is rewritten whole by whoever
+    /// listens to this, and a boundary being dragged moves on every frame of the drag - sixty
+    /// rewrites a second for one adjustment. A drag that ended where it started says nothing and
+    /// is not reported.
+    /// </remarks>
+    public Action? Settled { get; set; }
+
+    /// <summary>Puts back a share that was written down. Nonsense is ignored, so the default stands.</summary>
+    public void Restore(double share)
+    {
+        if (double.IsFinite(share) && share > 0d)
+        {
+            _share = Math.Clamp((float)share, Least, Most);
+        }
+    }
+
     /// <summary>The left pane's width right now. Ask just before beginning that pane.</summary>
     public float Left()
     {
@@ -75,10 +110,23 @@ public sealed class PaneSplit(float share, string name = "pane")
             ImGui.SetMouseCursor(ImGuiMouseCursor.ResizeEW);
         }
 
-        if (held && _width > 0f)
+        if (held && _width > 0f && ImGui.GetIO().MouseDelta.X != 0f)
         {
             _share = Math.Clamp(_share + (ImGui.GetIO().MouseDelta.X / _width), Least, Most);
+            _moved = true;
         }
+
+        if (_dragging && !held)
+        {
+            if (_moved)
+            {
+                Settled?.Invoke();
+            }
+
+            _moved = false;
+        }
+
+        _dragging = held;
 
         // Faint always and brighter under the mouse: a handle nobody can see is a handle
         // nobody finds, and one that never reacts does not read as a handle at all.

@@ -266,10 +266,12 @@ carried round on its own by the **orbit button** at the picture's top right — 
 seconds (`MonsterPortrait.Orbit`) at the current distance, with dragging off until the button is
 pressed again, which is the one thing that stops it. It stands on a floor of the game's own tiles
 that turns with it — drawn by the overlay as lines, not into the picture; see the floor bullet
-below. Above the picture is one row: the animation combo, only as wide as its longest name and
-reopening at the one playing, the count of animations after it, and at the right the pane's **own
-frame rate** — pictures drawn a second, zero at rest (`RedrawRate`) — before Play/Pause. The
-animation's progress is a bar over the picture's top edge with the frame counter in it. Under the
+below. Above the picture is one row: the label *animation*, the combo, only as wide as its
+longest name and reopening at the one playing, the bare count in brackets after it, and at the
+right the pane's **own frame rate** — pictures drawn a second, zero at rest (`RedrawRate`) —
+before Play/Pause. The animation's progress is a bar over the picture's top edge with the frame
+counter in it; it hangs from the same line as the orbit button and is deliberately *not* the
+same height, since only the button had to grow to be recognisable at all. Under the
 picture are short lines rather than a tooltip: what the click read, what the mouse does, what the
 floor's squares are, why a monster is in plain ink or holds still, and a notice when a model
 stands in a pit (the bullet below). There *was* a tooltip, and it came up exactly where the
@@ -379,6 +381,33 @@ false`. What cost time to rediscover here is written down:
   settled by reading code. `MonsterModel.Paint` carries the reason, and the last of them is not a
   failure at all: a mesh with no texture coordinates has a perfectly good texture and no way to
   look it up, which is the expected state of a bare body whose clothes are attached objects.
+- **The whole book is set in the monospace, and that is a reading decision.** It is a table of
+  2792 rows, a pane of percentages and ranges, and a pane of status lines — and the body face is
+  a serif whose figures are **old-style**, where a 6 stands taller than a 7 and a 2 hangs below
+  the line. A column of those does not line up and does not scan, which is how it was reported.
+  `OverlayFonts` already had the face in the atlas for exactly this reason (see the flask count
+  below); `DrawTab` pushes it around everything the window draws. The monster's **name** is the
+  one exception and stays in the serif heading: it is the only line here that is neither dense
+  nor numeric, and it is what says which monster the panes beside it describe. Where the machine
+  has no monospace at all the push is a no-op and the book looks as it did.
+- **A dragged width has to be written down by the tool, because nobody else writes it.** ImGui
+  keeps a table's column widths for as long as the table lives and puts them in an ini file this
+  tool neither reads nor writes, and `PaneSplit` deliberately started every boundary at its
+  default — so the monster book's reading layout was thrown away on every launch, which is the
+  complaint. `monsterColumnWidths` and `monsterPanes` now carry both, **by name** for the reason
+  `monsterColumns` already is: a column added anywhere but the end shifts every number after it.
+  Reading a width back is the awkward half — ImGui.NET 1.91.6 binds neither `TableGetColumnWidth`
+  nor `TableSetColumnWidth`, in the wrapper or in `ImGuiNative` — so `DataGrid` measures it at the
+  start of each header cell, where the content region is exactly the column's given width
+  (`TableBeginCell` sets the cursor to `WorkMinX` and the work rect's right edge to `WorkMaxX`,
+  and `WorkMaxX - WorkMinX` is `WidthGiven` by construction). Putting one back is
+  `TableSetupColumn`'s init width, which ImGui applies only while the table is initialising and
+  only where the column has no width of its own — so handing it the same number every frame does
+  not fight a drag in progress. A **stretch** column's init number is a *weight* rather than a
+  width, and feeding it the saved width is right regardless: ImGui divides the room in proportion
+  to the weights, so weights proportional to the saved widths reproduce the saved proportions.
+  Both the grid and the splitters report when a drag **ends**, never while it runs: the settings
+  file is rewritten whole, and a boundary being dragged moves sixty times a second.
 - **A widget over the picture gets the pointer only if it is submitted after the picture, and
   only with the picture marked `SetNextItemAllowOverlap`.** `ItemHoverable` hands the hover to
   the first item that claims it, so a button drawn before the picture and inside its rectangle

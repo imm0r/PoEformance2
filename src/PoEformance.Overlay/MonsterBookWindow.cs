@@ -91,11 +91,16 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     private static readonly List<string> _weak = [];
     private static readonly List<string> _quiet = [];
 
-    private readonly PaneSplit _rail = new(0.2f, "rail");
-    private readonly PaneSplit _split = new(0.46f, "list");
+    /// <summary>What each boundary is known by - to ImGui, and in the settings file.</summary>
+    private const string RailPane = "rail";
+    private const string ListPane = "list";
+    private const string ModelPane = "model";
+
+    private readonly PaneSplit _rail = new(0.2f, RailPane);
+    private readonly PaneSplit _split = new(0.46f, ListPane);
 
     /// <summary>Where the detail pane ends and the model's begins. Of the room those two share.</summary>
-    private readonly PaneSplit _model = new(0.58f, "model");
+    private readonly PaneSplit _model = new(0.58f, ModelPane);
     private readonly DataGrid _grid = new();
 
     /// <summary>What each of the rail's fields holds within the rows that are left.</summary>
@@ -206,17 +211,96 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// <summary>Told when somebody changes the layout, so the choice can be kept.</summary>
     public Action? Changed { get; set; }
 
+    /// <summary>How wide each column is, by name, for whoever writes the settings file.</summary>
+    public IReadOnlyDictionary<string, int> ColumnWidths => _grid.Widths;
+
+    /// <summary>Where the three boundaries are, by the name each was made with.</summary>
+    /// <remarks>
+    /// A DICTIONARY AND NOT THREE NUMBERS, so a fourth pane needs no new settings key and an old
+    /// file missing one of them simply leaves that boundary at its default - which is what a
+    /// build that had two panes writes for a build that has three.
+    /// </remarks>
+    public IReadOnlyDictionary<string, double> Panes => new Dictionary<string, double>(StringComparer.Ordinal)
+    {
+        [RailPane] = _rail.Share,
+        [ListPane] = _split.Share,
+        [ModelPane] = _model.Share,
+    };
+
     /// <summary>Puts back what a settings file remembered. Nulls leave the defaults.</summary>
-    public void Show(IReadOnlyList<string>? columns, bool? rail = null, bool? model = null)
+    public void Show(
+        IReadOnlyList<string>? columns,
+        bool? rail = null,
+        bool? model = null,
+        IReadOnlyDictionary<string, int>? widths = null,
+        IReadOnlyDictionary<string, double>? panes = null)
     {
         _wanted = columns is { Count: > 0 } ? columns : null;
         _railOpen = rail ?? _railOpen;
         _modelOpen = model ?? _modelOpen;
+        _grid.Restore(widths);
+
+        if (panes is not null)
+        {
+            Put(panes, RailPane, _rail);
+            Put(panes, ListPane, _split);
+            Put(panes, ModelPane, _model);
+        }
+
+        // WIRED HERE rather than where the fields are made, because a field initialiser cannot
+        // see this window's own Changed - and all four of these write the same settings file.
+        // Assigning the same method again on a second Show is harmless.
+        _grid.Settled = Moved;
+        _rail.Settled = Moved;
+        _split.Settled = Moved;
+        _model.Settled = Moved;
+
         Layout();
+
+        static void Put(IReadOnlyDictionary<string, double> panes, string name, PaneSplit split)
+        {
+            if (panes.TryGetValue(name, out double share))
+            {
+                split.Restore(share);
+            }
+        }
     }
 
-    /// <summary>Draws the tab.</summary>
+    /// <summary>Somebody dragged a boundary or a column edge, and it came to rest.</summary>
+    private void Moved() => Changed?.Invoke();
+
+    /// <summary>
+    /// Draws the tab, in the face a table of figures belongs in.
+    /// </summary>
+    /// <remarks>
+    /// THE WHOLE BOOK IN THE MONOSPACE, which is a reading decision rather than a preference and
+    /// was asked for from the live client. This window is a table of 2792 rows, a pane of
+    /// percentages and ranges, and a pane of status lines - and the body face is a serif whose
+    /// digits are OLD-STYLE, where a 6 stands taller than a 7 and a 2 hangs below the line. A
+    /// column of those does not line up and does not scan; the monospace's digits are lining and
+    /// all one width, which is the whole reason that face is in the atlas (see
+    /// <see cref="OverlayFonts"/>). It costs nothing where there is no monospace on the machine:
+    /// the push is a no-op and the book looks exactly as it did.
+    ///
+    /// THE MONSTER'S NAME STAYS IN THE SERIF, which is the one exception and a deliberate one.
+    /// It is the only line here that is neither dense nor numeric, and it is what says which
+    /// monster the two panes beside it are describing - see <see cref="Identity"/>, whose heading
+    /// push lands inside this one and wins, as ImGui's font stack does.
+    /// </remarks>
     public void DrawTab()
+    {
+        OverlayFonts.PushMono();
+        try
+        {
+            Book();
+        }
+        finally
+        {
+            OverlayFonts.PopMono();
+        }
+    }
+
+    private void Book()
     {
         MonsterVarieties all = table();
         StatDescriptions said = sentences();
@@ -1007,17 +1091,12 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             ImGui.TextDisabled("(the game gives this one no name)");
         }
 
-        OverlayFonts.PushMono();
-        try
+        // The path used to push the monospace for itself - it is the one line here somebody reads
+        // out and types back in, where 0/O and 1/l have to be different shapes. The whole window
+        // is in that face now (see DrawTab), so the push would only be a second one.
+        if (ImGui.Selectable($"{_chosen}###monster-path", false))
         {
-            if (ImGui.Selectable($"{_chosen}###monster-path", false))
-            {
-                ImGui.SetClipboardText(_chosen);
-            }
-        }
-        finally
-        {
-            OverlayFonts.PopMono();
+            ImGui.SetClipboardText(_chosen);
         }
 
         if (ImGui.IsItemHovered())

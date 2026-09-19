@@ -107,6 +107,17 @@ public sealed class MonsterPortrait
     /// <summary>The most the progress bar is allowed to be, in font sizes: a wide pane does not need a wide bar.</summary>
     private const float ProgressSpan = 14f;
 
+    /// <summary>How big the orbit button's art is, in frame heights.</summary>
+    /// <remarks>
+    /// TWICE, because at one it could not be made out at all - reported from the live client as a
+    /// button that is simply not there. Two things were against it at that size. The art is a
+    /// black tile with a thin white drawing on it, which over a dark backdrop reads as a smudge
+    /// rather than as a control; and a drawing of a cube inside a broken circle has detail that
+    /// nineteen pixels cannot hold. In frame heights rather than pixels, so it follows the text
+    /// size the way every other control in the row does.
+    /// </remarks>
+    private const float OrbitFaces = 2f;
+
     /// <summary>The line under the picture that says what the mouse does.</summary>
     private const string Gestures = "drag turns · wheel zooms at the pointer · double-click resets";
 
@@ -554,20 +565,26 @@ public sealed class MonsterPortrait
     private void Overlays(Vector2 corner, float side)
     {
         ImGuiStylePtr style = ImGui.GetStyle();
-        float image = ImGui.GetFrameHeight();
-        float tall = image + (style.FramePadding.Y * 2f);
         float inset = style.ItemSpacing.X;
+        float top = corner.Y + inset;
 
-        IntPtr icon = OrbitIcon((int)MathF.Round(image));
-        float wide = icon != IntPtr.Zero ? tall : ImGui.CalcTextSize("orbit").X + (style.FramePadding.X * 2f);
-        ImGui.SetCursorScreenPos(new Vector2(corner.X + side - wide - inset, corner.Y + inset));
+        // THE TWO ARE SIZED APART AND SHARE ONLY THE LINE THEY HANG FROM. The button had to grow
+        // to be recognisable at all; the counter did not, and a bar as tall as the button is a
+        // slab across the top of the picture. So the bar keeps the height it had - a frame and
+        // the button's own padding - and only the top edges line up.
+        float counter = ImGui.GetFrameHeight() + (style.FramePadding.Y * 2f);
+
+        float art = MathF.Round(ImGui.GetFrameHeight() * OrbitFaces);
+        IntPtr icon = OrbitIcon((int)art);
+        float wide = (icon != IntPtr.Zero ? art : ImGui.CalcTextSize("orbit").X) + (style.FramePadding.X * 2f);
+        ImGui.SetCursorScreenPos(new Vector2(corner.X + side - wide - inset, top));
 
         // Shown as running by its background rather than by a tint on the art, the way the icon
         // picker marks its chosen cell: the picture on the button is what says what it does.
         Vector4 back = _orbiting ? OverlayInk.Accent with { W = 0.55f } : Vector4.Zero;
         bool pressed = icon != IntPtr.Zero
-            ? ImGui.ImageButton(OrbitId, icon, new Vector2(image), Vector2.Zero, Vector2.One, back, Vector4.One)
-            : ImGui.Button((_orbiting ? "stop" : "orbit") + OrbitId, new Vector2(wide, tall));
+            ? ImGui.ImageButton(OrbitId, icon, new Vector2(art), Vector2.Zero, Vector2.One, back, Vector4.One)
+            : ImGui.Button((_orbiting ? "stop" : "orbit") + OrbitId, new Vector2(wide, counter));
         if (pressed)
         {
             _orbiting = !_orbiting;
@@ -578,9 +595,17 @@ public sealed class MonsterPortrait
             return;
         }
 
+        // Kept clear of the button at both ends - the bar is centred, so the room it may take is
+        // twice the gap to the button. On any pane worth reading this is nowhere near binding.
         float span = MathF.Min(side * ProgressShare, ImGui.GetFontSize() * ProgressSpan);
-        var at = new Vector2(corner.X + ((side - span) * 0.5f), corner.Y + inset);
-        var size = new Vector2(span, tall);
+        span = MathF.Min(span, side - (2f * (wide + (2f * inset))));
+        if (!(span > 1f))
+        {
+            return;
+        }
+
+        var at = new Vector2(corner.X + ((side - span) * 0.5f), top);
+        var size = new Vector2(span, counter);
         ImGui.SetCursorScreenPos(at);
         ImGui.ProgressBar(_frame / tracks.Frames, size, string.Empty);
 
@@ -994,8 +1019,11 @@ public sealed class MonsterPortrait
             _posedNormals = new Vector3[count];
         }
 
+        // THE BARE NUMBER IN BRACKETS, because the label before the combo already says what is
+        // being counted: "animation [idle_01] 32 animations" says the word twice and reads as
+        // two separate facts rather than as one.
         IReadOnlyList<SkeletonAnimation> moves = _model.Rig.Animations;
-        _count = $"{moves.Count} animation{(moves.Count == 1 ? string.Empty : "s")}";
+        _count = $"({moves.Count})";
 
         var first = 0;
         for (var one = 0; one < moves.Count; one++)
