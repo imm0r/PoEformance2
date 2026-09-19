@@ -159,6 +159,20 @@ public sealed record OverlaySettings(
     // than clamped, so a hand-edited file cannot hide a pane - see PaneSplit.Restore.
     [property: JsonPropertyName("monsterPanes")] IReadOnlyDictionary<string, double>? MonsterPanes = null,
 
+    // The model pane's capture settings, which are what turn a monster into icon art: whether it
+    // is drawn greyed the way the game's Inactive icons are, how much of the colour's mean that
+    // grey keeps, and what is painted behind it. KEPT because the factor goes into the FILE the
+    // export writes - somebody building a set of icons over several evenings must not have it
+    // silently back at the default on the second one. The backdrop is kept beside it because it
+    // is the same decision, made once. See MonsterPortrait and PictureGrey.
+    //
+    // ZERO MEANS "NOT SET" on the factor, the way every other number in this file does: the
+    // measured default lives in the code, where a better measurement can correct it for
+    // everybody who never moved the slider.
+    [property: JsonPropertyName("modelGrey")] bool ModelGrey = false,
+    [property: JsonPropertyName("modelGreyFactor")] float ModelGreyFactor = 0f,
+    [property: JsonPropertyName("modelBackdrop")] string ModelBackdrop = "",
+
     // Whether the monster book's facet rail has a pane of its own. ON by default, because a rail
     // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is
     // read WHILE PLAYING: three panes wide enough to read is most of a monitor, and the game wants

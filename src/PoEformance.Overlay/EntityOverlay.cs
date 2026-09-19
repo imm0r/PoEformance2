@@ -437,6 +437,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _roomWants = settings.RoomsOrDefault;
         _rooms?.Apply(_roomWants);
 
+        // The same handover as the rooms above, and for the same reason: the settings are read
+        // before the monster book is attached, so what they say is remembered here and pressed
+        // onto the pane whenever it turns up - see AttachMonsterBook.
+        _modelWants = settings;
+        Capture(_monsterBook?.Model);
+
         // No handover hole here, unlike the room layer above: the ground names need no route
         // planner, so the layer exists from the start and takes the settings directly.
         _ground.Apply(settings.GroundOrDefault);
@@ -493,6 +499,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 : basis.MonsterPanes,
             MonsterRail = _monsterBook?.RailOpen ?? basis.MonsterRail,
             MonsterModel = _monsterBook?.ModelOpen ?? basis.MonsterModel,
+            ModelGrey = _monsterBook?.Model?.Grey ?? basis.ModelGrey,
+            ModelGreyFactor = _monsterBook?.Model?.GreyFactor ?? basis.ModelGreyFactor,
+            ModelBackdrop = _monsterBook?.Model?.Behind.ToString() ?? basis.ModelBackdrop,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -646,6 +655,41 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// Same hole the stash switches fell into, kept shut the same way.
     /// </remarks>
     private RoomSettings _roomWants = RoomSettings.Default;
+
+    /// <summary>What the settings file said about the model pane, until there is a pane to say it to.</summary>
+    private OverlaySettings _modelWants = OverlaySettings.Default;
+
+    /// <summary>
+    /// Puts the capture settings onto the model pane, wherever it has got to.
+    /// </summary>
+    /// <remarks>
+    /// A ZERO FACTOR IS "NOT SET" rather than a factor of zero, which would draw every model
+    /// black. That is the convention every other number in the settings file follows, and here
+    /// it is what keeps the measured default in the code where a better measurement can correct
+    /// it - see <see cref="PictureGrey.Measured"/>.
+    ///
+    /// The backdrop is stored by NAME. An enum's numbers are an implementation detail and
+    /// reordering them would silently turn somebody's checkerboard into a flat colour; a name
+    /// that no longer exists simply leaves the default standing.
+    /// </remarks>
+    private void Capture(MonsterPortrait? pane)
+    {
+        if (pane is null)
+        {
+            return;
+        }
+
+        pane.Grey = _modelWants.ModelGrey;
+        if (_modelWants.ModelGreyFactor > 0f)
+        {
+            pane.GreyFactor = _modelWants.ModelGreyFactor;
+        }
+
+        if (Enum.TryParse(_modelWants.ModelBackdrop, ignoreCase: true, out ModelBackdrop behind))
+        {
+            pane.Behind = behind;
+        }
+    }
     private readonly RuleLayer _rules = new();
 
     /// <summary>What the rule engine decided to show this tick, or null when it is not wired.</summary>
@@ -2150,6 +2194,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         };
 
         window.Show(columns, rail, model, columnWidths, panes);
+
+        // What the settings file said about the pane, which was read before this existed.
+        Capture(window.Model);
         _monsterBook = window;
 
         _tools.Add(

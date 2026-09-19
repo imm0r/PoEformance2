@@ -164,6 +164,40 @@ public class OverlaySettingsRoundTripTests
         }
     }
 
+    /// <summary>
+    /// The model pane's capture settings survive a restart.
+    /// </summary>
+    /// <remarks>
+    /// THE FACTOR IS THE ONE THAT MATTERS, because it does not only change what is on screen -
+    /// it decides how dark the Inactive half of an exported icon comes out. A set of icons made
+    /// over two evenings with the slider silently back at its default on the second one is a
+    /// set that does not match, and nothing about it looks wrong until they are side by side.
+    /// </remarks>
+    [Fact]
+    public void TheModelPanesCaptureSettingsComeBack()
+    {
+        var wanted = new PoEformance.Features.OverlaySettings(
+            ItemRarity.Magic,
+            ModelGrey: true,
+            ModelGreyFactor: 0.62f,
+            ModelBackdrop: "Checker");
+
+        string path = TempPath();
+        try
+        {
+            Assert.True(PoEformance.Features.OverlaySettingsStore.Save(wanted, path));
+            PoEformance.Features.OverlaySettings read = PoEformance.Features.OverlaySettingsStore.Load(path);
+
+            Assert.True(read.ModelGrey);
+            Assert.Equal(0.62f, read.ModelGreyFactor);
+            Assert.Equal("Checker", read.ModelBackdrop);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
     [Fact]
     public void TheHiddenTabsComeBack()
     {

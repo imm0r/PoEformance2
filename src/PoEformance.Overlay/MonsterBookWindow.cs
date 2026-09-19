@@ -261,6 +261,14 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         _split.Settled = Moved;
         _model.Settled = Moved;
 
+        // And the pane's own capture settings, which are written to the same file: the greying
+        // factor decides what the export puts in a PNG, so a slider moved and not written down
+        // is a set of icons that stops matching after a restart.
+        if (Model is not null)
+        {
+            Model.Changed = Moved;
+        }
+
         Layout();
 
         static void Put(IReadOnlyDictionary<string, double> panes, string name, PaneSplit split)

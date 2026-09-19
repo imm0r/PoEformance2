@@ -100,6 +100,18 @@ collected in `logs/boss-arenas.tsv`, so that file gets filled from what was actu
 Once the boss is down the marker switches to the Inactive art, the way the game's own landmarks
 do. The switch is on the Markers → Map & Places tab.
 
+**Where the game draws no icon for a boss, one is made from the boss itself.** The Monster Book's
+model pane reads the mesh, skin and rig out of the game's own bundles, so a pose picked there can
+be written straight out as icon art: colour and greyed, cut out on transparency, at 64 px for a
+sheet cell and at 1024 to work on. Nothing is keyed by hand — the renderer's background was always
+transparent, and the floor and the controls are drawn around the picture rather than into it. What
+it wrote opens in a small window of its own, both halves at cell size and at three times it on a
+checkerboard, because an icon is judged at 64 px and a pose that reads beautifully across the pane
+can be a smudge in a cell. The
+greying follows the game's own: fully desaturated, alpha untouched, and darker by a factor that
+its 27 Active/Inactive boss pairs put between 0.47 and 1.14, which is why the pane carries a
+slider with their median on it rather than one number.
+
 It also draws **where a monster is pointing**. Path of Exile 2 keeps no target pointer anywhere in
 memory — the game aims by *turning* an actor to an angle and firing once it is within a tolerance —
 so the facing **is** the aim, as exactly as the game itself has it. The ray runs along it in world
