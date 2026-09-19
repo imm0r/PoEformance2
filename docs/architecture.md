@@ -393,6 +393,11 @@ false`. What cost time to rediscover here is written down:
   slide out on their own and no control needs telling that a pane went. **The monster count is the
   exception and deliberately so**: it is the answer to the query, not a control, so it hangs from
   the box's own right edge. Put over the list it describes, it read as a label for the list.
+  **Two things can then want the same edge**, and one of them has to yield: fold the model pane
+  away and the box spans the whole width, so the count's edge *is* the window's — where the
+  *Model* button lives. The clamp that keeps items from overlapping then pushed the button past
+  the clip rectangle and it vanished, which is the worst of the possible losers since it is the
+  only way to bring the pane back. The button keeps the edge, the count backs off by its width.
 - **A footer under filling panes is two mistakes deep, and a headless ImGui settled both.** The
   panes hold one text line back with `GetContentRegionAvail().Y - GetTextLineHeightWithSpacing()`,
   which is right and was not enough. The **grip between two panes** took
