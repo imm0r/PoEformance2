@@ -36,6 +36,15 @@ namespace PoEformance.Overlay;
 /// THE KEYFRAMES ARE UNPACKED ON A TASK, ONE ANIMATION AT A TIME. A bundled rig holds twelve
 /// megabytes of them; the animation being played is a few tens of kilobytes of that, and Oodle
 /// on the draw thread is a call this class has no measurement for and does not make.
+///
+/// THE FLOOR IS DRAWN BY THE OVERLAY, NOT INTO THE PICTURE. It used to be, and a picture drawn
+/// one rung down and stretched over the pane stretched the floor's one-pixel lines into steps -
+/// "so unglaublich pixelig", from the live client. <see cref="ModelFloor"/> works the lines out
+/// from the very camera the picture was drawn with, in shares of the side, and <see cref="Strokes"/>
+/// writes them into the draw list at the screen's own resolution, anti-aliased, on every frame.
+/// Under the picture while the eye is above the floor, and over it while the eye is below - the
+/// model is all on one side of the plane, so that order is right at every pixel but a weapon
+/// hanging under the feet.
 /// </remarks>
 public sealed class MonsterPortrait
 {
@@ -58,6 +67,27 @@ public sealed class MonsterPortrait
 
     /// <summary>The id ImGui knows the picture by, which is what makes it something to grab.</summary>
     private const string Grip = "##monster-model";
+
+    /// <summary>What the pane is painted before anything else: Blender's viewport grey, 0x3D3D3D.</summary>
+    /// <remarks>
+    /// THE COLOURS ARE BLENDER'S DEFAULT THEME, read out of its userdef_default_theme.c rather than
+    /// eyeballed off a screenshot, because Blender's floor is what the live client asked for by
+    /// name. Its 3D viewport background is 0x3D3D3D; its grid is 0x545454 at half alpha and its
+    /// emphasised grid the same at full, which <see cref="ModelFloor.Faint"/> carries; and an
+    /// axis is the grid colour blended half way to the axis colour - 0xFF3352 for x, 0x8BDC00 for
+    /// y - and shaded down by ten, which is its make_axis_color in resources.cc. Packed the way
+    /// ImGui packs a colour: alpha in the top byte, red in the bottom one.
+    /// </remarks>
+    private const uint Backdrop = 0xFF3D3D3D;
+
+    /// <inheritdoc cref="Backdrop"/>
+    private const uint Grid = 0x00545454;
+
+    /// <inheritdoc cref="Backdrop"/>
+    private const uint AxisX = 0x0049399F;
+
+    /// <inheritdoc cref="Backdrop"/>
+    private const uint AxisY = 0x00208E65;
 
     /// <summary>
     /// How the picture is handed to the renderer, which is CONTIGUOUS and that is not a preference.
@@ -99,6 +129,12 @@ public sealed class MonsterPortrait
 
     private MeshPicture.Canvas? _canvas;
 
+    /// <summary>The floor's lines for this frame, in a list kept so that no frame allocates one.</summary>
+    private readonly List<ModelFloor.Line> _floor = [];
+
+    /// <summary>A tile in the shown model's own units - see <see cref="ModelFloor.TileOn"/>.</summary>
+    private float _tile = ModelFloor.Tile;
+
     private float _turn;
     private float _tilt;
     private float _zoom = 1f;
@@ -108,7 +144,6 @@ public sealed class MonsterPortrait
     private float _drawnZoom = float.NaN;
     private Vector2 _drawnPan = new(float.NaN);
     private int _drawnSize;
-    private bool _drawnGround;
     private float _drawnFrame = float.NaN;
     private int _drawnAnimation = -1;
     private bool _drawnPosed;
@@ -162,7 +197,7 @@ public sealed class MonsterPortrait
     /// <summary>The biggest the model will be drawn, each way.</summary>
     public int Most => _sizes.Most;
 
-    /// <summary>Whether the grid the model stands on is drawn. On, because it is what makes a turn legible.</summary>
+    /// <summary>Whether the floor the model stands on is drawn. On, because it is what makes a turn legible.</summary>
     public bool Ground { get; set; } = true;
 
     /// <summary>Why there is no picture, for the line that says so. Empty while there is one.</summary>
@@ -224,7 +259,26 @@ public sealed class MonsterPortrait
         //     collapsed "Type" instead. A claimed id is also what fixes that, through the guard
         //     "if (g.HoveredId != 0 && g.HoveredId != id) return false" the headers then meet.
         ImGui.InvisibleButton(Grip, new Vector2(side, side));
-        ImGui.GetWindowDrawList().AddImage(_texture, ImGui.GetItemRectMin(), ImGui.GetItemRectMax());
+
+        // THE FLOOR GOES UNDER THE PICTURE OR OVER IT BY WHICH SIDE OF IT THE EYE IS ON - see
+        // ModelFloor.Under. From the camera the picture was DRAWN with, not the one being dragged
+        // towards: the drag and the wheel below move the camera after this frame's picture was
+        // taken, and a floor a frame ahead of its model would slide under the feet on every turn.
+        ImDrawListPtr draw = ImGui.GetWindowDrawList();
+        Vector2 corner = ImGui.GetItemRectMin();
+        draw.AddRectFilled(corner, ImGui.GetItemRectMax(), Backdrop);
+        MeshPicture.Camera camera = MeshPicture.Camera.Of(_model.Mesh, _drawnTurn, _drawnTilt, _drawnZoom, _drawnPan);
+        bool under = ModelFloor.Under(camera);
+        if (under)
+        {
+            Floor(draw, corner, side, camera);
+        }
+
+        draw.AddImage(_texture, corner, ImGui.GetItemRectMax());
+        if (!under)
+        {
+            Floor(draw, corner, side, camera);
+        }
 
         // HELD RATHER THAN HOVERED, so the model keeps turning when the drag runs off the edge of
         // it - which it does constantly, because the picture is small and a full turn is 360 px.
@@ -424,7 +478,9 @@ public sealed class MonsterPortrait
     /// </remarks>
     private string Hint()
     {
-        const string Gestures = "Drag to turn. Wheel to zoom where the pointer is. Double-click to reset.";
+        const string Gestures = "Drag to turn. Wheel to zoom where the pointer is. Double-click to reset.\n"
+            + "The floor is in the game's units: ten squares to a brighter line, 250 units to a tile. "
+            + "Red is the model's x axis, green its y.";
 
         string said = Gestures;
         if (_model.Paint.Length > 0)
@@ -488,6 +544,10 @@ public sealed class MonsterPortrait
         // A pan aimed at one monster's head is nowhere in particular on the next one.
         _pan = Vector2.Zero;
 
+        // The game draws this variety's mesh scaled by its own multiplier, and the floor's tiles
+        // have to shrink in the mesh's units by the same amount to stay the game's tiles.
+        _tile = ModelFloor.TileOn(one?.ModelSize ?? 0);
+
         if (one is null || path.Length == 0)
         {
             Drop();
@@ -546,7 +606,6 @@ public sealed class MonsterPortrait
             || _drawnZoom != _zoom
             || _drawnPan != _pan
             || _drawnSize != size
-            || _drawnGround != Ground
             || _drawnPosed != posed
             || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen));
 
@@ -691,7 +750,6 @@ public sealed class MonsterPortrait
         _drawnZoom = _zoom;
         _drawnPan = _pan;
         _drawnSize = size;
-        _drawnGround = Ground;
         _drawnPosed = posed;
         _drawnFrame = _frame;
         _drawnAnimation = _chosen;
@@ -706,12 +764,12 @@ public sealed class MonsterPortrait
                 _pose.Take(_tracks, _frame);
                 _pose.Move(_model.Mesh, _posed, _posedNormals);
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, default, _model.Skin, _zoom, Ground, _pan);
+                    _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, default, _model.Skin, _zoom, _pan);
             }
             else
             {
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, Ground, _pan);
+                    _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, _pan);
             }
 
             if (!drawn.Ready)
@@ -736,6 +794,100 @@ public sealed class MonsterPortrait
             // input here came out of a game's files.
             Why = $"the model would not draw: {exception.Message}";
             Drop();
+        }
+    }
+
+    /// <summary>Works out this frame's floor from the camera the picture was drawn with, and draws it.</summary>
+    private void Floor(ImDrawListPtr draw, Vector2 corner, float side, in MeshPicture.Camera camera)
+    {
+        if (!Ground)
+        {
+            return;
+        }
+
+        ModelFloor.Of(_floor, camera, side, _tile);
+        Strokes(draw, corner, side, _floor);
+    }
+
+    /// <summary>
+    /// Writes the floor's pieces into the draw list, each fading from one end to the other.
+    /// </summary>
+    /// <remarks>
+    /// STRAIGHT INTO THE VERTEX BUFFER, and not one AddLine per piece. A line of ImGui's is one
+    /// colour from end to end, and the frame's fade is not - so the fade has to be carried by the
+    /// vertices, which AddLine does not take. And there are a few thousand pieces on a frame, each
+    /// of which through the wrapper is a call across the interop boundary per vertex; one reserve
+    /// per piece and a pointer walk is the same picture for a fraction of the frame.
+    ///
+    /// THE PROFILE IS THE ONE IMGUI DREW THIN LINES WITH before it baked them into its atlas: a
+    /// solid centre and a one-pixel feather to nothing on either side, on the white pixel of the
+    /// font atlas so that the current texture serves. That is a two-pixel tent holding one pixel's
+    /// worth of ink, which is what an anti-aliased line of width one is.
+    /// </remarks>
+    private static unsafe void Strokes(ImDrawListPtr draw, Vector2 corner, float side, List<ModelFloor.Line> lines)
+    {
+        if (lines.Count == 0)
+        {
+            return;
+        }
+
+        Vector2 white = ImGui.GetFontTexUvWhitePixel();
+        ImDrawList* list = draw.NativePtr;
+        float feather = list->_FringeScale;
+
+        foreach (ModelFloor.Line line in lines)
+        {
+            Vector2 a = corner + (line.From * side);
+            Vector2 b = corner + (line.To * side);
+            Vector2 run = b - a;
+            float length = run.Length();
+            if (!(length > 1e-3f))
+            {
+                continue;
+            }
+
+            Vector2 across = new Vector2(-run.Y, run.X) * (feather / length);
+            uint ink = line.Stroke switch
+            {
+                ModelFloor.Stroke.AxisX => AxisX,
+                ModelFloor.Stroke.AxisY => AxisY,
+                _ => Grid,
+            };
+
+            uint fromInk = ink | ((uint)Math.Clamp(line.FromAlpha * 255f, 0f, 255f) << 24);
+            uint toInk = ink | ((uint)Math.Clamp(line.ToAlpha * 255f, 0f, 255f) << 24);
+
+            // Six vertices - the feather's two edges and the centre at each end - and four
+            // triangles between them. Reserved per piece, so ImGui's own check for running past
+            // sixteen-bit indices runs per piece too.
+            draw.PrimReserve(12, 6);
+            ImDrawVert* vertex = list->_VtxWritePtr;
+            ushort* index = list->_IdxWritePtr;
+            uint at = list->_VtxCurrentIdx;
+
+            vertex[0] = new ImDrawVert { pos = a - across, uv = white, col = ink };
+            vertex[1] = new ImDrawVert { pos = a, uv = white, col = fromInk };
+            vertex[2] = new ImDrawVert { pos = a + across, uv = white, col = ink };
+            vertex[3] = new ImDrawVert { pos = b - across, uv = white, col = ink };
+            vertex[4] = new ImDrawVert { pos = b, uv = white, col = toInk };
+            vertex[5] = new ImDrawVert { pos = b + across, uv = white, col = ink };
+
+            index[0] = (ushort)at;
+            index[1] = (ushort)(at + 1);
+            index[2] = (ushort)(at + 4);
+            index[3] = (ushort)at;
+            index[4] = (ushort)(at + 4);
+            index[5] = (ushort)(at + 3);
+            index[6] = (ushort)(at + 1);
+            index[7] = (ushort)(at + 2);
+            index[8] = (ushort)(at + 5);
+            index[9] = (ushort)(at + 1);
+            index[10] = (ushort)(at + 5);
+            index[11] = (ushort)(at + 4);
+
+            list->_VtxWritePtr = vertex + 6;
+            list->_IdxWritePtr = index + 12;
+            list->_VtxCurrentIdx = at + 6;
         }
     }
 

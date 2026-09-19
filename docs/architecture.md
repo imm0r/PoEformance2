@@ -262,7 +262,8 @@ its output is an array a test can measure, where a D3D11 renderer could only be 
 screenshot on a machine with the game.
 
 The portrait is **turned by dragging, zoomed on the wheel, and reset by double-clicking**, and it
-stands on a grid that turns with it. `MonsterPortrait` holds the turn, tilt and zoom and redraws
+stands on a floor of the game's own tiles that turns with it — drawn by the overlay as lines, not
+into the picture; see the floor bullet below. `MonsterPortrait` holds the turn, tilt and zoom and redraws
 whenever one of them moves — which is per frame during a drag, and is what makes the numbers
 below matter. At rest it follows its pane up to what the renderer will draw; `monsterModelSize`
 (default 768) caps what **turning** it may cost, and the portrait steps one rung *down* from that
@@ -309,13 +310,28 @@ false`. Eight things here cost time to rediscover, so they are written down:
   otherwise redraw the mesh on every frame, at a new size, discarding the canvas each time — and
   why stepping one rung down during a drag roughly quarters the work instead of shaving a little
   off it.
-- **The floor goes at `Most.Z`, and a hair below it.** A model runs along negative z with its
-  head at the far end, so the feet are the end *nearest zero*; read the other way the grid is
-  drawn across the monster's scalp. And placed at exactly `Most.Z` it shares a depth with the
-  soles, so the depth test keeps whichever arrived first — the floor — and grid lines cut across
-  the feet. `MeshPicture.Under` is the clearance. A post standing on its end never shows this,
-  because pixel centres either side of an edge never interpolate to equal depths; it takes a
-  model with a flat sole, which is why the test grew one.
+- **The floor is at the model's origin, and it is lines, not pixels.** A model runs along negative
+  z with its head at the far end, so the feet are the end *nearest zero*; read the other way the
+  grid is drawn across the monster's scalp. And the game plants a monster by its origin, not by
+  the bottom of its box: measured on a real rig, the feet sit at z = 0.98 in the bind pose and
+  stay there through every frame of a walk while the pelvis dips fifteen units. Two monsters in a
+  row showed the box bottom wrong from the live client — one shin-deep, the next hovering — and
+  `--posedump` prints the numbers for any monster that still does. The floor was first rasterised
+  into the picture and depth-tested against the model, and came back as a staircase: an animation
+  is drawn a rung below the pane and stretched over it, and a stretched one-pixel line is steps.
+  `ModelFloor` now works the floor out as lines from the very `MeshPicture.Camera` the picture
+  was drawn with, and the portrait writes them into ImGui's vertex buffer at the screen's own
+  resolution — under the picture while the eye is above the floor, over it while below, which is
+  exact for everything but a weapon hanging under the feet, since the whole model is on one side
+  of the plane. The look is Blender's, by request, and read out of Blender's default theme and
+  overlay grid shader rather than a screenshot: 0x3D3D3D behind, 0x545454 lines at half alpha
+  with every tenth at full, a red x axis and a green y axis, the finest decade fading as its lines
+  crowd while the level above carries the emphasis it loses, and the whole floor fading by the
+  cube of the view's drop towards level. The squares are the game's: a tile is 250 world units
+  (GameHelper2's `TileToWorldConversion`, the same 250 the radar divides by 23 for a grid cell),
+  ten squares to a tile, and the variety's `ModelSizeMultiplier` shrinks the tile in the mesh's
+  units by exactly the amount the game enlarges the mesh — so a boss stands on more squares than a
+  rat by the same margin it does in the game.
 - **A group containing a `SpanAvailWidth` header measures as the whole pane.** Nothing measures a
   group here any more, but the trap is still in `OverlayLayout.Subsection` for the next caller who
   tries. `EndGroup` takes `ImMax(CursorMaxPos, LastItemData.Rect.Max)` — the *last item's*
