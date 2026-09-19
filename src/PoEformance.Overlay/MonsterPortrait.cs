@@ -109,14 +109,13 @@ public sealed class MonsterPortrait
 
     /// <summary>How big the orbit button's art is, in frame heights.</summary>
     /// <remarks>
-    /// TWICE, because at one it could not be made out at all - reported from the live client as a
-    /// button that is simply not there. Two things were against it at that size. The art is a
-    /// black tile with a thin white drawing on it, which over a dark backdrop reads as a smudge
-    /// rather than as a control; and a drawing of a cube inside a broken circle has detail that
-    /// nineteen pixels cannot hold. In frame heights rather than pixels, so it follows the text
-    /// size the way every other control in the row does.
+    /// THREE, and it got there in two steps from the live client. At one it could not be made out
+    /// at all - a drawing of a cube inside a broken circle has detail that nineteen pixels cannot
+    /// hold, and over a dark backdrop what is left reads as a smudge rather than as a control. At
+    /// two it was legible and still asked to grow by half again, which is this. In frame heights
+    /// rather than pixels, so it follows the text size the way every other control does.
     /// </remarks>
-    private const float OrbitFaces = 2f;
+    private const float OrbitFaces = 3f;
 
     /// <summary>The line under the picture that says what the mouse does.</summary>
     private const string Gestures = "drag turns · wheel zooms at the pointer · double-click resets";
@@ -569,9 +568,9 @@ public sealed class MonsterPortrait
         float top = corner.Y + inset;
 
         // THE TWO ARE SIZED APART AND SHARE ONLY THE LINE THEY HANG FROM. The button had to grow
-        // to be recognisable at all; the counter did not, and a bar as tall as the button is a
-        // slab across the top of the picture. So the bar keeps the height it had - a frame and
-        // the button's own padding - and only the top edges line up.
+        // to be recognisable at all - three frame heights by now - while the counter did not, and
+        // a bar as tall as the button would be a slab across the top of the picture. So the bar
+        // keeps the height it had, a frame and a button's padding, and only the top edges line up.
         float counter = ImGui.GetFrameHeight() + (style.FramePadding.Y * 2f);
 
         float art = MathF.Round(ImGui.GetFrameHeight() * OrbitFaces);
@@ -579,12 +578,7 @@ public sealed class MonsterPortrait
         float wide = (icon != IntPtr.Zero ? art : ImGui.CalcTextSize("orbit").X) + (style.FramePadding.X * 2f);
         ImGui.SetCursorScreenPos(new Vector2(corner.X + side - wide - inset, top));
 
-        // Shown as running by its background rather than by a tint on the art, the way the icon
-        // picker marks its chosen cell: the picture on the button is what says what it does.
-        Vector4 back = _orbiting ? OverlayInk.Accent with { W = 0.55f } : Vector4.Zero;
-        bool pressed = icon != IntPtr.Zero
-            ? ImGui.ImageButton(OrbitId, icon, new Vector2(art), Vector2.Zero, Vector2.One, back, Vector4.One)
-            : ImGui.Button((_orbiting ? "stop" : "orbit") + OrbitId, new Vector2(wide, counter));
+        bool pressed = icon != IntPtr.Zero ? Orbiter(icon, art) : Worded(wide, counter);
         if (pressed)
         {
             _orbiting = !_orbiting;
@@ -613,6 +607,50 @@ public sealed class MonsterPortrait
         ImGui.GetWindowDrawList().AddText(
             at + ((size - ImGui.CalcTextSize(said)) * 0.5f), ImGui.GetColorU32(ImGuiCol.Text), said);
     }
+
+    /// <summary>
+    /// The orbit button itself: the art alone, with no frame of its own under it.
+    /// </summary>
+    /// <remarks>
+    /// NOTHING LIT WHILE NOBODY IS POINTING AT IT, which is what was asked for: the button sat in
+    /// a warm box over the picture, and a box is what the row of controls above wears, not
+    /// something that belongs over a model. ImageButtonEx always calls RenderFrame, so the only
+    /// way to be rid of the box is to hand it nothing to draw - the button's own colour goes
+    /// transparent and the border width goes to zero. The HOVER AND THE PRESS STILL SHOW: those
+    /// reach for ImGuiCol_ButtonHovered and ImGuiCol_ButtonActive, which are left alone, so the
+    /// control still answers the pointer and only rests invisible.
+    ///
+    /// AND RUNNING IS SHOWN BY TINTING THE ART rather than by a colour behind it. A background
+    /// was the first attempt and it is the wrong mechanism here: the art is an OPAQUE black tile
+    /// with a white drawing on it, so anything painted behind reaches only the four rounded
+    /// corners. A tint multiplies instead, which leaves the black tile black and turns the
+    /// drawing itself the accent - the one part of the picture anybody is looking at.
+    /// </remarks>
+    private bool Orbiter(IntPtr icon, float art)
+    {
+        ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0f, 0f, 0f, 0f));
+        ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 0f);
+        try
+        {
+            return ImGui.ImageButton(
+                OrbitId,
+                icon,
+                new Vector2(art),
+                Vector2.Zero,
+                Vector2.One,
+                Vector4.Zero,
+                _orbiting ? OverlayInk.Accent : Vector4.One);
+        }
+        finally
+        {
+            ImGui.PopStyleVar();
+            ImGui.PopStyleColor();
+        }
+    }
+
+    /// <summary>The same button where the art could not be loaded, which keeps its frame - a bare word is not a button.</summary>
+    private bool Worded(float wide, float tall)
+        => ImGui.Button((_orbiting ? "stop" : "orbit") + OrbitId, new Vector2(wide, tall));
 
     /// <summary>The orbit button's art, uploaded at the size it is drawn, or nothing where the resource is not there.</summary>
     private IntPtr OrbitIcon(int pixels)
