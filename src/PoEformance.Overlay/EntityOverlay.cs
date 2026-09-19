@@ -502,6 +502,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ModelGrey = _monsterBook?.Model?.Grey ?? basis.ModelGrey,
             ModelGreyFactor = _monsterBook?.Model?.GreyFactor ?? basis.ModelGreyFactor,
             ModelBackdrop = _monsterBook?.Model?.Behind.ToString() ?? basis.ModelBackdrop,
+            ModelOutline = _monsterBook?.Model?.Outline.ToString() ?? basis.ModelOutline,
+            ModelOutlineWidth = _monsterBook?.Model?.OutlineWidth ?? basis.ModelOutlineWidth,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -688,6 +690,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (Enum.TryParse(_modelWants.ModelBackdrop, ignoreCase: true, out ModelBackdrop behind))
         {
             pane.Behind = behind;
+        }
+
+        if (Enum.TryParse(_modelWants.ModelOutline, ignoreCase: true, out OutlineSide outline))
+        {
+            pane.Outline = outline;
+        }
+
+        // Zero is "no rim" and is a choice somebody made; only a negative means the file has
+        // never said anything about it. See OverlaySettings.
+        if (_modelWants.ModelOutlineWidth >= 0f)
+        {
+            pane.OutlineWidth = _modelWants.ModelOutlineWidth;
         }
     }
     private readonly RuleLayer _rules = new();

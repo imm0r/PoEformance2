@@ -110,7 +110,11 @@ checkerboard, because an icon is judged at 64 px and a pose that reads beautiful
 can be a smudge in a cell. The
 greying follows the game's own: fully desaturated, alpha untouched, and darker by a factor that
 its 27 Active/Inactive boss pairs put between 0.47 and 1.14, which is why the pane carries a
-slider with their median on it rather than one number.
+slider with their median on it rather than one number. The black rim those icons have is
+measured off the same 27 — the outermost pixel of the silhouette is black, the second is half
+way out of it, and the art starts at the third — and the preview window puts one on, grown
+outwards so the model keeps its detail or painted inwards the way the art was drawn, at a width
+in cell pixels.
 
 It also draws **where a monster is pointing**. Path of Exile 2 keeps no target pointer anywhere in
 memory — the game aims by *turning* an actor to an angle and firing once it is within a tolerance —
