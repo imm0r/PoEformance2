@@ -144,6 +144,14 @@ public sealed class MonsterPortrait
         + "pixel is black, the second half way out of it,\n"
         + "and the art starts at the third. zero draws none.";
 
+    /// <summary>What the brightness row is, said where somebody asks it.</summary>
+    private const string LightSaid =
+        "brings the model to the brightness the game paints its icons at.\n"
+        + "measured on the interior of its 27 boss icons: median 55,\n"
+        + "against 24 on the first model exported here. a curve, so\n"
+        + "black stays black and a highlight is not clipped away.\n"
+        + "the number beside it is what came out.";
+
     /// <summary>What the export button does, said where somebody asks it.</summary>
     private const string SaveSaid =
         "writes this pose as icon art: colour and greyed,\n"
@@ -306,14 +314,14 @@ public sealed class MonsterPortrait
     /// The export's own pictures, kept so the outline can be changed without drawing again.
     /// </summary>
     /// <remarks>
-    /// THE SOURCES ARE THE GREYED AND UNGREYED RENDERS WITH NO OUTLINE ON THEM, because the
-    /// outline is the one setting somebody changes while LOOKING at the result - and redrawing
-    /// a thousand-square model for a slider would be forty milliseconds a tick of something
-    /// the pose did not change. What is made from them is kept beside them, so the button that
-    /// writes the files and the pictures on screen cannot come from different pixels.
+    /// THE SOURCE IS THE RAW RENDER - no lift, no greying, no rim - because all three are
+    /// settings somebody changes while LOOKING at the result, and redrawing a thousand-square
+    /// model for a slider would be forty milliseconds a tick of something the pose did not
+    /// change. Both halves are derived from this one buffer by <see cref="Remake"/>, so they
+    /// cannot drift apart, and what is made is kept beside it so the button that writes the
+    /// files and the pictures on screen cannot come from different pixels.
     /// </remarks>
-    private byte[] _shotColourSource = [];
-    private byte[] _shotGreySource = [];
+    private byte[] _shotSource = [];
     private byte[] _shotColourFull = [];
     private byte[] _shotGreyFull = [];
     private byte[] _shotColourCell = [];
@@ -329,6 +337,14 @@ public sealed class MonsterPortrait
     /// the pictures saying so, which is what the write button is for.
     /// </remarks>
     private bool _shotWritten;
+
+    /// <summary>What the lift actually achieved, for the line that says so. See PictureLight.</summary>
+    /// <remarks>
+    /// REPORTED RATHER THAN ASSUMED, because the exponent is searched on luminance and applied
+    /// per channel, and those are not the same operation on a saturated colour - so what comes
+    /// out lands near what was asked for rather than on it.
+    /// </remarks>
+    private float _shotLit;
 
     /// <summary>Whether the window showing them is up. Opened by an export, closed by its cross.</summary>
     private bool _shotsOpen;
@@ -495,6 +511,20 @@ public sealed class MonsterPortrait
 
     /// <summary>How wide that rim is, in CELL pixels. Zero draws none. See the same type.</summary>
     public float OutlineWidth { get; set; } = PictureOutline.Measured;
+
+    /// <summary>
+    /// Whether an exported icon is brought to the brightness the game's own icons are painted at.
+    /// </summary>
+    /// <remarks>
+    /// ON, because a model is lit for standing in a dungeon and an icon is painted to be read
+    /// at 64 pixels: measured against the art it has to sit beside, the first export of this
+    /// came out at half the brightness of the game's boss icons. See <see cref="PictureLight"/>,
+    /// which also explains why it is a curve rather than a multiply.
+    /// </remarks>
+    public bool Light { get; set; } = true;
+
+    /// <summary>What brightness to bring it to. The game's own median - see the same type.</summary>
+    public float LightTarget { get; set; } = PictureLight.Measured;
 
     /// <summary>What is painted behind the model.</summary>
     public ModelBackdrop Behind { get; set; } = ModelBackdrop.Viewport;
@@ -1103,10 +1133,68 @@ public sealed class MonsterPortrait
             Write();
         }
 
+        Lift(wide);
+
         if (!_shotWritten)
         {
             ImGuiText.Wrapped(OverlayInk.Quiet, "what is shown is newer than what was written.");
         }
+    }
+
+    /// <summary>
+    /// The brightness row: whether the icon is brought to the game's own, and to what.
+    /// </summary>
+    /// <remarks>
+    /// BESIDE THE RIM AND NOT IN THE PANE, for the same reason: this changes what the icon
+    /// looks like at 64 pixels beside the game's, and both pictures that answer that question
+    /// are directly above it. It also reports what it ACHIEVED rather than only what was
+    /// asked - the exponent is solved on luminance and applied per channel, so the result
+    /// lands near the target rather than on it, and a number nobody can check is not a
+    /// measurement.
+    /// </remarks>
+    private void Lift(float wide)
+    {
+        bool lit = Light;
+        if (ImGui.Checkbox("light##monster-light", ref lit))
+        {
+            Light = lit;
+            Remake();
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(LightSaid);
+        }
+
+        if (!Light)
+        {
+            return;
+        }
+
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(wide);
+        float target = LightTarget;
+        if (ImGui.SliderFloat(
+            "##monster-light-target", ref target, PictureLight.Dimmest, PictureLight.Brightest, "%.0f"))
+        {
+            LightTarget = target;
+        }
+
+        if (ImGui.IsItemDeactivatedAfterEdit())
+        {
+            Remake();
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(LightSaid);
+        }
+
+        ImGui.SameLine();
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextDisabled($"= {_shotLit:F0}");
     }
 
     /// <summary>The two halves side by side at one size, with a line saying what the size is.</summary>
@@ -1696,6 +1784,11 @@ public sealed class MonsterPortrait
 
         if (Grey)
         {
+            // THE FACTOR IS SHARED with the exported Inactive half, so moving it here changes
+            // what a written icon will look like - and since the export is derived from the
+            // raw render, the pictures in the preview window follow without the model being
+            // drawn again. The switch above is not shared: the export always writes both
+            // halves, whether or not the pane is showing the grey one.
             ImGui.SameLine();
             ImGui.SetNextItemWidth(wide);
             float factor = GreyFactor;
@@ -1703,6 +1796,11 @@ public sealed class MonsterPortrait
                 "##monster-grey-factor", ref factor, PictureGrey.Weakest, PictureGrey.Strongest, "%.2f"))
             {
                 GreyFactor = factor;
+            }
+
+            if (ImGui.IsItemDeactivatedAfterEdit())
+            {
+                Remake();
                 Changed?.Invoke();
             }
 
@@ -1793,12 +1891,10 @@ public sealed class MonsterPortrait
                 return;
             }
 
-            // THE SOURCES ARE KEPT WITHOUT AN OUTLINE, so the window can put one on, take it
-            // off and change its side without the model being drawn again - see the fields.
+            // THE RENDER IS KEPT RAW, so the window can lift it, grey it, put a rim on it and
+            // change its mind about any of the three without the model being drawn again.
             int bytes = shot.Width * shot.Height * 4;
-            _shotColourSource = shot.Rgba.AsSpan(0, bytes).ToArray();
-            PictureGrey.Apply(shot.Rgba.AsSpan(0, bytes), GreyFactor);
-            _shotGreySource = shot.Rgba.AsSpan(0, bytes).ToArray();
+            _shotSource = shot.Rgba.AsSpan(0, bytes).ToArray();
             _shotWide = shot.Width;
             _shotTall = shot.Height;
             _shotStem = Stem(_wanted);
@@ -1837,15 +1933,27 @@ public sealed class MonsterPortrait
     /// </remarks>
     private void Remake()
     {
-        if (_shotColourSource.Length == 0 || _shotWide <= 0 || _shotTall <= 0)
+        if (_shotSource.Length == 0 || _shotWide <= 0 || _shotTall <= 0)
         {
             return;
         }
 
-        float radius = OutlineWidth * _shotWide / IconSheet.Tile;
+        // THE ORDER IS THE ARGUMENT. The lift comes first, because the brightness it aims for
+        // was measured on the game's art BEFORE its black rim was counted - and because a
+        // curve applied after the rim would lift the rim too. The greying comes second, so
+        // the Inactive half is the greyed version of the SAME picture the Active one shows
+        // rather than of a dimmer one. The rim comes last and is black in both, which is what
+        // the game's own pairs do.
+        _shotColourFull = (byte[])_shotSource.Clone();
+        PictureLight.Apply(
+            _shotColourFull,
+            Light ? PictureLight.GammaFor(_shotColourFull, LightTarget) : PictureLight.Untouched);
+        _shotLit = PictureLight.MeanOf(_shotColourFull);
 
-        _shotColourFull = (byte[])_shotColourSource.Clone();
-        _shotGreyFull = (byte[])_shotGreySource.Clone();
+        _shotGreyFull = (byte[])_shotColourFull.Clone();
+        PictureGrey.Apply(_shotGreyFull, GreyFactor);
+
+        float radius = OutlineWidth * _shotWide / IconSheet.Tile;
         PictureOutline.Apply(_shotColourFull, _shotWide, _shotTall, radius, Outline);
         PictureOutline.Apply(_shotGreyFull, _shotWide, _shotTall, radius, Outline);
 
@@ -2025,12 +2133,12 @@ public sealed class MonsterPortrait
         _shotStem = string.Empty;
         _shotsOpen = false;
         _shotWritten = false;
-        _shotColourSource = [];
-        _shotGreySource = [];
+        _shotSource = [];
         _shotColourFull = [];
         _shotGreyFull = [];
         _shotColourCell = [];
         _shotGreyCell = [];
+        _shotLit = 0f;
     }
 
     /// <summary>

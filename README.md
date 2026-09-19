@@ -116,6 +116,15 @@ way out of it, and the art starts at the third — and the preview window puts o
 outwards so the model keeps its detail or painted inwards the way the art was drawn, at a width
 in cell pixels.
 
+**And the brightness is matched, because a model is lit for a dungeon and an icon is painted for
+a map.** The interior of the game's boss icons has a median luminance of 55; the first model
+exported here measured 24, which on the minimap reads as a shadow of the icons beside it. So the
+picture is brought to that number before the rim goes on — by a curve rather than a multiply, so
+black stays black and a highlight is not clipped away, and by solving the exponent against the
+picture's own histogram rather than its average, which misses by a third. What it actually
+achieved is printed beside the slider: the exponent is found on luminance and applied per
+channel, so it lands near the target rather than on it.
+
 It also draws **where a monster is pointing**. Path of Exile 2 keeps no target pointer anywhere in
 memory — the game aims by *turning* an actor to an angle and firing once it is within a tolerance —
 so the facing **is** the aim, as exactly as the game itself has it. The ray runs along it in world

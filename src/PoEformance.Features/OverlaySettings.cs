@@ -183,6 +183,13 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("modelOutline")] string ModelOutline = "",
     [property: JsonPropertyName("modelOutlineWidth")] float ModelOutlineWidth = -1f,
 
+    // And whether an exported icon is brought to the brightness the game paints its own at,
+    // and to which. Kept for the same reason as the two above: it decides what is in the file.
+    // Zero is "not set" here - a target of zero is not a brightness anybody could want, which
+    // is why this one needs no negative. See PictureLight.
+    [property: JsonPropertyName("modelLight")] bool ModelLight = true,
+    [property: JsonPropertyName("modelLightTarget")] float ModelLightTarget = 0f,
+
     // Whether the monster book's facet rail has a pane of its own. ON by default, because a rail
     // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is
     // read WHILE PLAYING: three panes wide enough to read is most of a monitor, and the game wants

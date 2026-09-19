@@ -504,6 +504,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ModelBackdrop = _monsterBook?.Model?.Behind.ToString() ?? basis.ModelBackdrop,
             ModelOutline = _monsterBook?.Model?.Outline.ToString() ?? basis.ModelOutline,
             ModelOutlineWidth = _monsterBook?.Model?.OutlineWidth ?? basis.ModelOutlineWidth,
+            ModelLight = _monsterBook?.Model?.Light ?? basis.ModelLight,
+            ModelLightTarget = _monsterBook?.Model?.LightTarget ?? basis.ModelLightTarget,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -702,6 +704,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (_modelWants.ModelOutlineWidth >= 0f)
         {
             pane.OutlineWidth = _modelWants.ModelOutlineWidth;
+        }
+
+        pane.Light = _modelWants.ModelLight;
+        if (_modelWants.ModelLightTarget > 0f)
+        {
+            pane.LightTarget = _modelWants.ModelLightTarget;
         }
     }
     private readonly RuleLayer _rules = new();
