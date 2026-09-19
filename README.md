@@ -90,6 +90,16 @@ town, a hideout, or a campaign zone. Corpses are filtered out, and drops below m
 RE instruments — dots out in the 3D world, the projection measurements, the calibration
 markers, and per-kind filters including terrain and effects.
 
+A **boss arena is found in the shape of the ground** rather than among the entities — an endgame
+map is generated at random and a boss room is not — so it is marked from the moment the area
+loads, long before the boss exists to be read. Where the icon sheet carries the game's own
+picture of that boss, the marker wears it: which picture is derived from the area's id and the
+arena tile's path and only ever accepted when the sheet really has a cell under that name, with
+`data/boss-icons.json` for the pairs the names do not settle. Arenas nothing could name are
+collected in `logs/boss-arenas.tsv`, so that file gets filled from what was actually played.
+Once the boss is down the marker switches to the Inactive art, the way the game's own landmarks
+do. The switch is on the Markers → Map & Places tab.
+
 It also draws **where a monster is pointing**. Path of Exile 2 keeps no target pointer anywhere in
 memory — the game aims by *turning* an actor to an angle and firing once it is within a tolerance —
 so the facing **is** the aim, as exactly as the game itself has it. The ray runs along it in world

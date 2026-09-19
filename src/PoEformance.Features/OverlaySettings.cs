@@ -34,6 +34,11 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("poiLabels")] bool PoiLabels = true,
     [property: JsonPropertyName("poiRoutes")] bool PoiRoutes = true,
     [property: JsonPropertyName("poiArrows")] bool PoiArrows = true,
+
+    // A boss arena drawn as the game's own picture of its boss rather than as the boss shape.
+    // On, because the picture says which boss it is and the shape only says that there is one -
+    // and where nothing is known the shape comes back by itself. See BossIcons.
+    [property: JsonPropertyName("bossArt")] bool BossArt = true,
     [property: JsonPropertyName("dotLabels")] bool DotLabels = false,
     [property: JsonPropertyName("healthBarsOnlyWhenHurt")] bool HealthBarsOnlyWhenHurt = false,
     [property: JsonPropertyName("hideBehindPanels")] bool HideBehindPanels = true,

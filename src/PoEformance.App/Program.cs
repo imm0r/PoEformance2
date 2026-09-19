@@ -2933,6 +2933,12 @@ internal static class Program
         overlay.Monsters = PoEformance.Game.Entities.MonsterVarieties.Load(
             FindDataFile("monster-varieties.json"));
 
+        // Which of the sheet's boss pictures belongs to which arena, for the arenas whose area
+        // id and tile path do not already say it. Missing is fine and is the ordinary case: the
+        // arena is still found in the ground and still marked, with the boss shape - see
+        // BossIcons, which also collects the ones nothing could name.
+        overlay.BossIcons = PoEformance.Features.BossIcons.Load(FindDataFile("boss-icons.json"));
+
         // And what the game says each of a monster's modifier stats DOES, taken from the atlas's
         // copy rather than loaded a second time. It owns the upgrade: the shipped export until the
         // background walk reads the install's own .csd files, and the game's own afterwards. Asked
