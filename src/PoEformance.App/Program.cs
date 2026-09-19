@@ -314,6 +314,12 @@ internal static class Program
             RunAstDump(rig);
         }
 
+        // And the pose those skeletons put a mesh in: where a monster's feet are. See RunPoseDump.
+        if (options.DumpPose is { } stance)
+        {
+            RunPoseDump(stance);
+        }
+
         // OUTSIDE the block above on purpose. Everything in it hangs off the game state, and
         // the loaded-file table does not: it hangs off FileRoot, so the tables are there at the
         // login screen, before any area exists. That is also what makes them worth having -
@@ -1343,6 +1349,211 @@ internal static class Program
         Console.WriteLine("  The first says the frames are WHERE the headers claim, the second that they");
         Console.WriteLine("  are WHAT a track is. Versions 6, 7, 9, 10, 11 and 12 have all been read and");
         Console.WriteLine("  checked over a real install; a version outside that list would be new.");
+    }
+
+    /// <summary>
+    /// Poses the monsters that match and reports where their feet are: the box, the skeleton at
+    /// bind, and the skeleton and the mesh frame by frame, against the ground the pane draws.
+    /// </summary>
+    /// <remarks>
+    /// THE MEASUREMENT BEHIND THE FLOOR'S HEIGHT. The model pane draws the floor through the
+    /// model's origin, on a rule measured on one real rig: the feet at z = 0.98 in the bind pose,
+    /// and there through every frame of an animation while the pelvis dips. A monster that stands
+    /// in the floor or hovers above it is either a model that breaks that rule or a pose this
+    /// reader gets wrong, and the two are told apart by numbers rather than by looking - the box's
+    /// bottom, the lowest bone at bind, and the lowest bone and the lowest posed vertex frame by
+    /// frame, with the root's own height beside them. Needs the install and its Oodle for a
+    /// bundled rig's keyframes, not the game.
+    /// </remarks>
+    /// <param name="match">A monster name or path; every monster containing it is posed, up to a handful.</param>
+    private static void RunPoseDump(string match)
+    {
+        Console.WriteLine();
+        Console.WriteLine("poses - where a monster's feet are, out of its mesh, its skeleton and its animation.");
+
+        PoEformance.Game.Files.GameFiles.OpenedFiles opened =
+            PoEformance.Game.Files.GameFiles.OpenOrSay(PoEformance.Game.Files.GameInstall.Find(null));
+        if (opened.Files is null)
+        {
+            Console.WriteLine($"  no install ({opened.Why}) - nothing to read.");
+            return;
+        }
+
+        PoEformance.Features.MonsterTables read = PoEformance.Features.MonsterTables.Read(
+            opened.Files,
+            PoEformance.Features.QuestTableLayouts.Load(FindDataFile("monster-tables.json")),
+            PoEformance.Game.Entities.MonsterVarieties.Load(FindDataFile("monster-varieties.json")));
+
+        foreach (string line in read.Say)
+        {
+            Console.WriteLine($"  {line}");
+        }
+
+        if (!read.FromGame)
+        {
+            Console.WriteLine("  the install's own monster table did not read, so no .ao paths are known.");
+            return;
+        }
+
+        if (match.Length == 0)
+        {
+            Console.WriteLine("  --posedump wants a monster name or path: it poses every match, and the whole table is not a list anybody reads.");
+            return;
+        }
+
+        var shown = 0;
+        foreach ((string path, PoEformance.Game.Entities.MonsterVariety one) in read.Table.All)
+        {
+            bool hit = path.Contains(match, StringComparison.OrdinalIgnoreCase)
+                || (one.Name is { Length: > 0 } && one.Name.Contains(match, StringComparison.OrdinalIgnoreCase));
+            if (!hit)
+            {
+                continue;
+            }
+
+            if (shown++ == 6)
+            {
+                Console.WriteLine("  … and more; narrow the name.");
+                break;
+            }
+
+            PoseDump(opened.Files, path, one);
+        }
+
+        if (shown == 0)
+        {
+            Console.WriteLine($"  no monster's name or path contains \"{match}\".");
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("  The model's up is -z, so the ground is z = 0 and a foot BELOW it reads positive.");
+        Console.WriteLine("  A lowest bone near 0 at bind and at every frame is a monster planted the way the");
+        Console.WriteLine("  floor assumes; one that drifts with the root is a pose this reader gets wrong.");
+    }
+
+    /// <summary>One monster's numbers, for <see cref="RunPoseDump"/>.</summary>
+    private static void PoseDump(PoEformance.Game.Files.GameFiles files, string path, PoEformance.Game.Entities.MonsterVariety one)
+    {
+        Console.WriteLine();
+        Console.WriteLine($"  {one.Name} - {path}");
+
+        PoEformance.Features.MonsterModel model = PoEformance.Features.MonsterModels.Of(files.Read, one);
+        if (!model.Ready)
+        {
+            Console.WriteLine($"    no model: {model.Why}");
+            return;
+        }
+
+        PoEformance.Game.Files.SkinnedMesh mesh = model.Mesh;
+        Console.WriteLine(
+            $"    mesh {model.Mesh_}: box z {mesh.Least.Z:F2} (top) to {mesh.Most.Z:F2} (bottom), "
+            + $"lowest vertex z {Lowest(mesh.Positions):F2}, {mesh.Positions.Length} vertices");
+
+        if (!model.Moves)
+        {
+            Console.WriteLine($"    holds still: {model.Move}");
+            return;
+        }
+
+        PoEformance.Game.Files.AnimationSkeleton rig = model.Rig;
+        PoEformance.Game.Files.SkeletonPose? pose = PoEformance.Game.Files.SkeletonPose.Of(rig);
+        if (pose is null)
+        {
+            Console.WriteLine("    the skeleton's bone tree does not hold together");
+            return;
+        }
+
+        pose.AtRest();
+        Console.WriteLine(
+            $"    rig {model.Rig_}: {rig.Bones.Count} bones, version {rig.Version}, {rig.Animations.Count} animations; "
+            + $"at bind lowest bone {Lowest(pose.BindModel, rig)}, root {Root(pose.BindModel, rig)}");
+
+        // The animation the pane plays first, the way the pane chooses it.
+        var chosen = 0;
+        for (var at = 0; at < rig.Animations.Count; at++)
+        {
+            if (string.Equals(rig.Animations[at].Name, PoEformance.Overlay.MonsterPortrait.Idle, StringComparison.Ordinal))
+            {
+                chosen = at;
+                break;
+            }
+        }
+
+        PoEformance.Game.Files.SkeletonAnimation move = rig.Animations[chosen];
+        byte[]? frames = rig.Tracks(move, files.Unpack);
+        PoEformance.Game.Files.AnimationTracks tracks = frames is null
+            ? PoEformance.Game.Files.AnimationTracks.None
+            : PoEformance.Game.Files.AnimationTracks.Read(frames, move.Tracks, rig.Version);
+        if (!tracks.Ready)
+        {
+            Console.WriteLine($"    {move.Name}: the keyframes did not read ({(frames is null ? "did not unpack" : tracks.Why)})");
+            return;
+        }
+
+        var posed = new System.Numerics.Vector3[mesh.Positions.Length];
+        var normals = new System.Numerics.Vector3[mesh.Positions.Length];
+        Console.WriteLine($"    {move.Name}: {tracks.Frames:F0} frames at {move.Rate}/s, {move.Tracks} tracks");
+        for (var step = 0; step <= 4; step++)
+        {
+            float frame = tracks.Frames * step / 4f;
+            pose.Take(tracks, frame);
+            pose.Move(mesh, posed, normals);
+            Console.WriteLine(
+                $"      frame {frame,6:F1}: lowest bone {Lowest(pose.World, rig)}, root {Root(pose.World, rig)}, "
+                + $"lowest vertex z {Lowest(posed):F2}");
+        }
+    }
+
+    /// <summary>The largest z among the points - the lowest, the model's up being -z.</summary>
+    private static float Lowest(ReadOnlySpan<System.Numerics.Vector3> places)
+    {
+        float lowest = float.MinValue;
+        foreach (System.Numerics.Vector3 place in places)
+        {
+            lowest = MathF.Max(lowest, place.Z);
+        }
+
+        return lowest;
+    }
+
+    /// <summary>The lowest bone's z and its name.</summary>
+    private static string Lowest(IReadOnlyList<System.Numerics.Matrix4x4> bones, PoEformance.Game.Files.AnimationSkeleton rig)
+    {
+        var lowest = float.MinValue;
+        var name = "?";
+        for (var at = 0; at < bones.Count && at < rig.Bones.Count; at++)
+        {
+            float z = bones[at].Translation.Z;
+            if (z > lowest)
+            {
+                lowest = z;
+                name = rig.Bones[at].Name;
+            }
+        }
+
+        return $"z {lowest:F2} ({name})";
+    }
+
+    /// <summary>The root's position - the bone called root, or the first one where nothing is.</summary>
+    private static string Root(IReadOnlyList<System.Numerics.Matrix4x4> bones, PoEformance.Game.Files.AnimationSkeleton rig)
+    {
+        var root = 0;
+        for (var at = 0; at < rig.Bones.Count; at++)
+        {
+            if (string.Equals(rig.Bones[at].Name, "root", StringComparison.OrdinalIgnoreCase))
+            {
+                root = at;
+                break;
+            }
+        }
+
+        if (root >= bones.Count)
+        {
+            return "?";
+        }
+
+        System.Numerics.Vector3 at_ = bones[root].Translation;
+        return $"{rig.Bones[root].Name} at ({at_.X:F2}, {at_.Y:F2}, {at_.Z:F2})";
     }
 
     private static void RunGroundTypeDump()
@@ -3884,6 +4095,7 @@ internal static class Program
         bool DumpAnimations,
         string? DumpAo,
         string? DumpAst,
+        string? DumpPose,
         bool ReadGlossary,
         bool ListTables,
         IReadOnlyList<string> Peek,
@@ -3901,7 +4113,7 @@ internal static class Program
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
             bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false, mapHunt = false;
             bool sweep = false, groundTypeDump = false, glossary = false, listTables = false;
-            string? aoDump = null, astDump = null;
+            string? aoDump = null, astDump = null, poseDump = null;
             var inventorySweep = false;
             string tabName = string.Empty;
             List<string> peek = [];
@@ -4053,6 +4265,16 @@ internal static class Program
                             : string.Empty;
                         break;
 
+                    // The hop after --astdump: the mesh posed on the skeleton, and where its feet
+                    // come out against the ground the model pane draws at the origin. Takes the
+                    // monster name or path; there is no survey form, because a pose is only
+                    // worth reading for the monster that stands wrong.
+                    case "--posedump":
+                        poseDump = i + 1 < args.Length && !args[i + 1].StartsWith("--", StringComparison.Ordinal)
+                            ? Value(ref i)
+                            : string.Empty;
+                        break;
+
                     // Regenerates data/animations.tsv from the game. Not a hunt - nothing is
                     // being searched for any more - so it stops the moment the row array's base
                     // is confirmed rather than sampling for as long as somebody plays.
@@ -4119,7 +4341,7 @@ internal static class Program
             return new CliOptions(
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, watchFlasks, probeKeys,
                 debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, mapHunt, sweep,
-                inventorySweep, tabName, groundTypeDump, animDump, aoDump, astDump,
+                inventorySweep, tabName, groundTypeDump, animDump, aoDump, astDump, poseDump,
                 glossary, listTables, peek, peekWatch, updateOutcome, updatedVersion);
         }
     }

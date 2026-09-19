@@ -486,8 +486,10 @@ header's version gates are measured for every version this reader walks, not the
 
 The format diagrams are [poe_data_tools/FORMATS.md](https://github.com/adamthedash/poe_data_tools/blob/master/FORMATS.md);
 `ggpk.exposed/poe2/<path>` serves the game's own files over HTTP, which is how these readers were
-checked against real data on a machine with no install. `--aodump` surveys the `.ao` graph and
-`--astdump` the skeletons it leads to.
+checked against real data on a machine with no install. `--aodump` surveys the `.ao` graph,
+`--astdump` the skeletons it leads to, and `--posedump` poses one monster's mesh on its skeleton and
+reports where its feet come out against the ground plane — the numbers behind a monster that stands
+in the model pane's floor or hovers above it.
 
 ## Deployment
 
@@ -611,6 +613,7 @@ PoEformance.App --aodump                      # survey every monster's .ao files
 PoEformance.App --aodump "Skeletal Warrior"   # + one monster's files in full, structs and entries
 PoEformance.App --astdump                     # survey the skeletons those .ao files name: bones and animations
 PoEformance.App --astdump "Skeletal Warrior"  # + one monster's rig in full, every bone and every animation
+PoEformance.App --posedump "TitanBoss"        # where a monster's feet are: box, bind skeleton, and posed frame by frame
 
 # Look at one address somebody already found (Cheat Engine path, as written):
 PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"
