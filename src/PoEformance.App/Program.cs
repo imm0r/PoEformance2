@@ -3101,7 +3101,9 @@ internal static class Program
             settings.MonsterModel,
             readFile: installed is null ? null : installed.Read,
             modelSize: settings.MonsterModelSize,
-            unpack: installed is null ? null : installed.Unpack);
+            unpack: installed is null ? null : installed.Unpack,
+            columnWidths: settings.MonsterColumnWidths,
+            panes: settings.MonsterPanes);
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read

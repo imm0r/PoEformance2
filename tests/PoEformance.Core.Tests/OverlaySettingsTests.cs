@@ -613,4 +613,74 @@ public class OverlaySettingsMergeTests
         Assert.Null(OverlaySettings.Default.NoiseOff);
         Assert.Empty(OverlaySettings.Default.NoiseOffOrEmpty);
     }
+
+    /// <summary>
+    /// The monster book's column widths and pane boundaries survive a restart, by the names it
+    /// writes them under.
+    /// </summary>
+    /// <remarks>
+    /// THE ROUND TRIP AND THE FILE, both. Both of these are DICTIONARIES, and a dictionary is a
+    /// shape the source-generated JSON has to have been told about - where that goes wrong is
+    /// Native AOT, on somebody else's machine, as a settings file that silently stops holding
+    /// one key. Reading the text back pins the names too: this is the whole point of keying by
+    /// name rather than by position, and a renamed key is a layout quietly forgotten.
+    ///
+    /// The numbers are a real layout rather than round ones - a name column dragged wide, the two
+    /// figure columns left near their fitted width, and three boundaries nowhere near their
+    /// defaults of 0.2, 0.46 and 0.58.
+    /// </remarks>
+    [Fact]
+    public void TheMonsterBooksWidthsAndPanesSurviveARestart()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-monsterbook-{Guid.NewGuid():N}.json");
+        try
+        {
+            Assert.True(OverlaySettingsStore.Save(
+                OverlaySettings.Default with
+                {
+                    MonsterColumnWidths = new Dictionary<string, int>(StringComparer.Ordinal)
+                    {
+                        ["name"] = 214,
+                        ["skills"] = 47,
+                        ["size"] = 41,
+                    },
+                    MonsterPanes = new Dictionary<string, double>(StringComparer.Ordinal)
+                    {
+                        ["rail"] = 0.17,
+                        ["list"] = 0.38,
+                        ["model"] = 0.62,
+                    },
+                },
+                path));
+
+            OverlaySettings back = OverlaySettingsStore.Load(path);
+
+            Assert.NotNull(back.MonsterColumnWidths);
+            Assert.Equal(214, back.MonsterColumnWidths["name"]);
+            Assert.Equal(47, back.MonsterColumnWidths["skills"]);
+            Assert.Equal(41, back.MonsterColumnWidths["size"]);
+
+            Assert.NotNull(back.MonsterPanes);
+            Assert.Equal(0.17, back.MonsterPanes["rail"], 6);
+            Assert.Equal(0.38, back.MonsterPanes["list"], 6);
+            Assert.Equal(0.62, back.MonsterPanes["model"], 6);
+
+            string written = File.ReadAllText(path);
+            Assert.Contains("monsterColumnWidths", written, StringComparison.Ordinal);
+            Assert.Contains("monsterPanes", written, StringComparison.Ordinal);
+            Assert.Contains("\"skills\"", written, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    /// <summary>Until somebody drags something there is nothing to remember, and no key for it.</summary>
+    [Fact]
+    public void AnUndraggedBookRemembersNothing()
+    {
+        Assert.Null(OverlaySettings.Default.MonsterColumnWidths);
+        Assert.Null(OverlaySettings.Default.MonsterPanes);
+    }
 }

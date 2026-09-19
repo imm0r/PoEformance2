@@ -74,10 +74,56 @@ public sealed class DataGrid
     /// <summary>The list has to be put back in order - it was just refiltered or rebuilt.</summary>
     private bool _resort = true;
 
+    /// <summary>How wide each column is, by column NAME. See <see cref="Widths"/>.</summary>
+    private readonly Dictionary<string, int> _widths = new(StringComparer.Ordinal);
+
+    /// <summary>Whether a width has changed since it was last reported.</summary>
+    private bool _moved;
+
     public DataGrid() => _compare = Compare;
 
     /// <summary>Says the row list has changed underneath, so the next draw re-sorts it.</summary>
     public void Resort() => _resort = true;
+
+    /// <summary>
+    /// How wide each column is right now, in pixels, by column NAME - for a caller that writes
+    /// it down.
+    /// </summary>
+    /// <remarks>
+    /// BY NAME AND NOT BY POSITION, for the reason the monster book already gives about which
+    /// columns it shows: a column added anywhere but the end shifts every number after it, and a
+    /// width saved one release would then be handed to a different column the next.
+    ///
+    /// MEASURED RATHER THAN ASKED FOR, because there is nothing to ask. ImGui.NET 1.91.6 binds no
+    /// TableGetColumnWidth and no TableSetColumnWidth - neither is in ImGuiNative either - so the
+    /// width is read where it can be read: at the START of a header cell the content region is
+    /// exactly the column's given width. TableBeginCell puts the cursor at the column's WorkMinX
+    /// and the work rect's right edge at its WorkMaxX, GetContentRegionAvail inside a table is
+    /// WorkRect.Max - CursorPos, and WorkMaxX - WorkMinX is WidthGiven by construction
+    /// (imgui_tables.cpp: MaxX = MinX + WidthGiven + spacing + 2*padding, WorkMinX = MinX +
+    /// padding + spacing1, WorkMaxX = MaxX - padding - spacing2).
+    /// </remarks>
+    public IReadOnlyDictionary<string, int> Widths => _widths;
+
+    /// <summary>Told once when a drag of a column's boundary ends. See <see cref="PaneSplit.Settled"/>.</summary>
+    public Action? Settled { get; set; }
+
+    /// <summary>Puts back widths that were written down. Nonsense is dropped, so the fitted width stands.</summary>
+    public void Restore(IReadOnlyDictionary<string, int>? widths)
+    {
+        if (widths is null)
+        {
+            return;
+        }
+
+        foreach ((string name, int wide) in widths)
+        {
+            if (wide > 0 && name.Length > 0)
+            {
+                _widths[name] = wide;
+            }
+        }
+    }
 
     /// <summary>
     /// Draws the rows named in <paramref name="rows"/> and returns what is selected after it.
@@ -135,8 +181,26 @@ public sealed class DataGrid
                 // ASKED FOR RATHER THAN FITTED, and this is the price of clipping: a table only
                 // ever sees the rows on screen, so left to fit its own content a column is sized to
                 // forty rows of two thousand. The width is the widest cell the COLUMN holds, which
-                // the store worked out when it was built, or the header and its sort arrow.
-                if (stretch)
+                // the store worked out when it was built, or the header and its sort arrow - or,
+                // where there is one, what somebody dragged this column to in an earlier session.
+                //
+                // AND IT IS ONLY EVER A STARTING WIDTH. TableSetupColumn takes the number while
+                // table->IsInitializing and only where the column has no width of its own yet, so
+                // handing it the same value on every frame does not fight a drag in progress - the
+                // drag is what this reads back, in Measured below.
+                //
+                // A STRETCH COLUMN'S NUMBER IS A WEIGHT AND NOT A WIDTH, and handing it the saved
+                // WIDTH is right regardless: ImGui divides the room among stretch columns in
+                // proportion to their weights (TableUpdateLayout: weight_ratio = StretchWeight /
+                // stretch_sum_weights), so weights proportional to the saved widths reproduce the
+                // saved proportions. With one stretch column - which is every table here - any
+                // weight at all fills whatever the fixed columns leave.
+                _widths.TryGetValue(column.Name, out int kept);
+                if (kept > 0)
+                {
+                    ImGui.TableSetupColumn(column.Name, flags, kept);
+                }
+                else if (stretch)
                 {
                     ImGui.TableSetupColumn(column.Name, flags);
                 }
@@ -157,6 +221,16 @@ public sealed class DataGrid
             // drawn once - and before the body, so the first frame of a new list is in order
             // rather than in whatever order the dictionary handed it over in.
             Sort(store, columns, rows);
+
+            // ONCE THE HAND IS OFF THE MOUSE. The header row above measured what the columns are;
+            // reporting that while a boundary is still being dragged is a settings file rewritten
+            // whole on every frame of the drag. A pane being widened moves a stretch column the
+            // same way and ends the same way, so it is caught by the same test.
+            if (_moved && !ImGui.IsAnyMouseDown())
+            {
+                _moved = false;
+                Settled?.Invoke();
+            }
 
             return Body(store, columns, rows, chosen, hooks);
         }
@@ -181,7 +255,7 @@ public sealed class DataGrid
     /// interaction here somebody finds by accident rather than by being told; the bins it picked
     /// stay lit afterwards, so the header says what the table is currently hiding.
     /// </remarks>
-    private static void Headers(
+    private void Headers(
         ColumnStore store, IReadOnlyList<int> columns, IReadOnlyList<ColumnRange> ranges, DataGridHooks? hooks)
     {
         float plot = ImGui.GetTextLineHeight() * PlotLines;
@@ -193,6 +267,11 @@ public sealed class DataGrid
         {
             ImGui.TableNextColumn();
             int index = columns[at];
+
+            // BEFORE ANYTHING IS DRAWN IN THE CELL, because what is being read is the room the
+            // cell starts with - see Widths. One line of anything moves the cursor and the
+            // answer with it.
+            Measured(store.Columns[index].Name);
 
             // BY STORE COLUMN AND NOT BY POSITION: hiding a column shifts every position after it,
             // and an id built from the position would hand one column's drag state to another.
@@ -207,6 +286,35 @@ public sealed class DataGrid
             {
                 ImGui.PopID();
             }
+        }
+    }
+
+    /// <summary>Notes how wide the column whose cell has just begun is.</summary>
+    /// <remarks>
+    /// THE FIRST SIGHT OF A COLUMN IS NOT A CHANGE. It is whatever the table fitted or whatever
+    /// was restored, and reporting it would have every open of the window rewrite the settings
+    /// file to say what it already said. Only a width that MOVES from a width already known is a
+    /// drag, and only a drag is worth writing down.
+    /// </remarks>
+    private void Measured(string name)
+    {
+        var wide = (int)MathF.Round(ImGui.GetContentRegionAvail().X);
+        if (wide <= 0)
+        {
+            // A column scrolled out of sight, or a table with no room at all. Neither is a width.
+            return;
+        }
+
+        if (!_widths.TryGetValue(name, out int had))
+        {
+            _widths[name] = wide;
+            return;
+        }
+
+        if (had != wide)
+        {
+            _widths[name] = wide;
+            _moved = true;
         }
     }
 

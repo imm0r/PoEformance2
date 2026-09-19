@@ -141,6 +141,19 @@ public sealed record OverlaySettings(
     // where. See MonsterBookWindow.
     [property: JsonPropertyName("monsterColumns")] IReadOnlyList<string>? MonsterColumns = null,
 
+    // How wide each of those columns is, in pixels, BY NAME for the reason above. ImGui keeps a
+    // dragged width for as long as the table lives and no longer - it is written into no file this
+    // tool reads or writes - so a reading layout somebody set up once was thrown away on every
+    // launch, which is what was reported. Null until a column is actually dragged; a name the
+    // table no longer has is simply never asked for.
+    [property: JsonPropertyName("monsterColumnWidths")] IReadOnlyDictionary<string, int>? MonsterColumnWidths = null,
+
+    // And where the window's three boundaries sit, as the share of the room the left pane of each
+    // takes. By the same argument: three panes, a facet rail, a table and a model is a layout
+    // somebody fits to their monitor once. Values outside what a drag can reach are ignored rather
+    // than clamped, so a hand-edited file cannot hide a pane - see PaneSplit.Restore.
+    [property: JsonPropertyName("monsterPanes")] IReadOnlyDictionary<string, double>? MonsterPanes = null,
+
     // Whether the monster book's facet rail has a pane of its own. ON by default, because a rail
     // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is
     // read WHILE PLAYING: three panes wide enough to read is most of a monitor, and the game wants

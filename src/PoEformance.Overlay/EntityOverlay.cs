@@ -481,6 +481,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             MonsterColumns = _monsterBook?.Columns is { Count: > 0 } columns
                 ? columns
                 : basis.MonsterColumns,
+            MonsterColumnWidths = _monsterBook?.ColumnWidths is { Count: > 0 } widths
+                ? widths
+                : basis.MonsterColumnWidths,
+            MonsterPanes = _monsterBook?.Panes is { Count: > 0 } panes
+                ? panes
+                : basis.MonsterPanes,
             MonsterRail = _monsterBook?.RailOpen ?? basis.MonsterRail,
             MonsterModel = _monsterBook?.ModelOpen ?? basis.MonsterModel,
             ShowProjectiles = _projectiles.Enabled,
@@ -2052,7 +2058,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         bool visible = false,
         Func<string, byte[]?>? readFile = null,
         int modelSize = PictureLadder.Usual,
-        Func<ReadOnlyMemory<byte>, int, byte[]?>? unpack = null)
+        Func<ReadOnlyMemory<byte>, int, byte[]?>? unpack = null,
+        IReadOnlyDictionary<string, int>? columnWidths = null,
+        IReadOnlyDictionary<string, double>? panes = null)
     {
         var window = new MonsterBookWindow(() => Monsters, () => StatSentences?.Invoke() ?? _noSentences)
         {
@@ -2066,7 +2074,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack),
         };
 
-        window.Show(columns, rail, model);
+        window.Show(columns, rail, model, columnWidths, panes);
         _monsterBook = window;
 
         _tools.Add(
