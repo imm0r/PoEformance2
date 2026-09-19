@@ -393,6 +393,19 @@ false`. What cost time to rediscover here is written down:
   slide out on their own and no control needs telling that a pane went. **The monster count is the
   exception and deliberately so**: it is the answer to the query, not a control, so it hangs from
   the box's own right edge. Put over the list it describes, it read as a label for the list.
+- **A footer under filling panes is two mistakes deep, and a headless ImGui settled both.** The
+  panes hold one text line back with `GetContentRegionAvail().Y - GetTextLineHeightWithSpacing()`,
+  which is right and was not enough. The **grip between two panes** took
+  `GetContentRegionAvail().Y` for its own height — measured after `SameLine`, so the *whole*
+  remaining room — and ImGui gives a line the height of its tallest item, so an invisible grip
+  silently made the row taller than every pane on it and ate the reserved line. And closing the
+  footer's row with `NewLine` added a whole blank one: `ItemSize` has already ended the line by
+  then, so `NewLine` takes its `ItemSize(0, FontSize)` branch. Both were found by building the
+  same nesting — window, page child, tab bar, tab item, panes, footer — against
+  `libcimgui.so` on Linux and printing the cursor positions, which is worth remembering: **ImGui
+  layout questions in this project are answerable without Windows and without the game.** What
+  such a harness cannot test is this window itself, since the overlay layer is Windows-only, so
+  it settles arguments rather than guarding against regressions.
 - **What the book *is* moved to a footer; what the query *found* stayed at the top.** Named
   skills, named tags, stat wordings and the day the table was built are not read while somebody is
   searching, and they sat between the query and the panes. They are one line under the panes now,

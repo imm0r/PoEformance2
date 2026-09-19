@@ -113,12 +113,28 @@ public sealed class PaneSplit(float share, string name = "pane")
     }
 
     /// <summary>The divider itself. Call BETWEEN the two panes, in place of the bare SameLine.</summary>
-    public void Bar()
+    /// <param name="height">
+    /// How tall the grip is. Zero asks for the rest of the room, which is right only where the
+    /// panes beside it take the rest of the room too.
+    /// </param>
+    /// <remarks>
+    /// THE GRIP HAS TO BE THE PANES' HEIGHT AND NOT THE ROOM'S, and getting that wrong is quiet.
+    /// A grip is invisible and ImGui gives a line the height of the TALLEST item on it, so a grip
+    /// reaching past the panes beside it simply makes the row taller than any of them - with
+    /// nothing on screen to say so. That swallowed the monster book's footer whole: the panes held
+    /// a line back for it, the grip took the line anyway, and the footer landed under the bottom
+    /// of a window which then grew a scrollbar nobody had asked for.
+    ///
+    /// The parameter has a default because the other windows using this DO fill the room, and for
+    /// them asking is the right answer - it is only a caller keeping something back that has to
+    /// say so.
+    /// </remarks>
+    public void Bar(float height = 0f)
     {
         ImGui.SameLine(0f, 0f);
 
-        float height = MathF.Max(1f, ImGui.GetContentRegionAvail().Y);
-        ImGui.InvisibleButton(_grip, new Vector2(Grip, height));
+        float tall = height > 0f ? height : MathF.Max(1f, ImGui.GetContentRegionAvail().Y);
+        ImGui.InvisibleButton(_grip, new Vector2(Grip, tall));
 
         bool held = ImGui.IsItemActive();
         bool hovered = ImGui.IsItemHovered();

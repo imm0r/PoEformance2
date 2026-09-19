@@ -325,10 +325,12 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         Header(all, said, edges);
         Filter();
 
-        // ONE TEXT LINE HELD BACK FOR THE FOOTER. A pane asking for the rest of the height would
-        // take that line too and put the footer off the bottom of the window, where ImGui answers
-        // with a scrollbar over the whole book.
-        float tall = -ImGui.GetTextLineHeightWithSpacing();
+        // ONE TEXT LINE HELD BACK FOR THE FOOTER, and handed to the GRIPS as well as to the panes.
+        // A pane asking for the rest of the height would take that line too and put the footer
+        // under the bottom of the window; so would a grip, which is the half that was missed the
+        // first time and is invisible when it goes wrong - see PaneSplit.Bar.
+        float tall = MathF.Max(
+            1f, ImGui.GetContentRegionAvail().Y - ImGui.GetTextLineHeightWithSpacing());
 
         if (_railOpen)
         {
@@ -340,7 +342,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
 
             ImGui.EndChild();
 
-            _rail.Bar();
+            _rail.Bar(tall);
         }
 
         float left = _split.Left();
@@ -351,7 +353,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
 
         ImGui.EndChild();
 
-        _split.Bar();
+        _split.Bar(tall);
 
         // THE DETAIL PANE GIVES UP WIDTH ONLY WHEN THE MODEL IS SHOWING. With the model folded
         // away it takes the rest, exactly as it did before there was a model at all.
@@ -365,7 +367,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
 
         if (_modelOpen)
         {
-            _model.Bar();
+            _model.Bar(tall);
 
             if (ImGui.BeginChild("##monster-model", new Vector2(0f, tall), ImGuiChildFlags.Borders))
             {
@@ -599,6 +601,10 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             ImGui.SetTooltip(Grammar);
         }
 
+        // A GAP BETWEEN THE BOX AND THE ROW, asked for from the live client. The two are different
+        // kinds of thing - one is typed into, the others are pressed - and at the ordinary item
+        // spacing they read as one block of controls.
+        ImGui.Spacing();
         Controls(all, edges);
         Caret(box, below);
     }
@@ -732,7 +738,7 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
         float start = ImGui.GetCursorPosX();
         Put(start + edges.Detail - wide);
 
-        Piece(skills);
+        ImGui.TextDisabled(skills);
         Piece(Between);
         Piece(tags);
         Piece(Between);
@@ -754,17 +760,19 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
             }
         }
 
-        // The row is closed rather than left hanging on a SameLine, so that whatever is drawn
-        // after this - today nothing, tomorrow something - starts on its own line.
-        ImGui.NewLine();
-
-        // NO SPACING BETWEEN THE PIECES, because the separators are already in the text. They are
+        // THE JOIN COMES BEFORE EACH PIECE AND NOT AFTER IT, so the line ends on a piece rather
+        // than on a dangling SameLine - and so nothing has to close it afterwards. Closing it with
+        // NewLine was the first attempt and it cost a WHOLE BLANK LINE: ItemSize has already ended
+        // the line by then, so NewLine takes the branch that adds a font-size gap, which is enough
+        // to push the footer under the bottom of the window. Measured in a headless ImGui.
+        //
+        // NO SPACING IN THE JOIN, because the separators are already in the text. The pieces are
         // separate items only so that each can answer a hover of its own, and a gap between them
         // would make one line read as five.
         static void Piece(string text)
         {
-            ImGui.TextDisabled(text);
             ImGui.SameLine(0f, 0f);
+            ImGui.TextDisabled(text);
         }
     }
 
