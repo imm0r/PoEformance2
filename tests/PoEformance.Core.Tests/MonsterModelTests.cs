@@ -189,6 +189,60 @@ public class MonsterModelTests
         Assert.NotNull(other.Skins[0]);
     }
 
+    /// <summary>
+    /// The number after a material picks the graph inside it, and so the shape's own texture.
+    /// </summary>
+    /// <remarks>
+    /// THE OTHER HALF OF PAINTING A MONSTER PART BY PART, and the one that was hiding in plain
+    /// sight: MaterialFile.Bare's own remark says the ":n" picks WITHIN the file, and nothing
+    /// read it. A boss with one material and several shapes - which is most of them - had every
+    /// shape reading the FIRST colour map in that file, so the head's sheet went on the cloak.
+    /// Reported from the live client on Veynar, Connal and Count Geonor in the same evening.
+    /// </remarks>
+    [Fact]
+    public void TheSelectorPicksWhichTextureTheShapeWears()
+    {
+        var install = Install();
+        install.Files["art/second.dds"] = Dds();
+        install.Files["art/paint.mat"] = Encoding.UTF8.GetBytes(
+            """{"graphinstances":[{"custom_parameters":[{"name":"AlbedoTransparency_TEX","parameters":[{"path":"art/skin.dds"}]}]},{"custom_parameters":[{"name":"AlbedoTransparency_TEX","parameters":[{"path":"art/second.dds"}]}]}]}""");
+
+        // The .sm names the material with no selector, so the model's own skin is the file's
+        // first colour map - and the shape asks for the second graph by number.
+        install.Files["art/skin.dds"] = Dds();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", material: "art/paint.mat:1");
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.True(said.Painted);
+        Assert.Equal(["art/second.dds"], said.Textures);
+        Assert.False(said.Guessed);
+    }
+
+    /// <summary>
+    /// A colour map picked with nothing saying it is one is reported as a guess.
+    /// </summary>
+    /// <remarks>
+    /// A mask or an occlusion map drawn as colour is a monster in greyscale, which reads as a
+    /// missing texture and sends somebody looking for a file that is not lost - reported on the
+    /// Vessel of Kulemak, who is painted from two sheets and looks unpainted. The pane says so
+    /// now, and this is the flag it says it from.
+    /// </remarks>
+    [Fact]
+    public void AColourMapNothingNamedIsMarkedAsAGuess()
+    {
+        var install = Install();
+        install.Files["art/skin.dds"] = Dds();
+        install.Files["art/paint.mat"] = Encoding.UTF8.GetBytes(
+            """{"textures":[{"filename":"art/skin.dds","format":"DXT1"}]}""");
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.True(said.Painted);
+        Assert.Equal(["art/skin.dds"], said.Textures);
+        Assert.True(said.Guessed);
+    }
+
     /// <summary>And when none of them has one, the reason says all of them were asked.</summary>
     [Fact]
     public void EveryMaterialTriedIsNamedWhenNoneHasColour()

@@ -106,6 +106,90 @@ public class MaterialFileTests
     }
 
     /// <summary>
+    /// The number after a material picks one of its graphs, and each graph has its own colour map.
+    /// </summary>
+    /// <remarks>
+    /// THE REMARK ON <c>Bare</c> SAID THIS ALL ALONG - "the number picks within the file" - and
+    /// nothing acted on it: the graphs were merged into one dictionary and every shape of a
+    /// monster read the FIRST colour map in the file. On a monster built of parts that paints
+    /// the head's sheet onto the cloak, which is patches of the wrong colour rather than a
+    /// missing texture, and it was reported from the live client on three bosses in a row.
+    ///
+    /// THE FALLBACK IS THE OTHER HALF. A selector past the end, or one pointing at a graph with
+    /// no colour map in it, leaves the shape with the file's own answer - which is what it had
+    /// before any of this, so a material shaped in a way this does not understand is no worse
+    /// off than it was.
+    /// </remarks>
+    [Fact]
+    public void ASelectorPicksTheGraphItNumbers()
+    {
+        MaterialFile said = MaterialFile.Parse(
+            """
+            {"graphinstances":[
+              {"custom_parameters":[
+                {"name":"AlbedoTransparency_TEX","parameters":[{"path":"art/head_colour.dds"}]}]},
+              {"custom_parameters":[
+                {"name":"AlbedoTransparency_TEX","parameters":[{"path":"art/cloak_colour.dds"}]}]},
+              {"custom_parameters":[
+                {"name":"NormalGlossAO_TEX","parameters":[{"path":"art/rim_normal.dds"}]}]}
+            ]}
+            """);
+
+        Assert.Equal(3, said.Graphs.Count);
+        Assert.Equal("art/head_colour.dds", said.AlbedoAt(0));
+        Assert.Equal("art/cloak_colour.dds", said.AlbedoAt(1));
+
+        // The merged view is unchanged for anything with no selector to go on: the first
+        // colour map in the file.
+        Assert.Equal("art/head_colour.dds", said.Albedo);
+        Assert.Equal("art/head_colour.dds", said.AlbedoAt(-1));
+
+        // A graph with no colour map of its own, and one past the end: the file's answer.
+        Assert.Equal("art/head_colour.dds", said.AlbedoAt(2));
+        Assert.Equal("art/head_colour.dds", said.AlbedoAt(9));
+    }
+
+    [Theory]
+    [InlineData("art/Boss.mat:0", 0)]
+    [InlineData("art/Boss.mat:1", 1)]
+    [InlineData("art/Boss.mat:12", 12)]
+    [InlineData("art/Boss.mat", -1)]
+    [InlineData("art/Boss:name.mat", -1)]
+    [InlineData("", -1)]
+    [InlineData(null, -1)]
+    public void TheSelectorIsReadOffThePath(string? path, int at)
+    {
+        Assert.Equal(at, MaterialFile.SelectorOf(path));
+
+        // And the two halves agree about where the colon is: what Bare cuts off is what
+        // SelectorOf reads, so a path cannot be a file to one of them and not to the other.
+        Assert.Equal(at >= 0, MaterialFile.Bare(path) != (path ?? string.Empty).Trim());
+    }
+
+    /// <summary>
+    /// A colour map chosen because nothing SAID it is one is reported as the guess it is.
+    /// </summary>
+    /// <remarks>
+    /// The fallback - the first texture that is not a normal map - is right on the materials
+    /// that have been looked at and lands on a mask or an occlusion map when it is not. That
+    /// draws the monster in greyscale, which reads as "the texture is missing" and sends
+    /// somebody hunting for a file that is not lost. See MonsterModel.Guessed.
+    /// </remarks>
+    [Fact]
+    public void AGuessedColourMapSaysItWasGuessed()
+    {
+        MaterialFile named = MaterialFile.Parse(
+            """{"graphinstances":[{"custom_parameters":[{"name":"AlbedoTransparency_TEX","parameters":[{"path":"a/b_colour.dds"}]}]}]}""");
+
+        Assert.Equal(("a/b_colour.dds", true), named.AlbedoOf(0));
+
+        MaterialFile guessed = MaterialFile.Parse(
+            """{"textures":[{"filename":"a/b_normal_DXT5.dds"},{"filename":"a/b_mask.dds"}]}""");
+
+        Assert.Equal(("a/b_mask.dds", false), guessed.AlbedoOf(-1));
+    }
+
+    /// <summary>
     /// A trailing comma is legal here and throws in the parser's default settings.
     /// </summary>
     /// <remarks>

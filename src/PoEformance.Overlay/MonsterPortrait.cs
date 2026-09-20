@@ -170,6 +170,10 @@ public sealed class MonsterPortrait
         + "tile: the arena's own path, where it is known.\n"
         + "name: what the game calls it. it becomes the marker's label.";
 
+    /// <summary>How many texture file names the cost line prints before it stops.</summary>
+    /// <remarks>Two is what a monster of parts usually has; more than three is a line nobody reads.</remarks>
+    private const int Named = 3;
+
     /// <summary>Longest each of the three fields may be. A path is the long one.</summary>
     private const uint AreasLength = 512;
 
@@ -1451,13 +1455,38 @@ public sealed class MonsterPortrait
         {
             string said = $"read {ByteCount.Said(_model.Bytes)} in {_model.Files} file{(_model.Files == 1 ? string.Empty : "s")}";
 
-            // HOW MANY SHEETS THE MONSTER IS PAINTED FROM, where it is more than one. A model
-            // built of parts wears a texture per shape, and saying so is what makes a picture
-            // that looks subtly wrong - a cloak in the body's colours - a thing somebody can
-            // check rather than squint at. One is the ordinary case and says nothing.
-            if (_model.Materials.Count > 1)
+            // HOW MANY SHEETS THE MONSTER IS PAINTED FROM, whenever it is painted at all.
+            // This was shown only for more than one, on the reasoning that one is the
+            // ordinary case and says nothing - and it says the one thing that was asked from
+            // the live client: whether the part-by-part painting is running and found a
+            // single sheet, or is not running at all. A line that appears only in the
+            // interesting case cannot answer that, because its absence is also what the
+            // version without it looks like.
+            if (_model.Materials.Count > 0)
             {
-                said += $" · {_model.Mesh.Shapes.Count} shapes from {_model.Materials.Count} textures";
+                int sheets = _model.Materials.Count;
+                said += $" · {_model.Mesh.Shapes.Count} shapes from {sheets} texture{(sheets == 1 ? string.Empty : "s")}";
+
+                // WHICH SHEETS, BY NAME, because a WRONG texture and a MISSING one look the
+                // same on screen: a mask or an occlusion map drawn as colour is a monster in
+                // greyscale, which reads as "the texture is gone" - and the file name settles
+                // it in a word. Reported on the Vessel of Kulemak, who is painted from two
+                // sheets and looks unpainted.
+                if (_model.Textures.Count > 0)
+                {
+                    said += ": " + string.Join(
+                        ", ", _model.Textures.Take(Named).Select(one => one[(one.LastIndexOf('/') + 1)..]));
+                }
+
+                // AND WHETHER THE CHOICE WAS A GUESS. Where no slot carries Albedo, Colour or
+                // Color, the rule is "the first texture that is not a normal map" - right on
+                // the materials that have been looked at, and still a guess. It has been
+                // marked as one in the comments since it was written; this is the first time
+                // it says so where somebody looking at the picture can see it.
+                if (_model.Guessed)
+                {
+                    said += " · no slot said which map is the colour one";
+                }
             }
 
             if (_tracks is { Ready: true } tracks)

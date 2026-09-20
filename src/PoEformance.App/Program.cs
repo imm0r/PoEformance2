@@ -2903,6 +2903,12 @@ internal static class Program
         overlay.Noise = world.Noise;
         overlay.Memory = world.Memory;
 
+        // WHAT BUILD THIS IS, on the title bar. The version says what was meant to be in it
+        // and the stamp says which commit actually was - a build compiled here has no stamp
+        // and reads "local", which is the answer that keeps a version number from being
+        // mistaken for a released one. See ToolVersion.
+        overlay.Version = PoEformance.Features.ToolVersion.With(PoEformance.Features.BuildStamp.Load());
+
         // The effects debug switch, as a pair of callbacks: the overlay draws and has no other
         // business with the reader, and this is the one bit of it worth reaching from up there.
         overlay.KeepEffects = keep => world.KeepEffects = keep;

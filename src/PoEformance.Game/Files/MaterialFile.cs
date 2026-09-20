@@ -42,6 +42,7 @@ public sealed class MaterialFile
     {
         Textures = [];
         Slots = new Dictionary<string, string>(StringComparer.Ordinal);
+        Graphs = [];
     }
 
     /// <summary>Every texture the file lists, in the order it lists them.</summary>
@@ -49,6 +50,24 @@ public sealed class MaterialFile
 
     /// <summary>Slot name to the texture path filling it, as the shader graphs assign them.</summary>
     public IReadOnlyDictionary<string, string> Slots { get; private init; }
+
+    /// <summary>
+    /// The same slots kept per graph instance, in file order - which is what a <c>:n</c> selects.
+    /// </summary>
+    /// <remarks>
+    /// THE NUMBER AFTER THE MATERIAL PICKS ONE OF THESE, and that was written down in this file
+    /// and then not acted on: an .ao names a material per shape as <c>…/Boss.mat:0</c>,
+    /// <c>…/Boss.mat:1</c>, and the remark on <see cref="Bare"/> says outright that the number
+    /// picks WITHIN the file. Merged into one dictionary, every shape of such a monster reads
+    /// the FIRST graph's colour map - which paints the head's sheet onto the cloak and reads as
+    /// patches of the wrong colour. Reported from the live client on three bosses in a row:
+    /// Bahlak, Connal and Count Geonor.
+    ///
+    /// <see cref="Slots"/> is kept beside it and is still the merged view, because the caller
+    /// with no selector to go on wants exactly that: the file's colour map, whichever graph
+    /// happens to carry it.
+    /// </remarks>
+    public IReadOnlyList<IReadOnlyDictionary<string, string>> Graphs { get; private init; }
 
     /// <summary>Whether anything was read.</summary>
     public bool Ready => Textures.Count > 0 || Slots.Count > 0;
@@ -71,14 +90,9 @@ public sealed class MaterialFile
     {
         get
         {
-            foreach ((string slot, string path) in Slots)
+            if (Coloured(Slots) is { Length: > 0 } named)
             {
-                if (slot.Contains("Albedo", StringComparison.OrdinalIgnoreCase)
-                    || slot.Contains("Colour", StringComparison.OrdinalIgnoreCase)
-                    || slot.Contains("Color", StringComparison.OrdinalIgnoreCase))
-                {
-                    return path;
-                }
+                return named;
             }
 
             foreach (MaterialTexture one in Textures)
@@ -96,6 +110,79 @@ public sealed class MaterialFile
     private static bool Normal(string path)
         => path.Contains("_normal", StringComparison.OrdinalIgnoreCase)
             || path.Contains("NormalGloss", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// The colour texture of ONE graph instance - what a <c>…/Boss.mat:1</c> asks for.
+    /// </summary>
+    /// <remarks>
+    /// FALLS BACK TO THE WHOLE FILE, which is the same trade the rest of this makes: a
+    /// selector pointing past the graphs, or at one that carries no colour map, leaves the
+    /// shape with the material's own answer rather than with nothing. That is what it had
+    /// before the selector was read at all, so nothing is made worse by a file this does not
+    /// understand.
+    /// </remarks>
+    /// <param name="at">The number after the colon, or negative for "no selector given".</param>
+    public string AlbedoAt(int at) => AlbedoOf(at).Path;
+
+    /// <summary>
+    /// The colour texture for a selector, and whether a SLOT NAME said so or it was a guess.
+    /// </summary>
+    /// <remarks>
+    /// THE SECOND HALF IS THE ONE WORTH HAVING. Where no slot carries Albedo, Colour or Color,
+    /// the answer is "the first texture that is not a normal map" - which is right on the
+    /// materials that have been looked at and is still a guess, and a guess that lands on a
+    /// mask or an ambient-occlusion map paints the monster in greyscale. That is a picture
+    /// somebody has to squint at and call "missing texture" (reported on the Vessel of
+    /// Kulemak), where being told "nothing said which map is the colour one" is an answer.
+    /// </remarks>
+    public (string Path, bool Named) AlbedoOf(int at)
+    {
+        if (at >= 0 && at < Graphs.Count && Coloured(Graphs[at]) is { Length: > 0 } found)
+        {
+            return (found, true);
+        }
+
+        return Coloured(Slots) is { Length: > 0 } named ? (named, true) : (Albedo, false);
+    }
+
+    /// <summary>The slot in one graph whose NAME says it is the colour map, or empty.</summary>
+    private static string Coloured(IReadOnlyDictionary<string, string> slots)
+    {
+        foreach ((string slot, string path) in slots)
+        {
+            if (slot.Contains("Albedo", StringComparison.OrdinalIgnoreCase)
+                || slot.Contains("Colour", StringComparison.OrdinalIgnoreCase)
+                || slot.Contains("Color", StringComparison.OrdinalIgnoreCase))
+            {
+                return path;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// The number after a material path's colon, or -1 where it carries none.
+    /// </summary>
+    /// <remarks>
+    /// The other half of <see cref="Bare"/>: that one answers "which file", this one answers
+    /// "which of the graphs in it". Both exist so no caller has to know how the colon works.
+    /// </remarks>
+    public static int SelectorOf(string? path)
+    {
+        if (path is not { Length: > 0 })
+        {
+            return -1;
+        }
+
+        string said = path.Replace('\\', '/').Trim();
+        int colon = said.LastIndexOf(':');
+
+        return colon > said.LastIndexOf('.') && colon >= 0 && Digits(said, colon + 1)
+            && int.TryParse(said[(colon + 1)..], out int at)
+            ? at
+            : -1;
+    }
 
     /// <summary>Reads one out of an open install. The path may carry a <c>:n</c> selector.</summary>
     /// <remarks>
@@ -142,6 +229,7 @@ public sealed class MaterialFile
 
         var textures = new List<MaterialTexture>();
         var slots = new Dictionary<string, string>(StringComparer.Ordinal);
+        var graphs = new List<IReadOnlyDictionary<string, string>>();
 
         try
         {
@@ -155,7 +243,7 @@ public sealed class MaterialFile
                     CommentHandling = JsonCommentHandling.Skip,
                 });
 
-            Walk(ref reader, textures, slots);
+            Walk(ref reader, textures, slots, graphs);
         }
         catch (JsonException)
         {
@@ -167,12 +255,15 @@ public sealed class MaterialFile
 
         return textures.Count == 0 && slots.Count == 0
             ? None
-            : new MaterialFile { Textures = textures, Slots = slots };
+            : new MaterialFile { Textures = textures, Slots = slots, Graphs = graphs };
     }
 
     /// <summary>The top-level object, taking the two members that name files.</summary>
     private static void Walk(
-        ref Utf8JsonReader reader, List<MaterialTexture> textures, Dictionary<string, string> slots)
+        ref Utf8JsonReader reader,
+        List<MaterialTexture> textures,
+        Dictionary<string, string> slots,
+        List<IReadOnlyDictionary<string, string>> graphs)
     {
         if (!reader.Read() || reader.TokenType != JsonTokenType.StartObject)
         {
@@ -196,7 +287,7 @@ public sealed class MaterialFile
             if (reader.ValueTextEquals("graphinstances"u8))
             {
                 reader.Read();
-                Slotted(ref reader, slots);
+                Slotted(ref reader, slots, graphs);
                 continue;
             }
 
@@ -265,7 +356,10 @@ public sealed class MaterialFile
     /// where a "name" like AlbedoTransparency_TEX sits beside a "path". Everything else in there -
     /// curves, variances, blend modes - is skipped by the reader rather than modelled.
     /// </remarks>
-    private static void Slotted(ref Utf8JsonReader reader, Dictionary<string, string> slots)
+    private static void Slotted(
+        ref Utf8JsonReader reader,
+        Dictionary<string, string> slots,
+        List<IReadOnlyDictionary<string, string>> graphs)
     {
         if (reader.TokenType != JsonTokenType.StartArray)
         {
@@ -281,6 +375,12 @@ public sealed class MaterialFile
                 continue;
             }
 
+            // ONE DICTIONARY PER GRAPH, kept in file order - the ":n" after a material picks
+            // by that order - and merged into the flat one as well, for the caller that has
+            // no selector to go on. Every instance is kept, including an empty one, because
+            // the number counts graphs and not graphs-that-had-something-in-them.
+            var graph = new Dictionary<string, string>(StringComparer.Ordinal);
+
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
                 if (reader.TokenType != JsonTokenType.PropertyName)
@@ -293,11 +393,17 @@ public sealed class MaterialFile
 
                 if (wanted)
                 {
-                    Parameters(ref reader, slots);
+                    Parameters(ref reader, graph);
                     continue;
                 }
 
                 reader.Skip();
+            }
+
+            graphs.Add(graph);
+            foreach ((string slot, string path) in graph)
+            {
+                slots.TryAdd(slot, path);
             }
         }
     }

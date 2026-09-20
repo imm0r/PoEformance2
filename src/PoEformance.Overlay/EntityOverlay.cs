@@ -590,6 +590,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     private readonly ToolTabs _tools = new();
 
+    /// <summary>
+    /// What the main window's title bar says this build is: the version, and the commit.
+    /// </summary>
+    /// <remarks>
+    /// Handed in rather than read here, because the build stamp is a file beside the
+    /// executable and this class reads no files - the same arrangement every other table
+    /// here arrives by. See ToolVersion.With.
+    /// </remarks>
+    public string Version
+    {
+        get => _tools.Version;
+        set => _tools.Version = value ?? ToolVersion.Said;
+    }
+
     // The tools something elsewhere in the overlay jumps to by name.
     private const string UiBrowserTab = "uibrowser";
     private const string DissectorTab = "dissector";
