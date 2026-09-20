@@ -54,6 +54,22 @@ public sealed record MonsterModel(
     /// <summary>The distinct materials the pictures came out of, for the report.</summary>
     public IReadOnlyList<string> Materials { get; init; } = [];
 
+    /// <summary>
+    /// How many materials the files NAMED: the .ao's own, and the mesh manifest's.
+    /// </summary>
+    /// <remarks>
+    /// THE DIFFERENCE BETWEEN "ONE SHEET IS THE TRUTH" AND "WE FOUND ONE". A monster reported
+    /// as thirty-five shapes from one texture is either painted from one atlas - which is
+    /// ordinary and right - or is a monster whose per-shape materials this walk did not match,
+    /// and the picture looks the same either way. The counts tell those apart: one named in the
+    /// .ao and none in the .sm is a monster with one material; thirty-five named and one used
+    /// is a bug in the matching.
+    /// </remarks>
+    public int NamedInAo { get; init; }
+
+    /// <inheritdoc cref="NamedInAo"/>
+    public int NamedInMesh { get; init; }
+
     /// <summary>The distinct colour textures actually put on the mesh, for the report.</summary>
     /// <remarks>
     /// NAMED BECAUSE A WRONG ONE LOOKS LIKE A MISSING ONE. A mask or an occlusion map drawn as
@@ -238,6 +254,8 @@ public static class MonsterModels
         {
             Skins = dress.Skins,
             Materials = dress.Materials,
+            NamedInAo = found.Materials.Count,
+            NamedInMesh = manifest.Materials.Count,
             Textures = dress.Textures,
             Guessed = dress.Guessed,
             Rig = rig,
@@ -468,10 +486,18 @@ public static class MonsterModels
     /// The material a shape asks for: its own by name, else the manifest's by position.
     /// </summary>
     /// <remarks>
-    /// THE MANIFEST'S LIST IS USED ONLY WHEN IT HAS ONE ENTRY PER SHAPE. It looks like shape
-    /// order and that is worth using and not worth trusting blind: a list of another length is
-    /// a list whose order is not established here, and indexing into it anyway would paint
-    /// parts from whatever happened to line up.
+    /// BY NAME FIRST, because that is the join the files really make - the .ao's child is keyed
+    /// by the shape's own name - and it is the only one that survives a mesh whose shapes are
+    /// listed in another order.
+    ///
+    /// THEN BY POSITION, AND ONLY WHERE THERE IS EXACTLY ONE ENTRY PER SHAPE. Reported from the
+    /// live client: Count Geonor's human form is fifteen shapes that came back painted from one
+    /// texture and visibly in pieces, while his wolf form - whose materials this matched by
+    /// name - was right. A list as long as the shape list is a list in shape order; a list of
+    /// any other length is one whose order is not established here, and indexing into it anyway
+    /// would paint parts from whatever happened to line up.
+    ///
+    /// The mesh manifest's own list is the last of the three, on the same terms.
     /// </remarks>
     private static string Wanted(
         string shape,
@@ -486,6 +512,11 @@ public static class MonsterModels
             {
                 return material;
             }
+        }
+
+        if (named.Count == shapes && at < named.Count)
+        {
+            return named[at].Material;
         }
 
         return manifest.Count == shapes && at < manifest.Count ? manifest[at] : string.Empty;

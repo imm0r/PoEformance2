@@ -243,6 +243,70 @@ public class MonsterModelTests
         Assert.True(said.Guessed);
     }
 
+    /// <summary>
+    /// A material list as long as the shape list is taken in shape order, name or no name.
+    /// </summary>
+    /// <remarks>
+    /// COUNT GEONOR'S TWO FORMS SETTLED THIS. His wolf came back five shapes from five
+    /// textures and looked right; his human came back fifteen shapes from ONE and was visibly
+    /// in pieces, with the materials named and not matched - the .ao's keys and the mesh's
+    /// shape names do not always agree. One entry per shape is a list in shape order, and
+    /// using it is the same rule the mesh manifest's list already gets. Any other length stays
+    /// unmatched: indexing into a list whose order is not established paints parts from
+    /// whatever happens to line up, which is the failure this is fixing.
+    /// </remarks>
+    [Fact]
+    public void MaterialsAreTakenInOrderWhenThereIsOnePerShape()
+    {
+        var install = Install();
+        install.Files["art/skin.dds"] = Dds();
+        install.Files["art/second.dds"] = Dds();
+
+        // The fixture's mesh has one shape, called HipsShape. Name the material under a key
+        // that shape does not have: matching by name finds nothing, and one entry for one
+        // shape is still a list in shape order.
+        install.Files["body.ao"] = Encoding.UTF8.GetBytes(
+            "version 3\nSkinMesh\n{\n\tskin = \"art/mesh.sm\"\n\t\tSomeOtherShape = \"art/painted.mat\"\n}\n");
+        install.Files["art/painted.mat"] = Mat("art/second.dds");
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.True(said.Painted);
+        Assert.Equal(["art/second.dds"], said.Textures);
+        Assert.Equal(1, said.NamedInAo);
+    }
+
+    /// <summary>
+    /// How many materials the files named, so "one sheet" can be told from "one sheet found".
+    /// </summary>
+    /// <remarks>
+    /// A MONSTER OF THIRTY-FIVE SHAPES PAINTED FROM ONE TEXTURE is either right - one atlas for
+    /// the whole body, which is ordinary - or a monster whose per-shape materials were not
+    /// matched, and the picture is identical either way. Reported from the live client on Veynar
+    /// and Connal, where the per-shape work changed nothing and nothing said whether it had
+    /// anything to work with. The counts are what tells those two apart.
+    /// </remarks>
+    [Fact]
+    public void HowManyMaterialsWereNamedIsCountedSeparatelyFromHowManyWereUsed()
+    {
+        var install = Install();
+        install.Files["art/skin.dds"] = Dds();
+
+        // One material in the .ao, one in the .sm, and the mesh's single shape wearing it.
+        MonsterModel one = MonsterModels.Of(install.Read, Named("body.ao"));
+        Assert.Equal(0, one.NamedInAo);
+        Assert.Equal(1, one.NamedInMesh);
+        Assert.Single(one.Materials);
+
+        var two = Install();
+        two.Files["art/skin.dds"] = Dds();
+        two.Files["body.ao"] = Ao(skin: "art/mesh.sm", material: "art/painted.mat:0", second: "art/other.mat:1");
+
+        MonsterModel said = MonsterModels.Of(two.Read, Named("body.ao"));
+        Assert.Equal(2, said.NamedInAo);
+        Assert.Equal(1, said.NamedInMesh);
+    }
+
     /// <summary>And when none of them has one, the reason says all of them were asked.</summary>
     [Fact]
     public void EveryMaterialTriedIsNamedWhenNoneHasColour()

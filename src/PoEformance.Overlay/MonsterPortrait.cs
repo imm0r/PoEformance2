@@ -1487,6 +1487,16 @@ public sealed class MonsterPortrait
                 {
                     said += " · no slot said which map is the colour one";
                 }
+
+                // AND WHERE FEWER SHEETS THAN SHAPES CAME BACK, how many were NAMED. One
+                // texture over thirty-five shapes is either a monster painted from one atlas,
+                // which is ordinary, or a monster whose per-shape materials were not matched -
+                // and the picture is identical either way. The counts are the only thing that
+                // tells them apart, so they are printed exactly where the question arises.
+                if (_model.Mesh.Shapes.Count > _model.Materials.Count)
+                {
+                    said += $" · named: {_model.NamedInAo} in the .ao, {_model.NamedInMesh} in the .sm";
+                }
             }
 
             if (_tracks is { Ready: true } tracks)
