@@ -2341,21 +2341,7 @@ public sealed class MonsterPortrait
     /// carry one and it would end up in the middle of "…_Active".
     /// </remarks>
     private static string Stem(string path)
-    {
-        int slash = path.LastIndexOf('/');
-        string last = slash >= 0 && slash < path.Length - 1 ? path[(slash + 1)..] : path;
-
-        var clean = new System.Text.StringBuilder(last.Length);
-        foreach (char c in last)
-        {
-            if (char.IsAsciiLetterOrDigit(c))
-            {
-                clean.Append(c);
-            }
-        }
-
-        return clean.Length > 0 ? clean.ToString() : "monster";
-    }
+        => BossIcons.FamilyOfPath(path) is { Length: > 0 } named ? named : "monster";
 
     /// <summary>
     /// Paints what is behind the model.

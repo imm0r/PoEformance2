@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PoEformance.Game.World;
 
 namespace PoEformance.Features;
 
@@ -104,7 +105,14 @@ public sealed class BossIcons
     }
 
     /// <summary>Nothing written down - which is the ordinary case, and not a broken install.</summary>
-    public static BossIcons Empty { get; } = Blank(null);
+    /// <remarks>
+    /// A FRESH ONE EACH TIME, not a singleton, and that stopped being a detail the moment
+    /// <see cref="Bosses"/> existed: a shared instance that anything can hand a boss table to
+    /// is one that carries that table into every other holder of it, tests included. The same
+    /// correction AtlasMapNames.Empty carries, for the same reason. Nothing compares these by
+    /// reference, and the allocation is two empty dictionaries on a construction path.
+    /// </remarks>
+    public static BossIcons Empty => Blank(null);
 
     /// <summary>An empty pair of tables, collecting into a log of its own.</summary>
     private static BossIcons Blank(string? log, string source = "") => new(
@@ -143,8 +151,28 @@ public sealed class BossIcons
     /// being written. Resolving is cached per landmark and emptied when the area changes (see
     /// PoiLayer), which without this means the entry somebody just filled in does nothing until
     /// they leave the arena they filled it in for - and then looks broken rather than late.
+    ///
+    /// The boss table's own revision is counted in, because the game correcting WHO stands in
+    /// an area changes exactly the same answers.
     /// </remarks>
-    public int Revision => _revision;
+    public int Revision => _revision + Bosses.Revision;
+
+    /// <summary>
+    /// What the game says stands in each area, or nothing while the table is not loaded.
+    /// </summary>
+    /// <remarks>
+    /// THE CLAIM THIS CLASS WAS BUILT WITHOUT, and it is worth saying plainly because the
+    /// remarks above are wrong about it. They say the pairing of a boss to its arena has to be
+    /// typed in by somebody who stood in the room. That is true of the ICON and false of the
+    /// BOSS: WorldAreas carries a Bosses column and it names the boss of 125 of the atlas's 173
+    /// maps - so the monster's own file name is a candidate for every one of them, and the
+    /// label is its in-game name rather than the tile's. See <see cref="AreaBosses"/>.
+    ///
+    /// Settable rather than taken in the constructor because it arrives the way the sheet does,
+    /// loaded by whoever wires the tool up in no fixed order, and because the game corrects it
+    /// mid-session.
+    /// </remarks>
+    public AreaBosses Bosses { get; set; } = AreaBosses.Empty;
 
     /// <summary>
     /// Loads the file, or returns <see cref="Empty"/> when it is missing or unreadable.
@@ -276,6 +304,20 @@ public sealed class BossIcons
             }
         }
 
+        // WHAT THE GAME SAYS STANDS HERE, as the monster's own file name - which is what the
+        // model pane calls the pictures it exports of it, so a boss posed once is matched to
+        // every map it is the boss of without anybody writing those maps down.
+        //
+        // AFTER THE NAMES DERIVED FROM THE GROUND and not before them, because those resolve
+        // to the GAME'S OWN art for an arena (GrimTangleBoss, IsleOfKinBoss) while this one
+        // resolves to a picture made here. Where the game drew its own, it wins - it is what
+        // the player sees on the game's map. Where it did not, which is every endgame map,
+        // nothing above this matches and this is the answer.
+        foreach (string path in Bosses.Of(areaId))
+        {
+            Offer(found, FamilyOfPath(path));
+        }
+
         foreach (string segment in Segments(tilePath))
         {
             Offer(found, FamilyOf(segment));
@@ -284,6 +326,57 @@ public sealed class BossIcons
 
         return found;
     }
+
+    /// <summary>
+    /// What a monster's pictures are filed under: its own file name, letters and digits only.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE COPY OF THIS RULE, and it has to stay that way. The model pane names an export
+    /// after the monster - Metadata/Monsters/WifeMonster/WifeMonsterMap_ becomes
+    /// WifeMonsterMapActive.png - and this turns the same path into the same family, so the
+    /// entry written beside those files and the candidate looked up when the marker is drawn
+    /// cannot disagree. A second implementation of "strip the path and the punctuation" is
+    /// exactly the kind of difference that shows up as one boss silently missing its picture.
+    ///
+    /// The trailing underscore several boss varieties carry goes with the rest of the
+    /// punctuation, or it would end up in the middle of "...Active".
+    /// </remarks>
+    public static string FamilyOfPath(string path)
+    {
+        ArgumentNullException.ThrowIfNull(path);
+
+        int slash = path.LastIndexOf('/');
+        string last = slash >= 0 && slash < path.Length - 1 ? path[(slash + 1)..] : path;
+
+        var clean = new System.Text.StringBuilder(last.Length);
+        foreach (char c in last)
+        {
+            if (char.IsAsciiLetterOrDigit(c))
+            {
+                clean.Append(c);
+            }
+        }
+
+        return clean.ToString();
+    }
+
+    /// <summary>The monsters the game lists as an area's bosses, best first.</summary>
+    public IReadOnlyList<string> BossesIn(string areaId)
+    {
+        ArgumentNullException.ThrowIfNull(areaId);
+        return Bosses.Of(areaId);
+    }
+
+    /// <summary>
+    /// Whether the boss table says anything at all, which is not the same as an area having none.
+    /// </summary>
+    /// <remarks>
+    /// The distinction the to-do list turns on. A table that lists no boss for a map is the
+    /// game saying there is nothing to make there; a table that was never loaded says nothing
+    /// about any map, and reading it as "no map has a boss" would empty the list of work
+    /// rather than fill it - the loudest possible way for a missing data file to go unnoticed.
+    /// </remarks>
+    public bool KnowsBosses => Bosses.Live > 0;
 
     /// <summary>The picture to look for, given whether the arena has been cleared.</summary>
     public static string Named(string family, bool cleared)

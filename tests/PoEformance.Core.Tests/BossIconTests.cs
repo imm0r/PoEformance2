@@ -1,4 +1,5 @@
 using PoEformance.Features;
+using PoEformance.Game.World;
 
 namespace PoEformance.Core.Tests;
 
@@ -43,6 +44,21 @@ public class BossIconTests
         // matching anything, which is the shape of check this project treats as no check.
         Assert.True(names.Count > 500, $"only {names.Count} cell names read - has the table moved?");
         return names;
+    }
+
+    /// <summary>A boss table with the given areas, written where the test can reach it.</summary>
+    private static AreaBosses Bosses(string areas)
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"area-bosses-{Guid.NewGuid():N}.json");
+        File.WriteAllText(path, "{\"areas\": {" + areas + "}}");
+        try
+        {
+            return AreaBosses.Load(path);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     /// <summary>A file with the given pairs, written where the test can reach it.</summary>
@@ -251,6 +267,69 @@ public class BossIconTests
 
             Assert.True(found, $"{area}: no candidate matched a cell name in the sheet");
         }
+    }
+
+    /// <summary>
+    /// The boss the game names for an area is a candidate, under the name its art is filed by.
+    /// </summary>
+    /// <remarks>
+    /// THE CANDIDATE THAT NEEDED NO PERSON. Everything else in this list is derived from the
+    /// ground or was typed in; this one is WorldAreas saying which monster stands here, turned
+    /// into the same family name the model pane gives the pictures it exports of that monster.
+    /// So posing a boss once covers every map the game says it is the boss of.
+    /// </remarks>
+    [Fact]
+    public void TheBossTheGameNamesIsOfferedUnderTheNameItsArtIsFiledBy()
+    {
+        BossIcons icons = BossIcons.Empty;
+        icons.Bosses = Bosses("""  "MapEpitaph": ["Metadata/Monsters/WifeMonster/WifeMonsterMap_"]  """);
+
+        IReadOnlyList<string> found = icons.Candidates(
+            "MapEpitaph", "Metadata/Terrain/Maps/Epitaph/Tiles/Feature/TombBoss_ArenaFloor.tdt");
+
+        // The trailing underscore goes with the rest of the punctuation, or the cell would be
+        // called "WifeMonsterMap_Active" and match nothing the export wrote.
+        Assert.Contains("WifeMonsterMap", found);
+
+        // An area the table says nothing about is unchanged.
+        Assert.DoesNotContain("WifeMonsterMap", icons.Candidates("MapBluff", "Metadata/Terrain/X/Arena_01.tdt"));
+    }
+
+    [Fact]
+    public void WhatSomebodyWroteDownStillBeatsWhatTheGameSays()
+    {
+        BossIcons icons = Written(
+            areas: """ "MapEpitaph": "WrittenByHand" """, tiles: string.Empty);
+        icons.Bosses = Bosses("""  "MapEpitaph": ["Metadata/Monsters/NPC/DogTrader_"]  """);
+
+        IReadOnlyList<string> found = icons.Candidates("MapEpitaph", "Metadata/Terrain/X/Arena_01.tdt");
+
+        // The column holds an NPC on two maps, so a person who stood in the room has to be
+        // able to overrule it - the one thing the column does not change.
+        Assert.Equal("WrittenByHand", found[0]);
+        Assert.Contains("DogTrader", found);
+    }
+
+    [Fact]
+    public void AFamilyIsTheMonstersOwnFileName()
+    {
+        Assert.Equal("WifeMonsterMap", BossIcons.FamilyOfPath("Metadata/Monsters/WifeMonster/WifeMonsterMap_"));
+        Assert.Equal("BloodKnightBossMAP2", BossIcons.FamilyOfPath("Metadata/Monsters/X/BloodKnightBossMAP2_"));
+        Assert.Equal("Alone", BossIcons.FamilyOfPath("Alone"));
+        Assert.Empty(BossIcons.FamilyOfPath("Metadata/Monsters/X/___"));
+        Assert.Empty(BossIcons.FamilyOfPath(string.Empty));
+    }
+
+    [Fact]
+    public void AMissingBossTableIsNotATableSayingThereAreNoBosses()
+    {
+        // The distinction the to-do list turns on: without the file, nothing is known about
+        // any map, and reading that as "no map has a boss" would empty the list of work.
+        Assert.False(BossIcons.Empty.KnowsBosses);
+
+        BossIcons icons = BossIcons.Empty;
+        icons.Bosses = Bosses("""  "MapBluff": ["Metadata/Monsters/X/SomeBoss"]  """);
+        Assert.True(icons.KnowsBosses);
     }
 
     /// <summary>

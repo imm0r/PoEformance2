@@ -746,6 +746,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>
+    /// What the game calls a monster, by its metadata path, or empty where nothing does.
+    /// </summary>
+    /// <remarks>
+    /// Asked per call rather than captured, because <see cref="Monsters"/> is replaced when the
+    /// install's own tables finish reading - a captured table would keep answering out of the
+    /// shipped export for the rest of the session.
+    /// </remarks>
+    private string Called(string path)
+        => Monsters.Find(path)?.Name ?? string.Empty;
+
+    /// <summary>
     /// The arena tiles known for an area: the ones under the player's feet, then the collected ones.
     /// </summary>
     /// <remarks>
@@ -1473,7 +1484,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         // Both tables are set by whoever wires this up, in no fixed order against this
         // constructor, so the list reads them per draw rather than taking a copy of Empty.
-        _bossPlan = new BossIconRows(() => _bossIcons, () => EndgameMaps);
+        _bossPlan = new BossIconRows(() => _bossIcons, () => EndgameMaps, Called);
 
         // The entry card takes its plates from the same cache the markers use, so a picture
         // that cannot be loaded is reported in one place and given up on once.
@@ -2356,6 +2367,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // order should be the one that works.
             BossIcons = BossIcons,
             Arenas = _arenas,
+
+            // So an arena can be labelled with the boss the game says stands in it rather than
+            // with the tile it is built from. See PoiLayer.MonsterName.
+            MonsterName = Called,
         };
 
         // Attached with the places rather than beside them: pinning a room is asking for a

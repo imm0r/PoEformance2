@@ -128,12 +128,24 @@ finally lands in the sheet.
 **And the work that is left is a list rather than a discovery.** The set of endgame maps is known
 exactly — `EndgameMaps.dat` is the table an atlas node points at, 173 rows — so the tool subtracts
 what has a picture from what exists and shows the rest on the Markers → Map & Places tab, with the
-arena tile it has already seen in each. Measured against the two shipped files: **not one** of those
+arena tile it has already seen in each. Measured against the shipped files: **not one** of those
 173 maps resolves a boss picture from its name. The sheet's 27 boss families are named for campaign
 arenas and act bosses, and the game simply draws no minimap icon for its map bosses — which is what
-the export above is for. A row with no boss to draw at all, a hideout or a Precursor tower, is
-ticked off by hand into the file's `skip` list, because a rule that hid them by their tags would
-hide exactly the maps a new league adds.
+the export above is for.
+
+**Who stands there, though, the game does say — and that was missed for a while.** `WorldAreas` has
+a `Bosses` column, a list of monsters per area, and it names the boss of **125** of the 173. So an
+arena is labelled with its boss's real name from the moment the area loads, with nothing written
+down; the icon family is the monster's own file name, which is what the export calls its pictures;
+and one boss posed once covers every map it is the boss of. That last part is the whole saving:
+those 125 maps hold **90** distinct bosses, **31** of which stand in more than one map — 66 maps
+between them — and nothing in either map tells you the one you are in is a repeat. The 48 maps
+that name no boss are exactly the hideouts, hubs, Expedition logbooks and merchant maps, so they
+need no ticking off either. `data/area-bosses.json` carries that column until the tool reads it
+from the client itself, `data/boss-icons.json` overrides it where somebody has stood in the room,
+and `scripts/area-bosses.py` is how the file is made. The list had hidden the Precursor towers as
+boss-less on the way here; the column gives each of them two Reactor Guardians, which is the kind
+of guess this project keeps promising itself it will stop making.
 
 **And the brightness is matched, because a model is lit for a dungeon and an icon is painted for
 a map.** The interior of the game's boss icons has a median luminance of 55; the first model

@@ -25,7 +25,8 @@ namespace PoEformance.Overlay;
 /// <see cref="MonsterPortrait.AreaNow"/>. Nothing is written until the write button is pressed
 /// in the window that shows the picture being written.
 /// </remarks>
-internal sealed class BossIconRows(Func<BossIcons> icons, Func<AtlasMapNames> maps)
+internal sealed class BossIconRows(
+    Func<BossIcons> icons, Func<AtlasMapNames> maps, Func<string, string>? named = null)
 {
     /// <summary>How many rows are drawn at most. The plan is 173 long and the tab is not.</summary>
     private const int MostRows = 400;
@@ -43,6 +44,7 @@ internal sealed class BossIconRows(Func<BossIcons> icons, Func<AtlasMapNames> ma
     private int _revision = -1;
     private int _missing = -1;
     private int _count = -1;
+    private int _bosses;
     private string _said = string.Empty;
 
     /// <summary>
@@ -59,8 +61,10 @@ internal sealed class BossIconRows(Func<BossIcons> icons, Func<AtlasMapNames> ma
         (int open, int waiting, int done, int skipped) = BossIconPlan.Count(_rows);
         ImGuiText.Wrapped(
             OverlayInk.Quiet,
-            $"{_rows.Count} endgame maps: {done} wear their boss's picture, {waiting} are written"
-                + $" down and waiting for the art, {skipped} have no boss, {open} still to do.");
+            $"{_rows.Count} endgame maps: {done} wear their boss's picture,"
+                + $" {waiting} {(waiting == 1 ? "has" : "have")} art waiting to go into the sheet,"
+                + $" {skipped} have no boss, {open} still to do"
+                + $" - {_bosses} different bosses, which is what that many maps really costs.");
 
         ImGui.SetNextItemWidth(200f);
         ImGui.InputTextWithHint("##boss-plan-find", "find by id or name...", ref _find, FindLength);
@@ -99,7 +103,55 @@ internal sealed class BossIconRows(Func<BossIcons> icons, Func<AtlasMapNames> ma
         _count = table.Count;
 
         _rows.Clear();
-        _rows.AddRange(BossIconPlan.Of(table, written, name => IconNames.CellFor(name) > 0));
+        _rows.AddRange(BossIconPlan.Of(
+            table, written, name => IconNames.CellFor(name) > 0, named, Exported()));
+
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (BossIconTask row in _rows)
+        {
+            if (row.State != BossIconState.Skipped && row.Family.Length > 0)
+            {
+                seen.Add(row.Family);
+            }
+        }
+
+        _bosses = seen.Count;
+    }
+
+    /// <summary>
+    /// Which families already have art in the exports folder, as one listing rather than 173 asks.
+    /// </summary>
+    /// <remarks>
+    /// THE STEP BETWEEN MADE AND DRAWN is otherwise invisible. An exported icon does nothing
+    /// until its cell is in assets/icons.png, and an evening of posing produces a folder full
+    /// of pictures that the map still knows nothing about - so the row says "waiting" rather
+    /// than "to do", and the only thing left on it is a paste.
+    ///
+    /// The folder is read ONCE per rebuild, not per row: the plan is worked out when something
+    /// moved, and a hundred and seventy File.Exists calls inside a draw is the kind of thing
+    /// that only hurts on the machine with the slow disk.
+    /// </remarks>
+    private static Func<string, bool> Exported()
+    {
+        var made = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        try
+        {
+            string folder = MonsterPortrait.Folder;
+            if (Directory.Exists(folder))
+            {
+                foreach (string file in Directory.EnumerateFiles(folder, "*" + BossIcons.ActiveSuffix + ".png"))
+                {
+                    string stem = Path.GetFileNameWithoutExtension(file);
+                    made.Add(stem[..^BossIcons.ActiveSuffix.Length]);
+                }
+            }
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            // An unreadable folder costs the "waiting" state and nothing else.
+        }
+
+        return made.Contains;
     }
 
     /// <summary>Whether a row survives the filters.</summary>
@@ -219,20 +271,23 @@ internal sealed class BossIconRows(Func<BossIcons> icons, Func<AtlasMapNames> ma
     {
         string where = row.Tiles.Count > 0
             ? $"\narena tile seen here: {row.Tiles[0]}"
-            : "\nno arena tile collected here yet - the map has not been played with the tool";
+            : string.Empty;
 
         return row.State switch
         {
             BossIconState.Done =>
                 $"{row.Family} - the marker wears this picture.{where}",
             BossIconState.Waiting =>
-                $"written down as {row.Family}, but the sheet has no cell under that name yet:"
-                    + $" the art still has to go into assets/icons.png.{where}",
+                $"the art for {row.Family} exists but the sheet has no cell under that name:"
+                    + $" paste it into assets/icons.png and name the cell there.{where}",
+            BossIconState.Skipped when row.Family.Length == 0 =>
+                "the game lists no boss for this map, so there is nothing to make."
+                    + " write an entry for it by hand if that is wrong.",
             BossIconState.Skipped =>
-                $"ticked off as having no boss.{where}",
+                $"ticked off by hand. the game says {row.Family} stands here.{where}",
             _ =>
-                "no picture and nothing written down. pose its boss in the Monster Book's model"
-                    + $" pane and write the entry from there.{where}",
+                $"pose {row.Family} in the Monster Book's model pane and export it -"
+                    + $" the fields in the preview window are filled in for you.{where}",
         };
     }
 }

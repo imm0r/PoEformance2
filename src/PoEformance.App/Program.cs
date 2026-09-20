@@ -2937,7 +2937,16 @@ internal static class Program
         // id and tile path do not already say it. Missing is fine and is the ordinary case: the
         // arena is still found in the ground and still marked, with the boss shape - see
         // BossIcons, which also collects the ones nothing could name.
-        overlay.BossIcons = PoEformance.Features.BossIcons.Load(FindDataFile("boss-icons.json"));
+        PoEformance.Features.BossIcons bossIcons =
+            PoEformance.Features.BossIcons.Load(FindDataFile("boss-icons.json"));
+
+        // And WHO the game says stands in each area - WorldAreas' own Bosses column, exported
+        // to a file until the tool reads that column itself. It names the boss of 125 of the
+        // atlas's 173 maps, which is where an arena's label and its icon family come from when
+        // nobody has written either down. Set BEFORE the table is handed over, so the layer
+        // that draws the markers never sees a half-built one. See AreaBosses.
+        bossIcons.Bosses = PoEformance.Game.World.AreaBosses.Load(FindDataFile("area-bosses.json"));
+        overlay.BossIcons = bossIcons;
 
         // And the set of maps those entries are still missing for. The same table the atlas
         // uses - loaded once, above - because "which maps have no boss picture yet" is a set
