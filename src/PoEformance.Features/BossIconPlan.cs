@@ -25,6 +25,10 @@ public enum BossIconState
 /// <param name="State">Where it stands.</param>
 /// <param name="Family">The picture family it resolves to, or empty.</param>
 /// <param name="Boss">What the boss is called, where anybody wrote it down.</param>
+/// <param name="Path">
+/// The boss's metadata path, where the game names one. What the Monster Book is opened at, so
+/// the row that says which boss a map has is also the way to go and pose it.
+/// </param>
 /// <param name="Tiles">Arena tiles seen in it that nothing could name. Fills the tile field.</param>
 public readonly record struct BossIconTask(
     string Id,
@@ -33,6 +37,7 @@ public readonly record struct BossIconTask(
     BossIconState State,
     string Family,
     string Boss,
+    string Path,
     IReadOnlyList<string> Tiles);
 
 /// <summary>
@@ -237,6 +242,7 @@ public static class BossIconPlan
             state,
             family,
             boss,
+            bosses.Count > 0 ? bosses[0] : string.Empty,
             icons.Unnamed(id));
     }
 

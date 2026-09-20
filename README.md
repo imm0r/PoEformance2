@@ -143,7 +143,9 @@ between them — and nothing in either map tells you the one you are in is a rep
 that name no boss are exactly the hideouts, hubs, Expedition logbooks and merchant maps, so they
 need no ticking off either. `data/area-bosses.json` carries that column until the tool reads it
 from the client itself, `data/boss-icons.json` overrides it where somebody has stood in the room,
-and `scripts/area-bosses.py` is how the file is made. The list had hidden the Precursor towers as
+and `scripts/area-bosses.py` is how the file is made. **Clicking the boss's name on a row opens the
+Monster Book at that monster** and copies the name — finding it meant typing that name into a table
+of 2733 rows, once per boss, ninety times. The list had hidden the Precursor towers as
 boss-less on the way here; the column gives each of them two Reactor Guardians, which is the kind
 of guess this project keeps promising itself it will stop making.
 

@@ -229,8 +229,16 @@ public class BossIconPlanTests
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
         Assert.Equal(90, families.Count);
 
-        // And every one of those rows knows what to pose, by the name the game shows.
+        // And every one of those rows knows what to pose, by the name the game shows - and
+        // carries the path the Monster Book is opened at, which is what makes the row a way in
+        // rather than a name to retype into a table of 2733.
         Assert.Contains(rows, row => row.Id == "MapGrimhaven" && row.Family == "WifeMonsterMap");
         Assert.Contains(rows, row => row.Id == "MapEpitaph" && row.Family == "WifeMonsterMap");
+        Assert.All(
+            rows.Where(row => row.State == BossIconState.Open),
+            row => Assert.NotEmpty(row.Path));
+        Assert.Equal(
+            "Metadata/Monsters/WifeMonster/WifeMonsterMap_",
+            rows.Single(row => row.Id == "MapEpitaph").Path);
     }
 }

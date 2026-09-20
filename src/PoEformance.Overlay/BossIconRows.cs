@@ -26,7 +26,10 @@ namespace PoEformance.Overlay;
 /// in the window that shows the picture being written.
 /// </remarks>
 internal sealed class BossIconRows(
-    Func<BossIcons> icons, Func<AtlasMapNames> maps, Func<string, string>? named = null)
+    Func<BossIcons> icons,
+    Func<AtlasMapNames> maps,
+    Func<string, string>? named = null,
+    Func<string, bool>? open = null)
 {
     /// <summary>How many rows are drawn at most. The plan is 173 long and the tab is not.</summary>
     private const int MostRows = 400;
@@ -221,6 +224,13 @@ internal sealed class BossIconRows(
 
         bool picked = string.Equals(Picked, row.Id, StringComparison.OrdinalIgnoreCase);
         ImGui.PushStyleColor(ImGuiCol.Text, Ink(row.State));
+
+        // THE ROW SPANS EVERY COLUMN AND THE BOSS CELL SITS ON TOP OF IT. ImGui hands the
+        // pointer to the LATER of two overlapping items only when the earlier one allows it
+        // (ItemHoverable: "AllowOverlap mode requires previous frame HoveredId to be null or to
+        // match"), so without this the row would swallow the click meant for the name - the
+        // same rule the model pane's picture and its orbit button live by.
+        ImGui.SetNextItemAllowOverlap();
         if (ImGui.Selectable($"{row.Name}###boss-plan-{row.Id}", picked, ImGuiSelectableFlags.SpanAllColumns))
         {
             // Clicking the row it is already on lets go of it, so the export goes back to
@@ -239,9 +249,7 @@ internal sealed class BossIconRows(
         ImGui.TextColored(OverlayInk.Quiet, row.Id);
 
         ImGui.TableNextColumn();
-        ImGui.TextColored(
-            row.Boss.Length > 0 ? OverlayInk.Name : OverlayInk.Quiet,
-            row.Boss.Length > 0 ? row.Boss : row.Family);
+        Boss(row);
 
         ImGui.TableNextColumn();
         bool skip = row.State == BossIconState.Skipped;
@@ -254,6 +262,52 @@ internal sealed class BossIconRows(
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip("tick a map that has no boss to make a picture for.\nit stops being counted as work.");
+        }
+    }
+
+    /// <summary>
+    /// The boss's name, which is a button: it opens the monster and copies its name.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE THING THIS LIST IS FOR IS GETTING TO THE MODEL, and the way there was a name
+    /// typed by hand into a table of 2733 rows - "Saphira, The Dread Consort" - once per boss,
+    /// ninety times. So the name is clickable and does both halves of that: it opens the
+    /// Monster Book at the monster, and it puts the name on the clipboard for the times the
+    /// book cannot be reached or the search has to be typed somewhere else.
+    ///
+    /// BOTH, RATHER THAN A CHOICE BETWEEN THEM, because neither can fail usefully. A jump into
+    /// a book that has not been attached does nothing visible, and a clipboard nobody pastes
+    /// costs nothing - so the click that does both always achieves whichever one is possible.
+    /// The clipboard half is also the idiom this tool already uses for a path in the book's own
+    /// detail pane.
+    /// </remarks>
+    private void Boss(BossIconTask row)
+    {
+        string shown = row.Boss.Length > 0 ? row.Boss : row.Family;
+        if (shown.Length == 0)
+        {
+            return;
+        }
+
+        ImGui.PushStyleColor(ImGuiCol.Text, row.Boss.Length > 0 ? OverlayInk.Name : OverlayInk.Quiet);
+        bool clicked = ImGui.Selectable($"{shown}###boss-plan-boss-{row.Id}", false);
+        ImGui.PopStyleColor();
+
+        if (clicked)
+        {
+            ImGui.SetClipboardText(shown);
+            bool found = row.Path.Length > 0 && open?.Invoke(row.Path) == true;
+            _said = found
+                ? $"opened {shown} in the Monster Book, and copied the name."
+                : $"copied \"{shown}\".";
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                row.Path.Length > 0
+                    ? $"click to open it in the Monster Book and copy the name\n{row.Path}"
+                    : "click to copy the name");
         }
     }
 
