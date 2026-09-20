@@ -150,6 +150,45 @@ public class MonsterModelTests
         Assert.Equal(string.Empty, said.Paint);
     }
 
+    /// <summary>
+    /// Every shape gets the texture its own name was filed under.
+    /// </summary>
+    /// <remarks>
+    /// THE SHAPE'S NAME IS THE JOIN, and it was being thrown away: the .ao's SkinMesh block holds
+    /// one child per shape, keyed by that shape's name - <c>HipsShape = ".../Body.mat:0"</c> -
+    /// and SkinnedMesh.Shapes carries the same names. Putting the two together is what lets the
+    /// renderer paint a monster part by part instead of stretching one sheet over all of it.
+    ///
+    /// A NAME THAT MATCHES NOTHING FALLS BACK, which keeps every monster that names one material
+    /// drawing exactly as it did - the change is confined to the ones that name several.
+    /// </remarks>
+    [Fact]
+    public void AShapeWearsTheMaterialFiledUnderItsOwnName()
+    {
+        var install = Install();
+        install.Files["art/skin.dds"] = Dds();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", material: "art/painted.mat:0");
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        // The fixture's mesh has one shape, called HipsShape, and the .ao files its material
+        // under exactly that name.
+        Assert.Equal("HipsShape", Assert.Single(said.Mesh.Shapes).Name);
+        Assert.Single(said.Skins);
+        Assert.Same(said.Skin, said.Skins[0]);
+        Assert.Equal(["art/painted.mat"], said.Materials);
+
+        // A material filed under a shape this mesh does not have leaves that shape on the
+        // model's single skin rather than on nothing.
+        var elsewhere = Install();
+        elsewhere.Files["art/skin.dds"] = Dds();
+        elsewhere.Files["body.ao"] = Ao(skin: "art/mesh.sm", material: "art/painted.mat:0", second: "art/other.mat:1");
+
+        MonsterModel other = MonsterModels.Of(elsewhere.Read, Named("body.ao"));
+        Assert.Single(other.Skins);
+        Assert.NotNull(other.Skins[0]);
+    }
+
     /// <summary>And when none of them has one, the reason says all of them were asked.</summary>
     [Fact]
     public void EveryMaterialTriedIsNamedWhenNoneHasColour()

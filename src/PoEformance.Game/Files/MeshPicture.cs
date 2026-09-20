@@ -202,6 +202,14 @@ public static class MeshPicture
 
         internal float[] Levels { get; private set; } = [];
 
+        /// <summary>Which texture each triangle wears, as an index into the drawing's palette.</summary>
+        /// <remarks>
+        /// AN INDEX AND NOT THE TEXTURE ITSELF, so this canvas does not hold a monster's
+        /// megabytes alive after it has been drawn. The palette is built per call and is a
+        /// handful of entries; this is a number per triangle, worked out once with the rows.
+        /// </remarks>
+        internal int[] Wears { get; private set; } = [];
+
         internal void Fit(int vertices, int triangles)
         {
             if (Corners.Length < vertices)
@@ -215,6 +223,7 @@ public static class MeshPicture
                 Tops = new int[triangles];
                 Feet = new int[triangles];
                 Levels = new float[triangles];
+                Wears = new int[triangles];
             }
         }
     }
@@ -234,6 +243,11 @@ public static class MeshPicture
     /// </param>
     /// <param name="zoom">How much closer than the fitted view, 1 being the whole model in frame.</param>
     /// <param name="pan">Where the model's centre sits, as a share of the picture off its middle, right and down. See <see cref="Panned"/>.</param>
+    /// <param name="skins">
+    /// One texture per shape of the mesh, in its order, for a monster built out of parts. A
+    /// null entry draws its shape in <paramref name="ink"/>; a shorter list leaves the rest to
+    /// <paramref name="skin"/>. See MonsterModel.Skins for why a monster needs more than one.
+    /// </param>
     public static GamePicture Of(
         SkinnedMesh? mesh,
         int size,
@@ -242,8 +256,9 @@ public static class MeshPicture
         Vector3 ink = default,
         Mipmaps? skin = null,
         float zoom = 1f,
-        Vector2 pan = default)
-        => Of(mesh, new Canvas(size), turn, tilt, ink, skin, zoom, pan);
+        Vector2 pan = default,
+        IReadOnlyList<Mipmaps?>? skins = null)
+        => Of(mesh, new Canvas(size), turn, tilt, ink, skin, zoom, pan, skins);
 
     /// <summary>
     /// Draws the mesh into a canvas the caller keeps, for anything that draws it more than once.
@@ -256,6 +271,11 @@ public static class MeshPicture
     /// <param name="skin">The monster's own colour texture with its levels, or null to draw it in <paramref name="ink"/>.</param>
     /// <param name="zoom">How much closer than the fitted view, 1 being the whole model in frame.</param>
     /// <param name="pan">Where the model's centre sits, as a share of the picture off its middle, right and down. See <see cref="Panned"/>.</param>
+    /// <param name="skins">
+    /// One texture per shape of the mesh, in its order, for a monster built out of parts. A
+    /// null entry draws its shape in <paramref name="ink"/>; a shorter list leaves the rest to
+    /// <paramref name="skin"/>. See MonsterModel.Skins for why a monster needs more than one.
+    /// </param>
     public static GamePicture Of(
         SkinnedMesh? mesh,
         Canvas canvas,
@@ -264,8 +284,9 @@ public static class MeshPicture
         Vector3 ink = default,
         Mipmaps? skin = null,
         float zoom = 1f,
-        Vector2 pan = default)
-        => Of(mesh, canvas, mesh?.Positions ?? [], mesh?.Normals ?? [], turn, tilt, ink, skin, zoom, pan);
+        Vector2 pan = default,
+        IReadOnlyList<Mipmaps?>? skins = null)
+        => Of(mesh, canvas, mesh?.Positions ?? [], mesh?.Normals ?? [], turn, tilt, ink, skin, zoom, pan, skins);
 
     /// <summary>
     /// Draws the mesh with its vertices somewhere other than the file put them - posed.
@@ -290,6 +311,11 @@ public static class MeshPicture
     /// indexed past their end: every index in the mesh addresses a vertex, and a short array would
     /// be a crash on the draw thread for a model that could simply have been drawn still.
     /// </remarks>
+    /// <param name="skins">
+    /// One texture per shape of the mesh, in its order, for a monster built out of parts. A
+    /// null entry draws its shape in <paramref name="ink"/>; a shorter list leaves the rest to
+    /// <paramref name="skin"/>. See MonsterModel.Skins for why a monster needs more than one.
+    /// </param>
     public static GamePicture Of(
         SkinnedMesh? mesh,
         Canvas canvas,
@@ -300,7 +326,8 @@ public static class MeshPicture
         Vector3 ink = default,
         Mipmaps? skin = null,
         float zoom = 1f,
-        Vector2 pan = default)
+        Vector2 pan = default,
+        IReadOnlyList<Mipmaps?>? skins = null)
     {
         ArgumentNullException.ThrowIfNull(canvas);
 
@@ -345,6 +372,14 @@ public static class MeshPicture
         // with - see SkinnedMesh.Coordinated for what an uncoordinated mesh would paint.
         Mipmaps? usable = skin is not null && mesh.Coordinated ? skin : null;
 
+        // ONE TEXTURE PER SHAPE WHERE THERE IS ONE. A monster is built of parts - body, cloak,
+        // wings - and each part's coordinates address ITS OWN sheet, so painting all of them
+        // from one texture puts the body's pixels on the wings. Reported from the live client
+        // by Bahlak the Sky Seer, who came out black with red patches while the game draws him
+        // in feathers. The palette holds the distinct textures with "none" at 0, and every
+        // triangle carries the index of the one its shape wears.
+        Mipmaps?[] palette = Palette(mesh, usable, skins);
+
         // EVERY VERTEX ONCE, not once per triangle it sits in. A closed mesh lists each vertex in
         // about six triangles, so transforming at the corners was six transforms for one.
         int vertices = positions.Length;
@@ -364,7 +399,9 @@ public static class MeshPicture
         int[] tops = canvas.Tops;
         int[] feet = canvas.Feet;
         float[] levels = canvas.Levels;
+        int[] wears = canvas.Wears;
         int[] indices = mesh.Indices;
+        Worn(mesh, palette, skins, usable, wears, triangles);
         for (var one = 0; one < triangles; one++)
         {
             Vector3 a = corners[indices[one * 3]];
@@ -380,14 +417,20 @@ public static class MeshPicture
 
             tops[one] = Math.Max(0, (int)MathF.Floor(Min3(a.Y, b.Y, c.Y)));
             feet[one] = Math.Min(size - 1, (int)MathF.Ceiling(Max3(a.Y, b.Y, c.Y)));
-            levels[one] = usable is null
+
+            // AGAINST THE TEXTURE THIS TRIANGLE WEARS, because the level is worked out from how
+            // many texels a pixel steps across and the parts of a monster are not all painted
+            // at the same resolution: a 512 square cloak read at a 2048 square body's level is
+            // the grain this calculation exists to avoid.
+            Mipmaps? worn = palette[wears[one]];
+            levels[one] = worn is null
                 ? 0f
                 : Level(
                     a, b, c,
                     mesh.Coordinates[indices[one * 3]],
                     mesh.Coordinates[indices[(one * 3) + 1]],
                     mesh.Coordinates[indices[(one * 3) + 2]],
-                    area, usable);
+                    area, worn);
         }
 
         // IN BANDS OF ROWS, EACH ON ITS OWN THREAD. A pixel belongs to one band and the triangles
@@ -395,7 +438,7 @@ public static class MeshPicture
         // byte however many threads share it - the depth test never sees two threads at once.
         // More bands than threads, so a band the model does not reach costs nothing much and the
         // ones through its middle are shared out.
-        var drawing = new Drawing(canvas, mesh, triangles, lamp, ink, usable);
+        var drawing = new Drawing(canvas, mesh, triangles, lamp, ink, palette);
         const int height = 8;
         int bands = (size + height - 1) / height;
         if (canvas.Threads == 1)
@@ -414,6 +457,88 @@ public static class MeshPicture
         }
 
         return new GamePicture(size, size, pixels);
+    }
+
+    /// <summary>
+    /// The distinct textures a drawing may read, with "none" at nought.
+    /// </summary>
+    /// <remarks>
+    /// A PALETTE RATHER THAN A TEXTURE PER TRIANGLE, because several shapes usually share one
+    /// material - a monster with nine shapes and two sheets makes two entries here and nine
+    /// numbers in <see cref="Worn"/>, and the hot loop reads a reference out of an array of
+    /// three instead of chasing one per triangle.
+    ///
+    /// INDEX 0 IS ALWAYS "NO TEXTURE", so a shape nothing was found for draws in ink exactly as
+    /// a monster with no skin at all does - which is the honest answer and the one that does not
+    /// put the body's pixels on the wings.
+    /// </remarks>
+    private static Mipmaps?[] Palette(
+        SkinnedMesh mesh, Mipmaps? usable, IReadOnlyList<Mipmaps?>? skins)
+    {
+        if (!mesh.Coordinated)
+        {
+            return [null];
+        }
+
+        var found = new List<Mipmaps?> { null };
+        if (skins is { Count: > 0 })
+        {
+            foreach (Mipmaps? one in skins)
+            {
+                if (one is not null && !found.Contains(one))
+                {
+                    found.Add(one);
+                }
+            }
+        }
+
+        if (usable is not null && !found.Contains(usable))
+        {
+            found.Add(usable);
+        }
+
+        return [.. found];
+    }
+
+    /// <summary>Which palette entry every triangle reads, from the shape it belongs to.</summary>
+    /// <remarks>
+    /// THE SHAPES ARE RANGES OF INDICES and the renderer works in triangles, so this is the one
+    /// place the two are put next to each other. A triangle outside every shape's range - which
+    /// a mesh whose shape table did not read has for all of them - falls back to the single
+    /// skin, which is exactly what the drawing did before it knew about shapes at all.
+    /// </remarks>
+    private static void Worn(
+        SkinnedMesh mesh,
+        Mipmaps?[] palette,
+        IReadOnlyList<Mipmaps?>? skins,
+        Mipmaps? usable,
+        int[] wears,
+        int triangles)
+    {
+        int fallback = Array.IndexOf(palette, usable);
+        Array.Fill(wears, fallback < 0 ? 0 : fallback, 0, triangles);
+
+        if (skins is not { Count: > 0 } || !mesh.Coordinated)
+        {
+            return;
+        }
+
+        for (var shape = 0; shape < mesh.Shapes.Count && shape < skins.Count; shape++)
+        {
+            MeshShape part = mesh.Shapes[shape];
+            int at = Array.IndexOf(palette, skins[shape]);
+            if (at < 0)
+            {
+                continue;
+            }
+
+            int from = Math.Clamp(part.From / 3, 0, triangles);
+            int upto = Math.Clamp((part.From + part.Count) / 3, from, triangles);
+            for (int one = from; one < upto; one++)
+            {
+                wears[one] = at;
+            }
+        }
     }
 
     /// <summary>
@@ -498,9 +623,11 @@ public static class MeshPicture
         private readonly int _triangles;
         private readonly Vector3 _lamp;
         private readonly Vector3 _ink;
-        private readonly Mipmaps? _skin;
+        private readonly Mipmaps?[] _palette;
+        private readonly int[] _wears;
 
-        public Drawing(Canvas canvas, SkinnedMesh mesh, int triangles, Vector3 lamp, Vector3 ink, Mipmaps? skin)
+        public Drawing(
+            Canvas canvas, SkinnedMesh mesh, int triangles, Vector3 lamp, Vector3 ink, Mipmaps?[] palette)
         {
             _pixels = canvas.Pixels;
             _depth = canvas.Depth;
@@ -515,7 +642,8 @@ public static class MeshPicture
             _triangles = triangles;
             _lamp = lamp;
             _ink = ink;
-            _skin = skin;
+            _palette = palette;
+            _wears = canvas.Wears;
         }
 
         /// <summary>Draws every triangle's part that falls in the rows from <paramref name="top"/> up to <paramref name="end"/>.</summary>
@@ -561,7 +689,10 @@ public static class MeshPicture
             int least = Math.Max(0, (int)MathF.Floor(Min3(c0.X, c1.X, c2.X)));
             int most = Math.Min(_size - 1, (int)MathF.Ceiling(Max3(c0.X, c1.X, c2.X)));
             float level = _levels[one];
-            bool skinned = _skin is not null;
+
+            // THE TEXTURE THIS TRIANGLE'S SHAPE WEARS, not the model's. See Palette.
+            Mipmaps? skin = _palette[_wears[one]];
+            bool skinned = skin is not null;
             Vector2 s0 = default;
             Vector2 s1 = default;
             Vector2 s2 = default;
@@ -623,7 +754,7 @@ public static class MeshPicture
                         // perspective correction a game renderer needs would be dividing by a w
                         // that is always one.
                         Vector2 spot = (first * s0) + (second * s1) + (third * s2);
-                        colour = Sample(_skin!, spot, level);
+                        colour = Sample(skin!, spot, level);
                     }
 
                     _pixels[at * 4] = Byte(colour.X * shade);

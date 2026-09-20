@@ -1450,6 +1450,16 @@ public sealed class MonsterPortrait
         else
         {
             string said = $"read {ByteCount.Said(_model.Bytes)} in {_model.Files} file{(_model.Files == 1 ? string.Empty : "s")}";
+
+            // HOW MANY SHEETS THE MONSTER IS PAINTED FROM, where it is more than one. A model
+            // built of parts wears a texture per shape, and saying so is what makes a picture
+            // that looks subtly wrong - a cloak in the body's colours - a thing somebody can
+            // check rather than squint at. One is the ordinary case and says nothing.
+            if (_model.Materials.Count > 1)
+            {
+                said += $" · {_model.Mesh.Shapes.Count} shapes from {_model.Materials.Count} textures";
+            }
+
             if (_tracks is { Ready: true } tracks)
             {
                 said += $" · keyframes {ByteCount.Said(tracks.Bytes)}";
@@ -1849,13 +1859,14 @@ public sealed class MonsterPortrait
                 _pose.Move(_model.Mesh, _posed, _posedNormals);
                 lowest = Lowest(_posed);
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, default, _model.Skin, _zoom, _pan);
+                    _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, default,
+                    _model.Skin, _zoom, _pan, _model.Skins);
             }
             else
             {
                 lowest = _model.Mesh.Most.Z;
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, _pan);
+                    _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, _pan, _model.Skins);
             }
 
             _rate.Redrawn(ImGui.GetTime());
@@ -2201,10 +2212,11 @@ public sealed class MonsterPortrait
             _pose.Take(_tracks, _frame);
             _pose.Move(_model.Mesh, _posed, _posedNormals);
             return MeshPicture.Of(
-                _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, default, _model.Skin, _zoom, _pan);
+                _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, default,
+                _model.Skin, _zoom, _pan, _model.Skins);
         }
 
-        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, default, _model.Skin, _zoom, _pan);
+        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, default, _model.Skin, _zoom, _pan, _model.Skins);
     }
 
     /// <summary>
