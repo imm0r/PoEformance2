@@ -33,6 +33,27 @@ public sealed record MonsterModel(
     /// <summary>Whether the monster is wearing its own texture rather than plain ink.</summary>
     public bool Painted => Paint.Length == 0 && Skin is not null;
 
+    /// <summary>
+    /// One texture per shape of the mesh, in its order - what the renderer paints each part with.
+    /// </summary>
+    /// <remarks>
+    /// A MONSTER IS BUILT OF PARTS AND THEY DO NOT SHARE A SHEET. Body, cloak, wings: the .ao
+    /// names a material per shape and each shape's coordinates address ITS OWN texture, so one
+    /// texture over the whole mesh puts the body's pixels on the wings. Reported from the live
+    /// client by Bahlak the Sky Seer, who came out black with red patches against a game that
+    /// draws him in feathers.
+    ///
+    /// A SHAPE WITH NO MATERIAL OF ITS OWN GETS <see cref="Skin"/>, which is what the whole mesh
+    /// used to get. That keeps every monster whose .ao names one material exactly as it was, and
+    /// confines the change to the ones that name several - where the old answer was wrong.
+    ///
+    /// Empty where there is nothing to paint with, and then the renderer draws in ink.
+    /// </remarks>
+    public IReadOnlyList<Mipmaps?> Skins { get; init; } = [];
+
+    /// <summary>The distinct materials the pictures came out of, for the report.</summary>
+    public IReadOnlyList<string> Materials { get; init; } = [];
+
     /// <summary>The skeleton the monster's .ao names, or <see cref="AnimationSkeleton.None"/>.</summary>
     public AnimationSkeleton Rig { get; init; } = AnimationSkeleton.None;
 
@@ -177,12 +198,21 @@ public static class MonsterModels
         // the live client by Veynar the Frostbane, who is plainly painted in the game and came
         // out here in plain ink. The renderer puts ONE texture on the mesh, so the first
         // material that actually carries a colour map is the one it gets.
-        List<string> materials = [.. found.Materials, .. manifest.Materials];
+        List<string> materials = [.. found.Materials.Select(one => one.Material), .. manifest.Materials];
         (Mipmaps? skin, string paint, string material) = Painted(counted, mesh, materials);
+
+        // AND ONE PER SHAPE, over the same reads: the walk above already decoded every material
+        // that has a colour in it, so this is a lookup rather than a second pass over the
+        // bundles. See MonsterModel.Skins for why a monster needs more than one.
+        (IReadOnlyList<Mipmaps?> skins, IReadOnlyList<string> used) =
+            Dressed(counted, mesh, found.Materials, manifest.Materials, skin, material);
+
         (AnimationSkeleton rig, string move) = Rigged(counted, found.Skeleton, mesh);
 
         return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint)
         {
+            Skins = skins,
+            Materials = used,
             Rig = rig,
             Rig_ = found.Skeleton,
             Move = move,
@@ -316,6 +346,108 @@ public static class MonsterModels
         };
     }
 
+    /// <summary>
+    /// Which texture each shape of the mesh wears, and the materials they came out of.
+    /// </summary>
+    /// <remarks>
+    /// THE SHAPE'S NAME IS THE JOIN, and it was already being read - the .ao's SkinMesh block
+    /// holds one child per shape, keyed by the shape's own name and valued with its material
+    /// (<c>HipsShape = ".../Body.mat:0"</c>), and SkinnedMesh.Shapes carries the same names with
+    /// the range of indices each covers. Nothing new has to be parsed to paint a monster part by
+    /// part; the two sides simply were never put next to each other.
+    ///
+    /// THE MANIFEST IS THE SECOND SOURCE and only where the counts agree. A .sm lists materials
+    /// in what looks like shape order, which is worth using and not worth trusting blind: a list
+    /// of a different length is a list this does not understand, and indexing into it anyway
+    /// would paint parts from whatever happened to line up.
+    ///
+    /// WHAT IS NOT NAMED KEEPS THE OLD ANSWER. A shape with no material of its own gets the
+    /// single skin the whole mesh used to wear, so every monster whose .ao names one material
+    /// draws exactly as it did and only the ones that name several change.
+    ///
+    /// READ ONCE PER MATERIAL, through a cache: nine shapes over two sheets is two decodes, not
+    /// nine, and a boss's sheet is 2048 square.
+    /// </remarks>
+    private static (IReadOnlyList<Mipmaps?> Skins, IReadOnlyList<string> Materials) Dressed(
+        Func<string, byte[]?> read,
+        SkinnedMesh mesh,
+        IReadOnlyList<(string Shape, string Material)> named,
+        IReadOnlyList<string> manifest,
+        Mipmaps? fallback,
+        string material)
+    {
+        if (mesh.Shapes.Count == 0)
+        {
+            return ([], fallback is null ? [] : [material]);
+        }
+
+        var cache = new Dictionary<string, Mipmaps?>(StringComparer.OrdinalIgnoreCase);
+        if (material.Length > 0)
+        {
+            cache[material] = fallback;
+        }
+
+        var skins = new Mipmaps?[mesh.Shapes.Count];
+        var used = new List<string>();
+        for (var shape = 0; shape < mesh.Shapes.Count; shape++)
+        {
+            string wants = Wanted(mesh.Shapes[shape].Name, shape, mesh.Shapes.Count, named, manifest);
+            if (wants.Length == 0)
+            {
+                skins[shape] = fallback;
+                continue;
+            }
+
+            if (!cache.TryGetValue(wants, out Mipmaps? worn))
+            {
+                (worn, _) = Colour(read, mesh, wants);
+                cache[wants] = worn;
+            }
+
+            skins[shape] = worn ?? fallback;
+            if (worn is not null && !used.Contains(wants, StringComparer.OrdinalIgnoreCase))
+            {
+                used.Add(wants);
+            }
+        }
+
+        if (fallback is not null && used.Count == 0 && material.Length > 0)
+        {
+            used.Add(material);
+        }
+
+        return (skins, used);
+    }
+
+    /// <summary>
+    /// The material a shape asks for: its own by name, else the manifest's by position.
+    /// </summary>
+    /// <remarks>
+    /// THE MANIFEST'S LIST IS USED ONLY WHEN IT HAS ONE ENTRY PER SHAPE. It looks like shape
+    /// order and that is worth using and not worth trusting blind: a list of another length is
+    /// a list whose order is not established here, and indexing into it anyway would paint
+    /// parts from whatever happened to line up.
+    /// </remarks>
+    private static string Wanted(
+        string shape,
+        int at,
+        int shapes,
+        IReadOnlyList<(string Shape, string Material)> named,
+        IReadOnlyList<string> manifest)
+    {
+        foreach ((string called, string material) in named)
+        {
+            if (string.Equals(called, shape, StringComparison.OrdinalIgnoreCase))
+            {
+                return MaterialFile.Bare(material);
+            }
+        }
+
+        return manifest.Count == shapes && at < manifest.Count
+            ? MaterialFile.Bare(manifest[at])
+            : string.Empty;
+    }
+
     /// <summary>One material: its colour texture, or which way this one is missing it.</summary>
     private static (Mipmaps? Skin, string Why) Colour(
         Func<string, byte[]?> read, SkinnedMesh mesh, string material)
@@ -406,12 +538,12 @@ public static class MonsterModels
     /// A depth-first walk would reach a base file before the monster's second .ao, and the nearer
     /// file is the one whose answer counts.
     /// </remarks>
-    private static (string Mesh, IReadOnlyList<string> Materials, string Skeleton)? Skinned(
+    private static (string Mesh, IReadOnlyList<(string Shape, string Material)> Materials, string Skeleton)? Skinned(
         Func<string, byte[]?> read, IReadOnlyList<string> named)
     {
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var queue = new Queue<(string Path, int Depth)>();
-        var materials = new List<string>();
+        var materials = new List<(string Shape, string Material)>();
 
         foreach (string one in named)
         {
@@ -458,11 +590,14 @@ public static class MonsterModels
                         // the Frostbane draws in plain ink here and is plainly painted in the
                         // game, which is what a shape-0 material with no colour map in it looks
                         // like. All of them are kept now and tried in order - see Painted.
+                        // KEY AND VALUE BOTH: the child's key is the SHAPE's own name, which
+                        // is what joins a material to the part of the mesh it belongs on -
+                        // SkinnedMesh.Shapes carries the same names. See Dressed.
                         foreach (AoEntry child in entry.Children)
                         {
                             if (child.Value.Contains(".mat", StringComparison.OrdinalIgnoreCase))
                             {
-                                materials.Add(child.Value);
+                                materials.Add((child.Key, child.Value));
                             }
                         }
 

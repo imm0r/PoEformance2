@@ -101,7 +101,13 @@ Once the boss is down the marker switches to the Inactive art, the way the game'
 do. The switch is on the Markers → Map & Places tab.
 
 **Where the game draws no icon for a boss, one is made from the boss itself.** The Monster Book's
-model pane reads the mesh, skin and rig out of the game's own bundles, so a pose picked there can
+model pane reads the mesh, skins and rig out of the game's own bundles — **skins**, plural, because
+a monster is built of parts and each part wears its own sheet: the `.ao` files a material under
+every shape's name and `SkinnedMesh` carries the same names, so body, cloak and wings are painted
+from their own textures. One texture over the whole mesh is what drew Bahlak the Sky Seer black
+with red patches, and a shape whose coordinates address another part's sheet samples whatever
+happens to sit there — wrong rather than missing, which is the harder kind to notice. A monster
+that names one material draws exactly as it did. so a pose picked there can
 be written straight out as icon art: colour and greyed, cut out on transparency, at 64 px for a
 sheet cell and at 1024 to work on. Nothing is keyed by hand — the renderer's background was always
 transparent, and the floor and the controls are drawn around the picture rather than into it. What

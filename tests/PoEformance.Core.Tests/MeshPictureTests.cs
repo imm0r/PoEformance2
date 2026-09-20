@@ -205,6 +205,52 @@ public class MeshPictureTests
     }
 
     /// <summary>
+    /// Each shape of a mesh is painted with its own texture.
+    /// </summary>
+    /// <remarks>
+    /// REPORTED FROM THE LIVE CLIENT, and it is the failure one texture per MODEL produces on a
+    /// monster built out of parts: Bahlak the Sky Seer came out black with red patches where the
+    /// game draws him in feathers. Every shape's coordinates address ITS OWN sheet, so painting
+    /// the wings from the body's texture samples whatever happens to sit at those coordinates -
+    /// a picture that is wrong rather than missing, which is the harder kind to notice.
+    ///
+    /// THE TWO HALVES ARE THE ASSERTION. The mesh is two quads, one shape each, and the two
+    /// sheets are flat colours - so "the left half is red and the right half is blue" is the
+    /// whole claim, and a renderer that kept one texture for the mesh paints both the same.
+    /// </remarks>
+    [Fact]
+    public void EveryShapeWearsItsOwnTexture()
+    {
+        const int Size = 128;
+
+        Mipmaps red = Sheet(220, 30, 30);
+        Mipmaps blue = Sheet(30, 30, 220);
+        SkinnedMesh parts = Parts();
+
+        GamePicture apart = MeshPicture.Of(parts, Size, skin: red, skins: [red, blue]);
+
+        (byte leftRed, byte leftBlue) = Spot(apart, Size / 4, Size / 2);
+        (byte rightRed, byte rightBlue) = Spot(apart, Size * 3 / 4, Size / 2);
+
+        Assert.True(leftRed > leftBlue * 2, $"the left shape should be red: {leftRed},{leftBlue}");
+        Assert.True(rightBlue > rightRed * 2, $"the right shape should be blue: {rightRed},{rightBlue}");
+
+        // WITHOUT THE LIST, NOTHING CHANGES. Every monster whose .ao names one material has to
+        // draw exactly as it did, so the single skin still covers the whole mesh.
+        GamePicture whole = MeshPicture.Of(parts, Size, skin: red);
+        (byte wasRed, byte wasBlue) = Spot(whole, Size * 3 / 4, Size / 2);
+        Assert.True(wasRed > wasBlue * 2, $"one skin should cover both shapes: {wasRed},{wasBlue}");
+
+        // A shape with no texture of its own falls back to ink rather than to a neighbour's
+        // sheet - the caller decides what to hand over, and null means "not this one".
+        GamePicture half = MeshPicture.Of(parts, Size, skin: null, skins: [red, null]);
+        (byte inkRed, byte inkBlue) = Spot(half, Size * 3 / 4, Size / 2);
+        Assert.True(
+            inkRed > 0 && Math.Abs(inkRed - inkBlue) < 40,
+            $"an unpainted shape should be plain ink: {inkRed},{inkBlue}");
+    }
+
+    /// <summary>
     /// The game's texture coordinates run NEGATIVE, and are wrapped rather than clamped.
     /// </summary>
     /// <remarks>
@@ -616,6 +662,47 @@ public class MeshPictureTests
     }
 
     /// <summary>A quad facing the viewer, with every corner at the same texture coordinate.</summary>
+    /// <summary>The red and the blue of one pixel, by its place in the picture.</summary>
+    private static (byte Red, byte Blue) Spot(GamePicture said, int x, int y)
+    {
+        int at = (((y * said.Width) + x) * 4);
+        return (said.Rgba[at], said.Rgba[at + 2]);
+    }
+
+    /// <summary>
+    /// Two quads side by side, one shape each - a monster built out of parts, in miniature.
+    /// </summary>
+    /// <remarks>
+    /// FLAT AND FACING THE CAMERA, so what is being measured is which texture a shape read and
+    /// not how it was lit: both halves take the same shade, and only the colour differs. The
+    /// coordinates are the same on both, which is the point - a shape's coordinates mean
+    /// something only against its own sheet.
+    /// </remarks>
+    private static SkinnedMesh Parts()
+    {
+        Vector3[] places =
+        [
+            new(-10f, 0f, -10f), new(0f, 0f, -10f), new(0f, 0f, 10f), new(-10f, 0f, 10f),
+            new(0f, 0f, -10f), new(10f, 0f, -10f), new(10f, 0f, 10f), new(0f, 0f, 10f),
+        ];
+
+        var normals = new Vector3[places.Length];
+        Array.Fill(normals, new Vector3(0f, 1f, 0f));
+
+        int[] indices = [0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7];
+        var spots = new Vector2[places.Length];
+        Array.Fill(spots, new Vector2(0.5f, 0.5f));
+
+        return SkinnedMesh.Of(
+            places,
+            normals,
+            indices,
+            new Vector3(-10f, -1f, -10f),
+            new Vector3(10f, 1f, 10f),
+            spots,
+            [new MeshShape("LeftShape", 0, 6), new MeshShape("RightShape", 6, 6)]);
+    }
+
     private static SkinnedMesh Coated(float v = 0.5f)
     {
         var places = new List<Vector3>();

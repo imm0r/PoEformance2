@@ -143,13 +143,19 @@ public sealed class SkinnedMesh
     /// <param name="least">The low corner of the box the camera is placed from.</param>
     /// <param name="most">The high corner.</param>
     /// <param name="coordinates">Texture coordinates, or null for a mesh with no skin.</param>
+    /// <param name="shapes">
+    /// The parts the indices are divided into, or null for one shape over all of them. A real
+    /// monster is built of several and each wears its own material, so a renderer that paints
+    /// them apart has to be testable against a mesh that has more than one.
+    /// </param>
     public static SkinnedMesh Of(
         Vector3[] positions,
         Vector3[] normals,
         int[] indices,
         Vector3 least,
         Vector3 most,
-        Vector2[]? coordinates = null)
+        Vector2[]? coordinates = null,
+        IReadOnlyList<MeshShape>? shapes = null)
     {
         ArgumentNullException.ThrowIfNull(positions);
         ArgumentNullException.ThrowIfNull(normals);
@@ -176,7 +182,7 @@ public sealed class SkinnedMesh
             Bones = [],
             Weights = [],
             Indices = indices,
-            Shapes = [new MeshShape("shape 0", 0, indices.Length)],
+            Shapes = shapes is { Count: > 0 } ? shapes : [new MeshShape("shape 0", 0, indices.Length)],
             Least = least,
             Most = most,
         };
