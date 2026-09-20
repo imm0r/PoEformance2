@@ -29,7 +29,7 @@ public static class ToolVersion
     /// number claiming to cover them would be invented. What the number has to do is tell two
     /// builds apart from today onwards, and it starts counting where it starts being kept.
     /// </remarks>
-    public const string Number = "0.1.0";
+    public const string Number = "0.1.1";
 
     /// <summary>The version with a "v" on it, as it reads on the title bar.</summary>
     public static string Said => "v" + Number;

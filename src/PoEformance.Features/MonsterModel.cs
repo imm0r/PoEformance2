@@ -54,6 +54,25 @@ public sealed record MonsterModel(
     /// <summary>The distinct materials the pictures came out of, for the report.</summary>
     public IReadOnlyList<string> Materials { get; init; } = [];
 
+    /// <summary>The distinct colour textures actually put on the mesh, for the report.</summary>
+    /// <remarks>
+    /// NAMED BECAUSE A WRONG ONE LOOKS LIKE A MISSING ONE. A mask or an occlusion map drawn as
+    /// colour is a monster in greyscale, which reads as "no texture" - and the file name says
+    /// in a word which of the two it is. See <see cref="Guessed"/>.
+    /// </remarks>
+    public IReadOnlyList<string> Textures { get; init; } = [];
+
+    /// <summary>
+    /// Whether any of those textures was chosen without a slot name saying it is the colour map.
+    /// </summary>
+    /// <remarks>
+    /// The fallback is "the first texture that is not a normal map", which is a guess this
+    /// project has always marked as one in its comments and never on screen. Where it is in
+    /// force the pane says so, because it is the difference between a monster the game paints
+    /// dark and a monster painted from the wrong map.
+    /// </remarks>
+    public bool Guessed { get; init; }
+
     /// <summary>The skeleton the monster's .ao names, or <see cref="AnimationSkeleton.None"/>.</summary>
     public AnimationSkeleton Rig { get; init; } = AnimationSkeleton.None;
 
@@ -199,20 +218,28 @@ public static class MonsterModels
         // out here in plain ink. The renderer puts ONE texture on the mesh, so the first
         // material that actually carries a colour map is the one it gets.
         List<string> materials = [.. found.Materials.Select(one => one.Material), .. manifest.Materials];
-        (Mipmaps? skin, string paint, string material) = Painted(counted, mesh, materials);
+
+        // ONE CACHE FOR THE WHOLE WALK, keyed by FILE rather than by what named it: a material
+        // is read once however many shapes point at it, and a texture is decoded once however
+        // many materials name it. Without it the model's own skin and the shape wearing the
+        // same material were two decodes of one 2048-square sheet - and two objects, which is
+        // also two uploads to the renderer.
+        var paints = new Paints();
+        (Mipmaps? skin, string paint, string material) = Painted(counted, mesh, materials, paints);
 
         // AND ONE PER SHAPE, over the same reads: the walk above already decoded every material
         // that has a colour in it, so this is a lookup rather than a second pass over the
         // bundles. See MonsterModel.Skins for why a monster needs more than one.
-        (IReadOnlyList<Mipmaps?> skins, IReadOnlyList<string> used) =
-            Dressed(counted, mesh, found.Materials, manifest.Materials, skin, material);
+        Dress dress = Dressed(counted, mesh, found.Materials, manifest.Materials, skin, material, paints);
 
         (AnimationSkeleton rig, string move) = Rigged(counted, found.Skeleton, mesh);
 
         return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint)
         {
-            Skins = skins,
-            Materials = used,
+            Skins = dress.Skins,
+            Materials = dress.Materials,
+            Textures = dress.Textures,
+            Guessed = dress.Guessed,
             Rig = rig,
             Rig_ = found.Skeleton,
             Move = move,
@@ -309,7 +336,7 @@ public static class MonsterModels
     /// default. Tried in order until one carries a colour map - see the remark in Of.
     /// </param>
     private static (Mipmaps? Skin, string Why, string Material) Painted(
-        Func<string, byte[]?> read, SkinnedMesh mesh, IReadOnlyList<string> named)
+        Func<string, byte[]?> read, SkinnedMesh mesh, IReadOnlyList<string> named, Paints paints)
     {
         var tried = new List<string>();
         var reasons = new List<string>();
@@ -325,7 +352,7 @@ public static class MonsterModels
             }
 
             tried.Add(bare);
-            (Mipmaps? skin, string why) = Colour(read, mesh, bare);
+            (Mipmaps? skin, string why, _, _) = Colour(read, mesh, bare, paints);
             if (skin is not null)
             {
                 return (skin, why, bare);
@@ -368,29 +395,31 @@ public static class MonsterModels
     /// READ ONCE PER MATERIAL, through a cache: nine shapes over two sheets is two decodes, not
     /// nine, and a boss's sheet is 2048 square.
     /// </remarks>
-    private static (IReadOnlyList<Mipmaps?> Skins, IReadOnlyList<string> Materials) Dressed(
+    private static Dress Dressed(
         Func<string, byte[]?> read,
         SkinnedMesh mesh,
         IReadOnlyList<(string Shape, string Material)> named,
         IReadOnlyList<string> manifest,
         Mipmaps? fallback,
-        string material)
+        string material,
+        Paints paints)
     {
         if (mesh.Shapes.Count == 0)
         {
-            return ([], fallback is null ? [] : [material]);
+            return new Dress([], fallback is null ? [] : [material], [], false);
         }
 
-        var cache = new Dictionary<string, Mipmaps?>(StringComparer.OrdinalIgnoreCase);
-        if (material.Length > 0)
-        {
-            cache[material] = fallback;
-        }
+        var textures = new List<string>();
+        var guessed = false;
 
         var skins = new Mipmaps?[mesh.Shapes.Count];
         var used = new List<string>();
         for (var shape = 0; shape < mesh.Shapes.Count; shape++)
         {
+            // AS WRITTEN, colon and all. The number picks a graph INSIDE the material, one
+            // per shape - see MaterialFile.Graphs - so two shapes naming the same file are
+            // two different textures and the cache has to tell them apart by the whole
+            // string rather than by the file.
             string wants = Wanted(mesh.Shapes[shape].Name, shape, mesh.Shapes.Count, named, manifest);
             if (wants.Length == 0)
             {
@@ -398,16 +427,21 @@ public static class MonsterModels
                 continue;
             }
 
-            if (!cache.TryGetValue(wants, out Mipmaps? worn))
+            (Mipmaps? worn, _, string texture, bool said) = Colour(read, mesh, wants, paints);
+            if (worn is not null)
             {
-                (worn, _) = Colour(read, mesh, wants);
-                cache[wants] = worn;
+                guessed |= !said;
+                if (!textures.Contains(texture, StringComparer.OrdinalIgnoreCase))
+                {
+                    textures.Add(texture);
+                }
             }
 
             skins[shape] = worn ?? fallback;
-            if (worn is not null && !used.Contains(wants, StringComparer.OrdinalIgnoreCase))
+            string file = MaterialFile.Bare(wants);
+            if (worn is not null && !used.Contains(file, StringComparer.OrdinalIgnoreCase))
             {
-                used.Add(wants);
+                used.Add(file);
             }
         }
 
@@ -416,8 +450,19 @@ public static class MonsterModels
             used.Add(material);
         }
 
-        return (skins, used);
+        return new Dress(skins, used, textures, guessed);
     }
+
+    /// <summary>What the shapes ended up wearing, and how sure the walk is about it.</summary>
+    /// <param name="Skins">One texture per shape, in the mesh's order.</param>
+    /// <param name="Materials">The distinct materials they came out of.</param>
+    /// <param name="Textures">The distinct colour textures, by path.</param>
+    /// <param name="Guessed">Whether any was chosen with no slot name saying it is the colour map.</param>
+    private readonly record struct Dress(
+        IReadOnlyList<Mipmaps?> Skins,
+        IReadOnlyList<string> Materials,
+        IReadOnlyList<string> Textures,
+        bool Guessed);
 
     /// <summary>
     /// The material a shape asks for: its own by name, else the manifest's by position.
@@ -439,31 +484,41 @@ public static class MonsterModels
         {
             if (string.Equals(called, shape, StringComparison.OrdinalIgnoreCase))
             {
-                return MaterialFile.Bare(material);
+                return material;
             }
         }
 
-        return manifest.Count == shapes && at < manifest.Count
-            ? MaterialFile.Bare(manifest[at])
-            : string.Empty;
+        return manifest.Count == shapes && at < manifest.Count ? manifest[at] : string.Empty;
     }
 
     /// <summary>One material: its colour texture, or which way this one is missing it.</summary>
-    private static (Mipmaps? Skin, string Why) Colour(
-        Func<string, byte[]?> read, SkinnedMesh mesh, string material)
+    private static (Mipmaps? Skin, string Why, string Texture, bool Named) Colour(
+        Func<string, byte[]?> read, SkinnedMesh mesh, string material, Paints paints)
     {
         if (material.Length == 0)
         {
-            return (null, "neither the .ao nor the .sm names a material");
+            return (null, "neither the .ao nor the .sm names a material", string.Empty, true);
         }
 
-        MaterialFile paint = Read(read, MaterialFile.Bare(material), MaterialFile.Read);
+        string file = MaterialFile.Bare(material);
+        if (!paints.Files.TryGetValue(file, out MaterialFile? paint))
+        {
+            paint = Read(read, file, MaterialFile.Read);
+            paints.Files[file] = paint;
+        }
+
         if (!paint.Ready)
         {
-            return (null, $"the material did not read: {MaterialFile.Bare(material)}");
+            return (null, $"the material did not read: {MaterialFile.Bare(material)}", string.Empty, true);
         }
 
-        if (paint.Albedo is not { Length: > 0 } texture)
+        // THE NUMBER AFTER THE FILE PICKS THE GRAPH, which this file's own remark said all
+        // along and nothing acted on: a monster built of parts names one material per shape
+        // as Boss.mat:0, Boss.mat:1, and the colour map is per graph. Taking the first one
+        // for every shape paints the head's sheet onto the cloak - patches of the wrong
+        // colour, which is how Bahlak, Connal and Count Geonor were reported.
+        (string texture, bool named) = paint.AlbedoOf(MaterialFile.SelectorOf(material));
+        if (texture.Length == 0)
         {
             // WHAT IT DOES NAME, because this is the one reason here that is a QUESTION rather
             // than an answer. Every other line says what went wrong and where; this one said
@@ -474,7 +529,21 @@ public static class MonsterModels
             // has never seen, and the only way to tell was to read the file with other tools.
             // So it prints the material and what is in it, which is exactly what deciding
             // between those two needs.
-            return (null, $"the material names no colour texture - {Listed(MaterialFile.Bare(material), paint)}");
+            return (
+                null,
+                $"the material names no colour texture - {Listed(MaterialFile.Bare(material), paint)}",
+                string.Empty,
+                true);
+        }
+
+        if (paints.Skins.TryGetValue(texture, out Mipmaps? kept))
+        {
+            // DECODED ONCE PER TEXTURE, not once per shape that points at it: two shapes of
+            // one material name the same sheet through different graphs, and a boss's sheet
+            // is sixteen megabytes of pixels before its levels are built.
+            return kept is null
+                ? (null, $"the texture did not read: {texture}", texture, named)
+                : Fitted(kept, mesh, texture, named);
         }
 
         // THROUGH ReadRaw AND NOT A BARE READ. A texture in this game is one of three things and
@@ -484,7 +553,8 @@ public static class MonsterModels
         // mesh and no colour and says nothing about why.
         if (GameArt.ReadRaw(read, texture) is not { Length: > 0 } bytes)
         {
-            return (null, $"the texture did not read: {texture}");
+            paints.Skins[texture] = null;
+            return (null, $"the texture did not read: {texture}", texture, named);
         }
 
         // THE LEVELS ARE BUILT HERE, ON THE LOAD'S TASK, and not where the picture is drawn: a
@@ -492,12 +562,37 @@ public static class MonsterModels
         // belongs beside the bundle reads it follows rather than on the frame that first draws it.
         if (Mipmaps.Of(GameArt.Decode(bytes)) is not { } skin)
         {
-            return (null, $"the texture did not decode: {texture}");
+            paints.Skins[texture] = null;
+            return (null, $"the texture did not decode: {texture}", texture, named);
         }
 
-        return mesh.Coordinated
-            ? (skin, string.Empty)
-            : (skin, "the mesh carries no texture coordinates, so the texture cannot be applied");
+        paints.Skins[texture] = skin;
+        return Fitted(skin, mesh, texture, named);
+    }
+
+    /// <summary>A decoded texture with the one thing that can still be wrong about it.</summary>
+    /// <remarks>
+    /// THE COORDINATES ARE CHECKED SEPARATELY AND LAST, because a mesh can have a perfectly
+    /// good texture and no way to look it up - the expected state of a bare body whose clothes
+    /// are attached objects, and a different answer from "the file would not read".
+    /// </remarks>
+    private static (Mipmaps? Skin, string Why, string Texture, bool Named) Fitted(
+        Mipmaps skin, SkinnedMesh mesh, string texture, bool named)
+        => mesh.Coordinated
+            ? (skin, string.Empty, texture, named)
+            : (skin,
+                "the mesh carries no texture coordinates, so the texture cannot be applied",
+                texture,
+                named);
+
+    /// <summary>What has already been read, so nothing is read or decoded twice.</summary>
+    private sealed class Paints
+    {
+        /// <summary>Material file by its path, with the selector taken off.</summary>
+        public Dictionary<string, MaterialFile> Files { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Decoded texture by its path, with null for one that would not read.</summary>
+        public Dictionary<string, Mipmaps?> Skins { get; } = new(StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>

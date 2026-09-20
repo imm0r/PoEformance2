@@ -63,7 +63,7 @@ push to `main` auto-compiles on GitHub and updates the rolling release
 [`latest-dev`](https://github.com/imm0r/PoEformance2/releases/tag/latest-dev) with a
 ready-to-run, self-contained exe.
 
-**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.0 · 4659c18`
+**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.1 · 4659c18`
 — the version, raised on every push, and the commit the publish workflow stamped into it. A build
 compiled locally reads `local`, because a version number on an unreleased build is a claim it
 cannot support. It is there because the alternative was comparing a screenshot against a merge
@@ -113,9 +113,13 @@ every shape's name and `SkinnedMesh` carries the same names, so body, cloak and 
 from their own textures. One texture over the whole mesh is what drew Bahlak the Sky Seer black
 with red patches, and a shape whose coordinates address another part's sheet samples whatever
 happens to sit there — wrong rather than missing, which is the harder kind to notice. A monster
-that names one material draws exactly as it did. so a pose picked there can
-be written straight out as icon art: colour and greyed, cut out on transparency, at 64 px for a
-sheet cell and at 1024 to work on. Nothing is keyed by hand — the renderer's background was always
+that names one material draws exactly as it did, and where it names one material with several
+graphs in it, the number after the file picks which — that is what the game's own `Boss.mat:1`
+means, and reading it is what stopped three bosses in a row wearing their head's sheet on their
+cloak.
+
+A pose picked in that pane can be written straight out as icon art: colour and greyed, cut out on
+transparency, at 64 px for a sheet cell and at 1024 to work on. Nothing is keyed by hand — the renderer's background was always
 transparent, and the floor and the controls are drawn around the picture rather than into it. What
 it wrote opens in a small window of its own, both halves at cell size and at three times it on a
 checkerboard, because an icon is judged at 64 px and a pose that reads beautifully across the pane
