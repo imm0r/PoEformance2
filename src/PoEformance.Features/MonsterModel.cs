@@ -285,7 +285,16 @@ public static class MonsterModels
 
         if (paint.Albedo is not { Length: > 0 } texture)
         {
-            return (null, "the material names no colour texture");
+            // WHAT IT DOES NAME, because this is the one reason here that is a QUESTION rather
+            // than an answer. Every other line says what went wrong and where; this one said
+            // only that the rule found nothing, and the rule - a slot whose name carries
+            // Albedo, Colour or Color, or the first texture that is not a normal map - was
+            // measured on the materials that happened to be looked at. A boss drawn in plain
+            // ink is then indistinguishable from a boss whose slot is called something this
+            // has never seen, and the only way to tell was to read the file with other tools.
+            // So it prints the material and what is in it, which is exactly what deciding
+            // between those two needs.
+            return (null, $"the material names no colour texture - {Listed(MaterialFile.Bare(material), paint)}");
         }
 
         // THROUGH ReadRaw AND NOT A BARE READ. A texture in this game is one of three things and
@@ -310,6 +319,36 @@ public static class MonsterModels
             ? (skin, string.Empty)
             : (skin, "the mesh carries no texture coordinates, so the texture cannot be applied");
     }
+
+    /// <summary>
+    /// A material named, with the slots and textures it holds - the evidence for "no colour".
+    /// </summary>
+    /// <remarks>
+    /// SHORT ON PURPOSE. This goes in a line under the picture, so it carries the material's own
+    /// file name rather than its path, the slot names as written, and the textures by file name
+    /// only - enough to recognise a colour map filed under a slot nobody taught this about, and
+    /// not so much that the line stops being readable. Three of each, because a material with
+    /// more than three of either has already made the point.
+    /// </remarks>
+    private static string Listed(string material, MaterialFile paint)
+    {
+        string Few(IEnumerable<string> names)
+        {
+            string[] some = [.. names.Take(Some)];
+            return some.Length == 0 ? "none" : string.Join(", ", some);
+        }
+
+        static string Named(string path) => path[(path.LastIndexOf('/') + 1)..];
+
+        string file = material.Length > 0 ? Named(material) : "?";
+        string slots = Few(paint.Slots.Select(one => $"{one.Key}={Named(one.Value)}"));
+        string textures = Few(paint.Textures.Select(one => Named(one.Path)));
+
+        return $"{file} names slots: {slots}; textures: {textures}";
+    }
+
+    /// <summary>How many slots and textures the line above names before it stops.</summary>
+    private const int Some = 3;
 
     /// <summary>
     /// The first SkinMesh found, walking from the monster's own files outwards through extends.

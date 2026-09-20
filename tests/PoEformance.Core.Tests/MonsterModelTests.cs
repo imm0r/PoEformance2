@@ -372,6 +372,16 @@ public class MonsterModelTests
         noColour.Files["art/paint.mat"] = Mat("art/skin_normal.dds", slot: "NormalGloss_TEX");
         Assert.Contains("no colour texture", Paint(noColour), StringComparison.Ordinal);
 
+        // AND WHAT IT DOES NAME, which is the one reason here that is a question rather than an
+        // answer: the rule for "which texture is the colour one" was measured on the materials
+        // that happened to be looked at, so a boss whose slot is called something new is drawn
+        // in plain ink and looks exactly like a boss with no texture at all. The material, its
+        // slots and its textures are printed, which is what tells those two apart.
+        string said = Paint(noColour);
+        Assert.Contains("paint.mat", said, StringComparison.Ordinal);
+        Assert.Contains("NormalGloss_TEX", said, StringComparison.Ordinal);
+        Assert.Contains("skin_normal.dds", said, StringComparison.Ordinal);
+
         var noTexture = Install();
         noTexture.Files.Remove("art/skin.dds");
         Assert.Contains("texture did not read", Paint(noTexture), StringComparison.Ordinal);
