@@ -63,7 +63,7 @@ push to `main` auto-compiles on GitHub and updates the rolling release
 [`latest-dev`](https://github.com/imm0r/PoEformance2/releases/tag/latest-dev) with a
 ready-to-run, self-contained exe.
 
-**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.4 · 4659c18`
+**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.5 · 4659c18`
 — the version, raised on every push, and the commit the publish workflow stamped into it. A build
 compiled locally reads `local`, because a version number on an unreleased build is a claim it
 cannot support. It is there because the alternative was comparing a screenshot against a merge
@@ -173,8 +173,11 @@ need no ticking off either. **And that column is now read from the client**, not
 `WorldAreas.dat`, and the walk that already reads all 442 rows for their names and flags picks it
 up in the same pass. The offset is arithmetic rather than a search, so what makes it believable is
 that `data/area-bosses.json` was generated months earlier from a third-party export by a different
-route — and the capture agrees with it on **206 of 442 rows, the same 206 ids, and the same number
-of bosses on every one**, with no disagreement in either direction. `data/area-bosses.json` stays as
+route — and a capture of the running client agrees with it on **206 of 442 rows, the same 206 ids,
+and the same paths in the same order on every one**, with no disagreement in either direction and
+nothing extra. Three things have to be right at once for that: the column offset, the array's
+(count, pointer) reading, and which half of a foreign reference holds the row — and a mistake in
+any of them does not produce 206 exact strings. `data/area-bosses.json` stays as
 the answer until an atlas node has been seen and for any area the walk did not reach,
 `data/boss-icons.json` overrides both where somebody has stood in the room,
 and `scripts/area-bosses.py` is how the file is made. **Clicking the boss's name on a row opens the
