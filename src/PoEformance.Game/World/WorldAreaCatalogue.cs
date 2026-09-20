@@ -9,13 +9,18 @@ namespace PoEformance.Game.World;
 /// <param name="Id">The engine id - <c>MapLostTowers</c>. The same on every client, so the key.</param>
 /// <param name="Name">The display name, in the CLIENT'S LANGUAGE. A label, never a key.</param>
 /// <param name="Tags">The game's own tag ids - "map", "map_tower", "swamp_biome".</param>
+/// <param name="Bosses">
+/// The metadata paths of the monsters the game calls this area's bosses, in the table's own
+/// order. Empty where it names none, which is most areas.
+/// </param>
 public sealed record WorldArea(
     string Id,
     string Name,
     bool IsMapArea,
     bool IsHideout,
     bool IsUnique,
-    IReadOnlyList<string> Tags);
+    IReadOnlyList<string> Tags,
+    IReadOnlyList<string> Bosses);
 
 /// <summary>
 /// Every area the game knows, read out of WorldAreas.dat instead of out of a file this tool ships.
@@ -67,8 +72,28 @@ public sealed class WorldAreaCatalogue
     /// <summary>Most tags on one area. A guard on a count that comes from memory.</summary>
     private const int MostTags = 32;
 
+    /// <summary>
+    /// Most bosses on one area. A guard on a count that comes from memory.
+    /// </summary>
+    /// <remarks>
+    /// GENEROUS ON PURPOSE. The shipped dump of this column tops out at five (BossRush_Area1),
+    /// so anything near this is already a sign the bytes are not a count - but a cap that sits
+    /// just above the largest thing seen turns the next patch into a silently short list.
+    /// </remarks>
+    private const int MostBosses = 32;
+
     /// <summary>Longest string taken seriously behind an id or a name.</summary>
     private const int MostChars = 96;
+
+    /// <summary>
+    /// Longest string taken seriously behind a monster's metadata path.
+    /// </summary>
+    /// <remarks>
+    /// LONGER THAN <see cref="MostChars"/> because these are paths rather than names:
+    /// Metadata/Monsters/LeagueAbyss/LichBoss/KulemakBoss is 49 characters before anything
+    /// unusual, and a path cut short is a path that matches nothing.
+    /// </remarks>
+    private const int MostPathChars = 160;
 
     /// <summary>Bytes one tag entry takes: a row reference followed by its table.</summary>
     private const int TagEntrySize = 0x10;
@@ -81,9 +106,12 @@ public sealed class WorldAreaCatalogue
     private readonly int _isMapArea;
     private readonly int _isHideout;
     private readonly int _tagsArray;
+    private readonly int _bossesArray;
     private readonly int _isUnique;
     private readonly long _computedRowSize;
     private readonly int _tagId;
+    private readonly int _monsterId;
+    private readonly int _bossEntrySize;
 
     private readonly int _dataStorage;
     private readonly int _data;
@@ -91,6 +119,18 @@ public sealed class WorldAreaCatalogue
     private readonly int _worldAreaRef;
 
     private readonly Dictionary<ulong, string> _tagNames = [];
+
+    /// <summary>
+    /// Monster paths by the address of their row, so one boss is read once however many areas
+    /// name it.
+    /// </summary>
+    /// <remarks>
+    /// WORTH IT FOR THE SAME REASON THE TAG CACHE IS, and more so: 31 of the 90 bosses in the
+    /// atlas stand in more than one map, 66 maps between them, so a third of the references
+    /// resolve to a row some other area already asked about.
+    /// </remarks>
+    private readonly Dictionary<ulong, string> _monsterPaths = [];
+
     private Dictionary<string, WorldArea> _areas = new(StringComparer.OrdinalIgnoreCase);
 
     public WorldAreaCatalogue(IMemoryReader reader, OffsetSchema schema)
@@ -108,9 +148,14 @@ public sealed class WorldAreaCatalogue
         _isMapArea = area.OffsetOf("IsMapArea");
         _isHideout = area.OffsetOf("IsHideout");
         _tagsArray = area.OffsetOf("TagsArray");
+        _bossesArray = area.OffsetOf("BossesArray");
         _isUnique = area.OffsetOf("IsUniqueMapArea");
         _computedRowSize = area.Constants["ComputedRowSize"];
         _tagId = tag.OffsetOf("IdPtr");
+
+        StructDef monster = schema.Structs["MonsterVarietyRow"];
+        _monsterId = monster.OffsetOf("IdPtr");
+        _bossEntrySize = (int)monster.Constants["EntrySize"];
 
         StructDef node = schema.Structs["AtlasNode"];
         _dataStorage = (int)node.Constants["DataStoragePtr"];
@@ -256,7 +301,60 @@ public sealed class WorldAreaCatalogue
             row[_isMapArea] != 0,
             row[_isHideout] != 0,
             row[_isUnique] != 0,
-            Tags(row));
+            Tags(row),
+            Bosses(row));
+    }
+
+    /// <summary>
+    /// The Bosses column: who the game says stands here, by metadata path.
+    /// </summary>
+    /// <remarks>
+    /// SAME SHAPE AS <see cref="Tags"/> - a count then a pointer at 16-byte foreign references -
+    /// because it is the same kind of column, and the reading was measured on that one. What
+    /// differs is where the string is: a Tags entry is read for its Id and so is a
+    /// MonsterVarieties entry, but the monster's Id is COLUMN 0, which is the reason this can be
+    /// read at all without the row size being confirmed against the game. A wrong row size moves
+    /// every column except the first.
+    ///
+    /// MOST AREAS NAME NONE and cost two reads out of the block they already arrived in, so this
+    /// is nearly free over the 442 rows; the per-row work starts only where there is a boss.
+    /// </remarks>
+    private List<string> Bosses(ReadOnlySpan<byte> row)
+    {
+        var bosses = new List<string>();
+        if (row.Length < _bossesArray + 16)
+        {
+            return bosses;
+        }
+
+        ulong count = BinaryPrimitives.ReadUInt64LittleEndian(row[_bossesArray..]);
+        ulong entries = BinaryPrimitives.ReadUInt64LittleEndian(row[(_bossesArray + 8)..]);
+        if (count is 0 or > MostBosses || !MemoryReaderExtensions.IsPlausiblePointer(entries))
+        {
+            return bosses;
+        }
+
+        for (ulong i = 0; i < count; i++)
+        {
+            ulong monster = _reader.ReadPointer(entries + (i * (ulong)_bossEntrySize));
+            if (!MemoryReaderExtensions.IsPlausiblePointer(monster))
+            {
+                continue;
+            }
+
+            if (!_monsterPaths.TryGetValue(monster, out string? path))
+            {
+                path = PathText(_reader.ReadPointer(monster + (ulong)_monsterId));
+                _monsterPaths[monster] = path;
+            }
+
+            if (path.Length > 0)
+            {
+                bosses.Add(path);
+            }
+        }
+
+        return bosses;
     }
 
     /// <summary>The Tags column: a count, then a pointer at the entries.</summary>
@@ -305,6 +403,35 @@ public sealed class WorldAreaCatalogue
 
     private string Text(ulong at)
         => MemoryReaderExtensions.IsPlausiblePointer(at) ? _reader.ReadUnicodeString(at, MostChars) : string.Empty;
+
+    /// <summary>A metadata path, which is allowed to be longer than a name.</summary>
+    private string PathText(ulong at)
+        => MemoryReaderExtensions.IsPlausiblePointer(at) ? _reader.ReadUnicodeString(at, MostPathChars) : string.Empty;
+
+    /// <summary>
+    /// What the game says stands in each area, by area id - the shape <see cref="AreaBosses"/>
+    /// learns from. Areas that name no boss are left out.
+    /// </summary>
+    /// <remarks>
+    /// AN EMPTY LIST IS NOT THE SAME AS ABSENCE here, and this leaves the empty ones out on
+    /// purpose. A walk can be partial; what it did not reach must stay unanswered so the shipped
+    /// file still covers it. Only the areas this actually read a row for appear, and an area it
+    /// read that names nobody is not in a position to say the shipped file is wrong about it -
+    /// see AreaBosses.Learn, which treats what it IS given as final.
+    /// </remarks>
+    public IReadOnlyDictionary<string, IReadOnlyList<string>> BossesByArea()
+    {
+        var found = new Dictionary<string, IReadOnlyList<string>>(StringComparer.OrdinalIgnoreCase);
+        foreach (WorldArea area in _areas.Values)
+        {
+            if (area.Bosses.Count > 0)
+            {
+                found[area.Id] = area.Bosses;
+            }
+        }
+
+        return found;
+    }
 
     /// <summary>
     /// What the table holds, and where it differs from the file this tool ships.

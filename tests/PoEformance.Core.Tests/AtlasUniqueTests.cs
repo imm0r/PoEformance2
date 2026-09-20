@@ -74,7 +74,7 @@ public class AtlasUniqueTests
         var areas = new Dictionary<string, WorldArea>(StringComparer.OrdinalIgnoreCase);
         foreach ((string id, bool unique) in rows)
         {
-            areas[id] = new WorldArea(id, string.Empty, true, false, unique, []);
+            areas[id] = new WorldArea(id, string.Empty, true, false, unique, [], []);
         }
 
         return areas;

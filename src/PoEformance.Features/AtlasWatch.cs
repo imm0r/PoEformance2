@@ -365,6 +365,22 @@ public sealed class AtlasWatch
     public AtlasRatings Ratings { get; }
 
     /// <summary>
+    /// Who the game says stands in each area, taught from the client's own table when the atlas
+    /// walk reaches it.
+    /// </summary>
+    /// <remarks>
+    /// SET BY THE COMPOSITION ROOT to the SAME instance the boss markers read, so teaching it
+    /// here is what makes an arena's label and its icon family come from the client rather than
+    /// from data/area-bosses.json. Left as the empty table when nobody attaches one, which is
+    /// what the tests and the replay paths do - the walk then reads the column and has nowhere
+    /// to put it, which costs the reads and breaks nothing.
+    ///
+    /// The same arrangement <see cref="Names"/> has for IsUniqueMapArea, and taught from the
+    /// same two places for the same reason.
+    /// </remarks>
+    public AreaBosses Bosses { get; set; } = AreaBosses.Empty;
+
+    /// <summary>
     /// The ritual line, when one is being drawn. Null unless somebody attached it.
     /// </summary>
     /// <remarks>
@@ -826,6 +842,7 @@ public sealed class AtlasWatch
             if (_catalogue.ReadFromNode(node.Address))
             {
                 Names.LearnUnique(_catalogue.All);
+                Bosses.Learn(_catalogue.BossesByArea());
             }
         }
 
@@ -1355,6 +1372,7 @@ public sealed class AtlasWatch
             }
 
             Names.LearnUnique(_catalogue.All);
+            Bosses.Learn(_catalogue.BossesByArea());
             return true;
         }
 

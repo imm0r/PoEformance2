@@ -2946,13 +2946,19 @@ internal static class Program
         PoEformance.Features.BossIcons bossIcons =
             PoEformance.Features.BossIcons.Load(FindDataFile("boss-icons.json"));
 
-        // And WHO the game says stands in each area - WorldAreas' own Bosses column, exported
-        // to a file until the tool reads that column itself. It names the boss of 125 of the
-        // atlas's 173 maps, which is where an arena's label and its icon family come from when
-        // nobody has written either down. Set BEFORE the table is handed over, so the layer
-        // that draws the markers never sees a half-built one. See AreaBosses.
+        // And WHO the game says stands in each area - WorldAreas' own Bosses column. It names the
+        // boss of 125 of the atlas's 173 maps, which is where an arena's label and its icon
+        // family come from when nobody has written either down. Set BEFORE the table is handed
+        // over, so the layer that draws the markers never sees a half-built one. See AreaBosses.
         bossIcons.Bosses = PoEformance.Game.World.AreaBosses.Load(FindDataFile("area-bosses.json"));
         overlay.BossIcons = bossIcons;
+
+        // THE SAME INSTANCE GOES TO THE ATLAS WALK, which is what upgrades it from the shipped
+        // file to the client's own column: WorldAreaCatalogue reads all 442 rows the first time
+        // an atlas node is seen, and what it finds is merged over this. The file stays as the
+        // answer until then and for any area the walk did not reach - a table read from the
+        // running client cannot go stale with a patch, and a file always will.
+        atlas.Bosses = bossIcons.Bosses;
 
         // And the set of maps those entries are still missing for. The same table the atlas
         // uses - loaded once, above - because "which maps have no boss picture yet" is a set

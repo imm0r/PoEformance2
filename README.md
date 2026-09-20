@@ -63,7 +63,7 @@ push to `main` auto-compiles on GitHub and updates the rolling release
 [`latest-dev`](https://github.com/imm0r/PoEformance2/releases/tag/latest-dev) with a
 ready-to-run, self-contained exe.
 
-**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.3 · 4659c18`
+**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.4 · 4659c18`
 — the version, raised on every push, and the commit the publish workflow stamped into it. A build
 compiled locally reads `local`, because a version number on an unreleased build is a claim it
 cannot support. It is there because the alternative was comparing a screenshot against a merge
@@ -169,8 +169,14 @@ and one boss posed once covers every map it is the boss of. That last part is th
 those 125 maps hold **90** distinct bosses, **31** of which stand in more than one map — 66 maps
 between them — and nothing in either map tells you the one you are in is a repeat. The 48 maps
 that name no boss are exactly the hideouts, hubs, Expedition logbooks and merchant maps, so they
-need no ticking off either. `data/area-bosses.json` carries that column until the tool reads it
-from the client itself, `data/boss-icons.json` overrides it where somebody has stood in the room,
+need no ticking off either. **And that column is now read from the client**, not only shipped: it is column 18 of
+`WorldAreas.dat`, and the walk that already reads all 442 rows for their names and flags picks it
+up in the same pass. The offset is arithmetic rather than a search, so what makes it believable is
+that `data/area-bosses.json` was generated months earlier from a third-party export by a different
+route — and the capture agrees with it on **206 of 442 rows, the same 206 ids, and the same number
+of bosses on every one**, with no disagreement in either direction. `data/area-bosses.json` stays as
+the answer until an atlas node has been seen and for any area the walk did not reach,
+`data/boss-icons.json` overrides both where somebody has stood in the room,
 and `scripts/area-bosses.py` is how the file is made. **Clicking the boss's name on a row opens the
 Monster Book at that monster** and copies the name — finding it meant typing that name into a table
 of 2733 rows, once per boss, ninety times. The list had hidden the Precursor towers as

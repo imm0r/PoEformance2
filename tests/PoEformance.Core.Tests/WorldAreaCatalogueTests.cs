@@ -26,6 +26,7 @@ public class WorldAreaCatalogueTests
     private const ulong Rows = 0xB0_0000;
     private const ulong Tags = 0xC0_0000;
     private const ulong Strings = 0xD0_0000;
+    private const ulong Bosses = 0xE0_0000;
 
     /// <summary>The shipped schema, loaded once. Shared because several probe tests want it.</summary>
     public static OffsetSchema Schema { get; } = LoadSchema();
@@ -57,6 +58,7 @@ public class WorldAreaCatalogueTests
         StructDef endgame = schema.Structs["EndgameMapsRow"];
         StructDef area = schema.Structs["WorldAreaDat"];
         StructDef tagRow = schema.Structs["TagsRow"];
+        StructDef monster = schema.Structs["MonsterVarietyRow"];
         StructDef table = schema.Structs["DatTable"];
         StructDef store = schema.Structs["DatRowStore"];
 
@@ -84,7 +86,9 @@ public class WorldAreaCatalogueTests
         // The rows themselves, one contiguous block because that is how they are read.
         fake.Place(Rows, new byte[Count * size]);
 
-        void Area(int index, string id, string name, byte map, byte hideout, byte unique, string[] tags)
+        void Area(
+            int index, string id, string name, byte map, byte hideout, byte unique,
+            string[] tags, string[] bosses)
         {
             ulong at = Rows + (ulong)(index * size);
             fake.Place(at + (ulong)area.OffsetOf("IdPtr"), Text(fake, Strings + (ulong)(0x1000 * index), id));
@@ -102,11 +106,28 @@ public class WorldAreaCatalogueTests
                 fake.Place(entries + (ulong)(i * entry), row);
                 fake.Place(row + (ulong)tagRow.OffsetOf("IdPtr"), Text(fake, row + 0x400, tags[i]));
             }
+
+            // THE BOSSES COLUMN, same (count, pointer) shape as the tags and reaching a row of a
+            // DIFFERENT table - which is the half no recording in this repo can cover, because
+            // the capture was taken by a build that never followed this pointer.
+            ulong who = Bosses + (ulong)(0x2000 * index);
+            fake.Place(at + (ulong)area.OffsetOf("BossesArray"), (ulong)bosses.Length);
+            fake.Place(at + (ulong)area.OffsetOf("BossesArray") + 8, who);
+            for (int i = 0; i < bosses.Length; i++)
+            {
+                ulong row = who + 0x400 + (ulong)(i * 0x100);
+                fake.Place(who + (ulong)(i * (int)monster.Constants["EntrySize"]), row);
+                fake.Place(row + (ulong)monster.OffsetOf("IdPtr"), Text(fake, row + 0x800, bosses[i]));
+            }
         }
 
-        Area(0, "MapLostTowers", "Lost Towers", 1, 0, 0, ["map", "map_tower", "swamp_biome"]);
-        Area(1, "MapUniqueLake", "The Fractured Lake", 1, 0, 1, ["map"]);
-        Area(2, "HideoutCanal", "Canal Hideout", 0, 1, 0, []);
+        // The tower has TWO bosses, which is the case a single-valued column would get wrong:
+        // every Precursor tower carries two Reactor Guardians. The hideout has none.
+        Area(
+            0, "MapLostTowers", "Lost Towers", 1, 0, 0, ["map", "map_tower", "swamp_biome"],
+            ["Metadata/Monsters/Reactor/ReactorGuardian1", "Metadata/Monsters/Reactor/ReactorGuardian2"]);
+        Area(1, "MapUniqueLake", "The Fractured Lake", 1, 0, 1, ["map"], ["Metadata/Monsters/Lake/LakeBoss"]);
+        Area(2, "HideoutCanal", "Canal Hideout", 0, 1, 0, [], []);
 
         return (fake, schema);
     }
@@ -143,6 +164,68 @@ public class WorldAreaCatalogueTests
 
         Assert.True(Assert.IsType<WorldArea>(catalogue.Of("MapUniqueLake")).IsUnique);
         Assert.True(Assert.IsType<WorldArea>(catalogue.Of("HideoutCanal")).IsHideout);
+    }
+
+    /// <summary>
+    /// The Bosses column resolves all the way to the monsters' own metadata paths.
+    /// </summary>
+    /// <remarks>
+    /// THE HALF THE CAPTURE CANNOT REACH. session-2026-09-catalogue.rec proves the count at 0x9C
+    /// against 206 areas of a table made elsewhere, and it can prove nothing beyond it: a
+    /// recording only holds reads the running build performed, and the build that took it never
+    /// followed this pointer. So the walk from the count to the string is tested here instead -
+    /// the entry stride, that a foreign reference's ROW pointer sits at the column start, and
+    /// that the monster's path is column 0 of its own row.
+    ///
+    /// TWO BOSSES ON ONE AREA on purpose: a column read as a single value would pass every test
+    /// an ordinary map could offer and lose a Precursor tower's second Reactor Guardian.
+    /// </remarks>
+    [Fact]
+    public void TheBossesColumnResolvesToTheMonstersPaths()
+    {
+        (FakeMemoryReader fake, OffsetSchema schema) = Fixture();
+        var catalogue = new WorldAreaCatalogue(fake, schema);
+
+        Assert.True(catalogue.ReadFromNode(Node), catalogue.LastError);
+
+        Assert.Equal(
+            ["Metadata/Monsters/Reactor/ReactorGuardian1", "Metadata/Monsters/Reactor/ReactorGuardian2"],
+            Assert.IsType<WorldArea>(catalogue.Of("MapLostTowers")).Bosses);
+        Assert.Equal(
+            ["Metadata/Monsters/Lake/LakeBoss"],
+            Assert.IsType<WorldArea>(catalogue.Of("MapUniqueLake")).Bosses);
+        Assert.Empty(Assert.IsType<WorldArea>(catalogue.Of("HideoutCanal")).Bosses);
+    }
+
+    /// <summary>
+    /// What <see cref="AreaBosses"/> is handed leaves out the areas that name nobody.
+    /// </summary>
+    /// <remarks>
+    /// AN AREA THE WALK SAW AND AN AREA IT DID NOT MUST NOT ARRIVE THE SAME WAY. Learn treats
+    /// what it is given as final, including an empty list - that is how a boss removed in a
+    /// patch gets corrected - so handing it every boss-less area in the game would wipe the
+    /// shipped table for the 236 rows that were never about bosses in the first place.
+    /// </remarks>
+    [Fact]
+    public void OnlyAreasThatNameABossAreHandedOn()
+    {
+        (FakeMemoryReader fake, OffsetSchema schema) = Fixture();
+        var catalogue = new WorldAreaCatalogue(fake, schema);
+        Assert.True(catalogue.ReadFromNode(Node), catalogue.LastError);
+
+        IReadOnlyDictionary<string, IReadOnlyList<string>> learned = catalogue.BossesByArea();
+
+        Assert.Equal(2, learned.Count);
+        Assert.Contains("MapLostTowers", learned);
+        Assert.Contains("MapUniqueLake", learned);
+        Assert.DoesNotContain("HideoutCanal", learned);
+
+        // And it is in the shape AreaBosses takes, teaching the live table over the shipped one.
+        AreaBosses bosses = AreaBosses.Empty;
+        Assert.Equal(2, bosses.Learn(learned));
+        Assert.Equal(
+            ["Metadata/Monsters/Reactor/ReactorGuardian1", "Metadata/Monsters/Reactor/ReactorGuardian2"],
+            bosses.Of("MapLostTowers"));
     }
 
     [Fact]

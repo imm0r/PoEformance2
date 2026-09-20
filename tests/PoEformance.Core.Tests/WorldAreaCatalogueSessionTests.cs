@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
@@ -241,5 +242,90 @@ public class WorldAreaCatalogueSessionTests
         // zone. Asserted off the TABLE so the knowledge does not leave with the entry.
         Assert.Equal("Sel Khari Sanctuary ", Assert.IsType<WorldArea>(catalogue.Of("P2_3")).Name);
         Assert.Equal("Sel Khari Sanctuary", catalogue.Of("P2_3")!.Name.Trim());
+    }
+
+    /// <summary>
+    /// The Bosses column is at 0x9C, and the capture proves it against a table made elsewhere.
+    /// </summary>
+    /// <remarks>
+    /// AN OFFSET NOBODY MEASURED, CHECKED BY SOMETHING THAT CANNOT HAVE BEEN FITTED TO IT.
+    /// 0x9C is arithmetic on dat-schema's column order - column 18 of 80 - and arithmetic is
+    /// how this project has been wrong before. What settles it is that data/area-bosses.json was
+    /// generated from a THIRD-PARTY export of the same table, months earlier and by a different
+    /// route, and it has 206 areas: this capture has a non-zero count at 0x9C on 206 of its 442
+    /// rows, the same 206 ids, and THE SAME NUMBER OF BOSSES ON EVERY ONE.
+    ///
+    /// 206 agreements and not one disagreement in either direction is not something a wrong
+    /// offset produces. Four bytes either way lands in a different column - the neighbours are
+    /// an unnamed QuestFlags reference and the Monsters array, which holds every monster that
+    /// may spawn in an area and so would be both far longer and present nearly everywhere.
+    ///
+    /// WHAT THIS DOES NOT COVER, and it is worth being exact: the capture was taken by a build
+    /// that did not read this column, so the pointer at +0xA4 is in the row block but the
+    /// MonsterVarieties rows behind it were never fetched. This tests the count and that the
+    /// pointer is a pointer; that the paths come back right needs a fresh recording. A
+    /// recording can only contain reads the running build performed - see CLAUDE.md.
+    /// </remarks>
+    [Fact]
+    public void TheBossesColumnAgreesWithTheTableThisToolShips()
+    {
+        using ReplayMemoryReader replay = Load();
+        WorldAreaCatalogue catalogue = Read(replay);
+        DatTableFacts facts = catalogue.Table!;
+
+        AreaBosses shipped = AreaBosses.Load(Path.Combine(Root.FullName, "data", "area-bosses.json"));
+        Assert.Equal(206, shipped.Count);
+
+        int bossAt = RealSessionTests.LiveSchema().Structs["WorldAreaDat"].OffsetOf("BossesArray");
+        Assert.Equal(0x9C, bossAt);
+
+        var row = new byte[facts.RowSize];
+        var counted = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var unreadable = new List<string>();
+
+        for (long i = 0; i < facts.Rows; i++)
+        {
+            Assert.True(replay.TryRead(facts.RowsBegin + (ulong)(i * facts.RowSize), row.AsSpan()));
+
+            string id = MemoryReaderExtensions.IsPlausiblePointer(
+                BinaryPrimitives.ReadUInt64LittleEndian(row.AsSpan(0)))
+                ? replay.ReadUnicodeString(BinaryPrimitives.ReadUInt64LittleEndian(row.AsSpan(0)), 96)
+                : string.Empty;
+            if (id.Length == 0)
+            {
+                continue;
+            }
+
+            ulong count = BinaryPrimitives.ReadUInt64LittleEndian(row.AsSpan(bossAt));
+            if (count == 0)
+            {
+                continue;
+            }
+
+            counted[id] = (int)count;
+
+            // The entries pointer sits eight bytes on, the same (count, pointer) shape TagsArray
+            // was measured to use. It is not followed here - see the remarks - but a column that
+            // is really an array has a pointer there, and a misread one generally does not.
+            if (!MemoryReaderExtensions.IsPlausiblePointer(
+                BinaryPrimitives.ReadUInt64LittleEndian(row.AsSpan(bossAt + 8))))
+            {
+                unreadable.Add(id);
+            }
+        }
+
+        Assert.Empty(unreadable);
+        Assert.Equal(206, counted.Count);
+
+        // The comparison proper, both directions at once: same ids, same lengths, no exceptions.
+        List<string> differs = [.. counted
+            .Where(pair => shipped.Of(pair.Key).Count != pair.Value)
+            .Select(pair => $"{pair.Key}: game {pair.Value}, file {shipped.Of(pair.Key).Count}")];
+        Assert.Empty(differs);
+
+        // And two by name, so a regeneration of the file that quietly emptied it would still
+        // be caught: the one-boss ordinary case and the longest list in the table.
+        Assert.Equal(1, counted["Abyss_Pinnacle"]);
+        Assert.Equal(5, counted["BossRush_Area1"]);
     }
 }
