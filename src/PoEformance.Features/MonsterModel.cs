@@ -70,6 +70,18 @@ public sealed record MonsterModel(
     /// <inheritdoc cref="NamedInAo"/>
     public int NamedInMesh { get; init; }
 
+    /// <summary>
+    /// Whether the manifest's per-material numbers added up and were used to spread its short
+    /// material list over the mesh's shapes.
+    /// </summary>
+    /// <remarks>
+    /// SHOWN BECAUSE THE READING IS NOT PROVEN, only tested: the number after each material path
+    /// is unidentified - see <see cref="MeshManifest.Spread"/> - and this says, per monster,
+    /// whether the file passed the test and the picture depends on it. A line that says so is
+    /// what turns "the boss looks right" into evidence about the format.
+    /// </remarks>
+    public bool Runs { get; init; }
+
     /// <summary>The distinct colour textures actually put on the mesh, for the report.</summary>
     /// <remarks>
     /// NAMED BECAUSE A WRONG ONE LOOKS LIKE A MISSING ONE. A mask or an occlusion map drawn as
@@ -233,7 +245,11 @@ public static class MonsterModels
         // the live client by Veynar the Frostbane, who is plainly painted in the game and came
         // out here in plain ink. The renderer puts ONE texture on the mesh, so the first
         // material that actually carries a colour map is the one it gets.
-        List<string> materials = [.. found.Materials.Select(one => one.Material), .. manifest.Materials];
+        List<string> materials =
+        [
+            .. found.Materials.Select(one => one.Material),
+            .. manifest.Materials.Where(one => one.Path.Length > 0).Select(one => one.Path),
+        ];
 
         // ONE CACHE FOR THE WHOLE WALK, keyed by FILE rather than by what named it: a material
         // is read once however many shapes point at it, and a texture is decoded once however
@@ -246,7 +262,7 @@ public static class MonsterModels
         // AND ONE PER SHAPE, over the same reads: the walk above already decoded every material
         // that has a colour in it, so this is a lookup rather than a second pass over the
         // bundles. See MonsterModel.Skins for why a monster needs more than one.
-        Dress dress = Dressed(counted, mesh, found.Materials, manifest.Materials, skin, material, paints);
+        Dress dress = Dressed(counted, mesh, found.Materials, manifest, skin, material, paints);
 
         (AnimationSkeleton rig, string move) = Rigged(counted, found.Skeleton, mesh);
 
@@ -256,6 +272,7 @@ public static class MonsterModels
             Materials = dress.Materials,
             NamedInAo = found.Materials.Count,
             NamedInMesh = manifest.Materials.Count,
+            Runs = dress.Runs,
             Textures = dress.Textures,
             Guessed = dress.Guessed,
             Rig = rig,
@@ -417,7 +434,7 @@ public static class MonsterModels
         Func<string, byte[]?> read,
         SkinnedMesh mesh,
         IReadOnlyList<(string Shape, string Material)> named,
-        IReadOnlyList<string> manifest,
+        MeshManifest manifest,
         Mipmaps? fallback,
         string material,
         Paints paints)
@@ -426,6 +443,11 @@ public static class MonsterModels
         {
             return new Dress([], fallback is null ? [] : [material], [], false);
         }
+
+        // ONCE, NOT PER SHAPE. The runs are walked to prove they add up before any of them is
+        // used, so asking inside the loop would re-prove the same thing for every shape.
+        IReadOnlyList<string> spread = manifest.Spread(mesh.Shapes.Count);
+        IReadOnlyList<string> paths = [.. manifest.Materials.Select(one => one.Path)];
 
         var textures = new List<string>();
         var guessed = false;
@@ -438,7 +460,7 @@ public static class MonsterModels
             // per shape - see MaterialFile.Graphs - so two shapes naming the same file are
             // two different textures and the cache has to tell them apart by the whole
             // string rather than by the file.
-            string wants = Wanted(mesh.Shapes[shape].Name, shape, mesh.Shapes.Count, named, manifest);
+            string wants = Wanted(mesh.Shapes[shape].Name, shape, mesh.Shapes.Count, named, spread, paths);
             if (wants.Length == 0)
             {
                 skins[shape] = fallback;
@@ -468,7 +490,7 @@ public static class MonsterModels
             used.Add(material);
         }
 
-        return new Dress(skins, used, textures, guessed);
+        return new Dress(skins, used, textures, guessed) { Runs = spread.Count > 0 };
     }
 
     /// <summary>What the shapes ended up wearing, and how sure the walk is about it.</summary>
@@ -480,7 +502,11 @@ public static class MonsterModels
         IReadOnlyList<Mipmaps?> Skins,
         IReadOnlyList<string> Materials,
         IReadOnlyList<string> Textures,
-        bool Guessed);
+        bool Guessed)
+    {
+        /// <summary>Whether the manifest's numbers added up and were used as runs of shapes.</summary>
+        public bool Runs { get; init; }
+    }
 
     /// <summary>
     /// The material a shape asks for: its own by name, else the manifest's by position.
@@ -497,13 +523,22 @@ public static class MonsterModels
     /// any other length is one whose order is not established here, and indexing into it anyway
     /// would paint parts from whatever happened to line up.
     ///
-    /// The mesh manifest's own list is the last of the three, on the same terms.
+    /// THEN THE MANIFEST'S RUNS, which is the case the three above cannot reach: a monster whose
+    /// .ao names nothing and whose manifest names FEWER materials than the mesh has shapes. That
+    /// is not a rare shape - measured from the live client, it is Veynar (35 shapes, 3 materials),
+    /// Connal (11 and 2) and Count Geonor's human form (15 and 7), all three of which came back
+    /// painted from a single sheet and visibly wrong. The number on each material line is what
+    /// spreads the short list over the long one, and <see cref="MeshManifest.Spread"/> only hands
+    /// one back when the numbers add up to exactly the shape count.
+    ///
+    /// The manifest's bare list is the last of the four, on the same terms as the second.
     /// </remarks>
     private static string Wanted(
         string shape,
         int at,
         int shapes,
         IReadOnlyList<(string Shape, string Material)> named,
+        IReadOnlyList<string> spread,
         IReadOnlyList<string> manifest)
     {
         foreach ((string called, string material) in named)
@@ -517,6 +552,11 @@ public static class MonsterModels
         if (named.Count == shapes && at < named.Count)
         {
             return named[at].Material;
+        }
+
+        if (spread.Count == shapes && at < spread.Count)
+        {
+            return spread[at];
         }
 
         return manifest.Count == shapes && at < manifest.Count ? manifest[at] : string.Empty;
