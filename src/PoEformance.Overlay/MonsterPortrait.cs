@@ -644,21 +644,7 @@ public sealed class MonsterPortrait
 
         Wanted(one, path);
 
-        // THE ORBIT MOVES THE CAMERA BEFORE THIS FRAME'S PICTURE IS TAKEN, unlike the drag, which
-        // moves it after: a drag is read off the picture, so it cannot come first, and being a
-        // frame behind a hand is invisible. The orbit has no such reason, and a picture drawn
-        // for the frame before would have the floor - worked out from the camera the picture
-        // was drawn with - trailing the turn by a frame too, for no gain.
-        if (_orbiting)
-        {
-            _turn -= Math.Clamp(ImGui.GetIO().DeltaTime, 0f, 0.25f) / Orbit * MathF.Tau;
-            if (_turn < -MathF.PI)
-            {
-                // Kept within one turn, so an orbit left running for an evening does not walk
-                // the angle out to where a float can no longer tell one frame from the next.
-                _turn += MathF.Tau;
-            }
-        }
+        Turned();
 
         // THE SIZE IS SETTLED BEFORE THE PICTURE IS TAKEN, because what it is drawn at follows
         // what it will be shown at - and that is the pane less what its row and its lines take,
@@ -767,6 +753,96 @@ public sealed class MonsterPortrait
         Shots();
         Status();
     }
+
+    /// <summary>
+    /// Carries the camera on one step of its lap, where the orbit is running.
+    /// </summary>
+    /// <remarks>
+    /// BEFORE THIS FRAME'S PICTURE IS TAKEN, unlike the drag, which moves it after: a drag is
+    /// read off the picture, so it cannot come first, and being a frame behind a hand is
+    /// invisible. The orbit has no such reason, and a picture drawn for the frame before would
+    /// have the floor - worked out from the camera the picture was drawn with - trailing the
+    /// turn by a frame too, for no gain.
+    /// </remarks>
+    private void Turned()
+    {
+        if (!_orbiting)
+        {
+            return;
+        }
+
+        _turn -= Math.Clamp(ImGui.GetIO().DeltaTime, 0f, 0.25f) / Orbit * MathF.Tau;
+        if (_turn < -MathF.PI)
+        {
+            // Kept within one turn, so an orbit left running for an evening does not walk the
+            // angle out to where a float can no longer tell one frame from the next.
+            _turn += MathF.Tau;
+        }
+    }
+
+    /// <summary>
+    /// Draws the model as a turning picture and nothing else.
+    /// </summary>
+    /// <remarks>
+    /// THE SAME MODEL PANE WITH EVERYTHING AROUND IT TAKEN OFF, for somewhere the picture is a
+    /// FACT ABOUT THE ROW rather than the thing being worked on - the entity browser's page for
+    /// a monster, where the question is "what am I looking at" and the answer is worth a
+    /// hundred and eighty pixels. No animation picker, no export, no greying slider, and no
+    /// drag or wheel: a pane that turns by itself and costs the reader no decisions.
+    ///
+    /// THE ORBIT IS ON AND HAS NO BUTTON, which is the whole difference from <see cref="Draw"/>.
+    /// There is nothing here to stop it for - a still picture of a monster from one angle is
+    /// what a sprite would have been - and a control that only ever gets pressed by accident is
+    /// worse than none.
+    ///
+    /// NO FLOOR EITHER. <see cref="ModelFloor"/> earns its lines on a pane somebody is placing a
+    /// camera in, where they say which way is which; at this size they are a grid over a thumbnail.
+    ///
+    /// ITS OWN INSTANCE, NOT THE BOOK'S. Two panes sharing one of these would each reload the
+    /// model on every switch between them - six to sixteen megabytes of bundle reads to show a
+    /// picture that was on screen a moment ago - so the composition root builds a second, with a
+    /// <see cref="PictureLadder"/> capped small because this one is never drawn big.
+    /// </remarks>
+    /// <param name="one">The monster to show, or null for none.</param>
+    /// <param name="path">Its path, which is what tells one monster from another.</param>
+    /// <param name="wide">How wide the strip is.</param>
+    /// <param name="tall">How tall it is. The picture is square and fits inside both.</param>
+    public void Circling(MonsterVariety? one, string path, float wide, float tall)
+    {
+        if (!Possible)
+        {
+            return;
+        }
+
+        Wanted(one, path);
+        _orbiting = true;
+        Turned();
+
+        float side = Math.Clamp(MathF.Min(wide, tall), Least, MeshPicture.Widest);
+        Finished(side);
+
+        if (_texture == IntPtr.Zero)
+        {
+            // SHORTER THAN THE BOOK'S, and deliberately so: this pane is a line of a page about
+            // something else, and a model that will not read must not push the components down
+            // the screen with a paragraph. The Monster Book is where the reason is spelled out.
+            ImGui.TextDisabled(_loading is { IsCompleted: false } ? "reading the model…" : "no model");
+            return;
+        }
+
+        // A DUMMY AND NOT AN INVISIBLE BUTTON, because nothing here takes the pointer: the
+        // picture is not draggable, and claiming an id would only take the click away from
+        // whatever section header runs across it.
+        ImGui.Dummy(new Vector2(side, side));
+
+        ImDrawListPtr draw = ImGui.GetWindowDrawList();
+        Vector2 corner = ImGui.GetItemRectMin();
+        Paint(draw, corner, ImGui.GetItemRectMax());
+        draw.AddImage(_texture, corner, ImGui.GetItemRectMax());
+    }
+
+    /// <summary>The smallest a turning picture is drawn. Below this a monster is a smudge.</summary>
+    private const float Least = 48f;
 
     /// <summary>
     /// The row above the picture: which animation, of how many, and whether it runs, with the

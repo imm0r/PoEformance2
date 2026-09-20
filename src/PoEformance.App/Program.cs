@@ -3122,7 +3122,13 @@ internal static class Program
         overlay.GroundTypes = groundTypes;
         overlay.AttachTracker(tracker, writeTracker);
         overlay.AttachDissector(structures);
-        overlay.AttachEntityBrowser(entityParts);
+        // The install goes in for the turning picture on a monster's page - the same bytes the
+        // book's model pane reads, and for the same reason it is InstalledArt.Read rather than
+        // .Pictures: an .ao is not a .dds and a decoder would answer null for every model.
+        overlay.AttachEntityBrowser(
+            entityParts,
+            readFile: installed is null ? null : installed.Read,
+            unpack: installed is null ? null : installed.Unpack);
         // THE INSTALL'S OWN BYTES, and not InstalledArt.Pictures - which has this same signature
         // and returns a PNG. It decodes a .dds and re-encodes it, so an .ao gives null - and
         // every monster reports having no model. A delegate type says nothing about what the bytes
