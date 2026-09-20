@@ -49,9 +49,62 @@ public class SkinnedMeshTests
         Assert.Equal(6, said.Version);
         Assert.Equal("Art/Models/MONSTERS/BasicSkeleton/rig_b70e7afb.smd", said.Geometry);
         Assert.Equal(
-            "Art/Textures/Monsters/KatarinaSkeleton/SkeletonVarc.mat",
+            new MeshMaterial("Art/Textures/Monsters/KatarinaSkeleton/SkeletonVarc.mat", 15),
             Assert.Single(said.Materials));
         Assert.Equal(["grp_head", "grp_neck", "grp_chest"], said.Bones);
+    }
+
+    /// <summary>
+    /// The number after a material is how many shapes it covers, and this file proves it.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE SAMPLE THAT SETTLES IT, and it was sitting in this file the whole time. The
+    /// number after a .mat path is <c>unk1</c> to every other reader of this format there is,
+    /// so its meaning could only come from a file where the answer is known independently -
+    /// and this manifest is BasicSkeleton's, whose geometry <see cref="SkinnedMesh"/> accounts
+    /// for byte by byte and whose fifteen shape names match the fifteen SkinMesh entries of the
+    /// .ao beside it. One material, the number 15, fifteen shapes.
+    ///
+    /// WHICH IS WHY <see cref="MeshManifest.Spread"/> REFUSES ANYTHING THAT DOES NOT ADD UP.
+    /// One file agreeing is a reading, not a proof, and the sum is the check that makes every
+    /// other file test the reading again before the renderer acts on it.
+    /// </remarks>
+    [Fact]
+    public void TheNumberAfterAMaterialIsHowManyShapesItCovers()
+    {
+        MeshManifest said = MeshManifest.Parse(Manifest);
+
+        Assert.Equal(
+            Enumerable.Repeat("Art/Textures/Monsters/KatarinaSkeleton/SkeletonVarc.mat", 15),
+            said.Spread(15));
+    }
+
+    /// <summary>A file whose numbers do not account for every shape spreads nothing.</summary>
+    /// <remarks>
+    /// THE HALF THAT KEEPS THE READING HONEST. Painting from runs that do not add up would put
+    /// parts on whatever happened to line up - the failure this whole line of work is fixing -
+    /// so a mismatch answers empty and the caller keeps what it had.
+    /// </remarks>
+    [Theory]
+    [InlineData(14)]
+    [InlineData(16)]
+    public void RunsThatDoNotCoverTheShapesAreNotUsed(int shapes)
+        => Assert.Empty(MeshManifest.Parse(Manifest).Spread(shapes));
+
+    /// <summary>A material with an empty path is still an entry, and its run still counts.</summary>
+    /// <remarks>
+    /// THE OLD READER DROPPED THESE, which was harmless while only the paths were read and
+    /// shifts every run after it now. The format allows an empty material and the game writes
+    /// them.
+    /// </remarks>
+    [Fact]
+    public void AnEmptyMaterialKeepsItsPlaceInTheRuns()
+    {
+        MeshManifest said = MeshManifest.Parse(
+            "version 5\nSkinnedMeshData \"a.smd\"\nMaterials 2\n\t\"\" 1\n\t\"art/skin.mat\" 2\n");
+
+        Assert.Equal(2, said.Materials.Count);
+        Assert.Equal(["", "art/skin.mat", "art/skin.mat"], said.Spread(3));
     }
 
     /// <summary>

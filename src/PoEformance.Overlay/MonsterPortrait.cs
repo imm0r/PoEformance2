@@ -409,6 +409,12 @@ public sealed class MonsterPortrait
     /// <summary>The monster's own name, as the table has it. The name field's prefill.</summary>
     private string _called = string.Empty;
 
+    /// <summary>The row the model was loaded for, kept for the file dump - it needs the .ao list.</summary>
+    private MonsterVariety? _variety;
+
+    /// <summary>What the last file dump wrote, or why it could not. Cleared with the model.</summary>
+    private string _dumped = string.Empty;
+
     private SkeletonPose? _pose;
     private AnimationTracks? _tracks;
     private Task<AnimationTracks?>? _loadingTracks;
@@ -1497,6 +1503,16 @@ public sealed class MonsterPortrait
                 {
                     said += $" · named: {_model.NamedInAo} in the .ao, {_model.NamedInMesh} in the .sm";
                 }
+
+                // AND WHETHER THE MANIFEST'S NUMBERS WERE WHAT JOINED THEM. The number after
+                // each material path is unidentified in every reader of this format there is;
+                // this one uses it only when the numbers add up to exactly the shape count, and
+                // says when they did - so a boss that comes out right is evidence for the
+                // reading rather than just a boss that came out right.
+                if (_model.Runs)
+                {
+                    said += " · the .sm's counts spread over the shapes";
+                }
             }
 
             if (_tracks is { Ready: true } tracks)
@@ -1655,6 +1671,8 @@ public sealed class MonsterPortrait
         // Kept rather than asked for again at export time: the row is right here now, and the
         // export happens from a window that no longer has the table. See Fill.
         _called = one?.Name ?? string.Empty;
+        _variety = one;
+        _dumped = string.Empty;
 
         // The last monster's exported cells go with it. Left up they would sit under a
         // different model saying "this is what you made", which is the kind of wrong that gets
@@ -2074,6 +2092,50 @@ public sealed class MonsterPortrait
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(SaveSaid);
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Button("files##monster-dump"))
+        {
+            Dump();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(DumpSaid);
+        }
+
+        if (_dumped.Length > 0)
+        {
+            ImGui.TextUnformatted(ImGuiText.Escape(_dumped));
+        }
+    }
+
+    /// <summary>What the files button is for.</summary>
+    private const string DumpSaid =
+        "Writes the .ao chain and the mesh manifest out as text, beside the exported pictures.\n"
+        + "For questions about the format itself, which a count under the picture cannot answer.";
+
+    /// <summary>
+    /// Writes the files behind this model out as text, for reading a format rather than a model.
+    /// </summary>
+    /// <remarks>
+    /// A FILE AND NOT A PANEL, because what this is for is being pasted somewhere. The .ao chain
+    /// of a boss runs to a few kilobytes and the question it answers - what does the game
+    /// actually write here - is one nobody can settle from a screenshot of a wrapped text widget.
+    /// </remarks>
+    private void Dump()
+    {
+        try
+        {
+            Directory.CreateDirectory(Folder);
+            string at = Path.Combine(Folder, Stem(_wanted) + ".files.txt");
+            File.WriteAllText(at, ModelDump.Of(_install, _variety, _wanted, _model));
+            _dumped = "wrote " + at;
+        }
+        catch (Exception fault) when (fault is IOException or UnauthorizedAccessException)
+        {
+            _dumped = "could not write the dump: " + fault.Message;
         }
     }
 

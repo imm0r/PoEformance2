@@ -4,6 +4,16 @@ using System.Numerics;
 namespace PoEformance.Game.Files;
 
 /// <summary>
+/// One line of a manifest's Materials section: a <c>.mat</c> path and the number after it.
+/// </summary>
+/// <param name="Path">The material file. The format allows this to be empty, and files use it.</param>
+/// <param name="Number">
+/// The unsigned number the line ends with. Unidentified - see <see cref="MeshManifest.Spread"/>
+/// for the one reading this project acts on and the test the file has to pass first.
+/// </param>
+public readonly record struct MeshMaterial(string Path, int Number);
+
+/// <summary>
 /// What a <c>.sm</c> file says: where the geometry is, and what goes on it.
 /// </summary>
 /// <remarks>
@@ -26,23 +36,89 @@ namespace PoEformance.Game.Files;
 /// names a material per SHAPE, with an index after it - <c>…/ExpeditionSkeleton.mat:0</c> - while
 /// this names one for the mesh as a whole. Whoever draws the thing wants the .ao's answer where
 /// there is one and this where there is not.
+///
+/// AND EVERY MATERIAL LINE CARRIES A NUMBER AFTER THE PATH, which this read past for a long time
+/// and which is the only thing in either file that can join seven materials to fifteen shapes.
+/// See <see cref="MeshMaterial.Number"/> and <see cref="Spread"/>.
 /// </remarks>
 /// <param name="Version">Off the first line. Bone groups appear from 6, the box from 5.</param>
 /// <param name="Geometry">The <c>.smd</c> that holds the triangles. Empty where the file said none.</param>
-/// <param name="Materials">The <c>.mat</c> files, in the order given. An entry may be empty.</param>
+/// <param name="Materials">The <c>.mat</c> files with their numbers, in the order given.</param>
 /// <param name="Least">The low corner of the bounding box, or zero before version 5.</param>
 /// <param name="Most">The high corner.</param>
 /// <param name="Bones">Bone group names, for a later pose. Empty before version 6.</param>
 public sealed record MeshManifest(
     int Version,
     string Geometry,
-    IReadOnlyList<string> Materials,
+    IReadOnlyList<MeshMaterial> Materials,
     Vector3 Least,
     Vector3 Most,
     IReadOnlyList<string> Bones)
 {
     /// <summary>Nothing read - a missing file, or one that is not a manifest.</summary>
     public static MeshManifest None { get; } = new(0, string.Empty, [], default, default, []);
+
+    /// <summary>
+    /// One material per shape, in the mesh's order - or empty where the file does not say.
+    /// </summary>
+    /// <remarks>
+    /// THE NUMBER IS UNIDENTIFIED AND THIS DOES NOT PRETEND OTHERWISE. The only other reader of
+    /// this format in the open calls it <c>unk1</c>, so nothing is known about it from outside;
+    /// what IS known is the shape of the problem it would solve. Count Geonor's human form is
+    /// fifteen shapes and its manifest names seven materials, Veynar thirty-five and three,
+    /// Connal eleven and two - and neither file holds anything else that could join the two
+    /// lists, the .smd's shape record being an index range and nothing more.
+    ///
+    /// SO THE FILE IS MADE TO PROVE IT BEFORE IT IS BELIEVED. Read as a run length - this
+    /// material covers the next N shapes - the numbers have to add up to EXACTLY the shape
+    /// count, and seven arbitrary numbers summing to fifteen is not something that happens by
+    /// accident. Where they do not add up, this answers empty and the caller keeps whatever it
+    /// did before; nothing is painted on a reading the file did not support. Which way it went
+    /// is printed under the model, so the answer is checkable rather than assumed.
+    ///
+    /// A ZERO-LENGTH RUN IS ALLOWED THROUGH, because a material that covers no shape is still
+    /// an entry in the list and dropping it would shift every run after it.
+    /// </remarks>
+    /// <param name="shapes">How many shapes the geometry turned out to have.</param>
+    public IReadOnlyList<string> Spread(int shapes)
+    {
+        if (shapes <= 0 || Materials.Count == 0)
+        {
+            return [];
+        }
+
+        var total = 0L;
+        foreach (MeshMaterial one in Materials)
+        {
+            if (one.Number < 0)
+            {
+                return [];
+            }
+
+            total += one.Number;
+            if (total > shapes)
+            {
+                return [];
+            }
+        }
+
+        if (total != shapes)
+        {
+            return [];
+        }
+
+        var spread = new string[shapes];
+        var at = 0;
+        foreach (MeshMaterial one in Materials)
+        {
+            for (var run = 0; run < one.Number; run++)
+            {
+                spread[at++] = one.Path;
+            }
+        }
+
+        return spread;
+    }
 
     /// <summary>Whether there is a geometry file to go on with.</summary>
     public bool Ready => Geometry.Length > 0;
@@ -76,7 +152,7 @@ public sealed record MeshManifest(
 
         var version = 0;
         var geometry = string.Empty;
-        var materials = new List<string>();
+        var materials = new List<MeshMaterial>();
         var bones = new List<string>();
         Vector3 least = default;
         Vector3 most = default;
@@ -96,11 +172,24 @@ public sealed record MeshManifest(
             {
                 section = Section.None;
             }
+            else if (section == Section.Materials)
+            {
+                // KEPT EVEN WHEN THE PATH IS EMPTY, which the old reader dropped. The format
+                // allows an empty material and the number beside it still counts, so dropping
+                // the line shifts every run after it - harmless while only the paths were read
+                // and wrong the moment they are joined to shapes by position.
+                if (Quoted(line, out string path, out string after))
+                {
+                    materials.Add(new MeshMaterial(path, Number(after)));
+                }
+
+                continue;
+            }
             else if (section != Section.None)
             {
                 if (First(line) is { Length: > 0 } said)
                 {
-                    (section == Section.Materials ? materials : bones).Add(said);
+                    bones.Add(said);
                 }
 
                 continue;
@@ -161,16 +250,35 @@ public sealed record MeshManifest(
     }
 
     /// <summary>The first quoted string on a line, or empty. The spec allows an empty one.</summary>
-    private static string First(string line)
+    private static string First(string line) => Quoted(line, out string said, out _) ? said : string.Empty;
+
+    /// <summary>
+    /// The first quoted string and whatever follows it, and whether there was one at all.
+    /// </summary>
+    /// <remarks>
+    /// THE BOOL IS THE POINT, not the string: an empty material and a line with no quote on it
+    /// both read as "" and they are not the same thing - one is an entry and one is not.
+    /// </remarks>
+    private static bool Quoted(string line, out string said, out string rest)
     {
+        said = string.Empty;
+        rest = string.Empty;
+
         int open = line.IndexOf('"', StringComparison.Ordinal);
         if (open < 0)
         {
-            return string.Empty;
+            return false;
         }
 
         int shut = line.IndexOf('"', open + 1);
-        return shut > open ? line[(open + 1)..shut] : string.Empty;
+        if (shut < open)
+        {
+            return false;
+        }
+
+        said = line[(open + 1)..shut];
+        rest = line[(shut + 1)..];
+        return true;
     }
 
     private static int Number(string said)

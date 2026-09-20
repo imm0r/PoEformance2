@@ -63,7 +63,7 @@ push to `main` auto-compiles on GitHub and updates the rolling release
 [`latest-dev`](https://github.com/imm0r/PoEformance2/releases/tag/latest-dev) with a
 ready-to-run, self-contained exe.
 
-**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.1 · 4659c18`
+**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.3 · 4659c18`
 — the version, raised on every push, and the commit the publish workflow stamped into it. A build
 compiled locally reads `local`, because a version number on an unreleased build is a claim it
 cannot support. It is there because the alternative was comparing a screenshot against a merge
@@ -117,6 +117,18 @@ that names one material draws exactly as it did, and where it names one material
 graphs in it, the number after the file picks which — that is what the game's own `Boss.mat:1`
 means, and reading it is what stopped three bosses in a row wearing their head's sheet on their
 cloak.
+
+**Most bosses name their materials nowhere near their shapes, though, and the join is a number
+nobody had identified.** Veynar the Frostbane is 35 shapes and his `.ao` names not one material;
+his mesh manifest names three. Connal is 11 and 2, Count Geonor's human form 15 and 7 — and all
+three came back painted from a single sheet and visibly in pieces. What joins the short list to
+the long one is the number every manifest writes after a material's path, which the only other
+reader of this format in the open calls `unk1`: it is how many consecutive shapes that material
+covers. The file already in this repository's tests settles it — BasicSkeleton's manifest names
+one material with the number 15, and its geometry, accounted for byte by byte, has exactly 15
+shapes. Because one sample is a reading rather than a proof, the runs are used **only where they
+add up to the shape count exactly**, and the pane says when they did, so every boss drawn this
+way is another test of it rather than a result resting on the first.
 
 A pose picked in that pane can be written straight out as icon art: colour and greyed, cut out on
 transparency, at 64 px for a sheet cell and at 1024 to work on. Nothing is keyed by hand — the renderer's background was always
