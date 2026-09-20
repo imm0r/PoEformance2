@@ -757,6 +757,30 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         => Monsters.Find(path)?.Name ?? string.Empty;
 
     /// <summary>
+    /// Opens the Monster Book at a monster, so the boss a map needs can be posed straight away.
+    /// </summary>
+    /// <remarks>
+    /// THE STEP THAT WAS TYPED BY HAND. Making the ninety boss pictures means finding ninety
+    /// monsters in a table of 2733 rows, and the only way in was the name - read off the to-do
+    /// list and typed into the search, once per boss. The list knows the path, the book can be
+    /// told it, so the click does it.
+    ///
+    /// False when the book has no row for that path, which is the honest answer rather than a
+    /// window opened onto nothing: the shipped export and the install's own tables do not
+    /// always agree, and a boss the current table has never heard of cannot be shown.
+    /// </remarks>
+    private bool Pose(string path)
+    {
+        if (_monsterBook is not { } book || !book.Choose(path))
+        {
+            return false;
+        }
+
+        _tools.Show("monster-book");
+        return true;
+    }
+
+    /// <summary>
     /// The arena tiles known for an area: the ones under the player's feet, then the collected ones.
     /// </summary>
     /// <remarks>
@@ -1484,7 +1508,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         // Both tables are set by whoever wires this up, in no fixed order against this
         // constructor, so the list reads them per draw rather than taking a copy of Empty.
-        _bossPlan = new BossIconRows(() => _bossIcons, () => EndgameMaps, Called);
+        _bossPlan = new BossIconRows(() => _bossIcons, () => EndgameMaps, Called, Pose);
 
         // The entry card takes its plates from the same cache the markers use, so a picture
         // that cannot be loaded is reported in one place and given up on once.

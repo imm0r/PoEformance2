@@ -484,6 +484,32 @@ public sealed class MonsterBookWindow(Func<MonsterVarieties> table, Func<StatDes
     /// for the rest of the session, so searching for "Block" would find nothing on exactly the
     /// machines that can word it best.
     /// </remarks>
+    /// <summary>
+    /// Selects a monster by its path, from outside the book.
+    /// </summary>
+    /// <remarks>
+    /// FOR THE TO-DO LIST'S CLICK. Working through the boss pictures means finding one monster
+    /// after another in a table of 2733 rows, by a name nobody wants to type twice - so the row
+    /// that says which boss a map has opens it here instead. See BossIconRows.
+    ///
+    /// THE ROW NUMBER IS ALLOWED TO BE HIDDEN. A search or a range may be filtering the row out,
+    /// and the grid returns the selection unchanged when it cannot see it (DataGrid.Draw), so the
+    /// model pane shows the monster either way - it reads the PATH. The highlight comes back with
+    /// the filter that hid it.
+    /// </remarks>
+    /// <returns>Whether the book has a row for that path.</returns>
+    public bool Choose(string path)
+    {
+        if (path is not { Length: > 0 })
+        {
+            return false;
+        }
+
+        _chosen = path;
+        _chosenRow = _page.Row(path);
+        return _chosenRow >= 0;
+    }
+
     private void Read(MonsterVarieties all, StatDescriptions said)
     {
         if (ReferenceEquals(_of, all) && ReferenceEquals(_said, said))
