@@ -153,10 +153,17 @@ public class BossIconPlanTests
                 icons,
                 _ => false);
 
-            // Listed - a rule that DROPPED them would drop a new league's maps too - and
-            // marked so the list can hide them until somebody asks.
+            // Listed - a rule that DROPPED them would drop a new league's maps too - and the
+            // hideout marked so the list can hide it until somebody asks.
+            //
+            // THE TOWER IS NOT QUIET ANY MORE, and that is the measurement correcting a guess
+            // rather than a preference: WorldAreas gives every Precursor tower two Reactor
+            // Guardians, so "a tower has no boss" was simply false. What makes a row go away
+            // is now the game saying there is nothing there - see the skip cases above.
             Assert.Equal(3, rows.Count);
-            Assert.Equal(2, rows.Count(BossIconPlan.IsQuiet));
+            Assert.Equal(1, rows.Count(BossIconPlan.IsQuiet));
+            Assert.True(BossIconPlan.IsQuiet(rows.Single(row => row.Id == "MapHideoutCanal_Claimable")));
+            Assert.False(BossIconPlan.IsQuiet(rows.Single(row => row.Id == "MapPrecursorTowerDesert")));
             Assert.False(BossIconPlan.IsQuiet(rows.Single(row => row.Id == "MapBluff")));
         }
         finally
@@ -166,20 +173,23 @@ public class BossIconPlanTests
     }
 
     /// <summary>
-    /// How much of the shipped atlas the shipped sheet already covers: none of it.
+    /// What the shipped files add up to: the whole atlas, split into work and not-work.
     /// </summary>
     /// <remarks>
-    /// THE NUMBER THAT MADE THIS FEATURE WORTH BUILDING, measured against the two files the
-    /// tool actually ships. The sheet's 27 boss families are named for campaign arenas and act
-    /// bosses - GrimTangleBoss, IsleOfKinBoss, the G4_* eight - and every one of the atlas's
-    /// 173 maps is named MapSomething, so not one of them resolves. Every endgame boss picture
-    /// therefore has to be made from the model, which is what the model pane's export is for.
+    /// THE MEASUREMENT THE FEATURE RESTS ON, against the three files the tool actually ships.
+    /// The sheet's 27 boss families are named for campaign arenas and act bosses -
+    /// GrimTangleBoss, IsleOfKinBoss, the G4_* eight - and every atlas map is named
+    /// MapSomething, so NOT ONE of the 173 resolves a picture. What the game does supply is
+    /// WHO stands there: 125 of them name a boss, 48 name none, and those 125 hold 104
+    /// distinct monsters. So the work is 104 models rather than 173 maps, and that ratio is
+    /// the whole argument for reading the column.
     ///
-    /// Asserted as "all of them are open" rather than as a count, so that art added later
-    /// makes this fail with a smaller number to write down rather than passing quietly.
+    /// Asserted as exact numbers because each one is a claim about the shipped data: art added
+    /// to the sheet, or a patch that moves the column, should fail this and be written down
+    /// rather than pass quietly.
     /// </remarks>
     [Fact]
-    public void NotOneEndgameMapResolvesAPictureFromItsNameAlone()
+    public void TheShippedFilesSplitTheAtlasIntoWorkAndNotWork()
     {
         var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (string line in File.ReadLines(Beside("assets", "icon-names.tsv")))
@@ -196,13 +206,31 @@ public class BossIconPlanTests
         AtlasMapNames maps = AtlasMapNames.Load(Beside("data", "atlas-maps.json"));
         Assert.Equal(173, maps.Count);
 
-        List<BossIconTask> rows = BossIconPlan.Of(
-            maps, BossIcons.Load(Beside("data", "boss-icons.json")), names.Contains);
+        BossIcons icons = BossIcons.Load(Beside("data", "boss-icons.json"));
+        icons.Bosses = AreaBosses.Load(Beside("data", "area-bosses.json"));
+
+        List<BossIconTask> rows = BossIconPlan.Of(maps, icons, names.Contains);
 
         (int open, int waiting, int done, int skipped) = BossIconPlan.Count(rows);
         Assert.Equal(0, done);
         Assert.Equal(0, waiting);
-        Assert.Equal(0, skipped);
-        Assert.Equal(173, open);
+        Assert.Equal(48, skipped);
+        Assert.Equal(125, open);
+
+        // NINETY MODELS FOR A HUNDRED AND TWENTY-FIVE MAPS, and the gap is the point. The 125
+        // list 104 distinct monsters between them, but a marker wears one picture, so what
+        // has to be posed is the 90 distinct FIRST bosses - and 31 of those stand in more than
+        // one map, covering 66 of the 125. That is the trap the column closes: filling this in
+        // by hand means meeting the same boss again in another map, 31 times, with nothing in
+        // either map to warn you.
+        var families = rows
+            .Where(row => row.State == BossIconState.Open)
+            .Select(row => row.Family)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        Assert.Equal(90, families.Count);
+
+        // And every one of those rows knows what to pose, by the name the game shows.
+        Assert.Contains(rows, row => row.Id == "MapGrimhaven" && row.Family == "WifeMonsterMap");
+        Assert.Contains(rows, row => row.Id == "MapEpitaph" && row.Family == "WifeMonsterMap");
     }
 }

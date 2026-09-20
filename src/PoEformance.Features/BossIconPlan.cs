@@ -5,16 +5,16 @@ namespace PoEformance.Features;
 /// <summary>How far along one endgame map is, on the way to its boss having its own picture.</summary>
 public enum BossIconState
 {
-    /// <summary>Nothing written down and nothing derivable. The work still to do.</summary>
+    /// <summary>A boss is known and nothing has been made of it yet. The work.</summary>
     Open,
 
-    /// <summary>An entry exists, but the sheet carries no cell under the name it points at.</summary>
+    /// <summary>The art exists - written down, or exported - and the sheet has no cell for it.</summary>
     Waiting,
 
     /// <summary>A picture resolves for this map. The marker wears it.</summary>
     Done,
 
-    /// <summary>Somebody looked and there is no boss here.</summary>
+    /// <summary>Nothing to make: the game lists no boss here, or somebody ticked it off.</summary>
     Skipped,
 }
 
@@ -52,22 +52,30 @@ public readonly record struct BossIconTask(
 /// MapAugury. The game simply does not draw a minimap icon for most of its map bosses. That is
 /// what the model pane's export is for, and it is why this list starts as long as it does.
 ///
-/// THE TAGS DO NOT DECIDE ANYTHING, deliberately. Six of the 173 are hideouts and seven are
-/// towers, which plainly have no boss - but the hubs carry no tag at all and neither do the
-/// maps, and a rule that hid rows by tag would hide exactly the maps a new league adds. So
-/// every row is listed, the obviously boss-less ones are hidden by DEFAULT rather than
-/// dropped, and a row nobody needs is ticked off by hand into the file's "skip" list, which is
-/// a record of somebody having looked rather than of somebody's rule.
+/// WHO STANDS THERE, THOUGH, THE GAME DOES SAY - see <see cref="AreaBosses"/>, which arrived
+/// after this list did and changed what it is a list OF. It is no longer "173 maps, go and
+/// find out": 125 of them name their boss, those 125 hold 104 distinct monsters, and 48 name
+/// none at all. So the work is 104 models to pose, the rows carry the boss's name before
+/// anybody has been there, and the 48 need no ticking off by hand.
+///
+/// THE TAGS STILL DECIDE NOTHING, and the correction is worth keeping. Hideouts were hidden by
+/// default along with the Precursor towers, on the reasoning that neither has a boss - and the
+/// towers have two each (CentipedeReactorGuardian2, CorruptionProcessor2, per the column). The
+/// guess was wrong within a day of being written; only the hideouts are hidden now, and what
+/// makes a row disappear is the game saying there is no boss or somebody saying so by hand.
 /// </remarks>
 public static class BossIconPlan
 {
     /// <summary>The tags that are hidden until somebody asks for everything.</summary>
     /// <remarks>
-    /// A hideout is a hideout and a Precursor tower is a tower: neither has ever had a boss in
-    /// it. Hidden rather than skipped, because hiding is this file's opinion while skipping is
-    /// the user's - and the checkbox that shows them costs nothing to tick.
+    /// ONE WORD, AND IT USED TO BE TWO. "tower" was in here on the reasoning that a Precursor
+    /// tower has no boss; WorldAreas gives each of the five two - a Centipede Reactor Guardian
+    /// and a Corruption Processor - so the reasoning was wrong and the rows belong in the list.
+    /// A hideout stays hidden because the game lists no boss for any of the six, which means
+    /// they are Skipped anyway; the tag only keeps them out of the way when somebody switches
+    /// the finished rows back on.
     /// </remarks>
-    public static readonly string[] Quiet = ["hideout", "tower"];
+    public static readonly string[] Quiet = ["hideout"];
 
     /// <summary>
     /// Every endgame map with where it stands, in the order they should be worked through.
@@ -81,10 +89,16 @@ public static class BossIconPlan
     /// what is left is a paste into the sheet.
     /// </remarks>
     /// <param name="maps">The endgame maps, from AtlasMapNames - the file's own list.</param>
-    /// <param name="icons">What has been written down, and what has been ticked off.</param>
+    /// <param name="icons">What has been written down, ticked off, and what the game says stands where.</param>
     /// <param name="carried">Whether the sheet holds a cell under a name. IconNames.CellFor.</param>
+    /// <param name="named">What a monster's path is called in the game, or empty. MonsterVarieties.</param>
+    /// <param name="exported">Whether art for a family has been written to the exports folder.</param>
     public static List<BossIconTask> Of(
-        AtlasMapNames maps, BossIcons icons, Func<string, bool> carried)
+        AtlasMapNames maps,
+        BossIcons icons,
+        Func<string, bool> carried,
+        Func<string, string>? named = null,
+        Func<string, bool>? exported = null)
     {
         ArgumentNullException.ThrowIfNull(maps);
         ArgumentNullException.ThrowIfNull(icons);
@@ -93,7 +107,7 @@ public static class BossIconPlan
         var rows = new List<BossIconTask>(maps.All.Count);
         foreach ((string id, AtlasMapInfo info) in maps.All)
         {
-            rows.Add(Row(id, info, icons, carried));
+            rows.Add(Row(id, info, icons, carried, named, exported));
         }
 
         // Open first and done last, because the list is a queue of work rather than a report;
@@ -148,7 +162,12 @@ public static class BossIconPlan
     /// open here until the area entry is written too, which is what the export writes anyway.
     /// </remarks>
     private static BossIconTask Row(
-        string id, AtlasMapInfo info, BossIcons icons, Func<string, bool> carried)
+        string id,
+        AtlasMapInfo info,
+        BossIcons icons,
+        Func<string, bool> carried,
+        Func<string, string>? named,
+        Func<string, bool>? exported)
     {
         string written = icons.FamilyFor(id);
         string family = written;
@@ -169,9 +188,46 @@ public static class BossIconPlan
             }
         }
 
-        BossIconState state = has ? BossIconState.Done
+        // WHOSE ARENA IT IS, from the game, where nothing was written down. This is what makes
+        // a row actionable before anybody has been there: the monster to pose, under the name
+        // the game shows, and the family its exported pictures will be filed under.
+        IReadOnlyList<string> bosses = icons.BossesIn(id);
+        string boss = icons.NameOf(family);
+        if (boss.Length == 0 && named is not null)
+        {
+            foreach (string path in bosses)
+            {
+                boss = named(path);
+                if (boss.Length > 0)
+                {
+                    break;
+                }
+            }
+        }
+
+        if (family.Length == 0 && bosses.Count > 0)
+        {
+            family = BossIcons.FamilyOfPath(bosses[0]);
+        }
+
+        BossIconState state =
+            has ? BossIconState.Done
             : icons.Skipped(id) ? BossIconState.Skipped
-            : written.Length > 0 ? BossIconState.Waiting
+
+            // NOTHING TO MAKE rather than work nobody has started. The game lists no boss for
+            // 48 of the 173 - the hideouts, the hubs, the logbooks, the merchant maps - and
+            // making somebody tick those off by hand would be asking them to confirm what the
+            // client already said. A curated entry overrides it, which is the way back in.
+            //
+            // ONLY WHEN THE TABLE HAS SPOKEN. Without it loaded, nothing is known about any
+            // map, and reading that as "no map has a boss" would empty the list of work
+            // instead of filling it - which is the quietest way for a missing data file to go
+            // unnoticed. Then every unresolved row is Open, the way it was before the column.
+            : family.Length == 0 && icons.KnowsBosses ? BossIconState.Skipped
+
+            // The art exists and the sheet does not have it yet: written down, or sitting in
+            // the exports folder waiting to be pasted into assets/icons.png.
+            : written.Length > 0 || exported?.Invoke(family) == true ? BossIconState.Waiting
             : BossIconState.Open;
 
         return new BossIconTask(
@@ -180,7 +236,7 @@ public static class BossIconPlan
             info.Tags,
             state,
             family,
-            icons.NameOf(family),
+            boss,
             icons.Unnamed(id));
     }
 

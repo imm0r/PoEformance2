@@ -107,6 +107,16 @@ public sealed class PoiLayer
     public BossIcons BossIcons { get; set; } = BossIcons.Empty;
 
     /// <summary>
+    /// What a monster's metadata path is called in the game, for the arena's label.
+    /// </summary>
+    /// <remarks>
+    /// A FUNCTION, because the monster table is replaced mid-session: the shipped export until
+    /// the install's own .dat files have been walked, the game's own afterwards. Unset leaves
+    /// the label the ground gives it, which is what it always was.
+    /// </remarks>
+    public Func<string, string>? MonsterName { get; set; }
+
+    /// <summary>
     /// Which arenas have had their boss put down, or null while nothing is watching.
     /// </summary>
     /// <remarks>
@@ -596,6 +606,7 @@ public sealed class PoiLayer
         // shape is the correct middle state, and stopping at the first picture would lose the
         // name of every boss whose cell has not been pasted in yet.
         string called = string.Empty;
+        var art = (Active: 0, Inactive: 0);
         foreach (string family in BossIcons.Candidates(areaId, landmark.Path))
         {
             if (called.Length == 0)
@@ -603,22 +614,68 @@ public sealed class PoiLayer
                 called = BossIcons.NameOf(family);
             }
 
-            int active = IconNames.CellFor(BossIcons.Named(family, cleared: false));
-            int inactive = IconNames.CellFor(BossIcons.Named(family, cleared: true));
-            int plain = active > 0 || inactive > 0 ? 0 : IconNames.CellFor(family);
-
-            if (active > 0 || inactive > 0 || plain > 0)
+            if (art.Active == 0 && art.Inactive == 0)
             {
-                return new Mark(active > 0 ? active : Math.Max(inactive, plain), inactive, called);
+                int active = IconNames.CellFor(BossIcons.Named(family, cleared: false));
+                int inactive = IconNames.CellFor(BossIcons.Named(family, cleared: true));
+                int plain = active > 0 || inactive > 0 ? 0 : IconNames.CellFor(family);
+
+                if (active > 0 || inactive > 0 || plain > 0)
+                {
+                    art = (active > 0 ? active : Math.Max(inactive, plain), inactive);
+                }
+            }
+
+            if (called.Length > 0 && (art.Active > 0 || art.Inactive > 0))
+            {
+                break;
             }
         }
 
+        if (art.Active > 0 || art.Inactive > 0)
+        {
+            return new Mark(art.Active, art.Inactive, called.Length > 0 ? called : Called(areaId));
+        }
+
+        // THE GAME'S OWN ANSWER, WHERE THE CURATED FILE HAS NONE. WorldAreas says which monster
+        // is this area's boss for 125 of the atlas's 173 maps, and the monster table says what
+        // it is called - so "Saphira, The Dread Consort" stands over the arena in both of her
+        // maps with nothing written down at all. The curated name still wins: it comes from
+        // somebody who stood in the room, and the column holds an NPC on two maps.
+        if (called.Length == 0)
+        {
+            called = Called(areaId);
+        }
+
+        // COLLECTED ONLY WHEN NOTHING AT ALL IS KNOWN. An arena whose boss the game names but
+        // whose picture has not been made yet is not a mystery - it is a row in the to-do list,
+        // with its name on it. The log is for the ones nobody can name, which is what makes it
+        // worth reading.
         if (called.Length == 0)
         {
             BossIcons.NoteMissing(areaId, landmark.Path, landmark.Name);
         }
 
         return new Mark(0, 0, called);
+    }
+
+    /// <summary>What the game calls the boss of an area, or empty.</summary>
+    private string Called(string areaId)
+    {
+        if (MonsterName is not { } naming)
+        {
+            return string.Empty;
+        }
+
+        foreach (string path in BossIcons.BossesIn(areaId))
+        {
+            if (naming(path) is { Length: > 0 } named)
+            {
+                return named;
+            }
+        }
+
+        return string.Empty;
     }
 
     /// <summary>
