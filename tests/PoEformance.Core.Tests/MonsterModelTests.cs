@@ -101,6 +101,10 @@ public class MonsterModelTests
     /// HOW ONE MESH SERVES SEVERAL MONSTERS. The manifest names a default and a monster's .ao
     /// overrides it per shape, with a ":n" selector after the file name - which is why one
     /// skeleton mesh appears as an expedition skeleton and as a bone rabble in different colours.
+    ///
+    /// REPORTED WITHOUT THE SELECTOR, which changed when several materials began to be tried:
+    /// the number picks within the file and the file is what was read, so what is reported is
+    /// the one that actually supplied the colour rather than the spelling it was named by.
     /// </remarks>
     [Fact]
     public void TheMonstersOwnMaterialBeatsTheManifests()
@@ -111,7 +115,57 @@ public class MonsterModelTests
         MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
 
         Assert.True(said.Ready);
-        Assert.Equal("art/painted.mat:0", said.Material);
+        Assert.Equal("art/painted.mat", said.Material);
+    }
+
+    /// <summary>
+    /// A monster built out of parts: the first material has no colour and the next one does.
+    /// </summary>
+    /// <remarks>
+    /// REPORTED FROM THE LIVE CLIENT. Veynar the Frostbane draws in full and came out in plain
+    /// ink, and he is plainly painted in the game - dark armour, red glow - so the colour map
+    /// exists and the walk was not finding it. Taking the FIRST material the .ao names is what
+    /// did that: a monster cut from one sheet names the same file per shape, which is what the
+    /// old rule was measured on, and a monster built out of parts names a different one per
+    /// shape - a cloth or a glow first, the body's skin second.
+    ///
+    /// The renderer puts one texture on the mesh, so the first material that actually carries a
+    /// colour map is the one it gets. The shapes are ordered as the .ao lists them.
+    /// </remarks>
+    [Fact]
+    public void AMaterialWithNoColourIsNotTheEndOfTheSearch()
+    {
+        var install = Install();
+
+        // Two shapes, two different materials: a glow with only a normal map, then the skin.
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", material: "art/glow.mat:0", second: "art/painted.mat:1");
+        install.Files["art/glow.mat"] = Mat("art/skin_normal.dds", slot: "NormalGloss_TEX");
+        install.Files["art/skin.dds"] = Dds();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.True(said.Ready);
+        Assert.True(said.Painted);
+        Assert.Equal("art/painted.mat", said.Material);
+        Assert.Equal(string.Empty, said.Paint);
+    }
+
+    /// <summary>And when none of them has one, the reason says all of them were asked.</summary>
+    [Fact]
+    public void EveryMaterialTriedIsNamedWhenNoneHasColour()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", material: "art/glow.mat:0", second: "art/rim.mat:1");
+        install.Files["art/glow.mat"] = Mat("art/skin_normal.dds", slot: "NormalGloss_TEX");
+        install.Files["art/rim.mat"] = Mat("art/rim_normal.dds", slot: "NormalGlossAO_TEX");
+
+        string paint = MonsterModels.Of(install.Read, Named("body.ao")).Paint;
+
+        // "none of the three had one" and "the one there is has none" are different findings,
+        // and only the first says the shape-by-shape walk was tried and came back empty.
+        Assert.Contains("none of the 3 materials", paint, StringComparison.Ordinal);
+        Assert.Contains("glow.mat", paint, StringComparison.Ordinal);
+        Assert.Contains("rim.mat", paint, StringComparison.Ordinal);
     }
 
     /// <summary>Every way the walk can stop says where it stopped.</summary>
@@ -372,6 +426,16 @@ public class MonsterModelTests
         noColour.Files["art/paint.mat"] = Mat("art/skin_normal.dds", slot: "NormalGloss_TEX");
         Assert.Contains("no colour texture", Paint(noColour), StringComparison.Ordinal);
 
+        // AND WHAT IT DOES NAME, which is the one reason here that is a question rather than an
+        // answer: the rule for "which texture is the colour one" was measured on the materials
+        // that happened to be looked at, so a boss whose slot is called something new is drawn
+        // in plain ink and looks exactly like a boss with no texture at all. The material, its
+        // slots and its textures are printed, which is what tells those two apart.
+        string said = Paint(noColour);
+        Assert.Contains("paint.mat", said, StringComparison.Ordinal);
+        Assert.Contains("NormalGloss_TEX", said, StringComparison.Ordinal);
+        Assert.Contains("skin_normal.dds", said, StringComparison.Ordinal);
+
         var noTexture = Install();
         noTexture.Files.Remove("art/skin.dds");
         Assert.Contains("texture did not read", Paint(noTexture), StringComparison.Ordinal);
@@ -419,7 +483,12 @@ public class MonsterModelTests
         return install;
     }
 
-    private static byte[] Ao(string? extends = null, string? skin = null, string? material = null)
+    /// <param name="second">
+    /// A second shape's material, for the monsters built out of parts: the .ao names one child
+    /// per shape and they are not always the same file.
+    /// </param>
+    private static byte[] Ao(
+        string? extends = null, string? skin = null, string? material = null, string? second = null)
     {
         var said = new StringBuilder("version 3\n");
         if (extends is { Length: > 0 })
@@ -433,6 +502,11 @@ public class MonsterModelTests
             if (material is { Length: > 0 })
             {
                 said.Append("\t\tHipsShape = \"").Append(material).Append("\"\n");
+            }
+
+            if (second is { Length: > 0 })
+            {
+                said.Append("\t\tCloakShape = \"").Append(second).Append("\"\n");
             }
 
             said.Append("}\n");

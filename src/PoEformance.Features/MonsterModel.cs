@@ -166,14 +166,19 @@ public static class MonsterModels
                 manifest.Geometry);
         }
 
-        // THE .ao's MATERIAL WINS WHERE THERE IS ONE. The manifest names a default for the mesh
+        // THE .ao's MATERIALS WIN WHERE THERE ARE ANY. The manifest names a default for the mesh
         // and the monster's own file overrides it per shape - which is how one skeleton mesh
         // serves an expedition skeleton and a bone rabble, in different colours.
-        string material = found.Material.Length > 0
-            ? found.Material
-            : manifest.Materials.FirstOrDefault(said => said.Length > 0) ?? string.Empty;
-
-        (Mipmaps? skin, string paint) = Painted(counted, mesh, material);
+        //
+        // ALL OF THEM, IN ORDER, AND NOT THE FIRST. A monster built out of parts names a
+        // material per shape and they are not all the same file: the first can perfectly well
+        // be a cloth or a glow with no colour map in it while the body's skin is the second.
+        // Taking the first was measured on monsters cut from one sheet and reported wrong from
+        // the live client by Veynar the Frostbane, who is plainly painted in the game and came
+        // out here in plain ink. The renderer puts ONE texture on the mesh, so the first
+        // material that actually carries a colour map is the one it gets.
+        List<string> materials = [.. found.Materials, .. manifest.Materials];
+        (Mipmaps? skin, string paint, string material) = Painted(counted, mesh, materials);
         (AnimationSkeleton rig, string move) = Rigged(counted, found.Skeleton, mesh);
 
         return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint)
@@ -269,7 +274,50 @@ public static class MonsterModels
     /// texture and no way to look it up. That is the expected state of a bare body whose clothes
     /// are attached objects, and it is a different answer from "the file would not read".
     /// </remarks>
-    private static (Mipmaps? Skin, string Why) Painted(
+    /// <param name="named">
+    /// Every material the files name, best first: the .ao's own, per shape, then the mesh's
+    /// default. Tried in order until one carries a colour map - see the remark in Of.
+    /// </param>
+    private static (Mipmaps? Skin, string Why, string Material) Painted(
+        Func<string, byte[]?> read, SkinnedMesh mesh, IReadOnlyList<string> named)
+    {
+        var tried = new List<string>();
+        var reasons = new List<string>();
+
+        foreach (string one in named)
+        {
+            string bare = MaterialFile.Bare(one);
+            if (bare.Length == 0 || tried.Contains(bare, StringComparer.OrdinalIgnoreCase))
+            {
+                // The same file with a different :n selector is the same file. Reading it twice
+                // would only report the same answer twice in a line somebody has to read.
+                continue;
+            }
+
+            tried.Add(bare);
+            (Mipmaps? skin, string why) = Colour(read, mesh, bare);
+            if (skin is not null)
+            {
+                return (skin, why, bare);
+            }
+
+            reasons.Add(why);
+        }
+
+        return tried.Count switch
+        {
+            0 => (null, "neither the .ao nor the .sm names a material", string.Empty),
+            1 => (null, reasons[0], tried[0]),
+
+            // SEVERAL, AND EACH ONE'S REASON, because "none of the three had a colour map" and
+            // "the one material there is has none" are different findings and only the first
+            // says the shape-by-shape walk was tried and came back empty.
+            _ => (null, $"none of the {tried.Count} materials has a colour texture - {string.Join(" | ", reasons.Take(Some))}", tried[0]),
+        };
+    }
+
+    /// <summary>One material: its colour texture, or which way this one is missing it.</summary>
+    private static (Mipmaps? Skin, string Why) Colour(
         Func<string, byte[]?> read, SkinnedMesh mesh, string material)
     {
         if (material.Length == 0)
@@ -285,7 +333,16 @@ public static class MonsterModels
 
         if (paint.Albedo is not { Length: > 0 } texture)
         {
-            return (null, "the material names no colour texture");
+            // WHAT IT DOES NAME, because this is the one reason here that is a QUESTION rather
+            // than an answer. Every other line says what went wrong and where; this one said
+            // only that the rule found nothing, and the rule - a slot whose name carries
+            // Albedo, Colour or Color, or the first texture that is not a normal map - was
+            // measured on the materials that happened to be looked at. A boss drawn in plain
+            // ink is then indistinguishable from a boss whose slot is called something this
+            // has never seen, and the only way to tell was to read the file with other tools.
+            // So it prints the material and what is in it, which is exactly what deciding
+            // between those two needs.
+            return (null, $"the material names no colour texture - {Listed(MaterialFile.Bare(material), paint)}");
         }
 
         // THROUGH ReadRaw AND NOT A BARE READ. A texture in this game is one of three things and
@@ -312,6 +369,36 @@ public static class MonsterModels
     }
 
     /// <summary>
+    /// A material named, with the slots and textures it holds - the evidence for "no colour".
+    /// </summary>
+    /// <remarks>
+    /// SHORT ON PURPOSE. This goes in a line under the picture, so it carries the material's own
+    /// file name rather than its path, the slot names as written, and the textures by file name
+    /// only - enough to recognise a colour map filed under a slot nobody taught this about, and
+    /// not so much that the line stops being readable. Three of each, because a material with
+    /// more than three of either has already made the point.
+    /// </remarks>
+    private static string Listed(string material, MaterialFile paint)
+    {
+        string Few(IEnumerable<string> names)
+        {
+            string[] some = [.. names.Take(Some)];
+            return some.Length == 0 ? "none" : string.Join(", ", some);
+        }
+
+        static string Named(string path) => path[(path.LastIndexOf('/') + 1)..];
+
+        string file = material.Length > 0 ? Named(material) : "?";
+        string slots = Few(paint.Slots.Select(one => $"{one.Key}={Named(one.Value)}"));
+        string textures = Few(paint.Textures.Select(one => Named(one.Path)));
+
+        return $"{file} names slots: {slots}; textures: {textures}";
+    }
+
+    /// <summary>How many slots and textures the line above names before it stops.</summary>
+    private const int Some = 3;
+
+    /// <summary>
     /// The first SkinMesh found, walking from the monster's own files outwards through extends.
     /// </summary>
     /// <remarks>
@@ -319,11 +406,12 @@ public static class MonsterModels
     /// A depth-first walk would reach a base file before the monster's second .ao, and the nearer
     /// file is the one whose answer counts.
     /// </remarks>
-    private static (string Mesh, string Material, string Skeleton)? Skinned(
+    private static (string Mesh, IReadOnlyList<string> Materials, string Skeleton)? Skinned(
         Func<string, byte[]?> read, IReadOnlyList<string> named)
     {
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var queue = new Queue<(string Path, int Depth)>();
+        var materials = new List<string>();
 
         foreach (string one in named)
         {
@@ -335,7 +423,6 @@ public static class MonsterModels
         // usually in the same .ao; a monster whose base supplies the rig and whose own file only
         // swaps the skin is the case that stopping at the skin would leave unable to move.
         string? mesh = null;
-        var material = string.Empty;
         string? skeleton = null;
 
         while (queue.Count > 0 && (mesh is null || skeleton is null))
@@ -364,12 +451,20 @@ public static class MonsterModels
                             continue;
                         }
 
-                        // The material sits UNDER the skin, one child per shape, and they name
-                        // the same file with different indices - so the first is as good as any.
-                        material = entry.Children
-                            .Select(child => child.Value)
-                            .FirstOrDefault(said => said.Contains(".mat", StringComparison.OrdinalIgnoreCase))
-                            ?? string.Empty;
+                        // THE MATERIAL SITS UNDER THE SKIN, ONE CHILD PER SHAPE, and this used
+                        // to take the first on the reasoning that they name the same file with
+                        // different indices. That holds for a monster cut from one sheet and
+                        // NOT for one built out of parts: reported from the live client, Veynar
+                        // the Frostbane draws in plain ink here and is plainly painted in the
+                        // game, which is what a shape-0 material with no colour map in it looks
+                        // like. All of them are kept now and tried in order - see Painted.
+                        foreach (AoEntry child in entry.Children)
+                        {
+                            if (child.Value.Contains(".mat", StringComparison.OrdinalIgnoreCase))
+                            {
+                                materials.Add(child.Value);
+                            }
+                        }
 
                         mesh = entry.Value;
                         break;
@@ -414,7 +509,7 @@ public static class MonsterModels
             }
         }
 
-        return mesh is null ? null : (mesh, material, skeleton ?? string.Empty);
+        return mesh is null ? null : (mesh, materials, skeleton ?? string.Empty);
     }
 
     /// <summary>
