@@ -176,8 +176,8 @@ public class AtlasGroupTests
 
         names.LearnUnique(new Dictionary<string, WorldArea>(StringComparer.OrdinalIgnoreCase)
         {
-            ["MapUniqueLake"] = new("MapUniqueLake", string.Empty, true, false, true, []),
-            ["MapUniqueReactor_01"] = new("MapUniqueReactor_01", string.Empty, true, false, true, []),
+            ["MapUniqueLake"] = new("MapUniqueLake", string.Empty, true, false, true, [], []),
+            ["MapUniqueReactor_01"] = new("MapUniqueReactor_01", string.Empty, true, false, true, [], []),
         });
 
         // The Fractured Lake is unique and in no named group, so it lands in the catch-all.

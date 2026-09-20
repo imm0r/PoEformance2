@@ -79,7 +79,7 @@ public class RitualWatchTests
 
         names.LearnUnique(new Dictionary<string, WorldArea>(StringComparer.OrdinalIgnoreCase)
         {
-            ["ExpeditionLogBook_Heath"] = new("ExpeditionLogBook_Heath", string.Empty, true, false, true, []),
+            ["ExpeditionLogBook_Heath"] = new("ExpeditionLogBook_Heath", string.Empty, true, false, true, [], []),
         });
 
         HashSet<(int X, int Y)> blocked = RitualWatch.Blocked(atlas, names);
