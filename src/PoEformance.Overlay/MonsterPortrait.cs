@@ -1451,13 +1451,17 @@ public sealed class MonsterPortrait
         {
             string said = $"read {ByteCount.Said(_model.Bytes)} in {_model.Files} file{(_model.Files == 1 ? string.Empty : "s")}";
 
-            // HOW MANY SHEETS THE MONSTER IS PAINTED FROM, where it is more than one. A model
-            // built of parts wears a texture per shape, and saying so is what makes a picture
-            // that looks subtly wrong - a cloak in the body's colours - a thing somebody can
-            // check rather than squint at. One is the ordinary case and says nothing.
-            if (_model.Materials.Count > 1)
+            // HOW MANY SHEETS THE MONSTER IS PAINTED FROM, whenever it is painted at all.
+            // This was shown only for more than one, on the reasoning that one is the
+            // ordinary case and says nothing - and it says the one thing that was asked from
+            // the live client: whether the part-by-part painting is running and found a
+            // single sheet, or is not running at all. A line that appears only in the
+            // interesting case cannot answer that, because its absence is also what the
+            // version without it looks like.
+            if (_model.Materials.Count > 0)
             {
-                said += $" · {_model.Mesh.Shapes.Count} shapes from {_model.Materials.Count} textures";
+                int sheets = _model.Materials.Count;
+                said += $" · {_model.Mesh.Shapes.Count} shapes from {sheets} texture{(sheets == 1 ? string.Empty : "s")}";
             }
 
             if (_tracks is { Ready: true } tracks)

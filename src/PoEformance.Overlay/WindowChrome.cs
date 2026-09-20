@@ -413,7 +413,15 @@ public sealed class WindowChrome
     /// items and so shows the X and not these - which is exactly why a click-through window is
     /// never collapsed (<see cref="Flags"/>): there, these ARE the X.
     /// </remarks>
-    public void TitleButtons(string id, bool closable = false)
+    /// <param name="aside">
+    /// A short line drawn just left of the icons, or empty for none - the tool's version on
+    /// the main window. PAINTED INTO THE DRAW LIST rather than submitted as an item, which is
+    /// what keeps it out of the window's measured content: the two comments in the body are
+    /// about an auto-fitting window that grows by whatever is put in its title bar, and text
+    /// that is only drawn cannot feed that loop. It is dropped rather than overlapped where
+    /// the window is too narrow to hold it beside its own name.
+    /// </param>
+    public void TitleButtons(string id, bool closable = false, string aside = "")
     {
         ImGuiStylePtr style = ImGui.GetStyle();
 
@@ -519,6 +527,23 @@ public sealed class WindowChrome
             }
 
             Pointer(draw, throughAt, size, Ink(rule.ClickThrough), rule.ClickThrough);
+
+            // AND THE VERSION BESIDE THEM, ending a gap short of the padlock. Right-aligned
+            // from there, so it grows leftwards towards the title rather than pushing the
+            // icons about, and skipped entirely where it would reach the window's own name -
+            // the icons are the way out of click-through and must never be crowded by this.
+            if (aside.Length > 0)
+            {
+                float wide = ImGui.CalcTextSize(aside).X;
+                float at = left - gap - wide;
+                if (at > corner.X + style.FramePadding.X + size + gap)
+                {
+                    draw.AddText(
+                        new Vector2(at, corner.Y + ((bar - ImGui.GetTextLineHeight()) * 0.5f)),
+                        ImGui.GetColorU32(OverlayInk.Quiet),
+                        aside);
+                }
+            }
         }
         finally
         {

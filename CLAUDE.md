@@ -95,6 +95,21 @@ are the reason offsets can be diagnosed from Linux, and committed ones under `te
 are regression tests against real memory. A recording can only contain reads the running
 build actually performed, so a new diagnostic needs a fresh recording.
 
+## Raise the version on every push
+
+`ToolVersion.Number` goes up by one patch with **every** push — one edit, one file, no
+exceptions. It is drawn on the overlay's own title bar beside the lock, so "which build is
+that" is a question a screenshot answers.
+
+This exists because it cost an hour. Three changes went out in a row, two of them missed a
+squash merge by under a minute, and a boss that looked unchanged could not be told apart from
+a boss whose build did not contain the fix — the only way to check was comparing a screenshot
+against a merge timestamp. A number that moves with every push makes that a glance.
+
+The build stamp (`BuildStamp`, `version.json` beside the exe) still says which COMMIT is
+running and is written by the publish workflow; the version says what was meant to be in it.
+Both are shown, because they fail differently and a local build has only the version.
+
 ## Style
 
 - Layering is compiler-enforced: Core → Game → Features → Overlay/Config → App. Nothing

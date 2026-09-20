@@ -63,6 +63,12 @@ push to `main` auto-compiles on GitHub and updates the rolling release
 [`latest-dev`](https://github.com/imm0r/PoEformance2/releases/tag/latest-dev) with a
 ready-to-run, self-contained exe.
 
+**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.0 · 4659c18`
+— the version, raised on every push, and the commit the publish workflow stamped into it. A build
+compiled locally reads `local`, because a version number on an unreleased build is a claim it
+cannot support. It is there because the alternative was comparing a screenshot against a merge
+timestamp to find out whether a fix was in the build somebody was looking at.
+
 **A downloaded build keeps itself current.** It checks that release a couple of times a day,
 says so on the config window's **Update** tab and in the overlay's Status page, shows what
 changed since the build you are running, and — when you press the button — downloads it,

@@ -139,6 +139,17 @@ public sealed class ToolTabs
     /// <summary>Whether this window is pinned in place or handed to the mouse.</summary>
     public WindowChrome Chrome { get; set; } = new();
 
+    /// <summary>
+    /// What is drawn beside the title bar's icons: the version, and which build this really is.
+    /// </summary>
+    /// <remarks>
+    /// Set by whoever wires the overlay up, because the BUILD STAMP lives beside the
+    /// executable and reading a file is not this class's business - see ToolVersion.With.
+    /// Left at the bare version number until then, which is what a test or a bare overlay
+    /// shows.
+    /// </remarks>
+    public string Version { get; set; } = ToolVersion.Said;
+
     /// <summary>How solid this window is drawn, as the user set it.</summary>
     /// <remarks>
     /// Read at Begin rather than copied into a field on a change, so a slider dragged in the
@@ -365,7 +376,12 @@ public sealed class ToolTabs
                 // Before the tabs, so they stop short of the icons. NOT closable, alone among
                 // the windows: this one carries the live readout and every way back into the
                 // tool, so a close button would be a button that hides the button.
-                Chrome.TitleButtons(ChromeId);
+                //
+                // WITH THE VERSION, and on this window only. It is the one window that is
+                // always up, and the question it answers - "is the build I am looking at the
+                // one with the fix in it" - was being settled by comparing a screenshot
+                // against a merge time. See ToolVersion.
+                Chrome.TitleButtons(ChromeId, closable: false, aside: Version);
 
                 // ABOVE THE TABS, so it is on screen whichever page is in front - which is the
                 // entire reason it exists. Outside DrawPages because it belongs to the window
