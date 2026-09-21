@@ -109,6 +109,45 @@ public sealed class ModelSweepTests
     }
 
     /// <summary>
+    /// The same piece SOCKETED is not torn, because a stray there goes nowhere.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THE FIRST CORPUS SETTLED. The flag counted socketed pieces too and named 306
+    /// monsters; of the 483 pieces behind that number, 434 were socketed. On a socketed piece
+    /// <c>Correcting</c> fills EVERY bone with the socket's own transform, matched or not - so
+    /// the geometry lands in the same place either way, and all a stray changes is which body
+    /// bone it animates with, which is the old rigid binding and not a fault. The real count is
+    /// 31 monsters.
+    ///
+    /// A flag that names ten times too many is a flag nobody reads, and this is the assertion
+    /// that keeps it honest: the identical rig, hung on a bone instead of "&lt;root&gt;", stays
+    /// quiet.
+    /// </remarks>
+    [Fact]
+    public void TheSamePieceSocketedIsNotTornBecauseAStrayThereGoesNowhere()
+    {
+        Fake install = Dressed();
+
+        // The same three-bone rig as the test above, and the same two matches and one stray -
+        // the ONLY difference is that the line names a bone instead of "<root>".
+        install.Files["art/cloak.ast"] = Packed.Skeleton(
+            [
+                ("root_jntBnd", 255, 1, 0f),
+                ("hip_jntBnd", 2, 255, -150f),
+                ("phys_skinned_feather_jntBnd", 255, 255, -20f),
+            ],
+            []);
+
+        SweepResult said = Swept(install, "quiet.ao");
+
+        Assert.DoesNotContain("torn", said.Tally.Flags.Keys);
+
+        // The stray is still COUNTED - the record keeps the fact, the flag just does not fire
+        // on it, so the next reader can ask the question again without another build.
+        Assert.Contains("\"strays\":1", Lines(install, "quiet.ao")[0]);
+    }
+
+    /// <summary>
     /// A piece whose box does not meet the monster's own is flagged apart.
     /// </summary>
     /// <remarks>

@@ -148,10 +148,20 @@ public static class ModelSweep
     ///   dropped      a piece whose socket the monster's rig has no bone for - it is left out
     ///   unfitted     a "&lt;root&gt;" piece with a rig and no bone in common, left at the origin;
     ///                Malgor's ship's wheel
-    ///   torn         a piece PART of whose bones matched nothing, so part of it took the root
-    ///                while the rest of it went where it belonged; Bahlak's feather bundle, the
-    ///                beam from his chest to the floor. The rig's own root is left out of that
-    ///                count, because it never matches by design - see PartFit.Strays.
+    ///   torn         a "&lt;root&gt;" piece PART of whose bones matched nothing, so part of it
+    ///                took the monster's root - the ground between his feet - while the rest went
+    ///                where it belonged; Bahlak's feather bundle, the beam from his chest to the
+    ///                floor. The rig's own root is left out of that count, because it never
+    ///                matches by design - see PartFit.Strays.
+    ///
+    ///                AND ONLY ON A "&lt;root&gt;" PIECE, which the first corpus is what settled.
+    ///                It counted socketed pieces too and reported 306 monsters; 434 of the 483
+    ///                pieces behind that number were socketed, and on a SOCKETED piece a stray
+    ///                goes nowhere: Correcting fills EVERY bone with the socket's own transform,
+    ///                matched or not, so the geometry lands in the same place either way and all
+    ///                a stray changes is which body bone it animates with - which is the old
+    ///                rigid binding, not a fault. The real count is 31 monsters. A flag that
+    ///                names ten times too many is a flag nobody reads.
     ///   apart        a piece whose box does not meet the body's at all - the shape of every
     ///                report that began "hier liegt noch etwas auf dem Boden"
     ///   malformed    an attachment_bones line naming a group nobody declares; Tycho's SkirtLayers
@@ -198,7 +208,9 @@ public static class ModelSweep
             paths |= one.Paths > 0;
             deep |= one.Depth > 1;
             past |= one.Past;
-            fell |= one.Kind == PartKind.Skin && one.Torn;
+            // ON A "<root>" PIECE ONLY - see below. 434 of the 483 torn pieces in the first
+            // corpus were socketed, where this says nothing at all.
+            fell |= one.Kind == PartKind.Skin && one.Place == PartPlace.Root && one.Torn;
             unfitted |= one.Kind == PartKind.Rigid && one.Bones > 1 && one.Matched == 0;
             apart |= one.Kind != PartKind.None && !one.Lost && Apart(one, least, most);
         }
