@@ -63,7 +63,7 @@ push to `main` auto-compiles on GitHub and updates the rolling release
 [`latest-dev`](https://github.com/imm0r/PoEformance2/releases/tag/latest-dev) with a
 ready-to-run, self-contained exe.
 
-**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.10 · 4659c18`
+**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.11 · 4659c18`
 — the version, raised on every push, and the commit the publish workflow stamped into it. A build
 compiled locally reads `local`, because a version number on an unreleased build is a claim it
 cannot support. It is there because the alternative was comparing a screenshot against a merge
@@ -225,7 +225,11 @@ in x rather than standing apart: they are modelled in their *own* space, so a pi
 the monster's until the socket bone's rest transform is on it. It is then bound rigidly to that one
 bone, which is what makes it follow an arm that lifts. A piece hung on another piece sockets into
 *its* rig rather than the body's — Doryani's dagger and mirror name bones of the belt — so an
-unknown socket falls back to wherever its carrier went. A monster with no readable rig wears
+unknown socket falls back to wherever its carrier went; at the top level, where there is no
+carrier, the piece is left out instead, because bone 0 is not an answer but the floor. And
+`<root>` is not a bone name at all: it is the game's way of saying *at my carrier's own origin*,
+so the piece is already in that space and gets no transform. Reading it as an unknown bone put
+the rig's root orientation on Bahlak the Sky Seer's feathers and laid them flat at his feet. A monster with no readable rig wears
 nothing, because there is nowhere to put it and a pile of clothing at its feet is worse than none.
 They are not free: nine pieces bring nine meshes, rigs and sheets, and a belt hangs three more under
 itself, so the pane carries a `parts` switch and the line under the picture says `wearing 13 parts`.
