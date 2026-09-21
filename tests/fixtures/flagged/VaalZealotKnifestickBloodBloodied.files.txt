@@ -1,0 +1,1259 @@
+monster: Blood Zealot [Metadata/Monsters/VaalMonsters/Zealots/VaalZealotKnifestickBloodBloodied]
+
+=== .ao Metadata/Monsters/VaalMonsters/Zealots/Knifestick/Blood/BloodyVaalZealotKnifestickBlood.ao (depth 0)
+version 3
+extends "Metadata/Monsters/VaalMonsters/Zealots/Knifestick/Blood/VaalZealotKnifestickBlood"
+
+AttachedAnimatedObject
+{
+	clear_inherited_attached_objects = true
+	attached_object = "hip_jntBnd Metadata/Monsters/VaalMonsters/Zealots/attachments/BloodyZealot03FauldsHeld.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/VaalZealot03.sm"
+		remove_skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/VaalZealot03_costume_03.sm"
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/VaalZealot03.sm"
+			Body_NEWShape = "Art/Models/MONSTERS/VaalZealots/Textures/BloodyVaalZealotsBody03.mat:0"
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/VaalZealot03_costume_03.sm"
+			leg_feathersShape = "Art/Models/MONSTERS/VaalZealots/Textures/BloodyVaalZealotsCloth.mat:0"
+			opaqueShape = "Art/Models/MONSTERS/VaalZealots/Textures/BloodyVaalZealotsCloth.mat:0"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Zealots/Knifestick/Blood/VaalZealotKnifestickBlood.ao (depth 1)
+version 3
+extends "Metadata/Monsters/VaalMonsters/Zealots/Knifestick/VaalZealotKnifestick"
+
+client
+{
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.4329999685287476,
+						"name": "EPK_Driver",
+						"apply_on_children": true,
+						"curve": "7 0 0 Smooth 0.284291 0.193373 Smooth 0.454124 1 CustomSmooth -3.87619 0.793789 0.697824 CustomSmooth 1.37311 0.974808 0.341741 CustomSmooth -2.25666 1.31142 0 Flat 1.433 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "stab_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.1660000085830689,
+						"name": "EPK_Driver",
+						"apply_on_children": true,
+						"curve": "4 0 0 Flat 0.257801 0.302176 CustomSmooth 2.58991 0.563141 1 CustomSmooth -4.45338 1.166 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "stab_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0013717421097680927,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalZealotKnifestickBlood/pet/bloodstab/stab_build.pet",
+						"bone_group": "FX_weaponTrail"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7676339745521545,
+						"end_time": 0.8952409625053406,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalZealotKnifestickFire/pet/melee_swipe.trl",
+						"bone_group": "FX_weaponHiltTrail"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "stab_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5595261454582214,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Effects/Blood/Mortar_OnActCast",
+						"bone_name": "R_Weapon_trail_01"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.4167296290397644,
+						"end_time": 0.5189045667648315,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalZealotKnifestickBlood/meleecut_rig.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "hip_jntBnd"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								-43.20000076293945,
+								0.0
+							],
+							"rotation": [
+								-0.9424799680709839,
+								0.0,
+								-1.2217299938201905
+							],
+							"scale": [
+								1.100000023841858,
+								1.100000023841858,
+								1.100000023841858
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Zealots/attachments/BloodyZealot03FauldsHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/attachments/Zealot03_faulds/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/attachments/Zealot03_faulds/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+		attachment_bones = "R_thigh_jntBnd L_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/attachments/Zealot03_faulds/VaalZealotFaulds.sm"
+			armour_VaalZealotFaulds|bag|bagShape = "Art/Models/MONSTERS/VaalZealots/Textures/BloodyVaalZealotsCloth.mat:0"
+			armour_VaalZealotFaulds|costume_03_cloth|costume_03_clothShape = "Art/Models/MONSTERS/VaalZealots/Textures/BloodyVaalZealotsCloth.mat:0"
+			armour_VaalZealotFaulds|costume_03_loin_cloth|costume_03_loin_clothShape = "Art/Models/MONSTERS/VaalZealots/Textures/BloodyVaalZealotsCloth.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false R_thigh_jntBnd L_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Zealots/Knifestick/VaalZealotKnifestick.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/VaalZealots/Knifestick/rig.amd"
+	animations = '[
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000000298023225,
+					"name": "move",
+					"position": [
+						160.0,
+						0.0,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000000298023225,
+					"name": "move",
+					"position": [
+						-160.0,
+						0.0,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.2330000400543215,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.365999937057495,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "patrol_idle_01",
+			"blend_in_time": -1
+		},
+		{
+			"name": "slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9735540151596069,
+					"name": "contact",
+					"position": [
+						0.0,
+						-174.36599731445313,
+						-7.738619804382324
+					]
+				}
+			]
+		},
+		{
+			"name": "stab_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4799579977989197,
+					"name": "contact",
+					"position": [
+						-1.6987199783325196,
+						-143.78399658203126,
+						-92.0154037475586
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/VaalMonsters/Zealots/attachments/Zealot03FauldsHeld.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.22904999554157258,
+								0.0
+							],
+							[
+								0.3575420081615448,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -1.5707999467849732,
+						"width": 213.8730010986328,
+						"angle": 3.141590118408203,
+						"length": 109.82599639892578,
+						"local_offset": [
+							18.0,
+							-97.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5418990254402161,
+								0.0
+							],
+							[
+								0.592179000377655,
+								1.0
+							]
+						],
+						"rotation": -0.4014259874820709,
+						"width": 57.803001403808597,
+						"length": 150.28900146484376,
+						"offset": [
+							61.0,
+							17.0
+						],
+						"impact_z_rotation": [
+							-0.4014259874820709,
+							-0.4014259874820709
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "cleave_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4262300133705139,
+								0.0
+							],
+							[
+								0.5464479923248291,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.7679449915885925,
+						"angle": 4.310959815979004,
+						"length": 190.1840057373047,
+						"local_offset": [
+							5.0,
+							-87.0
+						],
+						"impact_z_rotation": [
+							-1.0821000337600709,
+							2.617990016937256
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/VaalZealots/Knifestick/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "R_Weapon_extend1"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -175"
+		socket = "R_Weapon_extend2"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -240"
+		socket = "R_Weapon_trail_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -105"
+		socket = "R_Weapon_trail_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -165"
+		socket = "R_Weapon_hilt"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 32"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/VaalZealot03.sm"
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/VaalZealot03_costume_03.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.030400147661566736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Attack",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08366630226373673,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Swish_Knifestick",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12363598495721817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37791499495506289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Swish_Knifestick",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4074098765850067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6733499765396118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Swish_Knifestick",
+						"bone_name": "L_Weapon"
+					}
+				]
+			},
+			{
+				"name": "cleave_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07201594859361649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Cleave",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15078681707382203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23408885300159455,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Swish_ArmSlow",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6906833052635193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0465986505150795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Death",
+						"bone_name": "Head_Attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19692783057689668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29580941796302798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3093677759170532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/WeaponDrop_Knifestick",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7330824136734009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/FallFoot",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.036222685128450397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Death",
+						"bone_name": "Head_Attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1255100965499878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/WeaponDrop_Knifestick",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2632593512535095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2906482517719269,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.036222685128450397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Death",
+						"bone_name": "Head_Attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10190369933843613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17149873077869416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/WeaponDrop_Knifestick",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2632593512535095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02898436225950718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Death",
+						"bone_name": "Head_Attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09565676003694534,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19702640175819398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3403874933719635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/WeaponDrop_Knifestick",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.036222685128450397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Death",
+						"bone_name": "Head_Attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17032422125339509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2644340395927429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/WeaponDrop_Knifestick",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3165168762207031,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02898436225950718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Death",
+						"bone_name": "Head_Attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0858636125922203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17632707953453065,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/WeaponDrop_Knifestick",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18399347364902497,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.020542316138744355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04431700333952904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.020542316138744355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04431700333952904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.020542316138744355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04431700333952904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.020542316138744355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04431700333952904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.33421802520751955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Idle",
+						"bone_name": "Head_Attachment"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05743838846683502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Knockback1",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09174198657274246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1467871516942978,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2752259075641632,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.533926010131836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6770414113998414,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.750436544418335,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Knockback2",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09000147879123688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21579784154891969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/FallFoot",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.291618674993515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4717026948928834,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.658337950706482,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0180017948150636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "patrol_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04179000109434128,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/PatrolEnd",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29773229360580447,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5910750031471252,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "patrol_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.41671222448349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5664400458335877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.064329743385315,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.19962477684021,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4070805311203004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5932300090789796,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/PatrolWalk",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.769673228263855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7859094142913819,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3830161094665529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.420901298522949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.029310500249266626,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34822702407836916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5134559273719788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Run.loop.ogg",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sacrifice_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.32014116644859316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Sacrifice",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7726060152053833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8842400312423707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/FallSacrifice",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.107755661010742,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5037460327148439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/FallFoot",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08350449055433274,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11699779331684113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Slam",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25188493728637698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36140039563179018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.670291006565094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Swish_Knifestick",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7063725590705872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8912110328674316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5222910642623902,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "stab_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.16315893828868867,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Vocals/Knifestick/Stab",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46084290742874148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4739137589931488,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Swish_Knifestick",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7731810808181763,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Body_Move",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9082935452461243,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/VaalZealots/Foley/Step_Bare",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false R_upperArm_attachment_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "root false root_jntBnd hip_jntBnd spine_1_jntBnd"
+		bone_group = "trailing_particles false R_Weapon_extend1 R_Weapon_extend2"
+		bone_group = "embers false R_Weapon_extend1 R_Weapon_extend2"
+		bone_group = "FX_weaponTrail false R_Weapon_trail_01 R_Weapon_trail_02"
+		bone_group = "FX_weaponHiltTrail false R_Weapon_hilt aux_L_Weapon_attachment"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Zealots/attachments/Zealot03FauldsHeld.ao (depth 3)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/attachments/Zealot03_faulds/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/attachments/Zealot03_faulds/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+		attachment_bones = "R_thigh_jntBnd L_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/attachments/Zealot03_faulds/VaalZealotFaulds.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false R_thigh_jntBnd L_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd "
+	}
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/VaalZealot03.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/VaalZealots03_armour_1f489c06.smd"
+Materials 1
+	"Art/Models/MONSTERS/VaalZealots/Textures/VaalZealotsBody03c.mat" 1
+BoundingBox -68.5775 -15.0105 -174.193 68.5775 15.0493 0.208731
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_root" 2 "root_jntBnd" "hip_jntBnd"
+	"grp_frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "neck_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalZealots/VaalZealots03_armour_1f489c06.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 1 in the header, 1 in the block · 3298 triangles over 2073 vertices
+  names: 26 bytes said, 26 read  [agree]
+
+=== shapes (9)
+0	Body_NEWShape	from 0	count 9894
+1	leg_feathersShape	from 9894	count 288
+2	opaqueShape	from 10182	count 4152
+3	armour_VaalZealotFaulds|bag|bagShape	from 14334	count 300
+4	armour_VaalZealotFaulds|costume_03_cloth|costume_03_clothShape	from 14634	count 2064
+5	armour_VaalZealotFaulds|costume_03_loin_cloth|costume_03_loin_clothShape	from 16698	count 1080
+6	armour_VaalZealotFaulds|bag|bagShape	from 17778	count 300
+7	armour_VaalZealotFaulds|costume_03_cloth|costume_03_clothShape	from 18078	count 2064
+8	armour_VaalZealotFaulds|costume_03_loin_cloth|costume_03_loin_clothShape	from 20142	count 1080
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  BloodyZealot03FauldsHeld.ao  socket hip_jntBnd [in its carrier's rig]  box (-21.7,-16.9,-20.4)..(17.2,13.6,34.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 1148 triangles over 1076 vertices
+    names: 340 bytes said, 340 read  [agree]
+    rig 12 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 10 of 12  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_F_fauld_01_jntBnd  [its own]  under 0  rests at (0,-13.6,0)
+      2 phys_skinned_B_fauld_01_jntBnd  [its own]  under 0  rests at (-0,12.9,-2.1)
+      3 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      4 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      5 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      6 phys_skinned_F_fauld_02_jntBnd  [its own]  under 1  rests at (0,-13.5,15.5)
+      7 phys_skinned_B_fauld_02_jntBnd  [its own]  under 2  rests at (0,14.2,14.2)
+      8 spine_2_jntBnd  [shared]  under 3  rests at (-0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      9 phys_skinned_F_fauld_03_jntBnd  [its own]  under 6  rests at (0,-13.4,30.9)
+      10 phys_skinned_B_fauld_03_jntBnd  [its own]  under 7  rests at (-0,15.6,30.6)
+      11 aux_animation_control_ratio  [its own]  under 0  rests at (0,0,0)
+  Zealot03FauldsHeld.ao  socket hip_jntBnd [in its carrier's rig]  box (-21.7,-16.9,-20.4)..(17.2,13.6,34.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 1148 triangles over 1076 vertices
+    names: 340 bytes said, 340 read  [agree]
+    rig 12 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 10 of 12  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_F_fauld_01_jntBnd  [its own]  under 0  rests at (0,-13.6,0)
+      2 phys_skinned_B_fauld_01_jntBnd  [its own]  under 0  rests at (-0,12.9,-2.1)
+      3 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      4 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      5 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      6 phys_skinned_F_fauld_02_jntBnd  [its own]  under 1  rests at (0,-13.5,15.5)
+      7 phys_skinned_B_fauld_02_jntBnd  [its own]  under 2  rests at (0,14.2,14.2)
+      8 spine_2_jntBnd  [shared]  under 3  rests at (-0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      9 phys_skinned_F_fauld_03_jntBnd  [its own]  under 6  rests at (0,-13.4,30.9)
+      10 phys_skinned_B_fauld_03_jntBnd  [its own]  under 7  rests at (-0,15.6,30.6)
+      11 aux_animation_control_ratio  [its own]  under 0  rests at (0,0,0)

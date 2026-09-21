@@ -1,0 +1,1122 @@
+monster: Viper Legionnaire [Metadata/Monsters/LeagueIncursionNew/ViperLegionnaire/ViperLegionnaireSwordIncursion]
+
+=== .ao Metadata/Monsters/VaalMonsters/ViperLegionnaire/ViperLegionnaireSwordIncursion.ao (depth 0)
+version 3
+extends "Metadata/Monsters/VaalMonsters/ViperLegionnaire/ViperLegionnaire"
+
+AttachedAnimatedObject
+{
+	clear_inherited_attached_objects = true
+	attached_object = "Head_Attachment Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard02HeaddressLivingLow.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard02MantleLivingLow.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/UpdatedVaalGuardSpearLivingMask.ao"
+	// weapon attached in otc to fix death jitter
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/ViperLegionnaire/ViperLegionnaire.sm"
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/UpdatedVaalGuardSpearLivingNoPhys.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/ViperLegionnaire/ViperLegionnaire.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/ViperLegionnaire/sword/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.33860599994659426,
+					"name": "leave_ground",
+					"position": [
+						0.0,
+						-49.808101654052737,
+						-142.35499572753907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6334270238876343,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8399659991264343,
+					"name": "hit_ground",
+					"position": [
+						0.0,
+						-49.808101654052737,
+						-142.35499572753907
+					]
+				}
+			]
+		},
+		{
+			"name": "combo_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.600000023841858,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 1.600000023841858,
+					"name": "move",
+					"position": [
+						0.0,
+						-350.0,
+						0.0
+					],
+					"data": "1 1 0 Everything 0 5 Away"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000000298023225,
+					"name": "move",
+					"position": [
+						160.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000000298023225,
+					"name": "move",
+					"position": [
+						-160.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "Back Metadata/Monsters/VaalMonsters/ViperLegionnaire/attachments/ViperLegionnaireCape.ao"
+	attached_object = "Back Metadata/Monsters/VaalMonsters/ViperLegionnaire/attachments/ViperLegionnaireSnakes.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/VaalMonsters/ViperLegionnaire/attachments/ViperLegionnaireRobe.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4756760001182556,
+								0.0
+							],
+							[
+								0.5189189910888672,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.7155849933624268,
+						"angle": 2.0245800018310549,
+						"length": 181.54800415039063,
+						"impact_z_rotation": [
+							-1.151919960975647,
+							-3.001970052719116
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.30270299315452578,
+								0.0
+							],
+							[
+								0.491892009973526,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.7155849933624268,
+						"width": 32.737998962402347,
+						"angle": 2.268929958343506,
+						"length": 104.16699981689453,
+						"impact_z_rotation": [
+							-1.309000015258789,
+							-3.543020009994507
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "combo_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.248649001121521,
+								0.0
+							],
+							[
+								0.30270299315452578,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": 0.7155849933624268,
+						"width": 56.54800033569336,
+						"angle": 1.7802400588989258,
+						"length": 163.69000244140626,
+						"impact_z_rotation": [
+							2.0071299076080324,
+							3.001970052719116
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.5435900092124939,
+								0.0
+							],
+							[
+								0.6000000238418579,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.4537859857082367,
+						"width": 58.98899841308594,
+						"angle": 1.6231600046157838,
+						"length": 137.63999938964845,
+						"impact_z_rotation": [
+							-1.6755199432373047,
+							-2.129300117492676
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.7743589878082275,
+								0.0
+							],
+							[
+								0.8256409764289856,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"width": 42.1349983215332,
+						"angle": 2.2165699005126955,
+						"length": 148.87600708007813,
+						"local_offset": [
+							-39.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.6283190250396729,
+							-2.129300117492676
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/ViperLegionnaire/sword/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/ViperLegionnaire/ViperLegionnaire.sm"
+			hide_segments = "BlackRomanRobeDS_NoPhysShape,BlackRomanRobeSS_NoPhysShape"
+	}
+	
+	AnimatedRender
+	{
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_upperArm_attachment_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_upperArm_attachment_jntBnd L_shoulder_cTwist_jntBnd_1"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.34408700466156008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Head_Turn_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4576280117034912,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Swish_Sword_",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.28145700693130495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Head_Turn_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34724798798561098,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Swish_Sword_",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05471229925751686,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Head_Turn_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24458299577236176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Swish_Sword_",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3226560056209564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Armour_",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7320430278778076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Swish_Sword_",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8152340054512024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Armour_",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1472899913787842,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Swish_Sword_",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2849400043487549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Armour_",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3276499509811402,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Boot_",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16852299869060517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Fall_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6017900109291077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Fall_Leg_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8057550191879273,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Fall_Leg_",
+						"bone_name": "L_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18294699490070344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Fall_Leg_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41000598669052126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Fall_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.144678995013237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Fall_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15978200733661652,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Fall_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1135689988732338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Fall_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1596039980649948,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Fall_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.14102999866008759,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Armour_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16730700433254243,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Boot_",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4745349884033203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Armour_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5009220242500305,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Boot_",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Boot_",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.011571500450372696,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Armour_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3319239914417267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Boot_",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34551799297332766,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Armour_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.22525200247764588,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Armour_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24154600501060487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Boot_",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5501880049705505,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Armour_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5637869834899902,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Boot_",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18601900339126588,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Armour_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19958500564098359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Boot_",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5037689805030823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Armour_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5251309871673584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_14/ViperLegionnaires/Foley/Step_Boot_",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard02HeaddressLivingLow.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard02Headdress/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard02Headdress/rig.ast"
+		linear_allowed_contraction = 0.300
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		enclosure_angle = 0.200
+		animation_velocity_factor = 2.000
+		animation_force_factor = 5.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard02Headdress/UpdatedVaalGuardSpearLivingHeaddress.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard02MantleLivingLow.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard01Mantle/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard01Mantle/rig.ast"
+		linear_allowed_contraction = 0.100
+		bend_stiffness = 300.000
+		bend_allowed_angle = 0.200
+		animation_velocity_factor = 1.000
+		animation_force_factor = 2.000
+		attachment_bones = "chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 R_clavicle_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 neck_jntBnd head_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard01Mantle/UpdatedVaalGuardSpearLivingMantle.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 R_clavicle_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 neck_jntBnd head_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/UpdatedVaalGuardSpearLivingMask.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/UpdatedVaalGuardSpearLivingMask.fmt"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/ViperLegionnaire/attachments/ViperLegionnaireCape.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/ViperLegionnaire/attachments/cape/ViperLegionnaireCape_armour.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/ViperLegionnaire/attachments/cape/ViperLegionnaireCape_armour.ast"
+		bend_allowed_angle = 0.600
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.450
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/ViperLegionnaire/attachments/cape/ViperLegionnaireCape.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/ViperLegionnaire/attachments/ViperLegionnaireSnakes.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/ViperLegionnaire/attachments/snakes/ViperLegionnaireSnakes_armour.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/ViperLegionnaire/attachments/snakes/ViperLegionnaireSnakes_armour.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		enclosure_angle = 0.250
+		animation_velocity_factor = 7.000
+		animation_force_factor = 100.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/ViperLegionnaire/attachments/snakes/ViperLegionnaireSnakes.sm"
+		hide_segments = "snakes_meshShape"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/ViperLegionnaire/attachments/ViperLegionnaireRobe.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/ViperLegionnaire/attachments/robe/ViperLegionnaireRobe_armour.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/ViperLegionnaire/attachments/robe/ViperLegionnaireRobe_armour.ast"
+		bend_allowed_angle = 0.800
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.600
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/ViperLegionnaire/attachments/robe/ViperLegionnaireRobe.sm"
+	}
+}
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/UpdatedVaalGuardSpearLivingNoPhys.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/UpdatedVaalGuardSpearLivingNoPhys_armour_b3a95fcb.smd"
+Materials 2
+	"Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/Textures/VaalGuardSpear_bodyc.mat" 1
+	"Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/Textures/VaalGuardSpearc.mat" 19
+BoundingBox -69.0258 -21.8451 -183.366 69.0259 25.224 0.580541
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/UpdatedVaalGuardSpearLivingNoPhys_armour_b3a95fcb.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 20 in the header, 20 in the block · 12378 triangles over 10261 vertices
+  names: 634 bytes said, 634 read  [agree]
+
+=== shapes (28)
+0	bodyShape	from 0	count 9870
+1	capedeco_frontShape	from 9870	count 654
+2	capedeco_ropeShape	from 10524	count 234
+3	chestplateShape	from 10758	count 1380
+4	headplateShape	from 12138	count 1824
+5	leatherShape	from 13962	count 678
+6	maskShape	from 14640	count 1002
+7	shinpads_leftShape	from 15642	count 1125
+8	shinpads_rightShape	from 16767	count 1125
+9	shoulderpad_leftShape	from 17892	count 1932
+10	shoulderpad_rightShape	from 19824	count 1932
+11	skirtShape	from 21756	count 1614
+12	skull_left_1Shape	from 23370	count 486
+13	skull_left_2Shape	from 23856	count 486
+14	skull_right_1Shape	from 24342	count 486
+15	skull_right_2Shape	from 24828	count 486
+16	waist_decoShape	from 25314	count 8796
+17	waist_ropeShape	from 34110	count 792
+18	wrist_leftShape	from 34902	count 1116
+19	wrist_rightShape	from 36018	count 1116
+20	cape_1Shape	from 37134	count 2352
+21	cape_2Shape	from 39486	count 822
+22	cape_3Shape	from 40308	count 96
+23	capeShape	from 40404	count 4572
+24	deco_back212Shape	from 44976	count 2160
+25	fixed_UpdatedVaalGuardSpearLivingMask|mask|maskShape	from 47136	count 1002
+26	ViperLegionnaireRobe_DSShape	from 48138	count 1764
+27	ViperLegionnaireRobe_SSShape	from 49902	count 150
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  VaalGuard02HeaddressLivingLow.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-27.9,-19.4,-51.2)..(27.9,48.6,11.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 7 in the header, 7 in the block · 2834 triangles over 2586 vertices
+    names: 204 bytes said, 204 read  [agree]
+    rig 3 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_M_feather_jntBnd_1  [its own]  under 0  rests at (0,12.5,-20)
+      2 aux_animation_control_ratio  [its own]  under 0  rests at (0,0,0)
+  VaalGuard02MantleLivingLow.ao  socket chest_jntBnd [in its carrier's rig]  box (-41.4,-17.6,-45.7)..(41.6,46.8,75.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 5 in the header, 5 in the block · 3334 triangles over 2580 vertices
+    names: 118 bytes said, 118 read  [agree]
+    rig 15 bones, 13 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 15  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 chest_jntBnd  [shared]  under 0  rests at (-0,0,0)  carrier has (0,-0.3,-127.3)
+      2 phys_tri_jntBnd  [its own]  under 0  rests at (0,17.8,37)
+      3 L_clavicle_jntBnd  [shared]  under 1  rests at (4.7,1,-14.1)  carrier has (4.7,0.7,-141.4)
+      4 R_clavicle_jntBnd  [shared]  under 1  rests at (-4.7,1,-14.1)  carrier has (-4.7,0.7,-141.4)
+      5 neck_jntBnd  [shared]  under 1  rests at (-0,3.5,-19.1)  carrier has (0,3.2,-146.4)
+      6 hip_jntBnd  [shared]  under 1  rests at (0,3.5,37.3)  carrier has (0,3.2,-89.9)
+      7 L_shoulder_jntBnd  [shared]  under 3  rests at (15.8,6.3,-11)  carrier has (15.8,6,-138.3)
+      8 R_shoulder_jntBnd  [shared]  under 4  rests at (-15.8,6.3,-11)  carrier has (-15.8,6,-138.3)
+      9 head_jntBnd  [shared]  under 5  rests at (-0,0.5,-31.4)  carrier has (-0,0.2,-158.6)
+      10 spine_1_jntBnd  [shared]  under 6  rests at (0,0.3,21.9)  carrier has (0,0,-105.4)
+      11 L_shoulder_cTwist_jntBnd_1  [shared]  under 7  rests at (25.5,7.2,-3.5)  carrier has (25.5,6.8,-130.7)
+      12 R_shoulder_cTwist_jntBnd_1  [shared]  under 8  rests at (-25.5,7.2,-3.5)  carrier has (-25.5,6.8,-130.7)
+      13 spine_2_jntBnd  [shared]  under 10  rests at (-0,-0.4,11.7)  carrier has (0,-0.7,-115.5)
+      14 aux_animation_control_ratio  [its own]  under 1  rests at (0,0,0)
+  UpdatedVaalGuardSpearLivingMask.ao  socket head_jntBnd [in its carrier's rig]  fixed mesh UpdatedVaalGuardSpearLivingMask.fmt  1 shapes
+      fixed_UpdatedVaalGuardSpearLivingMask|mask|maskShape  ->  Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/Textures/VaalGuardSpearc.mat
+  ViperLegionnaireCape.ao  socket Back [NOT in its carrier's rig]  box (-28.4,5.9,4.9)..(31.1,15.9,141.5)
+    version 3 · c0h 2 · 2 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 426 triangles over 328 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 19 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 18 of 19  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L_cape_jntBnd_1  [its own]  under 0  rests at (15.3,5.3,14.9)
+      2 phys_skinned_R_cape_jntBnd_1  [its own]  under 0  rests at (-15.3,5.3,14.9)
+      3 phys_skinned_L_cape_jntBnd_2  [its own]  under 1  rests at (15.3,5.9,28.7)
+      4 phys_skinned_R_cape_jntBnd_2  [its own]  under 2  rests at (-15.3,5.9,28.7)
+      5 phys_skinned_L_cape_jntBnd_3  [its own]  under 3  rests at (15.3,6.6,42.5)
+      6 phys_skinned_R_cape_jntBnd_3  [its own]  under 4  rests at (-15.3,6.6,42.5)
+      7 phys_skinned_L_cape_jntBnd_4  [its own]  under 5  rests at (15.3,7.2,56.4)
+      8 phys_skinned_R_cape_jntBnd_4  [its own]  under 6  rests at (-15.3,7.2,56.4)
+      9 phys_skinned_L_cape_jntBnd_5  [its own]  under 7  rests at (15.3,7.9,70.2)
+      10 phys_skinned_R_cape_jntBnd_5  [its own]  under 8  rests at (-15.3,7.9,70.2)
+      11 phys_skinned_L_cape_jntBnd_6  [its own]  under 9  rests at (15.3,8.5,84)
+      12 phys_skinned_R_cape_jntBnd_6  [its own]  under 10  rests at (-15.3,8.5,84)
+      13 phys_skinned_L_cape_jntBnd_7  [its own]  under 11  rests at (15.3,9.2,97.9)
+      14 phys_skinned_R_cape_jntBnd_7  [its own]  under 12  rests at (-15.3,9.2,97.9)
+      15 phys_skinned_L_cape_jntBnd_8  [its own]  under 13  rests at (15.3,9.8,111.7)
+      16 phys_skinned_R_cape_jntBnd_8  [its own]  under 14  rests at (-15.3,9.8,111.7)
+      17 phys_skinned_L_cape_jntBnd_9  [its own]  under 15  rests at (15.3,10.5,125.5)
+      18 phys_skinned_R_cape_jntBnd_9  [its own]  under 16  rests at (-15.3,10.5,125.5)
+  ViperLegionnaireSnakes.ao  socket Back [NOT in its carrier's rig]  box (-83.9,-3.7,-81.4)..(84.6,23.7,65)
+    version 3 · c0h 2 · 2 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 2092 triangles over 1433 vertices
+    names: 60 bytes said, 60 read  [agree]
+    rig 46 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 45 of 46  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_snake_1_jntBnd_1  [its own]  under 0  rests at (0.6,20.4,-9.9)
+      2 phys_skinned_snake_2_jntBnd_1  [its own]  under 0  rests at (14.2,20.4,0.1)
+      3 phys_skinned_snake_3_jntBnd_1  [its own]  under 0  rests at (-13.4,20.4,-0)
+      4 phys_skinned_snake_4_jntBnd_1  [its own]  under 0  rests at (16.4,21.5,13.2)
+      5 phys_skinned_snake_5_jntBnd_1  [its own]  under 0  rests at (-15.2,21.5,13.1)
+      6 phys_skinned_snake_1_jntBnd_2  [its own]  under 1  rests at (0.7,20.4,-17.5)
+      7 phys_skinned_snake_2_jntBnd_2  [its own]  under 2  rests at (21.7,20.4,-1.2)
+      8 phys_skinned_snake_3_jntBnd_2  [its own]  under 3  rests at (-20.8,20.4,-1.3)
+      9 phys_skinned_snake_4_jntBnd_2  [its own]  under 4  rests at (21.7,21.5,18.6)
+      10 phys_skinned_snake_5_jntBnd_2  [its own]  under 5  rests at (-20.5,21.5,18.5)
+      11 phys_skinned_snake_1_jntBnd_3  [its own]  under 6  rests at (0.7,20.4,-25.1)
+      12 phys_skinned_snake_2_jntBnd_3  [its own]  under 7  rests at (29.1,20.4,-2.5)
+      13 phys_skinned_snake_3_jntBnd_3  [its own]  under 8  rests at (-28.3,20.4,-2.6)
+      14 phys_skinned_snake_4_jntBnd_3  [its own]  under 9  rests at (26.9,21.5,24.1)
+      15 phys_skinned_snake_5_jntBnd_3  [its own]  under 10  rests at (-25.8,21.5,23.9)
+      16 phys_skinned_snake_1_jntBnd_4  [its own]  under 11  rests at (0.8,20.4,-32.6)
+      17 phys_skinned_snake_2_jntBnd_4  [its own]  under 12  rests at (36.6,20.4,-3.9)
+      18 phys_skinned_snake_3_jntBnd_4  [its own]  under 13  rests at (-35.8,20.4,-3.8)
+      19 phys_skinned_snake_4_jntBnd_4  [its own]  under 14  rests at (32.2,21.5,29.5)
+      20 phys_skinned_snake_5_jntBnd_4  [its own]  under 15  rests at (-31.1,21.5,29.4)
+      21 phys_skinned_snake_1_jntBnd_5  [its own]  under 16  rests at (0.8,20.4,-40.2)
+      22 phys_skinned_snake_2_jntBnd_5  [its own]  under 17  rests at (44.1,20.4,-5.2)
+      23 phys_skinned_snake_3_jntBnd_5  [its own]  under 18  rests at (-43.2,20.4,-5.1)
+      24 phys_skinned_snake_4_jntBnd_5  [its own]  under 19  rests at (37.5,21.5,35)
+      25 phys_skinned_snake_5_jntBnd_5  [its own]  under 20  rests at (-36.4,21.5,34.8)
+      26 phys_skinned_snake_1_jntBnd_6  [its own]  under 21  rests at (0.8,20.4,-47.8)
+      27 phys_skinned_snake_2_jntBnd_6  [its own]  under 22  rests at (51.5,20.4,-6.5)
+      28 phys_skinned_snake_3_jntBnd_6  [its own]  under 23  rests at (-50.7,20.4,-6.4)
+      29 phys_skinned_snake_4_jntBnd_6  [its own]  under 24  rests at (42.7,21.5,40.4)
+      30 phys_skinned_snake_5_jntBnd_6  [its own]  under 25  rests at (-41.7,21.5,40.2)
+      31 phys_skinned_snake_1_jntBnd_7  [its own]  under 26  rests at (0.9,20.4,-55.3)
+      32 phys_skinned_snake_2_jntBnd_7  [its own]  under 27  rests at (59,20.4,-7.8)
+      33 phys_skinned_snake_3_jntBnd_7  [its own]  under 28  rests at (-58.2,20.4,-7.6)
+      34 phys_skinned_snake_4_jntBnd_7  [its own]  under 29  rests at (48,21.5,45.8)
+      35 phys_skinned_snake_5_jntBnd_7  [its own]  under 30  rests at (-47,21.5,45.6)
+      36 phys_skinned_snake_1_jntBnd_8  [its own]  under 31  rests at (0.9,20.4,-62.9)
+      37 phys_skinned_snake_2_jntBnd_8  [its own]  under 32  rests at (66.4,20.4,-9.2)
+      38 phys_skinned_snake_3_jntBnd_8  [its own]  under 33  rests at (-65.6,20.4,-8.9)
+      39 phys_skinned_snake_4_jntBnd_8  [its own]  under 34  rests at (53.3,21.5,51.3)
+      40 phys_skinned_snake_5_jntBnd_8  [its own]  under 35  rests at (-52.3,21.5,51)
+      41 phys_skinned_snake_1_jntBnd_9  [its own]  under 36  rests at (0.9,20.4,-70.5)
+      42 phys_skinned_snake_2_jntBnd_9  [its own]  under 37  rests at (73.9,20.4,-10.5)
+      43 phys_skinned_snake_3_jntBnd_9  [its own]  under 38  rests at (-73.1,20.4,-10.2)
+      44 phys_skinned_snake_4_jntBnd_9  [its own]  under 39  rests at (58.5,21.5,56.7)
+      45 phys_skinned_snake_5_jntBnd_9  [its own]  under 40  rests at (-57.6,21.5,56.4)
+  ViperLegionnaireRobe.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-26.9,-19,-5.3)..(27.6,23.9,61.6)
+    version 3 · c0h 2 · 2 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 638 triangles over 498 vertices
+    names: 112 bytes said, 112 read  [agree]
+    rig 45 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 44 of 45  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,0,0)  carrier has (0,0,0)
+      1 phys_L_robe_jntBnd_1  [its own]  under 0  rests at (5.2,-16.6,6.6)
+      2 phys_L_robe_jntBnd_5  [its own]  under 0  rests at (13.6,-11.1,6.6)
+      3 phys_L_robe_jntBnd_9  [its own]  under 0  rests at (16.8,-1.8,6.6)
+      4 phys_L_robe_jntBnd_13  [its own]  under 0  rests at (12.8,5.3,6.6)
+      5 phys_L_robe_jntBnd_18  [its own]  under 0  rests at (4.5,8.3,6.6)
+      6 phys_R_robe_jntBnd_1  [its own]  under 0  rests at (-5.2,-16.6,6.6)
+      7 phys_R_robe_jntBnd_5  [its own]  under 0  rests at (-13.6,-11.1,6.6)
+      8 phys_R_robe_jntBnd_9  [its own]  under 0  rests at (-16.8,-1.8,6.6)
+      9 phys_R_robe_jntBnd_13  [its own]  under 0  rests at (-12.8,5.3,6.6)
+      10 phys_R_robe_jntBnd_18  [its own]  under 0  rests at (-4.5,8.3,6.6)
+      11 phys_L_robe_jntBnd_2  [its own]  under 1  rests at (6.2,-16.2,20.1)
+      12 phys_L_robe_jntBnd_6  [its own]  under 2  rests at (15.8,-10.3,20.1)
+      13 phys_L_robe_jntBnd_10  [its own]  under 3  rests at (19.2,-0.5,20.1)
+      14 phys_L_robe_jntBnd_14  [its own]  under 4  rests at (14.7,7.2,20.1)
+      15 phys_L_robe_jntBnd_19  [its own]  under 5  rests at (5.1,10.7,20.1)
+      16 phys_R_robe_jntBnd_2  [its own]  under 6  rests at (-6.2,-16.2,20.1)
+      17 phys_R_robe_jntBnd_6  [its own]  under 7  rests at (-15.8,-10.3,20.1)
+      18 phys_R_robe_jntBnd_10  [its own]  under 8  rests at (-19.2,-0.5,20.1)
+      19 phys_R_robe_jntBnd_14  [its own]  under 9  rests at (-14.7,7.2,20.1)
+      20 phys_R_robe_jntBnd_19  [its own]  under 10  rests at (-5.1,10.7,20.1)
+      21 phys_L_robe_jntBnd_3  [its own]  under 11  rests at (7,-15.7,33.6)
+      22 phys_L_robe_jntBnd_7  [its own]  under 12  rests at (17.5,-9.7,30.9)
+      23 phys_L_robe_jntBnd_11  [its own]  under 13  rests at (21.7,0.7,33.6)
+      24 phys_L_robe_jntBnd_15  [its own]  under 14  rests at (16.4,9.2,33.6)
+      25 phys_L_robe_jntBnd_20  [its own]  under 15  rests at (5.7,13.4,33.6)
+      26 phys_R_robe_jntBnd_3  [its own]  under 16  rests at (-7,-15.7,33.6)
+      27 phys_R_robe_jntBnd_7  [its own]  under 17  rests at (-17.5,-9.7,30.9)
+      28 phys_R_robe_jntBnd_11  [its own]  under 18  rests at (-21.7,0.7,33.6)
+      29 phys_R_robe_jntBnd_15  [its own]  under 19  rests at (-16.4,9.2,33.6)
+      30 phys_R_robe_jntBnd_20  [its own]  under 20  rests at (-5.7,13.4,33.6)
+      31 phys_L_robe_jntBnd_4  [its own]  under 21  rests at (7.7,-15.3,46.9)
+      32 phys_L_robe_jntBnd_8  [its own]  under 22  rests at (20.1,-8.7,46.9)
+      33 phys_L_robe_jntBnd_12  [its own]  under 23  rests at (24.3,2.1,47.4)
+      34 phys_L_robe_jntBnd_16  [its own]  under 24  rests at (18.1,11.4,47.5)
+      35 phys_L_robe_jntBnd_21  [its own]  under 25  rests at (6.3,16.5,47.4)
+      36 phys_R_robe_jntBnd_4  [its own]  under 26  rests at (-7.7,-15.3,46.9)
+      37 phys_R_robe_jntBnd_8  [its own]  under 27  rests at (-20.1,-8.7,46.9)
+      38 phys_R_robe_jntBnd_12  [its own]  under 28  rests at (-24.3,2.1,47.4)
+      39 phys_R_robe_jntBnd_16  [its own]  under 29  rests at (-18.1,11.4,47.5)
+      40 phys_R_robe_jntBnd_21  [its own]  under 30  rests at (-6.3,16.5,47.4)
+      41 phys_L_robe_jntBnd_17  [its own]  under 34  rests at (19.9,14,62.2)
+      42 phys_L_robe_jntBnd_22  [its own]  under 35  rests at (6.9,20.3,62.2)
+      43 phys_R_robe_jntBnd_17  [its own]  under 39  rests at (-19.9,14,62.2)
+      44 phys_R_robe_jntBnd_22  [its own]  under 40  rests at (-6.9,20.3,62.2)

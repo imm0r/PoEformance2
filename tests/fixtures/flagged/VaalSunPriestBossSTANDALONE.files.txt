@@ -1,0 +1,2904 @@
+monster: High Priest [Metadata/Monsters/LeagueIncursionNew/MiniBosses/IncursionSunPriestBoss/VaalSunPriestBossSTANDALONE]
+
+=== .ao Metadata/Monsters/LeagueIncursionNew/MiniBosses/IncursionSunPriestBoss/VaalPriestBoss.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachApparitionBoss/rig.amd"
+	view_of = "submerge_01"
+		view_name = "submerge_idle_01"
+		view_begin = 900
+		view_looping = true
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.5,
+					"name": "start_target_update",
+					"data": "120 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6638173460960388,
+					"name": "contact",
+					"position": [
+						-11.345243453979493,
+						-139.00811767578126,
+						-121.64859771728516
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7243024110794067,
+					"name": "contact",
+					"position": [
+						-4.791806697845459,
+						-146.31092834472657,
+						-85.77618408203125
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.5,
+					"name": "start_target_update",
+					"data": "120 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6399999856948853,
+					"name": "contact",
+					"position": [
+						-7.104073524475098,
+						-138.45767211914063,
+						-117.90977478027344
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7367761135101318,
+					"name": "contact",
+					"position": [
+						-1.978043556213379,
+						-148.50729370117188,
+						-80.99984741210938
+					]
+				}
+			]
+		},
+		{
+			"name": "emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.033799998462200168,
+					"name": "bb_enable_collision"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.47777727246284487,
+					"name": "im_back"
+				}
+			]
+		},
+		{
+			"name": "laser_channel_loop_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 2.0,
+					"name": "start_target_update",
+					"data": "0 0 1 100 30"
+				}
+			]
+		},
+		{
+			"name": "laser_channel_start_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 2.0,
+					"name": "start_target_update",
+					"data": "0 0 1 100 30"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8413200378417969,
+					"name": "spear",
+					"position": [
+						0.0,
+						-63.25080108642578,
+						-166.64700317382813
+					]
+				}
+			]
+		},
+		{
+			"name": "projectile_spell_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.12246614694595337,
+					"end_time": 2.693150520324707,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6166677474975587,
+					"name": "contact",
+					"position": [
+						-2.1113202571868898,
+						-120.76614379882813,
+						-84.85530090332031
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.904174566268921,
+					"name": "contact",
+					"position": [
+						-2.1113202571868898,
+						-117.7948989868164,
+						-119.687744140625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.215245246887207,
+					"name": "contact",
+					"position": [
+						-2.1113202571868898,
+						-117.7948989868164,
+						-102.55236053466797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5192458629608156,
+					"name": "contact",
+					"position": [
+						-2.1113202571868898,
+						-117.7948989868164,
+						-115.20606231689453
+					]
+				}
+			]
+		},
+		{
+			"name": "projectile_sweep_combined_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8999999761581421,
+					"name": "contact",
+					"position": [
+						103.13861083984375,
+						-2.708587646484375,
+						-171.3431396484375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8999999761581421,
+					"name": "contact",
+					"position": [
+						-102.90963745117188,
+						-1.3748226165771485,
+						-172.64523315429688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0,
+					"name": "contact",
+					"position": [
+						99.2974853515625,
+						-12.375495910644532,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0,
+					"name": "contact",
+					"position": [
+						-100.29376220703125,
+						-10.806652069091797,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.100000023841858,
+					"name": "contact",
+					"position": [
+						95.7095947265625,
+						-19.41126251220703,
+						-173.84909057617188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.100000023841858,
+					"name": "contact",
+					"position": [
+						-97.33592224121094,
+						-16.471519470214845,
+						-172.71646118164063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2000000476837159,
+					"name": "contact",
+					"position": [
+						89.23689270019531,
+						-28.051292419433595,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2000000476837159,
+					"name": "contact",
+					"position": [
+						-92.16166687011719,
+						-26.323944091796876,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "contact",
+					"position": [
+						82.79460906982422,
+						-36.18109893798828,
+						-174.6114501953125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "contact",
+					"position": [
+						-86.05575561523438,
+						-33.564109802246097,
+						-171.54037475585938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.399999976158142,
+					"name": "contact",
+					"position": [
+						75.616943359375,
+						-42.520477294921878,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.399999976158142,
+					"name": "contact",
+					"position": [
+						-79.44940948486328,
+						-40.86528778076172,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5,
+					"name": "contact",
+					"position": [
+						65.96317291259766,
+						-49.472808837890628,
+						-173.87124633789063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5,
+					"name": "contact",
+					"position": [
+						-70.11827087402344,
+						-48.6810302734375,
+						-169.26708984375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.600000023841858,
+					"name": "contact",
+					"position": [
+						59.046791076660159,
+						-54.280059814453128,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.600000023841858,
+					"name": "contact",
+					"position": [
+						-62.87422180175781,
+						-52.987579345703128,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7000000476837159,
+					"name": "contact",
+					"position": [
+						48.922080993652347,
+						-58.31005859375,
+						-172.12074279785157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7000000476837159,
+					"name": "contact",
+					"position": [
+						-52.83412170410156,
+						-58.71913146972656,
+						-166.34219360351563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "contact",
+					"position": [
+						40.684165954589847,
+						-61.80900573730469,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "contact",
+					"position": [
+						-43.978736877441409,
+						-61.39479064941406,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.899999976158142,
+					"name": "contact",
+					"position": [
+						33.48457336425781,
+						-63.43885803222656,
+						-170.20213317871095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.899999976158142,
+					"name": "contact",
+					"position": [
+						-36.37047576904297,
+						-63.71058654785156,
+						-163.49673461914063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "contact",
+					"position": [
+						25.038311004638673,
+						-64.47221374511719,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "contact",
+					"position": [
+						-27.416942596435548,
+						-65.091796875,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0999999046325685,
+					"name": "contact",
+					"position": [
+						21.521596908569337,
+						-65.62300109863281,
+						-168.4447021484375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0999999046325685,
+					"name": "contact",
+					"position": [
+						-23.048763275146486,
+						-65.19708251953125,
+						-161.03799438476563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.200000047683716,
+					"name": "contact",
+					"position": [
+						16.194517135620118,
+						-65.24615478515625,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.200000047683716,
+					"name": "contact",
+					"position": [
+						-17.168148040771486,
+						-65.85232543945313,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.299999952316284,
+					"name": "contact",
+					"position": [
+						14.289226531982422,
+						-66.16390991210938,
+						-166.95140075683595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.299999952316284,
+					"name": "contact",
+					"position": [
+						-14.248756408691407,
+						-65.40805053710938,
+						-158.9866943359375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4000000953674318,
+					"name": "contact",
+					"position": [
+						-13.427974700927735,
+						-66.02058410644531,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4000000953674318,
+					"name": "contact",
+					"position": [
+						14.30459976196289,
+						-66.45883178710938,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5,
+					"name": "contact",
+					"position": [
+						7.0,
+						-66.45883178710938,
+						-166.2487335205078
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5,
+					"name": "contact",
+					"position": [
+						-7.0,
+						-66.02058410644531,
+						-157.97792053222657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6215407848358156,
+					"name": "contact",
+					"position": [
+						1.0,
+						-66.45883178710938,
+						-195.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.628109931945801,
+					"name": "contact",
+					"position": [
+						-1.0,
+						-66.02058410644531,
+						-195.0
+					]
+				}
+			]
+		},
+		{
+			"name": "projectile_sweep_left_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.18010741472244264,
+					"end_time": 2.4481639862060549,
+					"name": "start_target_update",
+					"data": "80 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8479999899864197,
+					"name": "contact",
+					"position": [
+						97.4852294921875,
+						-27.277389526367189,
+						-171.24156188964845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0479999780654908,
+					"name": "contact",
+					"position": [
+						76.2851791381836,
+						-59.989471435546878,
+						-173.79478454589845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2480000257492066,
+					"name": "contact",
+					"position": [
+						47.29375457763672,
+						-83.84712219238281,
+						-172.5125732421875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4479999542236329,
+					"name": "contact",
+					"position": [
+						14.669137001037598,
+						-97.1170654296875,
+						-168.65550231933595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6480000019073487,
+					"name": "contact",
+					"position": [
+						-15.425407409667969,
+						-99.77740478515625,
+						-163.3994140625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8480000495910645,
+					"name": "contact",
+					"position": [
+						-35.951171875,
+						-96.67631530761719,
+						-157.78701782226563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0480000972747804,
+					"name": "contact",
+					"position": [
+						-45.385108947753909,
+						-94.2498550415039,
+						-152.8883819580078
+					]
+				}
+			]
+		},
+		{
+			"name": "projectile_sweep_right_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.18010741472244264,
+					"end_time": 2.4481639862060549,
+					"name": "start_target_update",
+					"data": "80 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8479999899864197,
+					"name": "contact",
+					"position": [
+						-103.61776733398438,
+						3.314581871032715,
+						-160.99978637695313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0479999780654908,
+					"name": "contact",
+					"position": [
+						-94.2803955078125,
+						-34.63031005859375,
+						-162.6228790283203
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2480000257492066,
+					"name": "contact",
+					"position": [
+						-68.03453063964844,
+						-72.67372131347656,
+						-164.04653930664063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4479999542236329,
+					"name": "contact",
+					"position": [
+						-28.645652770996095,
+						-96.62025451660156,
+						-164.19989013671876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6480000019073487,
+					"name": "contact",
+					"position": [
+						11.031494140625,
+						-101.47378540039063,
+						-162.324951171875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8480000495910645,
+					"name": "contact",
+					"position": [
+						38.53382110595703,
+						-94.404296875,
+						-158.20306396484376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0480000972747804,
+					"name": "contact",
+					"position": [
+						49.346405029296878,
+						-88.67426300048828,
+						-152.08795166015626
+					]
+				}
+			]
+		},
+		{
+			"name": "submerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7858422994613648,
+					"name": "trail"
+				}
+			]
+		},
+		{
+			"name": "submerge_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.06451614946126938,
+					"end_time": 0.5591403841972351,
+					"name": "move",
+					"position": [
+						0.0,
+						-162.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5631101727485657,
+					"name": "trail"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7586232423782349,
+					"name": "bb_disable_collision"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8164011836051941,
+					"name": "tele"
+				}
+			]
+		},
+		{
+			"name": "summon_orb_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.37977805733680727,
+					"end_time": 0.8645003437995911,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.028380036354065,
+					"name": "contact",
+					"position": [
+						0.0,
+						-191.5760040283203,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8978400230407715,
+					"name": "move_daemons"
+				}
+			]
+		},
+		{
+			"name": "sun_orb_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8516299724578857,
+					"name": "contact",
+					"position": [
+						0.0,
+						-133.5659942626953,
+						-146.58700561523438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.094559907913208,
+					"name": "move_daemons"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/scorching_ignite_audio.ao"
+	attached_object = "<root> Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/scorching_loop_audio.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachApparitionBoss/rig.ast"
+		socket = "jnt_L_thumb"
+			translation = "0 -73.952 -164.598"
+		socket = "jnt_R_thumb"
+			translation = "0 -73.952 -164.598"
+		socket = "jnt_FX"
+			translation = "0 -73.9525 -164.598"
+		socket = "aux_light_attach"
+			parent = "chest_jntBnd"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -7.65549"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -11.7692 -5.83517"
+		socket = "R_Weapon"
+			parent = "aux_R_top_Weapon"
+			translation = "0 0 10.2318"
+			ignore_parent_axis = "x"
+			ignore_parent_rotation = "yawpitchroll"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		animation_velocity_factor = 10.000
+		animation_force_factor = 2.335
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachApparitionBoss/BreachApparitionBoss.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder_01_01 false L_top_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder_01_01 false R_top_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow_01_01 false L_top_elbow_jntBnd L_top_shoulder_jntBnd"
+		bone_group = "grp_R_elbow_01_01 false R_top_elbow_jntBnd R_top_shoulder_jntBnd"
+		bone_group = "grp_L_wrist_01_01 false L_top_wrist_jntBnd L_top_elbow_jntBnd"
+		bone_group = "grp_R_wrist_01_01 false R_top_wrist_jntBnd R_top_elbow_jntBnd"
+		bone_group = "grp_L_hand_01_01 false L_top_finger_2_jntBnd_1 L_top_wrist_jntBnd"
+		bone_group = "grp_R_hand_01_01 false R_top_finger_2_jntBnd_1 R_top_wrist_jntBnd"
+		bone_group = "grp_L_shoulder_02_01 false L_bot_shoulder_jntBnd chest_jntBnd"
+		bone_group = "grp_R_shoulder_02_01 false R_bot_shoulder_jntBnd chest_jntBnd"
+		bone_group = "grp_L_elbow_02_01 false L_bot_elbow_jntBnd L_bot_shoulder_jntBnd"
+		bone_group = "grp_R_elbow_02_01 false R_bot_elbow_jntBnd R_bot_shoulder_jntBnd"
+		bone_group = "grp_L_wrist_02_01 false L_bot_wrist_jntBnd L_bot_elbow_jntBnd"
+		bone_group = "grp_R_wrist_02_01 false R_bot_wrist_jntBnd R_bot_elbow_jntBnd"
+		bone_group = "grp_L_hand_02_01 false L_bot_finger_2_jntBnd_1 L_bot_wrist_jntBnd"
+		bone_group = "grp_R_hand_02_01 false R_bot_finger_2_jntBnd_1 R_bot_wrist_jntBnd"
+		bone_group = "root false L_bot_shoulder_jntBnd chest_jntBnd R_bot_shoulder_jntBnd"
+		bone_group = "frameupper false L_top_shoulder_jntBnd neckHands_L_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd neckHands_R_jntBnd R_top_shoulder_jntBnd"
+		bone_group = "aux_parasite false L_bot_elbow_jntBnd R_bot_elbow_jntBnd R_top_elbow_jntBnd L_top_elbow_jntBnd L_top_shoulder_jntBnd R_top_shoulder_jntBnd neckHands_L_back_jntBnd neckHands_R_back_jntBnd R_top_wrist_jntBnd L_top_wrist_jntBnd L_bot_wrist_jntBnd R_bot_wrist_jntBnd phys_skinned_R_chain_jntBnd_1 phys_skinned_L_chain_jntBnd_1"
+		bone_group = "FX_hand_R_U false aux_R_top_Weapon"
+		bone_group = "FX_hand_R_B false aux_R_bot_Weapon"
+		bone_group = "FX_hand_L_U false aux_L_top_Weapon"
+		bone_group = "FX_hand_L_B false aux_L_bot_Weapon"
+		bone_group = "fire_burrow false root_jntBnd"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/Attack_OnAct",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10258398950099945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47918200492858889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Fast_",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5791934132575989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/FireTrail",
+						"bone_name": "R_top_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/Attack_OnAct",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10258398950099945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4399789869785309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Fast_",
+						"bone_name": "L_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5284035205841065,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/FireTrail",
+						"bone_name": "L_top_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10000000149011612,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/Death_Engulf",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16650648415088654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Slow_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3617209196090698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6098599433898927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Fall_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Slow_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Emerge",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/Emerge",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31912821531295779,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Swing_OnAct_",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6292300224304199,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Fast_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07999999821186066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07999999821186066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07999999821186066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07999999821186066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07999999821186066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.21096718311309815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Chains_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5347020030021668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Idle",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4073374271392823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Chains_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16965217888355256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30792000889778139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/SubOrb_End",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5926511883735657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Idle",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2999998331069947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack_Long",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.480558156967163,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Fast_",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.637480616569519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Fast_",
+						"bone_name": "R_top_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16528856754302979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30000001192092898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/SubOrb_End",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7202648520469666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Idle",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2492467164993287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack_Long",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.442476749420166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Fast_",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5953630208969117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Fast_",
+						"bone_name": "R_top_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.033955901861190799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06960950046777725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10061725974082947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Effort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22049960494041444,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/Beam_OnAct",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.752265989780426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1035748720169068,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack_Long",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2482813596725464,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/Beam_Caster_Loop",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5115861892700196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Swing_OnAct_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5703799724578858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Swing_Spell_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6156284809112549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/Beam_Start",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "projectile_spell_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack_Long",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05348049849271774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Slow_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06746625900268555,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/ProjChargeUp",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.270179271697998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3996100425720215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Swing_Spell_",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4545423984527588,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/FireTrail",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6705799102783204,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6859099864959717,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Swing_Spell_",
+						"bone_name": "L_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7345712184906006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/FireTrail",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8929226398468018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0263800621032717,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Swing_Spell_",
+						"bone_name": "R_bot_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.034329414367676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/FireTrail",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1799278259277345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.34335994720459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Swing_Spell_",
+						"bone_name": "L_bot_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.349048614501953,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/FireTrail",
+						"bone_name": "R_top_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "projectile_sweep_combined_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack_Long",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38969001173973086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/FireTrail",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5448200106620789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/SweepCombo",
+						"bone_name": "L_top_elbow_Twist_jntBnd_1",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1487400531768799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/FireTrail",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8062200546264649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/FireTrail",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.600872755050659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Effort",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "projectile_sweep_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28262001276016238,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/FireTrail",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3859011232852936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/SweepSingle",
+						"bone_name": "L_top_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8254637718200684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "projectile_sweep_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4248347282409668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/FireTrail",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4872099757194519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/SweepSingle",
+						"bone_name": "R_top_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9235999584197999,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23330000042915345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Chains_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5235554575920105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Run",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.377310037612915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Chains_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "submerge_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Slow_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Emerge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/Submerge",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1264367252588272,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Swing_OnAct_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3028486371040344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Fast_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sun_orb_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06960950046777725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07524893432855606,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/Beam_OnAct",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3437541723251343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Effort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7996304631233215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5290418863296509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5330114364624024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Vocals/Attack_Long",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8687777519226075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Effects/SunOrb_Push",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.665785551071167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/VaalPriest/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup.pet",
+						"bone_group": "grp_R_wrist_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup.pet",
+						"bone_group": "grp_R_wrist_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4952471852302551,
+						"end_time": 0.6754872798919678,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/hand_buildup_flare.pet",
+						"bone_group": "grp_R_hand_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.527513325214386,
+						"end_time": 0.710004448890686,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/hand_buildup_flare.pet",
+						"bone_group": "grp_R_hand_02_01"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup.pet",
+						"bone_group": "grp_L_wrist_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup.pet",
+						"bone_group": "grp_L_wrist_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5170078277587891,
+						"end_time": 0.6814906597137451,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/hand_buildup_flare.pet",
+						"bone_group": "grp_L_hand_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5395196676254273,
+						"end_time": 0.7332665920257568,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/hand_buildup_flare.pet",
+						"bone_group": "grp_L_hand_02_01"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6085614562034607,
+						"end_time": 2.6155619621276857,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/pet/death/death.pet",
+						"bone_group": "frameupper"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.5999999046325685,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/pet/death/death_puff.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.24279865622520448,
+						"end_time": 1.7138195037841797,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/pet/handBuildUp.pet",
+						"bone_groups": [
+							"FX_hand_L_U",
+							"FX_hand_R_U"
+						]
+					}
+				]
+			},
+			{
+				"name": "projectile_spell_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2821410596370697,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup.pet",
+						"bone_group": "grp_L_hand_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2821410596370697,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup.pet",
+						"bone_group": "grp_R_hand_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2821410596370697,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup.pet",
+						"bone_group": "grp_L_hand_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2821410596370697,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup.pet",
+						"bone_group": "grp_R_hand_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6093043684959412,
+						"end_time": 2.517059803009033,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/projectile_spell_buildup.pet",
+						"bone_group": "grp_L_hand_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6093043684959412,
+						"end_time": 2.219914197921753,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/projectile_spell_buildup.pet",
+						"bone_group": "grp_R_hand_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6093043684959412,
+						"end_time": 1.8807432651519776,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/projectile_spell_buildup.pet",
+						"bone_group": "grp_L_hand_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6093043684959412,
+						"end_time": 1.6076030731201172,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/projectile_spell_buildup.pet",
+						"bone_group": "grp_R_hand_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.6096640825271607,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_muzzle.pet",
+						"bone_group": "grp_R_hand_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8957200050354005,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_muzzle.pet",
+						"bone_group": "grp_L_hand_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.215564250946045,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_muzzle.pet",
+						"bone_group": "grp_R_hand_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.509727716445923,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_muzzle.pet",
+						"bone_group": "grp_L_hand_02_01"
+					}
+				]
+			},
+			{
+				"name": "projectile_sweep_combined_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4676485061645508,
+						"end_time": 2.4614810943603517,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup_cont.pet",
+						"bone_group": "grp_L_wrist_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4676485061645508,
+						"end_time": 2.4614810943603517,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup_cont.pet",
+						"bone_group": "grp_L_wrist_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4676485061645508,
+						"end_time": 2.4614810943603517,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup_cont.pet",
+						"bone_group": "grp_R_wrist_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4676485061645508,
+						"end_time": 2.4614810943603517,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup_cont.pet",
+						"bone_group": "grp_R_wrist_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8270964622497559,
+						"end_time": 2.747572898864746,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/hand_buildup_flare.pet",
+						"bone_group": "grp_R_hand_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8270964622497559,
+						"end_time": 2.747572898864746,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/hand_buildup_flare.pet",
+						"bone_group": "grp_L_hand_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8270964622497559,
+						"end_time": 2.747572898864746,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/hand_buildup_flare.pet",
+						"bone_group": "grp_R_hand_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8270964622497559,
+						"end_time": 2.7347357273101808,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/hand_buildup_flare.pet",
+						"bone_group": "grp_L_hand_01_01"
+					}
+				]
+			},
+			{
+				"name": "projectile_sweep_left_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.45772746205329897,
+						"end_time": 1.6601251363754273,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup_cont.pet",
+						"bone_group": "grp_L_wrist_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.45772746205329897,
+						"end_time": 1.658623456954956,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup_cont.pet",
+						"bone_group": "grp_L_wrist_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6363178491592407,
+						"end_time": 1.9407706260681153,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/hand_buildup_flare.pet",
+						"bone_group": "grp_L_hand_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6363178491592407,
+						"end_time": 2.06533145904541,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/hand_buildup_flare.pet",
+						"bone_group": "grp_L_hand_01_01"
+					}
+				]
+			},
+			{
+				"name": "projectile_sweep_right_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5837920904159546,
+						"end_time": 1.6586252450942994,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup_cont.pet",
+						"bone_group": "grp_R_wrist_01_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5867934226989746,
+						"end_time": 1.6586253643035889,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/proj_buildup_cont.pet",
+						"bone_group": "grp_R_wrist_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6768385171890259,
+						"end_time": 1.8057031631469727,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/hand_buildup_flare.pet",
+						"bone_group": "grp_R_hand_02_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6768385171890259,
+						"end_time": 1.7246627807617188,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/hand_buildup_flare.pet",
+						"bone_group": "grp_R_hand_01_01"
+					}
+				]
+			},
+			{
+				"name": "submerge_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7797261476516724,
+						"end_time": 1.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/burrow_travel.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "sun_orb_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.005144032649695873,
+						"end_time": 2.22082257270813,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/pet/handBuildUp.pet",
+						"bone_groups": [
+							"FX_hand_L_U",
+							"FX_hand_R_U"
+						]
+					}
+				]
+			},
+			{
+				"name": "submerge_idle_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.10000002384185791,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fx/burrow_travel.pet",
+						"bone_group": "fire_burrow"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.6228112578392029,
+						"end_time": 0.7295142412185669,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fire_trail.ao",
+						"animation": "attack_220",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-132.0500030517578
+							],
+							"rotation": [
+								0.0,
+								0.0,
+								-0.7853999733924866
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.5710353851318359,
+						"end_time": 0.7010031938552856,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fire_trail.ao",
+						"animation": "attack_220",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-132.0500030517578
+							],
+							"rotation": [
+								-3.141589879989624,
+								0.0,
+								-0.7853999733924866
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/ao/Death_light.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-25.000001907348634
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.847130060195923,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/ao/Death_dust_puff.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								80.0,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.04165630787611008,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/djinn_impact_grd.ao",
+						"offset": [
+							-0.6223793029785156,
+							-18.299362182617189
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "projectile_spell_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.5022506713867188,
+						"end_time": 1.6526281833648682,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fire_trail.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-132.0500030517578
+							],
+							"rotation": [
+								0.0,
+								0.0,
+								-0.7853999733924866
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.8009045124053956,
+						"end_time": 1.9617910385131837,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fire_trail.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-132.0500030517578
+							],
+							"rotation": [
+								-3.141589879989624,
+								0.0,
+								-0.7853999733924866
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.090550422668457,
+						"end_time": 2.2394328117370607,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fire_trail.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-132.0500030517578
+							],
+							"rotation": [
+								0.0,
+								0.0,
+								-0.7853999733924866
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.3982021808624269,
+						"end_time": 2.5320591926574709,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/fire_trail.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-132.0500030517578
+							],
+							"rotation": [
+								-3.141589879989624,
+								0.0,
+								-0.7853999733924866
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "submerge_02",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.6265256404876709,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/djinn_impact_grd.ao",
+						"offset": [
+							-0.6223793029785156,
+							-8.05902099609375
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "head_jntBnd"
+			state = ""
+				colour = "1.27686 0.11157 0.11157"
+				position = "0 -96 -125"
+				radius = 379
+			state = "on_death"
+				position = "0 -52 -125"
+				radius = 500
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on_death"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.03106721118092537,
+						"end_time": 0.4560258984565735,
+						"state_name": ""
+					}
+				]
+			},
+			{
+				"name": "submerge_02",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"end_time": 0.13560126721858979,
+						"state_name": "on_death"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.351874 1 Flat 0.639291 1 Flat 0.965031 0 Flat 1.5 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.351874 1 Flat 0.639291 1 Flat 0.965031 0 Flat 1.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.351874 1 Flat 0.639291 1 Flat 0.965031 0 Flat 1.5 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.351874 1 Flat 0.639291 1 Flat 0.965031 0 Flat 1.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.327810049057007,
+						"name": "EmissiveMulti",
+						"auto_reset": false,
+						"curve": "2 0 0 Smooth 3.32781 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "EmissiveMulti",
+						"curve": "3 0 1 Flat 0.64597 0 Flat 1 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_loop_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "EmissiveMulti",
+						"curve": "2 0 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "EmissiveMulti",
+						"curve": "3 0 0 Flat 1.30126 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "projectile_spell_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.626297 1 Flat 1.57858 1 Linear 2.32235 0 Flat 3 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.626297 1 Flat 1.88045 1 Linear 2.75804 0 Flat 3 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.626297 1 Flat 2.16987 1 Linear 3 0 Flat 3 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.626297 1 Flat 2.49507 1 Linear 3 0 Flat 3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "projectile_sweep_combined_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.6659998893737795,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.85998 1 Flat 2.40439 1 Flat 3.29046 0 Flat 3.666 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.6659998893737795,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.85998 1 Flat 2.40439 1 Flat 3.29046 0 Flat 3.666 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.6659998893737795,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.85998 1 Flat 2.40439 1 Flat 3.29046 0 Flat 3.666 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.6659998893737795,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.85998 1 Flat 2.40439 1 Flat 3.29046 0 Flat 3.666 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "projectile_sweep_left_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.703748 1 Flat 1.96759 1 Flat 2.69268 0 Flat 3 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.703748 1 Flat 1.96759 1 Flat 2.69268 0 Flat 3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "projectile_sweep_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.703748 1 Flat 1.96759 1 Flat 2.69268 0 Flat 3 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Flat 0.703748 1 Flat 1.96759 1 Flat 2.69268 0 Flat 3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "sun_orb_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.6659998893737795,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Flat 2.20303 1 Flat 2.66415 1 Flat 3.43269 0 Flat 3.666 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "laser_channel_start_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24248504638671876,
+						"end_time": 1.8539093732833863,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_R_hand_01_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24248504638671876,
+						"end_time": 1.8539093732833863,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_R_hand_02_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24248504638671876,
+						"end_time": 1.8539093732833863,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_L_hand_01_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24248504638671876,
+						"end_time": 1.8539093732833863,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_L_hand_02_01"
+					}
+				]
+			},
+			{
+				"name": "sun_orb_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24611416459083558,
+						"end_time": 2.1841719150543215,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_R_hand_01_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24611416459083558,
+						"end_time": 2.1841719150543215,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_L_hand_02_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24611416459083558,
+						"end_time": 2.1841719150543215,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_R_hand_02_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24611416459083558,
+						"end_time": 2.1841719150543215,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_L_hand_01_01"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/R_U_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/R_B_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/L_B_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/L_U_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_02.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_02.epk"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_loop_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_02.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_02.epk"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_02.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_02.epk"
+					}
+				]
+			},
+			{
+				"name": "projectile_spell_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/R_B_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/R_U_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/L_B_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/L_U_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "projectile_sweep_combined_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/R_U_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/L_U_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/L_B_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/R_B_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "projectile_sweep_left_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/L_U_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/L_B_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "projectile_sweep_right_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/R_U_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/VaalSunPriestBoss/epk/R_B_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "sun_orb_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.7262930870056154,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.7354767322540285,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_02.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.7281298637390138,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.711599588394165,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_02.epk"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/scorching_ignite_audio.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/skill_impact_sound/skillhitsounds.amd"
+	default_animation = "animate_02"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/skill_impact_sound/skillhitsounds.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/Effects/skill_impact_sound/skillhitsounds.sm"
+	}
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/scorching_loop_audio.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/whirlwind/whirlwind_soundhands.amd"
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/whirlwind/whirlwind_soundhands.ast"
+	}
+	
+	SkinMesh
+	{
+	}
+	
+	Lights
+	{
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "animate",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFX/ScorchEPKLoop"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BreachApparitionBoss/BreachApparitionBoss.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BreachApparitionBoss/BreachApparitionBoss_armour_491b021c.smd"
+Materials 2
+	"Art/Models/Portals/BreachApparitionPortal/Textures/VaalGoldApparitionPropsc.mat" 3
+	"Art/Models/Portals/BreachApparitionPortal/Textures/VaalApparitionPortal1c.mat" 9
+BoundingBox -121.001 -28.6287 -299.424 121.001 58.8977 -43.8459
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/BreachApparitionBoss/BreachApparitionBoss_armour_491b021c.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 12 in the header, 12 in the block · 24909 triangles over 23481 vertices
+  names: 422 bytes said, 422 read  [agree]
+
+=== shapes (12)
+0	BackPieceShape	from 0	count 4734
+1	HeadPieceShape	from 4734	count 8244
+2	NeckPieceShape	from 12978	count 642
+3	apparition_body_ringsShape	from 13620	count 528
+4	apparition_body_spikesShape	from 14148	count 20403
+5	apparition_bodyShape	from 34551	count 12258
+6	arm_chain_meshShape	from 46809	count 2520
+7	arm_wrapsShape	from 49329	count 1632
+8	braceletsShape	from 50961	count 3696
+9	chains_set_meshShape	from 54657	count 15432
+10	ponchoShape	from 70089	count 2406
+11	shoulder_padsShape	from 72495	count 2232
+
+=== fitting
+the monster's rig: 166 bones
+mounts: aux_R_02_float_hand_jntBnd, aux_R_01_float_hand_jntBnd, aux_L_02_float_hand_jntBnd, aux_L_01_float_hand_jntBnd, aux_animation_control_ratio, aux_position, aux_R_bot_Weapon, aux_L_bot_Weapon, aux_L_top_Weapon, aux_R_top_Weapon
+  scorching_ignite_audio.ao  socket <root> [NOT in its carrier's rig]  box (-50.5,-50.5,-170.6)..(50.5,50.5,0)
+    (the geometry did not read)
+    rig 1 bones, 0 of them names its carrier's rig also has
+      0 root  [its own]  under nothing  rests at (0,0,0)
+  scorching_loop_audio.ao  socket <root> [NOT in its carrier's rig]  (no mesh - an effect or a sound)

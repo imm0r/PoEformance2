@@ -1,0 +1,2002 @@
+monster: Asinia, the Praetor's Consort [Metadata/Monsters/WifeMonster/WifeMonsterApparition_]
+
+=== .ao Metadata/Monsters/WifeMonster/Apparition/WifeMonsterApparition.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/WifeMonster/rig.amd"
+	view_of = "intro_01"
+		view_name = "intro_idle"
+		view_end = 625
+		view_looping = true
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	animations = '[
+		{
+			"name": "combo_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.8329999446868898,
+					"name": "move",
+					"data": "1 1 0 Everything 0 0 NoOverride"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 0.6692439913749695,
+					"name": "start_face",
+					"data": "180 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.98539799451828,
+					"name": "end_face"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 1.2153199911117554,
+					"name": "start_face",
+					"data": "180 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 1.5889500379562379,
+					"name": "end_face"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 2.0529000759124758,
+					"name": "start_face",
+					"data": "180 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 2.2910499572753908,
+					"name": "end_face"
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "light_off"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5052200555801392,
+					"name": "death3"
+				}
+			]
+		},
+		{
+			"name": "explode_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 2.4060399532318117,
+					"end_time": 3.8329999446868898,
+					"name": "start_target_update",
+					"data": "420 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5,
+					"name": "trigger",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.549999952316284,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5999999046325685,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6500000953674318,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.700000047683716,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.75,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.8499999046325685,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.9000000953674318,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.950000047683716,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.049999952316284,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0999999046325685,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						-10.0,
+						-100.0
+					]
+				}
+			]
+		},
+		{
+			"name": "intro_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.5999999046325685,
+					"name": "light_on"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 4.308760166168213,
+					"end_time": 5.277148723602295,
+					"name": "move",
+					"position": [
+						0.0,
+						-203.75999450683595,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 10 Away"
+				}
+			]
+		},
+		{
+			"name": "summoned_delayed_blast_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.405639886856079,
+					"name": "death2"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 3.7480499744415285,
+					"end_time": 7.200051784515381,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.750149965286255,
+					"name": "light_on"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.362569808959961,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.890439987182617,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.9238200187683109,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.127630233764648,
+					"name": "explode"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.284860134124756,
+					"name": "light_off"
+				}
+			]
+		},
+		{
+			"name": "swap_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.1175899505615235,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1175899505615235,
+					"name": "submerge"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1175899505615235,
+					"name": "portalout"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2511099576950074,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2511099576950074,
+					"name": "hit_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2511099576950074,
+					"name": "emerge"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/WifeMonster/Apparition/attachments/FrillsApparition.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/WifeMonster/Apparition/attachments/CapeApparition.ao"
+	attached_object = "skirt_jntBnd Metadata/Monsters/WifeMonster/Apparition/attachments/SkirtApparition.ao"
+	attached_object = "R_Weapon Metadata/Monsters/WifeMonster/Apparition/attachments/WifeMonsterWeaponApparition.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.30726298689842226,
+								0.0
+							],
+							[
+								0.36871498823165896,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.6108649969100952,
+						"angle": 2.792530059814453,
+						"length": 205.0,
+						"local_offset": [
+							-15.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.3316130042076111,
+							-0.15707999467849732
+						],
+						"impact_z_rotation": [
+							-0.6283190250396729,
+							-3.857180118560791
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon",
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3128489851951599,
+								0.0
+							],
+							[
+								0.37988799810409548,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.17453299462795258,
+						"angle": 2.792530059814453,
+						"x_axis_scale": 0.75,
+						"length": 180.0,
+						"impact_x_rotation": [
+							0.2967059910297394,
+							2.722709894180298
+						],
+						"impact_z_rotation": [
+							-0.4188790023326874,
+							0.0
+						],
+						"impact_bone": "R_Weapon",
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "combo_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.18644100427627564,
+								0.0
+							],
+							[
+								0.24293799698352815,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -1.500980019569397,
+						"angle": 3.8397200107574465,
+						"x_axis_scale": 1.1729999780654908,
+						"length": 126.19000244140625,
+						"offset": [
+							-13.0,
+							-1.0
+						],
+						"impact_z_rotation": [
+							-0.6806780099868774,
+							-4.782199859619141
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3606559932231903,
+								0.0
+							],
+							[
+								0.3770489990711212,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"width": 143.67799377441407,
+						"angle": 1.553339958190918,
+						"x_axis_scale": 0.6010000109672546,
+						"length": 120.68900299072266,
+						"offset": [
+							-71.0,
+							39.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3793100118637085,
+								0.0
+							],
+							[
+								0.40804600715637209,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"previous_patterns_to_exclude_from": 1,
+						"update_target_direction": true,
+						"rotation": -0.6283190250396729,
+						"angle": 1.9896800518035889,
+						"x_axis_scale": 0.8199999928474426,
+						"length": 154.5449981689453,
+						"offset": [
+							44.0,
+							-29.0
+						],
+						"impact_z_rotation": [
+							-0.06981319934129715,
+							1.9722199440002442
+						],
+						"impact_type": "Slash"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5689650177955627,
+								0.0
+							],
+							[
+								0.6034479737281799,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"angle": 3.141590118408203,
+						"x_axis_scale": 0.8550000190734863,
+						"length": 181.81900024414063,
+						"offset": [
+							-7.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.0,
+							-2.7401700019836427
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.7068970203399658,
+								0.0
+							],
+							[
+								0.7758619785308838,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"angle": 3.1590499877929689,
+						"x_axis_scale": 0.800000011920929,
+						"length": 149.69700622558595,
+						"offset": [
+							-19.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-2.5132699012756349,
+							-0.15707999467849732
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/WifeMonster/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "light"
+			parent = "root_jntBnd"
+			translation = "0 -29.9032 -288.385"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/WifeMonster.sm"
+			arm_guardsShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0 1"
+			head_skullsShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0 1"
+			headpieceShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0 1"
+			headShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0 1"
+			L_knucklesShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0 1"
+			L_shoulderpad_spikesShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0 1"
+			L_shoulderpadShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0 1"
+			mainShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0 1"
+			maskShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0 1"
+			R_knucklesShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0 1"
+			R_shoulderpad_spikesShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0 1"
+			R_shoulderpadShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0 1"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_upperArm_attachment_jntBnd L_shoulder_cTwist_jntBnd_1"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07083339989185333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08645839989185333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10833299905061722,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38020798563957217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6854169964790344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2072999477386475,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07083339989185333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08645839989185333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10833299905061722,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38020798563957217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6916670203208923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.132290005683899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1770630031824112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20460599660873414,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32068100571632388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49970901012420657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5803710222244263,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8872799873352051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.908922016620636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.962037980556488,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1351699829101563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4735499620437623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.591599941253662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.597499966621399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7666900157928467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8237500190734864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1247599124908449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4454400539398195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "combo_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1770630031824112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20460599660873414,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32068100571632388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49970901012420657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5803710222244263,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8872799873352051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.908922016620636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.962037980556488,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1351699829101563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4735499620437623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.591599941253662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.597499966621399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7666900157928467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8237500190734864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1247599124908449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4454400539398195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1125819981098175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Long",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16293799877166749,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_SwordDrop",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30809998512268069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34661298990249636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Scratching",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.54510098695755,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Scratching",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7969130277633667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.912447988986969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Scratching",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.176110029220581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Scratching",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.318310022354126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.519760012626648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Scratching",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.801200032234192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Bone_Cracking",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4144399166107179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.039530038833618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Quick",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "delayed_blast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20090000331401826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20448799431324006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35516300797462466,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6995630264282227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8825240135192871,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0080900192260743,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8583300113677979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9623600244522095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1847898960113527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.687030076980591,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Quick",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9274098873138429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2682199478149416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Quick",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.343559980392456,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.287089824676514,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.452099800109863,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "explode_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05855970084667206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26351800560951235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Long",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3353869915008545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8943639993667603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2137800455093384,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Bone_Cracking",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9298100471496583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0176498889923097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4488699436187746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4816501140594484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18923300504684449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32440000772476199,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Long",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37846699357032778,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7298979759216309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7636910080909729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3144899606704713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.469939947128296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.621999979019165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1694300174713136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5073399543762209,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/Swap_Initial",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.565030097961426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.578550100326538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7035698890686037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Sword_Small",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/RunLoop_Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/RunLoop_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22208400070667268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.529932975769043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8540310263633728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1636899709701539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "summoned_delayed_blast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 3.566999912261963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.767899990081787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7714900970458986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9221599102020265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.266560077667236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.449520111083984,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.575089931488037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.42533016204834,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.529359817504883,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.7517900466918949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.254030227661133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Quick",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.494410037994385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.835219860076904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Quick",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.910560131072998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.854090213775635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.019100189208985,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "swap_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12527799606323243,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/Swap_Initial",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15888899564743043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5270829796791077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8219450116157532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9044449925422669,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2191699743270875,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6561199426651,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7386200428009034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Sword_Small",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9815399646759034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "light"
+			state = ""
+				colour = "0.293819 1.32729 0.583888"
+				position = "0 0 -125"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "on_death"
+				position = "0 0 -125"
+				radius = 0
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "delayed_blast_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.1890499591827393,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/epk/teleport_in.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 4.4389801025390629,
+						"end_time": 5.50816011428833,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/epk/teleport_out.epk"
+					}
+				]
+			},
+			{
+				"name": "intro_idle",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Pet/Skadi/fx/invisible.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "delayed_blast_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 4.92549991607666,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/HusbandBoss/ghost_soul_large.ao",
+						"animation": "soul_release_02_01",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.0,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/HusbandBoss/ghost_soul_large.ao",
+						"animation": "emerge_01",
+						"orientation": 3.141590118408203
+					}
+				]
+			},
+			{
+				"name": "summoned_delayed_blast_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/HusbandBoss/ghost_soul_large.ao",
+						"animation": "emerge_01",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.3727500438690187,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/HusbandBoss/apparitionFadeIn.ao"
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 7.15418004989624,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/HusbandBoss/apparitionFadeOut.ao"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "FadeFloat",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "3 0 1 Smooth 1.30502 0 Linear 1.5 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "delayed_blast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.185289978981018,
+						"name": "TeleportOutIn",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 1.18529 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 4.405250072479248,
+						"end_time": 5.165999889373779,
+						"name": "TeleportOutIn",
+						"apply_on_children": true,
+						"curve": "2 4.40525 0 Smooth 5.166 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "summoned_delayed_blast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 3.382390022277832,
+						"end_time": 7.841020107269287,
+						"name": "FadeFloat",
+						"apply_on_children": true,
+						"curve": "5 3.38239 0 Smooth 3.62656 0 Flat 4.27327 1 Flat 7.40127 1 Linear 7.84102 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/WifeMonster/Apparition/attachments/FrillsApparition.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Frills/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Frills/rig.ast"
+		linear_allowed_contraction = 0.150
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.150
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Frills/Frills.sm"
+			L_arm_frillShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0"
+		R_arm_frillShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_shoulder_cTwist_1_jntBnd L_elbow_jntBnd R_shoulder_cTwist_1_jntBnd R_elbow_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/WifeMonster/Apparition/attachments/CapeApparition.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Cape/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Cape/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Cape/Cape.sm"
+			cape_baseShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0"
+		cape_midShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0"
+		cape_topShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0"
+	}
+}
+
+=== .ao Metadata/Monsters/WifeMonster/Apparition/attachments/SkirtApparition.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Skirt/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.350
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "skirt_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Skirt/Skirt.sm"
+			skirt_baseShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0"
+		skirt_metalShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0"
+		skirt_midShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0"
+		skirt_topShape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterApparitionc.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/WifeMonster/Apparition/attachments/WifeMonsterWeaponApparition.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/WifeMonsterWeapon.fmt"
+			WifeMonsterWeapon7Shape = "Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterWeaponApparitionc.mat:0"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/WifeMonster.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/WifeMonster_armour_f5ab0ca9.smd"
+Materials 1
+	"Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterc.mat" 12
+BoundingBox -69.5907 -20.9124 -200.429 69.5909 26.8269 -88.2223
+BoneGroups 22
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_root" 2 "root_jntBnd" "hip_jntBnd"
+	"grp_frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "neck_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/WifeMonster_armour_f5ab0ca9.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 12 in the header, 12 in the block · 26332 triangles over 18692 vertices
+  names: 376 bytes said, 376 read  [agree]
+
+=== shapes (21)
+0	arm_guardsShape	from 0	count 2244
+1	head_skullsShape	from 2244	count 32604
+2	headpieceShape	from 34848	count 642
+3	headShape	from 35490	count 3360
+4	L_knucklesShape	from 38850	count 1980
+5	L_shoulderpad_spikesShape	from 40830	count 1728
+6	L_shoulderpadShape	from 42558	count 1674
+7	mainShape	from 44232	count 28734
+8	maskShape	from 72966	count 324
+9	R_knucklesShape	from 73290	count 1980
+10	R_shoulderpad_spikesShape	from 75270	count 2052
+11	R_shoulderpadShape	from 77322	count 1674
+12	L_arm_frillShape	from 78996	count 1746
+13	R_arm_frillShape	from 80742	count 1746
+14	cape_baseShape	from 82488	count 1614
+15	cape_midShape	from 84102	count 1614
+16	cape_topShape	from 85716	count 1614
+17	skirt_baseShape	from 87330	count 4152
+18	skirt_metalShape	from 91482	count 6660
+19	skirt_midShape	from 98142	count 4548
+20	skirt_topShape	from 102690	count 7488
+
+=== fitting
+the monster's rig: 85 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_light_attachment, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  FrillsApparition.ao  socket <root> [NOT in its carrier's rig]  box (-70.6,-12.7,-148.2)..(70.6,26.3,-113.2)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 1164 triangles over 714 vertices
+    names: 64 bytes said, 64 read  [agree]
+    rig 7 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_shoulder_cTwist_1_jntBnd  [its own]  under 0  rests at (25.5,6.8,-130.7)
+      2 R_shoulder_cTwist_1_jntBnd  [its own]  under 0  rests at (-25.5,6.8,-130.7)
+      3 L_elbow_jntBnd  [shared]  under 1  rests at (37.8,6.8,-130.7)  carrier has (35.1,7.7,-123.2)
+      4 R_elbow_jntBnd  [shared]  under 2  rests at (-37.8,6.8,-130.7)  carrier has (-35.1,7.7,-123.2)
+      5 L_elbow_jntBnd|phys_skinned_R_frill_jntBnd  [its own]  under 3  rests at (51.5,3.3,-130.7)
+      6 R_elbow_jntBnd|phys_skinned_R_frill_jntBnd  [its own]  under 4  rests at (-51.5,10.4,-130.7)
+  CapeApparition.ao  socket chest_jntBnd [in its carrier's rig]  box (-25.5,10.9,-19.9)..(23.9,33.2,48.4)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 1614 triangles over 996 vertices
+    names: 80 bytes said, 80 read  [agree]
+    rig 20 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 19 of 20  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 chest_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (0,-0.3,-127.3)
+      2 L_clavicle_jntBnd  [shared]  under 1  rests at (4.7,1,-14.1)  carrier has (4.7,0.7,-141.4)
+      3 R_clavicle_jntBnd  [shared]  under 1  rests at (-4.7,1,-14.1)  carrier has (-4.7,0.7,-141.4)
+      4 phys_skinned_L_1_jntBnd  [its own]  under 1  rests at (7.2,13.6,-5.5)
+      5 phys_skinned_L_4_jntBnd  [its own]  under 1  rests at (7.2,13.6,-5.5)
+      6 phys_skinned_L_7_jntBnd  [its own]  under 1  rests at (7.2,13.6,-5.5)
+      7 phys_skinned_R_1_jntBnd  [its own]  under 1  rests at (-7.2,13.6,-5.5)
+      8 phys_skinned_R_4_jntBnd  [its own]  under 1  rests at (-7.2,13.6,-5.5)
+      9 phys_skinned_R_7_jntBnd  [its own]  under 1  rests at (-7.2,13.6,-5.5)
+      10 phys_skinned_L_2_jntBnd  [its own]  under 4  rests at (9.8,17.5,16.6)
+      11 phys_skinned_L_5_jntBnd  [its own]  under 5  rests at (9.8,17.5,16.6)
+      12 phys_skinned_L_8_jntBnd  [its own]  under 6  rests at (9.8,17.5,16.6)
+      13 phys_skinned_R_2_jntBnd  [its own]  under 7  rests at (-9.6,17.5,16.6)
+      14 phys_skinned_R_5_jntBnd  [its own]  under 8  rests at (-9.6,17.5,16.6)
+      15 phys_skinned_R_8_jntBnd  [its own]  under 9  rests at (-9.6,17.5,16.6)
+      16 phys_skinned_L_3_jntBnd  [its own]  under 10  rests at (12.3,21.5,38.7)
+      17 phys_skinned_L_6_jntBnd  [its own]  under 11  rests at (12.3,21.5,38.7)
+      18 phys_skinned_R_3_jntBnd  [its own]  under 13  rests at (-12.3,21.5,38.7)
+      19 phys_skinned_R_6_jntBnd  [its own]  under 14  rests at (-12.3,21.5,38.7)
+  SkirtApparition.ao  socket skirt_jntBnd [in its carrier's rig]  box (-78.9,-78.3,-23.9)..(78.9,78.8,89.7)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 4 in the header, 4 in the block · 7616 triangles over 4966 vertices
+    names: 118 bytes said, 118 read  [agree]
+    rig 35 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 34 of 35  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 phys_skinned_L_1_jntBnd  [its own]  under 0  rests at (8.8,-21.2,13.1)
+      3 phys_skinned_L_5_jntBnd  [its own]  under 0  rests at (21.2,-8.8,13.1)
+      4 phys_skinned_L_9_jntBnd  [its own]  under 0  rests at (21.2,8.8,13.1)
+      5 phys_skinned_L_13_jntBnd  [its own]  under 0  rests at (8.8,21.2,13.1)
+      6 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (-8.8,-21.2,13.1)
+      7 phys_skinned_R_5_jntBnd  [its own]  under 0  rests at (-21.2,-8.8,13.1)
+      8 phys_skinned_R_9_jntBnd  [its own]  under 0  rests at (-21.2,8.8,13.1)
+      9 phys_skinned_R_13_jntBnd  [its own]  under 0  rests at (-8.8,21.2,13.1)
+      10 spine_2_jntBnd  [shared]  under 1  rests at (-0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      11 phys_skinned_L_2_jntBnd  [its own]  under 2  rests at (13.1,-31.7,33.1)
+      12 phys_skinned_L_6_jntBnd  [its own]  under 3  rests at (31.7,-13,33.1)
+      13 phys_skinned_L_10_jntBnd  [its own]  under 4  rests at (31.8,13.1,33.1)
+      14 phys_skinned_L_14_jntBnd  [its own]  under 5  rests at (13.3,31.7,33.1)
+      15 phys_skinned_R_2_jntBnd  [its own]  under 6  rests at (-13.1,-31.7,33.1)
+      16 phys_skinned_R_6_jntBnd  [its own]  under 7  rests at (-31.7,-13,33.1)
+      17 phys_skinned_R_10_jntBnd  [its own]  under 8  rests at (-31.8,13.1,33.1)
+      18 phys_skinned_R_14_jntBnd  [its own]  under 9  rests at (-13.3,31.7,33.1)
+      19 phys_skinned_L_3_jntBnd  [its own]  under 11  rests at (17.5,-42.3,53.2)
+      20 phys_skinned_L_7_jntBnd  [its own]  under 12  rests at (42.3,-17.3,53.2)
+      21 phys_skinned_L_11_jntBnd  [its own]  under 13  rests at (42.3,17.4,53.2)
+      22 phys_skinned_L_15_jntBnd  [its own]  under 14  rests at (17.8,42.2,53.2)
+      23 phys_skinned_R_3_jntBnd  [its own]  under 15  rests at (-17.5,-42.3,53.2)
+      24 phys_skinned_R_7_jntBnd  [its own]  under 16  rests at (-42.3,-17.3,53.2)
+      25 phys_skinned_R_11_jntBnd  [its own]  under 17  rests at (-42.3,17.4,53.2)
+      26 phys_skinned_R_15_jntBnd  [its own]  under 18  rests at (-17.8,42.2,53.2)
+      27 phys_skinned_L_4_jntBnd  [its own]  under 19  rests at (21.9,-52.8,73.3)
+      28 phys_skinned_L_8_jntBnd  [its own]  under 20  rests at (52.9,-21.6,73.4)
+      29 phys_skinned_L_12_jntBnd  [its own]  under 21  rests at (52.9,21.7,73.3)
+      30 phys_skinned_L_16_jntBnd  [its own]  under 22  rests at (22.3,52.7,73.3)
+      31 phys_skinned_R_4_jntBnd  [its own]  under 23  rests at (-21.9,-52.8,73.3)
+      32 phys_skinned_R_8_jntBnd  [its own]  under 24  rests at (-52.9,-21.6,73.4)
+      33 phys_skinned_R_12_jntBnd  [its own]  under 25  rests at (-52.9,21.7,73.3)
+      34 phys_skinned_R_16_jntBnd  [its own]  under 26  rests at (-22.3,52.7,73.3)
+  WifeMonsterWeaponApparition.ao  socket R_Weapon [NOT in its carrier's rig]  fixed mesh WifeMonsterWeapon.fmt  1 shapes
+      WifeMonsterWeapon7Shape  ->  Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterWeaponc.mat

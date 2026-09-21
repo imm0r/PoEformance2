@@ -1,0 +1,908 @@
+monster: Warrior Spirit [Metadata/Monsters/KaruiJadeSpearSpirit/WarriorSpirit]
+
+=== .ao Metadata/Monsters/KaruiJadeSpearSpirit/KaruiJadeSpearSpiritMale_KaruiCaptainMinion.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/OneRig/Animations/KaruiJadeSpearSpirit/Male/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 1.600000023841858,
+					"name": "move",
+					"data": "0 1 0 Everything 0 0 Away 1.000000"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 1.5329999923706055,
+					"name": "move",
+					"data": "0 1 0 Everything 0 0 Away 1.000000"
+				}
+			]
+		},
+		{
+			"name": "attack_approach_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.4000000059604645,
+					"name": "move",
+					"position": [
+						0.0,
+						-133.19000244140626,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "into_run_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.2451501041650772,
+					"name": "move",
+					"position": [
+						0.0,
+						-90.0,
+						0.0
+					],
+					"data": "0 1 0 Everything 0 15 Away 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "spine_1_jntBnd Metadata/Monsters/KaruiJadeSpearSpirit/attachments/MaleRobe.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/KaruiJadeSpearSpirit/attachments/MalePlatesRear.ao"
+	attached_object = "spine_2_jntBnd Metadata/Monsters/KaruiJadeSpearSpirit/attachments/MalePlatesFront.ao"
+	attached_object = "aux_R_Weapon_attachment_jntBnd Metadata/Items/Weapons/OneHandWeapons/OneHandAxes/Microtransactions/KaruiCaptainAxe/KaruiCaptain1HAxeHeld.ao"
+	attached_object = "aux_L_Weapon_attachment_jntBnd Metadata/Items/Weapons/OneHandWeapons/OneHandAxes/Microtransactions/KaruiCaptainAxe/KaruiCaptain1HAxeHeld.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.2549019753932953,
+								0.0
+							],
+							[
+								0.3520408272743225,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"increment_damage_stage": false,
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"angle": 3.4382989406585695,
+						"x_axis_scale": 0.746999979019165,
+						"length": 120.0,
+						"local_offset": [
+							35.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.19198623299598695,
+							3.2288591861724855
+						],
+						"impact_bone": "aux_L_Weapon_attachment_jntBnd"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.2556818127632141,
+								0.0
+							],
+							[
+								0.35227271914482119,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"angle": 3.4382989406585695,
+						"x_axis_scale": 0.746999979019165,
+						"length": 120.0,
+						"local_offset": [
+							-35.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.1745329350233078,
+							-3.193952798843384
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4375,
+								0.0
+							],
+							[
+								0.47159090638160708,
+								0.781818151473999
+							],
+							[
+								0.47727271914482119,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"increment_damage_stage": false,
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.8377580642700195,
+						"angle": 2.286381483078003,
+						"x_axis_scale": 0.9490000009536743,
+						"length": 112.82099914550781,
+						"local_offset": [
+							-8.0,
+							-30.0
+						],
+						"impact_z_rotation": [
+							-0.4363323450088501,
+							1.937315583229065
+						]
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.43877550959587099,
+								0.0
+							],
+							[
+								0.4948979616165161,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": 0.8377580642700195,
+						"angle": 2.286381483078003,
+						"x_axis_scale": 0.9490000009536743,
+						"length": 112.82099914550781,
+						"local_offset": [
+							-8.0,
+							-30.0
+						],
+						"impact_z_rotation": [
+							0.2617993950843811,
+							-1.937315583229065
+						]
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/OneRig/Animations/KaruiJadeSpearSpirit/Male/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "aux_meleetrail_l01"
+			parent = "aux_L_Weapon_attachment_jntBnd"
+			translation = "0 0 -45"
+		socket = "aux_meleetrail_r01"
+			parent = "aux_R_Weapon_attachment_jntBnd"
+			translation = "0 0 -45"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/KaruiJadeSpearSpiritMale.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "fx_meleetrail_01 false aux_L_Weapon_attachment_jntBnd aux_meleetrail_l01"
+		bone_group = "fx_meleetrail_02 false aux_R_Weapon_attachment_jntBnd aux_meleetrail_r01"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Armour_Short",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17821285128593446,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Whoosh",
+						"bone_name": "L_thumb_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18212977051734925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Whoosh",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3211762607097626,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/MinionAttack",
+						"bone_name": "face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3368425965309143,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7990204691886902,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Armour_Short",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1182386875152588,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Step",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Armour_Short",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32273730635643008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42593762278556826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Whoosh",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4296914339065552,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/MinionAttack",
+						"bone_name": "face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4522063434123993,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Whoosh",
+						"bone_name": "L_thumb_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7655614614486694,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Armour_Short",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.071412444114685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Step",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/MinionDeath",
+						"bone_name": "face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/MinionDeath",
+						"bone_name": "face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/MinionDeath",
+						"bone_name": "face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/MinionDeath",
+						"bone_name": "face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/MinionDeath",
+						"bone_name": "face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/MinionDeath",
+						"bone_name": "face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Armour_Short",
+						"bone_name": "L_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/MinionAggro",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/T1/T1_JadeCloneExplode",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/T1/T3_JadeWallBreak",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4675641357898712,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Armour_Short",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2535202205181122,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Armour_Short",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44537296891212466,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/TavakaiBoss/FX/Minion/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.3224242329597473,
+						"end_time": 0.5928869843482971,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tavakai/fx/clone_meleetrails/clone_melee_trail.trl",
+						"bone_group": "fx_meleetrail_02"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.32484856247901919,
+						"end_time": 0.5904627442359924,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tavakai/fx/clone_meleetrails/clone_melee_trail.trl",
+						"bone_group": "fx_meleetrail_01"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5944164991378784,
+						"end_time": 0.7774420976638794,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tavakai/fx/clone_meleetrails/clone_melee_trail.trl",
+						"bone_group": "fx_meleetrail_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6048687696456909,
+						"end_time": 0.775119423866272,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tavakai/fx/clone_meleetrails/clone_melee_trail.trl",
+						"bone_group": "fx_meleetrail_02"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/KaruiJadeSpearSpirit/attachments/MaleRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/attachments/Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/attachments/Robe/rig.ast"
+		linear_allowed_contraction = 0.600
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.800
+		enclosure_radius = 1.000
+		enclosure_angle = 0.350
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/attachments/Robe/Robe.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiJadeSpearSpirit/attachments/MalePlatesRear.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/attachments/PlatesRear/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/attachments/PlatesRear/rig.ast"
+		linear_allowed_contraction = 0.200
+		bend_stiffness = 300.000
+		bend_allowed_angle = 30.000
+		enclosure_radius = 5.000
+		enclosure_angle = 0.200
+		attachment_bones = "spine_1_jntBnd spine_2_jntBnd chest_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/attachments/PlatesRear/PlatesRear.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_2_jntBnd chest_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiJadeSpearSpirit/attachments/MalePlatesFront.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/attachments/PlatesFront/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/attachments/PlatesFront/rig.ast"
+		linear_allowed_contraction = 0.200
+		bend_stiffness = 300.000
+		bend_allowed_angle = 30.000
+		enclosure_radius = 5.000
+		enclosure_angle = 0.200
+		attachment_bones = "spine_2_jntBnd chest_jntBnd L_chest_jntBnd R_chest_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/attachments/PlatesFront/PlatesFront.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd chest_jntBnd L_chest_jntBnd R_chest_jntBnd"
+	}
+}
+
+=== .ao Metadata/Items/Weapons/OneHandWeapons/OneHandAxes/Microtransactions/KaruiCaptainAxe/KaruiCaptain1HAxeHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Items/Weapons/Microtransactions/BetaKaruiCaptainWeapons/KaruiCaptain1HAxe/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Items/Weapons/OneHandWeapons/OneHandAxes/Microtransactions/KaruiCaptainAxe/attachments/KaruiCaptain1HAxeDangleHeld.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Items/Weapons/Microtransactions/BetaKaruiCaptainWeapons/KaruiCaptain1HAxe/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/Items/Weapons/Microtransactions/BetaKaruiCaptainWeapons/KaruiCaptain1HAxe/KaruiCaptain1HAxe.sm"
+	}
+	
+	AnimatedRender
+	{
+	}
+	
+	ParticleEffects
+	{
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Items/Weapons/OneHandWeapons/OneHandAxes/Microtransactions/KaruiCaptainAxe/attachments/KaruiCaptain1HAxeDangleHeld.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Items/Weapons/Microtransactions/BetaKaruiCaptainWeapons/KaruiCaptain1HAxe/attachments/rig.amd"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Items/Weapons/Microtransactions/BetaKaruiCaptainWeapons/KaruiCaptain1HAxe/attachments/rig.ast"
+		linear_allowed_contraction = 0.150
+		bend_stiffness = 300.000
+		bend_allowed_angle = 5.000
+		normal_viscosity_multiplier = 0.150
+		tangent_viscosity_multiplier = 0.050
+		enclosure_radius = 2.000
+		enclosure_angle = 1.750
+		enable_collisions = false
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/Items/Weapons/Microtransactions/BetaKaruiCaptainWeapons/KaruiCaptain1HAxe/attachments/KaruiCaptain1HAxe_Dangle.sm"
+	}
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/KaruiJadeSpearSpiritMale.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/KaruiJadeSpearSpiritMale_armour_f221a251.smd"
+Materials 1
+	"Art/Models/MONSTERS/KaruiJadeSpearSpirit/Textures/KaruiJadeSpearSpiritMalec.mat" 25
+BoundingBox -74.7911 -24.326 -197.145 74.7911 24.1509 0.475666
+BoneGroups 22
+	"grp_root" 2 "root_jntBnd" "hip_jntBnd"
+	"grp_frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/KaruiJadeSpearSpirit/Male/KaruiJadeSpearSpiritMale_armour_f221a251.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 25 in the header, 25 in the block · 26096 triangles over 18441 vertices
+  names: 832 bytes said, 832 read  [agree]
+
+=== shapes (36)
+0	Arm_L_ForePadShape	from 0	count 1680
+1	Arm_L_HandShape	from 1680	count 3732
+2	Arm_L_ScapulaShape	from 5412	count 408
+3	Arm_L_ShoulderPadShape	from 5820	count 3660
+4	Arm_L_ShoulderPlateShape	from 9480	count 1866
+5	Arm_LShape	from 11346	count 1080
+6	Arm_R_ForePadShape	from 12426	count 1680
+7	Arm_R_HandShape	from 14106	count 3732
+8	Arm_R_ScapulaShape	from 17838	count 408
+9	Arm_R_ShoulderPadShape	from 18246	count 3660
+10	Arm_R_ShoulderPlateShape	from 21906	count 1866
+11	Arm_RShape	from 23772	count 1080
+12	armour_KaruiJadeSpearSpiritMale|Belt|BeltShape	from 24852	count 300
+13	Boot_L_CalfShape	from 25152	count 3762
+14	Boot_L_FootShape	from 28914	count 3420
+15	Boot_R_CalfShape	from 32334	count 3762
+16	Boot_R_FootShape	from 36096	count 3420
+17	ChestShape	from 39516	count 9564
+18	Head_extrasShape	from 49080	count 2664
+19	Head_internalShape	from 51744	count 6924
+20	HeadShape	from 58668	count 8604
+21	HipsShape	from 67272	count 1884
+22	NeckShape	from 69156	count 1740
+23	ThighsShape	from 70896	count 5280
+24	WaistShape	from 76176	count 2112
+25	BeltShape	from 78288	count 300
+26	FrontClothShape	from 78588	count 6096
+27	FrontStraws_OrnamentsShape	from 84684	count 2520
+28	FrontStrawsShape	from 87204	count 1416
+29	RearCloth_OrnamentsShape	from 88620	count 3252
+30	RearClothShape	from 91872	count 6096
+31	PlateRearShape	from 97968	count 6348
+32	PlatesFrontShape	from 104316	count 4152
+33	axeShape	from 108468	count 23274
+34	dangleShape	from 131742	count 1188
+35	feathersShape	from 132930	count 522
+
+=== fitting
+the monster's rig: 87 bones
+mounts: aux_position, aux_camera_position, aux_L_Weapon_attachment_jntBnd_02, aux_R_Weapon_attachment_jntBnd_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_Head_attachment, aux_L_Weapon_attachment_jntBnd, aux_R_Weapon_attachment_jntBnd
+  MaleRobe.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-22.7,-22.9,-6.1)..(22.7,25.9,88)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 6 in the header, 6 in the block · 6560 triangles over 6039 vertices
+    names: 208 bytes said, 208 read  [agree]
+    rig 31 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 30 of 31  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_RobeFront_R_01_jntBnd  [its own]  under 0  rests at (-8.5,-12.9,12.1)
+      2 phys_skinned_RobeFront_L_01_jntBnd  [its own]  under 0  rests at (8.5,-12.9,12.1)
+      3 phys_skinned_RobeRear_R_01_jntBnd  [its own]  under 0  rests at (-7.8,16.2,5.8)
+      4 phys_skinned_RobeRear_L_01_jntBnd  [its own]  under 0  rests at (7.8,16.2,5.8)
+      5 phys_skinned_StrawFront_R_01_jntBnd  [its own]  under 0  rests at (-3.9,-14.3,10.3)
+      6 phys_skinned_StrawFront_L_01_jntBnd  [its own]  under 0  rests at (3.9,-14.3,10.3)
+      7 phys_skinned_RobeFront_R_02_jntBnd  [its own]  under 1  rests at (-9.9,-14.3,28.3)
+      8 phys_skinned_RobeFront_L_02_jntBnd  [its own]  under 2  rests at (9.9,-14.3,28.3)
+      9 phys_skinned_RobeRear_R_02_jntBnd  [its own]  under 3  rests at (-8.9,18.8,20.2)
+      10 phys_skinned_RobeRear_L_02_jntBnd  [its own]  under 4  rests at (8.9,18.8,20.2)
+      11 phys_skinned_StrawFront_R_02_jntBnd  [its own]  under 5  rests at (-4.3,-16.3,22.5)
+      12 phys_skinned_StrawFront_L_02_jntBnd  [its own]  under 6  rests at (4.3,-16.3,22.5)
+      13 phys_skinned_RobeFront_R_03_jntBnd  [its own]  under 7  rests at (-10.6,-14.5,45.4)
+      14 phys_skinned_RobeFront_L_03_jntBnd  [its own]  under 8  rests at (10.6,-14.5,45.4)
+      15 phys_skinned_RobeRear_R_03_jntBnd  [its own]  under 9  rests at (-9.9,19.8,38.8)
+      16 phys_skinned_RobeRear_L_03_jntBnd  [its own]  under 10  rests at (9.9,19.8,38.8)
+      17 phys_skinned_StrawFront_R_03_jntBnd  [its own]  under 11  rests at (-4.8,-17.5,35.3)
+      18 phys_skinned_StrawFront_L_03_jntBnd  [its own]  under 12  rests at (4.8,-17.5,35.3)
+      19 phys_skinned_RobeFront_R_04_jntBnd  [its own]  under 13  rests at (-11.4,-14.3,62.5)
+      20 phys_skinned_RobeFront_L_04_jntBnd  [its own]  under 14  rests at (11.4,-14.3,62.5)
+      21 phys_skinned_RobeRear_R_04_jntBnd  [its own]  under 15  rests at (-10.9,20.4,57.8)
+      22 phys_skinned_RobeRear_L_04_jntBnd  [its own]  under 16  rests at (10.9,20.4,57.8)
+      23 phys_skinned_StrawFront_R_04_jntBnd  [its own]  under 17  rests at (-5.2,-18,48)
+      24 phys_skinned_StrawFront_L_04_jntBnd  [its own]  under 18  rests at (5.2,-18,48)
+      25 phys_skinned_RobeFront_R_05_jntBnd  [its own]  under 19  rests at (-12,-14.3,76)
+      26 phys_skinned_RobeFront_L_05_jntBnd  [its own]  under 20  rests at (12,-14.3,76)
+      27 phys_skinned_RobeRear_R_05_jntBnd  [its own]  under 21  rests at (-11.7,20.8,73.8)
+      28 phys_skinned_RobeRear_L_05_jntBnd  [its own]  under 22  rests at (11.7,20.8,73.8)
+      29 phys_skinned_StrawFront_R_05_jntBnd  [its own]  under 23  rests at (-5.7,-18.2,60.7)
+      30 phys_skinned_StrawFront_L_05_jntBnd  [its own]  under 24  rests at (5.7,-18.2,60.7)
+  MalePlatesRear.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-13.1,13.3,-14.5)..(13,57.2,45.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 2116 triangles over 1658 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 9 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 8 of 9  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 spine_2_jntBnd  [shared]  under 0  rests at (0,-0,-12.3)  carrier has (-0,-0,-125.5)
+      2 phys_RearPlate_01_jntBnd  [its own]  under 0  rests at (0.1,17.7,-7.9)
+      3 chest_jntBnd  [shared]  under 1  rests at (0,-0,-24.9)  carrier has (-0,-0,-138.1)
+      4 phys_RearPlate_02_jntBnd  [its own]  under 2  rests at (0.1,30.3,10.6)
+      5 phys_Feather_R_01_jntBnd  [its own]  under 4  rests at (-5.5,43.1,29.4)
+      6 phys_Feather_L_01_jntBnd  [its own]  under 4  rests at (5.6,43.1,29.4)
+      7 phys_skinned_Feather_R_03_jntBnd  [its own]  under 5  rests at (-5,50.6,40.4)
+      8 phys_skinned_Feather_L_03_jntBnd  [its own]  under 6  rests at (5.2,50.6,40.4)
+  MalePlatesFront.ao  socket spine_2_jntBnd [in its carrier's rig]  box (-22.3,-25.2,5.5)..(22.3,-10.6,78.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1384 triangles over 1040 vertices
+    names: 32 bytes said, 32 read  [agree]
+    rig 10 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 9 of 10  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 chest_jntBnd  [shared]  under 0  rests at (0,-0,-12.6)  carrier has (-0,-0,-138.1)
+      2 phys_PlatesFront_L_01_jntBnd  [its own]  under 0  rests at (12.8,-18.2,10.6)
+      3 phys_PlatesFront_R_01_jntBnd  [its own]  under 0  rests at (-12.8,-18.2,10.6)
+      4 L_chest_jntBnd  [shared]  under 1  rests at (8.1,-7.7,-16.3)  carrier has (8.1,-7.7,-141.8)
+      5 R_chest_jntBnd  [shared]  under 1  rests at (-8.1,-7.7,-16.3)  carrier has (-8.1,-7.7,-141.8)
+      6 phys_skinned_PlatesFront_L_02_jntBnd  [its own]  under 2  rests at (16,-17.5,55.7)
+      7 phys_skinned_PlatesFront_R_02_jntBnd  [its own]  under 3  rests at (-16,-17.5,55.7)
+      8 phys_skinned_PlatesFront_L_03_jntBnd  [its own]  under 6  rests at (15.9,-17.4,70.4)
+      9 phys_skinned_PlatesFront_R_03_jntBnd  [its own]  under 7  rests at (-15.9,-17.4,70.4)
+  KaruiCaptain1HAxeHeld.ao  socket aux_R_Weapon_attachment_jntBnd [in its carrier's rig]  box (-15.4,-2.9,-53.2)..(15.4,3.2,22.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23D · stride 36
+    shapes 1 in the header, 1 in the block · 7758 triangles over 6086 vertices
+    names: 16 bytes said, 16 read  [agree]
+    rig 18 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 18  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 aux_r  [its own]  under 0  rests at (0,-1,0)
+      2 aux_mid_01  [its own]  under 0  rests at (0,0,-34.9)
+      3 aux_mid_02  [its own]  under 0  rests at (0,0,-38.5)
+      4 aux_handle_01  [its own]  under 0  rests at (4.9,0,20.7)
+      5 aux_handle_02  [its own]  under 0  rests at (0,0,20.7)
+      6 aux_handle_03  [its own]  under 0  rests at (0,0,0)
+      7 aux_blade_01  [its own]  under 0  rests at (-2.9,0,0)
+      8 aux_blade_02  [its own]  under 0  rests at (0,0,0)
+      9 aux_blade_03  [its own]  under 0  rests at (-6.2,0,-17.3)
+      10 aux_blade_04  [its own]  under 0  rests at (-11.4,0,-27.2)
+      11 aux_blade_05  [its own]  under 0  rests at (-14,0,-36.6)
+      12 aux_blade_06  [its own]  under 0  rests at (-10.7,0,-44.4)
+      13 aux_blade_07  [its own]  under 0  rests at (0,0,-51.7)
+      14 aux_blade_08  [its own]  under 0  rests at (10.7,0,-44.4)
+      15 aux_blade_09  [its own]  under 0  rests at (14,0,-36.6)
+      16 aux_blade_10  [its own]  under 0  rests at (11.4,0,-27.2)
+      17 aux_blade_11  [its own]  under 0  rests at (6.2,0,-17.3)
+    KaruiCaptain1HAxeDangleHeld.ao  socket <root> [NOT in its carrier's rig]  box (-5,-3.9,16.6)..(5.5,5.3,51.5)
+      version 3 · c0h 4 · 1 level(s) of detail · format 0x23D · stride 36
+      shapes 2 in the header, 2 in the block · 570 triangles over 459 vertices
+      names: 48 bytes said, 48 read  [agree]
+      rig 4 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 3 of 4  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_skinned_dangle_jntBnd_1  [its own]  under 0  rests at (0,0,28.4)
+        2 phys_skinned_dangle_jntBnd_2  [its own]  under 1  rests at (0,0,38.6)
+        3 phys_skinned_dangle_jntBnd_3  [its own]  under 2  rests at (0,0,47.4)
+  KaruiCaptain1HAxeHeld.ao  socket aux_L_Weapon_attachment_jntBnd [in its carrier's rig]  box (-15.4,-2.9,-53.2)..(15.4,3.2,22.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23D · stride 36
+    shapes 1 in the header, 1 in the block · 7758 triangles over 6086 vertices
+    names: 16 bytes said, 16 read  [agree]
+    rig 18 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 18  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 aux_r  [its own]  under 0  rests at (0,-1,0)
+      2 aux_mid_01  [its own]  under 0  rests at (0,0,-34.9)
+      3 aux_mid_02  [its own]  under 0  rests at (0,0,-38.5)
+      4 aux_handle_01  [its own]  under 0  rests at (4.9,0,20.7)
+      5 aux_handle_02  [its own]  under 0  rests at (0,0,20.7)
+      6 aux_handle_03  [its own]  under 0  rests at (0,0,0)
+      7 aux_blade_01  [its own]  under 0  rests at (-2.9,0,0)
+      8 aux_blade_02  [its own]  under 0  rests at (0,0,0)
+      9 aux_blade_03  [its own]  under 0  rests at (-6.2,0,-17.3)
+      10 aux_blade_04  [its own]  under 0  rests at (-11.4,0,-27.2)
+      11 aux_blade_05  [its own]  under 0  rests at (-14,0,-36.6)
+      12 aux_blade_06  [its own]  under 0  rests at (-10.7,0,-44.4)
+      13 aux_blade_07  [its own]  under 0  rests at (0,0,-51.7)
+      14 aux_blade_08  [its own]  under 0  rests at (10.7,0,-44.4)
+      15 aux_blade_09  [its own]  under 0  rests at (14,0,-36.6)
+      16 aux_blade_10  [its own]  under 0  rests at (11.4,0,-27.2)
+      17 aux_blade_11  [its own]  under 0  rests at (6.2,0,-17.3)

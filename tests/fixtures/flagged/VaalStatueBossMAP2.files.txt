@@ -1,0 +1,5602 @@
+monster: Tetzcatl, the Blazing Guardian [Metadata/Monsters/VaalBossStatue/VaalStatueBossMAP2]
+
+=== .ao Metadata/Monsters/VaalBossStatue/VaalBossStatue.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/VaalBossStatue/rig.amd"
+	view_of = "idle_01"
+		view_name = "spell_testing_temp_01"
+		view_begin = 393
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8460519909858704,
+					"name": "stomp",
+					"position": [
+						99.29889678955078,
+						-64.83360290527344,
+						2.2451798915863039
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7817950248718262,
+					"name": "stomp",
+					"position": [
+						-82.88200378417969,
+						-72.1167984008789,
+						-4.510469913482666
+					]
+				}
+			]
+		},
+		{
+			"name": "combo_laser_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.600000023841858,
+					"name": "contact",
+					"position": [
+						-323.9530029296875,
+						-125.0,
+						-150.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.600000023841858,
+					"name": "contact",
+					"position": [
+						317.0710144042969,
+						-125.0,
+						-150.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7013299465179444,
+					"name": "beam_balls",
+					"position": [
+						317.0710144042969,
+						-125.0,
+						-150.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6732399463653566,
+					"name": "beam_balls2",
+					"position": [
+						317.0710144042969,
+						-125.0,
+						-150.0
+					]
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "death_gem",
+					"position": [
+						-62.58549880981445,
+						-462.5989990234375,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "double_jab_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.5971499681472779,
+					"name": "contact",
+					"position": [
+						-8.72305965423584,
+						-182.2519989013672,
+						0.786342978477478
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.833150029182434,
+					"name": "contact",
+					"position": [
+						13.979100227355957,
+						-183.73800659179688,
+						7.855380058288574
+					]
+				}
+			]
+		},
+		{
+			"name": "run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3007830083370209,
+					"name": "stomp",
+					"position": [
+						121.88999938964844,
+						-119.02400207519531,
+						-6.6321702003479
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1858899593353272,
+					"name": "stomp",
+					"position": [
+						-125.0,
+						-117.95700073242188,
+						-6.6321702003479
+					]
+				}
+			]
+		},
+		{
+			"name": "six_lasers_criscross_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6719070076942444,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "six_lasers_focus_explosion_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.1713999509811402,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "six_lasers_front_to_back_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5299190282821655,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "snake_barrage_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5337949991226196,
+					"name": "contact",
+					"position": [
+						-36.298099517822269,
+						-282.41400146484377,
+						-6.433119773864746
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.709634006023407,
+					"name": "contact",
+					"position": [
+						38.07809829711914,
+						-290.9670104980469,
+						-9.99055004119873
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8352329730987549,
+					"name": "contact",
+					"position": [
+						-64.81320190429688,
+						-380.8489990234375,
+						-24.095600128173829
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0016499757766724,
+					"name": "contact",
+					"position": [
+						66.09369659423828,
+						-380.3349914550781,
+						-27.31920051574707
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2026100158691407,
+					"name": "contact",
+					"position": [
+						-75.52439880371094,
+						-565.4359741210938,
+						-6.79295015335083
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.375309944152832,
+					"name": "contact",
+					"position": [
+						76.71790313720703,
+						-572.5910034179688,
+						-13.720100402832032
+					]
+				}
+			]
+		},
+		{
+			"name": "snake_barrage_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.16599999368190766,
+					"end_time": 0.8989999890327454,
+					"name": "move",
+					"position": [
+						0.0,
+						250.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 5 Away"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5673779845237732,
+					"name": "contact",
+					"position": [
+						-83.68710327148438,
+						-315.8689880371094,
+						-5.643630027770996
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7005199790000916,
+					"name": "contact",
+					"position": [
+						93.26399993896485,
+						-369.77099609375,
+						-9.395500183105469
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8684819936752319,
+					"name": "contact",
+					"position": [
+						-79.66629791259766,
+						-273.9530029296875,
+						-28.218399047851564
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0077699422836304,
+					"name": "contact",
+					"position": [
+						84.06710052490235,
+						-304.90301513671877,
+						-29.188100814819337
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2043999433517457,
+					"name": "contact",
+					"position": [
+						-28.597900390625,
+						-141.28799438476563,
+						-13.809399604797364
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3375400304794312,
+					"name": "contact",
+					"position": [
+						41.12730026245117,
+						-138.60000610351563,
+						-21.58530044555664
+					]
+				}
+			]
+		},
+		{
+			"name": "stomp_180_left_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9333320260047913,
+					"name": "contact",
+					"position": [
+						139.01300048828126,
+						211.23199462890626,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2203400135040284,
+					"name": "contact",
+					"position": [
+						-74.22599792480469,
+						254.73399353027345,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.25,
+					"name": "stomp",
+					"position": [
+						108.05999755859375,
+						13.38659954071045,
+						-11.54889965057373
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2576199769973755,
+					"name": "stomp",
+					"position": [
+						-101.1510009765625,
+						24.62700080871582,
+						-15.143099784851075
+					]
+				}
+			]
+		},
+		{
+			"name": "stomp_180_right_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9355949759483337,
+					"name": "contact",
+					"position": [
+						-139.3159942626953,
+						210.802001953125,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2022600173950196,
+					"name": "contact",
+					"position": [
+						77.14309692382813,
+						254.96099853515626,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.350000023841858,
+					"name": "stomp",
+					"position": [
+						104.68399810791016,
+						20.91189956665039,
+						-12.237700462341309
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.350000023841858,
+					"name": "stomp",
+					"position": [
+						-112.1500015258789,
+						16.19879913330078,
+						-6.776659965515137
+					]
+				}
+			]
+		},
+		{
+			"name": "stomp_90_left_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6630359888076782,
+					"name": "stomp",
+					"position": [
+						-0.30438199639320376,
+						-129.2969970703125,
+						-45.012298583984378
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2279000282287598,
+					"name": "stomp",
+					"position": [
+						26.440000534057618,
+						111.70800018310547,
+						-1.8036799430847169
+					]
+				}
+			]
+		},
+		{
+			"name": "stomp_90_right_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.675000011920929,
+					"name": "stomp",
+					"position": [
+						0.3046720027923584,
+						-124.38700103759766,
+						1.8615100383758546
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2319999933242798,
+					"name": "stomp",
+					"position": [
+						-25.356199264526368,
+						111.31999969482422,
+						0.9622650146484375
+					]
+				}
+			]
+		},
+		{
+			"name": "stun_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.4666000008583069,
+					"name": "move",
+					"position": [
+						0.0,
+						180.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 3.5,
+					"end_time": 4.300000190734863,
+					"name": "move",
+					"position": [
+						0.0,
+						-180.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "triangle_slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 4.869999885559082,
+					"name": "contact",
+					"position": [
+						0.0,
+						-48.538299560546878,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.070670127868652,
+					"name": "cascade1",
+					"position": [
+						0.0,
+						-48.538299560546878,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.270669937133789,
+					"name": "cascade2",
+					"position": [
+						0.0,
+						-48.538299560546878,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.470670223236084,
+					"name": "cascade3",
+					"position": [
+						0.0,
+						-48.538299560546878,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.670670032501221,
+					"name": "cascade4",
+					"position": [
+						0.0,
+						-48.538299560546878,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.870669841766357,
+					"name": "cascade5",
+					"position": [
+						0.0,
+						-48.538299560546878,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "walls_to_ball_laser_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.73014897108078,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6884700059890748,
+					"name": "blast"
+				}
+			]
+		},
+		{
+			"name": "spell_testing_temp_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4178290069103241,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+
+	anim_driven_subobject = "L_hand 1 3 50.0 50.0 140.0 0 0.0 0 none"
+	anim_driven_subobject = "R_hand 1 3 50.0 50.0 140.0 0 0.0 0 none"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "core_light Metadata/Monsters/VaalBossStatue/Objects/VaalStatueBossCoreLight.ao"
+	attached_object = "aux_facelight Metadata/Monsters/VaalBossStatue/Objects/VaalStatueBossFaceLight.ao"
+	attached_object = "core_light Metadata/Monsters/VaalBossStatue/Objects/VaalStatueBossCoreLight.ao"
+	attached_object = "aux_facelight Metadata/Monsters/VaalBossStatue/Objects/VaalStatueBossFaceLight.ao"
+	attached_object = "core_light Metadata/Monsters/VaalBossStatue/Objects/VaalStatueBossCoreLight.ao"
+	attached_object = "aux_facelight Metadata/Monsters/VaalBossStatue/Objects/VaalStatueBossFaceLight.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.40782099962234499,
+								0.0
+							],
+							[
+								0.5083799958229065,
+								1.0
+							]
+						],
+						"increment_damage_stage": false,
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"update_target_direction": true,
+						"rotation": -0.2967059910297394,
+						"width": 115.60700225830078,
+						"length": 531.7919921875,
+						"offset": [
+							160.0,
+							86.0
+						],
+						"impact_z_rotation": [
+							-0.2967059910297394,
+							-0.2967059910297394
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "left_top_mouth"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.47560998797416689,
+								0.0
+							],
+							[
+								0.6097559928894043,
+								1.0
+							]
+						],
+						"increment_damage_stage": false,
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"update_target_direction": true,
+						"width": 132.947998046875,
+						"length": 480.5,
+						"offset": [
+							240.0,
+							24.0
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "left_mid_mouth"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5,
+								0.0
+							],
+							[
+								0.5609760284423828,
+								1.0
+							]
+						],
+						"increment_damage_stage": false,
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"update_target_direction": true,
+						"rotation": 0.20943999290466309,
+						"width": 121.38700103759766,
+						"length": 452.7829895019531,
+						"offset": [
+							364.0,
+							-13.0
+						],
+						"impact_z_rotation": [
+							0.20943999290466309,
+							0.20943999290466309
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "left_bot_mouth"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.40782099962234499,
+								0.0
+							],
+							[
+								0.5083799958229065,
+								1.0
+							]
+						],
+						"increment_damage_stage": false,
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"update_target_direction": true,
+						"rotation": 0.22689299285411836,
+						"width": 115.60700225830078,
+						"length": 537.572998046875,
+						"offset": [
+							-160.0,
+							86.0
+						],
+						"impact_z_rotation": [
+							0.22689299285411836,
+							0.22689299285411836
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "right_top_mouth"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5,
+								0.0
+							],
+							[
+								0.5670729875564575,
+								1.0
+							]
+						],
+						"increment_damage_stage": false,
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"update_target_direction": true,
+						"rotation": -0.20943999290466309,
+						"width": 121.38700103759766,
+						"length": 451.8420104980469,
+						"offset": [
+							-364.0,
+							-13.0
+						],
+						"impact_z_rotation": [
+							-0.20943999290466309,
+							-0.20943999290466309
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "right_mid_mouth"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.518293023109436,
+								0.0
+							],
+							[
+								0.591463029384613,
+								1.0
+							]
+						],
+						"increment_damage_stage": false,
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"update_target_direction": true,
+						"width": 132.947998046875,
+						"length": 468.6960144042969,
+						"offset": [
+							-240.0,
+							24.0
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "right_bot_mouth"
+					}
+				]
+			}
+		},
+		{
+			"name": "stomp_180_left_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.33519598841667178,
+								0.0
+							],
+							[
+								0.519553005695343,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"move_with_initiator": false,
+						"rotation": 0.3316130042076111,
+						"angle": 2.5307300090789797,
+						"length": 479.7690124511719,
+						"offset": [
+							6.0,
+							0.0
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "stomp_180_right_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.33519598841667178,
+								0.0
+							],
+							[
+								0.519553005695343,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"move_with_initiator": false,
+						"rotation": -0.3316130042076111,
+						"angle": 2.5307300090789797,
+						"length": 479.7690124511719,
+						"offset": [
+							6.0,
+							0.0
+						]
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/VaalBossStatue/rig.ast"
+		socket = "left_top_mouth"
+			parent = "L_snake_top_jaw_jntBnd"
+			translation = "31.0109 0 -7.15524"
+		socket = "left_mid_mouth"
+			parent = "L_snake_mid_jaw_jntBnd"
+			translation = "33.0416 0 -5.36208"
+		socket = "left_bot_mouth"
+			parent = "L_snake_bottom_jaw_jntBnd"
+			translation = "32.6337 0 -6.02045"
+		socket = "right_top_mouth"
+			parent = "R_snake_top_jaw_jntBnd"
+			translation = "-34.8371 0 5.62298"
+		socket = "right_mid_mouth"
+			parent = "R_snake_mid_jaw_jntBnd"
+			translation = "-36.0907 0 5.58164"
+		socket = "right_bot_mouth"
+			parent = "R_snake_bottom_jaw_jntBnd"
+			translation = "-35.0085 0 5.22508"
+		socket = "aux_mouth_out_1"
+			parent = "R_snake_bottom_head_jntBnd"
+			translation = "-75 0 -12.8493"
+		socket = "aux_mouth_out_2"
+			parent = "R_snake_mid_head_jntBnd"
+			translation = "-75 0 -12.85"
+		socket = "aux_mouth_out_3"
+			parent = "R_snake_top_head_jntBnd"
+			translation = "-75 0 -12.8493"
+		socket = "aux_mouth_out_4"
+			parent = "L_snake_top_head_jntBnd"
+			translation = "75 0 12.85"
+		socket = "aux_mouth_out_5"
+			parent = "L_snake_mid_head_jntBnd"
+			translation = "75 0 12.85"
+		socket = "aux_mouth_out_6"
+			parent = "L_snake_bottom_head_jntBnd"
+			translation = "75 0 12.85"
+		socket = "core_light"
+			parent = "gem_jntBnd"
+			translation = "0 -50.7888 0"
+		socket = "aux_shoulder_cap_l"
+			parent = "L_shoulderpad_jntBnd"
+			translation = "111.314 0 0"
+		socket = "aux_shoulder_cap_r"
+			parent = "R_shoulderpad_jntBnd"
+			translation = "-111.31 0 0"
+		socket = "aux_headdisc_3"
+			parent = "head_jntBnd"
+			translation = "0 20 -121.251"
+		socket = "aux_headdisc_4"
+			parent = "head_jntBnd"
+			translation = "59.7326 20 -91.5352"
+		socket = "aux_headdisc_5"
+			parent = "head_jntBnd"
+			translation = "85.073 20 -34.9065"
+		socket = "aux_headdisc_1"
+			parent = "head_jntBnd"
+			translation = "-85.07 20 -34.91"
+		socket = "aux_headdisc_2"
+			parent = "head_jntBnd"
+			translation = "-59.73 20 -91.5352"
+		socket = "aux_facelight"
+			parent = "head_jntBnd"
+			translation = "0 -126.873 -50"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 250.000
+		normal_viscosity_multiplier = 0.050
+		enclosure_angle = 0.750
+		animation_velocity_factor = 10.000
+		animation_force_factor = 50.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/VaalBossStatue/VaalBossStatue.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false headdress_jntBnd L_shoulderpad_jntBnd R_shoulderpad_jntBnd"
+		bone_group = "root false root_jntBnd"
+		bone_group = "snake_head_mouthline_1 false R_snake_bottom_jaw_jntBnd aux_mouth_out_1"
+		bone_group = "snake_head_mouthline_2 false R_snake_mid_jaw_jntBnd aux_mouth_out_2"
+		bone_group = "snake_head_mouthline_3 false R_snake_top_jaw_jntBnd aux_mouth_out_3"
+		bone_group = "snake_head_mouthline_4 false L_snake_top_jaw_jntBnd aux_mouth_out_4"
+		bone_group = "snake_head_mouthline_5 false L_snake_mid_jaw_jntBnd aux_mouth_out_5"
+		bone_group = "snake_head_mouthline_6 false L_snake_bottom_jaw_jntBnd aux_mouth_out_6"
+		bone_group = "snake_1_body false R_snake_bottom_jntBnd_2 R_snake_bottom_jntBnd_3 R_snake_bottom_jntBnd_4 R_snake_bottom_jntBnd_5 R_snake_bottom_jntBnd_6 R_snake_bottom_jntBnd_7 R_snake_bottom_jntBnd_8 R_snake_bottom_jntBnd_9 R_snake_bottom_jntBnd_10 R_snake_bottom_jntBnd_11 R_snake_bottom_jntBnd_12 R_snake_bottom_jntBnd_13 R_snake_bottom_jntBnd_14 R_snake_bottom_jntBnd_15 R_snake_bottom_jntBnd_16 R_snake_bottom_jntBnd_17 R_snake_bottom_jntBnd_18 R_snake_bottom_jntBnd_19 R_snake_bottom_jntBnd_20 R_snake_bottom_jntBnd_21 R_snake_bottom_jntBnd_22 R_snake_bottom_jntBnd_23 R_snake_bottom_jaw_jntBnd right_bot_mouth"
+		bone_group = "snake_2_body false R_snake_mid_jntBnd_2 R_snake_mid_jntBnd_3 R_snake_mid_jntBnd_4 R_snake_mid_jntBnd_5 R_snake_mid_jntBnd_6 R_snake_mid_jntBnd_7 R_snake_mid_jntBnd_8 R_snake_mid_jntBnd_9 R_snake_mid_jntBnd_10 R_snake_mid_jntBnd_11 R_snake_mid_jntBnd_12 R_snake_mid_jntBnd_13 R_snake_mid_jntBnd_14 R_snake_mid_jntBnd_15 R_snake_mid_jntBnd_16 R_snake_mid_jntBnd_17 R_snake_mid_jntBnd_18 R_snake_mid_jntBnd_19 R_snake_mid_jntBnd_20 R_snake_mid_jntBnd_21 R_snake_mid_jntBnd_22 R_snake_mid_jntBnd_23 R_snake_mid_jaw_jntBnd"
+		bone_group = "snake_3_body false R_snake_top_jntBnd_2 R_snake_top_jntBnd_3 R_snake_top_jntBnd_4 R_snake_top_jntBnd_5 R_snake_top_jntBnd_6 R_snake_top_jntBnd_7 R_snake_top_jntBnd_8 R_snake_top_jntBnd_9 R_snake_top_jntBnd_10 R_snake_top_jntBnd_11 R_snake_top_jntBnd_12 R_snake_top_jntBnd_13 R_snake_top_jntBnd_14 R_snake_top_jntBnd_15 R_snake_top_jntBnd_16 R_snake_top_jntBnd_17 R_snake_top_jntBnd_18 R_snake_top_jntBnd_19 R_snake_top_jntBnd_20 R_snake_top_jntBnd_21 R_snake_top_jntBnd_22 R_snake_top_jntBnd_23 R_snake_top_jaw_jntBnd"
+		bone_group = "snake_4_body false L_snake_bottom_jntBnd_2 L_snake_bottom_jntBnd_3 L_snake_bottom_jntBnd_4 L_snake_bottom_jntBnd_5 L_snake_bottom_jntBnd_6 L_snake_bottom_jntBnd_7 L_snake_bottom_jntBnd_8 L_snake_bottom_jntBnd_9 L_snake_bottom_jntBnd_10 L_snake_bottom_jntBnd_11 L_snake_bottom_jntBnd_12 L_snake_bottom_jntBnd_13 L_snake_bottom_jntBnd_14 L_snake_bottom_jntBnd_15 L_snake_bottom_jntBnd_16 L_snake_bottom_jntBnd_17 L_snake_bottom_jntBnd_18 L_snake_bottom_jntBnd_19 L_snake_bottom_jntBnd_20 L_snake_bottom_jntBnd_21 L_snake_bottom_jntBnd_22 L_snake_bottom_jntBnd_23 L_snake_bottom_jntBnd_23 L_snake_bottom_jaw_jntBnd"
+		bone_group = "snake_5_body false L_snake_mid_jntBnd_2 L_snake_mid_jntBnd_3 L_snake_mid_jntBnd_4 L_snake_mid_jntBnd_5 L_snake_mid_jntBnd_6 L_snake_mid_jntBnd_7 L_snake_mid_jntBnd_8 L_snake_mid_jntBnd_9 L_snake_mid_jntBnd_10 L_snake_mid_jntBnd_11 L_snake_mid_jntBnd_12 L_snake_mid_jntBnd_13 L_snake_mid_jntBnd_14 L_snake_mid_jntBnd_15 L_snake_mid_jntBnd_16 L_snake_mid_jntBnd_17 L_snake_mid_jntBnd_18 L_snake_mid_jntBnd_19 L_snake_mid_jntBnd_20 L_snake_mid_jntBnd_21 L_snake_mid_jntBnd_22 L_snake_mid_jntBnd_23 L_snake_mid_jaw_jntBnd"
+		bone_group = "snake_6_body false L_snake_top_jntBnd_2 L_snake_top_jntBnd_3 L_snake_top_jntBnd_4 L_snake_top_jntBnd_5 L_snake_top_jntBnd_6 L_snake_top_jntBnd_7 L_snake_top_jntBnd_8 L_snake_top_jntBnd_9 L_snake_top_jntBnd_10 L_snake_top_jntBnd_11 L_snake_top_jntBnd_12 L_snake_top_jntBnd_13 L_snake_top_jntBnd_14 L_snake_top_jntBnd_15 L_snake_top_jntBnd_16 L_snake_top_jntBnd_17 L_snake_top_jntBnd_18 L_snake_top_jntBnd_19 L_snake_top_jntBnd_20 L_snake_top_jntBnd_21 L_snake_top_jntBnd_22 L_snake_top_jntBnd_23 L_snake_top_jaw_jntBnd"
+		bone_group = "torso_width false aux_shoulder_cap_r R_shoulderpad_jntBnd neck_jntBnd L_shoulderpad_jntBnd aux_shoulder_cap_l"
+		bone_group = "r_shoulder false R_shoulderpad_jntBnd aux_shoulder_cap_r"
+		bone_group = "l_shoulder false L_shoulderpad_jntBnd aux_shoulder_cap_l"
+		bone_group = "head_disc false aux_headdisc_1 aux_headdisc_2 aux_headdisc_3 aux_headdisc_4 aux_headdisc_5"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Attack_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28303301334381106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.420430988073349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "left_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4999769926071167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "left_mid_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5295450091362,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5984489917755127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7018589973449707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7340660095214844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7443190217018127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7783839702606201,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8749759793281555,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9533870220184326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "left_mid_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9977260231971741,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1058399677276612,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5295499563217164,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "L_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Attack_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28303301334381106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "R_snake_bottom_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.420430988073349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "R_snake_top_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4999769926071167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5295450091362,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "R_snake_top_jntBnd_23"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5984489917755127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "right_mid_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7018589973449707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7340660095214844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7443190217018127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7783839702606201,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "R_snake_top_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8749759793281555,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9533870220184326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9977260231971741,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1058399677276612,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5295499563217164,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "R_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "combo_laser_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04090910032391548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/ComboLaser_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11505699902772904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19176100194454194,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44744300842285159,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47047099471092226,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonal",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5471760034561157,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonal",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5599439740180969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6008520126342773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6213409900665283,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "L_gem_arm_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7542589902877808,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissBuildUp",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8028389811515808,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissBuildUp",
+						"bone_name": "right_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8897730112075806,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissBuildUp",
+						"bone_name": "left_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9511359930038452,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissBuildUp",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9690309762954712,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeShake",
+						"bone_name": "aux_headdisc_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0534100532531739,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissBuildUp",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1173299551010132,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissBuildUp",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.163349986076355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5916800498962403,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LaserCharge",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6555800437927247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "L_gem_arm_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.670799970626831,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LaserCharge",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.814389944076538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "L_gem_arm_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6149799823760988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/ConnectingBeam/Cast",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6525399684906008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "L_gem_arm_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.657170057296753,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/ConnectingBeam/Cast",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6974499225616457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.789489984512329,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8738598823547365,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.993540048599243,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "L_gem_arm_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1960299015045168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "R_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_180_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Death_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/VaalCoreFall_",
+						"bone_name": "gem_surrounding_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.025568200275301935,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08948870003223419,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1107959970831871,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3120880126953125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36647701263427737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4048289954662323,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4346590042114258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7585200071334839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "L_snake_bottom_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8087909817695618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8906260132789612,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.01419997215271,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "L_snake_bottom_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0397800207138062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3082400560379029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4725300073623658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6875100135803223,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "L_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9133599996566773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "L_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0284199714660646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1392099857330324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "R_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.301140069961548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "R_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6197800636291506,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/VaalCoreFall_",
+						"bone_name": "gem_surrounding_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.902009963989258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.902009963989258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Drone",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.931809902191162,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.936079978942871,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissDeath",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9744300842285158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "L_snake_top_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0778300762176515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Drone",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.106529951095581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissDeath",
+						"bone_name": "left_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1107900142669679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.217329978942871,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissDeath",
+						"bone_name": "right_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3196001052856447,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5071001052856447,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7542600631713869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.78410005569458,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.159090042114258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Death_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/VaalCoreFall_",
+						"bone_name": "gem_surrounding_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.028406299650669099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0994219034910202,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12309399992227555,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1420309990644455,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39768698811531069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40715599060058596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44976499676704409,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4829060137271881,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8427159786224365,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "L_snake_bottom_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9894850254058838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0084199905395508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1267800331115723,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "L_snake_bottom_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1551899909973145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4534599781036378,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8748199939727784,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "L_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1257400512695314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "L_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.253570079803467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.376660108566284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "R_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.556570053100586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "R_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2241299152374269,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2241299152374269,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Drone",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.257240056991577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2619800567626955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissDeath",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3045899868011476,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "L_snake_top_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4145898818969728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Drone",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.451349973678589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissDeath",
+						"bone_name": "left_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.456089973449707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5744500160217287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissDeath",
+						"bone_name": "right_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.688070058822632,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.896389961242676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.170979976654053,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.2041401863098148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.6207499504089359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "double_jab_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03663000091910362,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06959710270166397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "aux_shoulder_cap_r"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1025639995932579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1245419979095459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17399300634860993,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5384619832038879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5750920176506043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6886450052261353,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/DoubleJab_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.76739901304245,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8131870031356812,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9542120099067688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "aux_shoulder_cap_l"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9926739931106567,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2783900499343873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "left_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3461500406265259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "left_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3864500522613526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "aux_shoulder_cap_l"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5201499462127686,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ExplosiveWhoosh",
+						"bone_name": "left_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5494500398635865,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/RockImpact/ImpactSmall_",
+						"bone_name": "left_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5787500143051148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpact",
+						"bone_name": "left_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6318700313568116,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "right_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.67399001121521,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "aux_shoulder_cap_r"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6941399574279786,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "right_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.758239984512329,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ExplosiveWhoosh",
+						"bone_name": "right_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7912100553512574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/RockImpact/ImpactSmall_",
+						"bone_name": "right_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.815019965171814,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpact",
+						"bone_name": "right_bot_mouth"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Flinch_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "core_light"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "core_light"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Flinch_",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "core_light"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Flinch_",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "core_light"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Flinch_",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal.loop.ogg",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Stone.loop.ogg",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Idle.loop.ogg",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Stone.loop.ogg",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/LargeStone.loop.ogg",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "aux_shoulder_cap_l"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal.loop.ogg",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Run.loop.ogg",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17572100460529328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Drone",
+						"bone_name": "L_shoulderpad_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21735799312591554,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9100009799003601,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "aux_shoulder_cap_r"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1483099460601807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "six_lasers_criscross_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1600400060415268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/SixLaser_Criscross_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31543999910354617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Creak",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38038399815559389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Creak",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3947030007839203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonalShort",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4457300007343292,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonalShort",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5778859853744507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5930830240249634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6071180105209351,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6200659871101379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.631309986114502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6537960171699524,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6672869920730591,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.680778980255127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7780119776725769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7982490062713623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.813988983631134,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8387230038642883,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.468940019607544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "six_lasers_focus_explosion_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/SixLaser_FocusExplosion_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Creak",
+						"bone_name": "core_light"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3455069959163666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9656019806861877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonalLarge",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.099269986152649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonalLarge",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.673840045928955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissBuildUp",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7699400186538697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissBuildUp",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8820699453353882,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissBuildUp",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9821799993515015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissBuildUp",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.086289882659912,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissBuildUp",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1903998851776125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissBuildUp",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.410989999771118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeShake",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.63142991065979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonalShort",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7611000537872316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonalShort",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.391860008239746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LaserCharge",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4855101108551027,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LaserCharge",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.353799819946289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.370719909667969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.4405999183654789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.443319797515869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.478579998016357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.494949817657471,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "left_mid_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.537650108337402,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.5570597648620609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.5920000076293949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.806049823760986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "six_lasers_front_to_back_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/SixLaser_FrontToBack_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17582499980926515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonalShort",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23076899349689485,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonalShort",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3186100125312805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonalShort",
+						"bone_name": "gem_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49670299887657168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5300260186195374,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LasterStart",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5516480207443237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6153849959373474,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6615380048751831,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7054949998855591,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7494509816169739,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3011200428009035,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "snake_barrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Drone",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/SnakeBarrage_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08820520341396332,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30531400442123415,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30959001183509829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40672698616981509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4758630096912384,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4887790083885193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5094389915466309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5189740061759949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5538039803504944,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6344339847564697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6430780291557312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7205269932746887,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.816785991191864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.822297990322113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9148719906806946,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9366739988327026,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9531040191650391,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9672560095787048,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "right_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.006790041923523,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "right_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.051990032196045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.140239953994751,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1563800573349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2776199579238892,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5278799533843995,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7432600259780884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.138240098953247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.519670009613037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "R_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "snake_barrage_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Drone",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/SnakeBarrage_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05878249928355217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22397500276565553,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24186299741268159,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.317128986120224,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33667200803756716,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34585899114608767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3489759862422943,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36907100677490237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5116220116615295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5212309956550598,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5377249717712402,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6242259740829468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6322540044784546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6555430293083191,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "right_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7808259725570679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7817310094833374,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7954360246658325,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8557630181312561,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9277210235595703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0058799982070923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "right_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0182199478149415,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1139500141143799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.133810043334961,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StepSmall",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.135640025138855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1617599725723267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2396800518035889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeBite",
+						"bone_name": "aux_mouth_out_4"
+					}
+				]
+			},
+			{
+				"name": "stomp_180_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Stomp_A_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.017582399770617486,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1893790066242218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24630600214004517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "R_snake_bottom_jntBnd_23"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28843799233436587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "L_snake_bottom_jntBnd_23"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3948020040988922,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "R_snake_bottom_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4330669939517975,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "L_snake_bottom_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4761910140514374,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "right_mid_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.55970698595047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.821977972984314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9230769872665405,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9790509939193726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0197800397872925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0506999492645264,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1135499477386475,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.185349941253662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1958099603652955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "L_snake_bottom_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.224910020828247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2411799430847169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3899600505828858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "R_gem_arm_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4346400499343873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_1"
+					}
+				]
+			},
+			{
+				"name": "stomp_180_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Stomp_A_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.017582399770617486,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1893790066242218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24630600214004517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "L_snake_bottom_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28843799233436587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "R_snake_bottom_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3948020040988922,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "L_snake_bottom_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4330669939517975,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "R_snake_bottom_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4761910140514374,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.55970698595047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8073260188102722,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9172160029411316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9790509939193726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0022000074386597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0506999492645264,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1135499477386475,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1604399681091309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1958099603652955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.224910020828247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2411799430847169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3899600505828858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "R_gem_arm_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4375699758529664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_6"
+					}
+				]
+			},
+			{
+				"name": "stomp_90_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal.loop.ogg",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Stone.loop.ogg",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03889960050582886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09164679795503617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23882800340652467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Stomp_B_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43303900957107546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5839549899101257,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6329669952392578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7436609864234924,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.217579960823059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "stomp_90_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Stone.loop.ogg",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal.loop.ogg",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03889960050582886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09164679795503617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23882800340652467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Stomp_B_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43303900957107546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5839549899101257,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6329669952392578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7436609864234924,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.217579960823059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "stun_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Stun_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "core_light"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1390829086303711,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24227313697338105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "R_snake_bottom_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30508482456207278,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "L_snake_bottom_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36565321683883669,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4464113414287567,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "L_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5137096643447876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "R_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5383855700492859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0072299242019654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4312098026275635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6645078659057618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "right_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7138570547103882,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.113163709640503,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissDeath",
+						"bone_name": "left_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1759767532348635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.822040557861328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9117660522460939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.364912748336792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "right_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4277172088623049,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "L_snake_bottom_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4793143272399904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "R_snake_bottom_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.598214626312256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6946723461151125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8965656757354738,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "R_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.921241044998169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "L_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9324631690979006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.244279861450195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "triangle_slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Creak",
+						"bone_name": "valve_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1444689929485321,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3387550115585327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44835200905799868,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5330399870872498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5878390073776245,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6476190090179443,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7173629999160767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7472530007362366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8419049978256226,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8419049978256226,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8952379822731018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/TriangleSlam_",
+						"bone_name": "valve_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9016849994659424,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Creak",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9066669940948486,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9166300296783447,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9764099717140198,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpactSmall",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.190619945526123,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2703299522399903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Creak",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.878100037574768,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeShake",
+						"bone_name": "core_light"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1720099449157717,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6103999614715578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeShake",
+						"bone_name": "core_light"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7648398876190187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.904320001602173,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeShake",
+						"bone_name": "core_light"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.362639904022217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.234429836273193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.618020057678223,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ExplosiveWhoosh",
+						"bone_name": "core_light"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.777440071105957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ExplosiveWhoosh",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.569519996643066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.793700218200684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.803659915924072,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.853479862213135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.873410224914551,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.898320198059082,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.943150043487549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.012889862060547,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.037799835205078,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.087619781494141,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "L_snake_top_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.172309875488281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.281899929046631,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "wall_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SweetenerEmerge",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Emerge_A_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneEmerge",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Creak",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21002499759197236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/MetalEmerge",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32873499393463137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Energy/Emerge",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3605999946594239,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6709699630737306,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveA_",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9814400672912599,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Emerge_B_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4781200885772707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6389100551605226,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.120140075683594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.533780097961426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveC_",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.933800220489502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeEmerge",
+						"bone_name": "right_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.363349914550781,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeEmerge",
+						"bone_name": "left_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.511380195617676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "R_snake_bottom_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.7362799644470219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHigh",
+						"bone_name": "left_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.888879776000977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpact",
+						"bone_name": "R_snake_bottom_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.027200222015381,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhoosh",
+						"bone_name": "L_snake_bottom_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.177380084991455,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.384769916534424,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpact",
+						"bone_name": "L_snake_bottom_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.562449932098389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.616209983825684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeEmerge",
+						"bone_name": "L_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.908559799194336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeEmerge",
+						"bone_name": "R_snake_top_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.021890163421631,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "L_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.0756001472473148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeEmerge",
+						"bone_name": "L_snake_top_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.133230209350586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Step",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.147190093994141,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.218790054321289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeEmerge",
+						"bone_name": "R_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.236680030822754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.3082499504089359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "R_snake_mid_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.469870090484619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "right_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.554049968719482,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "left_top_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.576769828796387,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "right_bot_mouth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.884039878845215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/HissHighShort",
+						"bone_name": "right_mid_mouth"
+					}
+				]
+			},
+			{
+				"name": "walls_to_ball_laser_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/WallsToBall_Laser_",
+						"bone_name": "aux_headdisc_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35692301392555239,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeShake",
+						"bone_name": "aux_headdisc_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38769200444221499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4430769979953766,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonalShort",
+						"bone_name": "aux_mouth_out_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44923099875450137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeWhooshSmall",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4738459885120392,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/ChargeUpTonalShort",
+						"bone_name": "aux_mouth_out_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5702559947967529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "R_snake_top_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6030769944190979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpact",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6379489898681641,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeImpact",
+						"bone_name": "aux_mouth_out_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.654358983039856,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "L_snake_top_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7323079705238342,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LaserCharge",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7958980202674866,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/LaserCharge",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8574360013008118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "L_snake_mid_jntBnd_23"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.943589985370636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Vocal/Snake/Hiss",
+						"bone_name": "R_snake_mid_jntBnd_23"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8379499912261963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/StoneMoveB_",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8748699426651,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/Metal",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9076900482177735,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9487199783325196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "aux_mouth_out_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9876899719238282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Effects/Sweetener/SnakeMove",
+						"bone_name": "aux_mouth_out_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.99590003490448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_2/VaalStatueBoss/Foley/SnakeDetach",
+						"bone_name": "aux_mouth_out_1"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "combo_laser_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.5999999046325685,
+						"name": "glow",
+						"curve": "6 0 0 Linear 0.524193 0 Flat 2.53408 1 Linear 2.60474 1 Flat 3.37414 0 Flat 3.6 0 Flat"
+					}
+				]
+			},
+			{
+				"name": "six_lasers_criscross_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.1659998893737795,
+						"name": "glow",
+						"curve": "5 0 0 Linear 0.347889 0 Flat 1.03635 1 Flat 2.5505 1 Flat 3.166 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "six_lasers_focus_explosion_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.466000080108643,
+						"name": "glow",
+						"curve": "5 0 0 Linear 0.367638 0 Flat 1.81687 1 Flat 4.06376 1 Flat 5.466 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "six_lasers_front_to_back_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0020920499227941038,
+						"end_time": 3.0,
+						"name": "glow",
+						"curve": "5 0.00209205 0 Linear 0.130091 0 Flat 0.656382 1 Flat 2.04466 1 Flat 3 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "snake_barrage_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.799999952316284,
+						"name": "glow",
+						"curve": "4 0 0 Smooth 0.534229 0.6 Flat 1.70545 0.6 Flat 2.8 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "snake_barrage_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.8660000562667847,
+						"name": "glow",
+						"curve": "4 0 0 Smooth 0.356025 0.6 Flat 1.13656 0.6 Flat 1.866 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "triangle_slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0020920499227941038,
+						"end_time": 6.5,
+						"name": "glow",
+						"curve": "6 0.00209205 0 Linear 0.561188 0 Flat 3.5421 1 Flat 4.24155 1 Flat 5.07245 0.248099 CustomSmooth -0.440208 6.5 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "wall_emerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 8.399999618530274,
+						"name": "Dust_Fade",
+						"curve": "3 0 1 Smooth 4.70378 0.736967 Smooth 8.4 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "wall_idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "Dust_Fade",
+						"curve": "2 0 1 Linear 1 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "walls_to_ball_laser_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.799999952316284,
+						"name": "glow",
+						"curve": "5 0 0 Linear 0.409741 0 Flat 1.19543 1 Flat 1.65341 1 Flat 2.8 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "aux_facelight"
+			state = "standalone"
+				colour = "0.461634 0.485109 0.553257"
+				radius = 250
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+				distance_threshold = 100
+			state = "on_death"
+				radius = 250
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+				distance_threshold = 100
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "six_lasers_criscross_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.675000011920929,
+						"end_time": 3.1659998893737795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_1"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.675000011920929,
+						"end_time": 3.1659998893737795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_6"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.675000011920929,
+						"end_time": 3.1659998893737795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_2"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.675000011920929,
+						"end_time": 3.1659998893737795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_3"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.675000011920929,
+						"end_time": 3.1659998893737795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_4"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.675000011920929,
+						"end_time": 3.1659998893737795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_5"
+					}
+				]
+			},
+			{
+				"name": "six_lasers_focus_explosion_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.100000023841858,
+						"end_time": 5.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_6"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.100000023841858,
+						"end_time": 5.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_1"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.100000023841858,
+						"end_time": 5.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_3"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.100000023841858,
+						"end_time": 5.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_2"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.100000023841858,
+						"end_time": 5.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_5"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.100000023841858,
+						"end_time": 5.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_4"
+					}
+				]
+			},
+			{
+				"name": "six_lasers_front_to_back_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4000000059604645,
+						"end_time": 2.8000001907348635,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_6"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4000000059604645,
+						"end_time": 2.8000001907348635,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_5"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4000000059604645,
+						"end_time": 2.8000001907348635,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_4"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4000000059604645,
+						"end_time": 2.8000001907348635,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_3"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4000000059604645,
+						"end_time": 2.8000001907348635,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_2"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4000000059604645,
+						"end_time": 2.8000001907348635,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/laser_beam/onact_plasma.pet",
+						"bone_group": "snake_head_mouthline_1"
+					}
+				]
+			},
+			{
+				"name": "snake_barrage_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6844260096549988,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/snake_head_slam/onAct_trailing_dirt.pet",
+						"bone_group": "snake_head_mouthline_1"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8598319888114929,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/snake_head_slam/onAct_trailing_dirt.pet",
+						"bone_group": "snake_head_mouthline_6"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0438350439071656,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/snake_head_slam/onAct_trailing_dirt.pet",
+						"bone_group": "snake_head_mouthline_2"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.350000023841858,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/snake_head_slam/onAct_trailing_dirt.pet",
+						"bone_group": "snake_head_mouthline_3"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.4500000476837159,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/snake_head_slam/onAct_trailing_dirt.pet",
+						"bone_group": "snake_head_mouthline_4"
+					}
+				]
+			},
+			{
+				"name": "snake_barrage_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5699149966239929,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/snake_head_slam/onAct_trailing_dirt.pet",
+						"bone_group": "snake_head_mouthline_1"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7101879715919495,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/snake_head_slam/onAct_trailing_dirt.pet",
+						"bone_group": "snake_head_mouthline_6"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8707680106163025,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/snake_head_slam/onAct_trailing_dirt.pet",
+						"bone_group": "snake_head_mouthline_2"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.022081971168518,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/snake_head_slam/onAct_trailing_dirt.pet",
+						"bone_group": "snake_head_mouthline_3"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.2157740592956544,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/snake_head_slam/onAct_trailing_dirt.pet",
+						"bone_group": "snake_head_mouthline_4"
+					}
+				]
+			},
+			{
+				"name": "wall_emerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.619299054145813,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "head_disc"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.577925980091095,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "l_shoulder"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1186920404434205,
+						"end_time": 1.6371150016784669,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "r_shoulder"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.3623430728912355,
+						"end_time": 2.827259063720703,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "head_disc"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.921689987182617,
+						"end_time": 4.261321067810059,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "torso_width"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.3858280181884767,
+						"end_time": 3.7376790046691896,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "head_disc"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.415265083312988,
+						"end_time": 6.421344757080078,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "torso_width"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.45096492767334,
+						"end_time": 5.225301742553711,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "head_disc"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 5.008665084838867,
+						"end_time": 5.783375263214111,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "snake_1_body"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 5.465576171875,
+						"end_time": 6.246150016784668,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "snake_4_body"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 6.244028091430664,
+						"end_time": 7.089386940002441,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "snake_3_body"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 6.459240913391113,
+						"end_time": 7.026792049407959,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "snake_4_body"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 6.550421237945557,
+						"end_time": 7.20502233505249,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "snake_5_body"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 6.638089179992676,
+						"end_time": 7.252782344818115,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "snake_6_body"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 6.910820007324219,
+						"end_time": 7.275542259216309,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/wall_emerge/onAct_wall_emerge_shoulderBurst.pet",
+						"bone_group": "snake_2_body"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6002789735794067,
+						"end_time": 0.7958149909973145,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/trail_melee.trl",
+						"bone_group": "snake_head_mouthline_4"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7754520177841187,
+						"end_time": 0.897350013256073,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/trail_melee.trl",
+						"bone_group": "snake_head_mouthline_6"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8591349720954895,
+						"end_time": 0.994422972202301,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/trail_melee.trl",
+						"bone_group": "snake_head_mouthline_5"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6304050087928772,
+						"end_time": 0.7958149909973145,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/trail_melee.trl",
+						"bone_group": "snake_head_mouthline_3"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7799149751663208,
+						"end_time": 0.9073939919471741,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/trail_melee.trl",
+						"bone_group": "snake_head_mouthline_1"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.842399001121521,
+						"end_time": 0.9676470160484314,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/fx/trail_melee.trl",
+						"bone_group": "snake_head_mouthline_2"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "combo_laser_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 1.1598299741744996,
+						"end_time": 3.5999999046325685,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/epk/six_lasers_crisscross_gem_pulse.epk"
+					}
+				]
+			},
+			{
+				"name": "six_lasers_criscross_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.1659998893737795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/epk/six_lasers_crisscross_gem_pulse.epk"
+					}
+				]
+			},
+			{
+				"name": "six_lasers_focus_explosion_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 5.466000080108643,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/epk/six_lasers_crisscross_gem_pulse.epk"
+					}
+				]
+			},
+			{
+				"name": "six_lasers_front_to_back_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/epk/six_lasers_crisscross_gem_pulse.epk"
+					}
+				]
+			},
+			{
+				"name": "snake_barrage_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.799999952316284,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/epk/six_lasers_crisscross_gem_pulse.epk"
+					}
+				]
+			},
+			{
+				"name": "snake_barrage_bwd_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.8660000562667847,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/epk/six_lasers_crisscross_gem_pulse.epk"
+					}
+				]
+			},
+			{
+				"name": "triangle_slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 6.5,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/epk/six_lasers_crisscross_gem_pulse.epk"
+					}
+				]
+			},
+			{
+				"name": "wall_emerge_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 8.399999618530274,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/epk/wall_emerge_pulse.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/epk/dust_layer.epk"
+					}
+				]
+			},
+			{
+				"name": "wall_idle_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/epk/dust_layer.epk"
+					}
+				]
+			},
+			{
+				"name": "walls_to_ball_laser_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.799999952316284,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/epk/six_lasers_crisscross_gem_pulse.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.1746930032968521,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.000003814697269,
+								0.0,
+								10.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "combo_laser_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.507112979888916,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								50.000003814697269,
+								0.0,
+								0.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.0217599868774415,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.000003814697269,
+								0.0,
+								10.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.8769900798797609,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								50.000003814697269,
+								0.0,
+								0.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.2410099506378176,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.000003814697269,
+								0.0,
+								10.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.17816999554634095,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								50.000003814697269,
+								0.0,
+								0.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.145650029182434,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_finger_2_jntBnd_2"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								50.000003814697269,
+								0.0,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "snake_barrage_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.4367940127849579,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								50.000003814697269,
+								0.0,
+								0.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.7772870063781738,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.000003814697269,
+								0.0,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "stomp_180_left_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.41283100843429568,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_snake_bottom_jaw_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								20.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.4546720087528229,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_snake_bottom_jaw_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								20.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.8786579966545105,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_snake_bottom_jaw_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								20.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.0515999794006348,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_snake_bottom_jaw_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								20.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.138069987297058,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.000003814697269,
+								0.0,
+								20.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.2259399890899659,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								50.000003814697269,
+								0.0,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "stomp_180_right_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.45746099948883059,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_snake_bottom_jaw_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								20.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.45746099948883059,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_snake_bottom_jaw_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								20.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.8256620168685913,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_snake_bottom_jaw_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								20.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.9804739952087402,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_snake_bottom_jaw_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								20.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.1631799936294556,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								50.000003814697269,
+								0.0,
+								0.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.1910699605941773,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.000003814697269,
+								0.0,
+								20.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "stomp_90_left_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.6600000262260437,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.000003814697269,
+								0.0,
+								20.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.2279000282287598,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								50.000003814697269,
+								0.0,
+								20.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "stomp_90_right_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.675000011920929,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								50.000003814697269,
+								0.0,
+								0.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.2319999933242798,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.000003814697269,
+								0.0,
+								20.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "triangle_slam_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.2753599882125855,
+						"end_time": 5.775360107421875,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/triangle_rune_slam.ao",
+						"animation": "buildup",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								-48.538002014160159,
+								0.0
+							],
+							"scale": [
+								1.25,
+								1.25,
+								1.25
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "wall_emerge_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.5146400928497316,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"scale": [
+								1.5000001192092896,
+								1.5000001192092896,
+								1.5000001192092896
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 4.141429901123047,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"scale": [
+								1.5000001192092896,
+								1.5000001192092896,
+								1.5000001192092896
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 6.080359935760498,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "L_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								50.000003814697269,
+								0.0,
+								20.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 6.578269958496094,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/VaalStatue/footstep.ao",
+						"from": {
+							"parent_bone": "R_wrist_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.000003814697269,
+								0.0,
+								-20.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "combo_laser_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 2.6966700553894045,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "wall_emerge_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.0,
+						"haptic_id": "Haptic_HugeBoss_Rumble_Loop3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.0745099782943726,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.9371001720428467,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 2.984529972076416,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 3.6930899620056154,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 4.253889560699463,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 4.408060073852539,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 5.550789833068848,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 6.247399806976318,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 6.668429851531982,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/VaalBossStatue/Objects/VaalStatueBossCoreLight.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Misc/blank.amd"
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Misc/blank.ast"
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			state = ""
+				colour = "3.00001 0 0"
+				position = "0 0 -125"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "off"
+				default_state = true
+				colour = "0.003 0 0"
+				position = "0 0 0"
+				radius = 150
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "on"
+				colour = "3.00001 0 0"
+				position = "0 0 0"
+				radius = 150
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+	}
+}
+
+=== .ao Metadata/Monsters/VaalBossStatue/Objects/VaalStatueBossFaceLight.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Misc/blank.amd"
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Misc/blank.ast"
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			state = ""
+				colour = "3.00001 0 0"
+				position = "0 0 -125"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "off"
+				default_state = true
+				colour = "0.003 0 0"
+				radius = 150
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "on"
+				colour = "0.461747 0.48477 0.553484"
+				radius = 250
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+				distance_threshold = 100
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/VaalBossStatue/VaalBossStatue.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/VaalBossStatue/rig_81e35361.smd"
+Materials 6
+	"Art/Models/MONSTERS/VaalBossStatue/Textures/VaalBossStatueRemakec.mat" 8
+	"Art/Models/MONSTERS/VaalBossStatue/Textures/VaalBossStatue_glowc.mat" 1
+	"Art/Models/MONSTERS/VaalBossStatue/Textures/VaalBossStatuec.mat" 35
+	"Art/Models/MONSTERS/VaalBossStatue/Textures/VaalBossStatueSnakesc.mat" 6
+	"Art/Models/MONSTERS/VaalBossStatue/Textures/VaalBossStatueSnakes_glowc.mat" 6
+	"Art/Models/MONSTERS/VaalBossStatue/Textures/VaalBossStatueSnakesc.mat" 1
+BoundingBox -529.575 -52.6357 -482.569 529.575 78.4985 -69.5985
+BoneGroups 130
+	"grp_l_snake_1_01" 2 "R_snake_top_jntBnd_1" "R_snake_top_jntBnd_2"
+	"grp_l_snake_1_02" 2 "R_snake_top_jntBnd_2" "R_snake_top_jntBnd_3"
+	"grp_l_snake_1_03" 2 "R_snake_top_jntBnd_3" "R_snake_top_jntBnd_4"
+	"grp_l_snake_1_04" 2 "R_snake_top_jntBnd_4" "R_snake_top_jntBnd_5"
+	"grp_l_snake_1_05" 2 "R_snake_top_jntBnd_5" "R_snake_top_jntBnd_6"
+	"grp_l_snake_1_06" 2 "R_snake_top_jntBnd_6" "R_snake_top_jntBnd_7"
+	"grp_l_snake_1_07" 2 "R_snake_top_jntBnd_7" "R_snake_top_jntBnd_8"
+	"grp_l_snake_1_08" 2 "R_snake_top_jntBnd_8" "R_snake_top_jntBnd_9"
+	"grp_l_snake_1_09" 2 "R_snake_top_jntBnd_9" "R_snake_top_jntBnd_10"
+	"grp_l_snake_1_10" 2 "R_snake_top_jntBnd_10" "R_snake_top_jntBnd_11"
+	"grp_l_snake_1_11" 2 "R_snake_top_jntBnd_11" "R_snake_top_jntBnd_12"
+	"grp_l_snake_1_12" 2 "R_snake_top_jntBnd_12" "R_snake_top_jntBnd_13"
+	"grp_l_snake_13" 2 "R_snake_top_jntBnd_13" "R_snake_top_jntBnd_14"
+	"grp_l_snake_1_14" 2 "R_snake_top_jntBnd_14" "R_snake_top_jntBnd_15"
+	"grp_l_snake_1_15" 2 "R_snake_top_jntBnd_15" "R_snake_top_jntBnd_16"
+	"grp_l_snake_1_16" 2 "R_snake_top_jntBnd_16" "R_snake_top_jntBnd_17"
+	"grp_l_snake_1_17" 2 "R_snake_top_jntBnd_17" "R_snake_top_jntBnd_18"
+	"grp_l_snake_1_18" 2 "R_snake_top_jntBnd_18" "R_snake_top_jntBnd_19"
+	"grp_l_snake_19" 2 "R_snake_top_jntBnd_19" "R_snake_top_jntBnd_20"
+	"grp_l_snake_1_20" 2 "R_snake_top_jntBnd_20" "R_snake_top_jntBnd_21"
+	"grp_l_snake_1_21" 2 "R_snake_top_jntBnd_21" "R_snake_top_jntBnd_22"
+	"grp_l_snake_1_22" 2 "R_snake_top_jntBnd_22" "R_snake_top_jntBnd_23"
+	"grp_l_snake_1_23" 2 "R_snake_top_jntBnd_23" "R_snake_top_head_jntBnd"
+	"grp_l_snake_1_head" 2 "R_snake_top_head_jntBnd" "R_snake_top_jaw_jntBnd"
+	"grp_l_snake_2_01" 2 "L_snake_mid_jntBnd_1" "L_snake_mid_jntBnd_2"
+	"grp_l_snake_2_02" 2 "L_snake_mid_jntBnd_2" "L_snake_mid_jntBnd_3"
+	"grp_l_snake_2_03" 2 "L_snake_mid_jntBnd_3" "L_snake_mid_jntBnd_4"
+	"grp_l_snake_2_04" 2 "L_snake_mid_jntBnd_4" "L_snake_mid_jntBnd_5"
+	"grp_l_snake_05" 2 "L_snake_mid_jntBnd_5" "L_snake_mid_jntBnd_6"
+	"grp_l_snake_2_06" 2 "L_snake_mid_jntBnd_6" "L_snake_mid_jntBnd_7"
+	"grp_l_snake_2_07" 2 "L_snake_mid_jntBnd_7" "L_snake_mid_jntBnd_8"
+	"grp_l_snake_2_08" 2 "L_snake_mid_jntBnd_8" "L_snake_mid_jntBnd_9"
+	"grp_l_snake_2_09" 2 "L_snake_mid_jntBnd_9" "L_snake_mid_jntBnd_10"
+	"grp_l_snake_2_10" 2 "L_snake_mid_jntBnd_10" "L_snake_mid_jntBnd_11"
+	"grp_l_snake_2_11" 2 "L_snake_mid_jntBnd_11" "L_snake_mid_jntBnd_12"
+	"grp_l_snake_2_12" 2 "L_snake_mid_jntBnd_12" "L_snake_mid_jntBnd_13"
+	"grp_l_snake_2_13" 2 "L_snake_mid_jntBnd_13" "L_snake_mid_jntBnd_14"
+	"grp_l_snake_2_14" 2 "L_snake_mid_jntBnd_14" "L_snake_mid_jntBnd_15"
+	"grp_l_snake_2_15" 2 "L_snake_mid_jntBnd_15" "L_snake_mid_jntBnd_16"
+	"grp_l_snake_2_16" 2 "L_snake_mid_jntBnd_16" "L_snake_mid_jntBnd_17"
+	"grp_l_snake_2_17" 2 "L_snake_mid_jntBnd_17" "L_snake_mid_jntBnd_18"
+	"grp_l_snake_2_18" 2 "L_snake_mid_jntBnd_18" "L_snake_mid_jntBnd_19"
+	"grp_l_snake_2_19" 2 "L_snake_mid_jntBnd_19" "L_snake_mid_jntBnd_20"
+	"grp_l_snake_2_20" 2 "L_snake_mid_jntBnd_20" "L_snake_mid_jntBnd_21"
+	"grp_l_snake_2_21" 2 "L_snake_mid_jntBnd_21" "L_snake_mid_jntBnd_22"
+	"grp_l_snake_2_22" 2 "L_snake_mid_jntBnd_22" "L_snake_mid_jntBnd_23"
+	"grp_l_snake_2_23" 2 "L_snake_mid_jntBnd_23" "L_snake_mid_head_jntBnd"
+	"grp_l_snake_2_head" 2 "L_snake_mid_head_jntBnd" "L_snake_mid_jaw_jntBnd"
+	"grp_l_snake_3_01" 2 "L_snake_bottom_jntBnd_1" "L_snake_bottom_jntBnd_2"
+	"grp_l_snake_3_02" 2 "L_snake_bottom_jntBnd_2" "L_snake_bottom_jntBnd_3"
+	"grp_l_snake_3_03" 2 "L_snake_bottom_jntBnd_3" "L_snake_bottom_jntBnd_4"
+	"grp_l_snake_3_04" 2 "L_snake_bottom_jntBnd_4" "L_snake_bottom_jntBnd_5"
+	"grp_l_snake_3_05" 2 "L_snake_bottom_jntBnd_5" "L_snake_bottom_jntBnd_6"
+	"grp_l_snake_3_06" 2 "L_snake_bottom_jntBnd_6" "L_snake_bottom_jntBnd_7"
+	"grp_l_snake_3_07" 2 "L_snake_bottom_jntBnd_7" "L_snake_bottom_jntBnd_8"
+	"grp_l_snake_3_08" 2 "L_snake_bottom_jntBnd_8" "L_snake_bottom_jntBnd_9"
+	"grp_l_snake_3_09" 2 "L_snake_bottom_jntBnd_9" "L_snake_bottom_jntBnd_10"
+	"grp_l_snake_3_10" 2 "L_snake_bottom_jntBnd_10" "L_snake_bottom_jntBnd_11"
+	"grp_l_snake_3_11" 2 "L_snake_bottom_jntBnd_11" "L_snake_bottom_jntBnd_12"
+	"grp_l_snake_3_12" 2 "L_snake_bottom_jntBnd_12" "L_snake_bottom_jntBnd_13"
+	"grp_l_snake_3_13" 2 "L_snake_bottom_jntBnd_13" "L_snake_bottom_jntBnd_14"
+	"grp_l_snake_3_14" 2 "L_snake_bottom_jntBnd_14" "L_snake_bottom_jntBnd_15"
+	"grp_l_snake_3_15" 2 "L_snake_bottom_jntBnd_15" "L_snake_bottom_jntBnd_16"
+	"grp_l_snake_3_16" 2 "L_snake_bottom_jntBnd_16" "L_snake_bottom_jntBnd_17"
+	"grp_l_snake_3_17" 2 "L_snake_bottom_jntBnd_17" "L_snake_bottom_jntBnd_18"
+	"grp_l_snake_3_18" 2 "L_snake_bottom_jntBnd_18" "L_snake_bottom_jntBnd_19"
+	"grp_l_snake_3_19" 2 "L_snake_bottom_jntBnd_19" "L_snake_bottom_jntBnd_20"
+	"grp_l_snake_3_20" 2 "L_snake_bottom_jntBnd_20" "L_snake_bottom_jntBnd_21"
+	"grp_l_snake_3_21" 2 "L_snake_bottom_jntBnd_21" "L_snake_bottom_jntBnd_22"
+	"grp_l_snake_3_22" 2 "L_snake_bottom_jntBnd_22" "L_snake_bottom_jntBnd_23"
+	"grp_l_snake_3_23" 2 "L_snake_bottom_jntBnd_23" "L_snake_bottom_head_jntBnd"
+	"grp_l_snake_3_head" 2 "L_snake_bottom_head_jntBnd" "L_snake_bottom_jaw_jntBnd"
+	"grp_r_snake_1_01" 2 "R_snake_top_jntBnd_1" "R_snake_top_jntBnd_2"
+	"grp_r_snake_1_02" 2 "R_snake_top_jntBnd_2" "R_snake_top_jntBnd_3"
+	"grp_r_snake_1_03" 2 "R_snake_top_jntBnd_3" "R_snake_top_jntBnd_4"
+	"grp_r_snake_1_04" 2 "R_snake_top_jntBnd_4" "R_snake_top_jntBnd_5"
+	"grp_r_snake_1_05" 2 "R_snake_top_jntBnd_5" "R_snake_top_jntBnd_6"
+	"grp_r_snake_1_06" 2 "R_snake_top_jntBnd_6" "R_snake_top_jntBnd_7"
+	"grp_r_snake_1_07" 2 "R_snake_top_jntBnd_7" "R_snake_top_jntBnd_8"
+	"grp_r_snake_1_08" 2 "R_snake_top_jntBnd_8" "R_snake_top_jntBnd_9"
+	"grp_r_snake_1_09" 2 "R_snake_top_jntBnd_9" "R_snake_top_jntBnd_10"
+	"grp_r_snake_1_10" 2 "R_snake_top_jntBnd_10" "R_snake_top_jntBnd_11"
+	"grp_r_snake_1_11" 2 "R_snake_top_jntBnd_11" "R_snake_top_jntBnd_12"
+	"grp_r_snake_1_12" 2 "R_snake_top_jntBnd_12" "R_snake_top_jntBnd_13"
+	"grp_r_snake_1_13" 2 "R_snake_top_jntBnd_13" "R_snake_top_jntBnd_14"
+	"grp_r_snake_1_14" 2 "R_snake_top_jntBnd_14" "R_snake_top_jntBnd_15"
+	"grp_r_snake_1_15" 2 "R_snake_top_jntBnd_15" "R_snake_top_jntBnd_16"
+	"grp_r_snake_1_16" 2 "R_snake_top_jntBnd_16" "R_snake_top_jntBnd_17"
+	"grp_r_snake_1_17" 2 "R_snake_top_jntBnd_17" "R_snake_top_jntBnd_18"
+	"grp_r_snake_1_18" 2 "R_snake_top_jntBnd_18" "R_snake_top_jntBnd_19"
+	"grp_r_snake_1_19" 2 "R_snake_top_jntBnd_19" "R_snake_top_jntBnd_20"
+	"grp_r_snake_1_20" 2 "R_snake_top_jntBnd_20" "R_snake_top_jntBnd_21"
+	"grp_r_snake_1_21" 2 "R_snake_top_jntBnd_21" "R_snake_top_jntBnd_22"
+	"grp_r_snake_1_22" 2 "R_snake_top_jntBnd_22" "R_snake_top_jntBnd_23"
+	"grp_r_snake_1_23" 2 "R_snake_top_jntBnd_23" "R_snake_top_head_jntBnd"
+	"grp_r_snake_1_head" 2 "R_snake_top_head_jntBnd" "R_snake_top_jaw_jntBnd"
+	"grp_r_snake_2_01" 2 "R_snake_mid_jntBnd_1" "R_snake_mid_jntBnd_2"
+	"grp_r_snake_2_02" 2 "R_snake_mid_jntBnd_2" "R_snake_mid_jntBnd_3"
+	"grp_r_snake_2_03" 2 "R_snake_mid_jntBnd_3" "R_snake_mid_jntBnd_4"
+	"grp_r_snake_2_04" 2 "R_snake_mid_jntBnd_4" "R_snake_mid_jntBnd_5"
+	"grp_r_snake_2_05" 2 "R_snake_mid_jntBnd_5" "R_snake_mid_jntBnd_6"
+	"grp_r_snake_2_06" 2 "R_snake_mid_jntBnd_6" "R_snake_mid_jntBnd_7"
+	"grp_r_snake_2_07" 2 "R_snake_mid_jntBnd_7" "R_snake_mid_jntBnd_8"
+	"grp_r_snake_2_08" 2 "R_snake_mid_jntBnd_8" "R_snake_mid_jntBnd_9"
+	"grp_r_snake_2_09" 2 "R_snake_mid_jntBnd_9" "R_snake_mid_jntBnd_10"
+	"grp_r_snake_2_10" 2 "R_snake_mid_jntBnd_10" "R_snake_mid_jntBnd_11"
+	"grp_r_snake_2_11" 2 "R_snake_mid_jntBnd_11" "R_snake_mid_jntBnd_12"
+	"grp_r_snake_2_12" 2 "R_snake_mid_jntBnd_12" "R_snake_mid_jntBnd_13"
+	"grp_r_snake_2_13" 2 "R_snake_mid_jntBnd_13" "R_snake_mid_jntBnd_14"
+	"grp_r_snake_2_14" 2 "R_snake_mid_jntBnd_14" "R_snake_mid_jntBnd_15"
+	"grp_r_snake_2_15" 2 "R_snake_mid_jntBnd_15" "R_snake_mid_jntBnd_16"
+	"grp_r_snake_2_16" 2 "R_snake_mid_jntBnd_16" "R_snake_mid_jntBnd_17"
+	"grp_r_snake_2_17" 2 "R_snake_mid_jntBnd_17" "R_snake_mid_jntBnd_18"
+	"grp_r_snake_2_18" 2 "R_snake_mid_jntBnd_18" "R_snake_mid_jntBnd_19"
+	"grp_r_snake_2_19" 2 "R_snake_mid_jntBnd_19" "R_snake_mid_jntBnd_20"
+	"grp_r_snake_2_20" 2 "R_snake_mid_jntBnd_20" "R_snake_mid_jntBnd_21"
+	"grp_r_snake_2_21" 2 "R_snake_mid_jntBnd_21" "R_snake_mid_jntBnd_22"
+	"grp_r_snake_2_22" 2 "R_snake_mid_jntBnd_22" "R_snake_mid_jntBnd_23"
+	"grp_r_snake_2_23" 2 "R_snake_mid_jntBnd_23" "R_snake_mid_head_jntBnd"
+	"grp_r_snake_2_24" 2 "R_snake_mid_head_jntBnd" "R_snake_mid_jaw_jntBnd"
+	"grp_r_snake_3_head" 2 "R_snake_bottom_head_jntBnd" "R_snake_bottom_jaw_jntBnd"
+	"grp_head" 2 "head_jntBnd" "headdress_jntBnd"
+	"grp_neck" 2 "head_jntBnd" "neck_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+
+=== .smd Art/Models/MONSTERS/VaalBossStatue/rig_81e35361.smd
+  version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 57 in the header, 57 in the block · 91606 triangles over 117338 vertices
+  names: 1914 bytes said, 1914 read  [agree]
+
+=== shapes (57)
+0	chestShape	from 0	count 25068
+1	headShape	from 25068	count 12888
+2	L_gem_armShape	from 37956	count 22416
+3	L_lower_armShape	from 60372	count 21264
+4	L_upper_armShape	from 81636	count 33468
+5	R_gem_armShape	from 115104	count 22416
+6	R_lower_armShape	from 137520	count 21264
+7	R_upper_armShape	from 158784	count 33468
+8	gemShape	from 192252	count 360
+9	chest_goldShape	from 192612	count 4236
+10	gem_surroundingShape	from 196848	count 3564
+11	head_miscShape	from 200412	count 312
+12	headpiece_handing_DSShape	from 200724	count 144
+13	headpieceShape	from 200868	count 5916
+14	L_finder_01Shape	from 206784	count 618
+15	L_finder_02Shape	from 207402	count 618
+16	L_finder_03Shape	from 208020	count 618
+17	L_finder_04Shape	from 208638	count 618
+18	L_gem_arm_goldShape	from 209256	count 744
+19	L_gem_clampShape	from 210000	count 1476
+20	L_handShape	from 211476	count 996
+21	L_headpiece_handing_01Shape	from 212472	count 870
+22	L_headpiece_handing_02Shape	from 213342	count 1602
+23	L_lower_arm_goldShape	from 214944	count 72
+24	L_shoulderpadShape	from 215016	count 2322
+25	L_thumb_01Shape	from 217338	count 108
+26	L_thumb_02Shape	from 217446	count 528
+27	L_upper_arm_goldShape	from 217974	count 348
+28	neckShape	from 218322	count 192
+29	pegShape	from 218514	count 1434
+30	R_finder_01Shape	from 219948	count 618
+31	R_finder_02Shape	from 220566	count 618
+32	R_finder_03Shape	from 221184	count 618
+33	R_finder_04Shape	from 221802	count 618
+34	R_gem_arm_goldShape	from 222420	count 744
+35	R_gem_clampShape	from 223164	count 1476
+36	R_handShape	from 224640	count 996
+37	R_headpiece_handing_01Shape	from 225636	count 870
+38	R_headpiece_handing_02Shape	from 226506	count 1602
+39	R_lower_arm_goldShape	from 228108	count 72
+40	R_shoulderpadShape	from 228180	count 2322
+41	R_thumb_01Shape	from 230502	count 108
+42	R_thumb_02Shape	from 230610	count 528
+43	R_upper_arm_goldShape	from 231138	count 348
+44	L_snake_0Shape1	from 231486	count 6048
+45	L_snake_0Shape2	from 237534	count 6048
+46	L_snake_0Shape3	from 243582	count 6048
+47	R_snake_02Shape	from 249630	count 3024
+48	R_snake_0Shape1	from 252654	count 6048
+49	R_snake_0Shape3	from 258702	count 6048
+50	L_snake_eyes_01Shape	from 264750	count 600
+51	L_snake_eyes_02Shape	from 265350	count 600
+52	L_snake_eyes_03Shape	from 265950	count 600
+53	R_snake_eyes_01Shape	from 266550	count 600
+54	R_snake_eyes_02Shape	from 267150	count 300
+55	R_snake_eyes_03Shape	from 267450	count 600
+56	SnakeTeethShape	from 268050	count 6768
+
+=== fitting
+the monster's rig: 225 bones
+mounts: aux_position, aux_animation_control_ratio, aux_serverbone_xy_R_hand, aux_serverbone_xy_L_hand
+  VaalStatueBossCoreLight.ao  socket core_light [NOT in its carrier's rig]  (no mesh - an effect or a sound)
+  VaalStatueBossFaceLight.ao  socket aux_facelight [NOT in its carrier's rig]  (no mesh - an effect or a sound)
+  VaalStatueBossCoreLight.ao  socket core_light [NOT in its carrier's rig]  (no mesh - an effect or a sound)
+  VaalStatueBossFaceLight.ao  socket aux_facelight [NOT in its carrier's rig]  (no mesh - an effect or a sound)
+  VaalStatueBossCoreLight.ao  socket core_light [NOT in its carrier's rig]  (no mesh - an effect or a sound)
+  VaalStatueBossFaceLight.ao  socket aux_facelight [NOT in its carrier's rig]  (no mesh - an effect or a sound)

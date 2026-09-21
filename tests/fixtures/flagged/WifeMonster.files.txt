@@ -1,0 +1,3926 @@
+monster: Asinia, the Praetor's Consort [Metadata/Monsters/WifeMonster/WifeMonster]
+
+=== .ao Metadata/Monsters/WifeMonster/WifeMonster.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/WifeMonster/rig.amd"
+	view_of = "intro_01"
+		view_name = "intro_idle"
+		view_end = 625
+		view_looping = true
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	animations = '[
+		{
+			"name": "bone_cone_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.9259107708930969,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.600000023841858,
+					"name": "contact",
+					"position": [
+						0.0,
+						-141.06500244140626,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "bone_wall_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.6223620176315308,
+					"end_time": 1.2781877517700196,
+					"name": "start_target_update",
+					"data": "270 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.240939974784851,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.285630226135254,
+					"name": "rain"
+				}
+			]
+		},
+		{
+			"name": "combo_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.8329999446868898,
+					"name": "move",
+					"data": "1 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 0.6692439913749695,
+					"name": "start_face",
+					"data": "180 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.98539799451828,
+					"name": "end_face"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 1.2153199911117554,
+					"name": "start_face",
+					"data": "180 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 1.5889500379562379,
+					"name": "end_face"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 2.0529000759124758,
+					"name": "start_face",
+					"data": "180 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 2.2910499572753908,
+					"name": "end_face"
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.8975400924682619,
+					"name": "purge"
+				}
+			]
+		},
+		{
+			"name": "delayed_blast_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 3.176370143890381,
+					"name": "start_target_update",
+					"data": "360 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.44801199436187746,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1944700479507447,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8759599924087525,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.1064200401306154,
+					"name": "explode"
+				}
+			]
+		},
+		{
+			"name": "explode_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.2088099718093873,
+					"end_time": 3.8329999446868898,
+					"name": "start_target_update",
+					"data": "600 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						10.555999755859375,
+						-155.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5,
+					"name": "trigger",
+					"position": [
+						0.7756999731063843,
+						11.4822998046875,
+						-155.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.575000047683716,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						17.85919952392578,
+						-153.63999938964845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6500000953674318,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						19.332500457763673,
+						-150.38299560546876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7249999046325685,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						21.94070053100586,
+						-149.5050048828125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						18.290700912475587,
+						-155.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.875,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						24.12310028076172,
+						-155.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.950000047683716,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						24.959699630737306,
+						-155.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0250000953674318,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						24.444499969482423,
+						-155.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.1055800914764406,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						25.17770004272461,
+						-155.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.174999952316284,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						21.849199295043947,
+						-157.7790069580078
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.2280399799346926,
+					"name": "contact",
+					"position": [
+						0.7756999731063843,
+						19.68429946899414,
+						-164.01300048828126
+					]
+				}
+			]
+		},
+		{
+			"name": "intro_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "light_on"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.490149974822998,
+					"name": "dialogue"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 4.59306001663208,
+					"end_time": 10.265999794006348,
+					"name": "move",
+					"data": "1 0 0 Nothing 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.71999979019165,
+					"name": "light_two"
+				}
+			]
+		},
+		{
+			"name": "summon_01",
+			"events": [
+				{
+					"type": "PoiseEventType",
+					"time": 0.0,
+					"end_time": 2.0965373516082765,
+					"name": "poise",
+					"data": "1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.083889961242676,
+					"name": "empower"
+				}
+			]
+		},
+		{
+			"name": "swap_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9272670149803162,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1175899505615235,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1175899505615235,
+					"name": "submerge"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1175899505615235,
+					"name": "portalout"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2511099576950074,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2511099576950074,
+					"name": "hit_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2511099576950074,
+					"name": "emerge"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/WifeMonster/attachments/Frills.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/WifeMonster/attachments/Cape.ao"
+	attached_object = "R_Weapon Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/WifeMonsterWeapon.fmt"
+	attached_object = "skirt_jntBnd Metadata/Monsters/WifeMonster/attachments/Skirt.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.30726298689842226,
+								0.0
+							],
+							[
+								0.36871498823165896,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": -0.6108649969100952,
+						"angle": 2.7925302982330324,
+						"length": 205.0,
+						"local_offset": [
+							-15.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.3316130042076111,
+							-0.15707997977733613
+						],
+						"impact_z_rotation": [
+							-0.6283190250396729,
+							-3.857179880142212
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon",
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3128489851951599,
+								0.0
+							],
+							[
+								0.37988799810409548,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": -0.17453299462795258,
+						"angle": 2.7925302982330324,
+						"x_axis_scale": 0.75,
+						"length": 180.0,
+						"impact_x_rotation": [
+							0.2967059910297394,
+							2.7227096557617189
+						],
+						"impact_z_rotation": [
+							-0.4188790023326874,
+							0.0
+						],
+						"impact_bone": "R_Weapon",
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "combo_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.18644100427627564,
+								0.0
+							],
+							[
+								0.24293799698352815,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"update_target_direction": true,
+						"rotation": -1.500980019569397,
+						"angle": 3.8397200107574465,
+						"x_axis_scale": 1.1729999780654908,
+						"length": 126.19000244140625,
+						"offset": [
+							-13.0,
+							-1.0
+						],
+						"impact_z_rotation": [
+							-0.6806780099868774,
+							-4.782199859619141
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3606559932231903,
+								0.0
+							],
+							[
+								0.3770489990711212,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"update_target_direction": true,
+						"width": 143.67799377441407,
+						"angle": 1.553339958190918,
+						"x_axis_scale": 0.6010000109672546,
+						"length": 120.68900299072266,
+						"offset": [
+							-71.0,
+							39.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3793100118637085,
+								0.0
+							],
+							[
+								0.40804600715637209,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"previous_patterns_to_exclude_from": 1,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"update_target_direction": true,
+						"rotation": -0.6283190250396729,
+						"angle": 1.9896801710128785,
+						"x_axis_scale": 0.8199999928474426,
+						"length": 154.5449981689453,
+						"offset": [
+							44.0,
+							-29.0
+						],
+						"impact_z_rotation": [
+							-0.06981319934129715,
+							1.9722199440002442
+						],
+						"impact_type": "Slash"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5689650177955627,
+								0.0
+							],
+							[
+								0.6034479737281799,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"update_target_direction": true,
+						"angle": 3.141590118408203,
+						"x_axis_scale": 0.8550000190734863,
+						"length": 181.81900024414063,
+						"offset": [
+							-7.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.0,
+							-2.7401700019836427
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.7068970203399658,
+								0.0
+							],
+							[
+								0.7758619785308838,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"update_target_direction": true,
+						"angle": 3.159050226211548,
+						"x_axis_scale": 0.800000011920929,
+						"length": 149.69700622558595,
+						"offset": [
+							-19.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-2.5132699012756349,
+							-0.15707997977733613
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "swap_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6229509711265564,
+								0.0
+							],
+							[
+								0.6721310019493103,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"angle": 3.892080068588257,
+						"x_axis_scale": 1.0210000276565552,
+						"length": 150.0,
+						"offset": [
+							32.0,
+							-37.0
+						],
+						"impact_z_rotation": [
+							-0.22689299285411836,
+							3.7000999450683595
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.7329840064048767,
+								0.0
+							],
+							[
+								0.8115180134773254,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": 0.7330380082130432,
+						"angle": 3.3161299228668215,
+						"x_axis_scale": 0.8840000033378601,
+						"length": 157.89500427246095,
+						"offset": [
+							-55.0,
+							-1.0
+						],
+						"impact_z_rotation": [
+							0.5235990285873413,
+							3.246309995651245
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/WifeMonster/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "light"
+			parent = "root_jntBnd"
+			translation = "0 -29.9032 -288.385"
+		socket = "trail_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "13.0588 0 -46.6609"
+		socket = "trail_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "28.7692 0 -52.2066"
+		socket = "trail_03"
+			parent = "aux_R_Weapon_attachment"
+			translation = "35.6776 0 -67.6459"
+		socket = "trail_04"
+			parent = "aux_R_Weapon_attachment"
+			translation = "28.7692 0 -85.5548"
+		socket = "trail_05"
+			parent = "aux_R_Weapon_attachment"
+			translation = "13.0588 0 -94.6341"
+		socket = "skulls_01"
+			parent = "head_jntBnd"
+			translation = "0 -14.3738 -14.2616"
+		socket = "skulls_02"
+			parent = "head_jntBnd"
+			translation = "-7.63864 -12.9887 -11.7673"
+		socket = "skulls_03"
+			parent = "head_jntBnd"
+			translation = "-12.5834 -7.77494 -8.7244"
+		socket = "skulls_04"
+			parent = "head_jntBnd"
+			translation = "7.66845 -12.9887 -11.7673"
+		socket = "skulls_05"
+			parent = "head_jntBnd"
+			translation = "12.5241 -7.14413 -8.31355"
+		socket = "skulls_06"
+			parent = "head_jntBnd"
+			translation = "0 -8.40174 -21.035"
+		socket = "skulls_07"
+			parent = "head_jntBnd"
+			translation = "0 -1.80941 -22.4345"
+		socket = "skulls_08"
+			parent = "head_jntBnd"
+			translation = "0 5.93745 -21.5895"
+		socket = "skulls_09"
+			parent = "head_jntBnd"
+			translation = "-8.99345 -2.72164 -16.5642"
+		socket = "skulls_10"
+			parent = "head_jntBnd"
+			translation = "-5.79762 4.37968 -18.9615"
+		socket = "skulls_11"
+			parent = "head_jntBnd"
+			translation = "5.71348 4.37968 -18.9615"
+		socket = "skulls_13"
+			parent = "head_jntBnd"
+			translation = "8.91975 -2.72164 -16.5642"
+		socket = "light_Copy1"
+			parent = "chest_jntBnd"
+			translation = "0 -1.19861 -92.6905"
+			ignore_parent_rotation = "yawpitchroll"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/WifeMonster.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_upperArm_attachment_jntBnd L_shoulder_cTwist_jntBnd_1"
+		bone_group = "FX_trail false trail_01 trail_02 trail_03 trail_04 trail_05"
+		bone_group = "FX_headSkulls false skulls_01 skulls_02 skulls_03 skulls_04 skulls_05 skulls_09 skulls_10 skulls_08 skulls_07 skulls_06 skulls_11 skulls_13"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07083339989185333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08645839989185333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10833299905061722,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38020798563957217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38020798563957217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/WeaponTrail",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6854169964790344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2072999477386475,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07083339989185333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08645839989185333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10833299905061722,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38020798563957217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38020798563957217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/WeaponTrail",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6916670203208923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.132290005683899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "bone_cone_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/BoneCone",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0749145969748497,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3533470034599304,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4725880026817322,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7198070287704468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9589080214500427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3628300428390504,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "bone_wall_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3078480064868927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.613545298576355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Attack",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6634230017662048,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0023000240325928,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7882308959960938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/BoneCone",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8256100416183472,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Long",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.520050048828125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.536679983139038,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Long",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6605734825134279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Swap",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.925649881362915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.075920104980469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Quick",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.204770088195801,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Sword_Small",
+						"bone_name": "trail_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.209549903869629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.125929832458496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1770630031824112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20460599660873414,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32068100571632388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39736199378967287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/ComboA",
+						"bone_name": "Head_Attachment",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49970901012420657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49970901012420657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/WeaponTrail",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5803710222244263,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8482530117034912,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/ComboB",
+						"bone_name": "Head_Attachment",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8872799873352051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.908922016620636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9595569968223572,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9595569968223572,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/WeaponTrail",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1351699829101563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4735499620437623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4844399690628052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/ComboC",
+						"bone_name": "Head_Attachment",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.591599941253662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.597499966621399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.597499966621399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/WeaponTrail",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7666900157928467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8237500190734864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1247599124908449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4454400539398195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "combo_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1770630031824112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20460599660873414,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32068100571632388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44677498936653139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/ComboA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49970901012420657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49970901012420657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/WeaponTrail",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5803710222244263,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8872799873352051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.908922016620636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.962037980556488,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.962037980556488,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/WeaponTrail",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9656080007553101,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/ComboB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1351699829101563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4735499620437623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5606199502944947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/ComboC",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.591599941253662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.597499966621399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.597499966621399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/WeaponTrail",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7666900157928467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8237500190734864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1247599124908449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4454400539398195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1125819981098175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Long",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16293799877166749,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_SwordDrop",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30809998512268069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34661298990249636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Scratching",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.54510098695755,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Scratching",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7969130277633667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.912447988986969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Scratching",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.176110029220581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Scratching",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.318310022354126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.519760012626648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Scratching",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.801200032234192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Bone_Cracking",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4144399166107179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.039530038833618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Quick",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "delayed_blast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/DelayedBlast",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20090000331401826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20448799431324006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35516300797462466,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6995630264282227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8825240135192871,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0080900192260743,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8583300113677979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9623600244522095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1847898960113527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.687030076980591,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Quick",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9274098873138429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2682199478149416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Quick",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.343559980392456,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.287089824676514,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.452099800109863,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "explode_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Explode",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05855970084667206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26351800560951235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Long",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3353869915008545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38247498869895937,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/Charge",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8943639993667603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2137800455093384,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Bone_Cracking",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9298100471496583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0176498889923097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.297600030899048,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/ChargedExplosion"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4488699436187746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4816501140594484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 4.054500102996826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Idle",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.7013109922409058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/FX/Emerge",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2531659603118898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Emerge",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.290480136871338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.470019817352295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Long",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.488589763641357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.70242977142334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.928919792175293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/Intro_Low",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.287129878997803,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.866789817810059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.8851399421691898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.456299781799316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/Swap_Initial",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.586599826812744,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.407710075378418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2166987955570221,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8539791107177735,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.492037057876587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7448525428771974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7982499599456789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9126193523406984,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.63494873046875,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Scratching",
+						"bone_name": "L_finger_4_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.63494873046875,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Death_Bone_Cracking",
+						"bone_name": "L_finger_4_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.519802570343018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.718442916870117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.893006324768066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.458831310272217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/RunLoop_Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/RunLoop_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22208400070667268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37879401445388796,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Run.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.529932975769043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8540310263633728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1636899709701539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/Intro_Low",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Long",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5029169917106628,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9384040236473084,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4188400506973267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0083301067352297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/ChargedExplosion"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0229101181030275,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0622398853302,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0622398853302,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1212399005889894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Sword_Small",
+						"bone_name": "trail_05"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1324799060821535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/Swap_Initial",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9725399017333986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.15516996383667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "summoned_delayed_blast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 3.566999912261963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Multi",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.767899990081787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7714900970458986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9221599102020265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.266560077667236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.449520111083984,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.575089931488037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.42533016204834,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.529359817504883,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.7517900466918949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.254030227661133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Quick",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.494410037994385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.835219860076904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Quick",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.910560131072998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.854090213775635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_QuickSmall",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.019100189208985,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "swap_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Swap",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12527799606323243,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/Swap_Initial",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15888899564743043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20978900790214539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5270829796791077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.801522970199585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8219450116157532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/WeaponTrail",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9044449925422669,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2191699743270875,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6561199426651,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7386200428009034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Sword_Small",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9815399646759034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "swap_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Swap",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41393399238586428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/Warp",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.214959979057312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/Swap_Magic",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3287099599838257,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/Swap_Hi",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.427489995956421,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Metal_Small",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5029919147491456,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.726889967918396,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7554600238800049,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Cloth_Short",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.881700038909912,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.881700038909912,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Effects/WeaponTrail",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3088300228118898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Attack_PreSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.784179925918579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8493499755859377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Movement_Sword_Small",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0259599685668947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_9/JunoWifeBoss/Foley/Footstep",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "light_Copy1"
+			style_speed = 35
+			state = ""
+				colour = "0.0784013 1.7461 1.1755"
+				position = "0 -82 43"
+				radius = 600
+				penumbra_dist = 0
+				penumbra_radius = 0.01
+			state = "on_death"
+				position = "0 -82 43"
+				radius = 0
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "dim"
+				colour = "0.0205515 0.457706 0.271742"
+				position = "0 -82 43"
+				radius = 500
+				penumbra_dist = 0
+				penumbra_radius = 0.02
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.3844259977340698,
+						"end_time": 0.6854609847068787,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/fx/ghostflameTrail_core.trl",
+						"bone_group": "FX_trail"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.39847201108932497,
+						"end_time": 0.8481040000915527,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/fx/ghostflameTrail_core.trl",
+						"bone_group": "FX_trail"
+					}
+				]
+			},
+			{
+				"name": "bone_cone_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.024818699806928636,
+						"end_time": 1.2758686542510987,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/fx/ghostflameTrail_buildUps.trl",
+						"bone_group": "grp_l_palm"
+					}
+				]
+			},
+			{
+				"name": "bone_wall_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.9641810059547424,
+						"end_time": 5.671471118927002,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/fx/ghostflameTrail_buildUps.trl",
+						"bone_group": "grp_l_palm"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5710690021514893,
+						"end_time": 2.134328842163086,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/fx/ghostflameTrail_core.trl",
+						"bone_group": "FX_trail"
+					}
+				]
+			},
+			{
+				"name": "combo_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.46774598956108096,
+						"end_time": 2.3144359588623049,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/fx/ghostflameTrail_core.trl",
+						"bone_group": "FX_trail"
+					}
+				]
+			},
+			{
+				"name": "delayed_blast_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6441590189933777,
+						"end_time": 3.6388790607452394,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/fx/ghostflameTrail_buildUps.trl",
+						"bone_group": "grp_l_palm"
+					}
+				]
+			},
+			{
+				"name": "swap_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.9238049983978272,
+						"end_time": 1.3961520195007325,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/fx/ghostflameTrail_core.trl",
+						"bone_group": "FX_trail"
+					}
+				]
+			},
+			{
+				"name": "swap_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.9925700426101685,
+						"end_time": 2.6587610244750978,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/fx/ghostflameTrail_core.trl",
+						"bone_group": "FX_trail"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.30106 1 Linear 0.6695 1 Linear 1.10373 0 Flat 1.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.334344 1 Linear 0.6695 1 Linear 1.10373 0 Flat 1.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "bone_cone_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.8660000562667847,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Linear 0.956813 -4.09862e-08 Flat 1.18351 5 Linear 1.49785 -1.66893e-06 Flat 1.866 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "bone_wall_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 7.065999984741211,
+						"name": "EmissiveMulti",
+						"curve": "7 0 0 Linear 1.13799 0.449324 Linear 4.90725 1 Linear 5.26073 1 Linear 5.32565 50 Linear 5.38697 1 Linear 7.066 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.8329999446868898,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.366862 1 Linear 2.26147 1 Linear 2.59332 0 Flat 2.833 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "combo_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.8329999446868898,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.366862 1 Linear 2.26147 1 Linear 2.59332 0 Flat 2.833 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "delayed_blast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.165999889373779,
+						"name": "EmissiveMulti",
+						"curve": "6 0 0 Linear 3.29405 0.960441 Flat 3.62649 8.61487 Linear 3.75841 8.61487 Linear 3.95893 0.320147 Flat 5.166 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "explode_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.8329999446868898,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "7 0 0 Smooth 1.82454 0.300676 Smooth 2.32739 1 Linear 2.38022 5 Linear 2.45848 1 Linear 3.40548 0 Flat 3.833 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "swap_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.458081990480423,
+						"end_time": 1.2149900197982789,
+						"name": "TeleportOutIn",
+						"apply_on_children": true,
+						"curve": "2 0.458082 0 Smooth 1.21499 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 1.2149800062179566,
+						"end_time": 1.6369500160217286,
+						"name": "TeleportOutIn",
+						"apply_on_children": true,
+						"curve": "2 1.21498 1 Linear 1.63695 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "explode_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4814850091934204,
+						"end_time": 1.920657992362976,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/fx/explode_01_buildUp.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.083890914916992,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/HusbandBoss/fx/empower_01.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "swap_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5373179912567139,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/fx/revive_aoe.pet",
+						"bone_group": "root"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/epk/weaponGlow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/epk/weaponGlow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "bone_cone_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/epk/handBuildUpGlow.epk"
+					}
+				]
+			},
+			{
+				"name": "bone_wall_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/epk/handBuildUpGlow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/epk/weaponGlow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "combo_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/epk/weaponGlow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "delayed_blast_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/epk/handBuildUpGlow.epk"
+					}
+				]
+			},
+			{
+				"name": "explode_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.8329999446868898,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/epk/explode_01.epk"
+					}
+				]
+			},
+			{
+				"name": "swap_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.458081990480423,
+						"end_time": 1.2149900197982789,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/epk/teleport_out.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.2149800062179566,
+						"end_time": 1.635308027267456,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/epk/teleport_in.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "bone_cone_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.2041699886322022,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/boneCone_spellcast_01.ao",
+						"animation": "trail_03",
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "bone_wall_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.5837700366973878,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/WifeMonster/boneRainCast.ao",
+						"animation": "cast",
+						"offset": [
+							21.0,
+							-4.0
+						],
+						"inherit_height": true,
+						"height": 332.0,
+						"inherit_scale": true
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/HusbandBoss/ghost_soul_large.ao",
+						"animation": "soul_release_02",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "bone_wall_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 5.284656047821045,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "explode_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 2.472123861312866,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 2.164471387863159,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/WifeMonster/attachments/Frills.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Frills/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Frills/rig.ast"
+		linear_allowed_contraction = 0.150
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.150
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Frills/Frills.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_shoulder_cTwist_1_jntBnd L_elbow_jntBnd R_shoulder_cTwist_1_jntBnd R_elbow_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/WifeMonster/attachments/Cape.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Cape/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Cape/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Cape/Cape.sm"
+	}
+}
+
+=== .ao Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/WifeMonsterWeapon.fmt (depth 1)
+	     ���� [Bc���c��@@���0�ADOLm  8   �  �
+      p,                          	   	 
+ 	  
+                                                                           ! "   # ! ! $ " " $ % $ ! & ' " % ' % ( ) ' ( ) ( * + ) * ! , & , ! - # - ! . , - - # / . - / 0 1 2 2 3 0 4 5 6 6 5 7 5 8 7 5 9 8 6 7 : 7 ; : 4 6 < < 6 : : ; = < : = > = ; < = > > ; ? < > @ @ > ? A 4 < < @ B A < B C @ ? B @ C D C ? C D E F 4 A F 5 4 B G A G B C H F A G H A I F H H G J K I H K H J G C L J G L L C M N L M N O L O J L C P M Q M P C E P R Q P E S P S T P T S U V R P T V P V T U R V W X V U V X W O Y J O Z Y Y [ J [ K J \ Y Z \ [ Y ] \ Z ] ^ \ K [ I ^ _ \ _ [ \ [ _ I ` _ ^ ` I _ a I ` I a F b a ` F a 5 a b c 5 a c c b d e c d 5 c f e f c 5 f 9 g f e 9 f h f i h i j h k f g i f k i k j g l k k m j l m k n o p o n q o r p p r s t s r t r o u t o o q v o v u u v w q x v w v y x y v x z y z { y z | { | } { | ~ }  � � �  � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � �  � �  		
+	
+	
+ !!"!""##$!
+$%"!$&!&%!$'&'$
+(%&)(&&')%(*'+)"%,,%*",#,*-+'..'
+.
+/+..0/.01/02,-,2#-32#24342#45#543646537658676859875:8:589;8;:9<;:= => ==?>=:@?=@@:;;<AA@;<BAABCAC@BDC@E?CE@EF?DGCCGEHGDFEIJGHGJEKJHELIEJLMILMNIJOLOJKPOKQRSQSTRUSRVUSWTUWSTWXYTXZYXXW[WU[\ZX\X[]Z\V^UV_^U^`U`[_a^b]\c]bdcbcdefdbedfgfbefggb\heghgijhikjilkimliigmlmnmongpmg\pompqno\rpsqo\[rqstuqtvsosvtwoprwpvowrxwwxvtyuxrzxzvv{t{vzt|y{}t}|t{z~r~z~}{[~ry||}�y������}�����}~��}[�~���������������������������������[�����[��������`�[���`���������`��`�`��^�`���^a����a���������a����������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������a������������a__���������������������������������������������������������������������������������������������������������������������������������������������������������� � � ����������	
+����	
+
+	 	! "!#$"$#$"%$&##&'&$()$%$)()%*()*+*%(*+,(+-./.0/01/20..-332.-435233466534768566799867:9;89:;9<=><>?=@>>A??AB>@CADBBDEA>F>CFDAGAFGDHEEHIDGJHDJFKGGKJLKFCLFMJKMKLHJNJMNHOIOHNIOPNMQONQORPROQPRSMTQTMLRQUQTURVSVRUSVWVXWVUXUTYUYXTZYZTLXY[YZ[\X[]\[[Z]]^\Z_]]_^^`\\`a`bab`c`dc`^dcde^fd^_fdgedfgeghgihhijfkggkiflk_lfkmiklminjimnjnopl_lpmqp_q_Zmprmrnnsonrsostrpuruspqusvtsuvtvwvxwuyvvyxuqyyzxyqzxz{{@xq|zz|{|qZ|ZL{|}{}@|L}@}C}LC~�~�~������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������      ����	�	
+				
+
+
+ ! !!""!#! $#!$ %$$%&'#$'$&#'('&)(')*+,*,--,./*-/-.*/01*0/.23141355*165367568759*579789*9+:98;+99:;:<;=<:;>+?<=@?=A;<;A>B?@?C<CA<?BCDB@>E+E,+AF>FE>FAGACGBHCCHGI,E.,IEFJKFGFKJIELLEJ.IMILMKNJNOJLJOPNKQLOMLQRMQSPKSKGPSTGUSSUTUGHVMRV.M2.VWVRVX2XVWYXWTUZZUH[TZ[Z\ZH\][\H^\]\_\^_^HB`]_a^BaBDbaDabcd^a_^dcda`_ee_df`efegedghfgidcdigjichgkgiklhkijmknlkinnolpimnipqpmqmrsnponstosuvwuxvvywwyzx{vyv{|{x}|x}~||{{y~�|�|~��y�zz��y��y������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������ ����� ����  	
+
+	
+	
+	�����
+
+�������������  !"#"$ %$ $&'%"'('"&) "*( )+ +!+),!+-,.+/*"/"#0*/1/#/203/132/4235313647357638679757:879;;:7<:;9=;;><;=>=?>+@-+.@@.AAB@-@C@BCD-CCBEDCFEGCCHFCGHFHIHGJJGKJLHHMILMHMNILNMOINONLPOLQRSSRTRUTSTVQSWWSVXQWWVYXWZZWY[XZZY\[Z]]Z\^[]_]\^]_`abacbcdbdebdfe`bgfhefihbejgbjehkjekilhimlkhnhlnjkoknogjppjomqlmrqnlslqstonnstpotruqsqvsvtquvrwutvxxptvuyvyxwzuuzyw{z{|zz|yy}x|}yx}~px~|}}~�|���~���~�����������������������������������������������������������������������������������~���������������������������������������������������������~���������`�p~�`������p�`g�gp���������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������� � ��� �  ������			
+	
+	
+�������� ! "! #$%&'#'$#'($()$('**'+,(*-*+.,*-.*$)/$/%)0/01//2%12/23%14235675327347248778998:8;::;<=>?@=?A@?A?B?>BCABCBD>EBBED>FEFGEDEHEGHIDHJIHGKHKJHGLKMJKLMKNOPNPQNROORSNTROSUVUSVWUXWVXYWNZT[ZNNQ[[\Z][Q]\[^_`^a_ba^b^cc^de^`_f`e`f_gfefhghfgihjehjhijikjkljlmmdjnopoqpnrosrntorsnuvsuvuwxvwxwytzo{ozo{q{z|}q{}{|~���~������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������ �� ��		
+  !!"!#"##$#$%$$&%$'$'&''()('*&*+&'(,',*),()+*-*,-+-.-/.-,0-0/)0,/010)11)22)12324324253454674476
+767897
+9:79;:87<<7:;<:<=8;><<>=?@ABA@?C@DC?CDE@CE@EFGB@FG@HGFGIBJGHGJIJKIJLKLMKLNMNOMPQRSRQTUVUWVVWXUYWWYXXZVVZ[Y\XY]\^\]^]_^_`]a_]baYb]cabYdbUdYcbeebdefcUgdgedehfgheifhgUTihjkijglhjhlgTmmlgkjnnokpjlpnjmqlqplmTrqmrTsrsTVtnpntoutpvotuvtvwowvxuxvwxyupzqzpz{uzq|r|q|r}}rs|}~s}z|��|~z�{�~�{��{��s����s����sV����V[���[[���{�������{��{�uu�x��������x����yx��y���������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������� �� �� ��		
+		
+
+			  ! ""!"!"#"#!#$#%$&##&%�&%&'�'&%'((')�)'()*+*))�++,*+-,+.-�.+/-.0.�0��/.101.�0�12/23/432�50��5610560�5�67117258687695�985:2742:8;79;8:7;9<;:;<9�<=4::<==<�=>4�=�=�>?@A@BA@CB?D@ED?EFDGHIGJHKGIJLHJMLNIHNHONPIQOHQHLQLRSIPTRLSUIKIUSVUWKUXUVTLYMYLTYZM[Y\ZY[]Y\Y]\]^[_]`^]_a]`]a`ab_cadbaceadaedefcgehfeheghgiWUjXjUXkjljkWjmlmjWmnlompnmqmopmrqrmsprqtrutqvrtsrwvwrxswxwvsxyyxvyvz{|}{~|{~|~��}||����}��������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������� ���� �����	�	�	
+	�
+	 � 
+ �
+
+��������������   !!" #"# $
+$
+$ %$ #%$&&$%&'#"'"('()*#'*%#*')&%*+*)+&*&++),+-+,--.-,-./.,.00./0/100112233�43546336�7648�67868���87��89:;<;:=9;<>;?9=?=@A?@B><BC>BDCBEDEFDEGFGHFFHIIHJIJKKJLMNOMPNPQNPRQSNQSTNONTOTUVOUWMOVWOWXMYWVZX[[X\\XWY\W]\Y]^\]_^`_]`a_bcdQcbebdQbSfbeSbfghihjihkjlkhglhlmklnmgollonpogqoprnoroqrsntsrrqutruvuqwtuwuvxyz{xz|x{{z}|{}~}z~z�|}�|�����������������|������|�x|����������x�������������yx�������������y�����������������������y������y�y�z������������������������������������������������������������������������������������������������������������������������������������������z�����z������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������ 	� 	��	����			�	���							�																
+	�		 		�																				 						
+				 						 						
+						
+			�	 																																																		 			 			!		!		 	"		!	"	#		!	 	$	!	$	"	 	%	$	%	&	$	$	&	"	 	'	%	&	%	(	(	%	'	(	'	)	&	(	*	'	+	)	 	,	'	'	,	+		,	 	+	,	-		-	,	+	-	.	.	-	/	/	-		.	/	0	1	0	/		1	/	1	2	0	1	3	2	1	4	3	4	1		4	5	3	4		6			6	4	7	5	4	6	7	�6		8	5	7	9	5	8	8	:	9	;	7	6	<	6	�<	;	6	=	7	;	=	8	7	=	;	<	<	�>	>	�	=	<	?	<	>	@	@	>		<	@	?	=	?	A	=	A	8	@	A	?	8	A	:		B	@	@	B	A	:	A	B	B			:	B	C	C	B		D	"	&	D	&	E	E	&	*	F	E	*	G	E	F	G	F	H	I	E	G	D	E	I	J	G	H	I	G	J	I	J	D	K	J	H	L	J	K	D	J	L	L	M	D	D	M	"	L	N	M	O	"	M	"	O	#	O	P	#	O	M	Q	P	O	R	O	Q	R	P	R	S	T	S	R	N	U	M	U	Q	M	U	R	Q	T	R	U	V	U	N	T	U	V	W	X	Y	W	Y	Z	W	Z	[	W	\	X	\	]	X	\	^	]	_	`	a	a	`	b	a	b	c	_	d	`	e	d	_	`	f	b	g	f	`	b	f	h	`	i	g	d	i	`	j	i	d	h	k	b	d	l	j	b	k	m	c	b	m	m	k	n	c	m	o	n	p	m	q	l	d	e	q	d	r	l	q	s	q	e	q	t	r	m	p	u	o	m	u	u	p	v	o	u	w	v	x	u	w	u	y	u	x	y	y	x	z	w	y	{	z	|	y	}	{	y	y	|	}	}	|	~	}		{	~	�	}	�		}	�	�		�	t	q	�	t	�	s	�	q	�	�	�	�	�	s	�	�	�	�	s	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	��	�	���	�	�	�	��	��	�	�	�	�	�	�	�	�	�	�	��	���	��	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	�	 
+�	
+ 
+�	 
+
+�	 
+
+
+�	�	
+�	
+
+
+
+
+�	
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+	
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+!
+!
+ 
+"
+
+#
+
+#
+
+!
+#
+$
+
+
+
+$
+!
+"
+%
+%
+"
+&
+'
+%
+&
+'
+(
+%
+)
+(
+'
+!
+%
+*
+%
+(
++
++
+*
+%
++
+(
+,
+,
+(
+)
+!
+*
+-
+-
+#
+!
+.
+-
+*
+-
+/
+#
+.
+/
+-
+/
+$
+#
+0
+$
+/
+.
+0
+/
+$
+0
+
+1
+.
+*
++
+1
+*
+.
+2
+0
+0
+3
+
+0
+2
+3
+
+3
+
+
+3
+
+1
++
+4
+4
++
+,
+5
+.
+1
+.
+5
+2
+1
+4
+6
+6
+5
+1
+7
+4
+,
+8
+6
+4
+8
+4
+7
+9
+8
+7
+:
+8
+9
+7
+;
+9
+7
+,
+;
+;
+<
+9
+=
+;
+,
+=
+<
+;
+=
+>
+<
+=
+,
+)
+=
+)
+>
+>
+)
+?
+?
+)
+@
+@
+)
+�	@
+A
+B
+@
+C
+A
+C
+@
+�	D
+A
+C
+�	E
+C
+D
+C
+E
+�	E
+�	�	D
+E
+�	E
+�	
+3
+F
+2
+F
+3
+G
+
+F
+G
+H
+
+
+H
+
+I
+J
+H
+
+H
+K
+
+K
+
+G
+L
+H
+M
+
+K
+M
+K
+L
+G
+N
+L
+L
+N
+M
+F
+N
+G
+N
+O
+M
+O
+P
+M
+F
+Q
+N
+Q
+O
+N
+F
+2
+Q
+O
+R
+P
+S
+Q
+2
+Q
+T
+O
+O
+T
+R
+S
+T
+Q
+R
+T
+U
+S
+U
+T
+R
+U
+V
+5
+S
+2
+W
+V
+U
+X
+S
+5
+X
+5
+6
+Y
+U
+S
+Y
+S
+X
+W
+U
+Y
+X
+6
+Z
+Z
+Y
+X
+6
+8
+Z
+Z
+8
+:
+Z
+[
+Y
+W
+Y
+[
+[
+Z
+:
+W
+[
+\
+\
+[
+:
+]
+^
+_
+`
+]
+_
+^
+a
+_
+`
+_
+b
+a
+^
+c
+a
+c
+d
+c
+e
+d
+f
+`
+b
+f
+b
+g
+h
+f
+g
+h
+i
+f
+j
+i
+h
+j
+k
+i
+l
+k
+j
+l
+j
+m
+n
+l
+m
+n
+m
+o
+n
+o
+p
+q
+r
+s
+s
+t
+u
+s
+r
+t
+r
+v
+t
+r
+w
+v
+x
+t
+v
+y
+t
+x
+x
+v
+z
+y
+x
+{
+x
+z
+|
+x
+|
+{
+}
+w
+r
+q
+}
+r
+}
+~
+w
+}
+
+~
+q
+�
+}
+}
+�
+
+q
+�
+�
+�
+�
+
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+�
+`��~�?@}�@�t̀�����8������2:?��@|�$�n8
+�໎�*?`�@2]���Ɓ�8��@�����>��@�<�����9��P����b5?� �@:i؀�5�S8Z�P����'?� �@@�.�?l�*8j�P����'?� �@h����9��<8������=�>��@=�*�!>j�98e�@̎�p�>�0�@(�'�45g��7�`��4��>@}�@'�5�0Ab�R7x�P)���_>�+�@$�E�*N[��6+�@���*>���@$�E�*N[��6�@̎�p�>�0�@q�ǀ�-��~8,�P)��<H�>���@$�����8^�P)���_>�+�@�郀�8���8N�@���*>���@�쏀��9�9O�pX��G�>���@�V��9^@�A8��)��f7h>�1�@�WȀA\;�X8'��!��g>��@Bl
+�2�n�[8����n��> 8�@?n
+�D�`�{8&�����  7 g�@j6,��T��8��Ҫ�0\z9���@g46��W�{8��y��  7�X�@z������%8���y��  7�X�@z���
+�%8�� ��0\z9 �@���~�#8�����  7��@���}��!8,�0���Y���&�@�����b��8������:B����@��ƀ�bˁ�7'�����zm����@9� ��掁�7���Ҫ�0\z9���@d�4������7��l��-��� 8�@6�������7'�����  7 g�@i�(�󪤁7�`��~��@}�@��̀�3��90�໎�*�`�@2����;��Z0λ����2:���@����(-л@�������@�Ė��n΁,1�P����b5�� �@:�؀����-��P����'�� �@@d.�m�܁�,��P����'�� �@h���K���.������=����@=g*�o���+��@̎�p���0�@(r'�x��*��`��4���@}�@'m5�y���$��P)���_��+�@$dE�z��)n�@���*����@$dE�z�� |�@̎�p���0�@qǀ�\���0��P)��<H˾���@܈��pׁ41һP)���_��+�@����v��1Ż@���*����@����o)�V2�pϔ��N����@�#�� w+�E4�pz��?��@��@�î��mÁ34�T��y�� !�@����s+�E4a��O���"� ��@	��6s��4�@˦��B��zA��=�S�`��/���Ê�7⪿pKA���Pb�Y/k�����a�D�@�A�I�j,7�01	�`Qm�&�����A2�7�l?�24� �,�1�׾�A/�.�UAE�x2���������@+��](L�2�� ���(���A.�X�u-��1ϳ 5����5�ZAs 6�6���2v��Ę���5�BA� h�hI�1t��ʆ���5�_%A� ~�~��1u� ���w��>�A.OX�u���1�`Qm�u��>��A2g7�n��2��������D?@�AhI�l�4�31ײ`H����50$A� U�U^�0s�@˦�9�B?�zA�U=�T_��/��Ê�K�?pKA�~�S�_�j/
+� �,����>�A/m.�X�@��2����?���@+w�a�F�62	�����,�P8A��!�3�t�.-������,?P8A�T!�3
+t�0-��������5�0A� &�& y�C,r������I��@��@�����}��*�����#J�>@��@�[��}��* � �����5�H�@� ���~�Y*s��ݦ�;�R?��@�o�)v�J,������W.�?�I�@�{�7o�j.����,!?���@�o�,u�M'#� ��dq?���@�s�!z��%���x\�Zqi? u�@2s�d�H�(0.��y�,�?`��@USҀV�S�g.G� x�y�4? �@=B��l�B��-ϰ�����? ��@z�p�:�61� �3�]��>`(�@tЀu0��0��^.���5��@�<��s6�j0��\C�M��>��@?��t/�-0}��q���5���@/%��t
+4��-F��,D���5���@+��u)��/8� ������>@��@�`��}��%�� c���F�>���@�c���z�"���l����5@=�@� ��~��&t�0����5`@�@� �����2$t�`�����5`.�@� ��� c�ht� c��yFؾ���@������z�"� ������@��@�����}��%� ��=q����@э�	�z��%1��ݦ��R���@ɑ��u�G,0���!����@Α܀,�j��'d�����C.���I�@��?�h�K.��p����uQ�@r�@;䓀*�3�F,���y�`��@6���O�a��-ȴ�x\�3qi� u�@2��_P��/ڴ x�R�4� �@=���jF�f-����[�� ��@��mA��05� �3���`(�@�Ѐr�7�R02��^.���5��@�Ē�o��0f��\C�������@���p�3��/1��q���5���@/ې�r�6�'-G��,D���5���@Ռ�r�+�S/S��y�`��@��π�~��z:ݱ`����5�+�@� ΀��;ݱ x�R�4� �@����~���:X�p����uQ�@r�@9�������:+� 5}���5�D�@� ����;X��q���5���@� ����;� x�y�4? �@��}�z;?��y�,�?`��@�ʀ
+y&��;��p���!vQ?@r�@9��~��;+�����W.�?�I�@�5��s5��;����!����@@ ��  ��:���,!?���@@ ���u;� ��=q����@� ��  ��:�� ��dq?���@� ��  �f;�� c��yFؾ���@ ��  ��:� c���F�>���@ ��  �Y;�`�����5`.�@4 ��  �; ��C����Q>���@�ݠ� wՁ99��pȣ�0{> !�@��sՁ99������>@��@�=��m=��9� Ě���> ��@	�������8ѻ Ε@V��@}�@�̀~��'���p��@�2:���@��w�$�#�
+��~�@�)�`�@Σ��p�Ɓ���� ��@~����@#Ė�z�赱�h�@}b5�� �@Ɨ؀q��X�Z�h�@�'�� �@�d.���l���j�h�@�'�� �@���;ǟ�����p��@p=����@�g*���j���e� ��@�o���0�@�r'���g�=�� Ε@䤋�@}�@�m5�пb�V�x��@<_��+�@�dE�ֲ[���+� ��@�)����@�dE�ֲ[���� ��@�o���0�@�ǀ2Ӕ��,��@�G˾���@�܈�}��u�^��@<_��+�@��r�����N� ��@�)����@7��q9�ԵO�0�@������@@���Ǣ@�|�����@�6h��1�@J�Ȁ��;�O�'�p�@x g���@��
+��(n�I����b�@��� 8�@��
+��0`��&��m�@  ж g�@��,��^T�������@0�w����@��6��]W��蹀<�@  ж�X�@���~�������<�@  ж�X�@������������@0�w� �@\����������pκ@  ж��@j��������,��x�@��>�&�@DQ��2������@�@=;B>���@PPƀ<�ˁ�'��B�@&{m>���@�q �2��������@0�w����@�:4�V��1�繰/�@}��> 8�@�s�A ��7�'��m�@  ж g�@�;(�V��r�� Ε@��?@}�@t̀!͐���~�@5*?`�@�]��(ŗ��λp��@&3:?��@�|��Z�л ��@��>��@#<��&�΁���h�@�b5?� �@�i؀∁C���h�@�'?� �@��.��6܁`���h�@�'?� �@����@���+���p��@>�>��@Ù*��5⁀��� ��@ep�>�0�@؎'��%񁔻�� Ε@���>@}�@ٓ5��$�ػ���@|`>�+�@ܜE��"򁯻n� ��@8+>���@ܜE��"���|� ��@ep�>�0�@��ǀ/���Ժ���@�H�>���@�$��+�ׁ��һ�@|`>�+�@郀(����Ż ��@8+>���@7쏀-�)�j��0��@��N>���@Lݠ� �+�ݹ�0=�@���>@��@K=���Á:�4���@ > !�@P��+�ݹa�`�@�#> ��@������s���� ��@:�B?�zAHU=��`�������@K�?pKA~���b��k�p��@��D?@�A�hI���7���	���f@v��>��A�g7����z�4��&@���>�A�m.���E�a���`�@?���@�w���L������|@x��>�A�OX���끃�ϳ��{@v�5�ZA� 6�����]�v�`��@v�5�BAI h���I���t����@v�5�_%A ~������u���|@'���AұX��+遃����f@%�����AΙ7��>�x���p��@`�D�@�A��I��*4���ײ �@v�50$A^ U���^���s� ��@�B��zAH�=���_��ﲐ��@7⪿pKA���_��
+��&@0�׾�Aѓ.��A@�Z���`�@�����@Չ��)F�r�	�P��@�,?P8AZT!��
+t�Z���P��@�,�P8AZ�!���t�Y���`��@v�5�0Ay &�� y�w�r����@$J�>@��@V[�}���峀��@�I��@��@V���}��� ����@v�5�H�@~ �~���s����@�R���@7����v�v��� }@C.���I�@����o�2����ۙ@!����@6����u�Ż#�୧@<q����@/����z�ӻ��`�U@2qi� u�@΍뀜H���.�`�r@`��@��Ҁ�+S�3�G���q@Q�4� �@þ���B�C�ϰ`r@Z�� ��@�逐:�����d-@��`(�@�Ѐ��0�ٺ�`�'@v�5��@Ē������ �<@������@������/���}� �j@v�5���@�ې���4�G�F�`�=@v�5���@�Ռ���)��8��m�@���@��@S�����}�һ���%�@xFؾ���@I���!�z����p/�@v�5@=�@~ ��~�˻t����@v�5`@�@ ���޻t� c�@v�5`.�@c ��O c���t��%�@�F�>���@Ic��!z����m�@���>@��@S`���}�һ�୧@eq?���@/s��"z�һ1����@<�R?��@7o��*u�w�0��ۙ@-!?���@2o܀�6j�»d� }@W.�?�I�@y��$h�6���0h�@"vQ?@r�@����m3�w���`�r@,�?`��@�`���a�@�ȴ`�U@[qi? u�@�s뀡�P��ڴ��q@z�4? �@�B����F�S��`r@��? ��@�z逓�A�ú5��d-@^��>`(�@�tЀ�7��2�`�'@v�5��@<���<���f� �<@N��>��@�?���3��1� �j@v�5���@�%���6�[�G�`�=@v�5���@�+���#+��S�`�r@,�?`��@tπ����ݱ@X{@v�5�+�@u ΀���ݱ��q@z�4? �@|�����X�0h�@"vQ?@r�@������2�+���v@v�5�D�@{ �����X� �j@v�5���@J ��������q@Q�4� �@|����)�?�`�r@`��@p�ʀ��&����0h�@�uQ�@r�@�������\�+� }@C.���I�@ˍ���5�ݠ���ۙ@-!?���@� �� � �ǰ��ۙ@!����@� �����V��୧@eq?���@ �� � �����୧@<q����@ �� � �̬���%�@�F�>���@� �� � �c���%�@xFؾ���@� �� � �4�� c�@v�5`.�@� �� � � � ���@0�Q����@L#�� �Ձ����0��@�z� !�@P���Ձ��뻐��@ʱ�@��@Kî��=�������@��� ��@���6���/�ѻ��q?���?�BA,k̀3t�C:q� ����@�@PA}��~�p:��@�?j��?`xMAMd��}�p:l� ����?@`9A�a��R`�:�� 8�� T�?�0BA�iӀ7r�0:�� ��p9a?`�3A�P��cP��9�� <_?_�9?�2AU��UZ��9h��7�?�v>�?1A7K��'M]��9G��w��H�!?P3A�N���[U��9���<@  �6��7A<@��/QV�:4����?  �6�?1AM��@WB��9C�`�@�7T?��@AC_̀.t�@:A� �j@  �6�CA?[;n�D:��/@t��>:FA4PS�ν`�X:,���+@  �6p\IADCT�ϻ_�m:(�@.@�S?��JAPV0���u�m:A��R@  �6��TAjC���{��:5� 7@���>��UA`S���}��:?��R@ω�>��dAEU��?j��:@�`�@  �6�ZdAZ��K)^��:5��c�?� �?�\AMe���{��:g� �N@��>��nAY��M7U�;1� �S@  �6�?mA&��RV-�;'����?7x?`jlA:k܀3t��:\����@�O�>�pA�\��QFD�R;���?@�L?@bwAlĀC&e�9;C��p�@  �6�oA���Dj�9;� �h>n��?�#cAz"��w��:�� �x?��? �vA|�-�t�
+;�� �-@� �?H#�A~��>�n�Z;X����ѝ�?p(SA�n��|�o:�� �m��i�?�BxA�HQ�0�b�;������3��?�hA�DG�1�i��:�� ��kЖ?@�UA�<+�(�w�r:λ /�  �6ZyA�"[�=�R�$;ʻ ���  �6P�iA� K�;�c��:⻀�:?  �6��A�&k�>�A�o;�� ��  �6 �VA�"4�3�t�w:�}?)m~?`�A�H`�8�S�C;����?  �6(އA�'w�=�-��;��`��x҆?@�BA�C�1u�):л`�$�  �6�rCA�%��?m�:�ٿ�>>P�3A�+���WS��9˻��ܿ  �6�=3A����UT��9л `@2�d?�z�A�Gg�;�G�q;s�`�_@  �6�0�A	#z�2���;Y� �\@�{?@/�AQa�?�B��;N�`��@�7z?�z~A
+|�Md��;%�� �@��[?�*�A%VV�>�@��;,�0��@  �6�A(!t� ���;2�0��@6�5?P,�A8QP�7�=��;
+�P�@  �60�AD"f����;�0ʾ@�QJ?��tA�x؀XV��;��`��@��?��tAPK@�0�;��;� e�@  �6@GuA]Q�	�$��;�`;�@���>0�kA�[��SO8�q;�pD�@  �6�_jA���9r�Z;��@  �6 �`A�V��N[*�m;Ϻ��@��/?��eA�y܀`M��;к ��@`c�>��fA\N(�4�A��;ƺ���@  �6��fAn=���)��;úPZ�@�;>0�\AcJ�5�B��;��`[�@  �6��XAy��4��;�� ��@,
+?�VUA�o׀R=K��;�����@  �6�4SA�J̀Bg"�n;��P��@��3>�]WAn?�2�F��;�� ��@  �6�WA{��I��;���d�@  �6 uHA�CȀIh�s;�����@��g>p�OAgJ�2�W��;�����@  �6�UOAy"��X��;�����@3��>��GA�lɀ[?>��;�����@��>�vGAeI耻g��;���|�@  �6�EGAw'��y	��;�����@��>�vGAeI�A�[��;���|�@  �6�EGAw'�)�^��;�� ?,@  �6`��@vԀ���6�@M�?  �6��@i��-�(��6ܹ��)@�@?@)�@n5܀;���6����@  �6@��@{����6����?�#'?��@}�}��?6乀�?  �6���@}����q6Ź�@&sH?@��@,w �w��t6	��n@.	D?`� A/v �t��w6"� �@  �6`� Ay�"���6� T.@���>>Aa#��B�&��61� PO�'}7?�>�@ �� �R5�@*@A\+?�lA#y��y���69� �[@�!�>�@A/;��t��7>��l�?�#'?���@} �}��6ƹ��?  �6@���}���q6�� 3���#'?��@�}�~��Z4湀l�?�#'?�ի�~�}��6y�@�W@�e!?�A	�~��7E�`�|@Ch?��A)gq��_7D���|@��? VA y�k�_7I��/�@  �6��A' y�U��|7d��/�@���>��A\S�|��\7Y��6*@1��>@/"AfH�}����6g��6*@  �6@/"A, w�_�݁�6p��U@�No>��*A4g5�t�䁒6y��U@  �6��*A^V�>����6~����?  �6�?1AS`�F�ˁu6���7�?�v>�?1A@:]�b��f6��@|�?Q�>�>+A>d0�l��m6{� <_?_�9?�2A.Ca�g���5�� i�?C��? ]+A@c/�k���5z����?���>p2A4q�s� �K6`� ��p9a?`�3A�Hi��H5��@�?�s?��A|�~� ��5R� ���o�?�3,A�p;��W5~��T���d�?`�+A�k+�p;���4{��w��H�!?P3A�Eg�n=�4��  a����?�"A�~��S5l��2�?��?� A>l�o���5c� <�>/��?��A
+@��~��~5^���ٿ�>>P�3A�7U�[U�V4����dp�?@�A�B��~��5^� ~�����?0�!A�l�mA���4h�����{�>pB*A�l�n?��:4z�@��R��>@!A�o�p; �X4g��%���6q? eA�|�}��4T�����֊>P�)A�_E�u+�4w���ܿ  �6�=3A��d�GY8�C4�����  �6P�)A� `�HS?��3~��>�  �6@/"A� u�_J(�b3q��>�^O�>@/"A�gG�}��3h�� ��  �6��A�^�B]8�Z2a� `0��W/?�NA�{�{���3;�� ����?��A�\H�n@���2Y��C��  �6�jA�Ҁ~
+�/2I�`s���?�A�t�u2��2K� �_����> YA�&��dK�3=���[��?��A�}�~��A3E� H3�$I�>@�
+A�)��VOρ�30��e����>�� A��{�4#� 
+��@?`�A�z�z"��,4'������J?�s�@�y�y%
+�,4��*�  �6�s�@�)���3���0��@?`��@�4�6s��4�� �4�  �6@��@���}3��@m�  �6��@���,rށ4߹����  �6���@���|�4ȹ��꿯#'?���@�} �}�`4ȹ����  �6`�����}�4����꿯#'?�����~�~��`4{�`T�XUC?�z���B)�Kc�?4w����  �6�t����
+z!��3�� 5^?�Qd?�}���|���5\�����,�r?����|����4\�������> ����(�|�4_����  �6������%�|��3c� �  �6 >����� }��3^� x ��Z?����GB�X[	�44^�����8?�U����{��3Z���Ͽă�?����iG���k4\��:��? R���X�X[�94X��t
+�k��> �����{��3>�`��  �6�-��� ��~�]3@��L�  �6 ����D�|�Z3<� B�^ �?�3���W�V\�04:���̿�b�?�"��~����o4W� =��{d�?�?���m.�q7�846����� ��? ���~�~���x4<� �|��
+�? ����{ ���4:�����y?���]=�kE�4��;"�  �6�} ��T�%x�3'��%/�o�t?�`��Q1�W]���3��m>�  �6`��;�{��2���=�  �6�E��π|��2
+� #�b��?�s�����-5� 0�A�z?�D��T݀W]��3
+�`�'�  �6����Ā}��2�� ����y?����bӀfK	��3 ����  �6 ����
+}�33������M|? ���k�n@�4�� ����y?@�&��\�^U��4�� ��  �6@�&�� ހ~�?3��@��  �6��6�� ��~�3\� #�'�?@�&��}��(5��@��,�?��6��k�kD��C4b� �
+��q? �G��u�t1�%4� �
+�  �6 �G�� � ��y3� #�뫎?��6� ~� �%5a��]�?,�?��6�Ej�k��6]� x@�q? �G�1u�q� �6��M	@��y?@�&�S[��_�	�86���J濥?@3O��ʀ}��4���U�  �6@3O���}��3���]�?  �6��6� �����6T��M	@  �6@�&�z ۀ���6��@�@  �6 ��|����6�� x@  �6 �G�} ���	��6�@�@���? ��?j߀n��96���=@��?���BcԀi���Z6���!@  �6���p
+ŀ���6� �*@$z�?8�\P߀T��x6���6@  �6 9�tЀ���6��(@"��? S�QO9�U��v6�`]6@  �6@R�jB�����6�@d@  �6p� �\W�"���6#��Y@��y?��;[B�i��V6��_�?  �6@���lA�����69� �W?��?���{ ����59��5�?��z?@M��2k.�o��'63���@�O?���{���m6<� @  �6 U��~�������6=� �@  �6 ��~�����6[� �?�ϕ? ����~��	��5:����?W��?�"���~�	��5V��*�?Pi�?`���ZX�X���,67� �?�e�? ����jE���5Y� ��?�Q�?�"��[Y�Y���&6V�@�?hUC?�z��bE)�N��&6u��q�?c m?����LLD�^���%6[���?  �6 ���}���x6|�`T@g?�"��~	���c6X����?lG�>@���y
+&���_6]� 	�?  �6@V��{� ���쁜6_�@�?2F�?`<Z��~���5ʶ ���2F�?`<Z��	����4ζ�
+�?mO?@3O�r̀��6󶀊�?  �6@3O�~����k6򶀛�?.?�NZ�t1�3����5϶ L�?�B?P<Z�]*L�=��(6ʶ ��?  �6`<Z�z#���q6Ѷ��?7�? Z�QI@�V����5��@W@  �6�j�w,��ށ�6��@�
+@�S�?�j�#x�z��#6��@���S�?�j��w�y'��3�� t��+�?PY��PB�`S�&4ö@�"�  �6�j��0�u,��2�� &�  �6p�Y��F�v&�t3ٶ@���;t-?�tY��+�/t�O4ֶ���%?pY��c�Fg�4׶@��  �6@rY��;�v(��3ᶠ|\��`�?P=E��| �{��7����S����?�j���} �}��7����>@��?�7� �|��9�@�`�  �6�cD �~��7����`�  �6����� �~��7���?@���?����~ �}��9����N@  �6��2�| ����H9n���N@  �6H���| ���H9��d|B��)@�]��}��~��:��iB��)@�$}��~��}�';��d9�A  �6��h��s�t2	��9R����A  �6�A���t��t4��9�����A  �6dMV��sՀw)�%9��
+�B��)@l ���}�}�;+�l�A  �6=L���t
+�u2��9u��"B  �6 .h�Gf�g���;E��gB  �6Jc{�Oc�c���;��`PB  �6��V�Cd(�i��x;ҹ [B  �6�@��Lf��f���;��}B  �6~���Md�e���; ��iB  �6��F�:e2�m��;Z���B  �6{���He�h�	��;ӵD^�A��)@�9D��}��~��9x�P��A  �6�V:�2aB�o���:ͺPǖA  �6��J��sˀz�?8o�2�A  �6l�/�#dF�u���99�ܬB��)@2T���}
+�}��:9���B  �6����Ebրj�	�.;��d�A  �6p����t�w-�u9��B  �6���<c̀n���:U��E�A��)@�ή��}�~	�|9ղ ��A  �6Z��6^��p��:���͵A  �6�����s*�y&���8q��V�A  �6���)b��v��79�� ��A��)@0͸��|�~�8�$��A  �6����"^��w� �j8ݬp�zA  �6����q6�{���6F��c]A  �6Sq��d��{����6!���@��'@�����z$�~	��Q4J���A  �6����_��{���5�ྛ@  �6����p;�}�E2��@X�+@�߿�s5�~�2��@�7�  �6J��p<�~%�����A��)@��4��~�~��8�X��A  �6�	)�`Q�x��9���R�A  �6��&�cP�z��A8û8<A��)@��3�}�z!��6h���HA  �6�I�	sʀz#�N6��P	6A  �6�l(��]U�z�!��6߻���@  �6(�R�sπy�'�	4�� =�@  �6T$-��bM�x�)��4��3e@��)@�!?�~��z�"��2d� =�?  �6�`�sπu�2��/b���>@��?�7��bH�x'��2����N@  �6��2��_N�w-�m3绠|\��`�?P=E²S8�^V��*Y�����,@lM�	~��|���-�`�b�S*@�XP¨EĀRa���+	���`�  �68�Q��}�)$�@�`�  �6�cD����'`���A  �6����Ig�^�.��3����@he@����}�u-��0���@X�+@�߿��t�k5+��0	� +�>  �6�|���q�m9 ��"Թ@�7�  �6J���q�l;��!˺ �L@  �65���s�n5#�$��<�@�a�?D�����w-�}/�GA  �6`P��Dj�b�*�2޸p>�@  �6E����u�o0%�-)1�(J!A5�?"�����w,�x/)�x@A  �6���<m�e�)�|1!��%GA  �6����u߀p/&�.���bA�Z$?������w�,�u0���!uA  �6�]��9n�f�*�|1���Y�A  �6@���~�w+��1*��[y�  �6p�u��b�N[*��9��@�"�  �6�j��m�YQ)��9����p��S�?p�x��]D�r4��9J�����  �6�+���I�;g-�m9��@���S�?�j��m8�{�:���գ��S�?�=���Z5�hF��9��`���  �6X\���&�$u!�=9z���B��S�?xւ��}�~ ��9������S�?X���\�_S�p99�����  �6P��� �|	�,9ά����S�?(z���|�}��9&��;���S�?�\���~�~��9��T���S�?P���^ �^V��b9̬`���  �6(ҳ��ڀ z��<9G�����S�?0n���} �} ��9� Q��TE�?觗���~
+��9�@N/�TE�?�8�����:�� Q��TE�?x4�����
+���9髠;���S�?p���~��~���9�������S�?0B���_�cN�o9������  �6������5o߁k9������S�?8b���}�~���9��գ��S�? ����aЀl?ꁘ9)��[y�  �6�E�����Fb؁�9Ǟ@N/�TE�?h��������:����B��S�?����}�� ��9����p��S�?�����lπw+��9ۣ��`�  �6�������K^ׁ�9���S����?�j���|�~���9� �׿�S�?�����y܀��?:^� �5�TE�?L�� ��  ��:Ѧ �5��S�?({�� }�  ��:���?@���?����|�~��-;���_�?�S�?����y݀���:Z��F,@�S�?���~��� �;|� �@TE�?h�������;����\@�S�?����,mрw��C;ţ��N@  �6H���N��I�*�^;�� ^e@  �6�E��V��E�(�l;ў���@  �6���e��:�*��;���֙@�S�? ���BbЀl���;$����@  �6(ҳ�vڀ$� ��;<��cq@�S�?8b��}�~��O;z� ��@�S�?0B��O`�c�	��;�����@  �6P��| ��	��;Ȭ�U�@�S�?P��T_ �_����;ɬ���@  �6X\��v&� ���;t���@�S�?p��~��~��q;��@�}@TE�?x4��
+����O;����@�S�?0n��} �}� �|;� ��@�S�?X��R]�a�끫;6����@  �6�+��eI�6�݁�;��@�}@TE�?觗�
+����O;� �@TE�?�8������;����@�S�?�\��~�~� �q;��֙@�S�?�=��G[4�i�偁;�� ^e@  �6p�u�Nb�L�ׁh;���cq@�S�?(z��|�}� �O;$���\@�S�?p�x�6^C�s��B;I�@W@  �6�j�Al�X�ׁ,;�@�
+@�S�?�j� n6�{��;���F,@�S�?xւ�}�~� �; ��_�?�S�?�z�z"�����:G� �5��S�?p�v� }�  ��:`� �5�TE�?� � �  ��:� �׿�S�?�z��z"��@:G� N��9u@x������{���5�� N����@8����yڀ��5Ʋ��Z?k@���]�"�A6��@8��,l@�����c�fI�>5۲�����Kd@�[������Fg�>5˲ N�X��@`����|�~��5��@U�F�B@�$���H��Faց�4��&���Ђ@p����b�cO��E5����o?Ffs@h_��@h܀n��A6ɲ�tq?�+�@�g��Kf�e���P6�� ��<@����ɾ���j���4
+����?�Q<@���l@�B�5��6��@_�?�h5@���*�����M��6����?ݺ7@����eI�L����6����?T�:@����k=�9̛��6�� ��?B�2@X���Qb�]�!�7���"�?��*@(g��bP
+�O��&7ϳ�I@��@�D��s4�5�*�H7]��t@o9@H���$����T�N7R���*@�3�?��]U�V�	��7�@�@8��?���{���D�y7j��@���?�`��Ϙʀ��j��7b��c@�(�?���H�Ԁմ\��7�� 0@��?���Õဳd��7��@��?�,@�ܶ�Z��E�%�27&��DP@�f�? ���>��-��8Z��Ve@\�+@�%��]
+��*� ��7t��l@]�?G��|�����8��`:?@~�M@E��D	��G�&�H7_�@yg@�6@hG��_/F�?����7��`Zi@>��?H��bN�K��8����3@�]@h��3p�l���/7o��m�?�W@x���W��p���6:� ��?tG@h��v$�-�*��6��j�?�<@���y�&�3��6�@��?�@(���ZV�T��_6���0�?�e@�~��ZY	�Y����65����? tf@ z��*oрq�遳6Q� d�>��@�R��=m�o��6G� ��>��@xN��Ie�h���6񳀓%@�h@�ӯ�v'�|��7�� �?�ʂ@@���RW,�`��w6s� N���@hs���}���56� N��#�@�����~���5쳀 S�6�@xN���c�eL��5�� \&����@�R���l�k=��5J� 2��4��@(����Q�Ra��95�� N�~({@H��}����5j� N�>��@&��|�{��6����"IY@(Ź��^�_T��45���Կk'7@pP���ڀ)rہ�4� �/�A@ ��減�:U���47� �V��pK@�_���.��^S�a4k��&���!@`±����3mف-4J���ÿ^�@ o���_�dK�25}��q"�DC�@@����{��x��5�� N�c��@A���
+���5�� ڻ����@�Ǥ��p�p:��5ƴ �7��ii@�����x�w#��4�� �a<���@�Ǥ�6s�s����5ƴ`�|�Ň-@�j������5fʁ4��������*@����y�u(��4��@�?Q�(@ԩ�)x��w���6����>?�$�@ l��/v�v���E6������$�@ l���v�u.��5�@@T��O@����}��{�e4���E7���q@Њ���u��r2��4� "�X�@i���hI����5c�@��Ȟu@ؑ���c8�r. �P5V���P�y-c@0 ��>�=k!��4��#n���8@���� ;�
+}�(4����U�P+@`���T�YQ)�i4F�`E��K�?8Э����|�/3ʴ �{���?j���5ր%p0�V3��u����@x!���m��|遰3�� .}�֘�?�����`��x�33���/� @2���ؕ�	uЁ�3���y��Ͼ?�ϯ�����y�33v�@~g���? N���PЀNb�B3a�`/:��v�?�M���6�9bǁ�3�����eg*@����D��Di�}4泀�0����?�B����䀮I���3����&����?�7��؀�I��4�� s.�r��?������nɁ.4������1@�%��粟��c��P4l� �$�BD@`����,�.gǁ^4s� ����38@����V�U^�4��@��^�:@H����@'�Am���4�� �8@��P@ $�������>7��@p#@�Gs@n��2u��t���7���L@6�F@H ��m�(�����a7��@�@[7@��p;����7� �@�6@����gC!��A��7�� �@�6@����gC!�I�灙7����n@�q�?j��\X��X��� 8ݴ@�@[7@��p;�0�Ɂ�7䴠.>@��Z@�(��~ ���B7�@	@@7�.@(���WY�\�쁄7��F�?�=w@�t��;b7�p����6K�� Z@4y@i��\M+�V�灸7V� 0q@l��?����^A7�P���7r� �@o,�? 	��:@]�l��7ص���?��,@��<PO�n���6�� ���4@@����Od���
+6�� ����? �|��?n�~��6 �` ����?�����?`�q."��4��]�a+@�����PQ�q.#�5�� �n�&�@ ђ��K+�WP/�V4��Р��l��?@Z���=8�QW-�4����?T�:@�����#y������$����?�6@�u���+v������)�� T�?�2@�<���.u�����)����I?d�}@�m���.t�����)4����?ݺ7@�����Hf�����$l��tq?�+�@�g���-t�����$4�@S�?��@x����m*�����)��"�?��*@(g���n'�����$�@��?�,@�ܶ��n����$r� ����@x���|����)�� N�X��@`���|����$���&���Ђ@p���.t�D���$��@���TO{@@���/t�f���)��@��^�:@H��� }�q���$S�@@����4@�P��
+)x�w��.+S��.��p-+@����Le�s��)o� ����38@���[X�o�%��$o� ���b�@�|��(q*�l�(��)�����eg*@���)q*�k�+��$���&���!@`±�5r�j�*��$S� ���%�@ D��������/q� �$?��g@���������Dǁ.q� ����@x����0�����/���I?d�}@�m����$��Tā.� T�?�2@�<���� ��I��i*W���?�6@�u������e���*�@_�?�h5@�������E��c, ���Z?k@���Ñ�>ف. � N��9u@x���������/ ������Kd@�[��<���+��0 ��Wy���h@���O����9��0q�@���TO{@@���j����A��0� ��<@����G�ڀĵS��1 ��¼���1@���f���ҵ\��1q�����1@�%��L�݀պa��2 ��.��p-+@����x��؟G��1(�@@����4@�P��x��ؚ@��1��.��p-+@����:�����n�C2K� ���b�@�|��P����]��2զ��&����?�7��b��ζZ��2 ��?)�t��?@o��X����l��3o� 0@��?�������&���$ �@S�?��@x�����F���X&>��\�?J@8�������3���(>��@���?�`����܀�?���' ��t@o9@H�����ڀ�I��9) �@��?�@(����ꄀ�
+�8µ 1O?s��@�����ɬ��69�8Ե ��>��@xN��̤���* �T8���j�?�<@����ꄀ��r7Z�@�?�8@�����ᴀ�8P��7i� �A?�"�@ ���ͩ��78�98� lc?}�D@@���٠��'@�8r� ��|�D@Hm�� ه��  ��8�� �6��ۊ@p���Ñ������8!� N��#�@�����Ā�����8��� S�6�@xN��=�����ہ�8��������z@�+��PЪ���ǁ�8�����{�D@H��K۠���9r�@֭��L4@���`䱀�ô�U9l��͕�H<@x���Qͭ���Ɓ9� 2��4��@(���냀����+9ѵ��Կk'7@pP��郀����q9]���q?��߿�BA,�̀�t�q�@�?b�̿`xMAM��}=�l� ������@PA����~>��� ���꿿@`9A�����`���� 8���SͿ�0BAʗӀ�r?��� ��`9a�`�3A�����P/��� <_?O�9��2A����Z�h��7�?dv��?1A7���'�]$�G��w��8�!�P3Aܲ���UC����<@  @���7A<���/�Vܳ4����?  @��?1AM흀@�B-�C�`�@�7T���@AC�̀�t��A� �j@  @��CA?��n���/@T���:FA4�S��C`��,���+@  @�p\IAD�T��E_I�(�@.@�S���JAP�0��*uI�A��R@  @���TAj���{��5� 7@������UA`���}��?��R@������dAE���?�jy�@�`�@  @��ZdAZ䫀K�^��5��c�?� ���\AM���{L�g� �N@ǽʾ��nA���M�U�1� �S@  @��?mA&技R�-t�'����?�6x�`jlA:�܀3�t*�\����@nO��pA����Q�Dn����?@�L�@bwA�ĀC�e1�C��p�@  @��oA�ꃀD�1�� �h>f����#cA�"�$w#��� �x?�ſ �vA��-t���� �-@� ��H#�A���>n+�X�`��@|7z��z~A
+��M�dy�%����ɝ�p(SAĒ�|A��� �m��i���BxA��Q�0AbƯ���}?m~�`�Aָ`�8NS䭍�����+����hA��G�14i���� ��cЖ�@�UA��+�(w7�λ��:?  @���A��k�>ZA���� /�  @�ZyA��[�=KRޮʻ��?  @�(އA��w�=f-橃� ���  @�P�iA��K�;6c��� ��  @� �VA��4�3t �� `@"�d��z�A��g�;WGt�s�`�_@  @��0�A	�z�2qA�Y� �\@�{�@/�A�a�?XBΪN�`��p҆�@�BA����uZ�л`�$�  @��rCA�����m���ٿ��>�P�3A�ի�שSM�˻��ܿ  @��=3A�䱀ԫT[�л� �@��[��*�A%�V�>[@(�,�0��@  @��A(�t� yH�2�0��@&�5�P,�A8�P�7a=�
+�P�@  @�0�AD�f�z���0ʾ@�QJ���tA��؀X�Vũ��`��@�����tAP�@�0f;��� e�@  @�@GuA]�Q�	z$��`;�@k���0�kA⥭�S�8s��pD�@  @��_jA�苀9�)���@  @� �`A����N�*��Ϻ��@��/���eA��܀`�Mȩк ��@@c����fA\�(�4`Ar�ƺ���@  @���fAn�=��x)�úPZ�@��;�0�\Ac��5_B���`[�@  @���XAy��s4���� ��@
+��VUAӑ׀R�K�������@  @��4SA��̀B�"����P��@��3��]WAn��2]F̨�� ��@  @��WA{��fIB����d�@  @� uHA��ȀI�g������@c�g�p�OAg��2NW𩝺���@  @��UOAy��ZX]������@�����GA۔ɀ[�>z������@B���vGAe�耼�4����|�@  @��EGAw��ڇ	������@B���vGAe��A;[4����|�@  @��EGAw��)K^��� ?,@  @�`��@v�Ԁz�����)@�@�@)�@n�܀;o����@M�?  @���@i-p(��ܹ��@  @�@��@{��}������?�#'���@��}�乀�?  @����@}���{ǸŹ�@sH�@��@,� �w,Ÿ	��n@	D�`� A/� �t/ĸ"� �@  @�`� Ay��"x��� T.@f���>Aaݶ�Be&��1� PO�}7��>�@ ��� V��@*@1\+��lA#���y!��9� �[@�!��@A/Ś�t*r�>��l�?�#'����@� �}�ƹ��?  @�@���}��}Ǹ�� 3���#'���@��~��ҹ湀l�?�#'��ի���}�y�@�W@�e!��A�	�~w�E�`�|@3h���A)�q8�P�D���|@��� VA ��k�P�I��/�@  @���A' y�UZ�A�d��/�@�����A�S�|�Q�Y��6*@���@/"A�H�}���g��6*@  @�@/"A, w�_M���p��U@CNo���*A4�5�t,���y��U@  @���*A^�V�>Z���~����?  @��?1AS�`�F\�Ÿ���7�?dv��?1A@�]�bO�̸��@|�?1󣾐>+A>�0�lCɸ{� <_?O�9��2A.�a�gK������?���p2A4��s5 ڸ`� i�?;��� ]+A@�/�kE�z� ��`9a�`�3A��i��[���@�?~s���A��~ �R� ���oĿ�3,A��;��T�~��2�?��� A>��o=�c�  a���ÿ�"A����V�l��T��d��`�+Aʕ+�p����{��w��8�!�P3A�g�n������ <�>'�����A
+���~@�^���ٿ��>�P�3A��U�[�Թ�����~{��pB*AÔ�n���z���\p��@�A󾔀~��q�^� ~������0�!A���m����h�@��2��@!AƑ�p� ӹg����q֊�P�)AϡE�u���w���ܿ  @��=3A�d�G�8޹�����  @�P�)A� `�H�?	�~��>�  @�@/"A� u�_�('�q��%���6q� eA��}���T��>�>O��@/"A�G�}��h�� ��  @���A��^�B�8i�a� `0��W/��NA��{���;�� ��v����AΤH�n��T�Y��C��  @��jA��Ҁ�
+t�I�`s�����Aό�u�Q�K� �_����� YA�ڒ�d��;�=���[�����A��~��/�E� H3�I��@�
+A�׫�V���0��e������ A�������#� 
+�Ф@�`�Aކ�z���'������J��s�@ڇ�y�
+���*�  @��s�@��)������0��@�`��@���6������ �4�  @�@��@���������@m�  @���@�케,����߹����  @����@��������ȹ��꿟#'����@� �}�Ϲȹ����  @�`�������������꿟#'��������~��Ϲ{�`T�HUC��z����)�K��w����  @��t�����
+�!��� 5^?�Qd��}������,�\������r���������\�������� �����(����_����  @������%���c� �  @� >���� ��^� x ��Z������B�X�	�^�����8��U������ �Z���Ͽ���������G���ʹ\��:�錆� R�����X��X��t
+�K��� �������
+�>�`��  @��-��� ���(�@��L�  @� �����D��)�<���̿�b���"�����ȹW� B�V ���3�����V��:� =��sd���?��ѓ.�q���6�������� �����~�ù<� �|��
+�� ����� ����:���z�y���£=�k�����;"�  @��} ���T�%�;�'��%/�_�t��`���1�W�����m>�  @�`���;��H����=�  @��E���π�J�
+� #�Z��s������i�� 0�1�z��D���݀W��
+�`�'�  @������Ā��B��� ����y������Ӏf�	� ����  @� �����
+��3�������M|� ���n����� ��|�y�@�&����^������ ��  @�@�&�� ހ��0���@��  @���6�� �����\� #���@�&�����k���@������6����k��޹b� �
+��q� �G�Ћ�t����� �
+�  @� �G�� � ��!�� #�㫎���6� �� m�a��]�?����6�E��kD��]� x@�q� �G�1��q1 ���M	@|�y�@�&�S���_T	㸞��J濕�@3O���ʀ������U�  @�@3O���������]�?  @���6� ��~��T��M	@  @�@�&�z ۀ|���� x@  @� �G�} ��	���@�@  @� ��|��|�����
+�?]O�@3O�r�̀z�󶀊�?  @�@3O�~��~�ʸ�@�?*F��`<Z���~)�ʶ L�?�B�P<Z�]�L�=n��ʶ ��?  @�`<Z�z�#�|�ǸѶ���?�.��NZ�t��3t��϶��? 7�� Z�Q�@�V]� ���@W@  @��j�w�,�y�����@�
+@�S���j�#��z$� ���*F��`<Z���	�����ζ@���S���j�ى�y���� t��+��PY���B�`��ö@�"�  @��j���0��,D��� &�  @�p�Y���F��&"�ٶ@���+t-��tY����/�عֶ���%�pY���c�F���׶@��  @�@rY���;��(��@�?XUC��z��b�)�Nc��u���?  @� ���}��|�ø|� �?~e�� �����E���Y����?LG��@���y�&�}�и]� 	�?  @�@V��{	 ��}���_� �@  @� ��~
+��~���[��q�?S m�����L�D�^U���[�`T@og��"��~�	�}�θX����?O����"�������V� ��?�Q���"��[��YZ��V���@�O����{��}�ɸ<� @  @� U��~	��~���=��*�?Hi��`���Z��X[��7��_�?  @�@���l�A�}���9� �?�ϕ� ���������:��5�?��z�@M��2�.�o;�3� �W?�醿���� �-�9��Y@z�y���;�B�iHԸ�@d@  @�p� �\�W�"y���#��(@��� S�Q�9�U^ĸ�`]6@  @�@R�j�B�|������6@  @� 9�t�Ѐ}��� �*@z��8�\�߀T_ø��!@  @����p�ŀ|��췠=@������B�ԀiG�Ҹ��@�@���� ��?�߀n?㸹��|\�|`��P=E�� �{�?�����>@����7�� �|�׵���S������j��� �}�?���@�`�  @��cD� ���t�����`�  @������� ���t����?@��������� �}�׵����N@  @���2�|� �{�n�n���N@  @�H���|� �{n������A  @��A��̌��t�	���iB��)��$}����}�����d9�A  @���h�Ѝ�t�	y�R�d|B��)��]����~��������A  @�dMV�ލՀw�����
+�B��)�l ����}�ï+�l�A  @�=L��Ό
+�u�R�u��"B  @� .h�G��gJ
+�E��gB  @�Jc{�O��cPe���`PB  @���V�C�(�iG;�ҹ [B  @��@��L���fL]���}B  @�~���M��eLT� ��iB  @���F�:�2�mA��Z���B  @�{���H��hH	P�ӵD^�A��)��9D����~��x�P��A  @��V:�2�B�o=��ͺPǖA  @���J��ˀz���o�2�A  @�l�/�#�F�u1W�9�ܬB��)�2T���
+�}��9���B  @�����E�րjF	����d�A  @�p���ӌ�w����B  @����<�̀n>|�U��E�A��)��ή����~�	�ղ ��A  @�Z��6���p;�����͵A  @�����ݍ*�y����q��V�A  @����)���v/���� ��A��)�0͸���~����$��A  @�����"���w+ +�ݬp�zA  @�����6�{����F��c]A  @�Sq�����{ ���!���@��'�������$�~��׹J���A  @��������{�s��ྛ@  @������;�}��n���@T�+��߿��5�~��R���@�7�  @�J���<�~��һ�����A��)���4����~�z��X��A  @��	)��Q�x&ɵ���R�A  @���&��P�z|�û8<A��)���3���z�!��h���HA  @��I�	�ʀz�#ظ��P	6A  @��l(��U�z!��߻���@  @�(�R��πy'���� =�@  @�T$-��M�x)����3e@��)��!?����z"@�d� =�?  @��`��πu2�b���>@����7�ݞH�x�'T�����N@  @���2��N�w�-$�绠|\�|`��P=E²�8�^���Y�����,�lM�	���|K��`�b�O*��XP¨�ĀR����	���`�  @�8�Q�����޻�@�`�  @��cD������`���A  @�����I��^H.����@T�+��߿�ό�k�+ú	���@de������u�-ۺ�� +�>  @��|��ˏ�m� �Թ@�7�  @�J��ɏ�l��˺ �L@  @�5��Ѝ�n�#߻��<�@�aͿD������w�-��GA  @�`P��D��bE*|�޸p>�@  @�E���׋�o�%��1�(J!A5��"������w�,�)�x@A  @����<��eA)��!��%GA  @����ۋ߀p�&?����bApZ$��������w,⺶��!uA  @��]��9��f?*�����Y�A  @�@�����w�+��*�@���S���j�ߓ8�{�����@�"�  @��j���m�Y�)�����p��S��p�x�ʣD�r�M�J��[y�  @�p�u���b�N�*��������  @��+����I�;�-$����գ��S���=����5�h�̴��`���  @�X\����&�$�!��z���B��S��xւ���~� �������S��X�����_��9�����  @�P���� ��	��ά����S��(z����}�l�&��;���S���\����~�����T���S��P���� �^��;�̬`���  @�(ҳ���ڀ ����G�����S��0n��� �}� ƴ� Q��LEӿ觗����~�m��@N/�LEӿ�8���������������S��0B�����c�� �������  @�����淀5��)����;���S��p�����~������ Q��LEӿx4��������m�髰գ��S�� �����Ѐl��δ)�����S��8b����~��m���[y�  @��E���襀F����Ǟ@N/�LEӿh���������������B��S���������� �����p��S������Ӕπw��R�ۣ��`�  @������K�������S������j����~��'�� �׿�S��������܀�� �^� �5�LEӿL�� ���  ϱѦ �5��S��({�� ��  ϱ���?@����������~�����_�?�S�������݀��Z��F,@�S��������  �|� �@LEӿh������ү����\@�S������,�рw*�ţ��N@  @�H���N�I`*��� ^e@  @��E��V覀Eb(��ў���@  @����e淀:i*����֙@�S�� ���B�ЀlA�$����@  @�(ҳ�v�ڀ$v R�<��cq@�S��8b����~��z� ��@�S��0B��O��cO	P������@  @�P��|� �|	��Ȭ�U�@�S��P��T� �_T�q�ɬ���@  @�X\��v�&� z�G�t���@�S��p�����~s���@�}@LEӿx4��
+���
+������@�S��0n��� �} �� ��@�S��X��R��aP�O�6����@  @��+��e�I�6n����@�}@LEӿ觗�
+��
+���� �@LEӿ�8�����Я����@�S���\����~ s���֙@�S���=��G�4�iB�櫀� ^e@  @�p�u�N�b�L]������cq@�S��(z����} ��$���\@�S��p�x�6�C�s2���I�@W@  @��j�A�l�XQ����@�
+@�S���j� �6�{�ү���F,@�S��xւ���~ � ��_�?�S���z��"����G� �5�LEӿ� � ��  ̱� �5��S��p�v� ��  ̱`� �׿�S���z���"����G� N��9u�x�����{�������Z?k������]P"߸�� N�����8�����ڀ��Ʋ@8��,l��������f��`�۲�����Kd��[�����F��`�˲ N�X���`������~����@U�F�B��$������F������&���Ђ�p������c��]�����o?Ffs�h_��@�܀n<߸ɲ�tq?�+���g��K��eL�׸�����?�Q<����l��B^5����@_�?�h5����*L���dM������?ݺ7�����e��Lf�������?T�:�����k��94����� ��?B�2�X���Q��]P!y����"�?��*�(g��b�
+�Obl�ϳ�I@����D��s��5k*[�]��t@o9�H���$X���\TX�R���*@�3Ͽ��]��V]	��@�@8�����{���iDC�j��@���`���hʀ�j>�b��c@�(Կ���H_Ԁ�L\1��� 0@�ֿ����kဳ�d���@��?�,��ܶ�ZᬀEd%f�&��DP@�f˿ ���>���-u��Z��Ve@\�+��%��]���*s .�t��l@]οG��|��~緅�`:?@~�M�E��D���Gb&[�_�@yg@�6�hG��_�F�?n�5���`Zi@>�˿H��b��Kd߷����3@�]�h��3��l:�h�o��m�?�W�x������p8���:� ��?tG�h��v��-o*����j�?�<����y��&n3���@��?��(���Z��T^и���0�?�e��~��Z�	�YZ���5����? tf� z��*�рq4���Q� d�>����R��=��o;���G� ��>���xN��I��hH���񳀓%@�h��ӯ��'�|�v��� �?�ʂ�@���R�,�`R�ĸs� N����hs�������6� N��#�����������쳀 S�6��xN�����e�8��� \&������R�����k�6�J� 2��4���(������R��c��� N�~({�H�����j���"IY�(Ź����_���5���Կk'7�pP����ڀ)����� �/�A� ���H��:����7� N�>���&����{������q"�DC��@������x�-��� N�c���A����
+����� �a<�����Ǥ�6��s6��ƴ@�?Q�(�ԩ�)���w)����� ڻ������Ǥ�Ő�p��ƴ��ÿ^�� o�����d�f�}���>?�$�� l��/��v/�ݸ� �8@��P� $������`���@p#@�Gs�n��2���t2�w����L@6�F�H ��m4(��X�O��� �@�6�����g�!�����3���@�@[7���p������<�� �@�6�����g�!�Ie�3�����n@�q��j��\���X\���ݴ@�@[7���p��0h�<�䴠.>@��Z��(��~� �}�^��@	@@7�.�(���W��\U�=���F�?�=w��t��;�7�p:���K�� Z@4y�i��\�+�VZ�#�V� 0q@l�������^�7�P`��r� �@o,ʿ 	��:�]�l?�p�ص���?��,���<�O�n;����� "�X��i����I��c� ���4�@�����d����� ���Ϳ �|���n�~�� �` ���ɿ������`�q�"����]�a+�����ǰQ�q�#q��������$�� l��ъ�u�;��@��Ȟu�ؑ��ȝ8�r� W�V� �n�&�� ђ���+�W�/Թ��Р��l���@Z����8�Q�-񹤵 �{��ǿj����ր%�0*����U�P+�`�����Y�)˹F���P�y-c�0 ����=�!����E7���q�Њ��ϋ��r����`E��Kѿ8Э������4�ʴ������*����ڇ�u�����@@T��O�������{�͹�� �7��ii�����܈�w�#�����#n���8����� ;�
+�빮�`�|�Ň-��j�����5��󹊴 �V��pK��_���Ҝ�^��Ϲk��&���!�`±���3���J��u�����x!����m������� .}�֘ʿ����`�؈�3����/� �2���(��	������y��Ͼ��ϯ������3�v�@~g���� N����ЀN�/�a�`/:��vտ�M�����9��������eg*��������D����泀�0���Ŀ�B���g䀮�������&���ῠ7���g؀���񹂳 s.�r�￨��������蹆�����1��%���N��ޝ�׹l� �$�BD�`������.��йs� ��<������B�������
+� ����38�������U������@��^�:�H�����'�A��������?T�:�������y��0�ۻ�� T�?�2��<����u��'��������?�6��u����v��&�������I?d�}��m����t��I��4����?ݺ7������f��.ۻl��tq?�+���g����t��iۻ4�@S�?���x���ϓ*��:����"�?��*�(g��͒'��;ۻ�@��?�,��ܶ��;ۻr� �����x����|�|���� N�X���`����|�|ۻ���&���Ђ�p����t�Dhۻ��@���TO{�@����t�fJ����@��^�:�H��� �}�q8ۻS�@@����4��P��
+�x�w,��S��.��p-+������e�s-���o� ����38�����X�o2%ۻo� ���b���|��(�*�l6(�������eg*����)�*�k6+ۻ���&���!�`±�5��j7*ۻS���I?d�}��m���B$����=�� �$?��g������f�����=�q� �����x���v0������?�6��u����ܛ���� T�?�2��<���@ �շ���W�@_�?�h5�����b�Ȼ�s� ���Z?k�����o���=� ��\�?J�8����_��͓��>�@S�?���x����EF���ͻ>��t@o9�H����aڀѷ��� � 0@�ֿ����a��ډڻ ��@���`���Z܀����� � ���%�� D��|���q� N��9u�x������ ������Kd��[��<o�<+к ��Wy���h����Oc��E9кq�@���TO{�@���jA��UAк� ��<�����Gbڀ�KS�� ��.��p-+�����x&��aG��(�@@����4��P��x&��f@����¼���1����fK���K\��q�����1��%��L`݀�FaV� ��.��p-+�����:q���#no�K� ���b���|��Pb��6]I�զ��&���ῠ7��bP��JZU� ��?)�t��@o��X\��+l�o�@��?��(��������
+�µ ��>���xN���\���� V��� 1O?s��������7����9ʷԵ�j�?�<���������F�Z�@�?�8����������P*�i� �A?�"�� ���3����8��� lc?}�D�@���'����@۷r� ��|�D�Hm�� '���  Զ�� �6��ۊ�p���=����Ҷ!� N��#������pĀ��ض��� S�6��xN��=W���1�G���������z��+��P0���;�������{�D�H��K%���-�ѵr�@֭��L4����`���=�U�l��͕�H<�x���Q3���<�ε� 2��4���(���������ѵ��Կk'7�pP�������]�໎�*?`�@ΣG����8������2:?��@���$n8
+�`��~�?@}�@�3�����8��@�����>��@#�j���9��P����b5?� �@Ɨ(��5�S8Z�P����'?� �@�dҀ?l*8j�P����'?� �@�G��9�<8������=�>��@�gր!>j98e�@̎�p�>�0�@�rـ45g�7�`��4��>@}�@�mˀ0AbR7x�P)���_>�+�@�d��*N[�6+�@���*>���@�d��*N[�6�@̎�p�>�0�@�9��-�~8,�P)��<H�>���@��x����8^�P)���_>�+�@}��8��8N�@���*>���@7q���99O��!��g>��@����2�n[8��)��f7h>�1�@J�8�A\;X8'�pX��G�>���@@�E�9^@A8����n��> 8�@����D�`{8&�����  7 g�@��Ԁ�T�8��Ҫ�0\z9���@��ʀ�W{8��y��  7�X�@� ���%8���y��  7�X�@� �
+��%8�� ��0\z9 �@\�W�~#8�����  7��@j�E�}�!8,�0���Y���&�@DQF��b�8������:B����@PP:��b��7'�����zm����@�q ����7���l��-��� 8�@�s������7'�����  7 g�@�;؀�7��Ҫ�0\z9���@�:̀����7繰���2:���@�|��(-л໎�*�`�@�]G��;�Z0λ`��~��@}�@t3��3�90�@�������@#<j��n�,1�P����b5�� �@�i(����-��P����'�� �@��Ҁm���,��P����'�� �@��G��K��.������=����@Ùրo���+��@̎�p���0�@؎ـx���*��`��4���@}�@ٓˀy���$��P)���_��+�@ܜ��z��)n�@���*����@ܜ��z��� |�@̎�p���0�@��9��\��0��P)��<H˾���@�$x��p�41һP)���_��+�@�}��v�1Ż@���*����@7�q��o)V2�T��y�� !�@P�b��s+E4a�pz��?��@��@K=R��m�34�pϔ��N����@L�`� w+E4尠O���"� ��@���6s�4���a�D�@�A�h��j,701	��Ê�7⪿pKA~�PbY/k�@˦��B��zAHUÀS�`�/��`Qm�&�����A�gɀl?24� �,�1�׾�A�mҀUAEx2���������@�w��](L2�� ���(���A�O��u-��1ϳ 5����5�ZA� ʀ6��2v��Ę���5�BAI ��hI1t��ʆ���5�_%A ��~�1u� ���w��>�Aұ��u���1�`Qm�u��>��AΙɀn�2��������D?@�A����l�431ײ`H����50$A^ ��U^0s��Ê�K�?pKA��S�_j/
+� �,����>�AѓҀX�@�2��@˦�9�B?�zAH�ÀT_�/���?���@Չ��a�F62	�����,?P8AZ�߀3
+t0-������,�P8AZT߀3�t.-���x\�Zqi? u�@΍�d�H(0.������? ��@��p�:61�������5�0Ay ڀ& yC,r� �3�]��>`(�@�0�u0�0��^.���5��@�n�s6j0��\C�M��>��@��j�t/-0}��,D���5���@��t�u)�/8��q���5���@��p�t
+4�-F� x�y�4? �@þZ�l�B�-ϰ�y�,�?`��@��.�V�Sg.G�����W.�?�I�@��7oj.���ݦ�;�R?��@7��)vJ,����,!?���@6��,uM'#� ��dq?���@/��!z�%������#J�>@��@V���}�* � �����5�H�@~ ���~Y*s������I��@��@V[���}�*� ������>@��@S��}�%�� c���F�>���@I� ��z"���l����5@=�@~ ��~�&t�0����5`@�@ ���2$t�`�����5`.�@c O�� cht� c��yFؾ���@Ic ���z"� ������@��@S`��}�%� ��=q����@/s�	�z�%1��ݦ��R���@7o��uG,0���!����@2o$�,�j�'d�����C.���I�@y�?�hK.��p����uQ�@r�@�m�*�3F,���y�`��@�`?�O�a�-ȴ�x\�3qi� u�@�s�_P�/ڴ x�R�4� �@�BZ�jFf-����[�� ��@�z�mA�05� �3���`(�@�t0�r�7R02��^.���5��@<n�o�0f��\C�������@�?j�p�3�/1��q���5���@�%p�r�6'-G��,D���5���@�+t�r�+S/S� x�R�4� �@|��~��:X�`����5�+�@u 2��;ݱ�y�`��@t1��~�z:ݱp����uQ�@r�@�r����:+� 5}���5�D�@{  ��;X��q���5���@J g��;� x�y�4? �@|��}z;?��y�,�?`��@p�6�
+y&�;��p���!vQ?@r�@��q�~�;+�����W.�?�I�@�s�s5�;����!����@� n�  �:���,!?���@� n�u;� ��=q����@ �  �:�� ��dq?���@ �  f;�� c��yFؾ���@� ~�  �:� c���F�>���@� ~�  Y;�`�����5`.�@� t�  ; ������>@��@K�R�m=�9�pȣ�0{> !�@Pb�s�99��C����Q>���@L#`� w�99�� Ě���> ��@�����8ѻ�~�@�)�`�@2]G�p������p��@�2:���@|�w�$#�
+� Ε@V��@}�@�t3�~�'��� ��@~����@�<j�z赱�h�@}b5�� �@:i(�q��X�Z�h�@�'�� �@@�Ҁ��l��j�h�@�'�� �@h�G�;ǟ����p��@p=����@=�ր��j��e� ��@�o���0�@(�ـ��g=�� Ε@䤋�@}�@'�ˀпbV�x��@<_��+�@$���ֲ[��+� ��@�)����@$���ֲ[��� ��@�o���0�@q�9�2Ӕ�,��@�G˾���@$x�}��u�^��@<_��+�@��}�r����N� ��@�)����@��q�q9ԵO�p�@x g���@Bl���(nI�����@�6h��1�@�W8���;O�'�0�@������@�VE�Ǣ@|����b�@��� 8�@?n���0`�&��m�@  ж g�@j6Ԁ�^T������@0�w����@g4ʀ�]W�蹀<�@  ж�X�@z� �~������<�@  ж�X�@z� �����������@0�w� �@�W�������pκ@  ж��@�E�����,��x�@��>�&�@��F�2�����@�@=;B>���@��:�<���'��B�@&{m>���@9� �2�����/�@}��> 8�@6���A �7�'��m�@  ж g�@i�؀V�r�����@0�w����@d�̀V�1��p��@&3:?��@����Z�л�~�@5*?`�@2�G�(ŗ�λ Ε@��?@}�@��3�!͐�� ��@��>��@��j�&�����h�@�b5?� �@:�(��C���h�@�'?� �@@dҀ�6�`���h�@�'?� �@hG�@��+���p��@>�>��@=gր�5����� ��@ep�>�0�@(rـ�%����� Ε@���>@}�@'mˀ�$�ػ���@|`>�+�@$d���"���n� ��@8+>���@$d���"���|� ��@ep�>�0�@q9�/��Ժ���@�H�>���@�x�+����һ�@|`>�+�@�}�(���Ż ��@8+>���@�q�-�)j����@ > !�@�b��+ݹa�0=�@���>@��@��R���:�4�0��@��N>���@�#`� �+ݹ�`�@�#> ��@	���s���p��@��D?@�A�����7��	����@K�?pKA���b�k� ��@:�B?�zA��À�`�����f@v��>��A2�ɀ��z�4��&@���>�A/�Ҁ��Ea���`�@?���@+�����L�����|@x��>�A.��������ϳ��{@v�5�ZAs ʀ���]�v�`��@v�5�BA� ����I��t����@v�5�_%A� ������u���|@'���A.O���+������f@%�����A2gɀ�>x���p��@`�D�@�Ah���*4��ײ �@v�50$A� ����^��s����@7⪿pKA�~_�
+��&@0�׾�A/mҀ�A@Z��� ��@�B��zA�UÀ��_��`�@�����@+w���)Fr�	�P��@�,�P8A�T߀��tY���P��@�,?P8A��߀�
+tZ���`�U@2qi� u�@2s��H��.�`r@Z�� ��@z��:���`��@v�5�0A� ڀ� yw�r��d-@��`(�@t0���0ٺ�`�'@v�5��@�<n����� �<@������@?j���/��}�`�=@v�5���@+t���)�8� �j@v�5���@/%p���4G�F���q@Q�4� �@=BZ��BC�ϰ`�r@`��@US.��+S3�G� }@C.���I�@�{���o2������@�R���@�o���vv����ۙ@!����@�o���uŻ#�୧@<q����@�s���zӻ�����@�I��@��@�[��}�� ����@v�5�H�@� �~��s����@$J�>@��@���}����m�@���@��@�`���}һ���%�@xFؾ���@�c �!�z���p/�@v�5@=�@� ��~˻t����@v�5`@�@� �޻t� c�@v�5`.�@� O�O c��t��%�@�F�>���@�� �!z���m�@���>@��@����}һ�୧@eq?���@э��"zһ1����@<�R?��@ɑ��*uw�0��ۙ@-!?���@Α$��6j»d� }@W.�?�I�@���$h6���0h�@"vQ?@r�@;�m��m3w���`�r@,�?`��@6�?��a@�ȴ`�U@[qi? u�@2����P�ڴ��q@z�4? �@=�Z���FS��`r@��? ��@����Aú5��d-@^��>`(�@�0��7�2�`�'@v�5��@��n��<��f� �<@N��>��@�j��3�1� �j@v�5���@/�p��6[�G�`�=@v�5���@�t��#+�S���q@z�4? �@������X�@X{@v�5�+�@� 2���ݱ`�r@,�?`��@��1����ݱ0h�@"vQ?@r�@9�r���2�+���v@v�5�D�@�  ���X� �j@v�5���@� g������q@Q�4� �@���)�?�`�r@`��@�6���&���0h�@�uQ�@r�@9q���\�+� }@C.���I�@�5s���5ݠ���ۙ@-!?���@@ n� � ǰ��ۙ@!����@@ n���V��୧@eq?���@� � � ����୧@<q����@� � � ̬���%�@�F�>���@ ~� � c���%�@xFؾ���@ ~� � 4�� c�@v�5`.�@4 t� �  � ����@ʱ�@��@�=R��=���0��@�z� !�@��b�����뻐�@0�Q����@��`� ���������@��� ��@	��6��/�ѻ@�?j��?`xMA����}p:l� ����@�@PA��~p:����q?���?�BAԕ4�3tC:q� ����?@`9A�R�R`:�� ��p9a?`�3A�b�cP�9�� 8�� T�?�0BA6�-�7r0:�� <_?_�9?�2A�Y�UZ�9h��7�?�v>�?1AɵV�'M]�9G��w��H�!?P3A$�]��[U�9��`��x҆?@�BAk��1u):л��ٿ�>>P�3AT�U��WS�9˻`�$�  �6�rCAy��?m:�ܿ  �6�=3A_�O��UT�9л ��  �6 �VAn�̀3�tw:� ��kЖ?@�UAg�Հ(�wr:λ ���  �6P�iAaീ;�c�:����ѝ�?p(SA<���|o:������3��?�hAP���1�i�:�� /�  �6ZyAQޥ�=�R$;ʻ �h>n��?�#cA��ހ�w�:�� �m��i�?�BxAB���0�b;����:?  �6��A9ڕ�>�Ao;���}?)m~?`�A*���8�SC;����?  �6(އAى�=�-�;�� �x?��? �vA��-�t
+;���c�?� �?�\A����{�:g� `@2�d?�z�A���;�Gq;s�`�_@  �6�0�A�݆�2��;Y� �-@� �?H#�A��>�nZ;X����?7x?`jlAƕ$�3t�:\� 7@���>��UA����}�:?�@.@�S?��JA��Ѐ��um:A� �\@�{?@/�A󯟀?�B�;N�`��@�7z?�z~A���Md�;%�� �@��[?�*�A۪��>�@�;,�0��@  �6�A�ߌ� ��;2�0��@6�5?P,�Aȯ��7�=�;
+�P�@  �60�A�ޚ���;���?@�L?@bwA�<�C&e9;C����@�O�>�pA�W�QFDR;��R@ω�>��dA��A�?j�:@��R@  �6��TA�����{�:5�`�@  �6�ZdA��U�K)^�:5���+@  �6p\IA����ϻ_m:(� �N@��>��nA�U�M7U;1� �S@  �6�?mA��v�RV-;'��p�@  �6�oA
+�}�Dj9;��/@t��>:FA̰��ν`X:,� �j@  �6�CA��>�;nD:�`�@�7T?��@A��3�.t@:A��<@  �6��7A��\�/QV:4����?  �6�?1A��c�@WB�9C�`;�@���>0�kA�S�SO8q;�pD�@  �6�_jA,�u�9rZ;��@  �6 �`AB�B�N[*m;Ϻ0ʾ@�QJ?��tA�(�XV�;����@��/?��eA�$�`M�;к`��@��?��tA����0�;�;� e�@  �6@GuA�⯀	�$�;� ��@`c�>��fA��؀4�A�;ƺ���@  �6��fA��À��)�;úPZ�@�;>0�\A���5�B�;��`[�@  �6��XA����4�;�� ��@,
+?�VUA-�)�R=K�;�����@  �6�4SAY�4�Bg"n;��P��@��3>�]WA����2�F�;�� ��@  �6�WA�����I�;���d�@  �6 uHA\�8�Ihs;�����@��g>p�OA����2�W�;�����@  �6�UOA�����X�;�����@3��>��GA%�7�[?>�;�����@��>�vGA����g�;���|�@  �6�EGA����y	�;�����@��>�vGA���A�[�;���|�@  �6�EGA���)�^�;����)@�@?@)�@��$�;��6��@M�?  �6��@��E�-�(�6ܹ ?,@  �6`��@��,���6���@  �6@��@�����6����?�#'?��@��}�?6乀�?  �6���@����q6Ź�@&sH?@��@ԉ �w�t6	��n@.	D?`� Aъ �t�w6"� �@  �6`� A���"��6� T.@���>>A��J�B�&�61� PO�'}7?�>�@ �� R5�@*@A\+?�lA݇�y��69� �[@�!�>�@A��f�t�7>��l�?�#'?���@� �}�6ƹ��?  �6@��������q6�� 3���#'?��@��~�Z4湀l�?�#'?�ի�����}�6y�@�W@�e!?�A����~�7E�`�|@Ch?��Aי>�q��_7D���|@��? VA���k�_7I��/�@  �6��A� ��U��|7d��/�@���>��A䤭�|��\7Y��6*@1��>@/"A뚸�}���6g��6*@  �6@/"A� ��_���6p��U@�No>��*A̙ˀt���6y��U@  �6��*A����>���6~����?  �6�?1A����F��u6���7�?�v>�?1A�ƣ�b��f6��@|�?Q�>�>+AЀl�m6{� <_?_�9?�2Aҽ��g��5�����?���>p2Ȁ�s� K6`� i�?C��? ]+A��рk��5z� ��p9a?`�3A���H5��@�?�s?��A��~� �5R� ���o�?�3,A�ŀW5~��2�?��?� A�o��5c�  a����?�"A��S5l��T���d�?`�+A6�Հp;��4{��w��H�!?P3A���n=��4�� <�>/��?��A��m�~�~5^���ٿ�>>P�3ALɫ�[UV4����dp�?@�A�l�~�5^� ~�����?0�!AA��mA��4h�����{�>pB*A=��n?�:4z��%���6q? eA��}�4T�@��R��>@!A:��p; X4g�����֊>P�)A1���u+4w���ܿ  �6�=3AO��GY8C4�����  �6P�)AT ��HS?�3~��>�  �6@/"A1 ��_J(b3q��>�^O�>@/"A���}�3h�� ��  �6��AU���B]8Z2a� `0��W/?�NA��{��3;�� ����?��A2���n@��2Y��C��  �6�jAu�.�~
+/2I�`s���?�A1��u2�2K� �_����> YA3�n�dK�3=���[��?��A��~�A3E� H3�$I�>@�
+AU�U�VO��30��e����>�� A|��{�4#� 
+��@?`�A"���z"�,4'������J?�s�@&���y%
+,4��*�  �6�s�@x�׀�3���0��@?`��@r��6s�4�� �4�  �6@��@z� �}��3��@m�  �6��@i�D�,r�4߹����  �6���@}��|�4ȹ��꿯#'?���@� �}`4ȹ����  �6`���}���}4����꿯#'?�������~�`4{�`T�XUC?�z��e�׀Kc?4w����  �6�t��}��
+z!�3�� 5^?�Qd?�}�����5\�@�?hUC?�z����׀N��&6u���?  �6 ��������x6|����?lG�>@�����ڀ��_6]� 	�?  �6@V���	������6_� �@  �6 ���
+������6[��q�?c m?��������^��%6[�`T@g?�"��������c6X� �?�e�? �������5Y� ��?�Q�?�"������Y��&6V����?W��?�"��	��	�5V��*�?Pi�?`������X��,67���@�O?��������m6<� @  �6 U���	�����6=��_�?  �6@����������69� �?�ϕ? ���	��	�5:��5�?��z?@M��ΕҀo�'63� �W?��?���������59��Y@��y?��ť��i�V6�@d@  �6p� �����"���6#��(@"��? S���ǀU�v6�`]6@  �6@R��뾀���6���6@  �6 9���0���6� #�b��?�s���-5� �*@$z�?8���!�T�x6��!@  �6�����;���6췠=@��?�����,�i��Z6��@�@  �6 �������6��@�@���? ����!�n�96���M	@��y?@�&��� �_�	86���M	@  �6@�&�� %���6���]�?  �6��6�� ���6T� #�'�?@�&���(5���]�?,�?��6����k�6]� x@�q? �G�ϋ��q� 6� x@  �6 �G�� ���	�6� #�뫎?��6� �� %5a��
+�?mO?@3O���4��6󶀊�?  �6@3O������k6�@�?2F�?`<Z�����~��5ʶ L�?�B?P<Z��ִ�=��(6ʶ ��?  �6`<Z���݀��q6Ѷ���?.?�NZ����3���5϶��?7�? Z�����V���5��@W@  �6�j���Ԁ���6��@�
+@�S�?�j�݈�z�#6�� ���2F�?`<Z������4ζ@���S�?�j�'��y'�3�� �
+��q? �G�0���t1�%4� t��+�?PY�I���`S&4ö@�"�  �6�j�u�Ѐu,�2�� &�  �6p�Y�j���v&t3ٶ@���;t-?�tY�u��/tO4ֶ���%?pY�J䝀Fg4׶@��  �6@rY�q�ŀv(�3ᶀU�  �6@3O�~��}�3���J濥?@3O�r�6�}�4�� �
+�  �6 �G�} � �y3�@��  �6��6� �~��3\�@��,�?��6�D��kD�C4b� ����y?@�&�S��^U�4�� ��  �6@�&�z "�~�?3�����  �6 ��}��
+}�33������M|? ��>��n@4�� ����y?���D�-�fK	�3 �`�'�  �6���o�<�}��2�� 0�A�z?�D�Y�#�W]�3
+���=�  �6�E�r�1�|�2
+��%/�o�t?�`�U�πW]��3��m>�  �6`�n�ŀ{�2��;"�  �6�} �^�%x3'�����y?��>�ÀkE4��L�  �6 ���j�|Z3<� �|��
+�? �������4:� =��{d�?�?��/�Ҁq7�846��t
+�k��> ���{��{�3>�`��  �6�-��~ ��~]3@� �  �6 >���� }�3^�����,�r?���������4\����� ��? ������~��x4<� B�^ �?�3��[��V\04:���̿�b�?�"�������o4W���Ͽă�?�������k4\�����8?�U��~���{�3Z��:��? R��\���X[94X� x ��Z?���Q���X[	44^�������> ���x�؀|4_����  �6����yۀ|�3c���>@��?�7��� �|��9���S����?�j��� �}�7���|\��`�?P=E�� �{�7��@�`�  �6�cD�~� �~�7����`�  �6����~� �~�7���?@���?����� �}��9����N@  �6��2� ���H9n���N@  �6H����� ��H9��d9�A  �6��h�0��t2	�9R�iB��)@�$}���}';��d|B��)@�]��
+�~�:�����A  �6�A��4��t4�9�����A  �6dMV�"�+�w)%9��
+�B��)@l �����};+�l�A  �6=L��2���u2�9u��"B  �6 .h¹��g��;E��gB  �6Jc{±��c��;��`PB  �6��V½�؀i�x;ҹ [B  �6�@�´��f��;��}B  �6~��³��e��; ��iB  �6��F�ƛ΀m�;Z���B  �6{��¸��h�	�;ӵD^�A��)@�9D���~�9x�P��A  �6�V:�Ο��o��:ͺPǖA  �6��J��5�z?8o�2�A  �6l�/�ݜ��u��99�ܬB��)@2T�����}�:9���B  �6���»�*�j�	.;��d�A  �6p���-��w-u9��B  �6���ĝ4�n��:U��E�A��)@�ή���~	|9ղ ��A  �6Z��ʢB�p�:���͵A  �6����#�րy&��8q��V�A  �6���מF�v�79�� ��A��)@0͸���~8�$��A  �6����ޢO�w� j8ݬp�zA  �6����ʀ{��6F��c]A  �6Sq���L�{���6!���@��'@�����܀~	�Q4J���A  �6�����S�{��5�ྛ@  �6���	�ŀ}�E2��@X�+@�߿���ˀ~��2��@�7�  �6J����Ā~��%�����A��)@��4���~�8�X��A  �6�	)�����x�9���R�A  �6��&�����z�A8û8<A��)@��3����z!�6h���HA  �6�I���6�z#N6��P	6A  �6�l(����z�!�6߻���@  �6(�R��1�y�'	4�� =�@  �6T$-����x�)�4��3e@��)@�!?����z�"�2d� =�?  �6�`��1�u�2�/b���>@��?�7�#���x'�2����N@  �6��2����w-m3绠|\��`�?P=E�N�Ȁ^V�*Y�����,@lM����|��-�`�b�S*@�XP�X�<�Ra��+	���`�  �68�Q�l�B�}�)$�@�`�  �6�cD������'`��@X�+@�߿�1��k5+�0	���@he@�����u-�0����A  �6���·���^�.�3�� +�>  �6�|��5��m9 �"Թ@�7�  �6J��7��l;�!˺ �L@  �65��0��n5#$��<�@�a�?D���
+�w-}/�GA  �6`P�¼��b�*2޸p>�@  �6E���)��o0%-)1�(J!A5�?"�����	�w,x/)�x@A  �6���ē�e�)|1!��%GA  �6���%�!�p/&.���bA�Z$?�������w�,u0���!uA  �6�]��ǒ�f�*|1���Y�A  �6@����w+�1*���p��S�?p�x�6���r4�9J�@�"�  �6�j�@�YQ)�9���[y�  �6p�u�N란N[*�9������  �6�+��e淀;g-m9��@���S�?�j�!�Ȁ{:���գ��S�?�=��H�ˀhF�9��`���  �6X\��v�ڀ$u!=9z���B��S�?xւ���~ �9������S�?X��S��_Sp99�����  �6P��|� �|	,9ά����S�?(z����}�9&��;���S�?�\�����~�9��T���S�?P��V� �^V�b9̬`���  �6(ҳ�v�&� z�<9G�����S�?0n��� �} �9� Q��TE�?觗�
+���~
+�9�@N/�TE�?�8�����:�� Q��TE�?x4��
+��
+��9髠;���S�?p����~��9�������S�?0B��P��cN�o9������  �6���e�I�5o�k9������S�?8b����~��9��գ��S�? ���B�0�l?��9)��[y�  �6�E��V�[�Fb��9Ǟ@N/�TE�?h������:����B��S�?����� �9����p��S�?����-�1�w+��9ۣ��`�  �6����M�d�K^��9���S����?�j����~��9� �׿�S�?�����$��?:^� �5�TE�?L�� ��  �:Ѧ �5��S�?({�� ��  �:���?@���?������~�-;���_�?�S�?������#���:Z��F,@�S�?������� ;|� �@TE�?h�������;����\@�S�?����ԓ/�w�C;ţ��N@  �6H�����c�I�*^;�� ^e@  �6�E����Z�E�(l;ў���@  �6�����I�:�*�;���֙@�S�? �����0�l��;$����@  �6(ҳ���&�$� �;<��cq@�S�?8b����~�O;z� ��@�S�?0B�����c�	�;�����@  �6P���� ��	�;Ȭ�U�@�S�?P���� �_���;ɬ���@  �6X\����ڀ ���;t���@�S�?p�����~�q;��@�}@TE�?x4������O;����@�S�?0n��� �}� |;� ��@�S�?X�����a���;6����@  �6�+���淀6���;��@�}@TE�?觗�������O;ﭠ�@�S�?�\�����~� q;��֙@�S�?�=����̀i���;�� ^e@  �6p�u��란L��h;���cq@�S�?(z����}� O;$� �@TE�?�8��������;����\@�S�?p�x�ʢ��s��B;I�@W@  �6�j���X��,;�@�
+@�S�?�j���ʀ{��;���F,@�S�?xւ���~� ; � �5�TE�?� � ���  �:��_�?�S�?�z���ހ���:G� �5��S�?p�v� ��  �:`� �׿�S�?�z��ހ@:G���Z?k@����z�]�"A6�� N����@8����&��5Ʋ N��9u@x����~�{��5��@8��,l@����K��fI�>5۲�����Kd@�[��&y�Fg�>5˲ N�X��@`�����~�5��@U�F�B@�$��h��Fa��4��&���Ђ@p���O��cO�E5�� ��<@����7B]��j��4
+� ����38@���]���U^��4��@��^�:@H���f�ـAm��4�����eg*@���k��Di�}4泀�o?Ffs@h_����$�n�A6ɲ�tq?�+�@�g�����e��P6�����?�Q<@������B�5�6��@_�?�h5@����L]���M�6����?ݺ7@�������L���6����?T�:@�������9̛�6�� ��?B�2@X�������]�!7���"�?��*@(g������O�&7ϳ�I@��@�D�����5�*H7]��t@o9@H����XU��TN7R���*@�3�?�����V�	�7�@��?�,@�ܶ���T�E�%27&�@�@8��?����� ��Dy7j��@���?�`��1h6���j�7b��c@�(�?����_,�մ\�7�� 0@��?���=k��d�7���DP@�f�? �����o�-�8Z��Ve@\�+@�%����V�*� �7t��l@]�?G������8��`:?@~�M@E����k�G�&H7_�@yg@�6@hG���Ѻ�?���7��`Zi@>��?H�����K�8����3@�]@h��͐�l��/7o��m�?�W@x����Y�p���6:� ��?tG@h�����-�*�6��j�?�<@������&�3�6�@��?�@(������T�_6���0�?�e@�~������Y���65����? tf@ z��֑/�q���6Q� d�>��@�R��Ó�o��6G� ��>��@xN�����h��6񳀓%@�h@�ӯ��ـ|��7�� �?�ʂ@@�����Ԁ`��w6s� �8@��P@ $�������>7�� N���@hs�����56� N��#�@�������5쳀 S�6�@xN��M��eL�5�� \&����@�R��A��k=�5J� 2��4��@(���`��Ra�95�� N�~({@H�������5j� N�>��@&����{��6����"IY@(Ź�R��_T�45���Կk'7@pP��v�&�)r��4� �/�A@ ��He�:U��47� �V��pK@�_��?�d�^S�a4k��&���!@`±�`�Q�3m�-4J���ÿ^�@ o��O��dK25}� �7��ii@����$��w#�4��`�|�Ň-@�j��Oc�5f�4���q"�DC�@@����
+�x�5�� ڻ����@�Ǥ�;���p:�5ƴ N�c��@A������5�� �a<���@�Ǥ�ʍ��s���5ƴ������*@���&��u(�4����>?�$�@ l��ъ��v��E6�@�?Q�(@ԩ�׈�w���6��@@T��O@����
+�{e4��@p#@�Gs@n��΋	�t��7ﴠ.>@��Z@�(���� ���B7���L@6�F@H ���4؀���a7�� �@�6@������߀�A���7��@�@[7@���������7� �@�6@������߀I���7��@�@[7@�����0���7���n@�q�?j�����X�� 8ݴ@	@@7�.@(������\���7�� Z@4y@i����ՀV���7V� 0q@l��?������ɀP���7r��F�?�=w@�t��Şɀp���6K� �@o,�? 	������l��7ص���?��,@��İ��n���6�� ���4@@�������
+6�� "�X�@i�������5c� ����? �|����~�6 �` ����?����7���q."�4��]�a+@����9���q.#5�������$�@ l��/���u.�5�@��Ȟu@ؑ��8�Ȁr. P5V��E7���q@Њ��1�	�r2�4� �n�&�@ ђ�]�ՀWP/V4��Р��l��?@Z��`�ȀQW-4�� �{���?j��k�*�%p0V3���U�P+@`��Z��YQ)i4F���P�y-c@0 �o���=k!�4�`E��K�?8Э�~��|/3ʴ�#n���8@���q ŀ
+}(4���u����@x!��A����|��3�� .}�֘�?���Q���x�33���/� @2��7(k�	u��3���y��Ͼ?�ϯ�Gi�y�33v�@~g���? N��V�0�NbB3a�`/:��v�?�M��q��9b��3����&����?�7��>g(��I�4����0����?�B��Eg��I��3�� s.�r��?����{��n�.4������1@�%��Na��c�P4l� �$�BD@`���v��.g�^4s� T�?�2@�<��ҋ������)����?�6@�u��Պ�����)����?T�:@����݇�����$����I?d�}@�m��Ҍ����)4����?ݺ7@����������$l��tq?�+�@�g��ӌ����$4�@S�?��@x���1�ր���)��"�?��*@(g��3�ـ���$�@��?�,@�ܶ�>�����$r� ����@x����愀��)�� N�X��@`����愀��$���&���Ђ@p����Ҍ�D��$��@���TO{@@����ь�f��)��@��^�:@H��� 胀q��$S�@@����4@�P���׈�w�.+S��.��p-+@��������s���)o� ����38@�������o�%�$o� ���b�@�|��؏րl�(�)�����eg*@���׏րk�+�$���&���!@`±�ˎ��j�*�$S� ����@x����vЀ���/� �$?��g@����Kf��D�.q� ���%�@ D���|态��/q���I?d�}@�m��gB܀�T�.� T�?�2@�<��m@ ��I�i*W���?�6@�u��z��e��*�@_�?�h5@���Lb��E�c, ���Z?k@���=o��>�. � N��9u@x���������/ ������Kd@�[���o���+�0 ��Wy���h@����c����9�0q�@���TO{@@����A怼�A�0� ��<@�����b&�ĵS�1 �@@����4@�P���&��ؚ@�1��.��p-+@�����&��؟G�1(��¼���1@����K
+�ҵ\�1q�����1@�%���`#�պa�2 ��.��p-+@�����q���nC2K� ���b�@�|���b����]�2զ��&����?�7���P�ζZ�2 ��?)�t��?@o���\����l�3o��\�?J@8���S_��3��(>�@S�?��@x���QE����X&>� 0@��?���Pa��&��$ ��@���?�`��RZ$��?��' ��t@o9@H���Ia&��I�9) � ��>��@xN��4\F��* T8�� 1O?s��@����N7T��698Ե@��?�@(���|��
+8µ�j�?�<@���|��r7Z�@�?�8@����aL��8P�7i� �A?�"�@ ��M3W��7898� lc?}�D@@��J'`��'@8r� ��|�D@Hm�� 'y��  �8�� �6��ۊ@p����=o�����8!� N��#�@�����p<�����8��� S�6�@xN���WE�����8��������z@�+���0V�����8�����{�D@H���%`����9r�@֭��L4@����O��ôU9l��͕�H<@x����3S����9� 2��4��@(����}����+9ѵ��Կk'7@pP���}����q9]� ������@PA�}��~�>���@�?b�̿`xMA�d�}�=�l���q?��߿�BA�k4��t��q� ���꿿@`9AaR��`����� 8���SͿ�0BA6i-��r�?��� ��`9a�`�3APb��P�/��� <_?O�9��2A�UY��Z��h��7�?dv��?1A�KV�'�]�$�G��w��8�!�P3A$N]��U�C���`��p҆�@�BAkC��u�Z�л��ٿ��>�P�3AT+U�שS�M�˻`�$�  @��rCAy%��m����ܿ  @��=3A_O�ԫT�[�л ��  @� �VAn"̀3t� �� ��cЖ�@�UAg<Հ(w�7�λ ���  @�P�iAa ��;6c�������ɝ�p(SA<n�|�A�������+����hAPD��14i����� /�  @�ZyAQ"��=KR�ޮʻ �h>f����#cA�zހ$w�#��� �m��i���BxABH��0Ab�Ư����:?  @���A9&��>ZA������}?m~�`�A*H��8NS�䭍���?  @�(އA'��=f-�橃� �x?�ſ �vA�|�-t������c�?� ���\A�e�{�L�g� `@"�d��z�AG��;WG�t�s�`�_@  @��0�A�#��2q�A�Y� �-@� ��H#�A�~�>n�+�X����?�6x�`jlA�k$�3�t�*�\� 7@������UA�S�}���?�@.@�S���JA�VЀ�*u�I�A� �\@�{�@/�A�Q��?XB�ΪN�`��@|7z��z~A�|�M�d�y�%�� �@��[��*�A�V��>[@�(�,�0��@  @��A�!�� y�H�2�0��@&�5�P,�A�Q��7a=��
+�P�@  @�0�A�"��z������?@�L�@bwA�l<�C�e�1�C�0ʾ@�QJ���tAx(�X�V�ũ��`��@�����tA�K��0f;���� e�@  @�@GuA���	z$��⺰��@nO��pA\W�Q�D�n����@��/���eAy$�`�M�ȩк ��@@c����fA�N؀4`A�r�ƺ���@  @���fA�À�x)��úPZ�@��;�0�\A�J�5_B����`[�@  @���XA��s4�����`;�@k���0�kA[S�S�8�s����@  @� �`ABVB�N�*���ϺpD�@  @��_jA,u�9��)���p�@  @��oA
+}�D��1�� �S@  @��?mA�v�R�-�t�'� �N@ǽʾ��nA�YU�M�U��1�`�@  @��ZdA�U�K�^���5��R@������dA�UA�?�j�y�@��R@  @���TA�C��{���5���+@  @�p\IA�C���E_�I�(��/@T���:FA�P���C`���,� �j@  @��CA�[>��n���`�@�7T���@A�_3��t���A��<@  @���7A�@\�/�V�ܳ4����?  @��?1A�c�@�B�-�C�@M�?  @���@�E�-p(���ܹ��)@�@�@)�@�5$�;o����� ?,@  @�`��@�,�z������@  @�@��@��}�������?�#'���@�}�}��乀�?  @����@��{�ǸŹ�@sH�@��@�w �w,�Ÿ	��n@	D�`� A�v �t/�ĸ"� �@  @�`� A��"x���� T.@f���>A�#J�Be&���1� PO�}7��>�@ � �V��@*@1\+��lA�y�y!���9� �[@�!��@A�;f�t*�r�>��l�?�#'����@�} �}��ƹ��?  @�@������}�Ǹ�� 3���#'���@}�~���ҹ湀l�?�#'��ի��~��}��y�@�W@�e!��A���~�w�E�`�|@3h���A�g>�q8�P�D���|@��� VA�y�k��P�I��/�@  @���A� ��UZ�A�d��/�@�����A�\��|�Q�Y��6*@���@/"A�f��}����g��6*@  @�@/"A� ��_M݁��p��U@CNo���*A�gˀt,䁶�y��U@  @���*A���>Z����~����?  @��?1A���F\ˁŸ���7�?dv��?1A�:��bO�̸��@|�?1󣾐>+A�dЀlC�ɸ{� <_?O�9��2A�C��gK���� i�?;��� ]+A�cрkE��z����?���p2A�q�s5 �ڸ`� ��`9a�`�3AH����[���@�?~s���A�|�~ ��R� ���oĿ�3,Apŀ��T�~��2�?��� A�l�o=��c�  a���ÿ�"A~���V�l��T��d��`�+A6kՀp�����{��w��8�!�P3AE��n�󁠹�� <�>'�����A�@m�~�@�^���ٿ��>�P�3AL7��[��Թ����\p��@�ABl�~���q�^� ~������0�!AAl�m�����h����~{��pB*A=l�n����z�@��2��@!A:o�p� �ӹg��%���6q� eA|�}����T����q֊�P�)A1_��u����w���ܿ  @��=3AO���G�8�޹�����  @�P�)AT ��H�?�	�~��>�  @�@/"A1 ��_�(�'�q��>�>O��@/"Ag��}���h�� ��  @���AU��B�8�i�a� `0��W/��NA{�{����;�� ��v����A2\��n���T�Y��C��  @��jAu.��
+�t�I�`s�����A1t�u��Q�K� �_����� YA3&n�d��;�=���[�����A}�~���/�E� H3�I��@�
+AU)U�V�ρ�0��e������ A|�����#� 
+�Ф@�`�A"z��z����'������J��s�@&y��y�
+����*�  @��s�@x׀������0��@�`��@r4�6������� �4�  @�@��@z ������@m�  @���@iD�,�ށ��߹����  @����@}�����ȹ��꿟#'����@} �}��Ϲȹ����  @�`���}����������꿟#'�����~��~���Ϲ{�`T�HUC��z��eB׀K���w����  @��t��}�
+�!���� 5^?�Qd��}��|���,�\������r������|����\�@�?XUC��z���E׀Nc��u���?  @� �����|�ø|�������� ���x؀����_����  @�����y�ۀ���c� �  @� >����� ���^� x ��Z����QG��X�	��^�����8��U��~���� �Z��t
+�K��� ���{���
+�>�`��  @��-��~ ����(�@��L�  @� ���j����)�<���Ͽ�������i�����ʹ\��:�錆� R��\X��X���X� B�V ���3��[W�V���:���̿�b���"���~���ȹW� =��sd���?��/mҀq���6�������� ����~�~��ù<� �|��
+�� ���{������:���z�y���>]Àk������;"�  @��} �^��%��;�'��%/�_�t��`�UQπW������m>�  @�`�nŀ��H����=�  @��E�r1���J�
+� #�Z��s����i�� 0�1�z��D�YT#�W���
+�`�'�  @����o<���B��� ����y����Db-�f�	�� ����  @� ��}�
+��3�������M|� ��>k�n������ ��|�y�@�&�S\�^������� ��  @�@�&�z "���0���@��  @���6� ����\� #���@�&�}���k���@������6�Dk�k���޹b� �
+��q� �G�0u��t����� �
+�  @� �G�} � ���!�� #�㫎���6� ~� �m�a��]�?����6��j�kD���]� x@�q� �G��u��q1 ����M	@|�y�@�&��[ �_T	�㸞��]�?  @���6�� �~���T��M	@  @�@�&�� %�|����� x@  @� �G�� ��	����@�@  @� ����|�����@�@���� ���j!�n?�㸹��=@�������c,�iG��Ҹ���!@  @�����
+;�|���� �*@z��8��P!�T_�ø���6@  @� 9��0�}�����(@��� S��OǀU^�ĸ�`]6@  @�@R����|�����@d@  @�p� ����"y큗�#��Y@z�y����[��iH�Ը��_�?  @�@������}����9� �W?�醿����{���-�9��5�?��z�@M���kҀo;��3���@�O������}�ɸ<� @  @� U������~����=� �@  @� �������~򁯸[� �?�ϕ� ���	~����:����?O����"��	~����V��*�?Hi��`����X�X[���7� �?~e�� ���j�����Y� ��?�Q���"���Y��YZ���V��q�?S m������L��^U����[�`T@og��"�����}�θX����?LG��@����
+ڀ}�и]� 	�?  @�@V�������}쁱�_�@�?*F��`<Z����~�)�ʶ�
+�?]O�@3O��4�z��󶀊�?  @�@3O���~��ʸ� L�?�B�P<Z��*��=n��ʶ ��?  @�`<Z��݀|�ǸѶ���?�.��NZ��1�3t���϶��? 7�� Z��I��V]�� ���@W@  @��j��Ԁyށ����@�
+@�S���j��x�z$�� ���*F��`<Z��������ζ@���S���j�'w�y������J濕�@3O�r6��������U�  @�@3O�~������@���+t-��tY�u+�/��عֶ���%�pY�J��F����׶@��  @�@rY�qŀ�(��� &�  @�p�Y�j���&�"�ٶ t��+��PY�IP��`���ö@�"�  @��j�uЀ�,�D�����S������j��} �}��?�����>@����7�� �|�׵��|\�|`��P=E�| �{��?���@�`�  @��cD�~ ����t�����`�  @�����~ ����t����?@���������~ �}�׵����N@  @���2 �{��n�n���N@  @�H���� �{�n���d9�A  @���h�0s�t�	�y�R�iB��)��$}�~�}���������A  @��A��4t�t��	���
+�B��)�l ��}��}��ï+�l�A  @�=L��2t��u��R�u�d|B��)��]�}
+�~���������A  @�dMV�"s+�w������ [B  @��@�´f�fL�]���gB  @�Jc{±c�cP�e����}B  @�~��³d�eL�T� ��"B  @� .h¹f�gJ�
+�E�`PB  @���V½d؀iG�;�ҹ��B  @�{��¸e�hH	�P�ӵ�iB  @���F��e΀mA���Z�ܬB��)�2T��}��}���9���B  @����»b*�jF	�����d�A  @�p���-t�w�����B  @�����c4�n>�|�U�D^�A��)��9D�}�~���x�P��A  @��V:��a��o=���ͺPǖA  @���J�s5�z����o�2�A  @�l�/��d��u1�W�9��E�A��)��ή�}�~�	��ղ ��A  @�Z���^B�p;������͵A  @�����#sրy�����q��V�A  @�����bF�v/����� ��A��)�0͸�|�~�����$��A  @������^O�w+ �+�ݬp�zA  @����qʀ{�����F��c]A  @�Sq���dL�{ ����!���@��'�����z܀~���׹J���A  @������_S�{��s��ྛ@  @����	pŀ}��n���@T�+��߿��sˀ~��R���@�7�  @�J���pĀ~��һ�����A��)���4�~�~��z��X��A  @��	)��`��x&�ɵ���R�A  @���&��c��z�|�û8<A��)���3��}�z�!���h���HA  @��I��s6�z�#�ظ��P	6A  @��l(�]��z!���߻���@  @�(�R��s1�y'����� =�@  @�T$-�b��x)�����3e@��)��!?��~�z"�@�d� =�?  @��`��s1�u2��b���>@����7�#b��x�'�T�����N@  @���2�_��w�-�$�绠|\�|`��P=E�NSȀ^����Y�����,�lM��~�|�K��`�b�O*��XP�XE<�R�����	���`�  @�8�Q�lB���޻�@�`�  @��cD��������`���@de����}�u�-�ۺ���@T�+��߿�1t�k�+�ú	���A  @����·g��^H.���� +�>  @��|��5q�m� ��Թ@�7�  @�J��7q�l���˺ �L@  @�5��0s�n�#�߻��<�@�aͿD��
+�w�-���GA  @�`P�¼j�bE*�|�޸p>�@  @�E���)u�o�%���1�(J!A5��"����	�w�,��)�x@A  @�����m�eA)���!��%GA  @����%u!�p�&�?����bApZ$�������w,�⺶��!uA  @��]���n�f?*������Y�A  @�@��~�w�+���*���p��S��p�x�6]��r��M�J�@�"�  @��j�@��Y�)����@���S���j�!mȀ{�������[y�  @�p�u�N��N�*���������  @��+��e��;�-�$����գ��S���=��HZˀh��̴��`���  @�X\��vڀ$�!���z���B��S��xւ�}�~� ��������S��X��S\�_���9�����  @�P��| ��	���ά����S��(z��|�}��l�&��;���S���\��~��~������T���S��P��V^ �^���;�̬`���  @�(ҳ�v&� �����G�����S��0n��} �}� �ƴ� Q��LEӿ觗�
+��~��m��@N/�LEӿ�8���������� Q��LEӿx4��
+����m�髠;���S��p��~�~������������S��0B��P_�c�� �������  @����eI�5�߁)�������S��8b��}�~���m���գ��S�� ���Ba0�l��δ)��[y�  @��E��V[�F�؁��Ǟ@N/�LEӿh�������������B��S�����}�� ������p��S������-l1�w��R�ۣ��`�  @�����Md�K�ׁ�����S������j��|�~���'�� �׿�S������y$���� �^� �5�LEӿL�� �  �ϱѦ �5��S��({�� }�  �ϱ���?@���������|�~������_�?�S�������y#����Z��F,@�S������~� � �|� �@LEӿh������ү����\@�S�������m/�w*��ţ��N@  @�H����c�I`*���� ^e@  @��E���Z�Eb(���ў���@  @�����I�:i*�����֙@�S�� ����b0�lA��$����@  @�(ҳ��&�$v �R�<��cq@�S��8b���}�~���z� ��@�S��0B���`�cO	�P������@  @�P��� �|	���Ȭ�U�@�S��P���_ �_T��q�ɬ���@  @�X\���ڀ z�G�t���@�S��p���~�~�s���@�}@LEӿx4����
+���� ��@�S��X���]�aP�O�6����@  @��+�����6n݁������@�S��0n���} �} ����֙@�S���=���[̀iB�櫀� ^e@  @�p�u����L]ׁ������@�S���\���~��~ �s��@�}@LEӿ觗����
+����נּcq@�S��(z���|�} ���$���\@�S��p�x��^��s2���I�@W@  @��j����XQׁ��� �@LEӿ�8�������Я��@�
+@�S���j��nʀ{�ү���F,@�S��xւ��}�~ �� ��_�?�S���z��zހ����G� �5�LEӿ� � ��  �̱� �5��S��p�v� }�  �̱`� �׿�S���z�zހ����G� ��@
+��VUA-o)�R�K��������@  @��4SAYJ4�B�"������d�@  @� uHA\C8�I��g����|�@  @��EGA�'�ڇ	�������@B���vGA�I����4������@�����GA%l7�[�>�z���P��@��3��]WA�?��2]F�̨�� ��@  @��WA���fI�B������@c�g�p�OA�J��2NW�𩝺���@B���vGA�I�A;[�4������@  @��UOA�"��ZX�]����|�@  @��EGA�'�)K^���� N�����8���y&����Ʋ��Z?k������z�]P"�߸�� N��9u�x���~�{������@8��,l�����Kc�f��`�۲�����Kd��[��&�y�F��`�˲ N�X���`���|�~�����@U�F�B��$��hH�F�ց����&���Ђ�p���Ob�c���]��� ��<�����7�]�������
+� ����38����]V��U�񁨹��@��^�:�H���f@ـA����������eg*����kD�D����泀�o?Ffs�h_���h$�n<�߸ɲ�tq?�+���g���f�eL��׸�����?�Q<�����@�B^5�����@_�?�h5����ִ]��dM�������?ݺ7������I�Lf��������?T�:������=�94������ ��?B�2�X����b��]P!�y����"�?��*�(g���P��Ob�l�ϳ�I@����D���4�5k*�[�]��t@o9�H���ܨU��\T�X�R���*@�3Ͽ���U�V]	���@�@8������ �iD�C�j��@���`��1�6��j�>�b��c@�(Կ�����,��L\�1��� 0@�ֿ���=����d����@��?�,��ܶ��T�Ed%�f�&��DP@�f˿ ����o�-u���Z��Ve@\�+��%���
+V�*s �.�t��l@]οG������~�緅�`:?@~�M�E���	k�Gb&�[�_�@yg@�6�hG���/��?n��5���`Zi@>�˿H���N�Kd�߷����3@�]�h���p�l:��h�o��m�?�W�x����WY�p8ꁈ�:� ��?tG�h���$�-o*�����j�?�<������&n3����@��?��(����V�T^�и���0�?�e��~���Y��YZ����5����? tf� z���o/�q4遦�Q� d�>����R���m�o;���G� ��>���xN���e�hH����񳀓%@�h��ӯ��vـ|�v��� �?�ʂ�@����WԀ`R�ĸs� �8@��P� $������`��� N����hs��}����6� N��#������~����쳀 S�6��xN��Mc�e��8��� \&������R��Al�k��6�J� 2��4���(���`Q�R���c��� N�~({�H���}���j� N�>���&���|�{�������"IY�(Ź�R^�_����5���Կk'7�pP��v&�)�ہ��� �/�A� ���e�:�����7� �V��pK��_��?.d�^��Ϲk��&���!�`±�`Q�3�ف�J���ÿ^�� o��O_�d��f�}� �7��ii�����$x�w�#�����`�|�Ň-��j��O�c�5�ʁ󹊴�q"�DC��@���{
+�x��-��� ڻ������Ǥ�;p��p���ƴ N�c���A��������� �a<�����Ǥ��s��s6���ƴ������*����&y�u��������>?�$�� l���v��v/��ݸ�@�?Q�(�ԩ��x�w)򁞸��@@T��O����}
+�{��͹�������$�� l��/v��u��;���E7���q�Њ��1u	�r������#n���8����q ŀ
+��빮���P�y-c�0 �o>��=�!����`E��Kѿ8Э�~���4�ʴ �{��ǿj��k5*�%�0�*���u�����x!��A�������� .}�֘ʿ���Q؈�3����/� �2��7�k�	�Ё����y��Ͼ��ϯ�G�i���3�v�@~g���� N��VP0�N��/�a�`/:��vտ�M��q6�9�ǁ�����&���ῠ7��>�(�����񹂳��0���Ŀ�B��E��������� s.�r�￨���{��Ɂ蹆�����1��%���a�ޝ��׹l� �$�BD�`���v,�.�ǁйs�@p#@�Gs�n���u	�t2��w�ﴠ.>@��Z��(��� �}�^����L@6�F�H ����؀�X��O���@�@[7����;����<�� �@�6������C߀���3��� �@�6������C߀Ie�3���@�@[7����;�0hɁ<����n@�q��j���X�X\����ݴ@	@@7�.�(����Y�\U�=��� Z@4y�i���MՀVZ�#�V� 0q@l��������AɀP`��r��F�?�=w��t���bɀp:����K� �@o,ʿ 	���@��l?�p�ص "�X��i��h����c����?��,����P��n;遏��� ���4�@���O������� ���Ϳ �|�?��~��� �` ���ɿ����7?��q�"����@��Ȟu�ؑ��8cȀr� �W�V��]�a+�����9P��q�#�q�����U�P+�`��ZT�Y�)�˹F� �n�&�� ђ�]KՀW�/�Թ��Р��l���@Z��`=ȀQ�-�񹤵��?�6��u��+���&������ T�?�2��<��.���'�������?T�:�����#���0��ۻ����I?d�}��m��.���I���4����?ݺ7�����H���.�ۻl��tq?�+���g��-���i�ۻ4�@S�?���x���1mր�:�����"�?��*�(g��3nـ�;�ۻ�@��?�,��ܶ�>n��;�ۻr� �����x������|����� N�X���`������|�ۻ���&���Ђ�p����.��Dh�ۻ��@���TO{�@����/��fJ�����@��^�:�H��� ��q8�ۻS�@@����4��P���)��w,���S��.��p-+������L��s-��o� ����38�����[��o2%�ۻo� ���b���|���qրl6(��������eg*�����qրk6+�ۻ���&���!�`±��r��j7*�ۻS� �����x�����Ѐ���� �$?��g�����K����ǁ=�q���I?d�}��m��g�܀��ā=�� T�?�2��<��m� �շ����W���?�6��u��z��ܛ�����@_�?�h5����L��Ȼ��s� ���Z?k����=����ف=� ��\�?J�8���S���͓���>�@S�?���x���Q������ͻ>��t@o9�H���I�&�ѷ���� � 0@�ֿ���P���ډ�ڻ ��@���`��R�$������� � ���%�� D����态��q� N��9u�x���������� ������Kd��[��đ��<+�к ��Wy���h���������E9�кq�@���TO{�@�����怼UA�к� ��<�������&��KS��� ��¼���1������
+��K\���q�����1��%����#��Fa�V� ��.��p-+����������aG���(�@@����4��P�������f@�����.��p-+�����Ə��#n�o�K� ���b���|�������6]�I�զ��&���ῠ7������JZ�U� ��?)�t��@o�������+l��o� 1O?s�������N�T���9�ʷԵ ��>���xN��4�F��� �V���@��?��(����|���
+��µ�j�?�<�����|����F�Z�@�?�8�����a�L���P�*�i� �A?�"�� ��M�W���8���� lc?}�D�@��J�`���@�۷r� ��|�D�Hm�� �y��  �Զ�� �6��ۊ�p�����o����Ҷ!� N��#��������<����ض��� S�6��xN��éE��1ہG���������z��+����V��;ǁ������{�D�H����`��-ѵr�@֭��L4������O��=��U�l��͕�H<�x�����S��<Ɓε� 2��4���(�����}������ѵ��Կk'7�pP����}�����]�       X   W i f e M o n s t e r W e a p o n 7 S h a p e   A r t / M o d e l s / M O N S T E R S / W i f e M o n s t e r / T e x t u r e s / W i f e M o n s t e r W e a p o n c . m a t   
+
+=== .ao Metadata/Monsters/WifeMonster/attachments/Skirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Skirt/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.350
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "skirt_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/attachments/Skirt/Skirt.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/WifeMonster.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/WifeMonster_armour_f5ab0ca9.smd"
+Materials 1
+	"Art/Models/MONSTERS/WifeMonster/Textures/WifeMonsterc.mat" 12
+BoundingBox -69.5907 -20.9124 -200.429 69.5909 26.8269 -88.2223
+BoneGroups 22
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_root" 2 "root_jntBnd" "hip_jntBnd"
+	"grp_frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "neck_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/WifeMonster/WifeMonster_armour_f5ab0ca9.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 12 in the header, 12 in the block · 26332 triangles over 18692 vertices
+  names: 376 bytes said, 376 read  [agree]
+
+=== shapes (21)
+0	arm_guardsShape	from 0	count 2244
+1	head_skullsShape	from 2244	count 32604
+2	headpieceShape	from 34848	count 642
+3	headShape	from 35490	count 3360
+4	L_knucklesShape	from 38850	count 1980
+5	L_shoulderpad_spikesShape	from 40830	count 1728
+6	L_shoulderpadShape	from 42558	count 1674
+7	mainShape	from 44232	count 28734
+8	maskShape	from 72966	count 324
+9	R_knucklesShape	from 73290	count 1980
+10	R_shoulderpad_spikesShape	from 75270	count 2052
+11	R_shoulderpadShape	from 77322	count 1674
+12	L_arm_frillShape	from 78996	count 1746
+13	R_arm_frillShape	from 80742	count 1746
+14	cape_baseShape	from 82488	count 1614
+15	cape_midShape	from 84102	count 1614
+16	cape_topShape	from 85716	count 1614
+17	skirt_baseShape	from 87330	count 4152
+18	skirt_metalShape	from 91482	count 6660
+19	skirt_midShape	from 98142	count 4548
+20	skirt_topShape	from 102690	count 7488
+
+=== fitting
+the monster's rig: 85 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_light_attachment, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  Frills.ao  socket <root> [NOT in its carrier's rig]  box (-70.6,-12.7,-148.2)..(70.6,26.3,-113.2)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 1164 triangles over 714 vertices
+    names: 64 bytes said, 64 read  [agree]
+    rig 7 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_shoulder_cTwist_1_jntBnd  [its own]  under 0  rests at (25.5,6.8,-130.7)
+      2 R_shoulder_cTwist_1_jntBnd  [its own]  under 0  rests at (-25.5,6.8,-130.7)
+      3 L_elbow_jntBnd  [shared]  under 1  rests at (37.8,6.8,-130.7)  carrier has (35.1,7.7,-123.2)
+      4 R_elbow_jntBnd  [shared]  under 2  rests at (-37.8,6.8,-130.7)  carrier has (-35.1,7.7,-123.2)
+      5 L_elbow_jntBnd|phys_skinned_R_frill_jntBnd  [its own]  under 3  rests at (51.5,3.3,-130.7)
+      6 R_elbow_jntBnd|phys_skinned_R_frill_jntBnd  [its own]  under 4  rests at (-51.5,10.4,-130.7)
+  Cape.ao  socket chest_jntBnd [in its carrier's rig]  box (-25.5,10.9,-19.9)..(23.9,33.2,48.4)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 1614 triangles over 996 vertices
+    names: 80 bytes said, 80 read  [agree]
+    rig 20 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 19 of 20  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 chest_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (0,-0.3,-127.3)
+      2 L_clavicle_jntBnd  [shared]  under 1  rests at (4.7,1,-14.1)  carrier has (4.7,0.7,-141.4)
+      3 R_clavicle_jntBnd  [shared]  under 1  rests at (-4.7,1,-14.1)  carrier has (-4.7,0.7,-141.4)
+      4 phys_skinned_L_1_jntBnd  [its own]  under 1  rests at (7.2,13.6,-5.5)
+      5 phys_skinned_L_4_jntBnd  [its own]  under 1  rests at (7.2,13.6,-5.5)
+      6 phys_skinned_L_7_jntBnd  [its own]  under 1  rests at (7.2,13.6,-5.5)
+      7 phys_skinned_R_1_jntBnd  [its own]  under 1  rests at (-7.2,13.6,-5.5)
+      8 phys_skinned_R_4_jntBnd  [its own]  under 1  rests at (-7.2,13.6,-5.5)
+      9 phys_skinned_R_7_jntBnd  [its own]  under 1  rests at (-7.2,13.6,-5.5)
+      10 phys_skinned_L_2_jntBnd  [its own]  under 4  rests at (9.8,17.5,16.6)
+      11 phys_skinned_L_5_jntBnd  [its own]  under 5  rests at (9.8,17.5,16.6)
+      12 phys_skinned_L_8_jntBnd  [its own]  under 6  rests at (9.8,17.5,16.6)
+      13 phys_skinned_R_2_jntBnd  [its own]  under 7  rests at (-9.6,17.5,16.6)
+      14 phys_skinned_R_5_jntBnd  [its own]  under 8  rests at (-9.6,17.5,16.6)
+      15 phys_skinned_R_8_jntBnd  [its own]  under 9  rests at (-9.6,17.5,16.6)
+      16 phys_skinned_L_3_jntBnd  [its own]  under 10  rests at (12.3,21.5,38.7)
+      17 phys_skinned_L_6_jntBnd  [its own]  under 11  rests at (12.3,21.5,38.7)
+      18 phys_skinned_R_3_jntBnd  [its own]  under 13  rests at (-12.3,21.5,38.7)
+      19 phys_skinned_R_6_jntBnd  [its own]  under 14  rests at (-12.3,21.5,38.7)
+  Skirt.ao  socket skirt_jntBnd [in its carrier's rig]  box (-78.9,-78.3,-23.9)..(78.9,78.8,89.7)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 4 in the header, 4 in the block · 7616 triangles over 4966 vertices
+    names: 118 bytes said, 118 read  [agree]
+    rig 35 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 34 of 35  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 phys_skinned_L_1_jntBnd  [its own]  under 0  rests at (8.8,-21.2,13.1)
+      3 phys_skinned_L_5_jntBnd  [its own]  under 0  rests at (21.2,-8.8,13.1)
+      4 phys_skinned_L_9_jntBnd  [its own]  under 0  rests at (21.2,8.8,13.1)
+      5 phys_skinned_L_13_jntBnd  [its own]  under 0  rests at (8.8,21.2,13.1)
+      6 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (-8.8,-21.2,13.1)
+      7 phys_skinned_R_5_jntBnd  [its own]  under 0  rests at (-21.2,-8.8,13.1)
+      8 phys_skinned_R_9_jntBnd  [its own]  under 0  rests at (-21.2,8.8,13.1)
+      9 phys_skinned_R_13_jntBnd  [its own]  under 0  rests at (-8.8,21.2,13.1)
+      10 spine_2_jntBnd  [shared]  under 1  rests at (-0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      11 phys_skinned_L_2_jntBnd  [its own]  under 2  rests at (13.1,-31.7,33.1)
+      12 phys_skinned_L_6_jntBnd  [its own]  under 3  rests at (31.7,-13,33.1)
+      13 phys_skinned_L_10_jntBnd  [its own]  under 4  rests at (31.8,13.1,33.1)
+      14 phys_skinned_L_14_jntBnd  [its own]  under 5  rests at (13.3,31.7,33.1)
+      15 phys_skinned_R_2_jntBnd  [its own]  under 6  rests at (-13.1,-31.7,33.1)
+      16 phys_skinned_R_6_jntBnd  [its own]  under 7  rests at (-31.7,-13,33.1)
+      17 phys_skinned_R_10_jntBnd  [its own]  under 8  rests at (-31.8,13.1,33.1)
+      18 phys_skinned_R_14_jntBnd  [its own]  under 9  rests at (-13.3,31.7,33.1)
+      19 phys_skinned_L_3_jntBnd  [its own]  under 11  rests at (17.5,-42.3,53.2)
+      20 phys_skinned_L_7_jntBnd  [its own]  under 12  rests at (42.3,-17.3,53.2)
+      21 phys_skinned_L_11_jntBnd  [its own]  under 13  rests at (42.3,17.4,53.2)
+      22 phys_skinned_L_15_jntBnd  [its own]  under 14  rests at (17.8,42.2,53.2)
+      23 phys_skinned_R_3_jntBnd  [its own]  under 15  rests at (-17.5,-42.3,53.2)
+      24 phys_skinned_R_7_jntBnd  [its own]  under 16  rests at (-42.3,-17.3,53.2)
+      25 phys_skinned_R_11_jntBnd  [its own]  under 17  rests at (-42.3,17.4,53.2)
+      26 phys_skinned_R_15_jntBnd  [its own]  under 18  rests at (-17.8,42.2,53.2)
+      27 phys_skinned_L_4_jntBnd  [its own]  under 19  rests at (21.9,-52.8,73.3)
+      28 phys_skinned_L_8_jntBnd  [its own]  under 20  rests at (52.9,-21.6,73.4)
+      29 phys_skinned_L_12_jntBnd  [its own]  under 21  rests at (52.9,21.7,73.3)
+      30 phys_skinned_L_16_jntBnd  [its own]  under 22  rests at (22.3,52.7,73.3)
+      31 phys_skinned_R_4_jntBnd  [its own]  under 23  rests at (-21.9,-52.8,73.3)
+      32 phys_skinned_R_8_jntBnd  [its own]  under 24  rests at (-52.9,-21.6,73.4)
+      33 phys_skinned_R_12_jntBnd  [its own]  under 25  rests at (-52.9,21.7,73.3)
+      34 phys_skinned_R_16_jntBnd  [its own]  under 26  rests at (-22.3,52.7,73.3)
