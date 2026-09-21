@@ -131,6 +131,16 @@ public sealed record MonsterModel(
 
     /// <summary>How many files those bytes came out of.</summary>
     public int Files { get; init; }
+
+    /// <summary>
+    /// How many pieces the monster wears that were joined onto the body.
+    /// </summary>
+    /// <remarks>
+    /// SHOWN UNDER THE PICTURE because a monster with none and a monster whose attachments were
+    /// switched off look the same, and so does one whose pieces all failed to read. See
+    /// MonsterModels.Dressing.
+    /// </remarks>
+    public int Parts { get; init; }
 }
 
 /// <summary>
@@ -188,7 +198,12 @@ public static class MonsterModels
     /// </summary>
     /// <param name="read">How to get a file out of the install, by path.</param>
     /// <param name="one">The monster. Its AoFiles come from the install's own table.</param>
-    public static MonsterModel Of(Func<string, byte[]?>? read, MonsterVariety? one)
+    /// <param name="wearing">
+    /// Whether the pieces the monster hangs off itself are read and joined on. Off gives exactly
+    /// the body this returned before there was a choice - see <see cref="Dressing"/> for what it
+    /// costs, which is the reason there is one.
+    /// </param>
+    public static MonsterModel Of(Func<string, byte[]?>? read, MonsterVariety? one, bool wearing = true)
     {
         if (read is null)
         {
@@ -266,8 +281,24 @@ public static class MonsterModels
 
         (AnimationSkeleton rig, string move) = Rigged(counted, found.Skeleton, mesh);
 
+        // AND WHAT THE MONSTER WEARS. Doryani's skirt, belt, necklace and six more pieces are
+        // attached_object entries naming their own .ao, mesh and rig - see Dressing. Joined into
+        // one mesh so the renderer, the per-shape palette and the pose go on working unchanged.
+        List<Part> parts = wearing
+            ? Dressing(counted, found.Files, rig, paints, skin)
+            : [];
+
+        if (parts.Count > 0)
+        {
+            List<MeshJoin> join = [new MeshJoin(mesh), .. parts.Select(one => new MeshJoin(one.Mesh, one.Bones))];
+            List<Mipmaps?> worn = [.. dress.Skins, .. parts.SelectMany(one => one.Skins)];
+            mesh = SkinnedMesh.Joined(join);
+            dress = dress with { Skins = worn };
+        }
+
         return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint)
         {
+            Parts = parts.Count,
             Skins = dress.Skins,
             Materials = dress.Materials,
             NamedInAo = found.Materials.Count,
@@ -281,6 +312,258 @@ public static class MonsterModels
             Bytes = tally.Bytes,
             Files = tally.Files,
         };
+    }
+
+    /// <summary>One piece a monster hangs off itself, ready to be joined onto the body.</summary>
+    /// <param name="Mesh">Its geometry.</param>
+    /// <param name="Bones">Its vertex bones, remapped onto the PARENT's rig, or null where they could not be.</param>
+    /// <param name="Skins">One texture per shape of it, in its order - the same rule the body follows.</param>
+    private readonly record struct Part(SkinnedMesh Mesh, byte[]? Bones, IReadOnlyList<Mipmaps?> Skins);
+
+    /// <summary>The entry keys whose value is another .ao. From the format diagram; see AoSurvey.</summary>
+    private static readonly string[] Hangs =
+        ["ao", "fixed_ao", "attached_object", "attached_slaved_animation_object"];
+
+    /// <summary>How deep the attachment chain is followed. Doryani's belt hangs a dagger; that is two.</summary>
+    private const int MostDeep = 4;
+
+    /// <summary>
+    /// Most pieces joined onto one monster. A guard on a walk whose shape nobody has measured.
+    /// </summary>
+    /// <remarks>
+    /// EFFECTS ATTACH EFFECTS, which is the failure this is against: an .ao chain followed without
+    /// a cap is how a click in the book becomes a minute. Doryani wears nine with four more under
+    /// his belt, so this is well clear of what a dressed monster needs.
+    /// </remarks>
+    private const int MostParts = 48;
+
+    /// <summary>
+    /// Everything the monster wears, read from the attachments its own files name.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THIS IS FOR. Reported from the live client: Doryani stands in the game in a skirt and
+    /// the pane drew him bare-legged. The paint was never the problem - his runs add up and every
+    /// shape has its sheet - the geometry simply was not there, because a skirt is not part of the
+    /// body mesh. It is <c>attached_object = "hip_jntBnd …/attachments/Skirt.ao"</c>, with a mesh,
+    /// a rig and an idle animation of its own, and the body's files say nothing else about it.
+    ///
+    /// THE BONES ARE MATCHED BY NAME, which is the whole trick and is not a guess: the skirt's own
+    /// rig carries <c>root_jntBnd</c>, <c>spine_1_jntBnd</c>, <c>spine_2_jntBnd</c> and
+    /// <c>chest_jntBnd</c> - the parent's names - and its .ao names those same bones again in
+    /// <c>attachment_bones</c>. So a vertex that the file says belongs to the skirt's bone 3 is a
+    /// vertex belonging to whichever of the PARENT'S bones carries that bone's name, and posing
+    /// the joined mesh with the parent's pose then places and animates the piece together.
+    ///
+    /// A BONE WITH NO MATCH FALLS BACK TO THE SOCKET the attachment was hung from, which is the
+    /// nearest thing the parent has to where the piece belongs; with no socket either it falls
+    /// back to bone 0, and a piece drawn at the root is at least visibly wrong rather than
+    /// invisibly absent.
+    ///
+    /// WHAT IT COSTS is the reason the pane has a switch for it. Doryani's body is 32 MB across
+    /// 15 files; his nine pieces bring their own meshes, rigs and sheets, and the belt hangs three
+    /// more under itself. That is the price of a monster that looks like itself, and it is paid on
+    /// every click in a list somebody scrolls.
+    /// </remarks>
+    private static List<Part> Dressing(
+        Func<string, byte[]?> read,
+        IReadOnlyList<string> files,
+        AnimationSkeleton parent,
+        Paints paints,
+        Mipmaps? fallback)
+    {
+        var parts = new List<Part>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var queue = new Queue<(string Path, string Socket, int Depth)>();
+
+        foreach (string one in files)
+        {
+            foreach ((string socket, string path) in Hung(Object(read, one)))
+            {
+                queue.Enqueue((path, socket, 1));
+            }
+        }
+
+        while (queue.Count > 0 && parts.Count < MostParts)
+        {
+            (string path, string socket, int depth) = queue.Dequeue();
+            if (path.Length == 0 || !seen.Add(path))
+            {
+                continue;
+            }
+
+            AnimatedObject ao = Object(read, path);
+            if (!ao.Ready)
+            {
+                continue;
+            }
+
+            if (depth < MostDeep)
+            {
+                foreach ((string inner, string under) in Hung(ao))
+                {
+                    // THE SOCKET OF THE THING IT HANGS ON, where the inner one names none worth
+                    // having: a dagger on a belt whose own socket is "<root>" belongs where the
+                    // belt is, not where the monster's origin is.
+                    queue.Enqueue((under, inner.StartsWith('<') ? socket : inner, depth + 1));
+                }
+            }
+
+            if (Worn(read, ao, parent, socket, paints, fallback) is { } part)
+            {
+                parts.Add(part);
+            }
+        }
+
+        return parts;
+    }
+
+    /// <summary>The socket and file of every .ao this one hangs off itself.</summary>
+    /// <remarks>
+    /// A SOCKET AND THEN A PATH INSIDE ONE PAIR OF QUOTES, which taken whole is a path no install
+    /// has - the trap that cost AoSurvey 2289 of its 3262 files. Split on the first space; the
+    /// socket is a bone name of the parent's rig, or <c>&lt;root&gt;</c> for the piece's own.
+    /// </remarks>
+    private static IEnumerable<(string Socket, string Path)> Hung(AnimatedObject ao)
+    {
+        foreach (AoStruct block in ao.Structs)
+        {
+            foreach (AoEntry entry in block.Entries)
+            {
+                if (Array.IndexOf(Hangs, entry.Key) < 0 || entry.Kind != AoValueKind.Quoted)
+                {
+                    continue;
+                }
+
+                string said = entry.Value.Trim();
+                int space = said.IndexOf(' ', StringComparison.Ordinal);
+                string path = space < 0 ? said : said[(space + 1)..].Trim();
+                if (path.EndsWith(AnimatedObject.Suffix, StringComparison.OrdinalIgnoreCase))
+                {
+                    yield return (space < 0 ? string.Empty : said[..space], path);
+                }
+            }
+        }
+    }
+
+    /// <summary>One attachment read whole: its mesh, its textures, and its bones on the parent's rig.</summary>
+    private static Part? Worn(
+        Func<string, byte[]?> read,
+        AnimatedObject ao,
+        AnimationSkeleton parent,
+        string socket,
+        Paints paints,
+        Mipmaps? fallback)
+    {
+        string skin = Skin(ao);
+        if (skin.Length == 0)
+        {
+            // An effect pack or a sound emitter. Ordinary, and nothing to draw.
+            return null;
+        }
+
+        MeshManifest manifest = Read(read, skin, MeshManifest.Read);
+        if (!manifest.Ready)
+        {
+            return null;
+        }
+
+        SkinnedMesh mesh = Read(read, manifest.Geometry, SkinnedMesh.Read);
+        if (!mesh.Ready)
+        {
+            return null;
+        }
+
+        Dress dress = Dressed(read, mesh, [], manifest, fallback, string.Empty, paints);
+        return new Part(mesh, Boned(read, ao, mesh, parent, socket), dress.Skins);
+    }
+
+    /// <summary>The <c>skin</c> a SkinMesh block names, or empty where the file has none.</summary>
+    private static string Skin(AnimatedObject ao)
+    {
+        foreach (AoStruct block in ao.Named(Block))
+        {
+            foreach (AoEntry entry in block.Entries)
+            {
+                if (string.Equals(entry.Key, Entry, StringComparison.Ordinal) && entry.Value.Length > 0)
+                {
+                    return entry.Value;
+                }
+            }
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// An attachment's vertex bones, moved onto the parent's rig by the names they share.
+    /// </summary>
+    /// <remarks>
+    /// BYTES, AND THAT IS A REAL CEILING. A vertex's bone is one byte, so a parent bone past 255
+    /// cannot be pointed at - and silently wrapping round would rig a skirt to an eyelid. Where
+    /// the match lands out of range the piece keeps still instead, which a picture shows and a
+    /// wrapped index would hide.
+    /// </remarks>
+    private static byte[]? Boned(
+        Func<string, byte[]?> read,
+        AnimatedObject ao,
+        SkinnedMesh mesh,
+        AnimationSkeleton parent,
+        string socket)
+    {
+        int count = mesh.Positions.Length;
+        if (!parent.Ready || mesh.Bones.Length != count * 4)
+        {
+            return null;
+        }
+
+        AnimationSkeleton own = Read(read, Skeleton(ao), AnimationSkeleton.Read);
+        if (!own.Ready || own.Bones.Count == 0)
+        {
+            return null;
+        }
+
+        var where = new Dictionary<string, int>(parent.Bones.Count, StringComparer.OrdinalIgnoreCase);
+        for (var one = 0; one < parent.Bones.Count; one++)
+        {
+            where.TryAdd(parent.Bones[one].Name, one);
+        }
+
+        int hung = socket.Length > 0 && where.TryGetValue(socket, out int at) ? at : 0;
+
+        // ONE LOOKUP PER BONE OF THE PIECE, not per vertex: a skirt has thousands of vertices and
+        // a dozen bones, and the answer is the same for every vertex that shares one.
+        var onto = new byte[own.Bones.Count];
+        for (var one = 0; one < own.Bones.Count; one++)
+        {
+            int found = where.TryGetValue(own.Bones[one].Name, out int same) ? same : hung;
+            onto[one] = found is >= 0 and <= byte.MaxValue ? (byte)found : (byte)0;
+        }
+
+        var bones = new byte[count * 4];
+        for (var one = 0; one < bones.Length; one++)
+        {
+            byte was = mesh.Bones[one];
+            bones[one] = was < onto.Length ? onto[was] : (byte)hung;
+        }
+
+        return bones;
+    }
+
+    /// <summary>The <c>skeleton</c> a ClientAnimationController names, or empty.</summary>
+    private static string Skeleton(AnimatedObject ao)
+    {
+        foreach (AoStruct block in ao.Named(RigBlock))
+        {
+            foreach (AoEntry entry in block.Entries)
+            {
+                if (string.Equals(entry.Key, RigEntry, StringComparison.Ordinal) && entry.Value.Length > 0)
+                {
+                    return entry.Value;
+                }
+            }
+        }
+
+        return string.Empty;
     }
 
     /// <summary>Reads through another function and adds up what comes back.</summary>
@@ -704,12 +987,19 @@ public static class MonsterModels
     /// A depth-first walk would reach a base file before the monster's second .ao, and the nearer
     /// file is the one whose answer counts.
     /// </remarks>
-    private static (string Mesh, IReadOnlyList<(string Shape, string Material)> Materials, string Skeleton)? Skinned(
+    private static (string Mesh, IReadOnlyList<(string Shape, string Material)> Materials, string Skeleton,
+        IReadOnlyList<string> Files)? Skinned(
         Func<string, byte[]?> read, IReadOnlyList<string> named)
     {
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var queue = new Queue<(string Path, int Depth)>();
         var materials = new List<(string Shape, string Material)>();
+
+        // EVERY .ao THE WALK ACTUALLY READ, kept so the dressing can look for attachments in the
+        // same files rather than walking them a second time. The walk stops once it has the skin
+        // and the rig, so this is the monster's own files and whatever they extend up to there -
+        // which is where attached_object entries live.
+        var walked = new List<string>();
 
         foreach (string one in named)
         {
@@ -736,6 +1026,8 @@ public static class MonsterModels
             {
                 continue;
             }
+
+            walked.Add(path);
 
             if (mesh is null)
             {
@@ -810,7 +1102,7 @@ public static class MonsterModels
             }
         }
 
-        return mesh is null ? null : (mesh, materials, skeleton ?? string.Empty);
+        return mesh is null ? null : (mesh, materials, skeleton ?? string.Empty, walked);
     }
 
     /// <summary>

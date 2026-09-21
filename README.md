@@ -63,7 +63,7 @@ push to `main` auto-compiles on GitHub and updates the rolling release
 [`latest-dev`](https://github.com/imm0r/PoEformance2/releases/tag/latest-dev) with a
 ready-to-run, self-contained exe.
 
-**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.7 · 4659c18`
+**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.8 · 4659c18`
 — the version, raised on every push, and the commit the publish workflow stamped into it. A build
 compiled locally reads `local`, because a version number on an unreleased build is a claim it
 cannot support. It is there because the alternative was comparing a screenshot against a merge
@@ -210,6 +210,20 @@ no floor, and no button to stop the orbit. Every other answer on that page is a 
 them tells you which of the fourteen things standing around you this row is. It loads only when a
 row is picked, and it has its own picture ladder capped at the smallest rung, because a strip that
 never grows has no business rasterising a megapixel.
+
+**And a monster wears what the game dresses it in.** Doryani stands in the game in a skirt, a belt,
+a necklace and six more pieces, and the pane drew him bare-legged — because none of that is in the
+body mesh. Each is an `attached_object` naming its own `.ao`, mesh and rig, and the body's files say
+nothing else about them. They are read now and **joined into one mesh** rather than drawn in turn,
+which leaves the renderer, the per-shape palette and the pose working by construction instead of
+through a second code path.
+
+What makes the join land in the right place is that the pieces share the parent's bone *names* —
+a skirt's own rig carries `spine_1_jntBnd` and `chest_jntBnd` — so each piece's vertex bones are
+matched onto the body's rig by name, and one pose then places and animates the lot. A bone with no
+match falls back to the socket the piece was hung from. They are not free: nine pieces bring nine
+meshes, rigs and sheets, and a belt hangs three more under itself, so the pane carries a `parts`
+switch and the line under the picture says `wearing 9 parts`.
 
 It also draws **where a monster is pointing**. Path of Exile 2 keeps no target pointer anywhere in
 memory — the game aims by *turning* an actor to an angle and firing once it is within a tolerance —

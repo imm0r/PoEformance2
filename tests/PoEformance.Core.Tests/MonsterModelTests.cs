@@ -616,6 +616,82 @@ public class MonsterModelTests
     private static string Paint(Fake install)
         => MonsterModels.Of(install.Read, Named("body.ao")).Paint;
 
+    /// <summary>
+    /// The pieces a monster hangs off itself are read and joined onto the body.
+    /// </summary>
+    /// <remarks>
+    /// REPORTED FROM THE LIVE CLIENT: Doryani stands in the game in a skirt and the pane drew him
+    /// bare-legged. His paint was never wrong - the geometry simply was not there, because a
+    /// skirt is an attached_object with a mesh and a rig of its own and the body's files say
+    /// nothing else about it.
+    ///
+    /// THE SOCKET IS THE HALF THAT BREAKS SILENTLY. The value is "hip_jntBnd &lt;path&gt;" inside one
+    /// pair of quotes, so a walk that takes it whole asks for a path no install has and reports
+    /// a monster with no attachments - which looks exactly like a monster that has none.
+    /// </remarks>
+    [Fact]
+    public void AnAttachedPieceIsJoinedOntoTheBody()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/skirt.ao");
+        install.Files["art/skirt.ao"] = Ao(skin: "art/skirt.sm");
+        install.Files["art/skirt.sm"] = Sm("art/skirt.smd", "art/paint.mat");
+        install.Files["art/skirt.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+
+        // The body is two triangles over four vertices; dressed it is twice that, and every
+        // index still addresses a vertex - which an unshifted index would not.
+        Assert.Equal(4, said.Mesh.Triangles);
+        Assert.Equal(8, said.Mesh.Positions.Length);
+        Assert.All(said.Mesh.Indices, one => Assert.InRange(one, 0, said.Mesh.Positions.Length - 1));
+
+        // One texture per shape still holds across the join, which is what keeps the piece from
+        // being painted out of the body's sheet.
+        Assert.Equal(said.Mesh.Shapes.Count, said.Skins.Count);
+    }
+
+    /// <summary>With the pieces switched off the body comes back exactly as it did.</summary>
+    /// <remarks>
+    /// THE SWITCH EXISTS BECAUSE THE PIECES ARE NOT FREE, so the off position has to cost nothing
+    /// as well as draw nothing: no attachment is read, and the mesh is the body's own.
+    /// </remarks>
+    [Fact]
+    public void WithPartsOffTheBodyIsUnchanged()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/skirt.ao");
+        install.Files["art/skirt.ao"] = Ao(skin: "art/skirt.sm");
+        install.Files["art/skirt.sm"] = Sm("art/skirt.smd", "art/paint.mat");
+        install.Files["art/skirt.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"), wearing: false);
+
+        Assert.Equal(0, said.Parts);
+        Assert.Equal(2, said.Mesh.Triangles);
+    }
+
+    /// <summary>A piece whose files are missing leaves the body standing.</summary>
+    /// <remarks>
+    /// A MONSTER WITH ONE UNREADABLE ATTACHMENT IS STILL A MONSTER. The failure this guards
+    /// against is a walk that answers "no model" for a boss because one dangler is not in the
+    /// install - taking the body away over a piece of jewellery.
+    /// </remarks>
+    [Fact]
+    public void APieceThatDoesNotReadDoesNotCostTheBody()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/missing.ao");
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.True(said.Ready);
+        Assert.Equal(0, said.Parts);
+        Assert.Equal(2, said.Mesh.Triangles);
+    }
+
     private static MonsterVariety Named(string path)
         => new(Name: "test", AoFiles: [path]);
 
@@ -644,13 +720,29 @@ public class MonsterModelTests
     /// A second shape's material, for the monsters built out of parts: the .ao names one child
     /// per shape and they are not always the same file.
     /// </param>
+    /// <param name="attach">
+    /// A piece hung off this one, written the way the game does: a SOCKET and then a path, both
+    /// inside one pair of quotes. Taken whole that is a path no install has, which is exactly
+    /// the trap the walk has to get past.
+    /// </param>
     private static byte[] Ao(
-        string? extends = null, string? skin = null, string? material = null, string? second = null)
+        string? extends = null,
+        string? skin = null,
+        string? material = null,
+        string? second = null,
+        string? attach = null,
+        string socket = "hip_jntBnd")
     {
         var said = new StringBuilder("version 3\n");
         if (extends is { Length: > 0 })
         {
             said.Append("extends \"").Append(extends).Append("\"\n");
+        }
+
+        if (attach is { Length: > 0 })
+        {
+            said.Append("AttachedAnimatedObject\n{\n\tattached_object = \"")
+                .Append(socket).Append(' ').Append(attach).Append("\"\n}\n");
         }
 
         if (skin is { Length: > 0 })
