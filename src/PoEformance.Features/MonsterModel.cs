@@ -1,3 +1,4 @@
+using System.Numerics;
 using PoEformance.Game.Entities;
 using PoEformance.Game.Files;
 
@@ -326,7 +327,7 @@ public static class MonsterModels
         SkinnedMesh Mesh,
         byte[]? Bones,
         byte[]? Weights,
-        System.Numerics.Matrix4x4? Place,
+        Matrix4x4? Place,
         IReadOnlyList<Mipmaps?> Skins);
 
     /// <summary>The entry keys whose value is another .ao. From the format diagram; see AoSurvey.</summary>
@@ -395,19 +396,25 @@ public static class MonsterModels
         }
 
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var queue = new Queue<(string Path, int Bone, int Depth)>();
+        var queue = new Queue<(string Path, Matrix4x4 Place, int Bone, int Depth)>();
 
+        // THE MONSTER ITSELF IS THE OUTERMOST CARRIER, at the identity: a piece socketed to
+        // "<root>" at the top level is already in the monster's own space and wants no transform
+        // at all. Bone 0 is the rig's root, so the piece still follows the monster.
         foreach (string one in files)
         {
             foreach ((string socket, string path) in Hung(Object(read, one)))
             {
-                queue.Enqueue((path, where.GetValueOrDefault(socket, 0), 1));
+                if (Socketed(socket, where, rest, Matrix4x4.Identity, 0, top: true) is { } put)
+                {
+                    queue.Enqueue((path, put.Place, put.Bone, 1));
+                }
             }
         }
 
         while (queue.Count > 0 && parts.Count < MostParts)
         {
-            (string path, int bone, int depth) = queue.Dequeue();
+            (string path, Matrix4x4 place, int bone, int depth) = queue.Dequeue();
             if (path.Length == 0 || !seen.Add(path))
             {
                 continue;
@@ -423,23 +430,65 @@ public static class MonsterModels
             {
                 foreach ((string inner, string under) in Hung(ao))
                 {
-                    // A PIECE ON A PIECE IS SOCKETED INTO ITS CARRIER'S RIG, not the body's -
-                    // measured: Doryani's dagger and mirror hang off phys_skinned_L_1_jntBnd and
-                    // _2_, which are bones of the BELT, and his ropes off "<root>", which is the
-                    // skirt's. None of the three is a bone the body has. So an inner socket the
-                    // parent does not carry falls back to wherever the thing it hangs on went,
-                    // which is the nearest place the body knows about.
-                    queue.Enqueue((under, where.GetValueOrDefault(inner, bone), depth + 1));
+                    if (Socketed(inner, where, rest, place, bone, top: false) is { } put)
+                    {
+                        queue.Enqueue((under, put.Place, put.Bone, depth + 1));
+                    }
                 }
             }
 
-            if (Worn(read, ao, rest.BindModel[bone], bone, paints, fallback) is { } part)
+            if (Worn(read, ao, place, bone, paints, fallback) is { } part)
             {
                 parts.Add(part);
             }
         }
 
         return parts;
+    }
+
+    /// <summary>
+    /// Where a socket puts a piece: the transform to model space, and the bone it then follows.
+    /// </summary>
+    /// <remarks>
+    /// THREE CASES, AND THE GAME'S OWN SPELLING SEPARATES THEM.
+    ///
+    /// "&lt;root&gt;" IS NOT A BONE NAME. It is how the game says "at my carrier's own origin", so
+    /// the piece is already in whatever space its carrier is in and wants that carrier's
+    /// transform unchanged - which at the top level is the identity. Reported from the live
+    /// client: Bahlak the Sky Seer wears one piece, socketed "&lt;root&gt;", and treating that as an
+    /// unknown bone put the parent rig's ROOT transform on a piece already in model space. The
+    /// root carries the rig's own orientation, so his feathers were tipped over and laid out
+    /// flat on the floor at his feet.
+    ///
+    /// A NAME THE PARENT RIG HAS is the ordinary case: the bone's rest transform places the
+    /// piece, and binding to that bone is what makes it follow an arm that lifts.
+    ///
+    /// A NAME IT DOES NOT HAVE means different things inside and outside. On a piece hung off
+    /// another piece it is a bone of the CARRIER's rig - Doryani's dagger and mirror name
+    /// phys_skinned_L_1_jntBnd and _2_, which belong to his belt - so the carrier's own place is
+    /// the nearest thing the body knows. At the TOP level there is no carrier to fall back to,
+    /// and bone 0 is not an answer, it is the floor: the piece is left out, on the same rule that
+    /// leaves a monster with no rig undressed.
+    /// </remarks>
+    private static (Matrix4x4 Place, int Bone)? Socketed(
+        string socket,
+        IReadOnlyDictionary<string, int> where,
+        SkeletonPose rest,
+        Matrix4x4 carrier,
+        int bone,
+        bool top)
+    {
+        if (socket.Length == 0 || socket.StartsWith('<'))
+        {
+            return (carrier, bone);
+        }
+
+        if (where.TryGetValue(socket, out int at) && at < rest.BindModel.Count)
+        {
+            return (rest.BindModel[at], at);
+        }
+
+        return top ? null : (carrier, bone);
     }
 
     /// <summary>The socket and file of every .ao this one hangs off itself.</summary>
@@ -486,7 +535,7 @@ public static class MonsterModels
     private static Part? Worn(
         Func<string, byte[]?> read,
         AnimatedObject ao,
-        System.Numerics.Matrix4x4 place,
+        Matrix4x4 place,
         int bone,
         Paints paints,
         Mipmaps? fallback)

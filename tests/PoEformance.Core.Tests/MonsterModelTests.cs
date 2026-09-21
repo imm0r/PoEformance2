@@ -699,6 +699,65 @@ public class MonsterModelTests
         Assert.Equal(2, said.Mesh.Triangles);
     }
 
+    /// <summary>
+    /// A piece socketed to "&lt;root&gt;" is already in the monster's space and is left there.
+    /// </summary>
+    /// <remarks>
+    /// REPORTED FROM THE LIVE CLIENT. Bahlak the Sky Seer wears one piece and its line reads
+    /// <c>socket &lt;root&gt;</c> - which is not a bone name at all, but how the game says "at my
+    /// carrier's own origin". Read as an unknown bone it fell back to bone 0 and took the parent
+    /// rig's ROOT transform, and the root carries the rig's own orientation: his feathers came
+    /// out tipped over and laid flat on the floor at his feet.
+    ///
+    /// The piece is still WORN - it is the placement that was wrong - so this asserts it is
+    /// there, which a rule that simply skipped unknown sockets would break.
+    /// </remarks>
+    [Fact]
+    public void APieceAtTheRootIsWornAndNotPushedOntoABone()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/feathers.ao", socket: "<root>", skeleton: "art/rig.ast");
+        install.Files["art/feathers.ao"] = Ao(skin: "art/feathers.sm");
+        install.Files["art/feathers.sm"] = Sm("art/feathers.smd", "art/paint.mat");
+        install.Files["art/feathers.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+
+        // Modelled at the origin like the body, and left there: no bone transform went on it.
+        // The fixture mesh spans -1..1 on every axis, so a root transform with any rotation or
+        // offset in it would show up as a box that is not the body's.
+        Assert.Equal(said.Mesh.Least, said.Mesh.Most * -1f);
+    }
+
+    /// <summary>
+    /// A top-level piece whose socket the body does not have is left out rather than dropped.
+    /// </summary>
+    /// <remarks>
+    /// BONE 0 IS NOT AN ANSWER, IT IS THE FLOOR. Falling back to the root put a piece flat at the
+    /// monster's feet, which reads as a bug in the renderer rather than a socket nobody could
+    /// resolve. Nothing to place it with means it is not drawn - the same rule that leaves a
+    /// monster with no rig undressed.
+    /// </remarks>
+    [Fact]
+    public void ATopLevelPieceWithAnUnknownSocketIsLeftOut()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/tail.ao", socket: "no_such_jntBnd", skeleton: "art/rig.ast");
+        install.Files["art/tail.ao"] = Ao(skin: "art/tail.sm");
+        install.Files["art/tail.sm"] = Sm("art/tail.smd", "art/paint.mat");
+        install.Files["art/tail.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.True(said.Ready);
+        Assert.Equal(0, said.Parts);
+        Assert.Equal(2, said.Mesh.Triangles);
+    }
+
     /// <summary>A piece whose files are missing leaves the body standing.</summary>
     /// <remarks>
     /// A MONSTER WITH ONE UNREADABLE ATTACHMENT IS STILL A MONSTER. The failure this guards
