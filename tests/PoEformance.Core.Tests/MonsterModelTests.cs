@@ -1146,6 +1146,60 @@ public class MonsterModelTests
     }
 
     /// <summary>
+    /// Where the file pairs the bones itself, that pairing wins over matching them by name.
+    /// </summary>
+    /// <remarks>
+    /// THE GAME WRITES IT DOWN, and matching by name was a workaround for not having read it.
+    /// Bahlak's feathers carry both halves:
+    ///
+    ///     attachment_bones = "hip_jntBnd   L_thigh_jntBnd … child_attach"
+    ///     bone_group = "child_attach false root_jntBnd L_thigh_jntBnd …"
+    ///
+    /// The lists run in step - the first names the parent's bones, the bone group at its end
+    /// names the piece's - and everything but the FIRST entry agrees, which is why matching by
+    /// name got most of his feathers right. The piece's root_jntBnd is the parent's hip_jntBnd,
+    /// and his whole phys_skinned_*_skirt_* chain hangs off that root: matched by name it went
+    /// to the monster's root, the ground between his feet, while the rest of the piece was
+    /// corrected onto his body, and the train came out as a beam between the two.
+    /// </remarks>
+    [Fact]
+    public void ThePairingTheFileWritesDownBeatsMatchingTheBonesByName()
+    {
+        var install = Install();
+        install.Files["art/rig.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("hip_jntBnd", 255, 255, -150f)], []);
+
+        // The piece calls its own root root_jntBnd, and the file says that IS the parent's hip.
+        // Its own strand hangs off that root and off nothing else, exactly as the skirt does.
+        install.Files["art/cloak.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("phys_skinned_skirt_jntBnd", 255, 255, 0f)], []);
+
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/cloak.ao", socket: "<root>", skeleton: "art/rig.ast");
+        install.Files["art/cloak.ao"] = Encoding.UTF8.GetBytes(
+            "version 3\nclient\n{\n"
+            + "\tClientAnimationController\n\t{\n"
+            + "\t\tskeleton = \"art/cloak.ast\"\n"
+            + "\t\tattachment_bones = \"hip_jntBnd child_attach\"\n"
+            + "\t}\n"
+            + "\tBoneGroups\n\t{\n"
+            + "\t\tbone_group = \"child_attach false root_jntBnd\"\n"
+            + "\t}\n"
+            + "\tSkinMesh\n\t{\n\t\tskin = \"art/cloak.sm\"\n\t}\n}\n");
+        install.Files["art/cloak.sm"] = Sm("art/cloak.smd", "art/paint.mat");
+        install.Files["art/cloak.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+
+        // Paired onto the hip, not matched onto the monster's root - so its vertices travel the
+        // hundred and fifty that separates the two, instead of staying on the floor.
+        Assert.Equal<byte>(1, said.Mesh.Bones[16]);
+        Assert.Equal(-150f, said.Mesh.Positions[4].Z - said.Mesh.Positions[0].Z, 3);
+    }
+
+    /// <summary>
     /// A piece that names no socket and shares no bone but the root stays where it is.
     /// </summary>
     /// <remarks>
