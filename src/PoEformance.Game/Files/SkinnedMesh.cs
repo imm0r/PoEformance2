@@ -544,6 +544,47 @@ public sealed class SkinnedMesh
 
             return new Shape(at, normal, coordinate, bones);
         }
+
+        /// <summary>
+        /// The vertex a <c>.smd</c> of version one or two writes, which is not the DOLm one.
+        /// </summary>
+        /// <remarks>
+        /// THE SAME PARTS IN THE SAME ORDER AND DIFFERENT GATES. In a DOLm block the texture
+        /// coordinate is bit 3 and the bones and weights are bit 2; here the reference writes
+        /// all three UNCONDITIONALLY and gates only the last two fields - <c>skin_extra</c> on
+        /// bit 1 and a second texture coordinate on bit 0.
+        ///
+        /// That is the difference between a 32-byte vertex and a 20-byte one on a format word
+        /// with neither bit set, and a stride twelve bytes short does not fail: it reads the
+        /// next vertex's position out of the middle of this one and produces a mesh made of
+        /// confetti.
+        /// </remarks>
+        public static Shape Older(byte format)
+        {
+            var at = 12;
+            int normal = at;
+
+            at += 4;  // Normal, four signed bytes.
+            at += 4;  // Tangent, read past rather than kept.
+
+            int coordinate = at;
+            at += 4;
+
+            int bones = at;
+            at += 8;  // Bones and weights, four bytes each.
+
+            if ((format >> 1 & 1) == 1)
+            {
+                at += 4;
+            }
+
+            if ((format & 1) == 1)
+            {
+                at += 4;
+            }
+
+            return new Shape(at, normal, coordinate, bones);
+        }
     }
 
     private static SkinnedMesh Parse(byte[] raw)
@@ -560,13 +601,12 @@ public sealed class SkinnedMesh
         var most = new Vector3(Float(file, at + 4), Float(file, at + 12), Float(file, at + 20));
         at += 24;
 
-        // VERSIONS BELOW THREE PUT THE GEOMETRY HERE RATHER THAN IN A DOLm, and nothing seen so
-        // far is one. Refused by name instead of read by guess: an older layout read as this one
-        // would produce a mesh-shaped answer out of the wrong bytes.
+        // VERSIONS BELOW THREE PUT THE GEOMETRY HERE RATHER THAN IN A DOLm, in a header that
+        // starts differently - so the fields read above are not this file's and it starts again
+        // from the version byte. See Older.
         if (version < 3)
         {
-            return Failed($"version {version.ToString(System.Globalization.CultureInfo.InvariantCulture)}"
-                + " puts its geometry outside a DOLm block, which this does not read");
+            return Older(file, version);
         }
 
         MeshBlock block = Block(file, at);
@@ -590,6 +630,160 @@ public sealed class SkinnedMesh
             Least = least,
             Most = most,
             Facts = block.Facts with { Version = version, Shapes = shapes, NamesSaid = names, NamesRead = read },
+        };
+    }
+
+    /// <summary>
+    /// A <c>.smd</c> of version one or two, whose geometry sits in the file rather than a DOLm.
+    /// </summary>
+    /// <remarks>
+    /// THE SWEEP IS WHAT MADE THIS WORTH DOING. Refused, these were 373 pieces on 115 monsters -
+    /// and the corpus could say so in one line only once it carried the READER'S OWN reason per
+    /// piece, which turned "113 monsters have something unreadable" into "one format, 373 times".
+    /// A long tail nobody can size is a job nobody starts.
+    ///
+    /// THE LAYOUT IS THE REFERENCE'S, not a guess at one: poe_data_tools' smd parser dispatches
+    /// <c>..3 =&gt; v2_section</c>, and every field below is one of its lines in order. Three
+    /// things differ from version three and each of them would silently produce a mesh-shaped
+    /// answer out of the wrong bytes:
+    ///
+    ///   - THE HEADER IS LONGER BEFORE THE FORMAT BYTE. Version three reads version, format,
+    ///     shapes; this reads version, TRIANGLES, VERTICES, format, shapes. Two u32 that are not
+    ///     there in the newer file, which is why this starts again from offset one rather than
+    ///     carrying on from what Parse already took.
+    ///   - VERSION TWO HAS ONE MORE WORD than version one, after the box. The reference gates it
+    ///     <c>cond(version == 2, le_u32)</c> and nothing here knows what it is.
+    ///   - A SHAPE CARRIES ONE NUMBER, NOT TWO. Version three writes a start and a count; this
+    ///     writes only where the shape STARTS, in triangles, so each shape runs to where the next
+    ///     one begins and the last to the end. Read as a pair the second shape would take the
+    ///     third's start as its own length.
+    ///
+    /// AND THE VERTEX IS NOT THE DOLm ONE - see <see cref="Shape.Older"/>.
+    /// </remarks>
+    private static SkinnedMesh Older(ReadOnlySpan<byte> file, byte version)
+    {
+        var at = 1;
+        uint triangles = Read32(file, ref at);
+        uint vertices = Read32(file, ref at);
+        byte format = file[at++];
+        int shapes = Read16(file, ref at);
+        var names = (int)Read32(file, ref at);
+
+        var least = new Vector3(Float(file, at), Float(file, at + 8), Float(file, at + 16));
+        var most = new Vector3(Float(file, at + 4), Float(file, at + 12), Float(file, at + 20));
+        at += 24;
+
+        if (version == 2)
+        {
+            at += 4;
+        }
+
+        if (triangles == 0 || vertices == 0)
+        {
+            return Failed("the mesh is empty");
+        }
+
+        Shape shape = Shape.Older(format);
+        int width = Width(vertices);
+
+        // BOUNDS FIRST, ARITHMETIC SECOND, exactly as the DOLm walk does it and for the same
+        // reason: these counts come out of the file and multiply into the sizes below.
+        long needed = at
+            + ((long)shapes * 8)
+            + ((long)triangles * 3 * width)
+            + ((long)vertices * shape.Stride);
+        if (needed > file.Length)
+        {
+            return Failed("the mesh says it is bigger than the file that holds it");
+        }
+
+        var faces = (int)triangles;
+        var points = (int)vertices;
+
+        // EVERY SHAPE'S NAME LENGTH AND START FIRST, AS ONE TABLE, and only then the names - the
+        // same shape as the DOLm file's, and the same trap if it is read interleaved.
+        var lengths = new int[shapes];
+        var starts = new int[shapes];
+        for (var one = 0; one < shapes; one++)
+        {
+            lengths[one] = (int)Read32(file, ref at);
+            starts[one] = (int)Read32(file, ref at);
+        }
+
+        var named = new MeshShape[shapes];
+        int began = at;
+        for (var one = 0; one < shapes; one++)
+        {
+            string name = $"shape {one.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+            if (lengths[one] > 0 && at + lengths[one] <= file.Length)
+            {
+                name = Encoding.Unicode.GetString(file.Slice(at, lengths[one]));
+                at += lengths[one];
+            }
+
+            // A START IN TRIANGLES, AND THE NEXT ONE IS WHERE IT ENDS. Clamped rather than
+            // trusted, on the same rule as everywhere else here.
+            int from = Math.Clamp(starts[one] * 3, 0, faces * 3);
+            int upto = one + 1 < shapes ? Math.Clamp(starts[one + 1] * 3, from, faces * 3) : faces * 3;
+            named[one] = new MeshShape(name, from, upto - from);
+        }
+
+        int read = at - began;
+        if (at + (faces * 3 * width) + (points * shape.Stride) > file.Length)
+        {
+            return Failed("the mesh says it is bigger than the file that holds it");
+        }
+
+        var indices = new int[faces * 3];
+        for (var one = 0; one < indices.Length; one++)
+        {
+            indices[one] = width == 2
+                ? BinaryPrimitives.ReadUInt16LittleEndian(file[(at + (one * 2))..])
+                : (int)BinaryPrimitives.ReadUInt32LittleEndian(file[(at + (one * 4))..]);
+
+            if (indices[one] >= points)
+            {
+                return Failed("the mesh points at a vertex it does not have");
+            }
+        }
+
+        at += indices.Length * width;
+
+        var positions = new Vector3[points];
+        var normals = new Vector3[points];
+        var coordinates = new Vector2[points];
+        var bones = new byte[points * 4];
+        var weights = new byte[points * 4];
+
+        for (var one = 0; one < points; one++)
+        {
+            int start = at + (one * shape.Stride);
+
+            positions[one] = new Vector3(Float(file, start), Float(file, start + 4), Float(file, start + 8));
+            normals[one] = Direction(file, start + shape.Normal);
+            coordinates[one] = new Vector2(
+                (float)BitConverter.UInt16BitsToHalf(
+                    BinaryPrimitives.ReadUInt16LittleEndian(file[(start + shape.Coordinate)..])),
+                (float)BitConverter.UInt16BitsToHalf(
+                    BinaryPrimitives.ReadUInt16LittleEndian(file[(start + shape.Coordinate + 2)..])));
+
+            file.Slice(start + shape.Bones, 4).CopyTo(bones.AsSpan(one * 4));
+            file.Slice(start + shape.Bones + 4, 4).CopyTo(weights.AsSpan(one * 4));
+        }
+
+        return new SkinnedMesh
+        {
+            Positions = positions,
+            Normals = normals,
+            Coordinates = coordinates,
+            Bones = bones,
+            Weights = weights,
+            Indices = indices,
+            Shapes = named,
+            Least = least,
+            Most = most,
+            Facts = new MeshFacts(
+                version, 0, 1, format, shape.Stride, shapes, shapes, faces, points, names, read),
         };
     }
 
