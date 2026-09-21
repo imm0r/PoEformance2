@@ -655,8 +655,9 @@ internal sealed class AoScanner(string text)
     /// <summary>Hangs each entry off the last one indented less than it.</summary>
     /// <remarks>
     /// A TAB AND A SPACE COUNT THE SAME, one each. The game writes these files with a tool and
-    /// indents them with tabs, and treating a tab as some number of columns would only matter for
-    /// a file that mixed the two - at which point the nesting it intended is anybody's guess.
+    /// indents them with tabs. A file that MIXES the two is what makes the width of a tab matter,
+    /// and 467 lines of the install do - see <see cref="Column"/>, which measures rather than
+    /// assumes.
     /// </remarks>
     private static IReadOnlyList<AoEntry> Nest(List<(int Indent, AoEntry Entry)> flat)
     {
@@ -701,12 +702,53 @@ internal sealed class AoScanner(string text)
         return roots;
     }
 
-    /// <summary>How far into its line the scanner is, which is the entry's indentation.</summary>
+    /// <summary>
+    /// How far into its line the scanner is, in COLUMNS, which is the entry's indentation.
+    /// </summary>
+    /// <remarks>
+    /// A TAB IS FOUR COLUMNS AND NOT ONE CHARACTER, and the game's own files are what settled the
+    /// width rather than a convention somebody likes. Counted over every entry line of every .ao
+    /// behind a monster's model:
+    ///
+    ///     65985  indented with tabs alone
+    ///       467  MIXED - a tab and then spaces
+    ///         3  spaces alone
+    ///
+    /// and every one of those 467 is "\t" then four spaces, "\t" then eight, or one "\t  \t".
+    /// At a width of four all three land exactly on a tab stop - eight, twelve, eight - so the
+    /// file's two spellings of the same depth agree, which is what says the width is four.
+    ///
+    /// WHY IT MATTERS, AND IT IS NOT COSMETIC. Entries are hung off one another BY COLUMN, so a
+    /// line counted three columns deeper than its neighbours becomes that neighbour's CHILD and
+    /// disappears from its struct's own entries. The keys carrying those 467 are led by
+    /// attachment_bones 45 times and bone_group 44 - the two lines that carry a piece's bone
+    /// pairing - so the Incursion Forgemaster's hammer says "L_wrist_jntBnd" in its own file and
+    /// was read as a child of the skeleton line above it, matched nothing, and lay on the floor
+    /// between his feet.
+    ///
+    /// THE REMARK THIS REPLACES PREDICTED IT and stopped one step short: it said a mixed file's
+    /// intent was "anybody's guess". It is not a guess when the file mixes them at a width where
+    /// both spellings coincide, and 467 lines out of 467 do.
+    ///
+    /// A LINE OF TABS ALONE IS UNAFFECTED IN ORDER, which is what makes this safe for the other
+    /// sixty-six thousand: n tabs is 4n columns, so every comparison between two such lines comes
+    /// out exactly as it did.
+    /// </remarks>
     private int Column()
     {
-        int line = _text.LastIndexOf('\n', Math.Max(0, _at - 1));
-        return _at - (line + 1);
+        int line = _text.LastIndexOf('\n', Math.Max(0, _at - 1)) + 1;
+
+        var column = 0;
+        for (int one = line; one < _at; one++)
+        {
+            column = _text[one] == '\t' ? (column / Tab * Tab) + Tab : column + 1;
+        }
+
+        return column;
     }
+
+    /// <summary>How many columns a tab advances to - see <see cref="Column"/>.</summary>
+    private const int Tab = 4;
 
     /// <summary>A bare name: letters, digits and the punctuation these files use in keys.</summary>
     /// <remarks>
