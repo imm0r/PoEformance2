@@ -25,6 +25,14 @@ already cost real time on this project.
   every element's StringId, rectangle, flags and child path, and F8 picks whatever is under
   the cursor. Any question of the form "does the game name that thing, and where is it" is
   one screenshot away — ask it there before concluding that something cannot be measured.
+- **`adamthedash/poe_data_tools`** is to the game's FILE formats what GameHelper2 is to its
+  memory: working parsers for `.ao`, `.sm`, `.smd`, `.fmt`, `.mat` and `.ast`. Clone it and
+  read the parser, not a diagram of it — `crates/poe_data_tools-lib/src/file_parsers/`.
+  `.smd` and `.fmt` wrap the SAME DOLm geometry block, and every rule about what sits between
+  that block and the shape names is a `cond(...)` in its `dolm` parser. Reading those gates
+  as unconditional cost this project a day: four bytes taken that were not there put every
+  shape name four bytes out, and the names came back NEARLY right, which reads as a wrongly
+  placed piece rather than a wrongly stepped file.
 - Do not trust a summarised directory listing over the real thing. A tree summary once
   reported "no Radar plugin" for a repo that plainly has one, and that wrong answer was
   taken at face value.
@@ -51,6 +59,22 @@ The game's own files are reference material too, not just the two projects above
 keys live in `poe2_production_Config.ini`, so the tool reads them rather than assuming the
 default 1-5 layout — the assumption looks correct until someone rebinds, and then the only
 symptom is that nothing happens.
+
+A monster's `.ao` is the same kind of file, and six versions went out learning it. Attached
+pieces came out in the wrong place, and every fix was a rule invented from bone NAMES and
+rest positions — any shared name, then a shared name resting where the parent's rests, then
+the socket, then the nearest shared ancestor — while the answer sat in the piece's own `.ao`
+the whole time: an `attachment_bones` line and the `bone_group` it ends with, two parallel
+lists pairing the piece's bones to the parent's by POSITION in the list. Everything in the
+middle agrees, which is why guessing by name got most of a monster right; the first entry
+does not, which is why the rest of him hung off the floor. Two of the invented rules each
+broke the monster the other had just fixed.
+
+What finally showed the shape of it was printing the PARENT's rest position beside the
+piece's in the model dump. The two rigs carry different rest poses — a piece is authored in a
+neutral one and the body in a crouch — and four rules in a row had assumed they matched
+without ever putting the two numbers side by side. **Print both halves of a comparison before
+theorising about either**, and read the attachment's own file before its bone list.
 
 ## The two screen-space systems
 
