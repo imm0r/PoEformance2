@@ -50,7 +50,53 @@ public sealed class EntityBrowserWindow
     /// </remarks>
     private readonly HashSet<string> _open = new(StringComparer.Ordinal);
 
-    private ulong _selected;
+    /// <summary>
+    /// Whether the list is showing the monsters or everything else.
+    /// </summary>
+    /// <remarks>
+    /// THE GAME'S OWN LINE, drawn where it already exists: <see cref="EntityKind.Monster"/> and
+    /// not a rule about names, paths or hostility. A player's own minions are monsters here
+    /// too, because they are monsters to the game - deriving "enemy" from IsFriendly would be a
+    /// second rule to be wrong about, and the one thing this side has to do is be the list you
+    /// look at when the question is about something that fights.
+    ///
+    /// WHY SPLIT AT ALL. An area holds a few dozen monsters and several hundred of everything
+    /// else - effects, doodads, projectiles, terrain - so the rows that move are a minority of
+    /// a list sorted by distance, and finding the rare one meant typing part of its name. Two
+    /// lists is one click instead.
+    /// </remarks>
+    private bool _foes = true;
+
+    /// <summary>
+    /// What is picked on each side, kept apart.
+    /// </summary>
+    /// <remarks>
+    /// ONE FIELD WOULD LOSE THE OTHER SIDE'S ROW on every switch, and switching is the point of
+    /// the toggle: looking up what a ground effect is called and coming back to the monster you
+    /// were reading is the ordinary way through this. It also keeps the model strip honest -
+    /// the picture belongs to the monster side's selection and nothing else can silently
+    /// replace it.
+    /// </remarks>
+    private ulong _selectedFoe;
+    private ulong _selectedRest;
+
+    /// <summary>Whichever of the two the toggle is on.</summary>
+    private ulong Selected
+    {
+        get => _foes ? _selectedFoe : _selectedRest;
+        set
+        {
+            if (_foes)
+            {
+                _selectedFoe = value;
+            }
+            else
+            {
+                _selectedRest = value;
+            }
+        }
+    }
+
     private string _filter = string.Empty;
 
     /// <summary>
@@ -139,7 +185,7 @@ public sealed class EntityBrowserWindow
             // From the whole snapshot rather than from the listed rows: hiding the selected
             // entity takes its row away, and the pane must still show what it is showing -
             // including the button that puts it back.
-            DrawComponents(view, snapshot.Entities.FirstOrDefault(entity => entity.Address == _selected));
+            DrawComponents(view, snapshot.Entities.FirstOrDefault(entity => entity.Address == Selected));
         }
 
         // Listed, not Entities: the survey walks every address's component table, and a
@@ -148,7 +194,7 @@ public sealed class EntityBrowserWindow
         // is worse than missing it - a survey exists to be believed.
         _inspector.Request(new EntityRequest(
             Enabled: true,
-            Address: _selected,
+            Address: Selected,
             Survey: [.. snapshot.Listed.Select(entity => entity.Address)],
             SurveySequence: _surveySequence,
             Expand: [.. _open]));
@@ -194,9 +240,62 @@ public sealed class EntityBrowserWindow
             }
         }
 
+        DrawSides(snapshot);
         DrawFacts(view, snapshot);
         DrawHidden();
     }
+
+    /// <summary>
+    /// The two halves of the list, with how many rows each holds.
+    /// </summary>
+    /// <remarks>
+    /// THE COUNTS ARE THE REASON THE SPLIT IS WORTH A CONTROL. "Gegner 14 · Alles andere 380"
+    /// says at a glance what the single list never did - that the rows anybody came here for
+    /// are four per cent of it - and it says when an area is empty of monsters without anybody
+    /// scrolling to find out.
+    ///
+    /// COUNTED OFF THE SNAPSHOT AND NOT OFF THE LISTED ROWS, so the number on the side you are
+    /// NOT on is still true: filtered counts would both fall to nothing as soon as anything is
+    /// typed, and the point of the other side's number is to tell you whether to go there.
+    ///
+    /// Selectable rather than Button, because two buttons of different widths do not read as a
+    /// pair of alternatives - one of which is currently true.
+    /// </remarks>
+    private void DrawSides(WorldSnapshot snapshot)
+    {
+        var monsters = 0;
+        foreach (WorldEntity entity in snapshot.Entities)
+        {
+            if (entity.Kind == EntityKind.Monster)
+            {
+                monsters++;
+            }
+        }
+
+        int rest = snapshot.Entities.Count - monsters;
+
+        if (ImGui.Selectable(
+                $"Gegner {monsters.ToString(CultureInfo.InvariantCulture)}###browser-foes",
+                _foes,
+                ImGuiSelectableFlags.None,
+                new Vector2(SideWidth, 0f)))
+        {
+            _foes = true;
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Selectable(
+                $"Alles andere {rest.ToString(CultureInfo.InvariantCulture)}###browser-rest",
+                !_foes,
+                ImGuiSelectableFlags.None,
+                new Vector2(SideWidth, 0f)))
+        {
+            _foes = false;
+        }
+    }
+
+    /// <summary>How wide each half of the toggle is. Equal, so neither reads as the main one.</summary>
+    private const float SideWidth = 160f;
 
     /// <summary>
     /// What the read is doing, on ONE line, with the sentences on hover.
@@ -487,9 +586,9 @@ public sealed class EntityBrowserWindow
                 // control's identity from its label - so without this the row would be a new
                 // control every frame and the click would never land.
                 if (ImGui.Selectable($"{kind}  {called}{away}{facts}###{entity.Address:X}",
-                        entity.Address == _selected))
+                        entity.Address == Selected))
                 {
-                    _selected = entity.Address;
+                    Selected = entity.Address;
                     RouteTo(entity);
                 }
             }
@@ -546,6 +645,57 @@ public sealed class EntityBrowserWindow
     /// </remarks>
     private static readonly string[] Kinds =
         ["humanoid", "human", "undead", "construct", "beast", "demon", "eldritch", "golem"];
+
+    /// <summary>
+    /// The monster itself, turning, at the top of its own page.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THE 3D VIEWER WAS BUILT FOR. Every other answer on this page is a word - a path, a
+    /// tag list, a life pool - and none of them tells you which of the fourteen things standing
+    /// around you this row is. The model does, in the time it takes to look at it.
+    ///
+    /// ONLY ON THE MONSTER SIDE, and by the entity's own kind rather than by which half of the
+    /// toggle is showing: a row can survive on screen for a frame after the toggle moves, and
+    /// asking the entity is the reading that cannot be out of step with itself.
+    ///
+    /// THE PATH IS THE KEY AND THE TABLE IS OPTIONAL. MonsterVarieties.Find answers null for a
+    /// monster the shipped export does not carry, and the model is read from the path either
+    /// way - the row only adds the AoFiles column, which the install's own table fills in. So a
+    /// monster nothing has a row for still gets its picture.
+    ///
+    /// NOTHING IS LOADED UNTIL A ROW IS PICKED, which is what makes this affordable: a model is
+    /// six to sixteen megabytes of bundle reads, and rows are chosen by clicking rather than
+    /// walked through with a key, so one deliberate click is one load.
+    /// </remarks>
+    private void DrawModel(WorldEntity? chosen)
+    {
+        if (Model is not { Possible: true } model || chosen is not { Kind: EntityKind.Monster } monster)
+        {
+            return;
+        }
+
+        float wide = Math.Min(ImGui.GetContentRegionAvail().X, Strip);
+        model.Circling(_monsters?.Invoke().Find(monster.Path), monster.Path, wide, Strip);
+    }
+
+    /// <summary>
+    /// How tall the turning picture is on a monster's page.
+    /// </summary>
+    /// <remarks>
+    /// A FIXED HEIGHT AND NOT A SHARE OF THE PANE, because what is under it is the reason the
+    /// page is open: the components. A picture that grew with the window would push them off
+    /// the bottom on the machine with the most room to show them.
+    /// </remarks>
+    private const float Strip = 180f;
+
+    /// <summary>
+    /// The turning picture on a monster's page, or null where the tool has no renderer.
+    /// </summary>
+    /// <remarks>
+    /// ITS OWN INSTANCE, not the Monster Book's - see <see cref="MonsterPortrait.Circling"/> for
+    /// why sharing one would reload the model on every switch between the two tabs.
+    /// </remarks>
+    public MonsterPortrait? Model { get; set; }
 
     private void DrawTable(string path)
     {
@@ -846,6 +996,7 @@ public sealed class EntityBrowserWindow
         // and the next return added anywhere above it silently drops a third of the pane.
         if (ImGui.CollapsingHeader("what this is", ImGuiTreeNodeFlags.DefaultOpen))
         {
+            DrawModel(chosen);
             ImGui.TextColored(PathText, view.Path);
             ImGuiText.Mono(DimText, $"id {view.Id}  at 0x{view.Address:X}");
             DrawTable(view.Path);
@@ -1247,6 +1398,12 @@ public sealed class EntityBrowserWindow
         {
             entities = entities.Where(entity => !_hiding.Hides(entity.Path, entity.WorldX, entity.WorldY));
         }
+
+        // THE SIDE THE TOGGLE IS ON, before the text filter and after the hiding - it is the
+        // coarsest of the three and the only one that is not about this particular search.
+        entities = _foes
+            ? entities.Where(entity => entity.Kind == EntityKind.Monster)
+            : entities.Where(entity => entity.Kind != EntityKind.Monster);
 
         if (_filter.Length > 0)
         {

@@ -2274,7 +2274,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// first: without it the browser still lists everything, but the click that matters -
     /// "show me the one nothing describes" - has nowhere to go.
     /// </remarks>
-    public void AttachEntityBrowser(EntityInspector inspector, bool visible = false)
+    /// <param name="readFile">
+    /// The install's own bytes, for the turning picture on a monster's page. Null leaves the
+    /// page exactly as it was - a browser on a machine with no game still lists everything.
+    /// </param>
+    /// <param name="unpack">The install's Oodle, so a bundled rig can move. See the book's.</param>
+    public void AttachEntityBrowser(
+        EntityInspector inspector,
+        bool visible = false,
+        Func<string, byte[]?>? readFile = null,
+        Func<ReadOnlyMemory<byte>, int, byte[]?>? unpack = null)
     {
         ArgumentNullException.ThrowIfNull(inspector);
 
@@ -2310,6 +2319,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 }
             },
             () => Monsters);
+
+        // ITS OWN PORTRAIT, capped at the ladder's smallest rung. The strip is 180 px and never
+        // grows, so drawing it at the book's 1024 would rasterise a megapixel to show a
+        // thumbnail; and sharing the book's instance would reload the model - six to sixteen
+        // megabytes - on every switch between the two tabs. See MonsterPortrait.Circling.
+        window.Model = new MonsterPortrait(
+            readFile, Upload, key => RemoveImage(key), PictureLadder.Smallest, unpack);
+
         _tools.Add(
             90, "entities", "Entity Browser", () => window.DrawTab(_snapshot, _snapshot.Player),
             window.Idle, page: Entities, pageLabel: EntitiesLabel);

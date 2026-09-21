@@ -63,7 +63,7 @@ push to `main` auto-compiles on GitHub and updates the rolling release
 [`latest-dev`](https://github.com/imm0r/PoEformance2/releases/tag/latest-dev) with a
 ready-to-run, self-contained exe.
 
-**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.5 · 4659c18`
+**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.6 · 4659c18`
 — the version, raised on every push, and the commit the publish workflow stamped into it. A build
 compiled locally reads `local`, because a version number on an unreleased build is a claim it
 cannot support. It is there because the alternative was comparing a screenshot against a merge
@@ -194,6 +194,22 @@ black stays black and a highlight is not clipped away, and by solving the expone
 picture's own histogram rather than its average, which misses by a third. What it actually
 achieved is printed beside the slider: the exponent is found on luminance and applied per
 channel, so it lands near the target rather than on it.
+
+**The entity browser is two lists now, and a monster's page shows the monster.** An area holds a
+few dozen monsters and several hundred of everything else — effects, doodads, projectiles,
+terrain — so the rows anybody came for were a small minority of one list sorted by distance, and
+finding the rare one meant typing part of its name. A toggle over the list splits it on the game's
+own line (`EntityKind.Monster`, minions included) and carries the count of each side, so an area
+with nothing alive in it says so without being scrolled. Each side keeps its own selected row,
+because looking up what a ground effect is called and coming back to the monster you were reading
+is the ordinary way through this.
+
+And at the top of a monster's page the **model turns**, in a 180-pixel strip: the same renderer the
+icon export uses, with everything around it taken off — no animation picker, no export, no drag,
+no floor, and no button to stop the orbit. Every other answer on that page is a word, and none of
+them tells you which of the fourteen things standing around you this row is. It loads only when a
+row is picked, and it has its own picture ladder capped at the smallest rung, because a strip that
+never grows has no business rasterising a megapixel.
 
 It also draws **where a monster is pointing**. Path of Exile 2 keeps no target pointer anywhere in
 memory — the game aims by *turning* an actor to an angle and firing once it is within a tolerance —
