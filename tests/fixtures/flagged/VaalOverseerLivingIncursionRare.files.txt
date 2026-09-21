@@ -1,0 +1,1565 @@
+monster: Temoc, Drill Overseer [Metadata/Monsters/LeagueIncursionNew/Garrison/VaalOverseerLivingIncursionRare]
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/VaalOverseerLivingUnique.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/Vaal/VaalOverseer/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.496707946062088,
+					"name": "fake_contact"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4982635974884033,
+					"name": "fake_contact"
+				}
+			]
+		},
+		{
+			"name": "cleave_projectile_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.6511499881744385,
+					"name": "contact",
+					"position": [
+						-19.83340072631836,
+						-59.80939865112305,
+						-152.27000427246095
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "spine_2_jntBnd Metadata/Monsters/VaalMonsters/attachments/VaalOverseerLivingUniqueFeatherHeaddress.ao"
+	attached_object = "L_Weapon Metadata/Monsters/VaalMonsters/attachments/VaalOverseerLivingShield.ao"
+	attached_object = "Head_Attachment Metadata/Monsters/VaalMonsters/attachments/VaalOverseerLivingUniqueFeatherMask.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/VaalMonsters/attachments/VaalOverseerLivingSkullBelt.ao"
+	attached_object = "R_Weapon Metadata/Monsters/VaalMonsters/attachments/VaalOverseerLivingClub.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3879779875278473,
+								0.0
+							],
+							[
+								0.4808740019798279,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.47123900055885317,
+						"angle": 2.478369951248169,
+						"x_axis_scale": 0.7390000224113464,
+						"length": 167.6300048828125,
+						"offset": [
+							35.0,
+							-19.0
+						],
+						"impact_z_rotation": [
+							-0.15707999467849732,
+							2.0769400596618654
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4043720066547394,
+								0.0
+							],
+							[
+								0.47541001439094546,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 2.862339973449707,
+						"x_axis_scale": 0.7799999713897705,
+						"length": 175.0,
+						"offset": [
+							-23.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.22689299285411836,
+							-2.7052600383758547
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "cleave_projectile_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6557379961013794,
+								0.0
+							],
+							[
+								0.7103829979896545,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.01745329424738884,
+						"angle": 4.188790321350098,
+						"x_axis_scale": 0.8700000047683716,
+						"length": 355.8280029296875,
+						"local_offset": [
+							-8.0,
+							-10.0
+						],
+						"impact_z_rotation": [
+							0.541051983833313,
+							2.775073766708374
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "heavystrike_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5307260155677795,
+								0.0
+							],
+							[
+								0.5810059905052185,
+								1.0
+							]
+						],
+						"width": 57.803001403808597,
+						"length": 399.7959899902344,
+						"offset": [
+							-16.0,
+							-3.0
+						]
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/Vaal/VaalOverseer/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/VaalOverseerLivingUnique.sm"
+			hide_segments = "bigShape,deco3Shape,deco4Shape,deco5Shape,deco70Shape2,deco73Shape6,deco98Shape7,deco_midShape,singleShape"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "alert_transition_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Slow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.025813400745391847,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Alerted",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06306672096252442,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/SwordDraw",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46466106176376345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Fast",
+						"bone_name": "R_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5547900199890137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "alert_transition_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Slow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.025813400745391847,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Alerted",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06306672096252442,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/SwordDraw",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46466106176376345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Fast",
+						"bone_name": "R_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5547900199890137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Slow",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.024403616786003114,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Attack1",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1561547815799713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/AttackWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18998199701309205,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Fast",
+						"bone_name": "R_upperArm_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06644999980926514,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Slow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11569954454898834,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Attack1",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28125882148742678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/AttackWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35869699716567995,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Fast",
+						"bone_name": "R_upperArm_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cleave_projectile_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Slow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07528959959745407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4461783766746521,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Effects/BuffWave/SwordBuffWave",
+						"bone_name": "R_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6662365198135376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/HeavyStrikeA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.27387535572052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Effects/BuffWave/SwordBuffSlice",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.498829960823059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Fast",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.633489966392517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0008353809243999422,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15000000596046449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/FallBig",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40608999133110049,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/MetalDrop",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5026959776878357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/MetalDrop",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8270230293273926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0005729730473831296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28492024540901186,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/FallBig",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15000000596046449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/FallBig",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24003000557422639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/MetalDrop",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2572898864746094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/FallBig",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4117152690887451,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/MetalDrop",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15000000596046449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/FallBig",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24003000557422639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/MetalDrop",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15000000596046449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/FallBig",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24003000557422639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/MetalDrop",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.016433855518698694,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03738701716065407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.016433855518698694,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03738701716065407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.016433855518698694,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03738701716065407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.016433855518698694,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03738701716065407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.016433855518698694,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03738701716065407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "formation_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08255530148744583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Slow",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14954496920108796,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Attack1",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3557739853858948,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Fast",
+						"bone_name": "R_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6614260077476502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5145000219345093,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8319300413131714,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "formation_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23677200078964234,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8884503245353699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_idle_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8884503245353699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_turn_180_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.063510000705719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Idle",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09287469834089279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13710099458694459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6275169849395752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_turn_90_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.063510000705719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Idle",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08648650348186493,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1351349949836731,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5867319703102112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_turn_90_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.063510000705719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Idle",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09484030306339264,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23046700656414033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6570029854774475,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3845230042934418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.615477979183197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8234699964523315,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Idle",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2530699968338013,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5085999965667725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8304699659347535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "heavystrike_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.042857199907302859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0565059632062912,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Attack2",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2894720137119293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5989609956741333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Fast",
+						"bone_name": "R_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6386200189590454,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Fast",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7311769723892212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9043809771537781,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/IdleMove_Slow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23677200078964234,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "jog_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.043243300169706348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09120369702577591,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46152400970458987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5999019742012024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6148399710655212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8742979764938355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1714999675750733,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2839299440383912,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Knockdown1",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Slow",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22481511533260346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4496307969093323,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8420707583427429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9630125761032105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Knockdown2",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.098439335823059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.193097710609436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Slow",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8340169191360474,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Slow",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Knockdown1",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3079031705856323,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6175859570503235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8045291304588318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Knockdown2",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8916711807250977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9966802000999451,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Slow",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.101688265800476,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Vocal/Run.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01441080030053854,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33247798681259158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6577990055084229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6587799787521362,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Move_Run",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9635120034217835,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/Monster/IncursionOverseerDrillSergeant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "cleave_projectile_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.6460399627685547,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Incursion/OverseerDrillSergeant/melee_trail_270.ao",
+						"animation": "attack_270",
+						"height": 160.0,
+						"speed": 6.0,
+						"scale": [
+							1.75,
+							1.75,
+							1.75
+						],
+						"inherit_orientation": true,
+						"orientation": 0.08726649731397629
+					}
+				]
+			},
+			{
+				"name": "heavystrike_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.7640190124511719,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Incursion/OverseerDrillSergeant/heavy_strike01.ao",
+						"offset": [
+							-13.511871337890625,
+							-59.050941467285159
+						],
+						"height": 115.0,
+						"inherit_orientation": true
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "cleave_projectile_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "6 0 0 Smooth 0.621742 0 Flat 1.31837 1 Linear 1.78795 1 Linear 2.10789 0 Flat 2.5 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "FadeFloat",
+						"apply_on_children": true,
+						"curve": "6 0 0 Smooth 0.152162 0 Flat 0.410173 1 Linear 1.73291 1 Linear 2.24463 0 Flat 2.5 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/attachments/VaalOverseerLivingUniqueFeatherHeaddress.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/VaalOverseerFeatherHeaddress/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/VaalOverseerFeatherHeaddress/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 600.000
+		bend_allowed_angle = 0.000
+		enclosure_angle = 0.200
+		animation_velocity_factor = 5.000
+		animation_force_factor = 10.000
+		attachment_bones = "spine_2_jntBnd chest_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd neck_jntBnd head_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd chest_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd neck_jntBnd head_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/VaalOverseerFeatherHeaddress/VaalOverseerLivingUniqueFeathers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/attachments/VaalOverseerLivingShield.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/VaalOverseerShield/rig.amd"
+	default_animation = "small_idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/VaalOverseerShield/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/VaalOverseerShield/UpdatedVaalOverseerLivingShield.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/attachments/VaalOverseerLivingUniqueFeatherMask.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/VaalOverseerLivingUniqueMask/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/VaalOverseerLivingUniqueMask/rig.ast"
+		linear_allowed_contraction = 0.025
+		bend_stiffness = 600.000
+		bend_allowed_angle = 0.000
+		enclosure_angle = 0.200
+		animation_velocity_factor = 5.000
+		animation_force_factor = 10.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/VaalOverseerLivingUniqueMask/VaalOverseerLivingUniqueMask.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/attachments/VaalOverseerLivingSkullBelt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/VaalOverseerBeltSkulls/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/VaalOverseerBeltSkulls/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_angle = 0.150
+		animation_velocity_factor = 1.000
+		animation_force_factor = 1.000
+		attachment_bones = "hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/VaalOverseerBeltSkulls/UpdatedVaalOverseerLivingBeltSkulls.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/attachments/VaalOverseerLivingClub.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/attachments/UpdatedVaalOverseerLivingClub.fmt"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/VaalOverseerLivingUnique.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/VaalOverseerLivingUnique_armour_df393496.smd"
+Materials 2
+	"Art/Models/MONSTERS/VaalMonsters/VaalOverseer/Textures/VaalOverseerLivingUnqiueClothc.mat" 21
+	"Art/Models/MONSTERS/VaalMonsters/VaalOverseer/Textures/VaalOverseerLivingUnqiueBodyc.mat" 1
+BoundingBox -83.6449 -32.0694 -297.828 83.6449 65.3714 -0.449249
+BoneGroups 22
+	"root" 1 "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "jaw_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/VaalOverseer/VaalOverseerLivingUnique_armour_df393496.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 22 in the header, 22 in the block · 23648 triangles over 21581 vertices
+  names: 658 bytes said, 658 read  [agree]
+
+=== shapes (31)
+0	back_decoShape	from 0	count 342
+1	bigShape	from 342	count 1596
+2	chest_plateShape	from 1938	count 1908
+3	deco3Shape	from 3846	count 2880
+4	deco4Shape	from 6726	count 2880
+5	deco5Shape	from 9606	count 2880
+6	deco70Shape2	from 12486	count 2880
+7	deco73Shape6	from 15366	count 2160
+8	deco98Shape7	from 17526	count 2160
+9	deco_midShape	from 19686	count 2880
+10	head_back_decoShape	from 22566	count 1668
+11	headdressShape	from 24234	count 3312
+12	rope_wrist_leftShape	from 27546	count 2304
+13	rope_wrist_rightShape	from 29850	count 2304
+14	shin_plate_leftShape	from 32154	count 3324
+15	shin_plate_rightShape	from 35478	count 3324
+16	shoulder_plater_leftShape	from 38802	count 1254
+17	shoulder_plater_rightShape	from 40056	count 1254
+18	singleShape	from 41310	count 780
+19	skirtShape	from 42090	count 10452
+20	waist_plateShape	from 52542	count 8592
+21	bodyShape	from 61134	count 9810
+22	bigShape	from 70944	count 1596
+23	deco3Shape	from 72540	count 2880
+24	deco4Shape	from 75420	count 2880
+25	deco5Shape	from 78300	count 2880
+26	deco70Shape2	from 81180	count 2880
+27	deco_midShape	from 84060	count 2880
+28	singleShape	from 86940	count 780
+29	headsShape	from 87720	count 2676
+30	waist_ropeShape	from 90396	count 1680
+
+=== fitting
+the monster's rig: 117 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  VaalOverseerLivingUniqueFeatherHeaddress.ao  socket spine_2_jntBnd [in its carrier's rig]  box (-67.4,-9.8,-165.5)..(67.4,63.3,25.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 7 in the header, 7 in the block · 5592 triangles over 5964 vertices
+    names: 148 bytes said, 148 read  [agree]
+    rig 11 bones, 6 of them names its carrier's rig also has
+    mesh weights reach bone 10 of 11  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 chest_jntBnd  [shared]  under 0  rests at (0,-0,-12.8)  carrier has (-0,2,-145.1)
+      2 L_clavicle_jntBnd  [shared]  under 1  rests at (8.5,0,-30.9)  carrier has (8.5,2,-163.3)
+      3 R_clavicle_jntBnd  [shared]  under 1  rests at (-8.5,0,-30.9)  carrier has (-8.5,2,-163.3)
+      4 neck_jntBnd  [shared]  under 1  rests at (0,2.8,-37.5)  carrier has (0,4.9,-169.8)
+      5 head_jntBnd  [shared]  under 4  rests at (0,-1.3,-51)  carrier has (0,0.7,-183.3)
+      6 phys_tri_feathers_jntBnd_1  [its own]  under 5  rests at (-0,11.2,-104.8)
+      7 phys_tri_feathers_jntBnd_2  [its own]  under 5  rests at (34.2,18.3,-73.6)
+      8 phys_tri_feathers_jntBnd_3  [its own]  under 5  rests at (18.8,21.6,-26.5)
+      9 phys_tri_feathers_jntBnd_4  [its own]  under 5  rests at (-34.2,18.3,-73.6)
+      10 phys_tri_feathers_jntBnd_5  [its own]  under 5  rests at (-18.8,21.6,-26.5)
+  VaalOverseerLivingShield.ao  socket L_Weapon [NOT in its carrier's rig]  box (-38.7,-34.7,-55.6)..(72.3,14.4,56.3)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 1618 triangles over 1605 vertices
+    names: 156 bytes said, 156 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 shield_segment_top_jntBnd  [its own]  under 0  rests at (32.3,-11.1,-37.2)
+      2 shield_segment_main_jntBnd  [its own]  under 0  rests at (16.8,-10.1,-0.1)
+      3 shield_segment_bot_jntBnd  [its own]  under 0  rests at (33.1,-8.2,43.6)
+  VaalOverseerLivingUniqueFeatherMask.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-24.3,-36.1,-88)..(24.3,13.3,15.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 4348 triangles over 4292 vertices
+    names: 92 bytes said, 92 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_feathers_jntBnd  [its own]  under 0  rests at (0,-4.5,-51.4)
+  VaalOverseerLivingSkullBelt.ao  socket hip_jntBnd [in its carrier's rig]  box (-36.7,-21.5,-14.3)..(30,9.6,24.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 1452 triangles over 856 vertices
+    names: 50 bytes said, 50 read  [agree]
+    rig 5 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_thigh_jntBnd  [shared]  under 0  rests at (11,0,-0)  carrier has (11,2,-106.8)
+      2 R_thigh_jntBnd  [shared]  under 0  rests at (-11,-0,-0)  carrier has (-11,2,-106.8)
+      3 phys_tri_beltSkulls_jntBnd_1  [its own]  under 1  rests at (14.9,-6.2,0.6)
+      4 phys_tri_beltSkulls_jntBnd_2  [its own]  under 2  rests at (-14.5,-7.7,0.3)
+  VaalOverseerLivingClub.ao  socket R_Weapon [NOT in its carrier's rig]  fixed mesh UpdatedVaalOverseerLivingClub.fmt  1 shapes
+      VaalOverseerWeaponShape  ->  Art/Models/MONSTERS/VaalMonsters/VaalOverseer/Textures/UpdatedVaalOverseerLivingWeapon01c.mat

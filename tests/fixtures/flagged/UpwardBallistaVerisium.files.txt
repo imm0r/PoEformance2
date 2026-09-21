@@ -1,0 +1,539 @@
+monster: Totem [Metadata/Monsters/Totems/UpwardBallistaVerisium]
+
+=== .ao Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/CannonBallista.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/totems/Ballistas/BallistaCannon/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"id": 1136090504,
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "contact",
+					"position": [
+						0.0,
+						-43.75616455078125,
+						-122.0863037109375
+					],
+					"contact_ref": [
+						0.0,
+						-12.160030364990235,
+						-87.84230041503906
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"id": 2482472208,
+					"type": "StandardEventType",
+					"time": 1.125,
+					"name": "contact",
+					"position": [
+						0.0,
+						-43.75616455078125,
+						-122.0863037109375
+					],
+					"contact_ref": [
+						0.0,
+						-12.160030364990235,
+						-87.84230041503906
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_03",
+			"events": [
+				{
+					"id": 2955077421,
+					"type": "StandardEventType",
+					"time": 0.9300000071525574,
+					"name": "contact",
+					"position": [
+						0.0,
+						-43.75616455078125,
+						-122.0863037109375
+					],
+					"contact_ref": [
+						0.0,
+						-12.160030364990235,
+						-87.84230041503906
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_04",
+			"events": [
+				{
+					"id": 4005263960,
+					"type": "StandardEventType",
+					"time": 0.75,
+					"name": "contact",
+					"position": [
+						0.0,
+						-43.75616455078125,
+						-122.0863037109375
+					],
+					"contact_ref": [
+						0.0,
+						-12.160030364990235,
+						-87.84230041503906
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "lock:root_jntBnd Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/attachments/Base.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/totems/Ballistas/BallistaCannon/rig.ast"
+		socket = "muzzle"
+			parent = "phys_tri_ring_M_jntBnd"
+			rotation = "-0 0 -1.39626"
+			translation = "-42.7238 -2.95905 18.7983"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.350
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Microtransactions/spell/Mercenary/Verisium/mb/MortarCannon/VerisiumCannon.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false platform_shard_3_jntBnd gear_jntBnd L_gear_jntBnd R_stand2_jntBnd platform_shard_1_jntBnd cog_shard_2_jntBnd main_jntBnd phys_tri_ring_L_jntBnd phys_tri_ring_R_jntBnd phys_tri_ring_M_jntBnd muzzle"
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.3311948776245118,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/GrenadeBallista/Cannon_Fire_Foley"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.1490051746368409,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/GrenadeBallista/Cannon_Fire_Foley"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.9511433839797974,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/GrenadeBallista/Cannon_Fire_Foley"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.7699487209320068,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/GrenadeBallista/Cannon_Fire_Foley"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Microtransactions/4.0/Skills/Verisium/Verisium_GrenadeBallista/Death",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/GrenadeBallista/Cannon_Fire_Foley",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Microtransactions/4.0/Skills/Verisium/Verisium_GrenadeBallista/Emerge",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Microtransactions/4.0/Skills/Verisium/Verisium_GrenadeBallista/Submerge",
+						"bone_name": "main_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"id": 3616590217,
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.2999999523162842,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/muzzleFlash.ao",
+						"animation": "muzzle",
+						"from": {
+							"parent_bone": "muzzle"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-3.000000238418579,
+								-5.0,
+								0.0
+							],
+							"rotation": [
+								0.0,
+								-0.08726999908685684,
+								-0.13962998986244203
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"id": 1082991522,
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.125,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/muzzleFlash.ao",
+						"animation": "muzzle",
+						"from": {
+							"parent_bone": "muzzle"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-3.000000238418579,
+								-5.0,
+								0.0
+							],
+							"rotation": [
+								0.0,
+								-0.08726999908685684,
+								-0.13962998986244203
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"id": 3000475975,
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.9300000071525574,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/muzzleFlash.ao",
+						"animation": "muzzle",
+						"from": {
+							"parent_bone": "muzzle"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-3.000000238418579,
+								-5.0,
+								0.0
+							],
+							"rotation": [
+								0.0,
+								-0.08726999908685684,
+								-0.13962998986244203
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"id": 2204528126,
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.75,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/muzzleFlash.ao",
+						"animation": "muzzle",
+						"from": {
+							"parent_bone": "muzzle"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-3.000000238418579,
+								-5.0,
+								0.0
+							],
+							"rotation": [
+								0.0,
+								-0.08726999908685684,
+								-0.13962998986244203
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"id": 449648589,
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/pet/death_01.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"id": 475318571,
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/pet/emierge_Ground.pet",
+						"bone_group": "root"
+					},
+					{
+						"id": 3417584407,
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/pet/emerge_body.pet",
+						"bone_group": "frameupper"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"id": 2406597895,
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/pet/submerge_01_body.pet",
+						"bone_group": "frameupper"
+					},
+					{
+						"id": 238878708,
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/pet/submerge_01.pet",
+						"bone_group": "root"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"id": 2901763972,
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/epk/emerge_flash.epk"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"id": 3587558823,
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/epk/submerge_fade.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"id": 483418876,
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.75,
+						"name": "surgeTime_R",
+						"curve": "4 0 0 Linear 0.0455702 0 Linear 0.658512 1 Linear 0.75 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"id": 120259361,
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "surgeTime_R",
+						"curve": "5 0 0 Linear 0.0150744 0 Linear 0.179522 1 Smooth 0.379921 0.552284 Smooth 0.5 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Effects/Microtransactions/Spells/Mercenary/Verisium/crossbow_ballistas/attachments/Base.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/totems/Ballistas/Base/rig.amd"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/totems/Ballistas/Base/rig.ast"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Microtransactions/spell/Mercenary/Verisium/mb/MortarCannon/VerisiumCannonBase.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Microtransactions/spell/Mercenary/Verisium/mb/MortarCannon/VerisiumCannon.sm
+version 6
+SkinnedMeshData "Art/Microtransactions/spell/Mercenary/Verisium/mb/MortarCannon/VerisiumCannon_armour_319eafd3.smd"
+Materials 1
+	"Art/Microtransactions/spell/Mercenary/Verisium/mb/MortarCannon/Textures/VerisiumCannonc.mat" 16
+BoundingBox -72.4051 -72.4051 -138.009 72.4051 72.4051 -9.5789
+BoneGroups 0
+
+=== .smd Art/Microtransactions/spell/Mercenary/Verisium/mb/MortarCannon/VerisiumCannon_armour_319eafd3.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 16 in the header, 16 in the block · 9076 triangles over 9708 vertices
+  names: 450 bytes said, 450 read  [agree]
+
+=== shapes (16)
+0	braceShape	from 0	count 1128
+1	cannonShape	from 1128	count 8916
+2	cog_02Shape	from 10044	count 4656
+3	cog_shard_1Shape	from 14700	count 1260
+4	cog_shard_2Shape	from 15960	count 768
+5	L_ringShape	from 16728	count 1152
+6	L_stand_Shape1	from 17880	count 816
+7	L_stand_Shape2	from 18696	count 132
+8	pin_Shape1	from 18828	count 2100
+9	pin_Shape2	from 20928	count 2100
+10	platform_shard_1Shape	from 23028	count 696
+11	platform_shard_2Shape	from 23724	count 852
+12	platform_shard_3Shape	from 24576	count 552
+13	R_ringShape	from 25128	count 1152
+14	R_stand_Shape1	from 26280	count 816
+15	R_stand_Shape2	from 27096	count 132
+
+=== fitting
+the monster's rig: 18 bones
+mounts: (none named aux_)
+  Base.ao  socket lock:root_jntBnd [NOT in its carrier's rig]  box (-83.6,-83.6,-11.7)..(83.6,83.6,0)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 586 triangles over 637 vertices
+    names: 56 bytes said, 56 read  [agree]
+    rig 1 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 1  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)

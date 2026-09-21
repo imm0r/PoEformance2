@@ -1,0 +1,1486 @@
+monster: Totem [Metadata/Monsters/Totems/UpwardBallistaBuccaneer]
+
+=== .ao Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/totems/Ballistas/UpwardBallista/rig.amd"
+	view_of = "attack_01"
+		view_name = "ripwire_01"
+	view_of = "attack_02"
+		view_name = "ripwire_02"
+	view_of = "attack_03"
+		view_name = "ripwire_03"
+	view_of = "attack_04"
+		view_name = "ripwire_04"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.2695017457008362,
+					"name": "contact",
+					"position": [
+						0.0,
+						11.258415222167969,
+						-197.57989501953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.055792808532715,
+					"name": "spawn_bolt"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.26816344261169436,
+					"name": "contact",
+					"position": [
+						0.0,
+						11.258415222167969,
+						-197.57989501953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.2326741218566896,
+					"name": "spawn_bolt"
+				}
+			]
+		},
+		{
+			"name": "attack_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.2811451852321625,
+					"name": "contact",
+					"position": [
+						0.0,
+						11.258415222167969,
+						-197.57989501953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4628074169158937,
+					"name": "spawn_bolt"
+				}
+			]
+		},
+		{
+			"name": "attack_04",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.2643004059791565,
+					"name": "contact",
+					"position": [
+						0.0,
+						11.258415222167969,
+						-197.57989501953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.060694932937622,
+					"name": "spawn_bolt"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "lock:root_jntBnd Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista_base.ao"
+	attached_object = "bow_shard1_jntBnd Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista_muzzle.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/totems/Ballistas/UpwardBallista/rig.ast"
+		socket = "aux_clusterFire_01"
+			parent = "bow_shard1_jntBnd"
+			translation = "0 -35.9439 -1"
+		socket = "aux_clusterFire_02"
+			parent = "bow_shard1_jntBnd"
+			translation = "0 -69.2277 -1"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/Effects/totems/Ballistas/UpwardBallista/UpwardBallista.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd bow_shard1_jntBnd"
+		bone_group = "frameupper false L_bow_lower_arm_4_jntBnd L_bow_lower_arm_3_jntBnd L_bow_lower_arm_2_jntBnd L_bow_lower_arm_1_jntBnd bow_shard1_jntBnd R_bow_upper_arm_1_jntBnd R_bow_upper_arm_2_jntBnd R_bow_upper_arm_3_jntBnd R_bow_upper_arm_4_jntBnd"
+		bone_group = "L_upper_arm false L_bow_upper_arm_1_jntBnd L_bow_upper_arm_2_jntBnd L_bow_upper_arm_3_jntBnd L_bow_upper_arm_4_jntBnd L_bow_upper_arm_5_jntBnd"
+		bone_group = "L_lower_arm false L_bow_lower_arm_1_jntBnd L_bow_lower_arm_2_jntBnd L_bow_lower_arm_3_jntBnd L_bow_lower_arm_4_jntBnd L_bow_lower_arm_5_jntBnd"
+		bone_group = "R_upper_arm false R_bow_upper_arm_1_jntBnd R_bow_upper_arm_2_jntBnd R_bow_upper_arm_3_jntBnd R_bow_upper_arm_4_jntBnd R_bow_upper_arm_5_jntBnd"
+		bone_group = "R_lower_arm false R_bow_lower_arm_1_jntBnd R_bow_lower_arm_2_jntBnd R_bow_lower_arm_3_jntBnd R_bow_lower_arm_4_jntBnd R_bow_lower_arm_5_jntBnd"
+		bone_group = "grp_segment_shaft false winch_jntBnd M_brace_jntBnd"
+		bone_group = "grp_segment_gears false gear_jntBnd main_jntBnd"
+		bone_group = "arrow_fx false arrow_jntBnd aux_clusterFire_02"
+		bone_group = "caanon_tip_fx false aux_clusterFire_01 aux_clusterFire_02"
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Linear 0.281868 0 Linear 0.392567 1 Flat 3.9128 1 Flat 4.3722 0 Flat 5 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"name": "resume_PARTICLE_CTRL",
+						"curve": "6 0 0 Linear 0.31231 0 Linear 0.31231 1 Linear 4.27257 1 Linear 4.27257 0 Linear 5 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"name": "Cannonphase",
+						"apply_on_children": true,
+						"curve": "5 0 1 Linear 0.218216 1 Linear 0.298472 0 Smooth 1.7514 1 Flat 5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.75,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Linear 0.273669 0 Linear 0.387827 1 Flat 3.0363 1 Flat 3.26047 0 Flat 3.75 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.75,
+						"name": "resume_PARTICLE_CTRL",
+						"curve": "6 0 0 Linear 0.234233 0 Linear 0.234233 1 Linear 3.20443 1 Linear 3.20443 0 Linear 3.75 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.75,
+						"name": "Cannonphase",
+						"apply_on_children": true,
+						"curve": "5 0 1 Linear 0.24461 1 Linear 0.292349 0 Smooth 1.12882 1 Flat 3.75 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.75,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Linear 0.269186 0 Linear 0.365079 1 Flat 2.15204 1 Flat 2.40471 0 Flat 2.75 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.75,
+						"name": "resume_PARTICLE_CTRL",
+						"curve": "6 0 0 Linear 0.217434 0 Linear 0.217434 1 Linear 2.34991 1 Linear 2.34991 0 Linear 2.75 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.75,
+						"name": "Cannonphase",
+						"apply_on_children": true,
+						"curve": "5 0 1 Linear 0.21439 1 Linear 0.273752 0 Smooth 1.03024 1 Flat 2.75 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Linear 0.281311 0 Linear 0.351041 1 Flat 1.87607 1 Flat 2.06848 0 Flat 2.333 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "resume_PARTICLE_CTRL",
+						"curve": "6 0 -1.78814e-07 Linear 0.225785 -1.78814e-07 Linear 0.225785 1 Linear 1.96388 1 Linear 1.99358 -1.78814e-07 Linear 2.333 -1.78814e-07 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "Cannonphase",
+						"apply_on_children": true,
+						"curve": "5 0 1 Linear 0.247737 1 Linear 0.304554 0 Smooth 0.982489 1 Flat 2.333 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "surgeTime_R",
+						"curve": "5 0 0 Linear 0.484364 1 Flat 4.74517 1 Flat 5.22671 1 Flat 6 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "resume_PARTICLE_CTRL",
+						"curve": "2 0 1 Linear 6 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "particlePhase_Override_01",
+						"apply_on_children": true,
+						"curve": "3 0 0.5 Linear 0.3 1 Flat 6 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "Cannonphase",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 6 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 1.68656 1 Flat 4.74517 1 Flat 5.22671 1 Flat 6 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.75,
+						"name": "resume_PARTICLE_CTRL",
+						"apply_on_children": true,
+						"curve": "4 0 1 Smooth 0.101643 1 Linear 0.101643 0 Linear 0.75 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.75,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 0.362754 0 Linear 0.75 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.75,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 1 Linear 0.138173 1 Flat 0.181761 0 Flat 0.75 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.75,
+						"name": "particlePhase_Override_01",
+						"apply_on_children": true,
+						"curve": "2 0 0 Smooth 0.75 0.5 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.75,
+						"name": "Cannonphase",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.592731 0 Flat 0.75 1.5 Smooth"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "CannonFase",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "particlePhase_Override_01",
+						"apply_on_children": true,
+						"curve": "2 0 0.5 Linear 1 0.5 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "Cannonphase",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "surgeTime_R",
+						"curve": "4 0 0 Linear 0.0492196 0 Linear 0.307979 1 Flat 0.5 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "resume_PARTICLE_CTRL",
+						"curve": "2 0 1 Linear 0.5 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.5 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "particlePhase_Override_01",
+						"apply_on_children": true,
+						"curve": "2 0 0.5 Linear 0.5 1 Smooth"
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.21199244260787965,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/fx/ghostflame_ballista_cannonflame.pet",
+						"bone_group": "grp_segment_shaft"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3265524208545685,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/projectile/fx/ghostflame_power_muzzle_fire.pet",
+						"bone_group": "caanon_tip_fx"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.245689257979393,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/fx/ghostflame_ballista_cannonflame.pet",
+						"bone_group": "grp_segment_shaft"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2802886962890625,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/projectile/fx/ghostflame_power_muzzle_fire.pet",
+						"bone_group": "caanon_tip_fx"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.23851734399795533,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/fx/ghostflame_ballista_cannonflame.pet",
+						"bone_group": "grp_segment_shaft"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2907155156135559,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/projectile/fx/ghostflame_power_muzzle_fire.pet",
+						"bone_group": "caanon_tip_fx"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.24907217919826508,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/fx/ghostflame_ballista_cannonflame.pet",
+						"bone_group": "grp_segment_shaft"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.284071147441864,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/projectile/fx/ghostflame_power_muzzle_fire.pet",
+						"bone_group": "caanon_tip_fx"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/crossbow_ballistas/pet/emerge_dust.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.18107610940933228,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/fx/ghostflame_ballista_emerge.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.1466812640428543,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/fx/ghostflame_ballista_emerge.pet",
+						"bone_group": "root"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/epk/ghostflame_ballista_pass.epk",
+						"remove_on_animation_end": false
+					}
+				]
+			}
+		]'
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Release",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42500001192092898,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Draw",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.665999889373779,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Latch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Release",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3187500238418579,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Draw",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.499499797821045,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Latch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Release",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23375001549720765,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Draw",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5662999153137209,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Latch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Release",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19830501079559327,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Draw",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1771554946899416,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Latch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Death",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Flinch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Flinch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Flinch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Flinch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Submerge",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "ripwire_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.2263154685497284,
+						"filename": "Metadata/Effects/Spells/crossbow_ripwire_ballista/OnACTs/clusterFire.ao",
+						"animation": "clusterFire_01",
+						"from": {
+							"parent_bone": "aux_clusterFire_01"
+						},
+						"speed": 1.0,
+						"offset": {
+							"rotation": [
+								0.0,
+								-1.5707999467849732,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "ripwire_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.2532559037208557,
+						"filename": "Metadata/Effects/Spells/crossbow_ripwire_ballista/OnACTs/clusterFire.ao",
+						"animation": "clusterFire_01",
+						"from": {
+							"parent_bone": "aux_clusterFire_01"
+						},
+						"speed": 1.0,
+						"offset": {
+							"rotation": [
+								0.0,
+								-1.5707999467849732,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "ripwire_03",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.25072357058525088,
+						"filename": "Metadata/Effects/Spells/crossbow_ripwire_ballista/OnACTs/clusterFire.ao",
+						"animation": "clusterFire_01",
+						"from": {
+							"parent_bone": "aux_clusterFire_01"
+						},
+						"speed": 1.0,
+						"offset": {
+							"rotation": [
+								0.0,
+								-1.5707999467849732,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "ripwire_04",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.25659647583961489,
+						"filename": "Metadata/Effects/Spells/crossbow_ripwire_ballista/OnACTs/clusterFire.ao",
+						"animation": "clusterFire_01",
+						"from": {
+							"parent_bone": "aux_clusterFire_01"
+						},
+						"speed": 1.0,
+						"offset": {
+							"rotation": [
+								0.0,
+								-1.5707999467849732,
+								0.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+
+	AnimatedRender
+	{
+		RenderPasses = 
+	'{
+	    "passes": [
+	        {
+	            "is_main": true,
+	            "type": "StandAlone",
+	            "filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/mat/ghostflame_ballista_pass.mat"
+	        }
+	    ]
+	}'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista_base.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/totems/Ballistas/Base/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista_arms_01.ao"
+		attached_object_translation = "46.85 -36.2 -5"
+		attached_object_rotation = "0.03491 -0.2094 -2.042"
+		attached_object_scale = "0.5 0.5 0.5"
+	attached_object = "<root> Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista_arms_01.ao"
+		attached_object_translation = "-40 50.45 -5.25"
+		attached_object_rotation = "0 -0 0.6458"
+		attached_object_scale = "0.5 0.5 0.5"
+	attached_object = "<root> Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista_arms_02.ao"
+		attached_object_translation = "39.2 20.65 0"
+		attached_object_rotation = "-0.4712 0.3665 -1.676"
+		attached_object_scale = "0.6 0.6 0.6"
+	attached_object = "<root> Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista_arms_02.ao"
+		attached_object_translation = "-55.9 -25.8 0"
+		attached_object_rotation = "0 -0.192 1.798"
+		attached_object_scale = "0.6 0.6 0.6"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/totems/Ballistas/Base/rig.ast"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/Effects/totems/Ballistas/Base/Base.sm"
+	}
+
+	TimelineParameters
+	{
+	}
+
+	EffectPack
+	{
+	}
+
+	AnimatedRender
+	{
+		RenderPasses = 
+	'{
+	    "passes": [
+	        {
+	            "is_main": true,
+	            "type": "StandAlone",
+	            "filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/mat/ghostflame_ballista_base_pass.mat",
+	            "apply_on_children": false
+	        }
+	    ]
+	}'
+	}
+}
+
+=== .ao Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista_muzzle.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "fire_01"
+	view_of = "animationPreSet"
+		view_name = "idle_01"
+		view_looping = true
+	view_of = "animationPreSet"
+		view_name = "start_01"
+		view_end = 500
+	view_of = "animationPreSet"
+		view_name = "end_01"
+		view_end = 500
+	group = "start_01_grp"
+		group_play_in_sequence = true
+		group_entry = "start_01 1"
+		group_entry = "idle_01 1"
+	default_animation = "start_01_grp"
+}
+
+BaseAnimationEvents
+{
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista_cannon.ao"
+		attached_object_translation = "0 45 0"
+}
+
+client
+{
+
+	Functions
+	{
+		OnAmmoConsumed =
+		{
+			//Log( '--> ammo consumed: {consumed_amount} : {remaining_amount}' );
+			PlayAnimation( 'fire_01' );
+		}
+
+		Remove =
+		{
+			//Log('--> Remove {this.parent_ao}' );
+			this.parent_ao.RemoveAttached( this, 'end_01' );
+		}
+	}
+
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+		socket = "aux_attach"
+		socket = "aux_attach_02"
+			translation = "0 -120.778 0"
+	}
+
+	BoneGroups
+	{
+		bone_group = "FX_point false root"
+		bone_group = "cannon_fx false aux_attach aux_attach_02"
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "fire_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "particlePhase_Override_01",
+						"apply_on_children": true,
+						"curve": "2 0 0.5 Linear 1 0.5 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "CannonFase",
+						"apply_on_children": true,
+						"curve": "4 0 1 Smooth 0.0397686 2 Linear 0.174268 1.23718 Smooth 1 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "particlePhase_Override_01",
+						"apply_on_children": true,
+						"curve": "2 0 0.5 Linear 1 0.5 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "CannonFase",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "particlePhase_Override_01",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.5 0.5 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CannonFase",
+						"apply_on_children": true,
+						"curve": "2 0 3 Linear 0.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "particlePhase_Override_01",
+						"apply_on_children": true,
+						"curve": "2 0 0.7 Linear 0.5 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CannonFase",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 0.5 1.5 Linear"
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "fire_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/projectile/fx/ghostflame_power_muzzle_fire.pet",
+						"bone_group": "cannon_fx"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista_arms_01.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Terrain/Leagues/Breach/HandPortal/attachments/GraspingArms/rig.amd"
+	view_of = "idle_01"
+		view_name = "end_01"
+		view_end = 1500
+		view_blend_in_time = 500
+	default_animation = "idle_01"
+	randomise_start_position = true
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Terrain/Leagues/Breach/HandPortal/attachments/GraspingArms/rig.ast"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/Terrain/Leagues/Breach/HandPortal/attachments/GraspingArms/GraspingArms.sm"
+			arms_meshShape = "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/mat/ghostflame_ballista_base_hands_pass.mat:0"
+	}
+
+	AnimatedRender
+	{
+		scale = 1.350000
+	}
+
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "GEALEventType",
+						"time": 0.0,
+						"geal": "SetCurrentAnimationSpeed(Random(0.6,1.5));"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista_arms_02.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Terrain/Leagues/Breach/HandPortal/attachments/GraspingArms/rig.amd"
+	view_of = "idle_01"
+		view_name = "end_01"
+		view_end = 1500
+		view_blend_in_time = 500
+	default_animation = "idle_01"
+	randomise_start_position = true
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Terrain/Leagues/Breach/HandPortal/attachments/GraspingArms/rig.ast"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/Terrain/Leagues/Breach/HandPortal/attachments/GraspingArms/GraspingArms.sm"
+			arms_meshShape = "Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/mat/ghostflame_ballista_base_hands_pass.mat:0"
+	}
+
+	AnimatedRender
+	{
+		scale = 0.900000
+	}
+
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "GEALEventType",
+						"time": 0.0,
+						"geal": "SetCurrentAnimationSpeed(Random(0.6,1.5));"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/ghostflame_ballista_cannon.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+		socket = "aux_line_01"
+			translation = "0 0 -100"
+	}
+
+	BoneGroups
+	{
+		bone_group = "FX_line false root aux_line_01"
+	}
+
+	ParticleEffects
+	{
+		continuous_effect = "FX_line Metadata/Effects/Microtransactions/Spells/Mercenary/Ghostflame/ballista/fx/ghostflame_ballista_cannon.pet"
+	}
+
+	TimelineParameters
+	{
+	}
+}
+
+=== .sm Art/Models/Effects/totems/Ballistas/UpwardBallista/UpwardBallista.sm
+version 6
+SkinnedMeshData "Art/Models/Effects/totems/Ballistas/UpwardBallista/rig_49bc87ae.smd"
+Materials 1
+	"Art/Models/Effects/totems/Ballistas/Textures/BallistaTotemsc.mat" 27
+BoundingBox -102.616 -72.3345 -162.317 102.62 72.3345 -9.1603
+BoneGroups 0
+
+=== .smd Art/Models/Effects/totems/Ballistas/UpwardBallista/rig_49bc87ae.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 27 in the header, 27 in the block · 15652 triangles over 15446 vertices
+  names: 770 bytes said, 770 read  [agree]
+
+=== shapes (27)
+0	bow_shard1_tiesShape	from 0	count 2688
+1	bow_shard2_tiesShape	from 2688	count 7296
+2	bow_shard3_tiesShape	from 9984	count 8640
+3	bow_shard3Shape	from 18624	count 2484
+4	bow_shardShape1	from 21108	count 1032
+5	bow_shardShape2	from 22140	count 2100
+6	bowstringShape	from 24240	count 1824
+7	clawShape	from 26064	count 252
+8	gearShape	from 26316	count 4164
+9	L_braceShape1	from 30480	count 336
+10	L_gearShape	from 30816	count 1128
+11	L_standShape1	from 31944	count 1848
+12	L_standShape2	from 33792	count 168
+13	M_brace1Shape	from 33960	count 720
+14	M_braceShape2	from 34680	count 480
+15	M_braceShape3	from 35160	count 480
+16	main_gearShape1	from 35640	count 672
+17	main_gearShape2	from 36312	count 1320
+18	mainShape	from 37632	count 2916
+19	platform_shardShape1	from 40548	count 840
+20	platform_shardShape2	from 41388	count 252
+21	platform_shardShape3	from 41640	count 888
+22	R_braceShape1	from 42528	count 336
+23	R_gearShape	from 42864	count 1128
+24	R_standShape1	from 43992	count 1848
+25	R_standShape2	from 45840	count 168
+26	winchShape	from 46008	count 948
+
+=== fitting
+the monster's rig: 49 bones
+mounts: (none named aux_)
+  ghostflame_ballista_base.ao  socket lock:root_jntBnd [NOT in its carrier's rig]  box (-83.9,-83.9,-11.7)..(83.9,83.9,0)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 424 triangles over 399 vertices
+    names: 18 bytes said, 18 read  [agree]
+    rig 1 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 1  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+    ghostflame_ballista_arms_01.ao  socket <root> [NOT in its carrier's rig]  attached_object_translation = "46.85 -36.2 -5"  attached_object_rotation = "0.03491 -0.2094 -2.042"  attached_object_scale = "0.5 0.5 0.5"  box (-29.1,-56.3,-8.1)..(29.1,2.8,41.5)
+      version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+      shapes 1 in the header, 1 in the block · 2908 triangles over 1944 vertices
+      names: 28 bytes said, 28 read  [agree]
+      rig 50 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 49 of 50  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 tail_jntBnd_2  [its own]  under 0  rests at (-0,0,0)
+        2 L_clavicle_jntBnd_01  [its own]  under 1  rests at (3.3,1.6,-1.3)
+        3 R_clavicle_jntBnd_01  [its own]  under 1  rests at (-3.3,1.6,-1.3)
+        4 L_shoulder_jntBnd_01  [its own]  under 2  rests at (12.7,-4.5,1)
+        5 R_shoulder_jntBnd_01  [its own]  under 3  rests at (-12.7,-4.5,1)
+        6 L_elbow_jntBnd_01  [its own]  under 4  rests at (20.8,-14.1,16.2)
+        7 L_shoulder_cTwist_jntBnd_01_1  [its own]  under 4  rests at (16.7,-9.3,8.6)
+        8 R_elbow_jntBnd_01  [its own]  under 5  rests at (-20.8,-14.1,16.2)
+        9 R_shoulder_cTwist_jntBnd_01_1  [its own]  under 5  rests at (-16.7,-9.3,8.6)
+        10 L_wrist_jntBnd_01  [its own]  under 6  rests at (25.4,-35.5,28.5)
+        11 L_elbow_Twist_jntBnd_01_1  [its own]  under 6  rests at (21.9,-19.5,19.3)
+        12 L_elbow_Twist_jntBnd_01_2  [its own]  under 6  rests at (23.1,-24.8,22.4)
+        13 L_elbow_Twist_jntBnd_01_3  [its own]  under 6  rests at (24.2,-30.1,25.4)
+        14 R_wrist_jntBnd_01  [its own]  under 8  rests at (-25.4,-35.5,28.5)
+        15 R_elbow_Twist_jntBnd_01_1  [its own]  under 8  rests at (-21.9,-19.5,19.3)
+        16 R_elbow_Twist_jntBnd_01_2  [its own]  under 8  rests at (-23.1,-24.8,22.4)
+        17 R_elbow_Twist_jntBnd_01_3  [its own]  under 8  rests at (-24.2,-30.1,25.4)
+        18 L_finger_1_jntBnd_01_1  [its own]  under 10  rests at (25.1,-46.4,31.5)
+        19 L_finger_2_jntBnd_01_1  [its own]  under 10  rests at (26.6,-45.6,33)
+        20 L_finger_3_jntBnd_01_1  [its own]  under 10  rests at (27.7,-44,34.5)
+        21 L_finger_4_jntBnd_01_1  [its own]  under 10  rests at (27.4,-42.4,35.6)
+        22 L_thumb_1_jntBnd_01_1  [its own]  under 10  rests at (23.5,-40,30.1)
+        23 L_Weapon_01  [its own]  under 10  rests at (25.2,-42,33.4)
+        24 R_finger_1_jntBnd_01_1  [its own]  under 14  rests at (-25.1,-46.4,31.5)
+        25 R_finger_2_jntBnd_01_1  [its own]  under 14  rests at (-26.6,-45.6,33)
+        26 R_finger_3_jntBnd_01_1  [its own]  under 14  rests at (-27.7,-44,34.5)
+        27 R_finger_4_jntBnd_01_1  [its own]  under 14  rests at (-27.4,-42.4,35.6)
+        28 R_thumb_1_jntBnd_01_1  [its own]  under 14  rests at (-23.5,-40,30.1)
+        29 R_Weapon_01  [its own]  under 14  rests at (-25.2,-42,33.4)
+        30 L_finger_1_jntBnd_01_2  [its own]  under 18  rests at (25.3,-49.5,32.4)
+        31 L_finger_2_jntBnd_01_2  [its own]  under 19  rests at (26.9,-49.6,35.1)
+        32 L_finger_3_jntBnd_01_2  [its own]  under 20  rests at (27.8,-46.9,36.5)
+        33 L_finger_4_jntBnd_01_2  [its own]  under 21  rests at (27.7,-43.7,37.3)
+        34 L_thumb_1_jntBnd_01_2  [its own]  under 22  rests at (22.6,-40.9,28.3)
+        35 R_finger_1_jntBnd_01_2  [its own]  under 24  rests at (-25.3,-49.5,32.4)
+        36 R_finger_2_jntBnd_01_2  [its own]  under 25  rests at (-26.9,-49.6,35.1)
+        37 R_finger_3_jntBnd_01_2  [its own]  under 26  rests at (-27.8,-46.9,36.5)
+        38 R_finger_4_jntBnd_01_2  [its own]  under 27  rests at (-27.7,-43.7,37.3)
+        39 R_thumb_1_jntBnd_01_2  [its own]  under 28  rests at (-22.6,-40.9,28.3)
+        40 L_finger_1_jntBnd_01_3  [its own]  under 30  rests at (25,-51.6,33.3)
+        41 L_finger_2_jntBnd_01_3  [its own]  under 31  rests at (26.8,-51.7,36.4)
+        42 L_finger_3_jntBnd_01_3  [its own]  under 32  rests at (27.7,-48.9,38)
+        43 L_finger_4_jntBnd_01_3  [its own]  under 33  rests at (27.9,-44.8,38.6)
+        44 L_thumb_1_jntBnd_01_3  [its own]  under 34  rests at (21.2,-44.6,28.2)
+        45 R_finger_1_jntBnd_01_3  [its own]  under 35  rests at (-25,-51.6,33.3)
+        46 R_finger_2_jntBnd_01_3  [its own]  under 36  rests at (-26.8,-51.7,36.4)
+        47 R_finger_3_jntBnd_01_3  [its own]  under 37  rests at (-27.7,-48.9,38)
+        48 R_finger_4_jntBnd_01_3  [its own]  under 38  rests at (-27.9,-44.8,38.6)
+        49 R_thumb_1_jntBnd_01_3  [its own]  under 39  rests at (-21.2,-44.6,28.2)
+    ghostflame_ballista_arms_01.ao  socket <root> [NOT in its carrier's rig]  attached_object_translation = "-40 50.45 -5.25"  attached_object_rotation = "0 -0 0.6458"  attached_object_scale = "0.5 0.5 0.5"  box (-29.1,-56.3,-8.1)..(29.1,2.8,41.5)
+      version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+      shapes 1 in the header, 1 in the block · 2908 triangles over 1944 vertices
+      names: 28 bytes said, 28 read  [agree]
+      rig 50 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 49 of 50  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 tail_jntBnd_2  [its own]  under 0  rests at (-0,0,0)
+        2 L_clavicle_jntBnd_01  [its own]  under 1  rests at (3.3,1.6,-1.3)
+        3 R_clavicle_jntBnd_01  [its own]  under 1  rests at (-3.3,1.6,-1.3)
+        4 L_shoulder_jntBnd_01  [its own]  under 2  rests at (12.7,-4.5,1)
+        5 R_shoulder_jntBnd_01  [its own]  under 3  rests at (-12.7,-4.5,1)
+        6 L_elbow_jntBnd_01  [its own]  under 4  rests at (20.8,-14.1,16.2)
+        7 L_shoulder_cTwist_jntBnd_01_1  [its own]  under 4  rests at (16.7,-9.3,8.6)
+        8 R_elbow_jntBnd_01  [its own]  under 5  rests at (-20.8,-14.1,16.2)
+        9 R_shoulder_cTwist_jntBnd_01_1  [its own]  under 5  rests at (-16.7,-9.3,8.6)
+        10 L_wrist_jntBnd_01  [its own]  under 6  rests at (25.4,-35.5,28.5)
+        11 L_elbow_Twist_jntBnd_01_1  [its own]  under 6  rests at (21.9,-19.5,19.3)
+        12 L_elbow_Twist_jntBnd_01_2  [its own]  under 6  rests at (23.1,-24.8,22.4)
+        13 L_elbow_Twist_jntBnd_01_3  [its own]  under 6  rests at (24.2,-30.1,25.4)
+        14 R_wrist_jntBnd_01  [its own]  under 8  rests at (-25.4,-35.5,28.5)
+        15 R_elbow_Twist_jntBnd_01_1  [its own]  under 8  rests at (-21.9,-19.5,19.3)
+        16 R_elbow_Twist_jntBnd_01_2  [its own]  under 8  rests at (-23.1,-24.8,22.4)
+        17 R_elbow_Twist_jntBnd_01_3  [its own]  under 8  rests at (-24.2,-30.1,25.4)
+        18 L_finger_1_jntBnd_01_1  [its own]  under 10  rests at (25.1,-46.4,31.5)
+        19 L_finger_2_jntBnd_01_1  [its own]  under 10  rests at (26.6,-45.6,33)
+        20 L_finger_3_jntBnd_01_1  [its own]  under 10  rests at (27.7,-44,34.5)
+        21 L_finger_4_jntBnd_01_1  [its own]  under 10  rests at (27.4,-42.4,35.6)
+        22 L_thumb_1_jntBnd_01_1  [its own]  under 10  rests at (23.5,-40,30.1)
+        23 L_Weapon_01  [its own]  under 10  rests at (25.2,-42,33.4)
+        24 R_finger_1_jntBnd_01_1  [its own]  under 14  rests at (-25.1,-46.4,31.5)
+        25 R_finger_2_jntBnd_01_1  [its own]  under 14  rests at (-26.6,-45.6,33)
+        26 R_finger_3_jntBnd_01_1  [its own]  under 14  rests at (-27.7,-44,34.5)
+        27 R_finger_4_jntBnd_01_1  [its own]  under 14  rests at (-27.4,-42.4,35.6)
+        28 R_thumb_1_jntBnd_01_1  [its own]  under 14  rests at (-23.5,-40,30.1)
+        29 R_Weapon_01  [its own]  under 14  rests at (-25.2,-42,33.4)
+        30 L_finger_1_jntBnd_01_2  [its own]  under 18  rests at (25.3,-49.5,32.4)
+        31 L_finger_2_jntBnd_01_2  [its own]  under 19  rests at (26.9,-49.6,35.1)
+        32 L_finger_3_jntBnd_01_2  [its own]  under 20  rests at (27.8,-46.9,36.5)
+        33 L_finger_4_jntBnd_01_2  [its own]  under 21  rests at (27.7,-43.7,37.3)
+        34 L_thumb_1_jntBnd_01_2  [its own]  under 22  rests at (22.6,-40.9,28.3)
+        35 R_finger_1_jntBnd_01_2  [its own]  under 24  rests at (-25.3,-49.5,32.4)
+        36 R_finger_2_jntBnd_01_2  [its own]  under 25  rests at (-26.9,-49.6,35.1)
+        37 R_finger_3_jntBnd_01_2  [its own]  under 26  rests at (-27.8,-46.9,36.5)
+        38 R_finger_4_jntBnd_01_2  [its own]  under 27  rests at (-27.7,-43.7,37.3)
+        39 R_thumb_1_jntBnd_01_2  [its own]  under 28  rests at (-22.6,-40.9,28.3)
+        40 L_finger_1_jntBnd_01_3  [its own]  under 30  rests at (25,-51.6,33.3)
+        41 L_finger_2_jntBnd_01_3  [its own]  under 31  rests at (26.8,-51.7,36.4)
+        42 L_finger_3_jntBnd_01_3  [its own]  under 32  rests at (27.7,-48.9,38)
+        43 L_finger_4_jntBnd_01_3  [its own]  under 33  rests at (27.9,-44.8,38.6)
+        44 L_thumb_1_jntBnd_01_3  [its own]  under 34  rests at (21.2,-44.6,28.2)
+        45 R_finger_1_jntBnd_01_3  [its own]  under 35  rests at (-25,-51.6,33.3)
+        46 R_finger_2_jntBnd_01_3  [its own]  under 36  rests at (-26.8,-51.7,36.4)
+        47 R_finger_3_jntBnd_01_3  [its own]  under 37  rests at (-27.7,-48.9,38)
+        48 R_finger_4_jntBnd_01_3  [its own]  under 38  rests at (-27.9,-44.8,38.6)
+        49 R_thumb_1_jntBnd_01_3  [its own]  under 39  rests at (-21.2,-44.6,28.2)
+    ghostflame_ballista_arms_02.ao  socket <root> [NOT in its carrier's rig]  attached_object_translation = "39.2 20.65 0"  attached_object_rotation = "-0.4712 0.3665 -1.676"  attached_object_scale = "0.6 0.6 0.6"  box (-29.1,-56.3,-8.1)..(29.1,2.8,41.5)
+      version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+      shapes 1 in the header, 1 in the block · 2908 triangles over 1944 vertices
+      names: 28 bytes said, 28 read  [agree]
+      rig 50 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 49 of 50  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 tail_jntBnd_2  [its own]  under 0  rests at (-0,0,0)
+        2 L_clavicle_jntBnd_01  [its own]  under 1  rests at (3.3,1.6,-1.3)
+        3 R_clavicle_jntBnd_01  [its own]  under 1  rests at (-3.3,1.6,-1.3)
+        4 L_shoulder_jntBnd_01  [its own]  under 2  rests at (12.7,-4.5,1)
+        5 R_shoulder_jntBnd_01  [its own]  under 3  rests at (-12.7,-4.5,1)
+        6 L_elbow_jntBnd_01  [its own]  under 4  rests at (20.8,-14.1,16.2)
+        7 L_shoulder_cTwist_jntBnd_01_1  [its own]  under 4  rests at (16.7,-9.3,8.6)
+        8 R_elbow_jntBnd_01  [its own]  under 5  rests at (-20.8,-14.1,16.2)
+        9 R_shoulder_cTwist_jntBnd_01_1  [its own]  under 5  rests at (-16.7,-9.3,8.6)
+        10 L_wrist_jntBnd_01  [its own]  under 6  rests at (25.4,-35.5,28.5)
+        11 L_elbow_Twist_jntBnd_01_1  [its own]  under 6  rests at (21.9,-19.5,19.3)
+        12 L_elbow_Twist_jntBnd_01_2  [its own]  under 6  rests at (23.1,-24.8,22.4)
+        13 L_elbow_Twist_jntBnd_01_3  [its own]  under 6  rests at (24.2,-30.1,25.4)
+        14 R_wrist_jntBnd_01  [its own]  under 8  rests at (-25.4,-35.5,28.5)
+        15 R_elbow_Twist_jntBnd_01_1  [its own]  under 8  rests at (-21.9,-19.5,19.3)
+        16 R_elbow_Twist_jntBnd_01_2  [its own]  under 8  rests at (-23.1,-24.8,22.4)
+        17 R_elbow_Twist_jntBnd_01_3  [its own]  under 8  rests at (-24.2,-30.1,25.4)
+        18 L_finger_1_jntBnd_01_1  [its own]  under 10  rests at (25.1,-46.4,31.5)
+        19 L_finger_2_jntBnd_01_1  [its own]  under 10  rests at (26.6,-45.6,33)
+        20 L_finger_3_jntBnd_01_1  [its own]  under 10  rests at (27.7,-44,34.5)
+        21 L_finger_4_jntBnd_01_1  [its own]  under 10  rests at (27.4,-42.4,35.6)
+        22 L_thumb_1_jntBnd_01_1  [its own]  under 10  rests at (23.5,-40,30.1)
+        23 L_Weapon_01  [its own]  under 10  rests at (25.2,-42,33.4)
+        24 R_finger_1_jntBnd_01_1  [its own]  under 14  rests at (-25.1,-46.4,31.5)
+        25 R_finger_2_jntBnd_01_1  [its own]  under 14  rests at (-26.6,-45.6,33)
+        26 R_finger_3_jntBnd_01_1  [its own]  under 14  rests at (-27.7,-44,34.5)
+        27 R_finger_4_jntBnd_01_1  [its own]  under 14  rests at (-27.4,-42.4,35.6)
+        28 R_thumb_1_jntBnd_01_1  [its own]  under 14  rests at (-23.5,-40,30.1)
+        29 R_Weapon_01  [its own]  under 14  rests at (-25.2,-42,33.4)
+        30 L_finger_1_jntBnd_01_2  [its own]  under 18  rests at (25.3,-49.5,32.4)
+        31 L_finger_2_jntBnd_01_2  [its own]  under 19  rests at (26.9,-49.6,35.1)
+        32 L_finger_3_jntBnd_01_2  [its own]  under 20  rests at (27.8,-46.9,36.5)
+        33 L_finger_4_jntBnd_01_2  [its own]  under 21  rests at (27.7,-43.7,37.3)
+        34 L_thumb_1_jntBnd_01_2  [its own]  under 22  rests at (22.6,-40.9,28.3)
+        35 R_finger_1_jntBnd_01_2  [its own]  under 24  rests at (-25.3,-49.5,32.4)
+        36 R_finger_2_jntBnd_01_2  [its own]  under 25  rests at (-26.9,-49.6,35.1)
+        37 R_finger_3_jntBnd_01_2  [its own]  under 26  rests at (-27.8,-46.9,36.5)
+        38 R_finger_4_jntBnd_01_2  [its own]  under 27  rests at (-27.7,-43.7,37.3)
+        39 R_thumb_1_jntBnd_01_2  [its own]  under 28  rests at (-22.6,-40.9,28.3)
+        40 L_finger_1_jntBnd_01_3  [its own]  under 30  rests at (25,-51.6,33.3)
+        41 L_finger_2_jntBnd_01_3  [its own]  under 31  rests at (26.8,-51.7,36.4)
+        42 L_finger_3_jntBnd_01_3  [its own]  under 32  rests at (27.7,-48.9,38)
+        43 L_finger_4_jntBnd_01_3  [its own]  under 33  rests at (27.9,-44.8,38.6)
+        44 L_thumb_1_jntBnd_01_3  [its own]  under 34  rests at (21.2,-44.6,28.2)
+        45 R_finger_1_jntBnd_01_3  [its own]  under 35  rests at (-25,-51.6,33.3)
+        46 R_finger_2_jntBnd_01_3  [its own]  under 36  rests at (-26.8,-51.7,36.4)
+        47 R_finger_3_jntBnd_01_3  [its own]  under 37  rests at (-27.7,-48.9,38)
+        48 R_finger_4_jntBnd_01_3  [its own]  under 38  rests at (-27.9,-44.8,38.6)
+        49 R_thumb_1_jntBnd_01_3  [its own]  under 39  rests at (-21.2,-44.6,28.2)
+    ghostflame_ballista_arms_02.ao  socket <root> [NOT in its carrier's rig]  attached_object_translation = "-55.9 -25.8 0"  attached_object_rotation = "0 -0.192 1.798"  attached_object_scale = "0.6 0.6 0.6"  box (-29.1,-56.3,-8.1)..(29.1,2.8,41.5)
+      version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+      shapes 1 in the header, 1 in the block · 2908 triangles over 1944 vertices
+      names: 28 bytes said, 28 read  [agree]
+      rig 50 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 49 of 50  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 tail_jntBnd_2  [its own]  under 0  rests at (-0,0,0)
+        2 L_clavicle_jntBnd_01  [its own]  under 1  rests at (3.3,1.6,-1.3)
+        3 R_clavicle_jntBnd_01  [its own]  under 1  rests at (-3.3,1.6,-1.3)
+        4 L_shoulder_jntBnd_01  [its own]  under 2  rests at (12.7,-4.5,1)
+        5 R_shoulder_jntBnd_01  [its own]  under 3  rests at (-12.7,-4.5,1)
+        6 L_elbow_jntBnd_01  [its own]  under 4  rests at (20.8,-14.1,16.2)
+        7 L_shoulder_cTwist_jntBnd_01_1  [its own]  under 4  rests at (16.7,-9.3,8.6)
+        8 R_elbow_jntBnd_01  [its own]  under 5  rests at (-20.8,-14.1,16.2)
+        9 R_shoulder_cTwist_jntBnd_01_1  [its own]  under 5  rests at (-16.7,-9.3,8.6)
+        10 L_wrist_jntBnd_01  [its own]  under 6  rests at (25.4,-35.5,28.5)
+        11 L_elbow_Twist_jntBnd_01_1  [its own]  under 6  rests at (21.9,-19.5,19.3)
+        12 L_elbow_Twist_jntBnd_01_2  [its own]  under 6  rests at (23.1,-24.8,22.4)
+        13 L_elbow_Twist_jntBnd_01_3  [its own]  under 6  rests at (24.2,-30.1,25.4)
+        14 R_wrist_jntBnd_01  [its own]  under 8  rests at (-25.4,-35.5,28.5)
+        15 R_elbow_Twist_jntBnd_01_1  [its own]  under 8  rests at (-21.9,-19.5,19.3)
+        16 R_elbow_Twist_jntBnd_01_2  [its own]  under 8  rests at (-23.1,-24.8,22.4)
+        17 R_elbow_Twist_jntBnd_01_3  [its own]  under 8  rests at (-24.2,-30.1,25.4)
+        18 L_finger_1_jntBnd_01_1  [its own]  under 10  rests at (25.1,-46.4,31.5)
+        19 L_finger_2_jntBnd_01_1  [its own]  under 10  rests at (26.6,-45.6,33)
+        20 L_finger_3_jntBnd_01_1  [its own]  under 10  rests at (27.7,-44,34.5)
+        21 L_finger_4_jntBnd_01_1  [its own]  under 10  rests at (27.4,-42.4,35.6)
+        22 L_thumb_1_jntBnd_01_1  [its own]  under 10  rests at (23.5,-40,30.1)
+        23 L_Weapon_01  [its own]  under 10  rests at (25.2,-42,33.4)
+        24 R_finger_1_jntBnd_01_1  [its own]  under 14  rests at (-25.1,-46.4,31.5)
+        25 R_finger_2_jntBnd_01_1  [its own]  under 14  rests at (-26.6,-45.6,33)
+        26 R_finger_3_jntBnd_01_1  [its own]  under 14  rests at (-27.7,-44,34.5)
+        27 R_finger_4_jntBnd_01_1  [its own]  under 14  rests at (-27.4,-42.4,35.6)
+        28 R_thumb_1_jntBnd_01_1  [its own]  under 14  rests at (-23.5,-40,30.1)
+        29 R_Weapon_01  [its own]  under 14  rests at (-25.2,-42,33.4)
+        30 L_finger_1_jntBnd_01_2  [its own]  under 18  rests at (25.3,-49.5,32.4)
+        31 L_finger_2_jntBnd_01_2  [its own]  under 19  rests at (26.9,-49.6,35.1)
+        32 L_finger_3_jntBnd_01_2  [its own]  under 20  rests at (27.8,-46.9,36.5)
+        33 L_finger_4_jntBnd_01_2  [its own]  under 21  rests at (27.7,-43.7,37.3)
+        34 L_thumb_1_jntBnd_01_2  [its own]  under 22  rests at (22.6,-40.9,28.3)
+        35 R_finger_1_jntBnd_01_2  [its own]  under 24  rests at (-25.3,-49.5,32.4)
+        36 R_finger_2_jntBnd_01_2  [its own]  under 25  rests at (-26.9,-49.6,35.1)
+        37 R_finger_3_jntBnd_01_2  [its own]  under 26  rests at (-27.8,-46.9,36.5)
+        38 R_finger_4_jntBnd_01_2  [its own]  under 27  rests at (-27.7,-43.7,37.3)
+        39 R_thumb_1_jntBnd_01_2  [its own]  under 28  rests at (-22.6,-40.9,28.3)
+        40 L_finger_1_jntBnd_01_3  [its own]  under 30  rests at (25,-51.6,33.3)
+        41 L_finger_2_jntBnd_01_3  [its own]  under 31  rests at (26.8,-51.7,36.4)
+        42 L_finger_3_jntBnd_01_3  [its own]  under 32  rests at (27.7,-48.9,38)
+        43 L_finger_4_jntBnd_01_3  [its own]  under 33  rests at (27.9,-44.8,38.6)
+        44 L_thumb_1_jntBnd_01_3  [its own]  under 34  rests at (21.2,-44.6,28.2)
+        45 R_finger_1_jntBnd_01_3  [its own]  under 35  rests at (-25,-51.6,33.3)
+        46 R_finger_2_jntBnd_01_3  [its own]  under 36  rests at (-26.8,-51.7,36.4)
+        47 R_finger_3_jntBnd_01_3  [its own]  under 37  rests at (-27.7,-48.9,38)
+        48 R_finger_4_jntBnd_01_3  [its own]  under 38  rests at (-27.9,-44.8,38.6)
+        49 R_thumb_1_jntBnd_01_3  [its own]  under 39  rests at (-21.2,-44.6,28.2)
+  ghostflame_ballista_muzzle.ao  socket bow_shard1_jntBnd [in its carrier's rig]  (no mesh - an effect or a sound)
+    ghostflame_ballista_cannon.ao  socket <root> [NOT in its carrier's rig]  attached_object_translation = "0 45 0"  (no mesh - an effect or a sound)

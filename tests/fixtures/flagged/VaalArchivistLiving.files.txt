@@ -1,0 +1,718 @@
+monster: Vaal Researcher [Metadata/Monsters/VaalMonsters/Living/VaalArchivistLiving]
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/VaalArchivistTemp.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/VaalArchivist/Animations/rig.amd"
+	animations = '[
+		{
+			"name": "spell_projectile_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.1573899984359742,
+					"name": "contact",
+					"position": [
+						-12.740799903869629,
+						-91.1427001953125,
+						-157.7830047607422
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_rune_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8011599779129028,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "spell_shield_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.001520037651062,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "spell_summon_far_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0133600234985352,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "spell_summon_near_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8267419934272766,
+					"name": "contact",
+					"position": [
+						-100.0,
+						0.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0646100044250489,
+					"name": "contact",
+					"position": [
+						100.0,
+						0.0,
+						0.0
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03CapeLow.ao"
+	attached_object = "Head_Attachment Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03LivingHeaddressLow.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03LivingRobeLow.ao"
+	attached_object = "<root> Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03MaskLiving.ao"
+	attached_object = "L_Weapon Metadata/Monsters/VaalArchivist/attachments/VaalArchivistWeapon.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/VaalArchivist/Animations/rig.ast"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -5.9192"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -10.6918 -4.11053"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/VaalGuard03Low.sm"
+			belt_plate_meshShape = "Art/Models/MONSTERS/VaalMonsters/Textures/VaalGuard03Livingc.mat:0"
+			sash_meshShape = "Art/Models/MONSTERS/VaalMonsters/Textures/VaalGuard03Livingc.mat:0"
+			body_meshShape = "Art/Models/MONSTERS/VaalMonsters/Textures/VaalGuard03Livingc.mat:0"
+			chest_clamps_meshShape = "Art/Models/MONSTERS/VaalMonsters/Textures/VaalGuard03Livingc.mat:0"
+			headdress_meshShape = "Art/Models/MONSTERS/VaalMonsters/Textures/VaalGuard03Livingc.mat:0"
+			necklace_meshShape = "Art/Models/MONSTERS/VaalMonsters/Textures/VaalGuard03Livingc.mat:0"
+			shouldepad_meshShape = "Art/Models/MONSTERS/VaalMonsters/Textures/VaalGuard03Livingc.mat:0"
+			skirt_plates_meshShape = "Art/Models/MONSTERS/VaalMonsters/Textures/VaalGuard03Livingc.mat:0"
+			underwear_meshShape = "Art/Models/MONSTERS/VaalMonsters/Textures/VaalGuard03Livingc.mat:0"
+			hide_segments = "belt_plate_meshShape,skirt_plates_meshShape,underwear_meshShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder false L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder false R_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow false L_elbow_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_elbow false R_elbow_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_wrist false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_wrist false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_hand false L_finger_2_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "grp_R_hand false R_finger_2_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_L_knee false L_knee_jntBnd L_thigh_jntBnd"
+		bone_group = "grp_R_knee false R_knee_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "parent_attach false chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 R_clavicle_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 neck_jntBnd head_jntBnd"
+		bone_group = "root false hip_jntBnd chest_jntBnd neck_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "L_arm_FX false L_shoulder_jntBnd L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "R_arm_FX false R_shoulder_jntBnd R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "L_leg_FX false L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd"
+		bone_group = "R_leg_FX false R_thigh_jntBnd R_knee_jntBnd R_ankle_jntBnd"
+		bone_group = "aux_parasite false L_knee_jntBnd R_knee_jntBnd R_thigh_jntBnd R_elbow_jntBnd L_elbow_jntBnd R_shoulder_jntBnd L_shoulder_jntBnd"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "alert_transition_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08402950316667557,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act3/VaalArchivist/Dialogue_AlertedLine_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/AlertedSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"chance": 0.5
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.010917900130152703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08544500172138214,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3645640015602112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0002457000082358718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0002457000082358718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_trolley_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.026732200756669046,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8231949806213379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.023587200790643693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8672249913215637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06602050364017487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41262900829315188,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/SpellProjA"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9059479832649231,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Unarmed",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9600480198860169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.991225004196167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/SpellProjB"
+					}
+				]
+			},
+			{
+				"name": "spell_rune_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.43830299377441409,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/SpellRune",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5079920291900635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7748249769210815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Unarmed",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spell_shield_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.031176399439573289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38878801465034487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/SpellShield",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8160889744758606,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9334610104560852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Unarmed",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "spell_summon_far_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5012289881706238,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act3/VaalArchivist/Dialogue_SerpentSummonLine_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/SpellSummonSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"chance": 0.5
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9090909957885742,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Unarmed"
+					}
+				]
+			},
+			{
+				"name": "spell_summon_near_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3076159954071045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4461919963359833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/SpellSummon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.74201500415802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Unarmed",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1911499500274659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2098300457000733,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalArchivist/Foley/Unarmed",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					}
+				]
+			}
+		]'
+	}
+	
+	DecalEvents
+	{
+	}
+	
+	AnimatedRender
+	{
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03CapeLow.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Cape/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Cape/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_radius = 2.000
+		enclosure_angle = 0.100
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Cape/UpdatedVaalGuard03LivingCape.sm"
+	}
+	
+	BoneGroups
+	{
+	    bone_group = "child_attach false hip_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03LivingHeaddressLow.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Headdress/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Headdress/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		enclosure_angle = 0.100
+		animation_force_factor = 1.000
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Headdress/UpdatedVaalGuard03LivingHeaddressLow.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03LivingRobeLow.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Skirt/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_radius = 2.000
+		enclosure_angle = 0.100
+		attachment_bones = "hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Skirt/UpdatedVaalGuard03LivingSkirtLow.sm"
+	}
+	
+	BoneGroups
+	{
+	    bone_group = "child_attach false hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03MaskLiving.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Mask/VaalGuard03MaskLiving.sm"
+	}
+	
+}
+
+=== .ao Metadata/Monsters/VaalArchivist/attachments/VaalArchivistWeapon.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/VaalArchivist/Attachments/VaalArchivistWeapon/VaalArchivistWeapon.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/VaalArchivist/Attachments/VaalArchivistWeapon/VaalArchivistWeapon.ast"
+	}
+	
+	AnimatedRender
+	{
+		outline_no_alphatest = false
+		cannot_be_disabled = false
+		outline_zprepass = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/VaalArchivist/Attachments/VaalArchivistWeapon/VaalArchivistWeapon.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Skin.ao (depth 2)
+version 3
+extends "nothing"
+
+BaseAnimationEvents { }
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	SkinMesh { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/VaalGuard03Low.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/VaalGuard03Low_armour_3637d6ce.smd"
+Materials 2
+	"Art/Models/MONSTERS/VaalMonsters/VaalGuardsLow/Textures/VaalGuard03c.mat" 2
+	"Art/Models/MONSTERS/VaalMonsters/VaalGuardsLow/Textures/VaalGuard03c.mat" 7
+BoundingBox -69.2383 -18.627 -192.359 69.2384 20.5893 0.360961
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/VaalGuard03Low_armour_3637d6ce.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 9 in the header, 9 in the block · 2778 triangles over 2354 vertices
+  names: 336 bytes said, 336 read  [agree]
+
+=== shapes (22)
+0	belt_plate_meshShape	from 0	count 48
+1	sash_meshShape	from 48	count 168
+2	body_meshShape	from 216	count 4200
+3	chest_clamps_meshShape	from 4416	count 48
+4	headdress_meshShape	from 4464	count 2466
+5	necklace_meshShape	from 6930	count 120
+6	shouldepad_meshShape	from 7050	count 528
+7	skirt_plates_meshShape	from 7578	count 216
+8	underwear_meshShape	from 7794	count 540
+9	capeShape	from 8334	count 600
+10	skull1Shape	from 8934	count 1410
+11	skull2Shape	from 10344	count 2310
+12	skull3Shape	from 12654	count 1404
+13	skull4Shape	from 14058	count 2280
+14	skull5Shape	from 16338	count 2226
+15	skull6Shape	from 18564	count 876
+16	skull7Shape	from 19440	count 2046
+17	skull8Shape	from 21486	count 2136
+18	belt_plate_meshShape	from 23622	count 1776
+19	skirt_platesShape	from 25398	count 6012
+20	skirtShape	from 31410	count 1050
+21	Headress01Shape	from 32460	count 576
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  VaalGuard03CapeLow.ao  socket chest_jntBnd [in its carrier's rig]  box (-23.9,8.1,-20.9)..(25.6,42.9,64)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 9 in the header, 9 in the block · 5096 triangles over 5246 vertices
+    names: 194 bytes said, 194 read  [agree]
+    rig 21 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 20 of 21  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_cape_L01_jntBnd  [its own]  under 0  rests at (10.9,13.9,-9.6)
+      2 phys_tri_cape_R01_jntBnd  [its own]  under 0  rests at (-10.9,13.9,-9.6)
+      3 phys_skull_01_jntBnd  [its own]  under 0  rests at (10.9,13.9,-16.7)
+      4 phys_skull_02_jntBnd  [its own]  under 0  rests at (-10.9,13.9,-2.5)
+      5 phys_skull_03_jntBnd  [its own]  under 0  rests at (0,18.1,5.7)
+      6 phys_skull_04_jntBnd  [its own]  under 0  rests at (15.5,12.1,11.7)
+      7 phys_skull_05_jntBnd  [its own]  under 0  rests at (10.9,13.9,24.5)
+      8 phys_skull_06_jntBnd  [its own]  under 0  rests at (-7.9,15.1,21.1)
+      9 phys_skull_07_jntBnd  [its own]  under 0  rests at (0,18.1,51.1)
+      10 spine_2_jntBnd  [shared]  under 0  rests at (0,-0.4,11.7)  carrier has (0,-0.7,-115.5)
+      11 phys_tri_cape_L02_jntBnd  [its own]  under 1  rests at (10.9,13.9,4.6)
+      12 phys_tri_cape_R02_jntBnd  [its own]  under 2  rests at (-10.9,13.9,4.6)
+      13 spine_1_jntBnd  [shared]  under 10  rests at (0,0.3,21.9)  carrier has (0,0,-105.4)
+      14 phys_tri_cape_L03_jntBnd  [its own]  under 11  rests at (10.9,13.9,18.1)
+      15 phys_tri_cape_R03_jntBnd  [its own]  under 12  rests at (-10.9,13.9,18.1)
+      16 hip_jntBnd  [shared]  under 13  rests at (0,3.5,37.3)  carrier has (0,3.2,-89.9)
+      17 phys_tri_cape_L04_jntBnd  [its own]  under 14  rests at (10.9,13.9,30.9)
+      18 phys_tri_cape_R04_jntBnd  [its own]  under 15  rests at (-10.9,13.9,30.9)
+      19 phys_tri_cape_L05_jntBnd  [its own]  under 17  rests at (10.9,13.9,44.2)
+      20 phys_tri_cape_R05_jntBnd  [its own]  under 18  rests at (-10.9,13.9,44.2)
+  VaalGuard03LivingHeaddressLow.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-30.3,-10.8,-51)..(30.3,52.2,37)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 1228 triangles over 992 vertices
+    names: 74 bytes said, 74 read  [agree]
+    rig 9 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 8 of 9  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_feathers_L01_jntBnd  [its own]  under 0  rests at (10.8,8.4,-3.6)
+      2 phys_tri_feathers_M01_jntBnd  [its own]  under 0  rests at (0,-0.7,-16.8)
+      3 phys_tri_feathers_R01_jntBnd  [its own]  under 0  rests at (-10.8,8.4,-3.6)
+      4 phys_tri_feathers_L02_jntBnd  [its own]  under 1  rests at (18.8,28.7,-2)
+      5 phys_tri_feathers_M02_jntBnd  [its own]  under 2  rests at (-0,11.8,-34.7)
+      6 phys_tri_feathers_R02_jntBnd  [its own]  under 3  rests at (-18.8,28.7,-2)
+      7 phys_tri_feathers_L03_jntBnd  [its own]  under 4  rests at (23.1,45.1,7.7)
+      8 phys_tri_feathers_R03_jntBnd  [its own]  under 6  rests at (-23.1,45.1,7.7)
+  VaalGuard03LivingRobeLow.ao  socket hip_jntBnd [in its carrier's rig]  box (-26.2,-22.6,-9.6)..(26.2,19.1,56.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 2946 triangles over 2828 vertices
+    names: 94 bytes said, 94 read  [agree]
+    rig 13 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 12 of 13  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,3.2,15.4)  carrier has (0,3.2,-89.9)
+      2 L_thigh_jntBnd  [shared]  under 1  rests at (10.1,3.2,15.4)  carrier has (10.1,3.2,-89.9)
+      3 R_thigh_jntBnd  [shared]  under 1  rests at (-10.1,3.2,15.4)  carrier has (-10.1,3.2,-89.9)
+      4 phys_tri_skirt_F01_jntBnd  [its own]  under 1  rests at (-0,-15.3,27.6)
+      5 phys_belt_jntBnd  [its own]  under 1  rests at (-0,-15.3,-6.2)
+      6 phys_hipPad_L_jntBnd  [its own]  under 1  rests at (15.7,-3.2,-5)
+      7 phys_hipPad_R_jntBnd  [its own]  under 1  rests at (-15.7,-3.2,-5)
+      8 phys_tri_skirt_L01_jntBnd  [its own]  under 2  rests at (20.3,-1,41.6)
+      9 phys_tri_skirt_L02_jntBnd  [its own]  under 2  rests at (11.4,12.9,41.6)
+      10 phys_tri_skirt_R01_jntBnd  [its own]  under 3  rests at (-20.3,-1,41.6)
+      11 phys_tri_skirt_R02_jntBnd  [its own]  under 3  rests at (-11.4,12.9,41.6)
+      12 phys_tri_skirt_F02_jntBnd  [its own]  under 4  rests at (0,-15.3,43.5)
+  VaalGuard03MaskLiving.ao  socket <root> [NOT in its carrier's rig]  box (-14.5,-16.9,-166.8)..(14.5,-12.3,-152.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 192 triangles over 242 vertices
+    names: 30 bytes said, 30 read  [agree]
+    (no rig of its own)
+  VaalArchivistWeapon.ao  socket L_Weapon [NOT in its carrier's rig]  box (-15.3,-6,-30.3)..(16.2,-0.1,24.8)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 2164 triangles over 2010 vertices
+    names: 50 bytes said, 50 read  [agree]
+    rig 3 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 aux_top_slot  [its own]  under 0  rests at (-0,-3.5,-9.8)
+      2 aux_bottom_slot  [its own]  under 0  rests at (-0,-3.5,10.2)

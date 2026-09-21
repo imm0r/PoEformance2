@@ -1,0 +1,892 @@
+monster: Rhoa Companion [Metadata/Monsters/RhoaPlayerSummoned/RhoaPlayerSummoned]
+
+=== .ao Metadata/Monsters/Mounts/Rhoa/RhoaMountPlayerSummoned.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Mounts/Rhoa/rig.amd"
+	animations = '[
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.16599999368190766,
+					"end_time": 0.6990000009536743,
+					"name": "move",
+					"position": [
+						0.0,
+						-133.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_move_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.2003505825996399,
+					"name": "move",
+					"position": [
+						0.0,
+						-142.46800231933595,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.27644094824790957,
+					"name": "footstepleft",
+					"position": [
+						18.598703384399415,
+						0.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6051197052001953,
+					"name": "footstepright",
+					"position": [
+						-15.63665771484375,
+						-12.392654418945313,
+						0.0
+					]
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.2941179871559143,
+								0.0
+							],
+							[
+								0.40641701221466067,
+								1.0
+							]
+						],
+						"width": 93.56700134277344,
+						"length": 175.43899536132813,
+						"local_offset": [
+							-8.0,
+							0.0
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "jaw_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.34224599599838259,
+								0.0
+							],
+							[
+								0.3475939929485321,
+								0.6586670279502869
+							],
+							[
+								0.3850269913673401,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"width": 64.0,
+						"length": 115.0,
+						"local_offset": [
+							-20.0,
+							0.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_foot_jntBnd"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.43827199935913088,
+								0.0
+							],
+							[
+								0.4444440007209778,
+								0.6053329706192017
+							],
+							[
+								0.48148098587989809,
+								1.0
+							],
+							[
+								0.48148098587989809,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"width": 64.0,
+						"length": 108.1510009765625,
+						"local_offset": [
+							20.0,
+							0.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_foot_jntBnd"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "neck_1_jntBnd Metadata/Monsters/Mounts/Rhoa/attachments/RhoaMountRopes.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Mounts/Rhoa/rig.ast"
+		linear_allowed_contraction = 0.100
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.100
+		tangent_viscosity_multiplier = 0.025
+		enclosure_angle = 0.200
+		animation_velocity_factor = 10.000
+		animation_force_factor = 10.000
+		use_shock_propagation = false
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Mounts/Rhoa/RhoaMount.sm"
+			hide_segments = "rope_LShape,rope_RShape"
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/mount_rhoa/pet/emerge_fade.pet",
+						"bone_group": "grp_neck_1"
+					}
+				]
+			}
+		]'
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Attack01",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2573220133781433,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Whoosh",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3769110441207886,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Footstep",
+						"bone_name": "L_outer_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4187547266483307,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Effects/BeakAttack"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Attack02",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2574079930782318,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Swish",
+						"bone_name": "R_outer_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3850429654121399,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Swish",
+						"bone_name": "L_outer_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6253389716148377,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Footstep",
+						"bone_name": "L_outer_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.708050012588501,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Footstep",
+						"bone_name": "R_outer_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19130399823188783,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19130399823188783,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/FallBounce",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3491640090942383,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3858398497104645,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/DeathEffect"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5117049813270569,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "L_outer_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5264210104942322,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/FallBounce",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36048099398612978,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36048099398612978,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/FallBounce",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3858398497104645,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/DeathEffect"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.438321977853775,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17747999727725984,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2604230046272278,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/FallBounce",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3858398497104645,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/DeathEffect"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40423399209976199,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23735299706459046,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23735299706459046,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/FallBounce",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35842400789260867,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3858398497104645,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/DeathEffect"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10110100358724594,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10110100358724594,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/FallBounce",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2034509927034378,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/FallBounce",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34449300169944765,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3858398497104645,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/DeathEffect"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21872900426387788,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21872900426387788,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/FallBounce",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31973201036453249,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/DeathFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3858398497104645,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/DeathEffect"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Summon"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_3_1/Rhoa/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5763689875602722,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "mount_01_additive",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.4692767560482025,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/Mounted"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Vocals/RunEfforts",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Saddle"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0797417014837265,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3977510631084442,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Footstep",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.426198273897171,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Saddle"
+					}
+				]
+			},
+			{
+				"name": "unsummon_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/DeathEffect",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23002596199512483,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Footstep",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5158434510231018,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Footstep",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.33554720878601076,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Footstep",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8970144987106323,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Footstep",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.436273455619812,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Footstep",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9594228267669678,
+						"filename": "Audio/Sound Effects/Skills/4.0/ReservationGems/RhoaMount/Foley/Footstep",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.2000000476837159,
+						"filename": "Metadata/Effects/Spells/mount_rhoa/epk/emerge_fade.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd chest_jntBnd L_shoulder_jntBnd"
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.26221027970314028,
+						"ao_type": "Metadata/Effects/Spells/mount_rhoa/footstep.ao",
+						"offset": [
+							18.03998565673828,
+							-12.546897888183594
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"scale": [
+							0.5,
+							0.75,
+							0.75
+						],
+						"inherit_orientation": true,
+						"min_orientation": -0.0872664600610733,
+						"max_orientation": 0.0872664600610733
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.5913633704185486,
+						"ao_type": "Metadata/Effects/Spells/mount_rhoa/footstep.ao",
+						"offset": [
+							-19.45635223388672,
+							-9.472155570983887
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"scale": [
+							0.5,
+							0.75,
+							0.75
+						],
+						"inherit_orientation": true,
+						"min_orientation": -0.0872664600610733,
+						"max_orientation": 0.0872664600610733
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Mounts/Rhoa/attachments/RhoaMountRopes.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Mounts/Rhoa/attachments/ropes/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Mounts/Rhoa/attachments/ropes/rig.ast"
+	    linear_allowed_contraction = 0.150
+	    bend_stiffness = 300.000
+	    bend_allowed_angle = 0.200
+	    normal_viscosity_multiplier = 0.150
+	    tangent_viscosity_multiplier = 0.050
+	    enclosure_radius = 2.000
+	    enclosure_angle = 0.200
+	    attachment_bones = "neck_1_jntBnd chest_jntBnd L_shoulder_jntBnd R_shoulder_jntBnd mouthpiece_jntBnd aux_L_rope_1 aux_R_rope_1 aux_L_rope_2 aux_R_rope_2 aux_L_rope_3 aux_R_rope_3 aux_L_rope_4 aux_R_rope_4 aux_L_rope_5 aux_R_rope_5 child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Mounts/Rhoa/attachments/ropes/RhoaMountRopes.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd chest_jntBnd L_shoulder_jntBnd R_shoulder_jntBnd mouthpiece_jntBnd phys_skinned_L_rope_jntBnd_1 phys_skinned_R_rope_jntBnd_1 phys_skinned_L_rope_jntBnd_2 phys_skinned_R_rope_jntBnd_2 phys_skinned_L_rope_jntBnd_3 phys_skinned_R_rope_jntBnd_3 phys_skinned_L_rope_jntBnd_4 phys_skinned_R_rope_jntBnd_4 phys_skinned_L_rope_jntBnd_5 phys_skinned_R_rope_jntBnd_5 "
+	}
+	
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/Mounts/Rhoa/RhoaMount.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/Mounts/Rhoa/rig_fe81a392.smd"
+Materials 2
+	"Art/Models/MONSTERS/Rhoa/Textures/UpdatedRhoaMountc.mat" 4
+	"Art/Models/MONSTERS/Rhoa/Textures/UpdatedRhoaMountSaddlec.mat" 6
+BoundingBox -28.8204 -129.743 -146.643 28.8204 168.2 0.247
+BoneGroups 37
+	"grp_root" 1 "hip_jntBnd"
+	"grp_frameupper" 3 "L_shoulder_jntBnd" "chest_jntBnd" "R_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "aux_head_tip"
+	"grp_neck_1" 2 "chest_jntBnd" "neck_1_jntBnd"
+	"grp_neck_2" 2 "neck_1_jntBnd" "neck_2_jntBnd"
+	"grp_neck_3" 2 "neck_2_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_1_jntBnd" "chest_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "chest_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "chest_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "aux_L_wrist_tip"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "aux_R_wrist_tip"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin_1" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin_1" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_shin_2" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_shin_2" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_foot" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_foot" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+	"grp_l_toe" 2 "L_toe_jntBnd" "aux_L_toe_tip"
+	"grp_r_toe" 2 "R_toe_jntBnd" "aux_R_toe_tip"
+	"grp_l_tail_1_01" 2 "tail_jntBnd" "phys_skinned_L_tail_feather_1_jntBnd_1"
+	"grp_l_tail_1_02" 2 "phys_skinned_L_tail_feather_1_jntBnd_1" "phys_skinned_L_tail_feather_1_jntBnd_2"
+	"grp_r_tail_1_01" 2 "tail_jntBnd" "phys_skinned_R_tail_feather_1_jntBnd_1"
+	"grp_r_tail_1_02" 2 "phys_skinned_R_tail_feather_1_jntBnd_1" "phys_skinned_R_tail_feather_1_jntBnd_2"
+	"grp_l_tail_2_01" 2 "tail_jntBnd" "phys_skinned_L_tail_feather_2_jntBnd_1"
+	"grp_l_tail_2_02" 2 "phys_skinned_L_tail_feather_2_jntBnd_1" "phys_skinned_L_tail_feather_2_jntBnd_2"
+	"grp_r_tail_2_01" 2 "tail_jntBnd" "phys_skinned_R_tail_feather_2_jntBnd_1"
+	"grp_r_tail_2_02" 2 "phys_skinned_R_tail_feather_2_jntBnd_1" "phys_skinned_R_tail_feather_2_jntBnd_2"
+	"grp_l_tail_3" 2 "tail_jntBnd" "phys_skinned_L_tail_feather_3_jntBnd_1"
+	"grp_r_tail_3" 2 "tail_jntBnd" "phys_skinned_R_tail_feather_3_jntBnd_1"
+	"grp_tail_1" 2 "hip_jntBnd" "tail_jntBnd"
+
+=== .smd Art/Models/MONSTERS/Mounts/Rhoa/rig_fe81a392.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 10 in the header, 10 in the block · 10462 triangles over 9092 vertices
+  names: 258 bytes said, 258 read  [agree]
+
+=== shapes (12)
+0	big_feathersShape	from 0	count 1704
+1	bodyShape	from 1704	count 11982
+2	small_feathersShape	from 13686	count 3516
+3	tongueShape	from 17202	count 366
+4	cordsShape	from 17568	count 2544
+5	head_buckleShape	from 20112	count 1200
+6	rope_bodyShape	from 21312	count 4992
+7	rope_LShape	from 26304	count 504
+8	rope_RShape	from 26808	count 504
+9	saddleShape	from 27312	count 4074
+10	rope_LShape	from 31386	count 504
+11	rope_RShape	from 31890	count 504
+
+=== fitting
+the monster's rig: 60 bones
+mounts: aux_position, aux_sheath_shield, aux_L_rope_1, aux_R_rope_1, aux_L_rope_2, aux_R_rope_2, aux_L_rope_3, aux_R_rope_3, aux_L_rope_4, aux_R_rope_4, aux_head_tip, aux_L_wrist_tip, aux_R_wrist_tip, aux_L_toe_tip, aux_R_toe_tip, aux_L_rope_5, aux_R_rope_5
+  RhoaMountRopes.ao  socket neck_1_jntBnd [in its carrier's rig]  box (-12.6,-17.3,-57.6)..(12.6,-2.3,4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 336 triangles over 284 vertices
+    names: 44 bytes said, 44 read  [agree]
+    rig 15 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 14 of 15  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 chest_jntBnd  [shared]  under 0  rests at (0,1.1,14.6)  carrier has (0,-36.5,-103.5)
+      2 L_shoulder_jntBnd  [shared]  under 0  rests at (13.7,-2.2,13.7)  carrier has (13.7,-38.3,-100.6)
+      3 R_shoulder_jntBnd  [shared]  under 0  rests at (-13.7,-2.2,13.7)  carrier has (-13.7,-38.3,-100.6)
+      4 mouthpiece_jntBnd  [shared]  under 0  rests at (0,-2.8,-56.1)  carrier has (0,-105.5,-119.2)
+      5 phys_skinned_L_rope_jntBnd_1  [its own]  under 0  rests at (11.6,-9.6,-2.1)
+      6 phys_skinned_R_rope_jntBnd_1  [its own]  under 0  rests at (-11.6,-9.6,-2.1)
+      7 phys_skinned_L_rope_jntBnd_2  [its own]  under 0  rests at (11,-14.6,-14.6)
+      8 phys_skinned_R_rope_jntBnd_2  [its own]  under 0  rests at (-11,-14.6,-14.6)
+      9 phys_skinned_L_rope_jntBnd_3  [its own]  under 0  rests at (10.2,-15.6,-27.9)
+      10 phys_skinned_R_rope_jntBnd_3  [its own]  under 0  rests at (-10.2,-15.6,-27.9)
+      11 phys_skinned_L_rope_jntBnd_4  [its own]  under 0  rests at (9.5,-13.5,-40.7)
+      12 phys_skinned_R_rope_jntBnd_4  [its own]  under 0  rests at (-9.5,-13.5,-40.7)
+      13 phys_skinned_L_rope_jntBnd_5  [its own]  under 0  rests at (8.7,-7.5,-51.6)
+      14 phys_skinned_R_rope_jntBnd_5  [its own]  under 0  rests at (-8.7,-7.5,-51.6)

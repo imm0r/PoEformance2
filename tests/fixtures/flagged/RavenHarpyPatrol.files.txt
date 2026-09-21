@@ -1,0 +1,1584 @@
+monster: Raven Harpy [DNT-UNUSED] [Metadata/Monsters/HarpyMonster/RavenHarpyPatrol]
+
+=== .ao Metadata/Monsters/HarpyMonster/HarpyVulture_physics.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/HarpyMonster/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "InterruptSkillEventType",
+					"time": 0.782850980758667,
+					"name": "interrupt_skill",
+					"data": "15 0"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9599999785423279,
+					"name": "contact",
+					"position": [
+						-5.006659984588623,
+						-33.5182991027832,
+						-110.68699645996094
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0,
+					"name": "contact",
+					"position": [
+						-5.006659984588623,
+						-36.330299377441409,
+						-104.73400115966797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0399999618530274,
+					"name": "contact",
+					"position": [
+						-5.006659984588623,
+						-41.6875,
+						-99.85540008544922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0800000429153443,
+					"name": "contact",
+					"position": [
+						-5.006659984588623,
+						-41.6875,
+						-98.27290344238281
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1200000047683716,
+					"name": "contact",
+					"position": [
+						-5.006659984588623,
+						-44.2401008605957,
+						-97.8488998413086
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.159999966621399,
+					"name": "contact",
+					"position": [
+						-5.006659984588623,
+						-44.2401008605957,
+						-91.1489028930664
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2000000476837159,
+					"name": "contact",
+					"position": [
+						-5.006659984588623,
+						-44.2401008605957,
+						-87.25140380859375
+					]
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.20000000298023225,
+					"end_time": 0.5329999923706055,
+					"name": "move",
+					"position": [
+						100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_move_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.31785523891448977,
+					"name": "move",
+					"position": [
+						0.0,
+						-60.0,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.19999998807907105,
+					"end_time": 0.6000000238418579,
+					"name": "move",
+					"position": [
+						-100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "flying_death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5329999923706055,
+					"name": "move",
+					"position": [
+						140.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "flying_death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5329999923706055,
+					"name": "move",
+					"position": [
+						-103.06900024414063,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "guarding_flying_walk_transition_flying_run_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.7329999804496765,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.47307440638542178,
+					"name": "knockdown"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.47307440638542178,
+					"name": "knockdown"
+				}
+			]
+		},
+		{
+			"name": "leap_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.260509967803955,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.023560047149658,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.901050090789795,
+					"name": "hit_ground"
+				}
+			]
+		},
+		{
+			"name": "run_01_transition_flying_run_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.2329999953508377,
+					"end_time": 0.5659999847412109,
+					"name": "move",
+					"position": [
+						0.0,
+						-153.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "swoop_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.6684399843215942,
+					"end_time": 1.13332998752594,
+					"name": "move",
+					"position": [
+						0.0,
+						-500.0,
+						4.7572199954049139e-30
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "aux_hair Metadata/Monsters/HarpyMonster/attachments/Vulture/VultureHair_PhysicsHeld.ao"
+	attached_slaved_animated_object = "<root> Metadata/Monsters/HarpyMonster/attachments/Vulture/VultureWingsHeld.ao"
+	attached_slaved_animated_object = "hip_jntBnd Metadata/Monsters/HarpyMonster/attachments/Vulture/VultureSkirt_PhysicsHeld.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.2402230054140091,
+								0.0
+							],
+							[
+								0.30726298689842226,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 1,
+						"rotation": -0.3665190041065216,
+						"angle": 1.535889983177185,
+						"length": 169.59100341796876,
+						"impact_z_rotation": [
+							0.26179900765419009,
+							1.3962600231170655
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.5865920186042786,
+								0.0
+							],
+							[
+								0.6368719935417175,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 1,
+						"rotation": 0.2967059910297394,
+						"angle": 1.7453299760818482,
+						"length": 169.59100341796876,
+						"impact_z_rotation": [
+							-0.26179900765419009,
+							-1.3962600231170655
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "flying_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4581010043621063,
+								0.0
+							],
+							[
+								0.6759780049324036,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 0,
+						"rotation": 0.4537859857082367,
+						"angle": 1.483530044555664,
+						"length": 152.0469970703125,
+						"impact_x_rotation": [
+							0.0,
+							-0.26179900765419009
+						],
+						"impact_z_rotation": [
+							0.785398006439209,
+							1.8325999975204468
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_foot_jntBnd_1"
+					}
+				]
+			}
+		},
+		{
+			"name": "flying_attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4357540011405945,
+								0.0
+							],
+							[
+								0.6759780049324036,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 0,
+						"rotation": -0.47123900055885317,
+						"angle": 1.483530044555664,
+						"length": 152.0469970703125,
+						"impact_x_rotation": [
+							0.0,
+							-0.26179900765419009
+						],
+						"impact_z_rotation": [
+							-0.785398006439209,
+							-1.8325999975204468
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_foot_jntBnd_1"
+					}
+				]
+			}
+		},
+		{
+			"name": "swoop_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.2067040055990219,
+								0.0
+							],
+							[
+								0.480446994304657,
+								1.0
+							]
+						],
+						"damage_statset_index": 0,
+						"width": 105.26300048828125,
+						"length": 274.85400390625,
+						"impact_type": "Slash",
+						"impact_bone": "R_foot_jntBnd_1"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/HarpyMonster/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/HarpyMonster/VultureHarpy.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "root false root_jntBnd hip_jntBnd"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.22448599338531495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Attack01",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3489750027656555,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8320549726486206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Swing",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.881866991519928,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Screech",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0402188301086426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "L_toe_base_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7117999792099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "L_foot_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.185030996799469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6463620066642761,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3007360100746155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13209599256515504,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13209599256515504,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5472099781036377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.340707004070282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4867764115333557,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "entrance_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.507457971572876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9438679814338684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9704790115356445,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0875793993473053,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Attack02",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46105900406837466,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Swing",
+						"bone_name": "R_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.576770007610321,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Attack02",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45882099866867068,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Swing",
+						"bone_name": "L_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5241349935531616,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25259900093078616,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1051599979400635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.518625020980835,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.544625997543335,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2923530042171478,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5200799703598023,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3573650121688843,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3662300109863281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "flying_flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.38487398624420168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Idle",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6094610095024109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlapIdle",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Fly",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38087400794029238,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_run_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Fly",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5075145959854126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_spellcast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Gurgle",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1819700002670289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flying_throw_mortar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3601349890232086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4925540089607239,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Swing",
+						"bone_name": "R_ankle_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "flying_transition_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.16508300602436067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/AttackExtra",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26871100068092348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3586280047893524,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "guarding_flying_death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2964960038661957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flying_flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06593240052461624,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flying_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23381100594997407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flying_turn_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3955950140953064,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flying_turn_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.4249599874019623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flying_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.14303499460220338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flying_walk_transition_flying_run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2308720052242279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.1819499731063843,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Gurgle",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_transition_flying_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2960039973258972,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1130599975585938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34705400466918948,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8347560167312622,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "L_toe_base_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2822699546813965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2987099885940552,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlapIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7170000076293946,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33974701166152956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.741599977016449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "L_toe_base_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1178799867630005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6786400079727173,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlapIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7170000076293946,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "leap_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3269529938697815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Gurgle",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3411099910736085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7994699478149415,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "L_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9838800430297852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Attack01",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.097759962081909,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.400909900665283,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.009619951248169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0411500930786135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "leap_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1808219999074936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2423200011253357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9906569719314575,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.107039213180542,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "L_toe_base_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10907900333404541,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Idle",
+						"bone_name": "R_foot_jntBnd_1",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37796300649642947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.800000011920929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "L_foot_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "run_01_transition_flying_run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07753860205411911,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Gurgle",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1534299999475479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "L_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3826409876346588,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4153839945793152,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6119800209999085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/TakeOff",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.114240050315857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01_transition_flying_run_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.16508300602436067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/AttackExtra",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26871100068092348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3586280047893524,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.22448599338531495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Attack01",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4160279929637909,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "L_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5295590162277222,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1878900527954102,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "L_foot_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "spellcast_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.881866991519928,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Vocal/Screech",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0402188301086426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "L_toe_base_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7117999792099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "L_foot_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "swoop_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.243244007229805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3829529881477356,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8738059997558594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/WingFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9386699795722961,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/SeagullHarpy/Foley/Steps",
+						"bone_name": "R_foot_jntBnd_1"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/HarpyMonster/attachments/Vulture/VultureHair_PhysicsHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/HarpyMonster/attachments/physics_hair/VultureHarpyHair.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/HarpyMonster/attachments/physics_hair/VultureHarpyHair.ast"
+		linear_allowed_contraction = 0.236
+		bend_stiffness = 313.131
+		bend_allowed_angle = 0.566
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.900
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/HarpyMonster/attachments/physics_hair/VultureHarpyHair.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/HarpyMonster/VultureHarpy.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/HarpyMonster/rig_5cb6a1d3.smd"
+Materials 1
+	"Art/Models/MONSTERS/3.15Monsters/Textures/HarpyMonsterc.mat" 1
+BoundingBox -72.4686 -53.3446 -179.987 72.4687 18.6435 -0.980738
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "jaw_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd_1" "L_knee_jntBnd_1"
+	"grp_r_thigh" 2 "R_thigh_jntBnd_1" "R_knee_jntBnd_1"
+	"grp_l_shin" 2 "L_knee_jntBnd_1" "L_ankle_jntBnd_1"
+	"grp_r_shin" 2 "R_knee_jntBnd_1" "R_ankle_jntBnd_1"
+	"grp_l_foot" 2 "L_ankle_jntBnd_1" "L_foot_jntBnd_1"
+	"grp_r_foot" 2 "R_ankle_jntBnd_1" "R_foot_jntBnd_1"
+	"grp_l_toe" 2 "L_foot_jntBnd_1" "L_toe_base_jntBnd_1"
+	"grp_r_toe" 2 "R_toe_base_jntBnd_1" "R_foot_jntBnd_1"
+
+=== .smd Art/Models/MONSTERS/HarpyMonster/rig_5cb6a1d3.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 1 in the header, 1 in the block · 5582 triangles over 3732 vertices
+  names: 18 bytes said, 18 read  [agree]
+
+=== shapes (1)
+0	bodyShape	from 0	count 16746
+
+=== fitting
+the monster's rig: 54 bones
+mounts: aux_position, aux_hair
+  VultureHair_PhysicsHeld.ao  socket aux_hair [in its carrier's rig]  box (-15.7,-2.6,-13.9)..(15.7,77.2,34.2)
+    (the geometry did not read)
+    rig 6 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_hair_01_jntBnd  [its own]  under 0  rests at (0,14.2,4)
+      2 base_jntBnd  [its own]  under 0  rests at (0,0,0)
+      3 phys_skinned_hair_02_jntBnd  [its own]  under 1  rests at (0,27.9,10.7)
+      4 phys_skinned_hair_03_jntBnd  [its own]  under 3  rests at (0,41.5,17.3)
+      5 phys_skinned_hair_04_jntBnd  [its own]  under 4  rests at (0,55.2,23.9)

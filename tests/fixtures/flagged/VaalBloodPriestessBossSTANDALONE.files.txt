@@ -1,0 +1,4482 @@
+monster: Ytzara, Blood Oracle [Metadata/Monsters/VaalMonsters/Living/BloodPriests/VaalBloodPriestessBossSTANDALONE]
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/VaalBloodPriestessBossSTANDALONE.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/BloodPriest/rig.amd"
+	view_of = "emerge_end_right_01"
+		view_name = "emerge_end_early_right_01"
+		view_end = 3244
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+		view_exclude_event = "ActiveDodgeEvent"
+		view_exclude_event = "TriggerEffectEvent"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.729449987411499,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5994199514389039,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "attack_move_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.3329999446868898,
+					"name": "move",
+					"data": "0 1 1 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.671532154083252,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				}
+			]
+		},
+		{
+			"name": "attack_move_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.0,
+					"name": "move",
+					"data": "0 1 1 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.4738157987594605,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				}
+			]
+		},
+		{
+			"name": "body_swap_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.64335697889328,
+					"name": "phaseout"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5507700443267823,
+					"name": "phasein"
+				}
+			]
+		},
+		{
+			"name": "claw_combo_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 1.5640323162078858,
+					"name": "move",
+					"position": [
+						0.0,
+						-214.1280059814453,
+						0.0
+					],
+					"data": "0 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.10492321848869324,
+					"end_time": 0.6399999856948853,
+					"name": "start_target_update",
+					"data": "100 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.687487006187439,
+					"name": "contact",
+					"position": [
+						35.0,
+						-140.0,
+						0.0
+					]
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.7871701717376709,
+					"end_time": 1.5099999904632569,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5540999174118043,
+					"name": "contact",
+					"position": [
+						-35.0,
+						-140.0,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "claw_flurry_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 5.275876998901367,
+					"name": "blood_slam",
+					"position": [
+						0.0,
+						-158.87841796875,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "claw_flurry_move_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.5999999046325685,
+					"name": "move",
+					"data": "0 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.8604796528816223,
+					"end_time": 1.69069242477417,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				}
+			]
+		},
+		{
+			"name": "claw_flurry_move_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 5.900000095367432,
+					"name": "move",
+					"data": "0 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.7442414164543152,
+					"end_time": 2.5391249656677248,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 3.234055995941162,
+					"end_time": 4.624222278594971,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.25,
+					"name": "blood_slam",
+					"position": [
+						0.0,
+						-158.87841796875,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "claw_whirling_blades_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.30000001192092898,
+					"name": "start_target_update",
+					"data": "70 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.33482465147972109,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8134438991546631,
+					"name": "hit_ground"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.367000013589859,
+					"name": "move",
+					"position": [
+						119.08799743652344,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.367000013589859,
+					"name": "move",
+					"position": [
+						-118.30999755859375,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "emerge_end_left_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.8712027072906496,
+					"name": "teleport"
+				}
+			]
+		},
+		{
+			"name": "emerge_end_right_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.875098943710327,
+					"name": "teleport"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.167778730392456,
+					"name": "reappear"
+				}
+			]
+		},
+		{
+			"name": "knockdown_claw_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 5.0329999923706059,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "multistrike_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6499999761581421,
+					"name": "disappear"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9950417876243591,
+					"name": "slash"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.127940058708191,
+					"name": "left",
+					"position": [
+						0.0,
+						-38.3755989074707,
+						-109.54299926757813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3153300285339356,
+					"name": "slash"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4196066856384278,
+					"name": "right",
+					"position": [
+						-3.6098599433898927,
+						-49.345001220703128,
+						-114.36799621582031
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.638417363166809,
+					"name": "slash"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8259354829788209,
+					"name": "left",
+					"position": [
+						0.0,
+						-51.53810119628906,
+						-110.04000091552735
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.992453694343567,
+					"name": "slash"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.1283316612243654,
+					"name": "right",
+					"position": [
+						-0.05030059814453125,
+						-49.767799377441409,
+						-116.24099731445313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.3242743015289308,
+					"name": "slash"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6221461296081545,
+					"name": "left",
+					"position": [
+						0.0,
+						-54.554901123046878,
+						-114.15299987792969
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.8167154788970949,
+					"name": "slash"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0469839572906496,
+					"name": "right",
+					"position": [
+						-0.05030059814453125,
+						-49.767799377441409,
+						-116.24099731445313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.641819953918457,
+					"name": "serialise"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.748430013656616,
+					"name": "appear"
+				}
+			]
+		},
+		{
+			"name": "raise_elemental_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.2929201126098635,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "emerge_end_early_right_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.875098943710327,
+					"name": "teleport"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.24399995803833,
+					"name": "reappear"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_move_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.30314961075782778,
+								0.0
+							],
+							[
+								0.31889763474464419,
+								0.3435700535774231
+							],
+							[
+								0.3425196707248688,
+								0.6775431632995606
+							],
+							[
+								0.36220473051071169,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 3,
+						"angle": 3.1415927410125734,
+						"x_axis_scale": 0.7699999809265137,
+						"length": 80.53399658203125,
+						"local_offset": [
+							2.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.3839724659919739
+						],
+						"impact_z_rotation": [
+							0.15707963705062867,
+							2.460914373397827
+						],
+						"impact_type": "Slash",
+						"impact_bone": "aux_R_Weapon_attachment"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6523604989051819,
+								0.0
+							],
+							[
+								0.6695278882980347,
+								0.36660265922546389
+							],
+							[
+								0.6866952776908875,
+								0.6852207183837891
+							],
+							[
+								0.7038626670837402,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 3,
+						"angle": 2.495820999145508,
+						"x_axis_scale": 0.7799999713897705,
+						"length": 89.12999725341797,
+						"offset": [
+							26.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.24434611201286317
+						],
+						"impact_z_rotation": [
+							-0.4363323450088501,
+							-2.2165682315826418
+						],
+						"impact_type": "Slash",
+						"impact_bone": "aux_L_Weapon_attachment"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_move_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.15354330837726594,
+								0.0
+							],
+							[
+								0.16535432636737824,
+								0.23224568367004395
+							],
+							[
+								0.17716535925865174,
+								0.5201537609100342
+							],
+							[
+								0.18897637724876405,
+								0.7927063703536987
+							],
+							[
+								0.19685038924217225,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"damage_statset_index": 2,
+						"rotation": 0.6108652949333191,
+						"angle": 2.268928050994873,
+						"x_axis_scale": 0.8939999938011169,
+						"length": 73.20800018310547,
+						"offset": [
+							0.0,
+							-15.0
+						],
+						"local_offset": [
+							-12.0,
+							-3.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.2967059910297394
+						],
+						"impact_z_rotation": [
+							0.19198623299598695,
+							-1.5009832382202149
+						],
+						"impact_type": "Slash",
+						"impact_bone": "aux_L_Weapon_attachment_02"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3776824176311493,
+								0.0
+							],
+							[
+								0.3991416394710541,
+								0.274472177028656
+							],
+							[
+								0.4163089990615845,
+								0.5163145065307617
+							],
+							[
+								0.43776825070381167,
+								0.8186181783676148
+							],
+							[
+								0.45064377784729006,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"damage_statset_index": 2,
+						"update_target_direction": true,
+						"rotation": -0.907571017742157,
+						"angle": 3.141590118408203,
+						"x_axis_scale": 0.8529999852180481,
+						"length": 89.56999969482422,
+						"offset": [
+							25.0,
+							4.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.22689281404018403
+						],
+						"impact_z_rotation": [
+							-1.0995575189590455,
+							1.9198622703552247
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6137338876724243,
+								0.0
+							],
+							[
+								0.6394850015640259,
+								0.274472177028656
+							],
+							[
+								0.6609442234039307,
+								0.5431861877441406
+							],
+							[
+								0.6781116127967835,
+								0.7735124826431274
+							],
+							[
+								0.6952789425849915,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"damage_statset_index": 2,
+						"update_target_direction": true,
+						"angle": 3.141590118408203,
+						"length": 86.70500183105469,
+						"local_offset": [
+							5.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.24434611201286317
+						],
+						"impact_z_rotation": [
+							0.22689281404018403,
+							-2.6005406379699709
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "claw_flurry_move_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3700787425041199,
+								0.0
+							],
+							[
+								0.374015748500824,
+								0.28982722759246828
+							],
+							[
+								0.3897637724876404,
+								0.466410756111145
+							],
+							[
+								0.4094488322734833,
+								0.7120921611785889
+							],
+							[
+								0.4566929042339325,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.1745329350233078,
+						"angle": 3.490658760070801,
+						"length": 100.0,
+						"impact_x_rotation": [
+							0.0,
+							-0.10471975803375244
+						],
+						"impact_z_rotation": [
+							0.0,
+							2.2514748573303224
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.46124032139778139,
+								0.0
+							],
+							[
+								0.4883720874786377,
+								0.18618041276931764
+							],
+							[
+								0.4922480583190918,
+								0.34740883111953738
+							],
+							[
+								0.5,
+								0.5508637428283691
+							],
+							[
+								0.5310077667236328,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.1745329350233078,
+						"angle": 4.014257431030273,
+						"length": 100.0,
+						"impact_z_rotation": [
+							-0.27925270795822146,
+							-2.2514748573303224
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6124030947685242,
+								0.0
+							],
+							[
+								0.6162790656089783,
+								0.25143951177597048
+							],
+							[
+								0.6240310072898865,
+								0.3896353244781494
+							],
+							[
+								0.643410861492157,
+								0.5431861877441406
+							],
+							[
+								0.6627907156944275,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.5061454772949219,
+						"angle": 2.8274335861206056,
+						"length": 100.0,
+						"impact_z_rotation": [
+							0.0,
+							2.0245819091796877
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.7566371560096741,
+								0.0
+							],
+							[
+								0.7566371560096741,
+								0.0
+							],
+							[
+								0.76106196641922,
+								0.14395391941070558
+							],
+							[
+								0.7654867172241211,
+								0.46257197856903078
+							],
+							[
+								0.7964601516723633,
+								0.9385796785354614
+							],
+							[
+								0.7964601516723633,
+								1.0
+							],
+							[
+								0.7964601516723633,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.22689281404018403,
+						"angle": 4.7123894691467289,
+						"x_axis_scale": 0.8220000267028809,
+						"length": 100.0,
+						"offset": [
+							-6.0,
+							-4.0
+						],
+						"impact_z_rotation": [
+							0.0,
+							-2.094395160675049
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "claw_flurry_move_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.16141732037067414,
+								0.0
+							],
+							[
+								0.18503937125205995,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.1745329350233078,
+						"angle": 3.490658760070801,
+						"length": 100.0,
+						"impact_x_rotation": [
+							0.0,
+							-0.10471975803375244
+						],
+						"impact_z_rotation": [
+							0.0,
+							2.2514748573303224
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.19911503791809083,
+								0.0
+							],
+							[
+								0.2300885021686554,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.1745329350233078,
+						"angle": 4.014257431030273,
+						"length": 100.0,
+						"impact_z_rotation": [
+							-0.27925270795822146,
+							-2.2514748573303224
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.2743362784385681,
+								0.0
+							],
+							[
+								0.29646018147468569,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.5061454772949219,
+						"angle": 2.8274335861206056,
+						"length": 100.0,
+						"impact_z_rotation": [
+							0.0,
+							2.0245819091796877
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.32300883531570437,
+								0.0
+							],
+							[
+								0.3495575189590454,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.22689281404018403,
+						"angle": 4.7123894691467289,
+						"x_axis_scale": 0.8220000267028809,
+						"length": 100.0,
+						"offset": [
+							-6.0,
+							-4.0
+						],
+						"impact_z_rotation": [
+							0.0,
+							-2.094395160675049
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "Head_Attachment Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodPriestFemaleHair.ao"
+	attached_object = "Head_Attachment Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodPriestFemaleHeadpiece.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodPriestFemaleRobe.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodPriestFemaleNecklace.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/BloodPriest/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_melee_01"
+			parent = "spine_2_jntBnd"
+			translation = "0.434467 0 0"
+		socket = "aux_melee_02"
+			parent = "root_jntBnd"
+			translation = "-19.5401 0 -132.727"
+		socket = "aux_melee_03"
+			parent = "root_jntBnd"
+			translation = "45.8871 -68.0764 -106.002"
+		socket = "aux_melee_04"
+			parent = "root_jntBnd"
+			translation = "45.8871 -68.0764 -123.977"
+		socket = "aux_melee_05"
+			parent = "spine_2_jntBnd"
+			translation = "-32.084 23.1765 -10.4427"
+		socket = "aux_melee_06"
+			parent = "root_jntBnd"
+			translation = "-11.6833 -112.47 -106.002"
+		socket = "aux_whirlingblade_trl"
+			parent = "hip_jntBnd"
+			translation = "0 -140 0"
+			ignore_parent_rotation = "yawpitchroll"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/BloodPriestFemale.sm"
+			hide_segments = "chestpiece_meshShape,feathers_meshShape,grey_feathers_meshShape,hair_meshShape,headpiece_meshShape,robe_attach_meshShape,robe_meshShape,robe_top_meshShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 head_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1"
+		bone_group = "root false root_jntBnd"
+		bone_group = "body_line false hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd neck_jntBnd"
+		bone_group = "melee false aux_melee_01 aux_melee_02"
+		bone_group = "melee_01 false aux_melee_01 aux_melee_03"
+		bone_group = "melee_02 false aux_melee_01 aux_melee_04"
+		bone_group = "melee_03 false aux_melee_01 aux_melee_05"
+		bone_group = "melee_04 false aux_melee_01 aux_melee_06"
+		bone_group = "FX_WB_Trail false aux_whirlingblade_trl"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "claw_combo_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.632637083530426,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/OnAct_BloodDrips_Inertia.pet",
+						"bone_group": "grp_r_forearm"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.3319154977798463,
+						"end_time": 1.5732771158218384,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/OnAct_BloodDrips_Inertia.pet",
+						"bone_group": "grp_l_forearm"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5132315158843994,
+						"end_time": 2.0472893714904787,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/OnAct_BloodDrips_Fast_Inertia.pet",
+						"bone_groups": [
+							"grp_r_forearm",
+							"grp_l_forearm"
+						]
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5132315158843994,
+						"end_time": 2.0472896099090578,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/OnAct_BloodDrips_Fast_Inertia.pet",
+						"bone_groups": [
+							"grp_r_forearm",
+							"grp_l_forearm"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.6108314990997316,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/ClawFlurry_BloodPool.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_move_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5132315158843994,
+						"end_time": 2.0472893714904787,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/OnAct_BloodDrips_Fast_Inertia.pet",
+						"bone_groups": [
+							"grp_r_forearm",
+							"grp_l_forearm"
+						]
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_move_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5132315158843994,
+						"end_time": 2.0472893714904787,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/OnAct_BloodDrips_Fast_Inertia.pet",
+						"bone_groups": [
+							"grp_r_forearm",
+							"grp_l_forearm"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.6108314990997316,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/ClawFlurry_BloodPool.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "claw_whirling_blades_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.33541789650917055,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/WhirlingBlades_Swirl.pet",
+						"bone_group": "FX_WB_Trail"
+					}
+				]
+			},
+			{
+				"name": "emerge_end_right_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.7193946838378908,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Bloodpriest_Interlude/FX/Teleport_SuckIn.pet",
+						"bone_group": "grp_waist"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.4192216396331789,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Bloodpriest_Interlude/FX/Teleport_EndDrips.pet",
+						"bone_groups": [
+							"frameupper",
+							"grp_l_forearm",
+							"grp_r_forearm",
+							"grp_r_thigh",
+							"grp_l_thigh",
+							"grp_waist"
+						]
+					}
+				]
+			},
+			{
+				"name": "multistrike_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.590021014213562,
+						"end_time": 1.1197043657302857,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Multislash_Flickering_Init.pet",
+						"bone_group": "grp_waist"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0499999523162842,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Multislash_Flickering.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.2999999523162842,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Multislash_Flickering.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.659999966621399,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Multislash_Flickering.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Multislash_Flickering.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.4028923511505129,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Multislash_Flickering.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.799999952316284,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Multislash_Flickering.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "emerge_end_early_right_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.7193946838378908,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Bloodpriest_Interlude/FX/Teleport_SuckIn.pet",
+						"bone_group": "grp_waist"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.095308542251587,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Bloodpriest_Interlude/FX/Teleport_BurstOut.pet",
+						"bone_group": "grp_waist"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.24399995803833,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Bloodpriest_Interlude/FX/Teleport_EndDrips.pet",
+						"bone_groups": [
+							"frameupper",
+							"grp_l_forearm",
+							"grp_r_forearm",
+							"grp_r_thigh",
+							"grp_l_thigh",
+							"grp_waist"
+						]
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04642409831285477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6037018299102783,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6544300317764282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BasicSwipe",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6686481237411499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Slash",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9145069718360901,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4556320905685425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4627677202224732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BasicSwipe",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4677813053131104,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Slash",
+						"bone_name": "aux_L_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13632987439632417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22113946080207826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/FlurryStrike/Swipe",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2382349967956543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Slash",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7028035521507263,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7387428283691406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/FlurryStrike/Swipe",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7434203624725342,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Slash",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9635499715805054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1552786827087403,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.182114601135254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/FlurryStrike/Swipe",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2121800184249879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Slash",
+						"bone_name": "aux_L_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "attack_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04642409831285477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45096245408058169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6544300317764282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BasicSwipe",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6686481237411499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Slash",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9145069718360901,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.354159951210022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4627677202224732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BasicSwipe",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4677813053131104,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Slash",
+						"bone_name": "aux_L_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "attack_move_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22113946080207826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/FlurryStrike/Swipe",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2382349967956543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Slash",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2588292360305786,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7387428283691406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/FlurryStrike/Swipe",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7434203624725342,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Slash",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7851452231407166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9635499715805054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1710864305496216,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackLong",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.182114601135254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/FlurryStrike/Swipe",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2121800184249879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Slash",
+						"bone_name": "aux_L_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "body_swap_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.21031999588012696,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21108099818229676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest_Miniboss/Priestess/Vocals/Body-Swap",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21969999372959138,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6227009892463684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6299200057983399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.722499966621399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7500799894332886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest_Miniboss/Priestess/Vocals/Body-Swap",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9838000535964966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "claw_combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42291760444641116,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackLong",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44117000699043276,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47971001267433169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49915000796318056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "R_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5402820110321045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Slash",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.116529941558838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2793500423431397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3241840600967408,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "aux_L_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.407570242881775,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackLong",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4220399856567383,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Slash",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4654899835586548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18748000264167787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20873236656188966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/FlurryStrike/Surge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25111228227615359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Charge",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7704012393951416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8390019536018372,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9213500022888184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0982478857040406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2167495489120484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3101881742477418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.402214765548706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.546679973602295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5658602714538575,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6276003122329713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7440413236618043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "aux_L_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7471469640731812,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Charge",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.015063762664795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.396868944168091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1308380663394928,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/FlurryStrike/Surge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18748000264167787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.290727823972702,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Charge",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.812505304813385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9213500022888184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9233899712562561,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0790932178497315,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2167495489120484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2211110591888428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.501833438873291,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.546679973602295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5658602714538575,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5988664627075196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.885353684425354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "aux_L_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.015063762664795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0950677394866945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.103541374206543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/Transformation/Transform"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.303459882736206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/Transformation/Vox"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.396868944168091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4461801052093508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Transform",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.488999366760254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/Transformation/OrbCharge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.069118022918701,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/Transformation/OrbSlam",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18748000264167787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20873236656188966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/FlurryStrike/Surge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25111228227615359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Charge",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7704012393951416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8390019536018372,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9213500022888184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0982478857040406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2167495489120484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3101881742477418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.402214765548706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.546679973602295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5658602714538575,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6276003122329713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7440413236618043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "aux_L_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7471469640731812,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Charge",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.015063762664795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.396868944168091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_move_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1308380663394928,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/FlurryStrike/Surge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18748000264167787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.290727823972702,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Charge",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.812505304813385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9213500022888184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9233899712562561,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0790932178497315,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2167495489120484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2211110591888428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.501833438873291,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.546679973602295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5658602714538575,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5988664627075196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.885353684425354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/BloodSlash/Swipe",
+						"bone_name": "aux_L_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.015063762664795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0950677394866945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.103541374206543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/Transformation/Transform"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.303459882736206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/Transformation/Vox"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.396868944168091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4461801052093508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Transform",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.488999366760254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/Transformation/OrbCharge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.069118022918701,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/Transformation/OrbSlam",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "claw_whirling_blades_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/WhirlingBlade/Spin",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Charge",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20214036107063294,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/WhirlingBlade/Scrape",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1151759997010231,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11448799818754196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1176920011639595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18047599494457246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12537899613380433,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20866499841213227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "defeated_enter_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Shriek",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1682099997997284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40723997354507449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.988036036491394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1269347667694092,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2180700302124024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/FlinchShort",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "defeated_exit_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.35112908482551577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4036180973052979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4057899713516236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "emerge_end_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17121000587940217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0947480201721192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0760080814361574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1312460899353029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackLong",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4018547534942629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4928600788116457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priest/Effects/Teleport/Start",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5571341514587404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Charge",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.759676933288574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priest/Effects/Teleport/End"
+					}
+				]
+			},
+			{
+				"name": "emerge_end_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17121000587940217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0947480201721192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0760080814361574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1312460899353029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackLong",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4018547534942629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4928600788116457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priest/Effects/Teleport/Start",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5571341514587404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Charge",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6929683685302736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priest/Effects/Teleport/End"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/FlinchShort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/FlinchShort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/FlinchShort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/FlinchShort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.29660001397132876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest_Miniboss/Priestess/Vocals/Idle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4726300239562989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest_Miniboss/Priestess/Vocals/Idle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.672100067138672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest_Miniboss/Priestess/Vocals/Idle",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10508731752634049,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14711809158325196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49669626355171206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5882604122161865,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7844077348709106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9753013849258423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7263697385787964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7750641107559205,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch"
+					}
+				]
+			},
+			{
+				"name": "knockdown_claw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5212636590003967,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5673912763595581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7752521634101868,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.871720314025879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.023098468780518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.435405254364014,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26134341955184939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.538959264755249,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8643658757209778,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9213131666183472,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0992730855941773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.239603877067566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					}
+				]
+			},
+			{
+				"name": "multistrike_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11502985656261444,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/ShriekEmpowered",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3361501693725586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Surge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0224634408950806,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Teleport",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0528500080108643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Swipe",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1336759328842164,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2915921211242676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Teleport",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.347749948501587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Swipe",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.417990803718567,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5976141691207886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Teleport",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7069300413131714,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Swipe",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8303545713424683,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9774322509765626,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Teleport",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1126322746276857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Swipe",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2058236598968508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackShort",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.25957989692688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Teleport",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.490140914916992,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Transform",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5579471588134767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Swipe",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5598599910736086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.648560047149658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Swing",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.680635929107666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Teleport",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.846013069152832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Effects/MultiSlash/Swipe",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "raise_elemental_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29098600149154665,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest_Miniboss/Priestess/Vocals/Raise-Ele",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4179530143737793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8377130031585693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4316600561141968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.924090027809143,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest_Miniboss/Priestess/Vocals/Run_Loop",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.057128600776195529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2563459873199463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3354499936103821,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5951319932937622,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6884729862213135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9272459745407105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0370999574661255,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2631100416183472,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3608299493789673,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5922800302505494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6728399991989136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9237500429153443,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0097599029541017,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2617099285125734,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.362790107727051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6019599437713625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_end_early_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17121000587940217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0947480201721192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0760080814361574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1312460899353029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/AttackLong",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4018547534942629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.424215078353882,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priest/Effects/Teleport/Start",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.24399995803833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priestess/Vocals/Charge",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.24399995803833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P3/P3_7/BloodTwins/Priest/Effects/Teleport/End"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6798253655433655,
+						"end_time": 0.8892350196838379,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Basic_MeleeTrail.trl",
+						"bone_group": "grp_r_palm"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.4895423650741578,
+						"end_time": 1.6770224571228028,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Basic_MeleeTrail.trl",
+						"bone_group": "grp_l_palm"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.30383479595184328,
+						"end_time": 0.5217471122741699,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Basic_MeleeTrail.trl",
+						"bone_group": "grp_l_palm"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.676580011844635,
+						"end_time": 1.0777325630187989,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Basic_MeleeTrail.trl",
+						"bone_group": "grp_r_palm"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.1589562892913819,
+						"end_time": 1.5240874290466309,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Basic_MeleeTrail.trl",
+						"bone_group": "grp_l_palm"
+					}
+				]
+			},
+			{
+				"name": "attack_move_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6798253655433655,
+						"end_time": 0.8892350196838379,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Basic_MeleeTrail.trl",
+						"bone_group": "grp_r_palm"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.4895423650741578,
+						"end_time": 1.6770224571228028,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Basic_MeleeTrail.trl",
+						"bone_group": "grp_l_palm"
+					}
+				]
+			},
+			{
+				"name": "attack_move_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.30383479595184328,
+						"end_time": 0.5217471122741699,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Basic_MeleeTrail.trl",
+						"bone_group": "grp_l_palm"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.676580011844635,
+						"end_time": 1.0777325630187989,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Basic_MeleeTrail.trl",
+						"bone_group": "grp_r_palm"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.1589562892913819,
+						"end_time": 1.5240874290466309,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Basic_MeleeTrail.trl",
+						"bone_group": "grp_l_palm"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_move_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.945624053478241,
+						"end_time": 1.1150810718536378,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Basic_MeleeTrail.trl"
+					}
+				]
+			},
+			{
+				"name": "claw_whirling_blades_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.2583106458187103,
+						"end_time": 0.8820514678955078,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/WB_Trails.trl",
+						"bone_group": "FX_WB_Trail"
+					}
+				]
+			},
+			{
+				"name": "emerge_end_right_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.8681869506835939,
+						"end_time": 3.385554075241089,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Bloodpriest_Interlude/FX/Teleport_MainTrail.trl",
+						"bone_group": "grp_waist"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.8681869506835939,
+						"end_time": 3.385554075241089,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Bloodpriest_Interlude/FX/Teleport_MainTrail.trl",
+						"bone_group": "grp_waist"
+					}
+				]
+			},
+			{
+				"name": "multistrike_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 3.3554232120513918,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/FX/Teleport_MultiStrikeTrail.trl",
+						"bone_group": "grp_waist"
+					}
+				]
+			},
+			{
+				"name": "emerge_end_early_right_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.8681869506835939,
+						"end_time": 3.24399995803833,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Bloodpriest_Interlude/FX/Teleport_MainTrail.trl",
+						"bone_group": "grp_waist"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.8681869506835939,
+						"end_time": 3.24399995803833,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Bloodpriest_Interlude/FX/Teleport_MainTrail.trl",
+						"bone_group": "grp_waist"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "claw_combo_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.9999282360076904,
+						"name": "Albedo_Mult",
+						"curve": "4 0 0 Linear 0.518352 0.462838 Smooth 0.778103 2 Custom 7.62846 -16.3137 0.999928 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 1.2785621881484986,
+						"end_time": 2.3614864349365236,
+						"name": "Albedo_Mult",
+						"curve": "4 1.27856 0 Linear 1.49782 0.844595 Smooth 1.73672 2 Custom 7.62846 -8.61363 2.36149 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5999999046325685,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.742149 0.118243 Custom 0.389011 0 1.02157 0.7 Flat 2.39093 1 Linear 2.6 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5999999046325685,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.310137 1 Linear 2.21852 1 Linear 2.6 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.900000095367432,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 1 Linear 1.94493 0.996622 Flat 3.15461 0 Flat 5.29066 0 Flat 5.6729 1 Flat 5.9 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5999999046325685,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.742149 0.118243 Custom 0.389011 0 1.02157 0.7 Flat 2.39093 1 Linear 2.6 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_move_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5999999046325685,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.742149 0.118243 Custom 0.389011 0 1.02157 0.7 Flat 2.39093 1 Linear 2.6 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5999999046325685,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.310137 1 Linear 2.21852 1 Linear 2.6 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_move_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.900000095367432,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 1 Linear 1.94493 0.996622 Flat 3.15461 0 Flat 5.29066 0 Flat 5.6729 1 Flat 5.9 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5999999046325685,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.742149 0.118243 Custom 0.389011 0 1.02157 0.7 Flat 2.39093 1 Linear 2.6 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "claw_whirling_blades_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "surgeTime_L",
+						"curve": "5 0 0 Linear 0.297182 0 Linear 0.770641 0.847973 Smooth 0.963682 1 Linear 1.333 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_end_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.9660000801086427,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 1 Linear 2.48933 1 Linear 2.96694 0 Linear 3.70452 0.293919 Smooth 3.966 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.9660000801086427,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "5 0 1 Linear 2.55886 1 Linear 2.86819 0 Linear 3.48518 0 Linear 3.966 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "multistrike_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.0,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.809451 1 Flat 3.45884 1 Linear 4 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.0,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 1 Smooth 0.550305 0 Flat 3.3003 0 Linear 3.82165 0.847973 Smooth 4 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_end_early_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.24399995803833,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "5 0 1 Linear 2.80265 1 Linear 2.9782 0 Linear 3.09936 0 Flat 3.244 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.24399995803833,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 1 Linear 2.73342 1 Linear 2.86693 0 Linear 3.07957 0 Flat 3.244 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "claw_combo_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.5552945137023926,
+						"end_time": 0.8223463296890259,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 0.555295 0 Linear 0.822346 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								-30.200000762939454,
+								-135.0
+							],
+							"rotation": [
+								0.7853999733924866,
+								0.0,
+								0.0
+							],
+							"scale": [
+								0.5,
+								0.5,
+								0.5
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.4208412170410157,
+						"end_time": 1.6938215494155884,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 1.42084 0 Linear 1.69382 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-135.0
+							],
+							"rotation": [
+								2.3561899662017824,
+								0.0,
+								-1.4486199617385865
+							],
+							"scale": [
+								0.5,
+								0.5,
+								0.5
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.9117844700813294,
+						"end_time": 1.1526827812194825,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-0.26179999113082888,
+								0.0,
+								0.0
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.1806195974349976,
+						"end_time": 1.376391887664795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-2.8797898292541506,
+								0.0,
+								-0.5410499572753906
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.5678927898406983,
+						"end_time": 1.7918822765350342,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 1.56789 0 Linear 1.79188 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-146.40000915527345
+							],
+							"rotation": [
+								0.7853999733924866,
+								0.0,
+								-0.5410499572753906
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.9438859224319459,
+						"end_time": 2.0889086723327638,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 1.94389 0 Linear 2.08891 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-120.00000762939453
+							],
+							"rotation": [
+								-3.0194199085235597,
+								0.0,
+								-0.3839699923992157
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/ChaosGodGorillaTransform.ao",
+						"animation": "bloodtwins_claw_flurry_02",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.9117844700813294,
+						"end_time": 1.1526827812194825,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-0.26179999113082888,
+								0.0,
+								0.0
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.1806195974349976,
+						"end_time": 1.376391887664795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-2.8797898292541506,
+								0.0,
+								-0.5410499572753906
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.5678927898406983,
+						"end_time": 1.7918822765350342,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 1.56789 0 Linear 1.79188 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-146.40000915527345
+							],
+							"rotation": [
+								0.7853999733924866,
+								0.0,
+								-0.5410499572753906
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.9438859224319459,
+						"end_time": 2.0889086723327638,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 1.94389 0 Linear 2.08891 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-120.00000762939453
+							],
+							"rotation": [
+								-3.0194199085235597,
+								0.0,
+								-0.3839699923992157
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_move_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.9117844700813294,
+						"end_time": 1.1526827812194825,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-0.26179999113082888,
+								0.0,
+								0.0
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.1806195974349976,
+						"end_time": 1.376391887664795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-2.8797898292541506,
+								0.0,
+								-0.5410499572753906
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.5678927898406983,
+						"end_time": 1.7918822765350342,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 1.56789 0 Linear 1.79188 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-146.40000915527345
+							],
+							"rotation": [
+								0.7853999733924866,
+								0.0,
+								-0.5410499572753906
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.9438859224319459,
+						"end_time": 2.0889086723327638,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 1.94389 0 Linear 2.08891 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-2.3561899662017824,
+								0.0,
+								-0.3839699923992157
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_move_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/ChaosGodGorillaTransform.ao",
+						"animation": "bloodtwins_claw_flurry_02",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.9117844700813294,
+						"end_time": 1.1526827812194825,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-0.26179999113082888,
+								0.0,
+								0.0
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.1806195974349976,
+						"end_time": 1.376391887664795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-2.8797898292541506,
+								0.0,
+								-0.5410499572753906
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.5678927898406983,
+						"end_time": 1.7918822765350342,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 1.56789 0 Linear 1.79188 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-146.40000915527345
+							],
+							"rotation": [
+								0.7853999733924866,
+								0.0,
+								-0.5410499572753906
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.9438859224319459,
+						"end_time": 2.0889086723327638,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 1.94389 0 Linear 2.08891 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-2.3561899662017824,
+								0.0,
+								-0.3839699923992157
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "multistrike_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.111350178718567,
+						"end_time": 1.3522484302520753,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-0.26179999113082888,
+								0.0,
+								0.0
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.365723967552185,
+						"end_time": 1.5614962577819825,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-2.8797898292541506,
+								0.0,
+								-0.5410499572753906
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.8050577640533448,
+						"end_time": 2.0290472507476808,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 1.80506 0 Linear 2.02905 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-146.40000915527345
+							],
+							"rotation": [
+								0.7853999733924866,
+								0.0,
+								-0.5410499572753906
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.2104074954986574,
+						"end_time": 2.389270544052124,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 2.21041 0 Linear 2.38927 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-2.3561899662017824,
+								0.0,
+								-0.3839699923992157
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.530705451965332,
+						"end_time": 2.745696783065796,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_360",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 2.53071 0 Linear 2.7457 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								-50.000003814697269,
+								-135.0
+							],
+							"rotation": [
+								-0.7853999733924866,
+								0.0,
+								-2.094399929046631
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.869861364364624,
+						"end_time": 3.0958573818206789,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/AOs/OnAct_ClawSlash.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 2.86986 0 Linear 3.09586 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								-45.000003814697269,
+								-135.0
+							],
+							"rotation": [
+								2.3561899662017824,
+								0.0,
+								-0.9250199794769287
+							],
+							"scale": [
+								0.7000000476837158,
+								0.7000000476837158,
+								0.7000000476837158
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "claw_combo_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/epks/ClawCombo.epk"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/epks/ClawFlurry.epk"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 5.65315580368042,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/epks/HumanTransform.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/epks/ClawFlurry.epk"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_move_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/epks/ClawFlurry.epk"
+					}
+				]
+			},
+			{
+				"name": "claw_flurry_move_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/epks/HumanTransform.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/epks/ClawFlurry.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_end_right_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.950789451599121,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Bloodpriest_Interlude/EPKs/Teleport.epk"
+					}
+				]
+			},
+			{
+				"name": "multistrike_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/epks/MultiStrike.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_end_early_right_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.200000047683716,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriestess/epks/Teleport.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			state = ""
+				colour = "0.6 0.6 0.6"
+				position = "0 -62 -342"
+				radius = 700
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "off"
+				position = "0 0 -125"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "death"
+				position = "0 0 -125"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodPriestFemaleHair.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/attachments/BloodPriestFemaleHair/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/attachments/BloodPriestFemaleHair/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_force_factor = 7.000
+		use_shock_propagation = false
+	    attachment_bones = "R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd neck_jntBnd head_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/attachments/BloodPriestFemaleHair/BloodPriestFemaleHair.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false R_clavicle_jntBnd root_jntBnd L_clavicle_jntBnd neck_jntBnd head_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodPriestFemaleHeadpiece.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/attachments/BloodPriestFemaleHeadpiece/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/attachments/BloodPriestFemaleHeadpiece/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		animation_velocity_factor = 10.000
+		animation_force_factor = 5.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/attachments/BloodPriestFemaleHeadpiece/BloodPriestFemaleHeadpiece.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodPriestFemaleRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/attachments/BloodPriestFemaleRobe/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/attachments/BloodPriestFemaleRobe/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.450
+		animation_velocity_factor = 0.500
+		animation_force_factor = 5.000
+		enable_collisions = false
+		attachment_bones = "L_knee_jntBnd L_thigh_jntBnd hip_jntBnd R_thigh_jntBnd R_knee_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/attachments/BloodPriestFemaleRobe/BloodPriestFemaleRobe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_knee_jntBnd L_thigh_jntBnd root_jntBnd R_thigh_jntBnd R_knee_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodPriestFemaleNecklace.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/attachments/BloodPriestFemaleNecklace/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/attachments/BloodPriestFemaleNecklace/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.005
+		use_shock_propagation = false
+		attachment_bones = "chest_jntBnd neck_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/attachments/BloodPriestFemaleNecklace/BloodPriestFemaleNecklace.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd neck_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd "
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/BloodPriestFemale.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/BloodPriestFemale_armour_155b375c.smd"
+Materials 2
+	"Art/Models/MONSTERS/BloodPriestMiniBoss/Textures/BloodPriestMinibossFemale_bloodc.mat" 12
+	"Art/Models/MONSTERS/BloodPriestMiniBoss/Textures/BloodPriestMinibossFemaleHairc.mat" 1
+BoundingBox -73.452 -20.3037 -274.604 73.4519 30.4563 0.150802
+BoneGroups 22
+	"root" 2 "root_jntBnd" "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodPriest/FemaleBloodPriest/BloodPriestFemale_armour_155b375c.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 13 in the header, 13 in the block · 10097 triangles over 8425 vertices
+  names: 496 bytes said, 496 read  [agree]
+
+=== shapes (17)
+0	arm_attach_meshShape	from 0	count 1692
+1	body_meshShape	from 1692	count 10398
+2	chestpiece_meshShape	from 12090	count 2364
+3	claws_meshShape	from 14454	count 2364
+4	feathers_meshShape	from 16818	count 1440
+5	grey_feathers_meshShape	from 18258	count 288
+6	headpiece_meshShape	from 18546	count 3264
+7	lower_arm_attach_meshShape	from 21810	count 354
+8	robe_attach_meshShape	from 22164	count 3198
+9	robe_meshShape	from 25362	count 1845
+10	robe_top_meshShape	from 27207	count 324
+11	wrist_attachment_meshShape	from 27531	count 216
+12	hair_meshShape	from 27747	count 2544
+13	robe_attach_meshShape	from 30291	count 6396
+14	robe_meshShape	from 36687	count 3690
+15	robe_top_meshShape	from 40377	count 648
+16	chestpiece_meshShape	from 41025	count 2364
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  BloodPriestFemaleHair.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-25.6,-9.4,-48.2)..(25.6,19,-1.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 848 triangles over 680 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 8 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 neck_jntBnd  [shared]  under 0  rests at (0,3.5,-19.1)  carrier has (0,3.2,-146.4)
+      2 L_clavicle_jntBnd  [shared]  under 0  rests at (4.7,1,-14.1)  carrier has (4.7,0.7,-141.4)
+      3 R_clavicle_jntBnd  [shared]  under 0  rests at (-4.7,1,-14.1)  carrier has (-4.7,0.7,-141.4)
+      4 head_jntBnd  [shared]  under 1  rests at (-0,0.5,-31.4)  carrier has (0,0.2,-158.6)
+      5 phys_tri_B_fringe_jntBnd  [its own]  under 1  rests at (0,5.5,-20.2)
+      6 phys_tri_L_fringe_jntBnd  [its own]  under 1  rests at (7.1,-0.9,-18.7)
+      7 phys_tri_R_fringe_jntBnd  [its own]  under 1  rests at (-7.1,-0.9,-18.7)
+  BloodPriestFemaleHeadpiece.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-63.2,-11.4,-116.1)..(63.1,30.2,6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 2240 triangles over 2886 vertices
+    names: 120 bytes said, 120 read  [agree]
+    rig 7 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_L_feathers_jntBnd_2  [its own]  under 0  rests at (22,11.9,-35.1)
+      2 phys_tri_L_feathers_jntBnd_1  [its own]  under 0  rests at (37.4,15.8,-15.3)
+      3 phys_tri_M_feathers_jntBnd_1  [its own]  under 0  rests at (0,8.9,-41.1)
+      4 phys_tri_R_feathers_jntBnd_2  [its own]  under 0  rests at (-22,11.9,-35.1)
+      5 phys_tri_R_feathers_jntBnd_1  [its own]  under 0  rests at (-37.4,15.8,-15.3)
+      6 phys_tri_M_feathers_jntBnd_2  [its own]  under 3  rests at (0,23.8,-83.1)
+  BloodPriestFemaleRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-24.6,-18.7,-21.6)..(26.8,28.1,85.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 3578 triangles over 2730 vertices
+    names: 106 bytes said, 106 read  [agree]
+    rig 17 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 16 of 17  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      4 phys_tri_F_robe_jntBnd_1  [its own]  under 0  rests at (0,-0.4,27.2)
+      5 phys_tri_L_B_robe_jntBnd_1  [its own]  under 0  rests at (11.6,-0,16.5)
+      6 phys_tri_R_B_robe_jntBnd_1  [its own]  under 0  rests at (-11.6,-0,16.5)
+      7 spine_2_jntBnd  [shared]  under 1  rests at (-0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      8 phys_tri_L_F_robe_jntBnd_1  [its own]  under 2  rests at (11.1,-0.4,13.4)
+      9 L_knee_jntBnd  [shared]  under 2  rests at (13.5,-0,40.2)  carrier has (13.5,3.2,-49.8)
+      10 phys_tri_R_F_robe_jntBnd_1  [its own]  under 3  rests at (-11.1,-0.4,13.4)
+      11 R_knee_jntBnd  [shared]  under 3  rests at (-13.5,-0,40.2)  carrier has (-13.5,3.2,-49.8)
+      12 phys_tri_F_robe_jntBnd_2  [its own]  under 4  rests at (0,-0.4,60.5)
+      13 phys_tri_L_B_robe_jntBnd_2  [its own]  under 5  rests at (12.2,-0,40.4)
+      14 phys_tri_R_B_robe_jntBnd_2  [its own]  under 6  rests at (-12.2,-0,40.4)
+      15 phys_tri_L_B_robe_jntBnd_3  [its own]  under 13  rests at (12.9,-0,69.4)
+      16 phys_tri_R_B_robe_jntBnd_3  [its own]  under 14  rests at (-12.9,-0,69.4)
+  BloodPriestFemaleNecklace.ao  socket chest_jntBnd [in its carrier's rig]  box (-9.6,-20,-19.7)..(9.4,0.5,11.9)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 788 triangles over 597 vertices
+    names: 40 bytes said, 40 read  [agree]
+    rig 5 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,0,0)  carrier has (0,0,0)
+      1 neck_jntBnd  [shared]  under 0  rests at (-0,3.9,-19)  carrier has (0,3.2,-146.4)
+      2 L_clavicle_jntBnd  [shared]  under 0  rests at (4.7,1.3,-14.1)  carrier has (4.7,0.7,-141.4)
+      3 R_clavicle_jntBnd  [shared]  under 0  rests at (-4.7,1.3,-14.1)  carrier has (-4.7,0.7,-141.4)
+      4 phys_skinned_necklace_jntBnd  [its own]  under 0  rests at (0,-13.4,2.2)

@@ -1,0 +1,1343 @@
+monster: Gold-melted Blacksmith [Metadata/Monsters/LeagueExpeditionNew/Expedition2/HumanoidFaction/VaalForgeManExpedition]
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/Expedition2/HumanoidFaction/VaalForgeman/VaalForgeManExpedition.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Vaal/Forgemaster/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4000000059604645,
+					"name": "contact",
+					"position": [
+						0.0,
+						-150.83099365234376,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000001788139344,
+					"name": "move",
+					"position": [
+						0.0,
+						130.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_dot_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.43300002813339236,
+					"name": "move",
+					"position": [
+						0.0,
+						-50.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.30000001192092898,
+					"name": "move",
+					"position": [
+						0.0,
+						-180.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.24983060359954835,
+					"name": "move",
+					"position": [
+						120.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_move_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.30000001192092898,
+					"name": "move",
+					"position": [
+						0.0,
+						-280.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.26600000262260439,
+					"name": "move",
+					"position": [
+						-140.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "sunder_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.1310805082321168,
+					"name": "contact",
+					"position": [
+						2.9576199054718019,
+						-150.1649932861328,
+						-1.4556299448013306
+					]
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3564356565475464,
+								0.0
+							],
+							[
+								0.3663366436958313,
+								0.19417476654052735
+							],
+							[
+								0.40594059228897097,
+								0.40291261672973635
+							],
+							[
+								0.4455445408821106,
+								0.6838948130607605
+							],
+							[
+								0.4900990128517151,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.5235987901687622,
+						"angle": 2.792526960372925,
+						"x_axis_scale": 0.5429999828338623,
+						"length": 187.1790008544922,
+						"offset": [
+							-11.0,
+							0.0
+						],
+						"local_offset": [
+							-3.0,
+							-10.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							0.6108649969100952,
+							1.3613568544387818
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "aux_weaponEnd_04"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/LeagueExpeditionNew/Expedition2/HumanoidFaction/VaalForgeman/attachments/VaalForgemanSkirt.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Vaal/Forgemaster/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_sunder_loc"
+			parent = "root_jntBnd"
+			translation = "3.80308 -157.474 0"
+		socket = "aux_weaponEnd_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-16.2137 6.01134 -53.4934"
+		socket = "aux_weaponEnd_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "17.6262 -5.84973 -53.9626"
+		socket = "aux_weaponEnd_03"
+			parent = "aux_R_Weapon_attachment"
+			translation = "17.6262 -5.84973 -66.0109"
+		socket = "aux_weaponEnd_04"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-16.2137 6.01134 -66.0109"
+		socket = "body_fwd"
+			parent = "chest_jntBnd"
+			translation = "0 -33.9272 0"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalForgemaster/VaalForgemanExpedition.sm"
+	}
+
+	Lights
+	{
+	}
+
+	WindEvents
+	{
+	}
+
+	AnimatedRender
+	{
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd head_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_sunder_loc false aux_sunder_loc"
+		bone_group = "grp_weaponEnd false aux_weaponEnd_02 aux_weaponEnd_03 aux_weaponEnd_04 aux_weaponEnd_01 aux_weaponEnd_02"
+		bone_group = "grp_body_fwd false chest_jntBnd body_fwd"
+		bone_group = "fx_leg_dustUp false aux_R_foot_attachment R_ankle_jntBnd"
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.5269461870193481,
+						"end_time": 0.7416031360626221,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForge/ao/melee_cut.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "root_jntBnd"
+						},
+						"speed_type": "Curve",
+						"speed_curve": "2 0.526946 0 Linear 0.741603 1 Smooth",
+						"offset": {
+							"translation": [
+								0.0,
+								-47.10000228881836,
+								-35.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForge/pet/on_act/death/body_fwd.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForge/pet/on_act/death/body_fwd.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForge/pet/on_act/death/body_fwd.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForge/pet/on_act/death/body_fwd.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForge/pet/on_act/death/body_fwd.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForge/pet/on_act/death/body_fwd.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "sunder_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.40380457043647768,
+						"end_time": 1.3266873359680176,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalForgeman/fx/OnAct_Sunder_01.pet",
+						"bone_group": "grp_weaponEnd"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4038049876689911,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalForgeman/fx/dustUp.pet",
+						"bone_group": "fx_leg_dustUp"
+					}
+				]
+			}
+		]'
+	}
+
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "sunder_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5937653183937073,
+						"end_time": 1.210538625717163,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalForgeman/fx/weapon_trail_slam.trl",
+						"bone_group": "grp_weaponEnd"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "sunder_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalForgeman/epks/weapon_glow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04697285592556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Attack",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16075149178504945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.281837522983551,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/HammerSwing",
+						"bone_name": "aux_weaponEnd_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30480170249938967,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0260958671569825,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2212947607040406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15240085124969483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19206677377223969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/WeaponDrop",
+						"bone_name": "aux_weaponEnd_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25156575441360476,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.677452802658081,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7014611959457398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18771325051784516,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/WeaponDrop",
+						"bone_name": "aux_weaponEnd_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2876910865306854,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29891306161880495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.662097156047821,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6855613589286804,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1256786286830902,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24064025282859803,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/WeaponDrop",
+						"bone_name": "aux_weaponEnd_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2854558527469635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6322892308235169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.654697060585022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1304217129945755,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/WeaponDrop",
+						"bone_name": "aux_weaponEnd_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19305863976478578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2514050602912903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5568661689758301,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5766010880470276,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12860125303268434,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17926232516765595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/WeaponDrop",
+						"bone_name": "aux_weaponEnd_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2854558527469635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6322892308235169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.654697060585022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18361997604370118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/WeaponDrop",
+						"bone_name": "aux_weaponEnd_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24196666479110719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2514050602912903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5568661689758301,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5766010880470276,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08721835911273956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Aggro",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11371999979019165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49949339032173159,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5966299772262573,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.625981867313385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "gold_strike_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08348637074232102,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/GoldStrikeA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24489346146583558,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3673385679721832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/HammerSwingLong",
+						"bone_name": "aux_weaponEnd_04"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8997980356216431,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/GoldStrikeB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1205726861953736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9201864004135132,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9405949115753174,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5313879251480103,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Idle",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3430721759796144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Idle",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.542641639709473,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.215295314788818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Idle",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.275841236114502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.3117194175720219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.41261625289917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.100972175598145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Idle",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/KnockdownA",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10855953395366669,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3491998016834259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35643672943115237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.774391233921051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.575920581817627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6537221670150757,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/KnockdownB",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6953380107879639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1856651306152345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2707011699676515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/KnockdownA",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12964500486850739,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31530943512916567,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3713291585445404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7970772385597229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3940836191177369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.462908148765564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/KnockdownB",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.008697271347046,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0676659345626831,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44121965765953066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5492066740989685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/Run.loop.ogg",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sunder_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22265145182609559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/SunderA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3918665647506714,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/FX/FootStomp",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48505499958992007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/FX/VerisiumSlam/VerisiumSurge",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7050624489784241,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7124841213226318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/HammerSwing",
+						"bone_name": "aux_weaponEnd_04"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8104511499404907,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Vocals/SunderB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8416234850883484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.124690055847168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/FX/VerisiumSlam/HammerSlam",
+						"bone_name": "aux_sunder_loc"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5169979333877564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7990247011184693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Rune/HumanoidFaction/ExpeditionForgeman/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "sunder_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.482572 0 Flat 1.04679 1 Flat 1.14702 1 Linear 1.43645 0 Flat 2.133 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/Expedition2/HumanoidFaction/VaalForgeman/attachments/VaalForgemanSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalForgemaster/attachments/skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalForgemaster/attachments/skirt/rig.ast"
+		linear_allowed_contraction = 0.250
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.600
+		normal_viscosity_multiplier = 0.120
+		tangent_viscosity_multiplier = 0.060
+		animation_velocity_factor = 1.000
+		animation_force_factor = 1.000
+        attachment_bones = "L_thigh_jntBnd hip_jntBnd R_thigh_jntBnd child_attach"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalForgemaster/attachments/skirt/ExpeditionForgemasterSkirt.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "child_attach false L_thigh_jntBnd root_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalForgemaster/VaalForgemanExpedition.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalForgemaster/VaalForgemanExpedition_armour_f22a06f5.smd"
+Materials 1
+	"Art/Models/MONSTERS/GenericBiped/BipedMedium/Textures/VaalForgemanExpeditionc.mat" 4
+BoundingBox -68.9448 -14.94 -192.803 68.9906 15.513 0.47267
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalForgemaster/VaalForgemanExpedition_armour_f22a06f5.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 4 in the header, 4 in the block · 8583 triangles over 6560 vertices
+  names: 138 bytes said, 138 read  [agree]
+
+=== shapes (5)
+0	body_meshShape	from 0	count 18162
+1	bones_meshShape	from 18162	count 1671
+2	kneepads_meshShape	from 19833	count 1536
+3	shoulderpads_meshShape	from 21369	count 4380
+4	skirt_meshShape	from 25749	count 5298
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  VaalForgemanSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-23.8,-17.7,-17.9)..(24.9,16.6,25.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1766 triangles over 1480 vertices
+    names: 30 bytes said, 30 read  [agree]
+    rig 24 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 22 of 24  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      3 phys_F_plate_jntBnd  [its own]  under 0  rests at (0,-15.3,-4.3)
+      4 phys_tri_R_cloth_jntBnd_5  [its own]  under 0  rests at (-3.1,8.8,-0.4)
+      5 phys_tri_L_cloth_jntBnd_5  [its own]  under 0  rests at (3.1,8.8,-0.4)
+      6 phys_L_plate_jntBnd  [its own]  under 0  rests at (15.8,-1.3,-0.4)
+      7 phys_R_plate_jntBnd  [its own]  under 0  rests at (-15.8,-1.3,-0.4)
+      8 phys_tri_F_L_cloth_jntBnd_1  [its own]  under 3  rests at (3.8,-14.9,13)
+      9 phys_tri_F_R_cloth_jntBnd_1  [its own]  under 3  rests at (-3.8,-14.9,13)
+      10 phys_tri_R_cloth_jntBnd_6  [its own]  under 4  rests at (-3.8,13.4,21)
+      11 phys_tri_L_cloth_jntBnd_6  [its own]  under 5  rests at (3.8,13.4,21)
+      12 phys_tri_L_cloth_jntBnd_1  [its own]  under 6  rests at (19.2,-2.2,19.6)
+      13 phys_tri_L_cloth_jntBnd_3  [its own]  under 6  rests at (17.2,4.7,19.1)
+      14 phys_tri_R_cloth_jntBnd_1  [its own]  under 7  rests at (-19.2,-2.2,19.6)
+      15 phys_tri_R_cloth_jntBnd_3  [its own]  under 7  rests at (-17.2,4.7,19.1)
+      16 phys_tri_F_L_cloth_jntBnd_2  [its own]  under 8  rests at (4.1,-15.2,36.4)
+      17 phys_tri_F_R_cloth_jntBnd_2  [its own]  under 9  rests at (-4.1,-15.2,36.4)
+      18 phys_tri_R_cloth_jntBnd_7  [its own]  under 10  rests at (-4,18.1,47.4)
+      19 phys_tri_L_cloth_jntBnd_7  [its own]  under 11  rests at (4,18.1,47.4)
+      20 phys_tri_L_cloth_jntBnd_2  [its own]  under 12  rests at (23.6,0.8,38)
+      21 phys_tri_L_cloth_jntBnd_4  [its own]  under 13  rests at (21.3,7.4,37.1)
+      22 phys_tri_R_cloth_jntBnd_2  [its own]  under 14  rests at (-23.6,0.8,38)
+      23 phys_tri_R_cloth_jntBnd_4  [its own]  under 15  rests at (-21.3,7.4,37.1)

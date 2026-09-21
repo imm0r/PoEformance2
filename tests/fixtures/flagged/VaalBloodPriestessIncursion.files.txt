@@ -1,0 +1,2495 @@
+monster: Blood Priestess [Metadata/Monsters/LeagueIncursionNew/SacrificialChamber/VaalBloodPriestessIncursion]
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/BloodyVaalBloodPriestFemale.ao (depth 0)
+version 3
+extends "Metadata/Monsters/VaalMonsters/Living/BloodPriests/VaalBloodPriestFemale"
+
+AttachedAnimatedObject
+{
+	clear_inherited_attached_objects = true
+	attached_object = "Head_Attachment Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/FemaleLivingVaalCasterFeathers.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodyFemaleLivingVaalCasterCapeHeld.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodyFemaleLivingVaalCasterHair.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodyFemaleLivingVaalCasterRobe.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/LivingVaalCasterMonsterFemale.sm"
+			ankleShape = "Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/BloodyLivingVaalCasterMonsterFemale.mat:0"
+			bodyShape = "Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/BloodyLivingVaalCasterMonsterFemale.mat:0"
+			capeShape = "Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/BloodyLivingVaalCasterMonsterFemale.mat:0"
+			chestpieceShape = "Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/BloodyLivingVaalCasterMonsterFemale.mat:0"
+			feathers_headShape = "Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/BloodyLivingVaalCasterMonsterFemale.mat:0"
+			headpieceShape = "Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/BloodyLivingVaalCasterMonsterFemale.mat:0"
+			skirtShape = "Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/BloodyLivingVaalCasterMonsterFemale.mat:0"
+			HairShape = "Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/BloodyLivingVaalCasterMonsterFemaleHair.mat:0"
+			hide_segments = "HairShape,capeShape,feathers_headShape,skirtShape"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/VaalBloodPriestFemale.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/LivingVaalCaster/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"id": 3664344085,
+					"type": "StandardEventType",
+					"time": 1.5472700595855713,
+					"name": "contact",
+					"position": [
+						53.870399475097659,
+						-92.86589813232422,
+						-131.48800659179688
+					]
+				},
+				{
+					"id": 1723763517,
+					"type": "StandardEventType",
+					"time": 1.5674799680709839,
+					"name": "contact",
+					"position": [
+						23.160600662231447,
+						-115.19999694824219,
+						-132.6649932861328
+					]
+				},
+				{
+					"id": 3775793204,
+					"type": "StandardEventType",
+					"time": 1.596619963645935,
+					"name": "contact",
+					"position": [
+						-15.31309986114502,
+						-95.83439636230469,
+						-122.32099914550781
+					]
+				}
+			]
+		},
+		{
+			"name": "blood_drain_01",
+			"events": [
+				{
+					"id": 1418827101,
+					"type": "StandardEventType",
+					"time": 1.3674999475479127,
+					"name": "contact",
+					"position": [
+						11.672800064086914,
+						-53.660701751708987,
+						-102.41799926757813
+					]
+				},
+				{
+					"id": 2773718026,
+					"type": "StandardEventType",
+					"time": 1.4683200120925904,
+					"name": "contact",
+					"position": [
+						10.57979965209961,
+						-50.7422981262207,
+						-104.43199920654297
+					]
+				},
+				{
+					"id": 3581650237,
+					"type": "StandardEventType",
+					"time": 1.5943599939346314,
+					"name": "contact",
+					"position": [
+						9.379989624023438,
+						-47.54719924926758,
+						-112.27400207519531
+					]
+				}
+			]
+		},
+		{
+			"name": "blood_exsanguinate_01",
+			"events": [
+				{
+					"id": 3361425994,
+					"type": "StandardEventType",
+					"time": 0.7519999742507935,
+					"name": "contact",
+					"position": [
+						17.29680061340332,
+						-2.062030076980591,
+						-107.00800323486328
+					]
+				}
+			]
+		},
+		{
+			"name": "blood_projectile_01",
+			"events": [
+				{
+					"id": 1549291235,
+					"type": "StandardEventType",
+					"time": 2.17290997505188,
+					"name": "contact",
+					"position": [
+						0.15540799498558045,
+						-50.909400939941409,
+						-140.41299438476563
+					]
+				},
+				{
+					"id": 706568891,
+					"type": "StandardEventType",
+					"time": 2.199820041656494,
+					"name": "contact",
+					"position": [
+						4.636940002441406,
+						-50.909400939941409,
+						-140.41299438476563
+					]
+				},
+				{
+					"id": 2165249182,
+					"type": "StandardEventType",
+					"time": 2.233459949493408,
+					"name": "contact",
+					"position": [
+						2.7539799213409426,
+						-50.909400939941409,
+						-140.41299438476563
+					]
+				}
+			]
+		},
+		{
+			"name": "corpse_raise_01",
+			"events": [
+				{
+					"id": 1094010565,
+					"type": "StandardEventType",
+					"time": 0.6718710064888,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"id": 2426677538,
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.367000013589859,
+					"name": "move",
+					"position": [
+						119.08799743652344,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"id": 1595579882,
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.367000013589859,
+					"name": "move",
+					"position": [
+						-118.30999755859375,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "sacrifice_01",
+			"events": [
+				{
+					"id": 4237919605,
+					"type": "StandardEventType",
+					"time": 0.6697369813919067,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/FemaleLivingVaalCasterCapeHeld.ao"
+	attached_object = "Head_Attachment Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/FemaleLivingVaalCasterFeathers.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/FemaleLivingVaalCasterHair.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/FemaleLivingVaalCasterRobe.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.29050299525260928,
+								0.0
+							],
+							[
+								0.3296090066432953,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.6981319785118103,
+						"width": 20.0,
+						"angle": 2.792530059814453,
+						"length": 100.0,
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.6312850117683411,
+								0.0
+							],
+							[
+								0.6927369832992554,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.8726649880409241,
+						"width": 30.0,
+						"angle": 2.268929958343506,
+						"length": 120.0,
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.11731799691915512,
+								0.0
+							],
+							[
+								0.1787710040807724,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.5235990285873413,
+						"width": 30.0,
+						"angle": 1.7453299760818482,
+						"length": 120.0,
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.3463689982891083,
+								0.0
+							],
+							[
+								0.42458099126815798,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.26179900765419009,
+						"width": 40.0,
+						"angle": 2.792530059814453,
+						"length": 130.0,
+						"local_offset": [
+							0.0,
+							-30.0
+						],
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.553072988986969,
+								0.0
+							],
+							[
+								0.6312850117683411,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.5235990285873413,
+						"width": 20.0,
+						"angle": 2.268929958343506,
+						"length": 100.0,
+						"local_offset": [
+							0.0,
+							-30.0
+						],
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/LivingVaalCaster/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/LivingVaalCasterMonsterFemale.sm"
+			hide_segments = "HairShape,capeShape,feathers_headShape,skirtShape"
+	}
+
+	BoneGroups
+	{
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "root false root_jntBnd hip_jntBnd"
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "blood_drain_01",
+				"events": [
+					{
+						"id": 2419510358,
+						"type": "ParticleEffectEventType",
+						"time": 0.7262848019599915,
+						"end_time": 0.7361403107643127,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriest/blood_proj/fx/ribbon_throw.pet",
+						"bone_group": "grp_r_palm"
+					},
+					{
+						"id": 703301105,
+						"type": "ParticleEffectEventType",
+						"time": 0.7378529906272888,
+						"end_time": 2.073427677154541,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriest/soulrend/pet/hand_build.pet",
+						"bone_group": "grp_l_palm"
+					},
+					{
+						"id": 20757241,
+						"type": "ParticleEffectEventType",
+						"time": 1.881617546081543,
+						"end_time": 1.9104913473129273,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriest/blood_proj/fx/ribbon_throw.pet",
+						"bone_group": "grp_r_palm"
+					}
+				]
+			},
+			{
+				"name": "blood_exsanguinate_01",
+				"events": [
+					{
+						"id": 2476767557,
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.7513288259506226,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriest/blood_proj/fx/ribbon_build.pet",
+						"bone_group": "grp_l_palm"
+					},
+					{
+						"id": 1397185307,
+						"type": "ParticleEffectEventType",
+						"time": 0.22659826278686524,
+						"end_time": 0.7514411807060242,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriest/soulrend/pet/hand_build.pet",
+						"bone_group": "grp_r_palm"
+					},
+					{
+						"id": 2148381517,
+						"type": "ParticleEffectEventType",
+						"time": 0.7429254055023193,
+						"end_time": 0.7524979710578919,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriest/blood_proj/fx/ribbon_throw.pet",
+						"bone_group": "grp_r_palm"
+					}
+				]
+			},
+			{
+				"name": "corpse_raise_01",
+				"events": [
+					{
+						"id": 845087437,
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.6372132301330567,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriest/blood_proj/fx/ribbon_build.pet",
+						"bone_groups": [
+							"grp_l_palm",
+							"grp_r_palm"
+						]
+					},
+					{
+						"id": 4223124037,
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.6370863914489747,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodPriest/soulrend/pet/hand_build.pet",
+						"bone_groups": [
+							"grp_l_palm",
+							"grp_r_palm"
+						]
+					}
+				]
+			}
+		]'
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"id": 1455872795,
+						"type": "SoundEventType",
+						"time": 0.04642409831285477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 1903931161,
+						"type": "SoundEventType",
+						"time": 0.22816899418830872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Attack_1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 3763330623,
+						"type": "SoundEventType",
+						"time": 0.5437830090522766,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"id": 474170341,
+						"type": "SoundEventType",
+						"time": 0.9145069718360901,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 1759627344,
+						"type": "SoundEventType",
+						"time": 1.3911099433898926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash",
+						"bone_name": "aux_L_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"id": 3789549380,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 1408358225,
+						"type": "SoundEventType",
+						"time": 0.07066179811954498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Attack_2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 127807825,
+						"type": "SoundEventType",
+						"time": 0.2382349967956543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"id": 1390034104,
+						"type": "SoundEventType",
+						"time": 0.7251160144805908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"id": 382937512,
+						"type": "SoundEventType",
+						"time": 0.9635499715805054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2307362196,
+						"type": "SoundEventType",
+						"time": 1.2121800184249879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash",
+						"bone_name": "aux_L_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "blood_drain_01",
+				"events": [
+					{
+						"id": 826661381,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 3192859547,
+						"type": "SoundEventType",
+						"time": 0.2352048009634018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 3073918506,
+						"type": "SoundEventType",
+						"time": 0.5537399649620056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash_Multistrike",
+						"bone_name": "R_finger_3_jntBnd_3"
+					},
+					{
+						"id": 2037641057,
+						"type": "SoundEventType",
+						"time": 0.6484754085540772,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Blood-Drain",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 754279491,
+						"type": "SoundEventType",
+						"time": 0.6520628333091736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/SelfStab_Stab",
+						"bone_name": "R_finger_4_jntBnd_3"
+					},
+					{
+						"id": 2228715513,
+						"type": "SoundEventType",
+						"time": 1.0590544939041138,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/SelfStab_Slice",
+						"bone_name": "R_finger_4_jntBnd_3"
+					},
+					{
+						"id": 3619446050,
+						"type": "SoundEventType",
+						"time": 1.8898298740386963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash",
+						"bone_name": "R_finger_3_jntBnd_3"
+					},
+					{
+						"id": 261510346,
+						"type": "SoundEventType",
+						"time": 1.8949217796325684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/Exsang_End",
+						"bone_name": "R_finger_4_jntBnd_3"
+					},
+					{
+						"id": 2083225328,
+						"type": "SoundEventType",
+						"time": 2.632986545562744,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_exsanguinate_01",
+				"events": [
+					{
+						"id": 4169850089,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 1493105654,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/BloodPool/Pool_OnAct",
+						"bone_name": "R_finger_3_jntBnd_1"
+					},
+					{
+						"id": 485244103,
+						"type": "SoundEventType",
+						"time": 0.26854756474494936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"id": 664781220,
+						"type": "SoundEventType",
+						"time": 0.3421582877635956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Blood-Exsan",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 3419406210,
+						"type": "SoundEventType",
+						"time": 0.6189718246459961,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"id": 4262590616,
+						"type": "SoundEventType",
+						"time": 0.6884914636611939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/SelfStab_Slice",
+						"bone_name": "R_finger_3_jntBnd_1"
+					},
+					{
+						"id": 3889660148,
+						"type": "SoundEventType",
+						"time": 0.7496030330657959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash",
+						"bone_name": "R_finger_3_jntBnd_1"
+					},
+					{
+						"id": 338715020,
+						"type": "SoundEventType",
+						"time": 0.8222225904464722,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/Exsang_End",
+						"bone_name": "R_finger_3_jntBnd_1"
+					},
+					{
+						"id": 158318684,
+						"type": "SoundEventType",
+						"time": 1.4245057106018067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 3782674738,
+						"type": "SoundEventType",
+						"time": 1.6754285097122193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "R_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_projectile_01",
+				"events": [
+					{
+						"id": 2957932385,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"id": 1536072460,
+						"type": "SoundEventType",
+						"time": 0.45574161410331728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Blood-Proj",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"id": 3222560230,
+						"type": "SoundEventType",
+						"time": 0.7844182848930359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"id": 214594690,
+						"type": "SoundEventType",
+						"time": 0.8789281249046326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/SelfStab_Stab",
+						"bone_name": "R_finger_4_jntBnd_1"
+					},
+					{
+						"id": 1870474340,
+						"type": "SoundEventType",
+						"time": 1.285314679145813,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/SelfStab_Slice",
+						"bone_name": "R_finger_4_jntBnd_1"
+					},
+					{
+						"id": 1573404560,
+						"type": "SoundEventType",
+						"time": 2.026108980178833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"id": 1745724478,
+						"type": "SoundEventType",
+						"time": 2.107538938522339,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/Exsang_End",
+						"bone_name": "R_finger_4_jntBnd_1"
+					},
+					{
+						"id": 2123188428,
+						"type": "SoundEventType",
+						"time": 2.261500597000122,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "body_swap_01",
+				"events": [
+					{
+						"id": 3464167235,
+						"type": "SoundEventType",
+						"time": 0.21031999588012696,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 412643329,
+						"type": "SoundEventType",
+						"time": 0.21108099818229676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Body-Swap",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 1284942673,
+						"type": "SoundEventType",
+						"time": 0.21969999372959138,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"id": 4150846436,
+						"type": "SoundEventType",
+						"time": 0.6227009892463684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"id": 1318249347,
+						"type": "SoundEventType",
+						"time": 1.6299200057983399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 416587088,
+						"type": "SoundEventType",
+						"time": 1.722499966621399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"id": 7805917,
+						"type": "SoundEventType",
+						"time": 1.7500799894332886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Body-Swap",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 69356967,
+						"type": "SoundEventType",
+						"time": 1.9838000535964966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "body_swap_in_01",
+				"events": [
+					{
+						"id": 1303162776,
+						"type": "SoundEventType",
+						"time": 0.10432010889053345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 4244118893,
+						"type": "SoundEventType",
+						"time": 0.21969999372959138,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"id": 689564718,
+						"type": "SoundEventType",
+						"time": 0.3774415850639343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Body-Swap",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 2893439413,
+						"type": "SoundEventType",
+						"time": 0.6227009892463684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "R_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "body_swap_out_01",
+				"events": [
+					{
+						"id": 2058002309,
+						"type": "SoundEventType",
+						"time": 0.09569478034973145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 531706449,
+						"type": "SoundEventType",
+						"time": 0.14133435487747193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Body-Swap",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 1444884852,
+						"type": "SoundEventType",
+						"time": 0.22083325684070588,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"id": 2153478681,
+						"type": "SoundEventType",
+						"time": 0.5785856246948242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "L_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "buff_boss_01",
+				"events": [
+					{
+						"id": 2179206281,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"id": 1174294860,
+						"type": "SoundEventType",
+						"time": 0.0555555485188961,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Buff-Boss",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"id": 2630483121,
+						"type": "SoundEventType",
+						"time": 0.3257574737071991,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"id": 730460425,
+						"type": "SoundEventType",
+						"time": 1.2499980926513672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "claw_combo_01",
+				"events": [
+					{
+						"id": 1012790549,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 1450972774,
+						"type": "SoundEventType",
+						"time": 0.11099400371313095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Claw-Combo",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 232530505,
+						"type": "SoundEventType",
+						"time": 0.44117000699043276,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"id": 848296378,
+						"type": "SoundEventType",
+						"time": 0.47971001267433169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"id": 912000997,
+						"type": "SoundEventType",
+						"time": 0.5402820110321045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"id": 3995457206,
+						"type": "SoundEventType",
+						"time": 1.116529941558838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3339873434,
+						"type": "SoundEventType",
+						"time": 1.2793500423431397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Swing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"id": 2705924138,
+						"type": "SoundEventType",
+						"time": 1.4220399856567383,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"id": 4120822287,
+						"type": "SoundEventType",
+						"time": 1.4654899835586548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "corpse_explode_01",
+				"events": [
+					{
+						"id": 1520345502,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 3355003254,
+						"type": "SoundEventType",
+						"time": 0.09720832854509354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Corpse-Explode",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 4076257280,
+						"type": "SoundEventType",
+						"time": 0.35937678813934328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 3875680280,
+						"type": "SoundEventType",
+						"time": 0.919061005115509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 33521976,
+						"type": "SoundEventType",
+						"time": 1.228359341621399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "corpse_raise_01",
+				"events": [
+					{
+						"id": 1537204726,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Corpse-Raise",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 3222587774,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 507220540,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/Blood_OnAct",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 463139416,
+						"type": "SoundEventType",
+						"time": 0.4456750750541687,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/SelfStab_Start",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 2105647674,
+						"type": "SoundEventType",
+						"time": 0.6395736336708069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/Blood_OnAct",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 2836340600,
+						"type": "SoundEventType",
+						"time": 1.3390005826950074,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"id": 2200451462,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"id": 2747498502,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3799456502,
+						"type": "SoundEventType",
+						"time": 0.1151759997010231,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"id": 1759066635,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"id": 3512865311,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3996826661,
+						"type": "SoundEventType",
+						"time": 0.11448799818754196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"id": 529078742,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"id": 3933724115,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3545334024,
+						"type": "SoundEventType",
+						"time": 0.1176920011639595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"id": 368211051,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"id": 1670009484,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2903107241,
+						"type": "SoundEventType",
+						"time": 0.18047599494457246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"id": 635011897,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"id": 1072100966,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 876017350,
+						"type": "SoundEventType",
+						"time": 0.12537899613380433,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"id": 944603051,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"id": 2994209683,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3290441525,
+						"type": "SoundEventType",
+						"time": 0.20866499841213227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"id": 3004431422,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 4054212827,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"id": 1396303299,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2469684382,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"id": 2716331004,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 1195805985,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"id": 303686895,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3948349178,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"id": 490932381,
+						"type": "SoundEventType",
+						"time": 0.29660001397132876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Idle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2616636941,
+						"type": "SoundEventType",
+						"time": 1.4726300239562989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Idle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 1544736731,
+						"type": "SoundEventType",
+						"time": 2.672100067138672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Idle",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"id": 2771721026,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/KnockdownA_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 1991469070,
+						"type": "SoundEventType",
+						"time": 0.13300085067749024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 2786068855,
+						"type": "SoundEventType",
+						"time": 0.1880357712507248,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"id": 1093973237,
+						"type": "SoundEventType",
+						"time": 0.4139082133769989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"id": 2653212127,
+						"type": "SoundEventType",
+						"time": 0.546909511089325,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 848040070,
+						"type": "SoundEventType",
+						"time": 0.7773652076721191,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"id": 1678529038,
+						"type": "SoundEventType",
+						"time": 0.9665507674217224,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 1909618668,
+						"type": "SoundEventType",
+						"time": 1.0101207494735718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"id": 2392492404,
+						"type": "SoundEventType",
+						"time": 1.4056847095489503,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/KnockdownB_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 1463966728,
+						"type": "SoundEventType",
+						"time": 1.7462114095687867,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"id": 174714601,
+						"type": "SoundEventType",
+						"time": 1.7829023599624634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_claw_01",
+				"events": [
+					{
+						"id": 3549534810,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/KnockdownA_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 1222291948,
+						"type": "SoundEventType",
+						"time": 0.20160390436649323,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"id": 438762126,
+						"type": "SoundEventType",
+						"time": 0.20871998369693757,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 219624978,
+						"type": "SoundEventType",
+						"time": 0.5289156436920166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"id": 2279779254,
+						"type": "SoundEventType",
+						"time": 0.7162907719612122,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"id": 924545677,
+						"type": "SoundEventType",
+						"time": 1.0507153272628785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 1908040567,
+						"type": "SoundEventType",
+						"time": 1.4728995561599732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 1818055192,
+						"type": "SoundEventType",
+						"time": 1.9259223937988282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/KnockdownB_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 2887757847,
+						"type": "SoundEventType",
+						"time": 2.6517064571380617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 19541780,
+						"type": "SoundEventType",
+						"time": 3.5838184356689455,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 2506589631,
+						"type": "SoundEventType",
+						"time": 4.0724196434021,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"id": 3980372621,
+						"type": "SoundEventType",
+						"time": 4.435305118560791,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "L_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"id": 2600521207,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/KnockdownA_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 3248564128,
+						"type": "SoundEventType",
+						"time": 0.11840518563985825,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 4074276707,
+						"type": "SoundEventType",
+						"time": 0.2613084614276886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"id": 1701701568,
+						"type": "SoundEventType",
+						"time": 0.4868910312652588,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 4155413273,
+						"type": "SoundEventType",
+						"time": 0.5511950254440308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"id": 2994528237,
+						"type": "SoundEventType",
+						"time": 0.8604803681373596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 2696307607,
+						"type": "SoundEventType",
+						"time": 0.8676208853721619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"id": 3265503513,
+						"type": "SoundEventType",
+						"time": 1.0779016017913819,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"id": 1246109776,
+						"type": "SoundEventType",
+						"time": 1.1391454935073853,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/KnockdownB_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 3109411161,
+						"type": "SoundEventType",
+						"time": 1.448428750038147,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"id": 3606394940,
+						"type": "SoundEventType",
+						"time": 1.5872446298599244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_knife_01",
+				"events": [
+					{
+						"id": 4120233687,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/KnockdownA_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 1977781320,
+						"type": "SoundEventType",
+						"time": 0.2203102558851242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"id": 3136565208,
+						"type": "SoundEventType",
+						"time": 0.22808662056922913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 1955992062,
+						"type": "SoundEventType",
+						"time": 0.5779924988746643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"id": 1750652546,
+						"type": "SoundEventType",
+						"time": 0.7827537059783936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"id": 3492007258,
+						"type": "SoundEventType",
+						"time": 1.148208737373352,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 512862759,
+						"type": "SoundEventType",
+						"time": 1.6095664501190186,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 452593630,
+						"type": "SoundEventType",
+						"time": 2.293837308883667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/KnockdownKnife_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 675932807,
+						"type": "SoundEventType",
+						"time": 2.398206949234009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash_Multistrike",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"id": 573995623,
+						"type": "SoundEventType",
+						"time": 2.398206949234009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/SelfStab_Slice",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"id": 1751764171,
+						"type": "SoundEventType",
+						"time": 2.897752046585083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 3869472083,
+						"type": "SoundEventType",
+						"time": 3.064870595932007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash_Multistrike",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"id": 1802613960,
+						"type": "SoundEventType",
+						"time": 3.0865893363952638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Effects/OnActs/SelfStab_Slice",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"id": 1533063834,
+						"type": "SoundEventType",
+						"time": 3.9163525104522707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 1408008227,
+						"type": "SoundEventType",
+						"time": 4.450289726257324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"id": 1299522469,
+						"type": "SoundEventType",
+						"time": 4.846846580505371,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "L_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "multistrike_01",
+				"events": [
+					{
+						"id": 2574611488,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 1023507513,
+						"type": "SoundEventType",
+						"time": 0.07190419733524323,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Multistrike",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 1433065847,
+						"type": "SoundEventType",
+						"time": 1.0528500080108643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash_Multistrike",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 713699931,
+						"type": "SoundEventType",
+						"time": 1.347749948501587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash_Multistrike",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2146759949,
+						"type": "SoundEventType",
+						"time": 1.7069300413131714,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash_Multistrike",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3357338245,
+						"type": "SoundEventType",
+						"time": 2.0224900245666506,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash_Multistrike",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3946092307,
+						"type": "SoundEventType",
+						"time": 2.424609899520874,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash_Multistrike",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2138869329,
+						"type": "SoundEventType",
+						"time": 2.5598599910736086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"id": 3665538341,
+						"type": "SoundEventType",
+						"time": 2.648560047149658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Swing",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3026868849,
+						"type": "SoundEventType",
+						"time": 2.7934300899505617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash_Multistrike",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "raise_elemental_01",
+				"events": [
+					{
+						"id": 2789728062,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 4078749775,
+						"type": "SoundEventType",
+						"time": 0.29098600149154665,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Raise-Ele",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 3588227516,
+						"type": "SoundEventType",
+						"time": 0.4179530143737793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3100710533,
+						"type": "SoundEventType",
+						"time": 0.8377130031585693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 1383060080,
+						"type": "SoundEventType",
+						"time": 1.4316600561141968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2513115672,
+						"type": "SoundEventType",
+						"time": 1.924090027809143,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3073821010,
+						"type": "SoundEventType",
+						"time": 3.809364080429077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"id": 3984241067,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Run_Loop",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 637239346,
+						"type": "SoundEventType",
+						"time": 0.057128600776195529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 4080560864,
+						"type": "SoundEventType",
+						"time": 0.2563459873199463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"id": 1311512659,
+						"type": "SoundEventType",
+						"time": 0.3354499936103821,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 256862450,
+						"type": "SoundEventType",
+						"time": 0.5951319932937622,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"id": 1624756064,
+						"type": "SoundEventType",
+						"time": 0.6884729862213135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 4188873363,
+						"type": "SoundEventType",
+						"time": 0.9272459745407105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"id": 1526425732,
+						"type": "SoundEventType",
+						"time": 1.0370999574661255,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3976977521,
+						"type": "SoundEventType",
+						"time": 1.2631100416183472,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"id": 1128392980,
+						"type": "SoundEventType",
+						"time": 1.3608299493789673,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3201735718,
+						"type": "SoundEventType",
+						"time": 1.5922800302505494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"id": 2412129178,
+						"type": "SoundEventType",
+						"time": 1.6728399991989136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3317460745,
+						"type": "SoundEventType",
+						"time": 1.9237500429153443,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"id": 3286546116,
+						"type": "SoundEventType",
+						"time": 2.0097599029541017,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2852849369,
+						"type": "SoundEventType",
+						"time": 2.2617099285125734,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"id": 1435687117,
+						"type": "SoundEventType",
+						"time": 2.362790107727051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step_Foley",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3771964744,
+						"type": "SoundEventType",
+						"time": 2.6019599437713625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sacrifice_01",
+				"events": [
+					{
+						"id": 3985310542,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Vocals/Sacrifice",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 202278570,
+						"type": "SoundEventType",
+						"time": 0.3283880352973938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/BloodPriest/Female/Foley/Slash",
+						"bone_name": "R_finger_2_jntBnd_1"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/FemaleLivingVaalCasterFeathers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterFeathers/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterFeathers/rig.ast"
+		linear_allowed_contraction = 0.100 
+		bend_stiffness = 500.000 
+		bend_allowed_angle = 0.100 
+		normal_viscosity_multiplier = 0.200 
+		tangent_viscosity_multiplier = 0.025 
+		enclosure_angle = 0.200
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterFeathers/FemaleLivingVaalCasterFeathers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodyFemaleLivingVaalCasterCapeHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterCape/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterCape/rig.ast"
+		linear_allowed_contraction = 0.180
+		bend_stiffness = 400.000
+		bend_allowed_angle = 0.200
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.250
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterCape/FemaleLivingVaalCasterCape.sm"
+			cape_meshShape = "Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/BloodyLivingVaalCasterMonsterFemale.mat:0"
+	}
+	
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodyFemaleLivingVaalCasterHair.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterHair/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterHair/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_force_factor = 7.000
+		use_shock_propagation = false
+		attachment_bones = "chest_jntBnd neck_jntBnd head_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd neck_jntBnd head_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterHair/FemaleLivingVaalCasterHair.sm"
+			HairShape = "Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/BloodyLivingVaalCasterMonsterFemaleHair.mat:0"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/BloodyFemaleLivingVaalCasterRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterRobe/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterRobe/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.200
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterRobe/FemaleLivingVaalCasterRobe.sm"
+			robeShape = "Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/BloodyLivingVaalCasterMonsterFemale.mat:0"
+			bead_robeShape = "Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/BloodyLivingVaalCasterMonsterFemale.mat:0"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/FemaleLivingVaalCasterCapeHeld.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterCape/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterCape/rig.ast"
+		linear_allowed_contraction = 0.180
+		bend_stiffness = 400.000
+		bend_allowed_angle = 0.200
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.250
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterCape/FemaleLivingVaalCasterCape.sm"
+	}
+	
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/FemaleLivingVaalCasterHair.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterHair/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterHair/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_force_factor = 7.000
+		use_shock_propagation = false
+		attachment_bones = "chest_jntBnd neck_jntBnd head_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd neck_jntBnd head_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterHair/FemaleLivingVaalCasterHair.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/BloodPriests/attachments/FemaleLivingVaalCasterRobe.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterRobe/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterRobe/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.200
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/attachments/FemaleLivingVaalCasterRobe/FemaleLivingVaalCasterRobe.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/LivingVaalCasterMonsterFemale.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/FemaleLivingVaalCaster_armour_96a3ee59.smd"
+Materials 2
+	"Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/LivingVaalCasterMonsterFemaleHairc.mat" 1
+	"Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/LivingVaalCasterMonsterFemalec.mat" 7
+BoundingBox -68.8287 -37.2653 -207.625 68.8287 20.2849 0.150802
+BoneGroups 22
+	"root" 2 "root_jntBnd" "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/LivingVaalCaster/FemaleLivingVaalCaster/FemaleLivingVaalCaster_armour_96a3ee59.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 8 in the header, 8 in the block · 13896 triangles over 11404 vertices
+  names: 188 bytes said, 188 read  [agree]
+
+=== shapes (16)
+0	HairShape	from 0	count 1986
+1	ankleShape	from 1986	count 1152
+2	bodyShape	from 3138	count 19128
+3	capeShape	from 22266	count 4374
+4	chestpieceShape	from 26640	count 2388
+5	feathers_headShape	from 29028	count 1860
+6	headpieceShape	from 30888	count 4548
+7	skirtShape	from 35436	count 6252
+8	cape_meshShape	from 41688	count 4584
+9	HairShape	from 46272	count 1986
+10	bead_robeShape	from 48258	count 3744
+11	robeShape	from 52002	count 2562
+12	cape_meshShape	from 54564	count 4584
+13	HairShape	from 59148	count 1986
+14	bead_robeShape	from 61134	count 3744
+15	robeShape	from 64878	count 2562
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  FemaleLivingVaalCasterFeathers.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-40.5,-37.5,-48.9)..(40.5,17.6,16.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 620 triangles over 788 vertices
+    names: 26 bytes said, 26 read  [agree]
+    rig 7 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_feathers_jntBnd_1  [its own]  under 0  rests at (-10.6,-1.5,-28.2)
+      2 phys_tri_feathers_jntBnd_2  [its own]  under 0  rests at (-21.6,-14.3,-11.2)
+      3 phys_tri_feathers_jntBnd_3  [its own]  under 0  rests at (-16.1,-10.8,5.2)
+      4 phys_tri_feathers_jntBnd_5  [its own]  under 0  rests at (10.6,-1.5,-28.2)
+      5 phys_tri_feathers_jntBnd_6  [its own]  under 0  rests at (21.6,-14.3,-11.2)
+      6 phys_tri_feathers_jntBnd_7  [its own]  under 0  rests at (16.1,-10.8,5.2)
+  BloodyFemaleLivingVaalCasterCapeHeld.ao  socket hip_jntBnd [in its carrier's rig]  box (-27.5,-10.2,-62.6)..(27.5,32.4,28.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1528 triangles over 1326 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 14 bones, 8 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 14  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 spine_2_jntBnd  [shared]  under 1  rests at (-0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      3 chest_jntBnd  [shared]  under 2  rests at (-0,-3.5,-37.3)  carrier has (0,-0.3,-127.3)
+      4 L_clavicle_jntBnd  [shared]  under 3  rests at (4.7,-2.5,-51.4)  carrier has (4.7,0.7,-141.4)
+      5 R_clavicle_jntBnd  [shared]  under 3  rests at (-4.7,-2.5,-51.4)  carrier has (-4.7,0.7,-141.4)
+      6 phys_tri_cape_jntBnd_1  [its own]  under 3  rests at (-8.1,9.4,-35.4)
+      7 phys_tri_cape_jntBnd_4  [its own]  under 3  rests at (8.1,9.4,-35.4)
+      8 L_shoulder_jntBnd  [shared]  under 4  rests at (15.8,2.8,-48.4)  carrier has (15.8,6,-138.3)
+      9 R_shoulder_jntBnd  [shared]  under 5  rests at (-15.8,2.8,-48.4)  carrier has (-15.8,6,-138.3)
+      10 phys_tri_cape_jntBnd_2  [its own]  under 6  rests at (-6.9,14.5,-3.4)
+      11 phys_tri_cape_jntBnd_5  [its own]  under 7  rests at (6.9,14.5,-3.4)
+      12 phys_tri_cape_jntBnd_3  [its own]  under 10  rests at (-6.9,17.1,12.5)
+      13 phys_tri_cape_jntBnd_6  [its own]  under 11  rests at (6.9,17.1,12.5)
+  BloodyFemaleLivingVaalCasterHair.ao  socket chest_jntBnd [in its carrier's rig]  box (-19.1,-14.7,-48.1)..(24.3,19,-1.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 662 triangles over 538 vertices
+    names: 18 bytes said, 18 read  [agree]
+    rig 14 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 14  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (4.7,1,-14.1)  carrier has (4.7,0.7,-141.4)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-4.7,1,-14.1)  carrier has (-4.7,0.7,-141.4)
+      3 neck_jntBnd  [shared]  under 0  rests at (0,3.5,-19.1)  carrier has (0,3.2,-146.4)
+      4 L_shoulder_jntBnd  [shared]  under 1  rests at (15.8,6.3,-11)  carrier has (15.8,6,-138.3)
+      5 R_shoulder_jntBnd  [shared]  under 2  rests at (-15.8,6.3,-11)  carrier has (-15.8,6,-138.3)
+      6 head_jntBnd  [shared]  under 3  rests at (-0,0.5,-31.4)  carrier has (0,0.2,-158.6)
+      7 phys_tri_hair_jntBnd_1  [its own]  under 6  rests at (-8.2,-2.2,-21.4)
+      8 phys_tri_hair_jntBnd_3  [its own]  under 6  rests at (-7.4,5.4,-25.4)
+      9 phys_tri_hair_jntBnd_4  [its own]  under 6  rests at (-0,13,-24.9)
+      10 phys_tri_hair_jntBnd_5  [its own]  under 6  rests at (7.4,5.4,-25.4)
+      11 phys_tri_hair_jntBnd_6  [its own]  under 6  rests at (8.2,-2.2,-21.4)
+      12 phys_tri_hair_jntBnd_2  [its own]  under 7  rests at (-9.7,-4.3,-12.6)
+      13 phys_tri_hair_jntBnd_7  [its own]  under 11  rests at (9.7,-4.3,-12.6)
+  BloodyFemaleLivingVaalCasterRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-34.2,-18.6,-16.2)..(33,35.7,87.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 2102 triangles over 2124 vertices
+    names: 46 bytes said, 46 read  [agree]
+    rig 31 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 30 of 31  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      4 spine_2_jntBnd  [shared]  under 1  rests at (-0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      5 L_knee_jntBnd  [shared]  under 2  rests at (13.5,0,40.2)  carrier has (13.5,3.2,-49.8)
+      6 phys_tri_skirt_jntBnd_05  [its own]  under 2  rests at (3.2,-12.2,17.9)
+      7 phys_tri_skirt_jntBnd_13  [its own]  under 2  rests at (4.1,11.3,17.9)
+      8 phys_tri_skirt_jntBnd_09  [its own]  under 2  rests at (16.1,6.8,24)
+      9 R_knee_jntBnd  [shared]  under 3  rests at (-13.5,-0,40.2)  carrier has (-13.5,3.2,-49.8)
+      10 phys_tri_skirt_jntBnd_01  [its own]  under 3  rests at (-3.2,-12.2,17.9)
+      11 phys_tri_skirt_jntBnd_17  [its own]  under 3  rests at (-4.1,11.3,17.9)
+      12 phys_tri_skirt_jntBnd_21  [its own]  under 3  rests at (-16.1,6.8,24)
+      13 phys_tri_skirt_jntBnd_06  [its own]  under 6  rests at (4.2,-11.8,41.3)
+      14 phys_tri_skirt_jntBnd_14  [its own]  under 7  rests at (4.7,17.4,41.3)
+      15 phys_tri_skirt_jntBnd_10  [its own]  under 8  rests at (16.6,9.5,35.7)
+      16 phys_tri_skirt_jntBnd_02  [its own]  under 10  rests at (-4.2,-11.8,41.3)
+      17 phys_tri_skirt_jntBnd_18  [its own]  under 11  rests at (-4.7,17.4,41.3)
+      18 phys_tri_skirt_jntBnd_22  [its own]  under 12  rests at (-16.6,9.5,35.7)
+      19 phys_tri_skirt_jntBnd_07  [its own]  under 13  rests at (4.2,-11.8,53)
+      20 phys_tri_skirt_jntBnd_15  [its own]  under 14  rests at (4.7,20.7,53)
+      21 phys_tri_skirt_jntBnd_11  [its own]  under 15  rests at (19.1,13.9,58.8)
+      22 phys_tri_skirt_jntBnd_03  [its own]  under 16  rests at (-4.2,-11.8,53)
+      23 phys_tri_skirt_jntBnd_19  [its own]  under 17  rests at (-4.7,20.7,53)
+      24 phys_tri_skirt_jntBnd_23  [its own]  under 18  rests at (-19.1,13.9,58.8)
+      25 phys_tri_skirt_jntBnd_08  [its own]  under 19  rests at (5.2,-11.4,76.4)
+      26 phys_tri_skirt_jntBnd_16  [its own]  under 20  rests at (5.3,26.8,76.4)
+      27 phys_tri_skirt_jntBnd_12  [its own]  under 21  rests at (19.7,16.6,70.5)
+      28 phys_tri_skirt_jntBnd_04  [its own]  under 22  rests at (-5.2,-11.4,76.4)
+      29 phys_tri_skirt_jntBnd_20  [its own]  under 23  rests at (-5.3,26.8,76.4)
+      30 phys_tri_skirt_jntBnd_24  [its own]  under 24  rests at (-19.7,16.6,70.5)
+  FemaleLivingVaalCasterCapeHeld.ao  socket hip_jntBnd [in its carrier's rig]  box (-27.5,-10.2,-62.6)..(27.5,32.4,28.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1528 triangles over 1326 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 14 bones, 8 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 14  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 spine_2_jntBnd  [shared]  under 1  rests at (-0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      3 chest_jntBnd  [shared]  under 2  rests at (-0,-3.5,-37.3)  carrier has (0,-0.3,-127.3)
+      4 L_clavicle_jntBnd  [shared]  under 3  rests at (4.7,-2.5,-51.4)  carrier has (4.7,0.7,-141.4)
+      5 R_clavicle_jntBnd  [shared]  under 3  rests at (-4.7,-2.5,-51.4)  carrier has (-4.7,0.7,-141.4)
+      6 phys_tri_cape_jntBnd_1  [its own]  under 3  rests at (-8.1,9.4,-35.4)
+      7 phys_tri_cape_jntBnd_4  [its own]  under 3  rests at (8.1,9.4,-35.4)
+      8 L_shoulder_jntBnd  [shared]  under 4  rests at (15.8,2.8,-48.4)  carrier has (15.8,6,-138.3)
+      9 R_shoulder_jntBnd  [shared]  under 5  rests at (-15.8,2.8,-48.4)  carrier has (-15.8,6,-138.3)
+      10 phys_tri_cape_jntBnd_2  [its own]  under 6  rests at (-6.9,14.5,-3.4)
+      11 phys_tri_cape_jntBnd_5  [its own]  under 7  rests at (6.9,14.5,-3.4)
+      12 phys_tri_cape_jntBnd_3  [its own]  under 10  rests at (-6.9,17.1,12.5)
+      13 phys_tri_cape_jntBnd_6  [its own]  under 11  rests at (6.9,17.1,12.5)
+  FemaleLivingVaalCasterFeathers.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-40.5,-37.5,-48.9)..(40.5,17.6,16.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 620 triangles over 788 vertices
+    names: 26 bytes said, 26 read  [agree]
+    rig 7 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_feathers_jntBnd_1  [its own]  under 0  rests at (-10.6,-1.5,-28.2)
+      2 phys_tri_feathers_jntBnd_2  [its own]  under 0  rests at (-21.6,-14.3,-11.2)
+      3 phys_tri_feathers_jntBnd_3  [its own]  under 0  rests at (-16.1,-10.8,5.2)
+      4 phys_tri_feathers_jntBnd_5  [its own]  under 0  rests at (10.6,-1.5,-28.2)
+      5 phys_tri_feathers_jntBnd_6  [its own]  under 0  rests at (21.6,-14.3,-11.2)
+      6 phys_tri_feathers_jntBnd_7  [its own]  under 0  rests at (16.1,-10.8,5.2)
+  FemaleLivingVaalCasterHair.ao  socket chest_jntBnd [in its carrier's rig]  box (-19.1,-14.7,-48.1)..(24.3,19,-1.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 662 triangles over 538 vertices
+    names: 18 bytes said, 18 read  [agree]
+    rig 14 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 14  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (4.7,1,-14.1)  carrier has (4.7,0.7,-141.4)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-4.7,1,-14.1)  carrier has (-4.7,0.7,-141.4)
+      3 neck_jntBnd  [shared]  under 0  rests at (0,3.5,-19.1)  carrier has (0,3.2,-146.4)
+      4 L_shoulder_jntBnd  [shared]  under 1  rests at (15.8,6.3,-11)  carrier has (15.8,6,-138.3)
+      5 R_shoulder_jntBnd  [shared]  under 2  rests at (-15.8,6.3,-11)  carrier has (-15.8,6,-138.3)
+      6 head_jntBnd  [shared]  under 3  rests at (-0,0.5,-31.4)  carrier has (0,0.2,-158.6)
+      7 phys_tri_hair_jntBnd_1  [its own]  under 6  rests at (-8.2,-2.2,-21.4)
+      8 phys_tri_hair_jntBnd_3  [its own]  under 6  rests at (-7.4,5.4,-25.4)
+      9 phys_tri_hair_jntBnd_4  [its own]  under 6  rests at (-0,13,-24.9)
+      10 phys_tri_hair_jntBnd_5  [its own]  under 6  rests at (7.4,5.4,-25.4)
+      11 phys_tri_hair_jntBnd_6  [its own]  under 6  rests at (8.2,-2.2,-21.4)
+      12 phys_tri_hair_jntBnd_2  [its own]  under 7  rests at (-9.7,-4.3,-12.6)
+      13 phys_tri_hair_jntBnd_7  [its own]  under 11  rests at (9.7,-4.3,-12.6)
+  FemaleLivingVaalCasterRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-34.2,-18.6,-16.2)..(33,35.7,87.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 2102 triangles over 2124 vertices
+    names: 46 bytes said, 46 read  [agree]
+    rig 31 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 30 of 31  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      4 spine_2_jntBnd  [shared]  under 1  rests at (-0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      5 L_knee_jntBnd  [shared]  under 2  rests at (13.5,0,40.2)  carrier has (13.5,3.2,-49.8)
+      6 phys_tri_skirt_jntBnd_05  [its own]  under 2  rests at (3.2,-12.2,17.9)
+      7 phys_tri_skirt_jntBnd_13  [its own]  under 2  rests at (4.1,11.3,17.9)
+      8 phys_tri_skirt_jntBnd_09  [its own]  under 2  rests at (16.1,6.8,24)
+      9 R_knee_jntBnd  [shared]  under 3  rests at (-13.5,-0,40.2)  carrier has (-13.5,3.2,-49.8)
+      10 phys_tri_skirt_jntBnd_01  [its own]  under 3  rests at (-3.2,-12.2,17.9)
+      11 phys_tri_skirt_jntBnd_17  [its own]  under 3  rests at (-4.1,11.3,17.9)
+      12 phys_tri_skirt_jntBnd_21  [its own]  under 3  rests at (-16.1,6.8,24)
+      13 phys_tri_skirt_jntBnd_06  [its own]  under 6  rests at (4.2,-11.8,41.3)
+      14 phys_tri_skirt_jntBnd_14  [its own]  under 7  rests at (4.7,17.4,41.3)
+      15 phys_tri_skirt_jntBnd_10  [its own]  under 8  rests at (16.6,9.5,35.7)
+      16 phys_tri_skirt_jntBnd_02  [its own]  under 10  rests at (-4.2,-11.8,41.3)
+      17 phys_tri_skirt_jntBnd_18  [its own]  under 11  rests at (-4.7,17.4,41.3)
+      18 phys_tri_skirt_jntBnd_22  [its own]  under 12  rests at (-16.6,9.5,35.7)
+      19 phys_tri_skirt_jntBnd_07  [its own]  under 13  rests at (4.2,-11.8,53)
+      20 phys_tri_skirt_jntBnd_15  [its own]  under 14  rests at (4.7,20.7,53)
+      21 phys_tri_skirt_jntBnd_11  [its own]  under 15  rests at (19.1,13.9,58.8)
+      22 phys_tri_skirt_jntBnd_03  [its own]  under 16  rests at (-4.2,-11.8,53)
+      23 phys_tri_skirt_jntBnd_19  [its own]  under 17  rests at (-4.7,20.7,53)
+      24 phys_tri_skirt_jntBnd_23  [its own]  under 18  rests at (-19.1,13.9,58.8)
+      25 phys_tri_skirt_jntBnd_08  [its own]  under 19  rests at (5.2,-11.4,76.4)
+      26 phys_tri_skirt_jntBnd_16  [its own]  under 20  rests at (5.3,26.8,76.4)
+      27 phys_tri_skirt_jntBnd_12  [its own]  under 21  rests at (19.7,16.6,70.5)
+      28 phys_tri_skirt_jntBnd_04  [its own]  under 22  rests at (-5.2,-11.4,76.4)
+      29 phys_tri_skirt_jntBnd_20  [its own]  under 23  rests at (-5.3,26.8,76.4)
+      30 phys_tri_skirt_jntBnd_24  [its own]  under 24  rests at (-19.7,16.6,70.5)

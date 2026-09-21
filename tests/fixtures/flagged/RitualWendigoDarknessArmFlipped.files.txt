@@ -1,0 +1,1165 @@
+monster: Daemon [Metadata/Monsters/RitualWendigo/RitualWendigoDarknessArmFlipped]
+
+=== .ao Metadata/Monsters/RitualWendigo/RitualWendigoDarknessArmFlipped.ao (depth 0)
+version 3
+extends "Metadata/Monsters/RitualWendigo/RitualWendigoDarknessArm"
+
+client
+{
+	AnimatedRender
+	{
+		// flip it
+		x_scale = -1.000000
+	}
+}
+
+=== .ao Metadata/Monsters/RitualWendigo/RitualWendigoDarknessArm.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/Arm/rig.amd"
+	view_of = "slam_01"
+		view_name = "slam_02"
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "ScreenCaptureEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+		view_exclude_event = "ActiveDodgeEvent"
+		view_exclude_event = "TriggerEffectEvent"
+	animations = '[
+		{
+			"name": "attack_01",
+			"blend_in_time": 0,
+			"blend_out_time": 0
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6668599843978882,
+					"name": "fist_slam",
+					"position": [
+						25.333740234375,
+						-160.28054809570313,
+						-8.909622192382813
+					]
+				}
+			],
+			"blend_in_time": 0,
+			"blend_out_time": 0
+		},
+		{
+			"name": "attack_03",
+			"blend_in_time": 0,
+			"blend_out_time": 0
+		},
+		{
+			"name": "attack_04",
+			"blend_in_time": 0,
+			"blend_out_time": 0
+		},
+		{
+			"name": "slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.20159904658794404,
+					"name": "knockdown_impact",
+					"position": [
+						2.517627716064453,
+						-173.53842163085938,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.20182999968528748,
+					"name": "intro_fist_slam",
+					"position": [
+						3.5461883544921877,
+						-172.89227294921876,
+						-14.563514709472657
+					]
+				}
+			]
+		},
+		{
+			"name": "slam_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.20159904658794404,
+					"name": "contact",
+					"position": [
+						2.517627716064453,
+						-173.53842163085938,
+						0.0
+					]
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5252525210380554,
+								0.0
+							],
+							[
+								0.6868686676025391,
+								0.5397796630859375
+							],
+							[
+								0.7777777910232544,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"angle": 3.682645082473755,
+						"x_axis_scale": 0.8820000290870667,
+						"length": 275.0409851074219,
+						"local_offset": [
+							-21.0,
+							27.0
+						],
+						"impact_x_rotation": [
+							-0.4363323450088501,
+							-0.03490658849477768
+						],
+						"impact_z_rotation": [
+							-0.3839724659919739,
+							3.5255653858184816
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5,
+								0.0
+							],
+							[
+								0.6111111044883728,
+								1.0
+							]
+						],
+						"angle": 6.2831854820251469,
+						"length": 164.7729949951172,
+						"local_offset": [
+							28.0,
+							-162.0
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_04",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.1340782195329666,
+								0.0
+							],
+							[
+								0.3631284832954407,
+								1.0
+							]
+						],
+						"angle": 6.2831854820251469,
+						"length": 130.6820068359375,
+						"local_offset": [
+							-22.0,
+							-160.0
+						]
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/IceWendigo/Arm/attachments/FurRArmONLY.ao"
+	attached_object = "<root> Metadata/Monsters/IceWendigo/Arm/attachments/JewelleryForearmsRArmONLY.ao"
+	attached_object = "<root> Metadata/Monsters/IceWendigo/Arm/attachments/JewelleryRArmONLY.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/Arm/rig.ast"
+		socket = "center_impact"
+			parent = "R_wrist_jntBnd"
+			translation = "-45.35 0 0"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/Arm/AzmeriWendigoArm.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false R_wrist_jntBnd R_Weapon_jntBnd"
+		bone_group = "finger_01 false R_finger_2_jntBnd_1 R_finger_2_jntBnd_2 R_finger_2_jntBnd_3"
+		bone_group = "grp_hand false R_finger_3_jntBnd_1 R_finger_3_jntBnd_2 R_finger_3_jntBnd_3 R_wrist_jntBnd R_finger_1_jntBnd_1 R_finger_1_jntBnd_2 R_finger_1_jntBnd_3"
+		bone_group = "finger_03 false R_finger_4_jntBnd_1 R_finger_4_jntBnd_2 R_finger_4_jntBnd_3"
+		bone_group = "finger_04 false R_finger_1_jntBnd_1 R_finger_1_jntBnd_2 R_finger_1_jntBnd_3"
+		bone_group = "grp_palm false R_finger_2_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_arm false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_upper_arm false R_elbow_jntBnd R_clavicle_jntBnd"
+		bone_group = "frameupper false R_clavicle_jntBnd R_elbow_jntBnd R_wrist_jntBnd"
+	}
+
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.19188132882118226,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/fx/shadow_hand_trl.trl",
+						"bone_group": "finger_01"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.6931717991828919,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/fx/shadow_hand_trl.trl",
+						"bone_groups": [
+							"root",
+							"grp_arm"
+						]
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.14840111136436463,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/fx/shadow_hand_trl.trl",
+						"bone_group": "finger_01"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.7641842365264893,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/fx/shadow_hand_trl.trl",
+						"bone_group": "finger_01"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/epk/moth_skin.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/epk/arm_wisps.epk",
+						"remove_on_animation_end": false
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/epk/moth_skin.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/epk/arm_wisps.epk",
+						"remove_on_animation_end": false
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/epk/moth_skin.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/epk/moth_skin.epk"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/epk/moth_skin.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/epk/arm_wisps.epk",
+						"remove_on_animation_end": false
+					}
+				]
+			}
+		]'
+	}
+
+	WindEvents
+	{
+		animations = '[
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "WindEventType",
+						"time": 0.6615839600563049,
+						"size": [
+							1000.0,
+							300.0,
+							1000.0
+						],
+						"shape": "Explosion",
+						"duration": 0.20000000298023225,
+						"tamper_curve": 0.0,
+						"primary_velocity": 10000.0,
+						"primary_wavelength": 1.0,
+						"secondary_velocity": 200.0,
+						"secondary_wavelength": 1.0,
+						"bone_name": "R_Weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "WindEventType",
+						"time": 0.12294670939445496,
+						"size": [
+							500.0,
+							300.0,
+							500.0
+						],
+						"shape": "Explosion",
+						"duration": 0.30000001192092898,
+						"tamper_curve": 0.0,
+						"primary_velocity": 6000.0,
+						"primary_wavelength": 1.0,
+						"secondary_velocity": 200.0,
+						"secondary_wavelength": 1.0,
+						"bone_name": "center_impact"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "WindEventType",
+						"time": 0.20726679265499116,
+						"size": [
+							1000.0,
+							300.0,
+							1000.0
+						],
+						"shape": "Explosion",
+						"duration": 0.20000000298023225,
+						"tamper_curve": 0.0,
+						"primary_velocity": 20000.0,
+						"primary_wavelength": 1.0,
+						"secondary_velocity": 200.0,
+						"secondary_wavelength": 1.0,
+						"bone_name": "R_Weapon_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "Acceleration",
+						"curve": "4 0 0 Smooth 0.309351 0 Flat 0.44306 0 Linear 0.5 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "Radius",
+						"curve": "3 0 2 Smooth 0.275857 2 Flat 0.5 2 Flat"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "Attraction",
+						"curve": "6 0 0.0338979 Smooth 0.139249 0.0338979 Flat 0.146168 0.0338979 Flat 0.245138 0.429054 Flat 0.366158 0.0338979 Flat 0.5 0.0338979 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "surgeTime_L",
+						"curve": "4 0 0.510135 Linear 0.223258 1 Linear 0.3151 0 Flat 0.5 1.62981e-09 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "Attraction",
+						"curve": "4 0 1 Linear 0.732754 1 Flat 0.732754 0 Flat 1.333 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "Acceleration",
+						"curve": "5 0 0 Linear 0.172518 0 Flat 0.923594 0 Flat 1.15764 0.05 Flat 1.333 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "Radius",
+						"curve": "4 0 1 Smooth 0.677303 1 Flat 0.690985 0 Smooth 1.333 0.503378 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "surgeTime_L",
+						"curve": "6 0 0 Linear 0.150872 0.597973 Linear 0.605287 1 Smooth 0.648497 0.118243 Flat 0.85878 0 Flat 1.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.7329999804496765,
+						"name": "Radius",
+						"curve": "3 0 1 Smooth 0.26692 1 Flat 0.733 0 Flat"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.7329999804496765,
+						"name": "Acceleration",
+						"curve": "3 0 0 Smooth 0.453509 1 Flat 0.733 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.7329999804496765,
+						"name": "Attraction",
+						"curve": "2 0 1 Smooth 0.733 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.7329999804496765,
+						"name": "surgeTime_L",
+						"curve": "4 0 0.510135 Linear 0.143155 1 Linear 0.667858 0 Flat 0.733 1.62981e-09 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.7999999523162842,
+						"name": "Attraction",
+						"curve": "4 0 1 Linear 0.232958 1 Flat 0.357395 0 Flat 1.8 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.7999999523162842,
+						"name": "Radius",
+						"curve": "2 0 1 Smooth 1.8 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.7971904277801514,
+						"name": "Acceleration",
+						"curve": "4 0 0 Smooth 1.40736 0 Flat 1.76175 0.206081 Linear 1.79719 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.7962539196014405,
+						"name": "surgeTime_L",
+						"curve": "4 0 0.510135 Linear 0.437176 1 Linear 1.43865 0 Flat 1.79625 1.62981e-09 Linear"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "surgeTime_L",
+						"curve": "4 0 0.510135 Linear 0.254457 1 Linear 0.573204 0.408784 Flat 2 1.62981e-09 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "Attraction",
+						"curve": "4 0 1 Linear 0.205835 1 Flat 0.228525 0 Flat 2 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "Acceleration",
+						"curve": "5 0 0 Linear 0.258842 0 Flat 1.23987 0 Flat 1.86224 0 Flat 2 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "Radius",
+						"curve": "4 0 1 Smooth 0.200162 1 Flat 0.257969 0 Smooth 1 1 Smooth"
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.12873999774456025,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/fx/moth_trailing.pet",
+						"bone_group": "finger_01"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/fx/Warning_Moths.pet",
+						"bone_groups": [
+							"root",
+							"grp_hand",
+							"grp_palm",
+							"grp_arm",
+							"grp_upper_arm"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.38917791843414309,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/fx/moth_trailing.pet",
+						"bone_group": "finger_01"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.039194390177726749,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/fx/moth_trailing.pet",
+						"bone_group": "finger_01"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/fx/moth_trailing.pet",
+						"bone_group": "finger_01"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.10000000149011612,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/fx/moth_trailing.pet",
+						"bone_group": "finger_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.080382227897644,
+						"filename": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/fx/moth_trailing.pet",
+						"bone_group": "finger_01"
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.6604779362678528,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/AtlasofWorldsBosses/TheWendigo/ao/slam_aoe.ao",
+						"offset": [
+							29.9930419921875,
+							-148.22698974609376
+						]
+					}
+				]
+			}
+		]'
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Whooshes/WhooshSpellCast",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Moths/MothProj/MothProj_EndImpactMoths",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.274874210357666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Whooshes/WhooshBigTonal",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Whooshes/WhooshSpellCast",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Moths/MothProj/MothProj_EndImpactMoths",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33764857053756716,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Whooshes/WhooshSmall",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5994154810905457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Slams/SlamSweetenerRocks",
+						"bone_name": "R_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5998344421386719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Slams/P2_HandPrint",
+						"bone_name": "center_impact"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Whooshes/WhooshBigTonal",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Moths/MothProj/MothProj_EndImpactMoths",
+						"bone_name": "R_finger_1_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Moths/MothProj/MothProj_EndImpactMoths",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2534255087375641,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Whooshes/WhooshSpellCast",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.514127790927887,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Slams/SlamSweetenerRocks",
+						"bone_name": "R_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5335810780525208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Slams/P2_HandPrint",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_04_quick",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Whooshes/WhooshSpellCast"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.061596572399139407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Slams/SlamHand",
+						"bone_name": "center_impact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09176629036664963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Slams/P2_HandPrint",
+						"bone_name": "center_impact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09176629036664963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Slams/SlamSweetener",
+						"bone_name": "center_impact"
+					}
+				]
+			},
+			{
+				"name": "skypalm_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.7042746543884277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Whooshes/WhooshSpellCast",
+						"bone_name": "R_Weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Whooshes/WhooshBigTonal",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Emerge/EmergeScreech",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Moths/MothProj/MothProj_EndImpactMoths"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1293104737997055,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Slams/SlamHand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1005750894546509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Scrapes/ScrapeCast",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "swipe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Whooshes/WhooshBigTonal",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Whooshes/WhooshBigTonal",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12068986892700196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Effects/Slams/SlamHand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9626440405845642,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Ritual/TheWendigoBoss/Foley/Scrapes/ScrapeCast",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/IceWendigo/Arm/attachments/FurRArmONLY.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/FurRArm/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/FurRArm/rig.ast"
+		linear_allowed_contraction = 0.200
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.250
+		enclosure_angle = 0.250
+		attachment_bones = "root_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 child_attach"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/FurRArm/RArmFur.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd R_elbow_jntBnd R_elbow_Twist_1_jntBnd R_elbow_Twist_2_jntBnd R_elbow_Twist_3_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/IceWendigo/Arm/attachments/JewelleryForearmsRArmONLY.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/JewelleryRForearm/rig.amd"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/JewelleryRForearm/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.350
+		attachment_bones = "R_elbow_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 R_wrist_jntBnd child_attach "
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/JewelleryRForearm/RForearmBangles.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "child_attach false R_elbow_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 R_wrist_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/IceWendigo/Arm/attachments/JewelleryRArmONLY.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/JewelleryR/rig.amd"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/JewelleryR/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.300
+		attachment_bones = "R_elbow_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 child_attach "
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/JewelleryR/RJewellery.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "child_attach false R_elbow_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3"
+	}
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/Arm/AzmeriWendigoArm.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/Arm/rig_6bfdb4a0.smd"
+Materials 2
+	"Art/Models/MONSTERS/AzmeriWendigo/Textures/AzmeriWendigoBodyc.mat" 1
+	"Art/Models/MONSTERS/AzmeriWendigo/Textures/AzmeriWendigoRingc.mat" 1
+BoundingBox -198.041 -108.029 -175.945 -35.422 37.3997 8.95244
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/IceWendigo/AzmeriWendigo/attachments/Arm/rig_6bfdb4a0.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23E · stride 36
+  shapes 2 in the header, 2 in the block · 5846 triangles over 3660 vertices
+  names: 82 bytes said, 82 read  [agree]
+
+=== shapes (15)
+0	AzmeriWendigoBodyShape	from 0	count 10218
+1	bangles_nophysShape	from 10218	count 7320
+2	arms_fur_base_layerShape	from 17538	count 29328
+3	arms_fur_layerShape	from 46866	count 29328
+4	arms_strands_Shape1	from 76194	count 3768
+5	arms_strands_Shape2	from 79962	count 29328
+6	R_arm_bangle_Shape1	from 109290	count 1716
+7	R_arm_bangle_Shape2	from 111006	count 1116
+8	R_arm_bangle_Shape3	from 112122	count 1080
+9	R_arm_bangle_Shape4	from 113202	count 696
+10	R_arm_bangle_Shape5	from 113898	count 768
+11	R_arm_bangle_Shape6	from 114666	count 672
+12	R_arm_bangle_Shape7	from 115338	count 1464
+13	dangler_5Shape	from 116802	count 648
+14	dangler_6Shape	from 117450	count 600
+
+=== fitting
+the monster's rig: 27 bones
+mounts: aux_position, aux_serverbone_xy_R_hand
+  FurRArmONLY.ao  socket <root> [NOT in its carrier's rig]  box (-154.4,-8.2,-120.8)..(-91.6,50.1,-38)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23E · stride 36
+    shapes 4 in the header, 4 in the block · 30584 triangles over 20114 vertices
+    names: 162 bytes said, 162 read  [agree]
+    rig 10 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 9 of 10  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_R_elbow_1_jntBnd  [its own]  under 0  rests at (-111.9,34.2,-109.3)
+      2 phys_tri_R_elbow_2_jntBnd  [its own]  under 0  rests at (-128.2,36.8,-88.9)
+      3 phys_tri_R_elbow_3_jntBnd  [its own]  under 0  rests at (-139.5,26.2,-67)
+      4 R_shoulder_jntBnd  [shared]  under 0  rests at (-51.3,-7.3,-150.4)  carrier has (-51.3,-7.3,-150.4)
+      5 R_shoulder_cTwist_jntBnd  [its own]  under 4  rests at (-84.8,7.7,-121.9)
+      6 R_elbow_jntBnd  [shared]  under 4  rests at (-118.4,22.7,-93.4)  carrier has (-118.4,22.7,-93.4)
+      7 R_elbow_Twist_1_jntBnd  [its own]  under 6  rests at (-127.3,10.8,-73.7)
+      8 R_elbow_Twist_2_jntBnd  [its own]  under 6  rests at (-136.2,-1.2,-54.1)
+      9 R_elbow_Twist_3_jntBnd  [its own]  under 6  rests at (-145.1,-13.1,-34.5)
+  JewelleryForearmsRArmONLY.ao  socket <root> [NOT in its carrier's rig]  box (-164,-32.2,-69)..(-119.1,15.6,-18.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 7 in the header, 7 in the block · 2504 triangles over 1580 vertices
+    names: 266 bytes said, 266 read  [agree]
+    rig 12 bones, 6 of them names its carrier's rig also has
+    mesh weights reach bone 11 of 12  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_elbow_jntBnd  [shared]  under 0  rests at (-118.4,22.7,-93.4)  carrier has (-118.4,22.7,-93.4)
+      2 phys_R_bangle_1_jntBnd  [its own]  under 0  rests at (-131.3,10.3,-52.8)
+      3 phys_R_bangle_2_jntBnd  [its own]  under 0  rests at (-137.2,5.5,-51.1)
+      4 phys_R_bangle_3_jntBnd  [its own]  under 0  rests at (-142.6,-15.1,-46.6)
+      5 phys_R_bangle_5_jntBnd  [its own]  under 0  rests at (-152.6,-7.5,-31.2)
+      6 phys_R_bangle_6_jntBnd  [its own]  under 0  rests at (-155.2,-11.2,-29.8)
+      7 phys_R_bangle_7_jntBnd  [its own]  under 0  rests at (-159.3,-24.4,-27.7)
+      8 R_wrist_jntBnd  [shared]  under 1  rests at (-154,-25,-14.8)  carrier has (-154,-25,-14.8)
+      9 R_elbow_Twist_jntBnd_1  [shared]  under 1  rests at (-127.3,10.8,-73.7)  carrier has (-127.3,10.8,-73.7)
+      10 R_elbow_Twist_jntBnd_2  [shared]  under 1  rests at (-136.2,-1.2,-54.1)  carrier has (-136.2,-1.2,-54.1)
+      11 R_elbow_Twist_jntBnd_3  [shared]  under 1  rests at (-145.1,-13.1,-34.5)  carrier has (-145.1,-13.1,-34.5)
+  JewelleryRArmONLY.ao  socket <root> [NOT in its carrier's rig]  box (-118,-0.4,-64.1)..(-110.7,8.2,-48.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 416 triangles over 344 vertices
+    names: 56 bytes said, 56 read  [agree]
+    rig 7 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_elbow_jntBnd  [shared]  under 0  rests at (-118.4,22.7,-93.4)  carrier has (-118.4,22.7,-93.4)
+      2 phys_tri_5_jntBnd  [its own]  under 0  rests at (-114.2,6.3,-54.6)
+      3 phys_tri_6_jntBnd  [its own]  under 0  rests at (-115.5,2.6,-54.1)
+      4 R_elbow_Twist_jntBnd_1  [shared]  under 1  rests at (-127.3,10.8,-73.7)  carrier has (-127.3,10.8,-73.7)
+      5 R_elbow_Twist_jntBnd_2  [shared]  under 1  rests at (-136.2,-1.2,-54.1)  carrier has (-136.2,-1.2,-54.1)
+      6 R_elbow_Twist_jntBnd_3  [shared]  under 1  rests at (-145.1,-13.1,-34.5)  carrier has (-145.1,-13.1,-34.5)

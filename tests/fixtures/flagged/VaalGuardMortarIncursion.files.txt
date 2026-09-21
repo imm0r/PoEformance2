@@ -1,0 +1,1446 @@
+monster: Vaal Guard [Metadata/Monsters/LeagueIncursionNew/CommanderNew/VaalGuardMortarIncursion]
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/VaalGuardMortarLiving.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Vaal/trapper/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.44999998807907107,
+					"name": "contact",
+					"position": [
+						-6.397850036621094,
+						-72.4655990600586,
+						-114.09600067138672
+					]
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.13126477599143983,
+					"name": "drop_nade",
+					"position": [
+						-34.1864013671875,
+						13.580300331115723,
+						-137.08900451660157
+					],
+					"contact_ref": [
+						-28.69855499267578,
+						31.312881469726564,
+						-101.44223022460938
+					]
+				}
+			]
+		},
+		{
+			"name": "death_dot_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.10075999796390534,
+					"name": "drop_nade",
+					"position": [
+						-26.052017211914064,
+						21.19051170349121,
+						-72.99957275390625
+					],
+					"contact_ref": [
+						-5.626636505126953,
+						26.436290740966798,
+						-115.71107482910156
+					]
+				}
+			]
+		},
+		{
+			"name": "death_fwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.20185984671115876,
+					"name": "drop_nade",
+					"position": [
+						-30.961891174316408,
+						-38.65385437011719,
+						-61.642486572265628
+					],
+					"contact_ref": [
+						-30.709386825561525,
+						-4.131446838378906,
+						-72.19316101074219
+					]
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000000298023225,
+					"name": "move",
+					"position": [
+						140.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.14159099757671357,
+					"name": "drop_nade",
+					"position": [
+						-1.8424110412597657,
+						2.444740056991577,
+						-102.32139587402344
+					],
+					"contact_ref": [
+						17.76666259765625,
+						7.756130218505859,
+						-83.515380859375
+					]
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000000298023225,
+					"name": "move",
+					"position": [
+						-140.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.06383298337459564,
+					"name": "drop_nade",
+					"position": [
+						-132.53726196289063,
+						2.816587448120117,
+						-61.187843322753909
+					],
+					"contact_ref": [
+						-89.22406768798828,
+						0.0,
+						-58.0848388671875
+					]
+				}
+			]
+		},
+		{
+			"name": "flinch_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.05999999865889549,
+					"name": "drop_nade",
+					"position": [
+						-45.382999420166019,
+						9.156820297241211,
+						-82.81089782714844
+					]
+				}
+			]
+		},
+		{
+			"name": "guarding_turn_180_left_01",
+			"events": [
+				{
+					"type": "StartRotateEventType",
+					"time": 0.0,
+					"end_time": 1.0,
+					"name": "start_rotate",
+					"data": "180 1"
+				}
+			]
+		},
+		{
+			"name": "throw_trap_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.699999988079071,
+					"name": "contact",
+					"position": [
+						-68.26439666748047,
+						-82.57599639892578,
+						-130.61900329589845
+					]
+				}
+			]
+		},
+		{
+			"name": "throw_underarm_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.15012000501155854,
+					"name": "grab_grenade"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6911053657531738,
+					"name": "contact",
+					"position": [
+						-35.67610168457031,
+						-89.27749633789063,
+						-77.9845962524414
+					],
+					"contact_ref": [
+						-40.31275939941406,
+						-35.80967712402344,
+						-63.86723709106445
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03CapeLow.ao"
+	attached_object = "Head_Attachment Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03LivingHeaddressLow.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03LivingRobeLow.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/UpdatedVaalGuard03LivingMask.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.391061007976532,
+								0.0
+							],
+							[
+								0.446927011013031,
+								1.0
+							]
+						],
+						"width": 80.92500305175781,
+						"length": 104.0459976196289
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Vaal/trapper/rig.ast"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -5.9192"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -10.6918 -4.11053"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/UpdatedVaalGuard03Living.sm"
+			hide_segments = "belt_plate_meshShape,maskShape,skirt_plates_meshShape,underwear_meshShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder false L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder false R_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow false L_elbow_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_elbow false R_elbow_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_wrist false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_wrist false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_hand false L_finger_2_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "grp_R_hand false R_finger_2_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_L_knee false L_knee_jntBnd L_thigh_jntBnd"
+		bone_group = "grp_R_knee false R_knee_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "parent_attach false chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 R_clavicle_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 neck_jntBnd head_jntBnd"
+		bone_group = "root false hip_jntBnd chest_jntBnd neck_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "L_arm_FX false L_shoulder_jntBnd L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "R_arm_FX false R_shoulder_jntBnd R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "L_leg_FX false L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd"
+		bone_group = "R_leg_FX false R_thigh_jntBnd R_knee_jntBnd R_ankle_jntBnd"
+		bone_group = "aux_parasite false L_knee_jntBnd R_knee_jntBnd R_thigh_jntBnd R_elbow_jntBnd L_elbow_jntBnd R_shoulder_jntBnd L_shoulder_jntBnd"
+		bone_group = "fx_melee_r false R_elbow_Twist_jntBnd_2 R_wrist_jntBnd R_finger_2_jntBnd_3"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "alert_transition_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act3/VaalGuardMortarLiving/VaalLivingMortar_Aggro_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/AggroSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "aux_face_jntBnd",
+						"chance": 0.6600000262260437,
+						"dialogue_sfx": true,
+						"volume": 1.7000000476837159,
+						"volume_variance": 0.10000000149011612,
+						"min_pitch": 0.10000000149011612,
+						"max_pitch": 0.10000000149011612,
+						"priority": 20
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09497208148241043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1516360640525818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5586592555046082,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6528331637382507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Throw/Medium",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20541217923164369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45387348532676699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Swish_Unarmed_",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10594499856233597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Fall_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6793685555458069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Fall_Leg_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20146718621253968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Fall_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11002500355243683,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Fall_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1084899976849556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Fall_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21449509263038636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Fall_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10764999687671662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Fall_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.035115718841552737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10734238475561142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.035115718841552737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10734238475561142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.035115718841552737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10734238475561142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.035115718841552737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10734238475561142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.035115718841552737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10734238475561142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "formation_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Swish_Unarmed_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Throw/Attack",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11403831094503403,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "formation_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.33664950728416445,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Idle",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "formation_throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Swish_Unarmed_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Throw/Attack",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1053471714258194,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.035115718841552737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10734238475561142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.035115718841552737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10734238475561142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.035115718841552737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10734238475561142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.035115718841552737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Flinch_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10734238475561142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_turn_180_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.13088585436344148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3359937071800232,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7462095618247986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "guarding_turn_90_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.13088585436344148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15163618326187135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5291303396224976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "guarding_turn_90_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.13088585436344148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15163618326187135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5291303396224976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "guarding_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07781318575143814,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6484438180923462,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2390263080596924,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4764561653137208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.813647985458374,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8674529194831848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Idle",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "jog_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Run",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42102500796318056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Run",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6681175827980042,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Jog.loop.ogg",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Slow_",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/KnockdownA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18058174848556519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43106609582901,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Slow_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7242689728736877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0097050666809083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0271809101104737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6698967218399048,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.784199833869934,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/KnockdownB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.906788945198059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Slow_",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/KnockdownA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16076450049877168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38376039266586306,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Slow_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6447868347167969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8988988995552063,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9144569039344788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4678186178207398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/KnockdownB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4866403341293336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.697535753250122,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Run",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3400610089302063,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Run",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6019174456596375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Run.loop.ogg",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "throw_trap_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLivinwg/Vocal/Mortar/Throw/Trap",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act3/VaalGuardMortarLiving/VaalLivingMortar_Trap_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Throw/TrapSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "aux_face_jntBnd",
+						"chance": 0.20000000298023225,
+						"dialogue_sfx": true,
+						"volume": 1.7000000476837159,
+						"volume_variance": 0.10000000149011612,
+						"min_pitch": 0.10000000149011612,
+						"max_pitch": 0.10000000149011612,
+						"priority": 20
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09217873215675354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Slow_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3113960027694702,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Walk_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6142759919166565,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Swish_Unarmed_",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "throw_underarm_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Step_Slow_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act3/VaalGuardMortarLiving/VaalLivingMortar_Underarm_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Vocal/Mortar/Throw/UnderarmSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "aux_face_jntBnd",
+						"chance": 0.20000000298023225,
+						"dialogue_sfx": true,
+						"volume": 1.7000000476837159,
+						"volume_variance": 0.10000000149011612,
+						"min_pitch": 0.10000000149011612,
+						"max_pitch": 0.10000000149011612,
+						"priority": 20
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6368714570999146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Swish_Unarmed_",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7027131915092468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalGuardLiving/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimatedRender
+	{
+	}
+	
+	AttachedAnimatedObject
+	{
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.43744978308677676,
+						"end_time": 0.5335455536842346,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalGuardBombThrower/pet/melee_swipe.trl",
+						"bone_group": "fx_melee_r"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03CapeLow.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Cape/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Cape/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_radius = 2.000
+		enclosure_angle = 0.100
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Cape/UpdatedVaalGuard03LivingCape.sm"
+	}
+	
+	BoneGroups
+	{
+	    bone_group = "child_attach false hip_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03LivingHeaddressLow.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Headdress/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Headdress/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		enclosure_angle = 0.100
+		animation_force_factor = 1.000
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Headdress/UpdatedVaalGuard03LivingHeaddressLow.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalGuard03LivingRobeLow.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Skirt/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_radius = 2.000
+		enclosure_angle = 0.100
+		attachment_bones = "hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/VaalGuard03Skirt/UpdatedVaalGuard03LivingSkirtLow.sm"
+	}
+	
+	BoneGroups
+	{
+	    bone_group = "child_attach false hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/UpdatedVaalGuard03LivingMask.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/attachments/UpdatedVaalGuard03LivingMask.fmt"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/UpdatedVaalGuard03Living.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/UpdatedVaalGuard03Living_armour_6217cbe8.smd"
+Materials 2
+	"Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/Textures/UpdatedVaalGuard03LivingBodyc.mat" 1
+	"Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/Textures/UpdatedVaalGuard03LivingClothc.mat" 13
+BoundingBox -69.0258 -19.404 -189.1 69.0259 21.0552 0.580541
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/UpdatedVaalGuard03Living_armour_6217cbe8.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 14 in the header, 14 in the block · 14036 triangles over 11915 vertices
+  names: 418 bytes said, 418 read  [agree]
+
+=== shapes (27)
+0	BodyShape	from 0	count 9870
+1	arm_rope65Shape	from 9870	count 2376
+2	armbandShape	from 12246	count 180
+3	belt_plate_meshShape	from 12426	count 888
+4	chest_clothShape	from 13314	count 2094
+5	chest_plateShape	from 15408	count 1776
+6	headdressShape	from 17184	count 4866
+7	leg_ropeShape	from 22050	count 2592
+8	maskShape	from 24642	count 882
+9	necklaceShape	from 25524	count 3132
+10	sash_waistShape	from 28656	count 3312
+11	shoulderpadShape	from 31968	count 2976
+12	skirt_plates_meshShape	from 34944	count 6012
+13	underwear_meshShape	from 40956	count 1152
+14	capeShape	from 42108	count 600
+15	skull1Shape	from 42708	count 1410
+16	skull2Shape	from 44118	count 2310
+17	skull3Shape	from 46428	count 1404
+18	skull4Shape	from 47832	count 2280
+19	skull5Shape	from 50112	count 2226
+20	skull6Shape	from 52338	count 876
+21	skull7Shape	from 53214	count 2046
+22	skull8Shape	from 55260	count 2136
+23	belt_plate_meshShape	from 57396	count 1776
+24	skirt_platesShape	from 59172	count 6012
+25	skirtShape	from 65184	count 1050
+26	fixed_UpdatedVaalGuard03LivingMask|mask|maskShape	from 66234	count 882
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  VaalGuard03CapeLow.ao  socket chest_jntBnd [in its carrier's rig]  box (-23.9,8.1,-20.9)..(25.6,42.9,64)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 9 in the header, 9 in the block · 5096 triangles over 5246 vertices
+    names: 194 bytes said, 194 read  [agree]
+    rig 21 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 20 of 21  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_cape_L01_jntBnd  [its own]  under 0  rests at (10.9,13.9,-9.6)
+      2 phys_tri_cape_R01_jntBnd  [its own]  under 0  rests at (-10.9,13.9,-9.6)
+      3 phys_skull_01_jntBnd  [its own]  under 0  rests at (10.9,13.9,-16.7)
+      4 phys_skull_02_jntBnd  [its own]  under 0  rests at (-10.9,13.9,-2.5)
+      5 phys_skull_03_jntBnd  [its own]  under 0  rests at (0,18.1,5.7)
+      6 phys_skull_04_jntBnd  [its own]  under 0  rests at (15.5,12.1,11.7)
+      7 phys_skull_05_jntBnd  [its own]  under 0  rests at (10.9,13.9,24.5)
+      8 phys_skull_06_jntBnd  [its own]  under 0  rests at (-7.9,15.1,21.1)
+      9 phys_skull_07_jntBnd  [its own]  under 0  rests at (0,18.1,51.1)
+      10 spine_2_jntBnd  [shared]  under 0  rests at (0,-0.4,11.7)  carrier has (0,-0.7,-115.5)
+      11 phys_tri_cape_L02_jntBnd  [its own]  under 1  rests at (10.9,13.9,4.6)
+      12 phys_tri_cape_R02_jntBnd  [its own]  under 2  rests at (-10.9,13.9,4.6)
+      13 spine_1_jntBnd  [shared]  under 10  rests at (0,0.3,21.9)  carrier has (0,0,-105.4)
+      14 phys_tri_cape_L03_jntBnd  [its own]  under 11  rests at (10.9,13.9,18.1)
+      15 phys_tri_cape_R03_jntBnd  [its own]  under 12  rests at (-10.9,13.9,18.1)
+      16 hip_jntBnd  [shared]  under 13  rests at (0,3.5,37.3)  carrier has (0,3.2,-89.9)
+      17 phys_tri_cape_L04_jntBnd  [its own]  under 14  rests at (10.9,13.9,30.9)
+      18 phys_tri_cape_R04_jntBnd  [its own]  under 15  rests at (-10.9,13.9,30.9)
+      19 phys_tri_cape_L05_jntBnd  [its own]  under 17  rests at (10.9,13.9,44.2)
+      20 phys_tri_cape_R05_jntBnd  [its own]  under 18  rests at (-10.9,13.9,44.2)
+  VaalGuard03LivingHeaddressLow.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-30.3,-10.8,-51)..(30.3,52.2,37)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 1228 triangles over 992 vertices
+    names: 74 bytes said, 74 read  [agree]
+    rig 9 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 8 of 9  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_feathers_L01_jntBnd  [its own]  under 0  rests at (10.8,8.4,-3.6)
+      2 phys_tri_feathers_M01_jntBnd  [its own]  under 0  rests at (0,-0.7,-16.8)
+      3 phys_tri_feathers_R01_jntBnd  [its own]  under 0  rests at (-10.8,8.4,-3.6)
+      4 phys_tri_feathers_L02_jntBnd  [its own]  under 1  rests at (18.8,28.7,-2)
+      5 phys_tri_feathers_M02_jntBnd  [its own]  under 2  rests at (-0,11.8,-34.7)
+      6 phys_tri_feathers_R02_jntBnd  [its own]  under 3  rests at (-18.8,28.7,-2)
+      7 phys_tri_feathers_L03_jntBnd  [its own]  under 4  rests at (23.1,45.1,7.7)
+      8 phys_tri_feathers_R03_jntBnd  [its own]  under 6  rests at (-23.1,45.1,7.7)
+  VaalGuard03LivingRobeLow.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-26.2,-22.6,-9.6)..(26.2,19.1,56.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 2946 triangles over 2828 vertices
+    names: 94 bytes said, 94 read  [agree]
+    rig 13 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 12 of 13  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,3.2,15.4)  carrier has (0,3.2,-89.9)
+      2 L_thigh_jntBnd  [shared]  under 1  rests at (10.1,3.2,15.4)  carrier has (10.1,3.2,-89.9)
+      3 R_thigh_jntBnd  [shared]  under 1  rests at (-10.1,3.2,15.4)  carrier has (-10.1,3.2,-89.9)
+      4 phys_tri_skirt_F01_jntBnd  [its own]  under 1  rests at (-0,-15.3,27.6)
+      5 phys_belt_jntBnd  [its own]  under 1  rests at (-0,-15.3,-6.2)
+      6 phys_hipPad_L_jntBnd  [its own]  under 1  rests at (15.7,-3.2,-5)
+      7 phys_hipPad_R_jntBnd  [its own]  under 1  rests at (-15.7,-3.2,-5)
+      8 phys_tri_skirt_L01_jntBnd  [its own]  under 2  rests at (20.3,-1,41.6)
+      9 phys_tri_skirt_L02_jntBnd  [its own]  under 2  rests at (11.4,12.9,41.6)
+      10 phys_tri_skirt_R01_jntBnd  [its own]  under 3  rests at (-20.3,-1,41.6)
+      11 phys_tri_skirt_R02_jntBnd  [its own]  under 3  rests at (-11.4,12.9,41.6)
+      12 phys_tri_skirt_F02_jntBnd  [its own]  under 4  rests at (0,-15.3,43.5)
+  UpdatedVaalGuard03LivingMask.ao  socket head_jntBnd [in its carrier's rig]  fixed mesh UpdatedVaalGuard03LivingMask.fmt  1 shapes
+      fixed_UpdatedVaalGuard03LivingMask|mask|maskShape  ->  Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Vaal/VaalGuards/Textures/UpdatedVaalGuard03LivingClothc.mat

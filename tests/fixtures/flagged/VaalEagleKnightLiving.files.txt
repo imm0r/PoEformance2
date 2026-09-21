@@ -1,0 +1,1191 @@
+monster: Vaal Enforcer [Metadata/Monsters/VaalMonsters/Living/VaalEagleKnightLiving]
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/VaalEagleKnightLiving.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/VaalEagleKnight/Animations/dual_axe/rig.amd"
+	animations = '[
+		{
+			"name": "guarding_turn_180_left_01",
+			"events": [
+				{
+					"type": "StartRotateEventType",
+					"time": 0.0,
+					"end_time": 1.0,
+					"name": "start_rotate",
+					"data": "180 1"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalEagleKnightLivingfeathersHeld.ao"
+	attached_object = "<root> Metadata/Monsters/VaalMonsters/Living/attachments/VaalEagleKnightLivingMask.ao"
+	attached_object = "R_Weapon Art/Models/Items/Weapons/OneHandWeapons/OneHandAxes/Monsters/VaalSergeantsAxeThin.fmt"
+	attached_object = "L_Weapon Art/Models/Items/Weapons/OneHandWeapons/OneHandAxes/Monsters/VaalSergeantsAxeThin.fmt"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.29050299525260928,
+								0.0
+							],
+							[
+								0.4189940094947815,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 2,
+						"angle": 3.141590118408203,
+						"length": 132.947998046875,
+						"impact_z_rotation": [
+							0.6108649969100952,
+							1.6580599546432496
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4301680028438568,
+								0.0
+							],
+							[
+								0.5083799958229065,
+								1.0
+							]
+						],
+						"damage_statset_index": 2,
+						"width": 80.92500305175781,
+						"length": 156.06900024414063,
+						"impact_x_rotation": [
+							0.0,
+							-0.6981319785118103
+						],
+						"impact_type": "Slash"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.18994399905204774,
+								0.0
+							],
+							[
+								0.2849160134792328,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"increment_damage_stage": false,
+						"defer_damage_prediction": true,
+						"damage_statset_index": 4,
+						"width": 115.60800170898438,
+						"angle": 1.7453299760818482,
+						"length": 109.8270034790039,
+						"impact_z_rotation": [
+							0.43633198738098147,
+							1.309000015258789
+						]
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.27374300360679629,
+								0.0
+							],
+							[
+								0.32608699798583987,
+								1.0
+							]
+						],
+						"increment_damage_stage": false,
+						"defer_damage_prediction": true,
+						"damage_statset_index": 4,
+						"width": 67.41600036621094,
+						"length": 151.68499755859376,
+						"impact_x_rotation": [
+							0.0,
+							-0.5235990285873413
+						],
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.5064939856529236,
+								0.0
+							],
+							[
+								0.5064939856529236,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"increment_damage_stage": false,
+						"defer_damage_prediction": true,
+						"damage_statset_index": 4,
+						"rotation": -0.785398006439209,
+						"width": 27.027999877929689,
+						"angle": 2.0245800018310549,
+						"length": 94.59500122070313,
+						"offset": [
+							27.0,
+							2.0
+						],
+						"impact_z_rotation": [
+							-0.8726649880409241,
+							-1.6580599546432496
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.6103900074958801,
+								0.0
+							],
+							[
+								0.6753249764442444,
+								1.0
+							]
+						],
+						"increment_damage_stage": false,
+						"defer_damage_prediction": true,
+						"damage_statset_index": 4,
+						"width": 67.56800079345703,
+						"length": 141.89199829101563,
+						"impact_x_rotation": [
+							0.0,
+							-0.785398006439209
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/VaalEagleKnight/Animations/dual_axe/rig.ast"
+		linear_allowed_contraction = 0.339
+		bend_stiffness = 169.000
+		bend_allowed_angle = 0.492
+		normal_viscosity_multiplier = 0.269
+		tangent_viscosity_multiplier = 0.123
+		enclosure_angle = 0.750
+		animation_velocity_factor = 2.000
+		animation_force_factor = 8.500
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/VaalEagleKnight/VaalEagleKnight.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	AnimatedRender
+	{
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_pad_jntBnd head_jntBnd L_shoulder_pad_jntBnd"
+	}
+	
+	ParticleEffects
+	{
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.35561200976371767,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalEagleKnight/ao/cleave_01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								14.050000190734864,
+								-73.25,
+								-125.05000305175781
+							],
+							"rotation": [
+								0.9598999619483948,
+								-0.750499963760376,
+								0.0
+							],
+							"scale": [
+								0.800000011920929,
+								0.800000011920929,
+								0.800000011920929
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.5151489973068237,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalEagleKnight/ao/cleave_01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								-55.000003814697269,
+								-100.00000762939453
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.34606701135635378,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalEagleKnight/ao/cleave_01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								14.050000190734864,
+								-49.55000305175781,
+								-106.60000610351563
+							],
+							"rotation": [
+								0.6108999848365784,
+								-0.5060999989509583,
+								0.0
+							],
+							"scale": [
+								0.800000011920929,
+								0.800000011920929,
+								0.800000011920929
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.45713499188423159,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalEagleKnight/ao/cleave_01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-19.05000114440918,
+								-67.35000610351563,
+								-120.00000762939453
+							],
+							"rotation": [
+								0.2442999929189682,
+								0.0,
+								0.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.8946290016174316,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalEagleKnight/ao/cleave_01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-19.05000114440918,
+								-46.10000228881836,
+								-117.80000305175781
+							],
+							"rotation": [
+								-1.5360000133514405,
+								-0.33159998059272768,
+								0.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.0476800203323365,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalEagleKnight/ao/cleave_01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-17.5,
+								-60.80000305175781,
+								-81.30000305175781
+							],
+							"rotation": [
+								-0.9424999952316284,
+								-0.40139999985694888,
+								-0.03491000086069107
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "alert_transition_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4024049937725067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Alert",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4377799928188324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47039198875427248,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Chainmail",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23270200192928315,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/WhooshStart",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2940270006656647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Attack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35619300603866579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/WhooshAxe",
+						"bone_name": "R_finger_1_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21336300671100617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/WhooshStart",
+						"bone_name": "L_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30622598528862,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Attack2A",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3250190019607544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/WhooshAxe",
+						"bone_name": "L_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7395840287208557,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.769432008266449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/WhooshStart",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8844050168991089,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Attack2B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.893248975276947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/WhooshAxe",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3597700595855713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Chainmail",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21229000389575959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/AxeDrop",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2556320130825043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/AxeDrop",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.075968898832798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/AxeDrop",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18520499765872956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/AxeDrop",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4012269973754883,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18310199677944184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/AxeDrop",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2043289989233017,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/AxeDrop",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15214000642299653,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/AxeDrop",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15302500128746034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/AxeDrop",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2556320130825043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/AxeDrop",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27553099393844607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/AxeDrop",
+						"bone_name": "L_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19194500148296357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/AxeDrop",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2556320130825043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/AxeDrop",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.4412699937820435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Walk",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_turn_180_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3589920103549957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Chainmail",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.472461998462677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Run",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.164109006524086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5559899806976318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6677539944648743,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6747689843177795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Walk",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2155739963054657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/ArmourMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30069699883461,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2978700399398804,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Chainmail",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08580029755830765,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2574009895324707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4245780110359192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7509750127792358,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9473410248756409,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_15/VaalEagleKnightLiving/Vocals/Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0932899713516236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/VaalEagleKnight/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalEagleKnightLivingfeathersHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/VaalEagleKnight/attachments/VaalMonsterfeathers.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/VaalEagleKnight/attachments/VaalMonsterfeathers.ast"
+		linear_stiffness = 83799.164
+		linear_allowed_contraction = 0.457
+		bend_stiffness = 831.000
+		bend_allowed_angle = 2.308
+		normal_viscosity_multiplier = 0.146
+		tangent_viscosity_multiplier = 0.415
+		enclosure_radius = 6.900
+		enclosure_angle = 0.200
+		animation_velocity_factor = 5.080
+		animation_force_factor = 43.100
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/VaalEagleKnight/attachments/VaalMonsterfeathers.sm"
+			VaalMonsterhead_feathersShape = "Art/Models/MONSTERS/VaalEagleKnight/Textures/VaalEagleKnightLivingc.mat"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalEagleKnightLivingMask.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/VaalEagleKnight/attachments/mask/VaalEagleKnightLivingMask.sm"
+	}
+}
+
+=== .ao Art/Models/Items/Weapons/OneHandWeapons/OneHandAxes/Monsters/VaalSergeantsAxeThin.fmt (depth 1)
+	 	   ���x�@0(�,(@h!�  �ADOLm  8   B  t      �                           	 
+  	 	  
+ 
+                                                                 !   ! " ! # " $    % $   & $ % ' & % ( & ' ) ( ' * ( ) + * ) , - . . - / 0 - , / - 1 2 - 0 1 - 3 4 - 2 3 - 4 5 6 7 5 7 8 9 5 8 : 9 8 ; : 8 ; < : = > ? > @ ? A > = ? @ B C A = D A C E D C @ F B B F G F H G G H I H J I I J K J L K K L M L N M O P Q P R Q S P O Q R T U S O V S U W V U R X T T X Y X Z Y Y Z [ Z \ [ [ \ ] \ ^ ] ] ^ _ ^ ` _ a b c b d c e b a c d f g e a h e g i h g d j f f j k j l k k l m l n m m n o n p o o p q p r q s t u t v u w t s u v x y w s z w y { z y v | x x | } | ~ } } ~  ~ �   � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � �  �  �  	
+
+	
+	  ! !"##$%$#%&$'&%'(&)(')*(+*)+,*-.//.0-1./0220323451-5617657869879:8;:9;<:=<;=><?@AA@B?C@DEFFEGDHEIJKILJMNOMPNPQNRSTTURRVSSVWWVXRUYYUZZ[YY[\]\[^Y\RY^R^VV_XV^__`X_a`_ba_^bcabdb^ed^efdghigjhklmknlopqorpsro�p���u��5y���s�s53(t� �k�@i+?�t���z	�{!�-� ���u���׵��u�u2$��,p��t��M}��t�v.-���l�`i+?m����{��{ q-p�p����t��e����u��u2%q�`��t��]w���u��v0)���>��i+?
+�^��z�|2ȸ �T��t��z�P��s�w+f0����+��u��j���v!�z"93:�`���i+?���{�}5/������u�������v#�{5��`���j+?��� �5Y���U�0h+?���{��{ '0K��q��s���;��t�u1 I,Y���e��u��Ck��v�w- �-�� 9� i+?�h��}��}
+2��[� u���u��w�x*/�`���h+?sn�� � o5� ~0?��p?%��� � �8Y���2?��p?�{�� � �8�wF@ L�?�c!�| � ��4v�08^��E�?c �� � ��4˷ �E@ J�??��| � �}2v�0�^��F�?;�� � �}2˷�x�@�c���w�4t � �4.� m�?�l�?�K�AZZ ��Z ��:W��l�?�l�?^(fAZZ ��Z ��:��   7,(@�K�A  ��  �-;W�   7(@^(fA  ��  �-;�� (@  �6V(fA  �  �j:���lۿ�l�?�K�A�Z ��� ��;W� (@   6�K�A  �  �j:W�@lۿ�l�?V(fA�Z ��� ��;�� (�   6�K�A�  � � ��;W��'�  �6V(fA�  � � ��;���l�?�lۿN(fAZ� �ZZ �	:���l�?�lۿ�K�AZ� �ZZ �	:W�     (�F(fA � �  ��9��   �0(��K�A � �  ��9W��lۿ�lۿN(fA�� �Z� �F9�� mۿ�lۿ�K�A�� �Z� �F9W��'�  �6V(fA�  � � ��8�� (�   6�K�A�  � � ��8W�   7,(@�K�A !{�  �*�9        ��A  �  �*�8 m�?�l�?�K�A{�} 聊2Y9 (@   6�K�A! {�{ ߁O4�8�lۿ�l�?�K�A�{�} ���Y9�l�?�lۿ�K�A�{�} 聊28 (�   6�K�A� {�{ !����8   �0(��K�A �{�  �*�7 mۿ�lۿ�K�A��{�} ���8 (�   6+,�  ���  �l9^8�lۿ�l�?+,�  ���  �&9�8  ��((@+,�  ���  �{8�8�l�?�l�?',�  ���  ��7�8�lۿ�lۿ+,�  ���  �&9	8    (�+,�  ���  �{8�7 (@   6+,�  ���  �7^8 m�?�lۿ+,�  ���  ��7	8    (����� � �  �s7I�    (�+,� � �  �s7M��l�?plۿ����Z� �ZZ �08I� m�?�lۿ+,�Z� �ZZ �08M��lۿ�lۿ+,¦� �Z� ��6M�`(@  p7����  �  ��8I��lۿ�lۿ������ �Z� ��6I� (�   6+,  � � ��5M� (�  @6�����  � � ��5I� (@   6+,�  �  ��8M�@m�? m�?}���ZZ ��Z �9I��l�?�l�?',�ZZ ��Z �9M�   �(@����  ��  ��9I�  ��((@+,�  ��  ��9M��lۿ�l�?�����Z ��� �:I��lۿ�l�?+,¦Z ��� �:M� (�  @6�����  � � ��:I� (�   6+,  � � ��:M�     (�F(fA �ɀ���65�    ����~�WA �ɀ���6��l�?�lۿN(fAQ�ɀ\W��75� ��?������WAQ�ɀW\���7���������v�WA��ɀ\���6� (@  �6V(fAr ɀ�e85��lۿ�lۿN(fA��ɀW��65�@���    ~�WA� ɀ
+��5��'�  �6V(fA� ɀ
+��55� ��?  �5~�WAr ɀ���e8��l�?�l�?^(fAQQɀ�\��85����?���?��WAQQɀ�W���8�   7(@^(fA rɀ��R95�   7���?��WA rɀ����R9�@lۿ�l�?V(fA�Qɀ����95��������?~�WA�Qɀ�����9��'�  �6V(fA� ɀ���B:5�@���    ~�WA� ɀ���B:�   7������� �a�~���o7�    (����� �a�~
+	�o7;����?h������:�a�aR��.8��l�?plۿ����:�a�Ra	�.8;��lۿ�lۿ������a�a�	��6;� ��?  07���R a�
+~���8� ������������a�R����6� (�  @6����� a����5;� ���   ����� a����5�`(@  p7����R a��~	��8;� ��?���?����::a��a��9�@m�? m�?}���::a��R	�9;�    ���?��� Ra��
+���9�   �(@���� Ra���	��9;��������?����:a�����
+:��lۿ�l�?�����:a���	�
+:;� ���   ����� a��灂:� (�  @6����� a��灂:;�    ����~�WA � �  �w7:�   7������� � �  �w7� ��?������WAZ� �ZZ �28:����?h������Z� �ZZ �28� ������������ �Z� ��6� ��?  �5~�WA  �  ��8:���������v�WA�� �Z� ��6:� ���   �����  � � ��5�@���    ~�WA�  � � ��5:� ��?  07���  �  ��8����?���?��WAZZ ��Z �9:� ��?���?����ZZ ��Z �9�   7���?��WA  ��  ��9:�    ���?���  ��  ��9��������?~�WA�Z ��� �::��������?����Z ��� �:�@���    ~�WA�  � � ��::� ���   �����  � � ��:��wF@x*¿h!�� � ���4v� �E@(*¿���� � ��}2v���^��䣿G ��� � ���4˷��^��棿�:��� � ��}2˷�x�@�c���w�3� � ��4.��wF@ L�?�c!� �� � �����wF@x*¿h!� �� � �H.��08^��E�?c �� �� � �����^��䣿G �� ���� �H.��x�@�c���w�; �� � ��*$���^��䣿G ��� ��Ѳ��^��棿�:��� �J.Ѳ08^��E�?c ��� ��6�0�^��F�?;��� �J.6���^��棿�:�� � ��.�� �E@(*¿��� |�  ��.շ0�^��F�?;�� �  �F2�� �E@ J�??�� |�  �F2շ�x�@�c���w�: q�  ��0���p���u��5y��ˍ�s��3(t� ���u���׵�΋�u��$� �k���X��t��߆	�{���-��,p��t��M}�ь�v��-���l���X�m�������{��q-p�p����t��e���΋��u��%q�`��t��]w��Ћ��v��)���>���X�
+�^���|��2ȸ �T��t��z�P�Ս�w��f0����+��u��j��݊!�z��93:�`�����X�����}��5/������u�������#�{��5��`���X����� ���5Y���U�p�X������{��'0K��q��s���;�Ќ�u� �I,Y���e��u��Ck�ӊ�w� ��-�� 9���X��h����}��
+2��[� u���u�։�x��/�`���X�sn��� �� �o5�~0?����%���� �� ��8Y� �2?����{��� �� ��8� �2?����{�  � � �m;W���2?��p?�{�  � � ��:W��~0?����%��  � � �m;� ~0?��p?%��  � � ��:��~0?����%��  � � �m; � ~0?��p?%��  � � ��:�`���X���  � � �m;��`���j+?��  � � ��:��`���X��� � � �k;Ѷ`���j+?�� � � ��:Ѷ`�����X��� �� � �k;��`���i+?�� �� � ��:�������u������ �� � ��:� ���u���׵�2���u2�$� �k�@i+?�t��!���{!��-��p���u��5y��5��s5�3(t��,p��t��M}�/��v.�-���l�`i+?m��� ��{ �q-p�p����t��e���2��u2�%q�`��t��]w��0��v0�)���>��i+?
+�^���|�2ȸ �T��t��z�P�+��w+�f0����+��u��j��#�߀z"�93:�`���i+?����}�5/������u�������݀{�5��`���j+?��� ��5Y���U�0h+?���
+�{ �'0K��q��s���;�0��u1 �I,Y���e��u��Ck�-��w- ��-�� 9� i+?�h���}�
+2��[� u���u�*��x*�/�`���h+?sn�� � �o5� ~0?��p?%��� � ��8Y���2?��p?�{�� � ��8� �E@ J�??��� � ��}2v�08^��E�?c �� � ���4˷�wF@ L�?�c!�� � ���4v�0�^��F�?;�� � ��}2˷�x�@�c���w�̌ � ��4.�   7,(@�K�A � ��  -;W��l�?�l�?^(fA�� ��Z �:�� m�?�l�?�K�A�� ��Z �:W� (@  �6V(fA�  �  j:��   7(@^(fA � ��  -;�� (@   6�K�A�  �  j:W��lۿ�l�?�K�AZ� ��� �;W��l�?�lۿN(fA�Z �ZZ 	:��@lۿ�l�?V(fAZ� ��� �;�� (�   6�K�A  � � �;W��'�  �6V(fA  � � �;���l�?�lۿ�K�A�Z �ZZ 	:W�     (�F(fA  �  �9��   �0(��K�A  �  �9W��lۿ�lۿN(fAZZ �Z� F9�� mۿ�lۿ�K�AZZ �Z� F9W��'�  �6V(fA  � � �8�� (�   6�K�A  � � �8W� m�?�l�?�K�A�酀} ��2Y9        ��A  ��  *�8   7,(@�K�A ߅�  *�9�lۿ�l�?�K�A酀} ��Y9 (@   6�K�A� ��{ �O4�8 (�   6�K�A! ��{ !���8�l�?�lۿ�K�A���} ��28 mۿ�lۿ�K�A��} ��8   �0(��K�A !��  *�7  ��((@+,�  ��  {8�8�lۿ�l�?+,�  ��  &9�8 (�   6+,�  ��  l9^8�l�?�l�?',�  ��  �7�8�lۿ�lۿ+,�  ��  &9	8    (�+,�  ��  {8�7 (@   6+,�  ��  7^8 m�?�lۿ+,�  ��  �7	8�l�?plۿ�����Z �ZZ 08I�    (�+,�  �  s7M�    (�����  �  s7I��lۿ�lۿ+,�ZZ �Z� �6M� m�?�lۿ+,¦Z �ZZ 08M��lۿ�lۿ����ZZ �Z� �6I� (�   6+,�  � � �5M� (�  @6����  � � �5I�`(@  p7�����  �  �8I� (@   6+,  �  �8M�@m�? m�?}����� ��Z 9I��l�?�l�?',¦� ��Z 9M�   �(@���� � ��  �9I�  ��((@+,� � ��  �9M��lۿ�l�?����Z� ��� :I��lۿ�l�?+,�Z� ��� :M� (�  @6����  � � �:I� (�   6+,�  � � �:M��l�?�lۿN(fA�Q7�\W�75�    ����~�WA r7���6�     (�F(fA r7���65���������v�WAQQ7�\��6� ��?������WA�Q7�W\��7��lۿ�lۿN(fAQQ7�W�65�@���    ~�WAr 7�
+��5��'�  �6V(fAr 7�
+��55� (@  �6V(fA� 7�e85� ��?  �5~�WA� 7���e8��l�?�l�?^(fA��7��\�85����?���?��WA��7��W��8�   7(@^(fA �7��R95�   7���?��WA �7����R9�@lۿ�l�?V(fAQ�7����95��������?~�WAQ�7�����9��'�  �6V(fAr 7���B:5�@���    ~�WAr 7���B:����?h�������:��aR�.8�    (����� R��~
+	o7;�   7������� R��~��o7��lۿ�lۿ����::��a�	�6;��l�?plۿ�����:��Ra	.8;� ����������::��R���6� (�  @6����R ����5;� ���   ����R ����5� ��?  07���� ��
+~��8�`(@  p7����� ���~	�8;� ��?���?�����Ɵ��a�9�@m�? m�?}����Ɵ��R	9;�    ���?��� ����
+��9�   �(@���� �����	�9;��������?���:Ɵ����
+:��lۿ�l�?����:Ɵ���	
+:;� ���   ����R �����:� (�  @6����R �����:;� ��?������WA�Z �ZZ 28:�   7�������  �  w7�    ����~�WA  �  w7:� ����������ZZ �Z� �6����?h�������Z �ZZ 28���������v�WAZZ �Z� �6:� ���   ����  � � �5�@���    ~�WA  � � �5:� ��?  �5~�WA�  �  �8:� ��?  07����  �  �8����?���?��WA�� ��Z 9:� ��?���?������ ��Z 9�   7���?��WA � ��  �9:�    ���?��� � ��  �9��������?~�WAZ� ��� ::��������?���Z� ��� :�@���    ~�WA  � � �::� ���   ����  � � �:���^��䣿G � � ��4˷ �E@(*¿����| � �}2v��wF@x*¿h!��| � ��4v��x�@�c���w��t � �4.���^��棿�:� � �}2˷08^��E�?c � � � ���wF@x*¿h!�� |� � H.���wF@ L�?�c!�� |� � ����x�@�c���w�� q� � �*$���^��䣿G � ��� H.�08^��E�?c ���� �6���^��棿�:���� J.Ѳ��^��䣿G ���� �Ѳ0�^��F�?;���� J.6�0�^��F�?;� ��  F2�� �E@(*¿���� ��  �.շ��^��棿�:� �� �.�� �E@ J�??��� ��  F2շ�x�@�c���w�� ��  �0�� �k���X��t��!z��{��-� ���u���׵�2u��u�$�p���u��5y��5s�s�3(t��,p��t��M}�/t�v�-���l���X�m��� {�{�q-p�p����t��e���2u�u�%q�`��t��]w��0u�v�)���>���X�
+�^�z�|�2ȸ �T��t��z�P�+s�w�f0����+��u��j��#v߀z�93:�`�����X���{�}�5/������u������v݀{�5��`���X��� ��5Y���U�p�X���{
+�{�'0K��q��s���;�0t�u� I,Y���e��u��Ck�-v�w� �-�� 9���X��h�}�}�
+2��[� u���u�*w�x�/�`���X�sn� �� o5�~0?����%�� �� �8Y� �2?����{� �� �8�~0?����%���  � � m;���2?��p?�{  � � �:W� �2?����{  � � m;W� ~0?��p?%���  � � �:�`���X���  �� � m;�� ~0?��p?%��  �� � �:��~0?����%��  �� � m; �`���j+?��  �� � �:��`�����X���� � � k;��`���j+?��� �� � �:Ѷ`���X���� �� � k;Ѷ`���i+?��� � � �:�������u������� � � �:�    	   C   J   N              �          �A��>�    5=����O�    5=������    0*zI�    K�	½no�    �����m�    � �����    ��&�T   A x e S h a p e   A r t / T e x t u r e s / M o n s t e r s / V a a l S e r g e a n t s / V a a l S e r g e a n t s A x e c . m a t   h a n d l e   m i d   b l a d e   
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Skin.ao (depth 2)
+version 3
+extends "nothing"
+
+BaseAnimationEvents { }
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	SkinMesh { }
+}
+
+=== .sm Art/Models/MONSTERS/VaalEagleKnight/VaalEagleKnight.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/VaalEagleKnight/rig_ea639705.smd"
+Materials 1
+	"Art/Textures/Monsters/VaalEagleKnight/VaalMonsterSpecularc.mat" 8
+BoundingBox -75.5679 -25.1667 -194.306 75.5679 21.9038 0.400113
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/VaalEagleKnight/rig_ea639705.smd
+  version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 8 in the header, 8 in the block · 7654 triangles over 6058 vertices
+  names: 344 bytes said, 344 read  [agree]
+
+=== shapes (9)
+0	VaalMonsterbeltShape	from 0	count 726
+1	VaalMonsterbodyShape	from 726	count 9708
+2	VaalMonsterleg_extrasShape	from 10434	count 2304
+3	VaalMonsterlegsShape	from 12738	count 3252
+4	VaalMonsterneckShape	from 15990	count 1080
+5	VaalMonstershoulderShape	from 17070	count 3402
+6	VaalMonsterskirtShape	from 20472	count 528
+7	VaalMonsterskullShape	from 21000	count 1962
+8	Headress05Shape	from 22962	count 918
+
+=== fitting
+the monster's rig: 96 bones
+mounts: aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  VaalEagleKnightLivingfeathersHeld.ao  socket head_jntBnd [in its carrier's rig]  box (-29.2,-11.9,-44.8)..(32.8,45.5,10.5)
+    (the geometry did not read)
+    rig 8 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,1)
+      1 phys_skinned_feathers_mid_01_jntBnd  [its own]  under 0  rests at (0,11.6,-27.5)
+      2 phys_skinned_feathers_low_01_jntBnd  [its own]  under 0  rests at (-0,12.8,-22.9)
+      3 phys_skinned_feathers_top_01_jntBnd  [its own]  under 0  rests at (0,-1.6,-28.4)
+      4 phys_skinned_feathers_mid_02_jntBnd  [its own]  under 1  rests at (0,19.5,-32.1)
+      5 phys_skinned_feathers_low_02_jntBnd  [its own]  under 2  rests at (-0,20.7,-18.3)
+      6 phys_skinned_feathers_top_02_jntBnd  [its own]  under 3  rests at (0,6,-33.5)
+      7 phys_skinned_feathers_low_03_jntBnd  [its own]  under 5  rests at (0,26.2,-11.7)
+  VaalEagleKnightLivingMask.ao  socket <root> [NOT in its carrier's rig]  box (-8.1,-15.4,-188.2)..(8.1,-5.8,-164.7)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 306 triangles over 195 vertices
+    names: 30 bytes said, 30 read  [agree]
+    (no rig of its own)

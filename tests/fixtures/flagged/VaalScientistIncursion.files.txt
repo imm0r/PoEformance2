@@ -1,0 +1,2582 @@
+monster: Surgical Experimentalist [Metadata/Monsters/LeagueIncursionNew/SynthfleshLab/VaalScientistIncursion]
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/VaalCasterLiving.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/LivingVaalCasterMonster/rig.amd"
+	animations = '[
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.39989998936653139,
+					"name": "move",
+					"position": [
+						110.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.39989998936653139,
+					"name": "move",
+					"position": [
+						-110.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "experiment_emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9432576894760132,
+					"name": "revive_monster"
+				}
+			]
+		},
+		{
+			"name": "lightning_ball_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.3355400562286378,
+					"name": "contact",
+					"position": [
+						0.0,
+						-67.22750091552735,
+						-144.91299438476563
+					]
+				}
+			]
+		},
+		{
+			"name": "lightning_tendril_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "contact",
+					"position": [
+						-29.972204208374025,
+						-22.023536682128908,
+						-179.552734375
+					],
+					"contact_ref": [
+						-29.974212646484376,
+						23.00518798828125,
+						-171.68873596191407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0250000953674318,
+					"name": "contact",
+					"position": [
+						58.79509735107422,
+						-33.797847747802737,
+						-126.1690673828125
+					],
+					"contact_ref": [
+						45.9854850769043,
+						9.318824768066407,
+						-133.91891479492188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.049999952316284,
+					"name": "contact",
+					"position": [
+						-28.773517608642579,
+						-9.047805786132813,
+						-198.98423767089845
+					],
+					"contact_ref": [
+						-29.42816925048828,
+						31.628406524658204,
+						-177.93812561035157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.075000047683716,
+					"name": "contact",
+					"position": [
+						60.76036071777344,
+						-28.80556869506836,
+						-130.36968994140626
+					],
+					"contact_ref": [
+						43.7086067199707,
+						13.345451354980469,
+						-133.4595947265625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0999999046325685,
+					"name": "contact",
+					"position": [
+						-29.364933013916017,
+						0.79296875,
+						-203.00167846679688
+					],
+					"contact_ref": [
+						-29.448684692382814,
+						38.27532196044922,
+						-178.02987670898438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.125,
+					"name": "contact",
+					"position": [
+						60.270389556884769,
+						-25.386402130126954,
+						-128.88980102539063
+					],
+					"contact_ref": [
+						42.65836715698242,
+						16.211647033691408,
+						-131.11827087402345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.1500000953674318,
+					"name": "contact",
+					"position": [
+						-30.818899154663087,
+						6.107471466064453,
+						-201.56752014160157
+					],
+					"contact_ref": [
+						-27.941513061523439,
+						42.430294036865237,
+						-176.9671630859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.174999952316284,
+					"name": "contact",
+					"position": [
+						62.018280029296878,
+						-23.20970916748047,
+						-125.34644317626953
+					],
+					"contact_ref": [
+						43.48331832885742,
+						17.652976989746095,
+						-128.54287719726563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.200000047683716,
+					"name": "contact",
+					"position": [
+						-31.29227066040039,
+						10.443931579589844,
+						-201.82305908203126
+					],
+					"contact_ref": [
+						-24.892013549804689,
+						45.643089294433597,
+						-176.26348876953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2249999046325685,
+					"name": "contact",
+					"position": [
+						66.52183532714844,
+						-21.361709594726564,
+						-120.97380065917969
+					],
+					"contact_ref": [
+						45.508949279785159,
+						17.945598602294923,
+						-126.81108856201172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.25,
+					"name": "contact",
+					"position": [
+						-31.00385284423828,
+						14.08840560913086,
+						-203.02774047851563
+					],
+					"contact_ref": [
+						-20.7437744140625,
+						48.072784423828128,
+						-175.86697387695313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2750000953674318,
+					"name": "contact",
+					"position": [
+						71.24546813964844,
+						-20.685237884521486,
+						-117.37803649902344
+					],
+					"contact_ref": [
+						48.315467834472659,
+						17.216140747070314,
+						-126.06392669677735
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.299999952316284,
+					"name": "contact",
+					"position": [
+						-29.957054138183595,
+						17.294593811035158,
+						-203.20986938476563
+					],
+					"contact_ref": [
+						-15.811737060546875,
+						50.1265869140625,
+						-175.75567626953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.325000047683716,
+					"name": "contact",
+					"position": [
+						74.60234069824219,
+						-21.73589324951172,
+						-115.72956848144531
+					],
+					"contact_ref": [
+						51.50408172607422,
+						15.978927612304688,
+						-125.85174560546875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.3499999046325685,
+					"name": "contact",
+					"position": [
+						-26.488325119018556,
+						18.822608947753908,
+						-203.0447540283203
+					],
+					"contact_ref": [
+						-11.187744140625,
+						51.44918441772461,
+						-175.93252563476563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.375,
+					"name": "contact",
+					"position": [
+						76.26653289794922,
+						-23.894962310791017,
+						-117.02159118652344
+					],
+					"contact_ref": [
+						54.519493103027347,
+						14.871593475341797,
+						-125.97607421875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4000000953674318,
+					"name": "contact",
+					"position": [
+						-23.13936996459961,
+						19.069114685058595,
+						-201.84780883789063
+					],
+					"contact_ref": [
+						-8.401718139648438,
+						52.469970703125,
+						-175.36087036132813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.424999952316284,
+					"name": "contact",
+					"position": [
+						77.18352508544922,
+						-25.55099105834961,
+						-121.5771255493164
+					],
+					"contact_ref": [
+						56.87869644165039,
+						14.411357879638672,
+						-126.79405212402344
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.450000047683716,
+					"name": "contact",
+					"position": [
+						-22.854568481445314,
+						18.349807739257814,
+						-198.7734832763672
+					],
+					"contact_ref": [
+						-8.36932373046875,
+						53.53250503540039,
+						-173.79876708984376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4749999046325685,
+					"name": "contact",
+					"position": [
+						77.78472900390625,
+						-26.42711639404297,
+						-129.66983032226563
+					],
+					"contact_ref": [
+						58.48967742919922,
+						14.238548278808594,
+						-129.1090087890625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5,
+					"name": "contact",
+					"position": [
+						-24.49854278564453,
+						17.968154907226564,
+						-194.80490112304688
+					],
+					"contact_ref": [
+						-9.92864990234375,
+						54.64076232910156,
+						-171.71026611328126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5250000953674318,
+					"name": "contact",
+					"position": [
+						78.0234146118164,
+						-26.47986602783203,
+						-141.09548950195313
+					],
+					"contact_ref": [
+						59.580543518066409,
+						13.864509582519532,
+						-133.7328338623047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.549999952316284,
+					"name": "contact",
+					"position": [
+						-26.197158813476564,
+						19.04547882080078,
+						-191.75389099121095
+					],
+					"contact_ref": [
+						-12.58917236328125,
+						56.00492858886719,
+						-168.85165405273438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.575000047683716,
+					"name": "contact",
+					"position": [
+						76.9843521118164,
+						-25.320560455322267,
+						-155.0549774169922
+					],
+					"contact_ref": [
+						59.69955825805664,
+						13.477951049804688,
+						-140.9654541015625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5999999046325685,
+					"name": "contact",
+					"position": [
+						-29.25157928466797,
+						20.901901245117189,
+						-188.7974853515625
+					],
+					"contact_ref": [
+						-16.135658264160158,
+						57.476192474365237,
+						-165.35791015625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.625,
+					"name": "contact",
+					"position": [
+						73.18070983886719,
+						-22.420337677001954,
+						-169.6600341796875
+					],
+					"contact_ref": [
+						57.65892791748047,
+						13.974838256835938,
+						-149.39132690429688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6500000953674318,
+					"name": "contact",
+					"position": [
+						-36.03302764892578,
+						22.165512084960939,
+						-183.33642578125
+					],
+					"contact_ref": [
+						-21.212234497070314,
+						58.67042541503906,
+						-160.65760803222657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.674999952316284,
+					"name": "contact",
+					"position": [
+						66.42874145507813,
+						-18.597816467285158,
+						-182.1385498046875
+					],
+					"contact_ref": [
+						53.95722198486328,
+						15.435272216796875,
+						-156.85951232910157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.700000047683716,
+					"name": "contact",
+					"position": [
+						-43.41374206542969,
+						23.758045196533204,
+						-175.68670654296876
+					],
+					"contact_ref": [
+						-25.957008361816408,
+						59.86106872558594,
+						-154.5469512939453
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7249999046325685,
+					"name": "contact",
+					"position": [
+						58.21588134765625,
+						-15.033157348632813,
+						-191.26280212402345
+					],
+					"contact_ref": [
+						49.6025276184082,
+						17.38983917236328,
+						-162.709228515625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.75,
+					"name": "contact",
+					"position": [
+						-51.20856475830078,
+						27.28168487548828,
+						-167.00914001464845
+					],
+					"contact_ref": [
+						-29.83557891845703,
+						61.241981506347659,
+						-147.1513671875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7750000953674318,
+					"name": "contact",
+					"position": [
+						50.22471618652344,
+						-10.931831359863282,
+						-198.30630493164063
+					],
+					"contact_ref": [
+						44.49506378173828,
+						20.17052459716797,
+						-167.51661682128907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "contact",
+					"position": [
+						-58.81787872314453,
+						31.729679107666017,
+						-157.48977661132813
+					],
+					"contact_ref": [
+						-32.64597702026367,
+						62.07936477661133,
+						-139.57492065429688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.825000047683716,
+					"name": "contact",
+					"position": [
+						43.29759216308594,
+						-7.293247222900391,
+						-203.6497802734375
+					],
+					"contact_ref": [
+						39.427978515625,
+						22.40111541748047,
+						-171.18048095703126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.8499999046325685,
+					"name": "contact",
+					"position": [
+						-63.44524383544922,
+						36.61011505126953,
+						-148.8964080810547
+					],
+					"contact_ref": [
+						-32.638389587402347,
+						62.60578918457031,
+						-133.65489196777345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.875,
+					"name": "contact",
+					"position": [
+						37.60722351074219,
+						-5.777183532714844,
+						-207.34982299804688
+					],
+					"contact_ref": [
+						35.82823944091797,
+						22.498741149902345,
+						-173.843017578125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.9000000953674318,
+					"name": "contact",
+					"position": [
+						-64.42142486572266,
+						41.14623260498047,
+						-142.66598510742188
+					],
+					"contact_ref": [
+						-30.68401336669922,
+						63.192779541015628,
+						-129.79452514648438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.924999952316284,
+					"name": "contact",
+					"position": [
+						32.662315368652347,
+						-5.4643402099609379,
+						-209.82025146484376
+					],
+					"contact_ref": [
+						32.84654998779297,
+						21.657333374023439,
+						-175.90988159179688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.950000047683716,
+					"name": "contact",
+					"position": [
+						-64.3062744140625,
+						43.16764450073242,
+						-138.31932067871095
+					],
+					"contact_ref": [
+						-29.572891235351564,
+						63.42790985107422,
+						-127.3890609741211
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.9749999046325685,
+					"name": "contact",
+					"position": [
+						28.291893005371095,
+						-4.572334289550781,
+						-212.3710174560547
+					],
+					"contact_ref": [
+						29.5057373046875,
+						21.559555053710939,
+						-177.85610961914063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0,
+					"name": "contact",
+					"position": [
+						-65.1909408569336,
+						43.474029541015628,
+						-134.36837768554688
+					],
+					"contact_ref": [
+						-29.713661193847658,
+						63.385353088378909,
+						-125.91883087158203
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0250000953674318,
+					"name": "contact",
+					"position": [
+						24.61441421508789,
+						-4.014057159423828,
+						-214.9197540283203
+					],
+					"contact_ref": [
+						26.553482055664064,
+						21.539772033691408,
+						-179.92684936523438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.049999952316284,
+					"name": "contact",
+					"position": [
+						-66.25756072998047,
+						43.163230895996097,
+						-132.23373413085938
+					],
+					"contact_ref": [
+						-30.0908203125,
+						63.580810546875,
+						-126.3093490600586
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.075000047683716,
+					"name": "contact",
+					"position": [
+						21.381858825683595,
+						-4.588977813720703,
+						-217.2969970703125
+					],
+					"contact_ref": [
+						24.534042358398439,
+						20.860939025878908,
+						-182.20166015625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0999999046325685,
+					"name": "contact",
+					"position": [
+						-66.8742446899414,
+						42.55078887939453,
+						-131.55752563476563
+					],
+					"contact_ref": [
+						-30.282432556152345,
+						63.71630859375,
+						-127.58695983886719
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.125,
+					"name": "contact",
+					"position": [
+						18.184648513793947,
+						-5.9437713623046879,
+						-218.8576202392578
+					],
+					"contact_ref": [
+						23.515193939208986,
+						19.53923797607422,
+						-183.91847229003907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.1500000953674318,
+					"name": "contact",
+					"position": [
+						-66.6679916381836,
+						40.438541412353519,
+						-131.50228881835938
+					],
+					"contact_ref": [
+						-30.515159606933595,
+						62.74615478515625,
+						-128.72601318359376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.174999952316284,
+					"name": "contact",
+					"position": [
+						16.429641723632814,
+						-7.8006591796875,
+						-219.05160522460938
+					],
+					"contact_ref": [
+						23.785572052001954,
+						17.56804656982422,
+						-184.2744140625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.200000047683716,
+					"name": "contact",
+					"position": [
+						-66.55057525634766,
+						37.461631774902347,
+						-133.69784545898438
+					],
+					"contact_ref": [
+						-31.099159240722658,
+						61.022464752197269,
+						-129.96583557128907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.2249999046325685,
+					"name": "contact",
+					"position": [
+						17.779495239257814,
+						-10.43038558959961,
+						-217.63760375976563
+					],
+					"contact_ref": [
+						25.551414489746095,
+						15.15045166015625,
+						-183.00979614257813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.25,
+					"name": "contact",
+					"position": [
+						-67.01836395263672,
+						34.75547790527344,
+						-140.30667114257813
+					],
+					"contact_ref": [
+						-32.441898345947269,
+						59.15289306640625,
+						-132.24581909179688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.2750000953674318,
+					"name": "contact",
+					"position": [
+						22.943117141723634,
+						-13.292274475097657,
+						-214.918212890625
+					],
+					"contact_ref": [
+						29.02029800415039,
+						12.805000305175782,
+						-180.04043579101563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.299999952316284,
+					"name": "contact",
+					"position": [
+						-66.91122436523438,
+						31.88302230834961,
+						-149.23458862304688
+					],
+					"contact_ref": [
+						-34.27832794189453,
+						57.1446533203125,
+						-135.6585693359375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.325000047683716,
+					"name": "contact",
+					"position": [
+						30.09022331237793,
+						-16.409744262695314,
+						-210.63255310058595
+					],
+					"contact_ref": [
+						33.09837341308594,
+						10.495895385742188,
+						-175.5652618408203
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.3499999046325685,
+					"name": "contact",
+					"position": [
+						-65.60847473144531,
+						27.928909301757814,
+						-158.22740173339845
+					],
+					"contact_ref": [
+						-36.4246826171875,
+						54.68402862548828,
+						-139.95079040527345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.375,
+					"name": "contact",
+					"position": [
+						37.10850524902344,
+						-19.070945739746095,
+						-205.22714233398438
+					],
+					"contact_ref": [
+						36.615806579589847,
+						8.580352783203125,
+						-170.20712280273438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.4000000953674318,
+					"name": "contact",
+					"position": [
+						-63.59485626220703,
+						23.59772491455078,
+						-166.76168823242188
+					],
+					"contact_ref": [
+						-38.40290832519531,
+						51.836273193359378,
+						-144.8957977294922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.424999952316284,
+					"name": "contact",
+					"position": [
+						43.0163459777832,
+						-22.175384521484376,
+						-199.1166229248047
+					],
+					"contact_ref": [
+						38.97274398803711,
+						6.5810546875,
+						-164.96304321289063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.450000047683716,
+					"name": "contact",
+					"position": [
+						-60.83800506591797,
+						19.69493865966797,
+						-174.95849609375
+					],
+					"contact_ref": [
+						-39.47789764404297,
+						49.039306640625,
+						-150.556640625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.4749999046325685,
+					"name": "contact",
+					"position": [
+						48.12957763671875,
+						-25.314483642578126,
+						-192.34564208984376
+					],
+					"contact_ref": [
+						40.75372314453125,
+						4.8383941650390629,
+						-159.75723266601563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5,
+					"name": "contact",
+					"position": [
+						-57.67405700683594,
+						16.22823143005371,
+						-182.5609588623047
+					],
+					"contact_ref": [
+						-39.465187072753909,
+						46.31294250488281,
+						-156.416015625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5250000953674318,
+					"name": "contact",
+					"position": [
+						51.930076599121097,
+						-28.407936096191408,
+						-184.7679901123047
+					],
+					"contact_ref": [
+						42.06157684326172,
+						3.3845062255859377,
+						-154.4131622314453
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.549999952316284,
+					"name": "contact",
+					"position": [
+						-53.688255310058597,
+						12.272977828979493,
+						-188.76866149902345
+					],
+					"contact_ref": [
+						-38.668922424316409,
+						43.26123046875,
+						-161.95449829101563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.575000047683716,
+					"name": "contact",
+					"position": [
+						54.35601806640625,
+						-31.526168823242189,
+						-176.67343139648438
+					],
+					"contact_ref": [
+						42.65374755859375,
+						1.92779541015625,
+						-148.9300994873047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5999999046325685,
+					"name": "contact",
+					"position": [
+						-48.95977783203125,
+						8.459636688232422,
+						-194.31149291992188
+					],
+					"contact_ref": [
+						-36.83384704589844,
+						40.141483306884769,
+						-167.03213500976563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.625,
+					"name": "contact",
+					"position": [
+						56.654476165771487,
+						-34.88548278808594,
+						-168.1024169921875
+					],
+					"contact_ref": [
+						42.90770721435547,
+						0.05515289306640625,
+						-143.37606811523438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.6500000953674318,
+					"name": "contact",
+					"position": [
+						-43.3938102722168,
+						5.584989547729492,
+						-199.60888671875
+					],
+					"contact_ref": [
+						-33.72320556640625,
+						37.37854766845703,
+						-171.29092407226563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.674999952316284,
+					"name": "contact",
+					"position": [
+						59.711639404296878,
+						-37.82331085205078,
+						-158.99383544921876
+					],
+					"contact_ref": [
+						43.01447677612305,
+						-1.6001129150390626,
+						-138.37945556640626
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.700000047683716,
+					"name": "contact",
+					"position": [
+						-37.59073257446289,
+						3.106128692626953,
+						-203.96847534179688
+					],
+					"contact_ref": [
+						-30.393081665039064,
+						34.57377624511719,
+						-174.5271453857422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.7249999046325685,
+					"name": "contact",
+					"position": [
+						63.71217346191406,
+						-39.5463752746582,
+						-150.17901611328126
+					],
+					"contact_ref": [
+						43.69281768798828,
+						-2.6824188232421877,
+						-134.35494995117188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.75,
+					"name": "contact",
+					"position": [
+						-32.26361083984375,
+						0.31815338134765627,
+						-206.45721435546876
+					],
+					"contact_ref": [
+						-26.509628295898439,
+						31.506702423095704,
+						-176.48727416992188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.7750000953674318,
+					"name": "contact",
+					"position": [
+						67.25869750976563,
+						-41.341651916503909,
+						-142.5491180419922
+					],
+					"contact_ref": [
+						45.159297943115237,
+						-4.1660614013671879,
+						-130.96861267089845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.799999952316284,
+					"name": "contact",
+					"position": [
+						-28.0856876373291,
+						-3.4362640380859377,
+						-206.65322875976563
+					],
+					"contact_ref": [
+						-22.353897094726564,
+						28.003238677978517,
+						-177.3642578125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.825000047683716,
+					"name": "contact",
+					"position": [
+						69.71589660644531,
+						-43.675079345703128,
+						-136.96136474609376
+					],
+					"contact_ref": [
+						46.96931838989258,
+						-6.269439697265625,
+						-127.85044860839844
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.8499999046325685,
+					"name": "contact",
+					"position": [
+						-26.168880462646486,
+						-8.306343078613282,
+						-204.7534637451172
+					],
+					"contact_ref": [
+						-19.157562255859376,
+						23.93942642211914,
+						-176.8358154296875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.875,
+					"name": "contact",
+					"position": [
+						71.67827606201172,
+						-46.05668258666992,
+						-133.90280151367188
+					],
+					"contact_ref": [
+						48.880760192871097,
+						-8.564613342285157,
+						-125.496826171875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.9000000953674318,
+					"name": "contact",
+					"position": [
+						-26.163726806640626,
+						-13.044090270996094,
+						-201.63983154296876
+					],
+					"contact_ref": [
+						-16.8515625,
+						19.969715118408204,
+						-175.58383178710938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.924999952316284,
+					"name": "contact",
+					"position": [
+						72.57293701171875,
+						-49.18663024902344,
+						-134.36947631835938
+					],
+					"contact_ref": [
+						51.33639144897461,
+						-11.192878723144532,
+						-124.36756134033203
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.950000047683716,
+					"name": "contact",
+					"position": [
+						-26.08373260498047,
+						-16.32604217529297,
+						-199.08209228515626
+					],
+					"contact_ref": [
+						-13.712722778320313,
+						16.852413177490236,
+						-174.6101531982422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.9749999046325685,
+					"name": "contact",
+					"position": [
+						73.3623275756836,
+						-52.91114044189453,
+						-137.2677764892578
+					],
+					"contact_ref": [
+						54.7999267578125,
+						-14.368560791015625,
+						-124.24759674072266
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.0,
+					"name": "contact",
+					"position": [
+						-24.91459846496582,
+						-19.28509521484375,
+						-197.047119140625
+					],
+					"contact_ref": [
+						-10.500473022460938,
+						13.804777145385743,
+						-173.96824645996095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.025000095367432,
+					"name": "contact",
+					"position": [
+						73.30633544921875,
+						-56.01274490356445,
+						-140.33755493164063
+					],
+					"contact_ref": [
+						57.117889404296878,
+						-17.51080322265625,
+						-123.99490356445313
+					]
+				}
+			]
+		},
+		{
+			"name": "overseeing_emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9952148795127869,
+					"name": "revive_monster"
+				}
+			]
+		},
+		{
+			"name": "overseeing_emerge_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0286678075790406,
+					"name": "revive_monster"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/VaalCasterLivingfeathers.ao"
+	attached_object = "L_inn_back_ball_base_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/ball_string/LivingVaalCasterLBackBallSting01.ao"
+	attached_object = "L_out_back_ball_base_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/ball_string/LivingVaalCasterLBackBallSting02.ao"
+	attached_object = "R_inn_back_ball_base_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/ball_string/LivingVaalCasterRBackBallSting01.ao"
+	attached_object = "R_out_back_ball_base_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/ball_string/LivingVaalCasterRBackBallSting02.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/VaalCasterLivingSkirt.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/VaalCasterLivingRobe.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.23243199288845063,
+								0.0
+							],
+							[
+								0.31891900300979617,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.6283190250396729,
+						"angle": 1.7802400588989258,
+						"length": 139.88099670410157,
+						"local_offset": [
+							22.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.5235990285873413,
+							1.5707999467849732
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.43720901012420657,
+								0.0
+							],
+							[
+								0.5162789821624756,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.4188790023326874,
+						"angle": 2.0245800018310549,
+						"length": 145.0,
+						"local_offset": [
+							-14.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.5235990285873413,
+							-1.5707999467849732
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/LivingVaalCasterMonster/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_lightninggather_01"
+			parent = "hip_jntBnd"
+			translation = "0 -55 0"
+		socket = "aux_lightninggather_02"
+			translation = "0 -67.228 -144.913"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.281
+	}
+	
+	AnimatedRender
+	{
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LivingVaalCasterMonster/LivingVaalCasterMonster.sm"
+			hide_segments = "balls_feathers_nophysShape,balls_nophysShape,hat_feathersShape"
+		skin = "Art/Models/MONSTERS/LivingVaalCasterMonster/LivingVaalCasterMonsterPhys.sm"
+			hide_segments = "skirt_front_nophysShape,skirtback_nophysShape,skirtbase_nophysShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd aux_L_upperArm_attachment"
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "fx_lightninggather_01 false aux_lightninggather_01"
+		bone_group = "fx_lightninggather_02 false aux_lightninggather_02"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12963099777698518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/AttackA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1621609926223755,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/ClawSwingA",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1951099932193756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/AttackClothA",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4335060119628906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/ClawSwingB",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44655099511146548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/AttackB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4716239869594574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/AttackClothB",
+						"bone_name": "R_shoulder_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01376315113157034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17563599348068238,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/DeathFallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4935379922389984,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/DeathFallB",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3695870041847229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/DeathFallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8409330248832703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/DeathFallB",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06022083759307861,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3582800030708313,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/DeathFallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7540130019187927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/DeathFallB",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0737186074256897,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3914929926395416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/DeathFallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6890000104904175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/DeathFallB",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44378700852394106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/DeathFallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.669920027256012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/DeathFallB",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3387880027294159,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/DeathFallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6230300068855286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/DeathFallB",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.030721276998519899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09011219441890717,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.007862409576773644,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05925668030977249,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.021095866337418557,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0701262503862381,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.014250599779188633,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07082755863666535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5683050155639648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.005752563010901213,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08696360141038895,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12609080970287324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/FootstepWalk",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.435975044965744,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6169744729995728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/StepCloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8242751955986023,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/KnockdownB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5957814455032349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/AttackClothA",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.005752563010901213,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08696360141038895,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23508445918560029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/FootstepWalk",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48512962460517886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6169744729995728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/StepCloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8242751955986023,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/KnockdownB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5957814455032349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/AttackClothA",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "lightning_ball_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/SkillClothA",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Effects/OrbOnAct",
+						"bone_name": "aux_lightninggather_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17678017914295197,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act3/VaalStormcaller/VaalCasterStormcaller_DialogueSkill_Chakuli_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/LightningBallSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "head_jntBnd",
+						"chance": 0.5
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.308650016784668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/SkillWhoosh",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "lightning_tendril_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/SkillClothB",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Effects/TendrilsOnAct",
+						"bone_name": "aux_lightninggather_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12285000085830689,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act3/VaalStormcaller/VaalCasterStormcaller_DialogueSkill_PaajtaLeKaax_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/LightningTendrilSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8212100267410279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/SkillWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "patrol_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.024570001289248468,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act3/VaalStormcaller/VaalCasterStormcaller_DialogueSkill_Tionak_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/PatrolEndSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "head_jntBnd",
+						"chance": 0.5
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.057890795171260837,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "patrol_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.25881001353263857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Idle",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "patrol_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.012733749113976956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/FootstepWalk",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11896970868110657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/StepCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6795200705528259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7128250598907471,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/StepCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0241130590438843,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Walk",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Running.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06094909831881523,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/StepCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3144330084323883,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35358500480651858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/StepCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.648239016532898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06828729808330536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/FootstepWalk",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16419599950313569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/StepCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6322330236434937,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/FootstepWalk",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6415640115737915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Vocal/Walk",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8708540201187134,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_16/VaalCasterStormcaller/Foley/StepCloth",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "lightning_tendril_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 1.9718801975250245,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalHumanoid01/ao/surge_lightningcharge.ao",
+						"from": {
+							"parent_bone": "aux_lightninggather_01"
+						},
+						"speed_type": "Stretch"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "lightning_ball_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalSorcerer/pet/BallLightning/ball_formation.pet",
+						"bone_group": "fx_lightninggather_02"
+					}
+				]
+			},
+			{
+				"name": "lightning_tendril_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8415634632110596,
+						"end_time": 4.012844085693359,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalSorcerer/pet/LightningTendrils/onact_channelpalm.pet",
+						"bone_groups": [
+							"grp_l_palm",
+							"grp_r_palm"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.872428059577942,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalSorcerer/pet/LightningTendrils/onact_split.pet",
+						"bone_group": "fx_lightninggather_01"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "experiment_emerge_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Environment/League_Incursion/temple_synthfleshlab/epk/scientist_surge.epk"
+					}
+				]
+			},
+			{
+				"name": "lightning_ball_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalSorcerer/epk/tendrils_handglow.epk"
+					}
+				]
+			},
+			{
+				"name": "lightning_tendril_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalSorcerer/epk/tendrils_handglow.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "experiment_emerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.7999999523162842,
+						"name": "surgeTime_R",
+						"curve": "4 0 0 Smooth 0.897588 0.618243 Smooth 1.08569 1 Smooth 1.8 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "lightning_ball_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.8329999446868897,
+						"name": "EPK_Driver",
+						"curve": "5 0 0 Linear 0.601699 0.391197 Smooth 0.97894 1 Smooth 1.21829 0.321958 Smooth 1.833 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "lightning_tendril_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"name": "EPK_Driver",
+						"curve": "7 0 0 Smooth 0.722269 0 Flat 1.83291 0.17359 Smooth 2.05291 1 Smooth 3.44741 0.945104 Smooth 4.05418 0.352077 CustomSmooth -0.84774 5 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/VaalCasterLivingfeathers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/headfeathers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/headfeathers/rig.ast"
+		animation_velocity_factor = 5.000
+		animation_force_factor = 5.000
+		gravity = 0.000
+	}
+	
+	AnimatedRender
+	{
+		outline_no_alphatest = false
+		cannot_be_disabled = false
+		outline_zprepass = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/headfeathers/LivingVaalCasterHeadFeathers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/ball_string/LivingVaalCasterLBackBallSting01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/ball_string/LivingVaalCasterLbackballsting01.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/ball_string/LivingVaalCasterLbackballsting01.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.005
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/ball_string/LivingVaalCasterLbackballsting01.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/ball_string/LivingVaalCasterLBackBallSting02.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/ball_string/LivingVaalCasterLbackballsting02.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/ball_string/LivingVaalCasterLbackballsting02.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.005
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/ball_string/LivingVaalCasterLbackballsting02.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/ball_string/LivingVaalCasterRBackBallSting01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/ball_string/LivingVaalCasterRbackballsting01.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/ball_string/LivingVaalCasterRbackballsting01.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.005
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/ball_string/LivingVaalCasterRbackballsting01.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/ball_string/LivingVaalCasterRBackBallSting02.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/ball_string/LivingVaalCasterRbackballsting02.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/ball_string/LivingVaalCasterRbackballsting02.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.005
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/ball_string/LivingVaalCasterRbackballsting02.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/VaalCasterLivingSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/skirt/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/skirt/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		enclosure_angle = 0.231
+		animation_force_factor = 1.000
+		enable_collisions = false
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/skirt/LivingVaalCasterMonsterSkirt.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+	
+	AnimatedRender
+	{
+		outline_no_alphatest = false
+		cannot_be_disabled = false
+		outline_zprepass = false
+	}
+}
+
+=== .ao Metadata/Monsters/VaalMonsters/Living/attachments/VaalCaster/VaalCasterLivingRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/Robe/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/Robe/rig.ast"
+		linear_allowed_contraction = 0.100
+		enclosure_angle = 0.200
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LivingVaalCasterMonster/attachments/Robe/LivingVaalCaster_Robe.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/LivingVaalCasterMonster/LivingVaalCasterMonster.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/LivingVaalCasterMonster/rig_fc7d9c65.smd"
+Materials 1
+	"Art/Models/MONSTERS/LivingVaalCasterMonster/Textures/LivingVaalCasterMonsterc.mat" 10
+BoundingBox -98.2929 -29.0823 -251.242 98.2929 23.0529 -0.226089
+BoneGroups 21
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck_01" 2 "neck_01_jntBnd" "neck_02_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_01_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+	"grp_neck_02" 2 "neck_02_jntBnd" "head_jntBnd"
+
+=== .smd Art/Models/MONSTERS/LivingVaalCasterMonster/rig_fc7d9c65.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 10 in the header, 10 in the block · 12138 triangles over 10877 vertices
+  names: 266 bytes said, 266 read  [agree]
+
+=== shapes (29)
+0	balls_feathers_nophysShape	from 0	count 324
+1	balls_nophysShape	from 324	count 3876
+2	bodyShape	from 4200	count 7284
+3	clawsShape	from 11484	count 3822
+4	hat_feathersShape	from 15306	count 1092
+5	helmetShape	from 16398	count 5106
+6	HoodShape	from 21504	count 1590
+7	necklaceShape	from 23094	count 2742
+8	shieldShape	from 25836	count 5232
+9	shirtShape	from 31068	count 5346
+10	skirt_front_nophysShape	from 36414	count 144
+11	skirtback_nophysShape	from 36558	count 732
+12	skirtbase_nophysShape	from 37290	count 1518
+13	hat_feathersShape	from 38808	count 1092
+14	balls_feathers_L_inn_backShape	from 39900	count 36
+15	balls_L_inn_backShape	from 39936	count 444
+16	balls_feathers_L_out_backShape	from 40380	count 36
+17	balls_L_out_backShape	from 40416	count 444
+18	balls_feathers_R_inn_backShape	from 40860	count 36
+19	balls_R_inn_backShape	from 40896	count 444
+20	balls_feathers_R_out_backShape	from 41340	count 36
+21	balls_R_out_backShape	from 41376	count 444
+22	balls_feathersShape	from 41820	count 72
+23	ballsShape	from 41892	count 840
+24	skirtbaseShape	from 42732	count 1518
+25	balls_feathersShape	from 44250	count 108
+26	ballsShape	from 44358	count 1260
+27	skirt_frontShape	from 45618	count 192
+28	skirtbackShape	from 45810	count 732
+
+=== fitting
+the monster's rig: 90 bones
+mounts: aux_position, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_head_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  VaalCasterLivingfeathers.ao  socket head_jntBnd [in its carrier's rig]  box (-62,-4.2,-63.5)..(61,14.6,19.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 364 triangles over 472 vertices
+    names: 34 bytes said, 34 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_Top_feather_jntBnd  [its own]  under 0  rests at (0,2.5,-36.8)
+      2 phys_tri_R_feather_01_jntBnd  [its own]  under 0  rests at (-35.3,4.6,-6.9)
+      3 phys_tri_L_feather_01_jntBnd  [its own]  under 0  rests at (35.3,4.6,-6.9)
+  LivingVaalCasterLBackBallSting01.ao  socket L_inn_back_ball_base_jntBnd [in its carrier's rig]  box (0,-1.6,-0.9)..(47.2,2.9,4.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 160 triangles over 191 vertices
+    names: 102 bytes said, 102 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 skinned_loop_idle_LivingVaalCasterLbackballsting01|root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_l_back_in_balls_jntBnd_1  [its own]  under 0  rests at (9.1,0,0.4)
+      2 phys_tri_l_back_in_balls_jntBnd_2  [its own]  under 1  rests at (18.3,0,0.8)
+      3 phys_tri_l_back_in_balls_jntBnd_3  [its own]  under 2  rests at (36.5,0,1.5)
+  LivingVaalCasterLBackBallSting02.ao  socket L_out_back_ball_base_jntBnd [in its carrier's rig]  box (0,-1.6,-1.7)..(44.9,2.8,2.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 160 triangles over 191 vertices
+    names: 102 bytes said, 102 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 skinned_loop_idle_LivingVaalCasterLbackballsting02|root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_l_back_out_balls_jntBnd_1  [its own]  under 0  rests at (9.1,0,0.4)
+      2 phys_tri_l_back_out_balls_jntBnd_2  [its own]  under 1  rests at (18.3,0,0.8)
+      3 phys_tri_l_back_out_balls_jntBnd_3  [its own]  under 2  rests at (36.5,0,1.5)
+  LivingVaalCasterRBackBallSting01.ao  socket R_inn_back_ball_base_jntBnd [in its carrier's rig]  box (0,-2.7,-0.9)..(47.2,1.6,4.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 160 triangles over 191 vertices
+    names: 102 bytes said, 102 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 skinned_loop_idle_LivingVaalCasterRbackballsting01|root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_r_back_in_balls_jntBnd_1  [its own]  under 0  rests at (9.1,0,0.4)
+      2 phys_tri_r_back_in_balls_jntBnd_2  [its own]  under 1  rests at (18.3,0,0.8)
+      3 phys_tri_r_back_in_balls_jntBnd_3  [its own]  under 2  rests at (36.5,0,1.5)
+  LivingVaalCasterRBackBallSting02.ao  socket R_out_back_ball_base_jntBnd [in its carrier's rig]  box (0,-2.7,-1.7)..(45,1.6,2.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 160 triangles over 191 vertices
+    names: 102 bytes said, 102 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 skinned_loop_idle_LivingVaalCasterRbackballsting02|root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_r_back_out_balls_jntBnd_1  [its own]  under 0  rests at (9.1,0,0.4)
+      2 phys_tri_r_back_out_balls_jntBnd_2  [its own]  under 1  rests at (18.3,0,0.8)
+      3 phys_tri_r_back_out_balls_jntBnd_3  [its own]  under 2  rests at (36.5,0,1.5)
+  VaalCasterLivingSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-26.3,-12,-12)..(25,9.8,65.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 810 triangles over 842 vertices
+    names: 86 bytes said, 86 read  [agree]
+    rig 7 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-12.1)  carrier has (0,0,-125.7)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.6,-0,0)  carrier has (10.6,-0,-113.7)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-10.6,-0,0)  carrier has (-10.6,-0,-113.7)
+      4 spine_2_jntBnd  [shared]  under 1  rests at (0,0,-24.2)  carrier has (0,-0,-137.8)
+      5 phys_tri_L_side_robe_jntBnd  [its own]  under 2  rests at (14.2,-0,30.9)
+      6 phys_tri_R_side_robe_jntBnd  [its own]  under 3  rests at (-14.2,-0,30.9)
+  VaalCasterLivingRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-26.8,-17.4,-37.6)..(26.8,28,105.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 764 triangles over 785 vertices
+    names: 118 bytes said, 118 read  [agree]
+    rig 24 bones, 8 of them names its carrier's rig also has
+    mesh weights reach bone 23 of 24  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-12.1)  carrier has (0,0,-125.7)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.6,-0,0)  carrier has (10.6,-0,-113.7)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-10.6,-0,0)  carrier has (-10.6,-0,-113.7)
+      4 phys_tri_front_skirt_jntBnd_1  [its own]  under 0  rests at (0,-6.1,33.4)
+      5 spine_2_jntBnd  [shared]  under 1  rests at (0,0,-24.2)  carrier has (0,-0,-137.8)
+      6 phys_tri_chainballs_jntBnd_7  [its own]  under 1  rests at (1.1,-13,-6.3)
+      7 L_knee_jntBnd  [shared]  under 2  rests at (17.8,0.7,54.6)  carrier has (17.8,0.7,-59.1)
+      8 phys_tri_back_skirt_jntBnd_1  [its own]  under 2  rests at (9.4,4,22.7)
+      9 R_knee_jntBnd  [shared]  under 3  rests at (-17.8,0.7,54.6)  carrier has (-17.8,0.7,-59.1)
+      10 phys_tri_back_skirt_jntBnd_4  [its own]  under 3  rests at (-9.4,4,22.7)
+      11 phys_tri_front_skirt_jntBnd_2  [its own]  under 4  rests at (0,-6.1,55.5)
+      12 chest_jntBnd  [shared]  under 5  rests at (0,-0,-36.3)  carrier has (0,-0,-149.9)
+      13 phys_tri_beads_jntBnd_1  [its own]  under 5  rests at (-4.2,-8.8,-23.3)
+      14 phys_tri_beads_jntBnd_3  [its own]  under 5  rests at (4.2,-7.6,-33)
+      15 phys_tri_chainballs_jntBnd_8  [its own]  under 6  rests at (1.1,-11.3,14.9)
+      16 phys_tri_back_skirt_jntBnd_2  [its own]  under 8  rests at (18.3,7,40.9)
+      17 phys_tri_back_skirt_jntBnd_5  [its own]  under 10  rests at (-18.3,7,40.9)
+      18 phys_tri_front_skirt_jntBnd_3  [its own]  under 11  rests at (0,-6.1,66.5)
+      19 phys_tri_beads_jntBnd_2  [its own]  under 13  rests at (-4.2,-11.9,1.1)
+      20 phys_tri_beads_jntBnd_4  [its own]  under 14  rests at (4.2,-10.6,-8.7)
+      21 phys_tri_chainballs_jntBnd_9  [its own]  under 15  rests at (1.1,-10.4,25.6)
+      22 phys_tri_back_skirt_jntBnd_3  [its own]  under 16  rests at (13.7,12.3,73.3)
+      23 phys_tri_back_skirt_jntBnd_6  [its own]  under 17  rests at (-13.7,12.3,73.3)

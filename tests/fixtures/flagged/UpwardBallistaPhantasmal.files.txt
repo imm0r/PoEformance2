@@ -1,0 +1,810 @@
+monster: Totem [Metadata/Monsters/Totems/UpwardBallistaPhantasmal]
+
+=== .ao Metadata/Effects/Microtransactions/Spells/Mercenary/Stygian/ballista/stygian_ballista.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/totems/Ballistas/UpwardBallista/rig.amd"
+	view_of = "attack_01"
+		view_name = "ripwire_01"
+	view_of = "attack_02"
+		view_name = "ripwire_02"
+	view_of = "attack_03"
+		view_name = "ripwire_03"
+	view_of = "attack_04"
+		view_name = "ripwire_04"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.07945900410413742,
+					"name": "contact",
+					"position": [
+						0.0,
+						11.258415222167969,
+						-197.57989501953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.055792808532715,
+					"name": "spawn_bolt"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.07945900410413742,
+					"name": "contact",
+					"position": [
+						0.0,
+						11.258415222167969,
+						-197.57989501953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.2326741218566896,
+					"name": "spawn_bolt"
+				}
+			]
+		},
+		{
+			"name": "attack_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.07945900410413742,
+					"name": "contact",
+					"position": [
+						0.0,
+						11.258415222167969,
+						-197.57989501953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4628074169158937,
+					"name": "spawn_bolt"
+				}
+			]
+		},
+		{
+			"name": "attack_04",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.07945900410413742,
+					"name": "contact",
+					"position": [
+						0.0,
+						11.258415222167969,
+						-197.57989501953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.060694932937622,
+					"name": "spawn_bolt"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "arrow_jntBnd Metadata/Monsters/Totems/Ballistas/attachments/Arrow.ao"
+	attached_object = "lock:<root> Metadata/Effects/Microtransactions/Spells/Mercenary/Stygian/ballista/stygian_ballista_base.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/totems/Ballistas/UpwardBallista/rig.ast"
+		socket = "aux_clusterFire_01"
+			parent = "bow_shard1_jntBnd"
+			translation = "0 8 -1"
+		socket = "aux_clusterFire_02"
+			parent = "bow_shard1_jntBnd"
+			translation = "0 -10 -1"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/Effects/totems/Ballistas/UpwardBallista/UpwardBallista.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd bow_shard1_jntBnd"
+		bone_group = "frameupper false L_bow_lower_arm_4_jntBnd L_bow_lower_arm_3_jntBnd L_bow_lower_arm_2_jntBnd L_bow_lower_arm_1_jntBnd bow_shard1_jntBnd R_bow_upper_arm_1_jntBnd R_bow_upper_arm_2_jntBnd R_bow_upper_arm_3_jntBnd R_bow_upper_arm_4_jntBnd"
+		bone_group = "L_upper_arm false L_bow_upper_arm_1_jntBnd L_bow_upper_arm_2_jntBnd L_bow_upper_arm_3_jntBnd L_bow_upper_arm_4_jntBnd L_bow_upper_arm_5_jntBnd"
+		bone_group = "L_lower_arm false L_bow_lower_arm_1_jntBnd L_bow_lower_arm_2_jntBnd L_bow_lower_arm_3_jntBnd L_bow_lower_arm_4_jntBnd L_bow_lower_arm_5_jntBnd"
+		bone_group = "R_upper_arm false R_bow_upper_arm_1_jntBnd R_bow_upper_arm_2_jntBnd R_bow_upper_arm_3_jntBnd R_bow_upper_arm_4_jntBnd R_bow_upper_arm_5_jntBnd"
+		bone_group = "R_lower_arm false R_bow_lower_arm_1_jntBnd R_bow_lower_arm_2_jntBnd R_bow_lower_arm_3_jntBnd R_bow_lower_arm_4_jntBnd R_bow_lower_arm_5_jntBnd"
+		bone_group = "grp_segment_shaft false winch_jntBnd M_brace_jntBnd"
+		bone_group = "grp_segment_gears false gear_jntBnd main_jntBnd"
+		bone_group = "string_01 false arrow_jntBnd L_bow_upper_arm_5_jntBnd"
+		bone_group = "string_02 false arrow_jntBnd R_bow_upper_arm_5_jntBnd"
+		bone_group = "string_03 false arrow_jntBnd R_bow_lower_arm_5_jntBnd"
+		bone_group = "string_04 false arrow_jntBnd L_bow_lower_arm_5_jntBnd"
+		bone_group = "arrow_fx false aux_clusterFire_02 bow_shard1_jntBnd"
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Smooth 0.273565 0 Flat 0.749571 1 Flat 1.33074 1 Linear 2.81134 0 Flat 5 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.75,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Smooth 0.27782 0 Linear 0.616144 1 Flat 1.38204 1 Linear 2.91799 0.00650326 Flat 3.75 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.75,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Smooth 0.235699 0 Flat 0.5249 1 Flat 1.12766 1 Linear 2.32099 0 Flat 2.75 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Smooth 0.239989 0 Flat 0.422063 1 Flat 1.00057 1 Linear 1.87865 0 Flat 2.333 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "surgeTime_R",
+						"curve": "4 0 0 Smooth 0.321636 0 Linear 2.02197 1 Flat 6 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "surgeTime_L",
+						"curve": "3 0 0 Smooth 0.969226 1 Flat 6 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 2.87546 1 Linear 6 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.75,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 0.310449 1 Linear 0.75 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.75,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 0.134852 0.00650328 Flat 0.75 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0.00650239 Smooth 0.5 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/crossbow_ballistas/pet/emerge_dust.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Stygian/ballista/fx/stygian_ballista_emerge.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5931479334831238,
+						"filename": "Metadata/Effects/Spells/crossbow_ballistas/pet/emerge_pulse.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Stygian/ballista/fx/stygian_ballista_emerge.pet",
+						"bone_group": "root"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/Spells/Mercenary/Stygian/ballista/epk/stygian_balista_pass.epk",
+						"remove_on_animation_end": false
+					}
+				]
+			}
+		]'
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Release",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42500001192092898,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Draw",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.665999889373779,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Latch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Release",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3187500238418579,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Draw",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.499499797821045,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Latch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Release",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23375001549720765,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Draw",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5662999153137209,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Latch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Release",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19830501079559327,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Draw",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1771554946899416,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Latch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Death",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Microtransactions/4.0/Skills/Phantasmal/Phantasmal_SiegeBallista/Emerge",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13500000536441804,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Draw",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2750000059604645,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/BallistaTotems/Emerge_Magic",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6599999666213989,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Latch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Flinch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Flinch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Flinch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Flinch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Crossbow/UpwardBallista/Submerge",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "ripwire_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.2263154685497284,
+						"filename": "Metadata/Effects/Spells/crossbow_ripwire_ballista/OnACTs/clusterFire.ao",
+						"animation": "clusterFire_01",
+						"from": {
+							"parent_bone": "aux_clusterFire_01"
+						},
+						"speed": 1.0,
+						"offset": {
+							"rotation": [
+								0.0,
+								-1.5707999467849732,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "ripwire_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.2532559037208557,
+						"filename": "Metadata/Effects/Spells/crossbow_ripwire_ballista/OnACTs/clusterFire.ao",
+						"animation": "clusterFire_01",
+						"from": {
+							"parent_bone": "aux_clusterFire_01"
+						},
+						"speed": 1.0,
+						"offset": {
+							"rotation": [
+								0.0,
+								-1.5707999467849732,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "ripwire_03",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.25072357058525088,
+						"filename": "Metadata/Effects/Spells/crossbow_ripwire_ballista/OnACTs/clusterFire.ao",
+						"animation": "clusterFire_01",
+						"from": {
+							"parent_bone": "aux_clusterFire_01"
+						},
+						"speed": 1.0,
+						"offset": {
+							"rotation": [
+								0.0,
+								-1.5707999467849732,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "ripwire_04",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.25659647583961489,
+						"filename": "Metadata/Effects/Spells/crossbow_ripwire_ballista/OnACTs/clusterFire.ao",
+						"animation": "clusterFire_01",
+						"from": {
+							"parent_bone": "aux_clusterFire_01"
+						},
+						"speed": 1.0,
+						"offset": {
+							"rotation": [
+								0.0,
+								-1.5707999467849732,
+								0.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Totems/Ballistas/attachments/Arrow.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/Effects/totems/Ballistas/Arrow.fmt"
+	}
+}
+
+=== .ao Metadata/Effects/Microtransactions/Spells/Mercenary/Stygian/ballista/stygian_ballista_base.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/totems/Ballistas/Base/rig.amd"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/totems/Ballistas/Base/rig.ast"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/Effects/totems/Ballistas/Base/Base.sm"
+			BaseShape = "Metadata/Effects/Microtransactions/Spells/Mercenary/Stygian/ballista/mat/stygian_ballista_base_pass.mat:0"
+	}
+
+	BoneGroups
+	{
+		bone_group = "fx false root_jntBnd"
+	}
+
+	ParticleEffects
+	{
+		continuous_effect = "fx Metadata/Effects/Microtransactions/Spells/Mercenary/Stygian/ballista/fx/stygian_ballista_base.pet"
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "particlePhase_Override_01",
+						"curve": "2 0 0.5 Smooth 6 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.75,
+						"name": "particlePhase_Override_01",
+						"curve": "2 0 0 Linear 0.75 0.5 Smooth"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "particlePhase_Override_01",
+						"curve": "2 0 0.5 Linear 1 0.5 Smooth"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "particlePhase_Override_01",
+						"curve": "2 0 0.5 Linear 0.5 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/Effects/totems/Ballistas/UpwardBallista/UpwardBallista.sm
+version 6
+SkinnedMeshData "Art/Models/Effects/totems/Ballistas/UpwardBallista/rig_49bc87ae.smd"
+Materials 1
+	"Art/Models/Effects/totems/Ballistas/Textures/BallistaTotemsc.mat" 27
+BoundingBox -102.616 -72.3345 -162.317 102.62 72.3345 -9.1603
+BoneGroups 0
+
+=== .smd Art/Models/Effects/totems/Ballistas/UpwardBallista/rig_49bc87ae.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 27 in the header, 27 in the block · 15652 triangles over 15446 vertices
+  names: 770 bytes said, 770 read  [agree]
+
+=== shapes (28)
+0	bow_shard1_tiesShape	from 0	count 2688
+1	bow_shard2_tiesShape	from 2688	count 7296
+2	bow_shard3_tiesShape	from 9984	count 8640
+3	bow_shard3Shape	from 18624	count 2484
+4	bow_shardShape1	from 21108	count 1032
+5	bow_shardShape2	from 22140	count 2100
+6	bowstringShape	from 24240	count 1824
+7	clawShape	from 26064	count 252
+8	gearShape	from 26316	count 4164
+9	L_braceShape1	from 30480	count 336
+10	L_gearShape	from 30816	count 1128
+11	L_standShape1	from 31944	count 1848
+12	L_standShape2	from 33792	count 168
+13	M_brace1Shape	from 33960	count 720
+14	M_braceShape2	from 34680	count 480
+15	M_braceShape3	from 35160	count 480
+16	main_gearShape1	from 35640	count 672
+17	main_gearShape2	from 36312	count 1320
+18	mainShape	from 37632	count 2916
+19	platform_shardShape1	from 40548	count 840
+20	platform_shardShape2	from 41388	count 252
+21	platform_shardShape3	from 41640	count 888
+22	R_braceShape1	from 42528	count 336
+23	R_gearShape	from 42864	count 1128
+24	R_standShape1	from 43992	count 1848
+25	R_standShape2	from 45840	count 168
+26	winchShape	from 46008	count 948
+27	ArrowShape	from 46956	count 1374
+
+=== fitting
+the monster's rig: 49 bones
+mounts: (none named aux_)
+  Arrow.ao  socket arrow_jntBnd [in its carrier's rig]  fixed mesh Arrow.fmt  1 shapes
+      ArrowShape  ->  Art/Models/Effects/totems/Ballistas/Textures/BallistaTotemsc.mat
+  stygian_ballista_base.ao  socket lock:<root> [NOT in its carrier's rig]  box (-83.9,-83.9,-11.7)..(83.9,83.9,0)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 424 triangles over 399 vertices
+    names: 18 bytes said, 18 read  [agree]
+    rig 1 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 1  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)

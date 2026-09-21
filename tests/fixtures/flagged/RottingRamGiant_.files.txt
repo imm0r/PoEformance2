@@ -1,0 +1,1583 @@
+monster: Rotting Hulk [Metadata/Monsters/RamGiant/RottingRamGiant_]
+
+=== .ao Metadata/Monsters/RamGiant/RottingRamGiant.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/RamGiant/rig.amd"
+	animations = '[
+		{
+			"name": "Wheel_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6080399751663208,
+					"name": "footstep",
+					"position": [
+						35.361698150634769,
+						-52.47880172729492,
+						-6.243319988250732
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.328000068664551,
+					"name": "footstep",
+					"position": [
+						35.402099609375,
+						-33.004398345947269,
+						-6.297299861907959
+					]
+				}
+			]
+		},
+		{
+			"name": "Wheel_attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3585300147533417,
+					"name": "footstep",
+					"position": [
+						-46.2218017578125,
+						49.370601654052737,
+						-6.290729999542236
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2020299434661867,
+					"name": "footstep",
+					"position": [
+						-42.20880126953125,
+						12.339099884033204,
+						-6.30109977722168
+					]
+				}
+			]
+		},
+		{
+			"name": "Wheel_throw_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3270300030708313,
+					"name": "footstep",
+					"position": [
+						-46.195899963378909,
+						49.17449951171875,
+						-6.297210216522217
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0755800008773804,
+					"name": "footstep",
+					"position": [
+						-23.31279945373535,
+						-125.62999725341797,
+						-6.254049777984619
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.3376901149749758,
+					"name": "footstep",
+					"position": [
+						-42.26110076904297,
+						12.308300018310547,
+						-6.16372013092041
+					]
+				}
+			]
+		},
+		{
+			"name": "Wheel_walk_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6684399843215942,
+					"name": "footstep",
+					"position": [
+						-20.083799362182618,
+						-72.1707992553711,
+						-6.279319763183594
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3320000171661378,
+					"name": "footstep",
+					"position": [
+						20.084400177001954,
+						-72.44509887695313,
+						-6.3014397621154789
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5842999815940857,
+					"name": "footstep",
+					"position": [
+						35.032501220703128,
+						-58.312400817871097,
+						-6.060739994049072
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4584100246429444,
+					"name": "footstep",
+					"position": [
+						35.4010009765625,
+						-32.91320037841797,
+						-6.299590110778809
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7369199991226196,
+					"name": "footstep",
+					"position": [
+						29.620399475097658,
+						-76.35260009765625,
+						-6.297359943389893
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3270299434661866,
+					"name": "footstep",
+					"position": [
+						35.35129928588867,
+						-33.211299896240237,
+						-6.317780017852783
+					]
+				}
+			]
+		},
+		{
+			"name": "death_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7208409905433655,
+					"name": "deathmaggot"
+				}
+			]
+		},
+		{
+			"name": "groundslam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8682199716567993,
+					"name": "footstep",
+					"position": [
+						31.176700592041017,
+						-102.26899719238281,
+						-6.220210075378418
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "footstep",
+					"position": [
+						35.40250015258789,
+						-32.912200927734378,
+						-6.3014397621154789
+					]
+				}
+			]
+		},
+		{
+			"name": "run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.03435000032186508,
+					"name": "footstep",
+					"position": [
+						-25.082000732421876,
+						-46.160099029541019,
+						-6.263329982757568
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.47464001178741457,
+					"name": "footstep",
+					"position": [
+						25.07430076599121,
+						-53.229698181152347,
+						-10.481399536132813
+					]
+				}
+			]
+		},
+		{
+			"name": "walk_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.05942000076174736,
+					"name": "footstep",
+					"position": [
+						28.87339973449707,
+						-51.676998138427737,
+						-6.734630107879639
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.676829993724823,
+					"name": "footstep",
+					"position": [
+						-29.022600173950197,
+						-57.94900131225586,
+						-9.181489944458008
+					]
+				}
+			]
+		},
+		{
+			"name": "zombie_vomit_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0441999435424805,
+					"name": "contact",
+					"position": [
+						0.0,
+						-22.07469940185547,
+						-142.71217346191407
+					],
+					"contact_ref": [
+						1.2313079833984376,
+						11.49908447265625,
+						-147.64791870117188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1131500005722047,
+					"name": "contact",
+					"position": [
+						-6.331901550292969,
+						-29.710773468017579,
+						-142.4272918701172
+					],
+					"contact_ref": [
+						-3.9934310913085939,
+						0.0,
+						-143.47679138183595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2113499641418458,
+					"name": "contact",
+					"position": [
+						0.0,
+						-28.837600708007814,
+						-147.95809936523438
+					],
+					"contact_ref": [
+						0.0,
+						-0.2858314514160156,
+						-149.6404571533203
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3306901454925538,
+					"name": "contact",
+					"position": [
+						9.56854248046875,
+						-32.66387176513672,
+						-141.95106506347657
+					],
+					"contact_ref": [
+						10.382926940917969,
+						-7.150947570800781,
+						-142.42286682128907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4570599794387818,
+					"name": "contact",
+					"position": [
+						0.0,
+						-35.04896545410156,
+						-134.93553161621095
+					],
+					"contact_ref": [
+						0.0,
+						-4.00042724609375,
+						-131.92132568359376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.56673002243042,
+					"name": "contact",
+					"position": [
+						0.0,
+						-34.700313568115237,
+						-153.35153198242188
+					],
+					"contact_ref": [
+						0.0,
+						0.003719329833984375,
+						-149.46563720703126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6723201274871827,
+					"name": "contact",
+					"position": [
+						0.0,
+						-35.30448913574219,
+						-150.73341369628907
+					],
+					"contact_ref": [
+						0.0,
+						-8.88553237915039,
+						-147.95333862304688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7383300065994263,
+					"name": "contact",
+					"position": [
+						0.0,
+						-35.40611267089844,
+						-147.59878540039063
+					],
+					"contact_ref": [
+						0.0,
+						-4.988978385925293,
+						-142.0538330078125
+					]
+				}
+			]
+		},
+		{
+			"name": "zombie_walk_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8344200253486633,
+					"name": "footstep",
+					"position": [
+						-24.64780044555664,
+						-35.657100677490237,
+						-7.05610990524292
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3329999446868897,
+					"name": "footstep",
+					"position": [
+						22.8843994140625,
+						-76.0145034790039,
+						-7.09453010559082
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/RamGiant/attachments/RamGiantLoinCloth.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4054054021835327,
+								0.0
+							],
+							[
+								0.477477490901947,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.13962635397911073,
+						"angle": 1.3264503479003907,
+						"x_axis_scale": 0.8100000023841858,
+						"length": 156.36500549316407,
+						"offset": [
+							-4.0,
+							-4.0
+						],
+						"impact_z_rotation": [
+							0.820304811000824,
+							1.972222089767456
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3891890048980713,
+								0.0
+							],
+							[
+								0.45405399799346926,
+								1.0
+							]
+						],
+						"rotation": -0.3316130042076111,
+						"width": 138.0,
+						"angle": 1.9547699689865113,
+						"length": 215.0,
+						"local_offset": [
+							68.0,
+							37.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							-0.3316130042076111,
+							-0.3316130042076111
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "zombie_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4264264404773712,
+								0.0
+							],
+							[
+								0.5045045018196106,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.12217305600643158,
+						"angle": 1.3962600231170655,
+						"x_axis_scale": 0.7789999842643738,
+						"length": 169.5850067138672,
+						"offset": [
+							-1.0,
+							8.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.1344599723815919
+						],
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "zombie_attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4324324429035187,
+								0.0
+							],
+							[
+								0.5465465188026428,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.12217305600643158,
+						"angle": 1.3962600231170655,
+						"x_axis_scale": 0.6520000100135803,
+						"length": 169.5850067138672,
+						"offset": [
+							3.0,
+							23.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							-0.9424779415130615,
+							-2.286381483078003
+						],
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/RamGiant/rig.ast"
+		socket = "aux_center_core"
+			parent = "spine_1_jntBnd"
+			translation = "0 -30 -15"
+		socket = "aux_center_circle_01"
+			parent = "spine_1_jntBnd"
+			translation = "25 -30 -15"
+		socket = "aux_center_circle_02"
+			parent = "spine_1_jntBnd"
+			translation = "0 -30 -40"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/RamGiant/RottingRamGiant.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false chest_jntBnd spine_2_jntBnd spine_1_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "arm_l false L_finger_2_jntBnd_2 L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "arm_r false R_finger_2_jntBnd_2 R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "stomach_fx false aux_center_circle_02 aux_center_core aux_center_circle_01"
+		bone_group = "stomach_dir false aux_center_core spine_2_jntBnd"
+		bone_group = "death_circle false L_elbow_Twist_jntBnd_1 neck_jntBnd spine_1_jntBnd"
+		bone_group = "stomach_line false spine_2_jntBnd aux_center_core"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33370301127433779,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/DeathFall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0502668619155884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2843050956726075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.424958348274231,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/WeakFootstep",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5383509397506714,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/WeakFootstep",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8093667030334473,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Emerge",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3747360110282898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/FootstepSlide",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8463159799575806,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.7703220248222351,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Idle"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23177632689476014,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5693644881248474,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8263334631919861,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3402698040008546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2799713611602785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.491596221923828,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17942321300506593,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2591667175292969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5354219675064087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8405402302742004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9483777284622192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9284708499908448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5517966747283937,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.577810049057007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownChestHit",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.095759868621826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03738690912723541,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25595715641975405,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.555054247379303,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8800312876701355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9749387502670288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.260474681854248,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5998334884643556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6314690113067629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownChestHit",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8903019428253176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownChestHit",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.117504119873047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12836399674415589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35225486755371096,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.635850191116333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9134724736213684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.238905191421509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6478793621063234,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6866886615753176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07513061910867691,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5098150372505188,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6593098640441895,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Run.loop.ogg",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10734095424413681,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7283852696418762,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9419721364974976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Run.loop.ogg",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.41556400060653689,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Effects/MeleeWhoosh",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.472106009721756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Attack.loop.ogg",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.43606698513031008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Effects/MeleeWhoosh",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5035660266876221,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Attack.loop.ogg",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.005911310203373432,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2753250002861023,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/FootstepSlide",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7180839776992798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/RunVocalStab.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8985180258750916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/WeakFootstep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Maggots.loop.ogg",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2496000528335572,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal1",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24305763840675355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5444493889808655,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8385490775108337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal2",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.930910050868988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5118178129196168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal3",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4743175506591799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownChestHit",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5448086261749269,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0843937397003176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal1",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28716710209846499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.554699182510376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.724053680896759,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal2",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.962132453918457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0003509521484377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownVocal3",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5403215885162355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.640951156616211,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownChestHit",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.913386821746826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/KnockdownChestHit",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1391985416412355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_vomit_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Vomit.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22727300226688386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Effects/VomitOnAct",
+						"bone_name": "aux_center_core"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2485400438308716,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Effects/VomitBodyLaunch",
+						"bone_name": "aux_center_core"
+					}
+				]
+			},
+			{
+				"name": "zombie_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Run.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.005911310203373432,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2753250002861023,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/FootstepSlide",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7180839776992798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/RunVocalStab.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8097131848335266,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RottenHulk/WeakFootstep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "zombie_attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5246899724006653,
+						"end_time": 0.8157579898834229,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MaggotHusks/pets/trail_melee.trl",
+						"bone_group": "arm_r"
+					}
+				]
+			},
+			{
+				"name": "zombie_attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5333300232887268,
+						"end_time": 0.8802480101585388,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MaggotHusks/pets/trail_melee.trl",
+						"bone_group": "arm_l"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3162199854850769,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RamGiant/pet/onact_death_circle.pet",
+						"bone_group": "death_circle"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.3223956823349,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RamGiant/pet/onact_death_circle.pet",
+						"bone_group": "death_circle"
+					}
+				]
+			},
+			{
+				"name": "zombie_vomit_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0323519706726075,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RamGiant/pet/onact_dir.pet",
+						"bone_group": "stomach_dir"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1270970106124879,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RamGiant/pet/onact_dir.pet",
+						"bone_group": "stomach_dir"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.2397880554199219,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RamGiant/pet/onact_dir.pet",
+						"bone_group": "stomach_dir"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.3274739980697632,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RamGiant/pet/onact_dir.pet",
+						"bone_group": "stomach_dir"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.446470022201538,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RamGiant/pet/onact_dir.pet",
+						"bone_group": "stomach_dir"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5085899829864503,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RamGiant/pet/onact_dir.pet",
+						"bone_group": "stomach_dir"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5516999959945679,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RamGiant/pet/onact_dir.pet",
+						"bone_group": "stomach_dir"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.6049400568008423,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RamGiant/pet/onact_dir.pet",
+						"bone_group": "stomach_dir"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/RamGiant/attachments/RamGiantLoinCloth.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/RamGiant/attachments/LoinCloth.amd"
+	default_animation = "idle"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/RamGiant/attachments/LoinCloth.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.500
+		enclosure_angle = 0.852
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/RamGiant/attachments/LoinCloth.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/RamGiant/RottingRamGiant.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/RamGiant/RottingRamGiant_armour_1776eed1.smd"
+Materials 3
+	"Art/Models/MONSTERS/RottingRamGiant/Textures/RottingRamGiantAc.mat" 4
+	"Art/Models/MONSTERS/RottingRamGiant/Textures/RottingRamGiantBc.mat" 1
+	"Art/Models/MONSTERS/RottingRamGiant/Textures/RottingRamGiantCc.mat" 1
+BoundingBox -130.749 -37.2384 -240.861 130.26 41.066 -1.45832
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/RamGiant/RottingRamGiant_armour_1776eed1.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 6 in the header, 6 in the block · 9060 triangles over 6068 vertices
+  names: 270 bytes said, 270 read  [agree]
+
+=== shapes (6)
+0	RottingRamGiantA1Shape	from 0	count 15864
+1	RottingRamGiantA2Shape	from 15864	count 1476
+2	RottingRamGiantRopeShape	from 17340	count 1152
+3	RottingRamGiantSkirtShape	from 18492	count 2286
+4	RottingRamGiantBShape	from 20778	count 3201
+5	RottingRamGiantCShape	from 23979	count 3201
+
+=== fitting
+the monster's rig: 56 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  RamGiantLoinCloth.ao  socket hip_jntBnd [in its carrier's rig]  box (-15.3,-45.9,-4)..(20.8,-37,54.7)
+    (the geometry did not read)
+    rig 5 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_loincloth_jntBnd_1  [its own]  under 0  rests at (-0,-42.5,-1.8)
+      2 phys_skinned_loincloth_jntBnd_2  [its own]  under 1  rests at (0,-42.3,13)
+      3 phys_skinned_loincloth_jntBnd_3  [its own]  under 2  rests at (0,-42.1,27.7)
+      4 phys_skinned_loincloth_jntBnd_4  [its own]  under 3  rests at (0,-42,42.5)

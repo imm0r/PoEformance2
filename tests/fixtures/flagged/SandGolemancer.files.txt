@@ -1,0 +1,1670 @@
+monster: Desiccated Lich [Metadata/Monsters/SandGolemancer/SandGolemancer]
+
+=== .ao Metadata/Monsters/SandGolemancer/SandGolemancer.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SandGolemancer/rig.amd"
+	view_of = "attack_01"
+		view_name = "temp_spellcast_01"
+	view_of = "spellcast_01"
+		view_name = "spellcast_01_tornado"
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	view_of = "spellcast_01"
+		view_name = "spellcast_portal_01"
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	view_of = "spellcast_01"
+		view_name = "revive_01"
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.665723979473114,
+					"name": "contact",
+					"position": [
+						-20.366300582885743,
+						-117.81800079345703,
+						-164.1999969482422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4127899408340455,
+					"name": "catch",
+					"position": [
+						-41.0797004699707,
+						28.71150016784668,
+						-205.43699645996095
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6205450296401978,
+					"name": "contact",
+					"position": [
+						20.366300582885743,
+						-79.74009704589844,
+						-164.1999969482422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4127899408340455,
+					"name": "catch",
+					"position": [
+						41.0797004699707,
+						28.71150016784668,
+						-205.43699645996095
+					]
+				}
+			]
+		},
+		{
+			"name": "sanctum_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.4961891174316407,
+					"name": "contact",
+					"position": [
+						-20.366300582885743,
+						-117.81800079345703,
+						-164.1999969482422
+					]
+				}
+			]
+		},
+		{
+			"name": "sanctum_attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.5010507106781006,
+					"name": "contact",
+					"position": [
+						20.366300582885743,
+						-79.74009704589844,
+						-164.1999969482422
+					]
+				}
+			]
+		},
+		{
+			"name": "spellcast_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0019299983978272,
+					"name": "thing",
+					"position": [
+						-0.5178449749946594,
+						-95.956298828125,
+						-201.1320037841797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.567039966583252,
+					"name": "emerge"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7618800401687623,
+					"name": "contact",
+					"position": [
+						-0.5178449749946594,
+						-95.956298828125,
+						-201.1320037841797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8065299987792969,
+					"name": "move_daemons"
+				}
+			]
+		},
+		{
+			"name": "spellcast_01_tornado",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0019299983978272,
+					"name": "thing",
+					"position": [
+						-0.5178449749946594,
+						-95.956298828125,
+						-201.1320037841797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.567039966583252,
+					"name": "emerge"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7286700010299683,
+					"name": "contact",
+					"position": [
+						-0.5178449749946594,
+						-95.956298828125,
+						-201.1320037841797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.87663996219635,
+					"name": "move_daemons"
+				}
+			]
+		},
+		{
+			"name": "spellcast_portal_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0019299983978272,
+					"name": "thing",
+					"position": [
+						-0.5178449749946594,
+						-95.956298828125,
+						-201.1320037841797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.567039966583252,
+					"name": "emerge"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7618799209594727,
+					"name": "contact",
+					"position": [
+						-0.5178449749946594,
+						-95.956298828125,
+						-201.1320037841797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8065299987792969,
+					"name": "move_daemons"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8731199502944947,
+					"name": "once"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/SandGolemancerBoss/attachments/SandGolemancerBossFloaties.ao"
+	attached_object = "<root> Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/idle_aura.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SandGolemancer/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SandGolemancer/SandGolemancer.sm"
+			hide_colliders = "collision_sphere_L_ankleShape,collision_sphere_L_hipShape,collision_sphere_L_kneeShape,collision_sphere_R_ankleShape,collision_sphere_R_hipShape,collision_sphere_R_kneeShape,collision_sphere_hipsShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false L_thigh_jntBnd R_thigh_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd neck_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "l_hand false R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "r_hand false L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "act_attack_01 false R_Weapon R_elbow_jntBnd"
+		bone_group = "act_attack_02 false L_Weapon L_elbow_jntBnd"
+		bone_group = "FX_trail_L false L_Weapon"
+		bone_group = "FX_trail_R false R_Weapon"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6626480221748352,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/shock.pet",
+						"bone_group": "act_attack_01"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6626480221748352,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/shock.pet",
+						"bone_group": "act_attack_02"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5011409521102906,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/shock.pet",
+						"bone_group": "act_attack_01"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.537142038345337,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/shock.pet",
+						"bone_group": "act_attack_02"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spellcast_01_buildUp.pet",
+						"bone_group": "l_hand"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spellcast_01_buildUp.pet",
+						"bone_group": "r_hand"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01_tornado",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spellcast_01_buildUp.pet",
+						"bone_group": "r_hand"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spellcast_01_buildUp.pet",
+						"bone_group": "l_hand"
+					}
+				]
+			},
+			{
+				"name": "spellcast_portal_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spellcast_01_buildUp.pet",
+						"bone_group": "l_hand"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spellcast_01_buildUp.pet",
+						"bone_group": "r_hand"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.7781609892845154,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spectral_throw.trl",
+						"bone_group": "FX_trail_R"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.7781609892845154,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spectral_throw.trl",
+						"bone_group": "FX_trail_L"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.3429083824157715,
+						"end_time": 1.7469712495803834,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spectral_throw.trl",
+						"bone_group": "FX_trail_R"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.3953944444656373,
+						"end_time": 1.8666954040527344,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spectral_throw.trl",
+						"bone_group": "FX_trail_L"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8005729913711548,
+						"end_time": 2.1828629970550539,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spectral_throw.trl",
+						"bone_group": "FX_trail_R"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8005729913711548,
+						"end_time": 1.9240729808807374,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spectral_throw.trl",
+						"bone_group": "FX_trail_L"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01_tornado",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8005729913711548,
+						"end_time": 2.1828629970550539,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spectral_throw.trl",
+						"bone_group": "FX_trail_R"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8005729913711548,
+						"end_time": 1.9240729808807374,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/spectral_throw.trl",
+						"bone_group": "FX_trail_L"
+					}
+				]
+			},
+			{
+				"name": "spellcast_portal_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8005729913711548,
+						"end_time": 2.182863235473633,
+						"filename": "Metadata/Effects/Environment/League_Sanctum/crystal_encounter/fx/proj_pt.trl",
+						"bone_group": "FX_trail_R"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8005729913711548,
+						"end_time": 1.9240729808807374,
+						"filename": "Metadata/Effects/Environment/League_Sanctum/crystal_encounter/fx/proj_pt.trl",
+						"bone_group": "FX_trail_L"
+					}
+				]
+			},
+			{
+				"name": "revive_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8005729913711548,
+						"end_time": 2.182863235473633,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Wisp/pets/proj_sanctum.trl",
+						"bone_group": "FX_trail_R"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8005729913711548,
+						"end_time": 1.9240729808807374,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Wisp/pets/proj_sanctum.trl",
+						"bone_group": "FX_trail_L"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2602100074291229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31586700677871706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6176660060882568,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/Whoosh",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0651299953460694,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.370710015296936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4215199947357178,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/SwingEnd",
+						"bone_name": "R_finger_1_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/Swing",
+						"bone_name": "L_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26336899399757388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31586700677871706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.593858003616333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/Whoosh",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0651299953460694,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.370710015296936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08814889937639237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2722820043563843,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/DeathFall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28109699487686159,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5484820008277893,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/SkullImpact",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.062056999653577808,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1404840052127838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6226530075073242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1192459985613823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1192459985613823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1192459985613823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1192459985613823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1192459985613823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.7123479843139648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveSlow",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2160199880599976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/IdleMumble",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09541139751672745,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/KnockDown",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27889499068260195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8743119835853577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3412599563598633,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.737589955329895,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3559300899505617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.750420093536377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9586799144744875,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07807809859514237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/KnockDown",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22822800278663636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7154759764671326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.097599983215332,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4219199419021607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9279299974441529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2507500648498537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.421180009841919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Breath.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26046401262283327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveSlow",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7187229990959168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/IdleMumble",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8492810130119324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/IdleMoveSlow",
+						"bone_name": "R_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/ShortAttack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.420244425535202,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8006296157836914,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8187984228134155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1763674020767213,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/Whoosh",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5859307050704957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1982390880584719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.423929452896118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/SwingEnd",
+						"bone_name": "R_finger_1_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/ShortAttack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4527971148490906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/Swing",
+						"bone_name": "L_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7411485910415649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8096383213996887,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2785483598709107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/Whoosh",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6800650358200074,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.162066698074341,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2597549855709076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6960920095443726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Effects/SpellcastOnAct",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8188220262527466,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act2/Golemancer/Golemancer_Summon_$(#).dialogue.ogg",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2558399438858033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.366950035095215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01_tornado",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2597549855709076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6960920095443726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Effects/SpellcastOnAct",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8188220262527466,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act2/Golemancer/Golemancer_Tornado_$(#).dialogue.ogg",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2558399438858033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3684499263763429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spellcast_portal_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2597549855709076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6960920095443726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Effects/SpellcastOnAct",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8188220262527466,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act2/Golemancer/Golemancer_Summon_$(#).dialogue.ogg",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2558399438858033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.366950035095215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Foley/MoveQuick",
+						"bone_name": "R_elbow_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.7999999523162842,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Smooth 0.484014 1 Linear 0.726711 1 Linear 1.13672 0 Flat 1.8 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Smooth 0.403345 1 Linear 0.605592 1 Linear 0.947266 0 Flat 1.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.632999897003174,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Smooth 0.857168 1 Linear 1.25985 1 Linear 1.8591 0 Flat 2.633 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.365999937057495,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Smooth 0.770247 1 Linear 1.13209 1 Linear 1.67058 0 Flat 2.366 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Smooth 1.48544 1 Linear 1.988 1 Linear 2.65296 0 Flat 3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01_tornado",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Smooth 1.48544 1 Linear 1.988 1 Linear 2.65296 0 Flat 3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "spellcast_portal_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Smooth 1.48544 1 Linear 1.988 1 Linear 2.65296 0 Flat 3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Smooth 1.48544 1 Linear 1.988 1 Linear 2.65296 0 Flat 3 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/epk/glow_hand_L.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/epk/glow_hand_R.epk"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/epk/glow_hand_L.epk"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/epk/glow_hand_R.epk"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/epk/glow_hand_L.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/epk/glow_hand_R.epk"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01_tornado",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/epk/glow_hand_L.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/epk/glow_hand_R.epk"
+					}
+				]
+			},
+			{
+				"name": "spellcast_portal_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/epk/glow_hand_portal_L.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/epk/glow_hand_portal_R.epk"
+					}
+				]
+			},
+			{
+				"name": "revive_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/epk/glow_hand_portal_R.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/epk/glow_hand_portal_L.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "spellcast_portal_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.919257640838623,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/sanctum_onact_spellcast_01.ao"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/SandGolemancerBoss/attachments/SandGolemancerBossFloaties.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SandGolemancerBoss/attachments/SandGolemancerFloaties/SandGolemancerFloaties_armour.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SandGolemancerBoss/attachments/SandGolemancerFloaties/SandGolemancerFloaties_armour.ast"
+		socket = "aux_line"
+			parent = "root_jntBnd"
+			translation = "0 0 -49.6532"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.000
+		enclosure_radius_additive = 300.000
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+		animation_max_velocity = 10000.000
+		gravity = 1.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SandGolemancerBoss/attachments/SandGolemancerFloaties/SandGolemancerFloaties.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "blade false root_jntBnd phys_floaty_jntBnd_2"
+		bone_group = "ptEmit false root_jntBnd aux_line"
+		bone_group = "rock_01` false phys_floaty_jntBnd_1"
+		bone_group = "rock_02 false phys_floaty_jntBnd_5"
+		bone_group = "rock_03 false"
+	}
+	
+	ParticleEffects
+	{
+	}
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/idle_aura.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/monster_particles/Act2_FOUR/SandGoleMancer/mb/aura/rig.amd"
+	view_of = "fadeout"
+		view_name = "death_idle"
+		view_begin = 987
+		view_looping = true
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/monster_particles/Act2_FOUR/SandGoleMancer/mb/aura/rig.ast"
+		socket = "aux_aura"
+			parent = "root"
+			translation = "0 0 -110.528"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "AA false aux_A aux_A5"
+		bone_group = "CC false aux_C aux_C5"
+		bone_group = "up false aux_up"
+		bone_group = "cyl false aux_floor aux_cyl"
+		bone_group = "circ false aux_circle2 aux_floor aux_circle1"
+		bone_group = "orb false aux_orb"
+		bone_group = "ptEmit false root aux_up1"
+		bone_group = "circle false root aux_cyl"
+		bone_group = "sphere false root aux_C2"
+		bone_group = "FX_aura false root aux_aura"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "idle",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/aura_PTEmit.pet",
+						"bone_group": "FX_aura"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SandGolemancer/pet/aura_circleEmit.pet",
+						"bone_group": "circle"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "idle",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0004897160106338561,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SandGolemancer/Effects/Sand.loop.ogg",
+						"bone_name": "aux_circle1"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/SandGolemancer/SandGolemancer.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/SandGolemancer/rig_e7d47cbc.smd"
+Materials 1
+	"Art/Textures/Monsters/SandGolemancer/SandGolemancerc.mat" 16
+BoundingBox -98.8345 -16.5443 -217.362 98.8345 18.9773 -12.6487
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "aux_L_knee_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "aux_R_knee_jntBnd"
+	"grp_l_toe" 2 "aux_L_knee_jntBnd" "aux_L_knee_tip"
+	"grp_r_toe" 2 "aux_R_knee_jntBnd" "aux_R_knee_tip"
+	"grp_l_foot" 2 "aux_L_knee_jntBnd" "aux_L_knee_tip"
+	"grp_r_foot" 2 "aux_R_knee_jntBnd" "aux_R_knee_tip"
+
+=== .smd Art/Models/MONSTERS/SandGolemancer/rig_e7d47cbc.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 16 in the header, 16 in the block · 6576 triangles over 5326 vertices
+  names: 678 bytes said, 678 read  [agree]
+
+=== shapes (16)
+0	L_forearm_segmentShape	from 0	count 396
+1	L_hand_segmentShape	from 396	count 1164
+2	L_humerus_segmentShape	from 1560	count 702
+3	neck_segmentShape	from 2262	count 156
+4	pelvis_segmentShape	from 2418	count 1866
+5	R_forearm_segmentShape	from 4284	count 396
+6	R_hand_segmentShape	from 4680	count 1164
+7	R_humerus_segmentShape	from 5844	count 702
+8	ribcage_segmentShape	from 6546	count 3756
+9	SandGolemancerHeadShape	from 10302	count 3420
+10	SandGolemancerJawShape	from 13722	count 546
+11	SandGolemancerLKneeShape	from 14268	count 498
+12	SandGolemancerLLegShape	from 14766	count 1110
+13	SandGolemancerRKneeShape	from 15876	count 498
+14	SandGolemancerRLegShape	from 16374	count 1110
+15	spine_segmentShape	from 17484	count 2244
+
+=== fitting
+the monster's rig: 57 bones
+mounts: aux_position, aux_head_jntBnd, aux_L_knee_jntBnd, aux_R_knee_jntBnd, aux_L_knee_tip, aux_R_knee_tip
+  SandGolemancerBossFloaties.ao  socket <root> [NOT in its carrier's rig]  box (-53.6,-38.1,-100)..(48,32.6,-40)
+    (the geometry did not read)
+    rig 9 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_floaty_jntBnd_1  [its own]  under 0  rests at (38.4,3.3,-87.1)
+      2 phys_floaty_jntBnd_2  [its own]  under 0  rests at (9.5,25.3,-51.4)
+      3 phys_floaty_jntBnd_3  [its own]  under 0  rests at (26.6,-20.2,-83.2)
+      4 phys_floaty_jntBnd_4  [its own]  under 0  rests at (22.8,0.6,-47.8)
+      5 phys_floaty_jntBnd_5  [its own]  under 0  rests at (-43,27.3,-82.6)
+      6 phys_floaty_jntBnd_6  [its own]  under 0  rests at (-26.7,-3.4,-60.6)
+      7 phys_floaty_jntBnd_7  [its own]  under 0  rests at (-7,-30.2,-68.7)
+      8 aux_animation_control_ratio  [its own]  under 0  rests at (0,0,0)
+  idle_aura.ao  socket <root> [NOT in its carrier's rig]  (no mesh - an effect or a sound)

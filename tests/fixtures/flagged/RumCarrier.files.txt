@@ -1,0 +1,1000 @@
+monster: Blackblooded Blisterboil [Metadata/Monsters/LeagueAbyss/Blackblood/RumCarrier]
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/RumCarrier/RumCarrier.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Bloodsucker/Animations/rum_carrier/rig.amd"
+	animations = '[
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8741670250892639,
+					"name": "slurp"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.2333333045244217,
+					"name": "move",
+					"position": [
+						75.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23333334922790528,
+					"name": "move",
+					"position": [
+						-75.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "explode_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.4415700435638428,
+					"name": "explode"
+				}
+			]
+		},
+		{
+			"name": "feed_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.6039400100708008,
+					"name": "slurp"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/LeagueAbyss/Blackblood/RumCarrier/Attachments/RumCarrierTentacles.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.22904999554157258,
+								0.0
+							],
+							[
+								0.3128489851951599,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.3316130042076111,
+						"angle": 1.8151400089263917,
+						"length": 115.60700225830078,
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.1344599723815919
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Bloodsucker/Animations/rum_carrier/rig.ast"
+		socket = "light"
+			translation = "0 1.32298 -154.962"
+		linear_allowed_contraction = 0.150
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_angle = 0.250
+		animation_velocity_factor = 10.000
+		animation_force_factor = 15.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Bloodsucker/Bloodsucker.sm"
+			Bloodsucker_bodyShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssRumCarrierPopped.mat:0"
+			Bloodsucker_pimple1Shape = "Art/Textures/Monsters/AbyssalMonsters/AbyssRumCarrier.mat:0"
+			Bloodsucker_pimple2Shape = "Art/Textures/Monsters/AbyssalMonsters/AbyssRumCarrier.mat:0"
+			Bloodsucker_pimple3Shape = "Art/Textures/Monsters/AbyssalMonsters/AbyssRumCarrier.mat:0"
+			Bloodsucker_pimple4Shape = "Art/Textures/Monsters/AbyssalMonsters/AbyssRumCarrier.mat:0"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "abyss_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07236000150442124,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07402999699115753,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30281999707221987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3519499897956848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3832100033760071,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4645448625087738,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Aggro",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49966001510620119,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "pimple_6_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12033799290657044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1713549941778183,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Whoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4563809931278229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9081500172615051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShortTEST_"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "pimple_6_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12033799290657044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26804232597351076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Whoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4563809931278229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15847499668598176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Death_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3796829879283905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15847499668598176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Death_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3796829879283905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15847499668598176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Death_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3796829879283905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14658640325069428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Death_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3511996567249298,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7799400091171265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShortTEST_"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14658640325069428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Death_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3511996567249298,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14658640325069428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Death_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3511996567249298,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "explode_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/BuildUpExplode",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0012335500214248896,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementLong",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09027290344238281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.379518985748291,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6968680024147034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7637869715690613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8647568225860596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/KnockdownB",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8811309337615967,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "feed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementLong",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4002799987792969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Feed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8214622139930725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0692800283432007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Feed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.482539415359497,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0423114076256752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0423114076256752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0423114076256752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2956976294517517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementTest"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0423114076256752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 5.081870079040527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementLong",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.726310729980469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.414895057678223,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17920149862766267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29189497232437136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementLong",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.335750013589859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.06150484085083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0945700407028199,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementLong",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9375799894332886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9708399772644044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17642904818058015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31725001335144045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementLong",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3305555582046509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0450820922851563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.099120020866394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementLong",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.90760338306427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.940348744392395,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11827799677848816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26372799277305605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Chase",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4329439699649811,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4509800374507904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7937309145927429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.046589970588684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1232800483703614,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09428799897432327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6692910194396973,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.263910174369812,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.429129958152771,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Vocals/Chase",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8423898220062256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/RumCarrier/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd chest_jntBnd neck_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	AttachedAnimatedObject
+	{
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "explode_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/RumCarrier/EPKs/Explode_Skin.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "explode_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "VTX_Tremble_TLF",
+						"curve": "2 0 0 Linear 1.5 1.63191 Smooth"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/RumCarrier/Attachments/RumCarrierTentacles.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Bloodsucker/attachments/Tentacles/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Bloodsucker/attachments/Tentacles/rig.ast"
+		linear_stiffness = 10000.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		enclosure_angle = 0.400
+		animation_velocity_factor = 10.000
+		animation_force_factor = 15.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Bloodsucker/attachments/Tentacles/RumCarrierTentacles.sm"
+			hide_segments = "TentacleShape"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/Bloodsucker/Bloodsucker.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/Bloodsucker/rig_760a501f.smd"
+Materials 2
+	"Art/Textures/Monsters/Bloodsucker/BloodsuckerPoppedc.mat" 1
+	"Art/Textures/Monsters/Bloodsucker/Bloodsucker02c.mat" 4
+BoundingBox -74.03 -31.9113 -140.323 74.03 45.9926 1.12926
+BoneGroups 28
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+	"grp_belly" 2 "hip_jntBnd" "phys_tri_belly_jntBnd"
+	"grp_pimple_1" 2 "hip_jntBnd" "pimple_2_jntBnd"
+	"grp_pimple_2" 2 "hip_jntBnd" "pimple_3_jntBnd"
+	"grp_pimple_3" 2 "hip_jntBnd" "pimple_4_jntBnd"
+	"grp_pimple_4" 2 "hip_jntBnd" "pimple_5_jntBnd"
+	"grp_pimple_5" 2 "hip_jntBnd" "pimple_6_jntBnd"
+	"grp_pimple_6" 2 "hip_jntBnd" "pimple_7_jntBnd"
+	"grp_pimple_7" 2 "hip_jntBnd" "pimple_1_jntBnd"
+
+=== .smd Art/Models/MONSTERS/Bloodsucker/rig_760a501f.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 5 in the header, 5 in the block · 12902 triangles over 8157 vertices
+  names: 234 bytes said, 234 read  [agree]
+
+=== shapes (6)
+0	Bloodsucker_bodyShape	from 0	count 35970
+1	Bloodsucker_pimple1Shape	from 35970	count 825
+2	Bloodsucker_pimple2Shape	from 36795	count 612
+3	Bloodsucker_pimple3Shape	from 37407	count 303
+4	Bloodsucker_pimple4Shape	from 37710	count 996
+5	TentacleShape	from 38706	count 7956
+
+=== fitting
+the monster's rig: 56 bones
+mounts: aux_position, aux_head_jntBnd, aux_L_foot_jntBnd, aux_R_foot_jntBnd
+  RumCarrierTentacles.ao  socket head_jntBnd [in its carrier's rig]  box (-30.1,-34.7,-24.5)..(30.1,-4,38.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 2652 triangles over 1664 vertices
+    names: 26 bytes said, 26 read  [agree]
+    rig 3 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_tentacles_jntBnd  [its own]  under 0  rests at (0,-18.4,7.3)
+      2 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
