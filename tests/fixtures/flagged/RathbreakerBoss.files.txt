@@ -1,0 +1,3951 @@
+monster: Rathbreaker [Metadata/Monsters/HyenaMonster/RathbreakerBoss]
+
+=== .ao Metadata/Monsters/HyenaMonster/Rathbreaker.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SunClanScavenger/Rathbreaker/rig.amd"
+	view_of = "axe_idle_01"
+		view_name = "axe_idle_01_charge"
+		view_end = 300
+		view_blend_in_time = 0
+		view_exclude_event = "SoundEvent"
+	animations = '[
+		{
+			"name": "axe_attack_01",
+			"events": [
+				{
+					"id": 2513955600,
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.15661999583244325,
+					"name": "start_target_update",
+					"data": "360 0 1"
+				},
+				{
+					"id": 1818386628,
+					"type": "StandardEventType",
+					"time": 0.4315809905529022,
+					"name": "footstep",
+					"position": [
+						-12.238800048828125,
+						105.88700103759766,
+						-6.755839824676514
+					]
+				},
+				{
+					"id": 1919282198,
+					"type": "StandardEventType",
+					"time": 0.9618989825248718,
+					"name": "footstep",
+					"position": [
+						-21.542499542236329,
+						52.4541015625,
+						-6.760970115661621
+					]
+				}
+			]
+		},
+		{
+			"name": "axe_attack_02",
+			"events": [
+				{
+					"id": 2696964958,
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.41545718908309939,
+					"name": "start_target_update",
+					"data": "360 0 1"
+				},
+				{
+					"id": 4047924468,
+					"type": "StandardEventType",
+					"time": 0.7723749876022339,
+					"name": "footstep",
+					"position": [
+						37.18259811401367,
+						-14.982000350952149,
+						-15.103599548339844
+					]
+				},
+				{
+					"id": 1603592992,
+					"type": "StandardEventType",
+					"time": 0.8512849807739258,
+					"name": "footstep",
+					"position": [
+						-19.538000106811525,
+						-52.59590148925781,
+						-7.435090065002441
+					]
+				},
+				{
+					"id": 2851887486,
+					"type": "StandardEventType",
+					"time": 0.8649410009384155,
+					"name": "footstep",
+					"position": [
+						-2.999429941177368,
+						105.22100067138672,
+						-6.795619964599609
+					]
+				},
+				{
+					"id": 939142464,
+					"type": "StandardEventType",
+					"time": 0.8649410009384155,
+					"name": "footstep",
+					"position": [
+						-81.40850067138672,
+						58.77090072631836,
+						-6.803579807281494
+					]
+				}
+			]
+		},
+		{
+			"name": "axe_charge_01",
+			"events": [
+				{
+					"id": 417669633,
+					"type": "StandardEventType",
+					"time": 0.07282000035047531,
+					"name": "footstep",
+					"position": [
+						-9.489410400390625,
+						30.691699981689454,
+						-8.259349822998047
+					]
+				},
+				{
+					"id": 1028069472,
+					"type": "StandardEventType",
+					"time": 0.1709499955177307,
+					"name": "footstep",
+					"position": [
+						9.522489547729493,
+						0.10352300107479096,
+						-5.575389862060547
+					]
+				},
+				{
+					"id": 1207459449,
+					"type": "StandardEventType",
+					"time": 0.24119000136852265,
+					"name": "footstep",
+					"position": [
+						-10.857799530029297,
+						-73.0259017944336,
+						-7.888000011444092
+					]
+				},
+				{
+					"id": 572015550,
+					"type": "StandardEventType",
+					"time": 0.359470009803772,
+					"name": "footstep",
+					"position": [
+						9.025309562683106,
+						-79.53019714355469,
+						-8.061779975891114
+					]
+				}
+			]
+		},
+		{
+			"name": "axe_charge_attack_01",
+			"events": [
+				{
+					"id": 708156146,
+					"type": "StandardEventType",
+					"time": 0.07231000065803528,
+					"name": "footstep",
+					"position": [
+						-9.489609718322754,
+						30.39419937133789,
+						-8.32079029083252
+					],
+					"contact_ref": [
+						-79.05970001220703,
+						-99.40760040283203,
+						0.0
+					]
+				},
+				{
+					"id": 16874068,
+					"type": "StandardEventType",
+					"time": 0.17147000133991242,
+					"name": "footstep",
+					"position": [
+						9.50786018371582,
+						0.3932270109653473,
+						-5.498260021209717
+					],
+					"contact_ref": [
+						-79.05970001220703,
+						-99.40760040283203,
+						0.0
+					]
+				},
+				{
+					"id": 650672309,
+					"type": "StandardEventType",
+					"time": 0.21475699543952943,
+					"name": "slash",
+					"position": [
+						0.0,
+						-99.40760040283203,
+						0.0
+					],
+					"contact_ref": [
+						-79.05970001220703,
+						-99.40760040283203,
+						0.0
+					]
+				},
+				{
+					"id": 4253464598,
+					"type": "StandardEventType",
+					"time": 0.23860999941825868,
+					"name": "footstep",
+					"position": [
+						-11.035499572753907,
+						-74.33979797363281,
+						-8.142000198364258
+					]
+				},
+				{
+					"id": 4002669302,
+					"type": "StandardEventType",
+					"time": 0.3883900046348572,
+					"name": "footstep",
+					"position": [
+						8.616840362548829,
+						-66.32270050048828,
+						-7.573850154876709
+					]
+				},
+				{
+					"id": 118251127,
+					"type": "StandardEventType",
+					"time": 0.5252699851989746,
+					"name": "ground_slash",
+					"position": [
+						-126.69200134277344,
+						-175.74600219726563,
+						0.0
+					]
+				},
+				{
+					"id": 3635829330,
+					"type": "StandardEventType",
+					"time": 0.6063399910926819,
+					"name": "footstep",
+					"position": [
+						-9.489709854125977,
+						30.80030059814453,
+						-8.236869812011719
+					]
+				},
+				{
+					"id": 1277411112,
+					"type": "StandardEventType",
+					"time": 0.7034400105476379,
+					"name": "footstep",
+					"position": [
+						9.54833984375,
+						-0.3715440034866333,
+						-5.709589958190918
+					]
+				},
+				{
+					"id": 2869977551,
+					"type": "StandardEventType",
+					"time": 0.7808889746665955,
+					"name": "footstep",
+					"position": [
+						-10.938599586486817,
+						-69.4384994506836,
+						-7.643089771270752
+					]
+				},
+				{
+					"id": 1608113625,
+					"type": "StandardEventType",
+					"time": 0.9048600196838379,
+					"name": "footstep",
+					"position": [
+						8.644530296325684,
+						-75.86979675292969,
+						-7.066569805145264
+					]
+				}
+			]
+		},
+		{
+			"name": "axe_charge_end_01",
+			"events": [
+				{
+					"id": 1990178725,
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.26600000262260439,
+					"name": "move",
+					"position": [
+						0.0,
+						-159.0,
+						0.0
+					],
+					"data": "0 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"id": 1178576783,
+					"type": "StandardEventType",
+					"time": 0.18491099774837495,
+					"name": "footstep",
+					"position": [
+						-76.7926025390625,
+						-79.77850341796875,
+						-10.672100067138672
+					]
+				},
+				{
+					"id": 860450331,
+					"type": "StandardEventType",
+					"time": 0.196260005235672,
+					"name": "footstep",
+					"position": [
+						-131.28599548339845,
+						-73.21749877929688,
+						-7.260000228881836
+					]
+				},
+				{
+					"id": 3068153923,
+					"type": "StandardEventType",
+					"time": 0.20452000200748444,
+					"name": "footstep",
+					"position": [
+						-70.12779998779297,
+						16.85110092163086,
+						-9.603960037231446
+					]
+				},
+				{
+					"id": 2756628415,
+					"type": "StandardEventType",
+					"time": 0.39768001437187197,
+					"name": "footstep",
+					"position": [
+						-127.99800109863281,
+						3.524049997329712,
+						-7.387909889221191
+					]
+				},
+				{
+					"id": 911513119,
+					"type": "StandardEventType",
+					"time": 0.8666399717330933,
+					"name": "footstep",
+					"position": [
+						-13.101099967956543,
+						-43.22420120239258,
+						-6.236100196838379
+					]
+				},
+				{
+					"id": 3004057744,
+					"type": "StandardEventType",
+					"time": 0.8666399717330933,
+					"name": "footstep",
+					"position": [
+						-54.38420104980469,
+						31.731399536132814,
+						-8.31521987915039
+					]
+				},
+				{
+					"id": 1748569474,
+					"type": "StandardEventType",
+					"time": 0.9337800145149231,
+					"name": "footstep",
+					"position": [
+						49.50790023803711,
+						-30.67460060119629,
+						-7.055349826812744
+					]
+				},
+				{
+					"id": 1830769444,
+					"type": "StandardEventType",
+					"time": 0.9368799924850464,
+					"name": "footstep",
+					"position": [
+						-9.585809707641602,
+						88.49810028076172,
+						-8.69651985168457
+					]
+				}
+			]
+		},
+		{
+			"name": "axe_charge_start_01",
+			"events": [
+				{
+					"id": 626616711,
+					"type": "StandardEventType",
+					"time": 0.3032729923725128,
+					"name": "footstep",
+					"position": [
+						-25.15679931640625,
+						79.59239959716797,
+						-6.762660026550293
+					]
+				},
+				{
+					"id": 4176570402,
+					"type": "StandardEventType",
+					"time": 0.4758380353450775,
+					"name": "rain",
+					"position": [
+						0.0,
+						0.0,
+						2.5407699135961319e-31
+					]
+				},
+				{
+					"id": 2589988448,
+					"type": "StandardEventType",
+					"time": 0.4758380353450775,
+					"name": "roar",
+					"position": [
+						0.0,
+						0.0,
+						2.5407699135961319e-31
+					]
+				},
+				{
+					"id": 4227430158,
+					"type": "StandardEventType",
+					"time": 0.488756000995636,
+					"name": "footstep",
+					"position": [
+						67.19640350341797,
+						87.00289916992188,
+						-6.80709981918335
+					]
+				},
+				{
+					"id": 3178972589,
+					"type": "StandardEventType",
+					"time": 0.9001569747924805,
+					"name": "footstep",
+					"position": [
+						9.395779609680176,
+						4.8796000480651859,
+						-15.27810001373291
+					]
+				},
+				{
+					"id": 458225135,
+					"type": "MoveEventType",
+					"time": 1.1064800024032593,
+					"end_time": 1.2999999523162842,
+					"name": "move",
+					"position": [
+						0.0,
+						-88.0,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"id": 3681006078,
+					"type": "StandardEventType",
+					"time": 1.1330000162124634,
+					"name": "move_88u"
+				}
+			]
+		},
+		{
+			"name": "axe_doublestrike_01",
+			"events": [
+				{
+					"id": 1527619589,
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.47963768243789675,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"id": 3004550384,
+					"type": "StartTargetUpdateEventType",
+					"time": 0.9551100134849548,
+					"end_time": 1.1594431400299073,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				},
+				{
+					"id": 2801366105,
+					"type": "StandardEventType",
+					"time": 1.4765299558639527,
+					"name": "ground_slash",
+					"position": [
+						27.60460090637207,
+						-166.4530029296875,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "axe_run_01",
+			"events": [
+				{
+					"id": 1404511072,
+					"type": "StandardEventType",
+					"time": 0.1039000004529953,
+					"name": "footstep",
+					"position": [
+						-11.137499809265137,
+						-38.12689971923828,
+						-7.483799934387207
+					]
+				},
+				{
+					"id": 1876636450,
+					"type": "StandardEventType",
+					"time": 0.22328999638557435,
+					"name": "footstep",
+					"position": [
+						9.039959907531739,
+						-68.29000091552735,
+						-6.393909931182861
+					]
+				},
+				{
+					"id": 1061771882,
+					"type": "StandardEventType",
+					"time": 0.5407999753952026,
+					"name": "footstep",
+					"position": [
+						-9.523050308227539,
+						35.04249954223633,
+						-7.695650100708008
+					]
+				},
+				{
+					"id": 4256426321,
+					"type": "StandardEventType",
+					"time": 0.6660000085830689,
+					"name": "footstep",
+					"position": [
+						9.673879623413086,
+						12.838500022888184,
+						-6.508600234985352
+					]
+				}
+			]
+		},
+		{
+			"name": "axe_slam_01",
+			"events": [
+				{
+					"id": 18691908,
+					"type": "StartTargetUpdateEventType",
+					"time": 1.4123166799545289,
+					"end_time": 2.4885525703430177,
+					"name": "start_target_update",
+					"data": "40 0 1"
+				},
+				{
+					"id": 1805651058,
+					"type": "StandardEventType",
+					"time": 2.4959635734558107,
+					"name": "lacerate_r",
+					"position": [
+						-85.18868255615235,
+						-28.65604591369629,
+						0.0
+					],
+					"contact_ref": [
+						0.31762123107910159,
+						-397.6436462402344,
+						0.0
+					]
+				},
+				{
+					"id": 4148251819,
+					"type": "StartTargetUpdateEventType",
+					"time": 2.6174798011779787,
+					"end_time": 3.1950433254241945,
+					"name": "start_target_update",
+					"data": "40 0 1"
+				},
+				{
+					"id": 3733134607,
+					"type": "StandardEventType",
+					"time": 3.224173069000244,
+					"name": "lacerate_l",
+					"position": [
+						48.3089599609375,
+						-40.09254455566406,
+						0.0
+					],
+					"contact_ref": [
+						1.318490982055664,
+						-388.44915771484377,
+						0.0
+					]
+				},
+				{
+					"id": 3733164800,
+					"type": "MoveEventType",
+					"time": 3.3299999237060549,
+					"end_time": 4.0,
+					"name": "move",
+					"position": [
+						0.0,
+						94.0,
+						0.0
+					],
+					"data": "1 1 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"id": 3207109716,
+					"type": "StartTargetUpdateEventType",
+					"time": 3.503023624420166,
+					"end_time": 5.360910892486572,
+					"name": "start_target_update",
+					"data": "50 0 1"
+				},
+				{
+					"id": 4124576311,
+					"type": "MoveEventType",
+					"time": 5.0,
+					"end_time": 5.5,
+					"name": "move",
+					"position": [
+						0.0,
+						-94.0,
+						0.0
+					],
+					"data": "1 1 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"id": 815658054,
+					"type": "StandardEventType",
+					"time": 5.5,
+					"name": "slam",
+					"position": [
+						4.767333984375,
+						-138.1800537109375,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "enraged_attack_01",
+			"events": [
+				{
+					"id": 3796142755,
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.48663565516471865,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				},
+				{
+					"id": 4137964280,
+					"type": "InterruptSkillEventType",
+					"time": 0.8690000176429749,
+					"name": "interrupt_skill",
+					"data": "25 0"
+				},
+				{
+					"id": 1687834645,
+					"type": "StartTargetUpdateEventType",
+					"time": 0.9330400228500366,
+					"end_time": 1.1318241357803345,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				}
+			]
+		},
+		{
+			"name": "enraged_overhead_chop_01",
+			"events": [
+				{
+					"id": 838205459,
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.025990605354309,
+					"name": "start_target_update",
+					"data": "180 -90 1"
+				},
+				{
+					"id": 1796642907,
+					"type": "StandardEventType",
+					"time": 1.2336299419403077,
+					"name": "contact",
+					"position": [
+						0.0,
+						-77.5811996459961,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "spear_attack_01",
+			"events": [
+				{
+					"id": 3319577559,
+					"type": "StandardEventType",
+					"time": 0.3005799949169159,
+					"name": "footstep",
+					"position": [
+						32.519500732421878,
+						-53.01860046386719,
+						-9.96897029876709
+					]
+				},
+				{
+					"id": 3106645713,
+					"type": "StandardEventType",
+					"time": 0.3741300106048584,
+					"name": "footstep",
+					"position": [
+						-37.093101501464847,
+						-47.96910095214844,
+						-6.163599967956543
+					]
+				}
+			]
+		},
+		{
+			"name": "spear_attack_02",
+			"events": [
+				{
+					"id": 2205242215,
+					"type": "StandardEventType",
+					"time": 0.44565001130104067,
+					"name": "footstep",
+					"position": [
+						-12.156800270080567,
+						106.19100189208985,
+						-6.758570194244385
+					]
+				},
+				{
+					"id": 2631273562,
+					"type": "StandardEventType",
+					"time": 0.9702050089836121,
+					"name": "footstep",
+					"position": [
+						-21.749399185180665,
+						51.228599548339847,
+						-6.797369956970215
+					]
+				},
+				{
+					"id": 1219109250,
+					"type": "StandardEventType",
+					"time": 1.1317100524902344,
+					"name": "footstep",
+					"position": [
+						33.225799560546878,
+						72.86260223388672,
+						-6.804180145263672
+					]
+				}
+			]
+		},
+		{
+			"name": "spear_run_01",
+			"events": [
+				{
+					"id": 3029471663,
+					"type": "StandardEventType",
+					"time": 0.09614340215921402,
+					"name": "footstep",
+					"position": [
+						-11.170700073242188,
+						-41.08769989013672,
+						-7.957699775695801
+					]
+				},
+				{
+					"id": 2269696937,
+					"type": "StandardEventType",
+					"time": 0.2374269962310791,
+					"name": "footstep",
+					"position": [
+						8.849360466003418,
+						-64.94390106201172,
+						-5.731289863586426
+					]
+				},
+				{
+					"id": 427366890,
+					"type": "StandardEventType",
+					"time": 0.542739987373352,
+					"name": "footstep",
+					"position": [
+						-9.528019905090332,
+						35.75870132446289,
+						-7.566110134124756
+					]
+				},
+				{
+					"id": 598527123,
+					"type": "StandardEventType",
+					"time": 0.6660000085830689,
+					"name": "footstep",
+					"position": [
+						9.673879623413086,
+						12.838500022888184,
+						-6.508600234985352
+					]
+				}
+			]
+		},
+		{
+			"name": "spear_throw_01",
+			"events": [
+				{
+					"id": 657478510,
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "td_start_face#120"
+				},
+				{
+					"id": 453046159,
+					"type": "StandardEventType",
+					"time": 0.7958099842071533,
+					"name": "td_end_face"
+				},
+				{
+					"id": 1274133608,
+					"type": "StandardEventType",
+					"time": 0.99031001329422,
+					"name": "footstep",
+					"position": [
+						36.98820114135742,
+						-14.13129997253418,
+						-14.92609977722168
+					]
+				},
+				{
+					"id": 506555297,
+					"type": "StandardEventType",
+					"time": 1.0402699708938599,
+					"name": "contact",
+					"position": [
+						-22.81599998474121,
+						-95.2615966796875,
+						-188.7259979248047
+					]
+				},
+				{
+					"id": 909250237,
+					"type": "StandardEventType",
+					"time": 1.0458999872207642,
+					"name": "hide_spear"
+				},
+				{
+					"id": 1261742738,
+					"type": "StandardEventType",
+					"time": 1.073639988899231,
+					"name": "footstep",
+					"position": [
+						-19.518800735473634,
+						-52.57429885864258,
+						-7.450540065765381
+					]
+				},
+				{
+					"id": 2195323035,
+					"type": "StandardEventType",
+					"time": 1.1007800102233887,
+					"name": "footstep",
+					"position": [
+						-3.006580114364624,
+						105.22799682617188,
+						-6.804780006408691
+					]
+				},
+				{
+					"id": 1641309066,
+					"type": "StandardEventType",
+					"time": 1.1007800102233887,
+					"name": "footstep",
+					"position": [
+						-81.39320373535156,
+						58.77799987792969,
+						-6.806379795074463
+					]
+				},
+				{
+					"id": 2015550804,
+					"type": "StandardEventType",
+					"time": 1.5658899545669556,
+					"name": "footstep",
+					"position": [
+						-37.09000015258789,
+						-25.80120086669922,
+						-6.230279922485352
+					]
+				},
+				{
+					"id": 1751700527,
+					"type": "StandardEventType",
+					"time": 1.641469955444336,
+					"name": "footstep",
+					"position": [
+						-21.767900466918947,
+						51.22999954223633,
+						-6.781620025634766
+					]
+				},
+				{
+					"id": 1998748212,
+					"type": "StandardEventType",
+					"time": 1.8255800008773804,
+					"name": "footstep",
+					"position": [
+						31.189699172973634,
+						-48.920501708984378,
+						-7.294079780578613
+					]
+				},
+				{
+					"id": 2426736004,
+					"type": "StandardEventType",
+					"time": 1.9442600011825562,
+					"name": "show_spear"
+				},
+				{
+					"id": 4281659696,
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "footstep",
+					"position": [
+						33.11800003051758,
+						72.89140319824219,
+						-6.807159900665283
+					]
+				}
+			]
+		}
+	]'
+
+	anim_driven_subobject = "hip_jntBnd 1 3 75.0 55.0 125.0 0 0.0 0 none"
+	anim_driven_subobject = "quad_hip_jntBnd 1 3 65.0 75.0 55.0 0 0.0 0 none"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/HyenaMonster/Attachments/RathbreakerNecklace.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/HyenaMonster/Attachments/RathbreakerDreads.ao"
+	attached_object = "R_Weapon Metadata/Monsters/SunClanScavenger/SunClanWeapons/SunClanCleaver.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "axe_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.3407819867134094,
+								0.0
+							],
+							[
+								0.40782099962234499,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 3,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": 0.4014259874820709,
+						"angle": 2.3561899662017824,
+						"length": 120.0,
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.1344599723815919
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "axe_attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.5243239998817444,
+								0.0
+							],
+							[
+								0.5837839841842651,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"damage_statset_index": 5,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"update_target_direction": true,
+						"width": 92.48600006103516,
+						"angle": 1.5533398389816285,
+						"length": 200.0,
+						"impact_x_rotation": [
+							-0.17453299462795258,
+							-0.5235990285873413
+						],
+						"impact_z_rotation": [
+							0.6108649969100952,
+							1.5707999467849732
+						],
+						"impact_type": "Slash",
+						"impact_bone": "weapon_02"
+					}
+				]
+			}
+		},
+		{
+			"name": "axe_doublestrike_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.3459460139274597,
+								0.0
+							],
+							[
+								0.38251399993896487,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"update_target_direction": true,
+						"width": 52.02299880981445,
+						"angle": 1.1344599723815919,
+						"length": 179.1909942626953,
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.1344599723815919
+						],
+						"impact_type": "Slash",
+						"impact_bone": "weapon_02"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.6368719935417175,
+								0.0
+							],
+							[
+								0.6787880063056946,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"damage_statset_index": 6,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"update_target_direction": true,
+						"width": 98.26599884033203,
+						"length": 189.54200744628907,
+						"impact_x_rotation": [
+							-0.17453299462795258,
+							-0.9599310159683228
+						],
+						"impact_type": "Slash",
+						"impact_bone": "weapon_02"
+					}
+				]
+			}
+		},
+		{
+			"name": "enraged_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.31147500872612,
+								0.0
+							],
+							[
+								0.3551909923553467,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"update_target_direction": true,
+						"width": 47.058998107910159,
+						"angle": 1.3090001344680787,
+						"length": 247.0590057373047,
+						"impact_x_rotation": [
+							-0.2617989778518677,
+							-0.6108649969100952
+						],
+						"impact_z_rotation": [
+							0.43633195757865908,
+							1.3090001344680787
+						],
+						"impact_type": "Slash",
+						"impact_bone": "weapon_02"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.702970027923584,
+								0.0
+							],
+							[
+								0.7376239895820618,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"update_target_direction": true,
+						"width": 42.327999114990237,
+						"angle": 1.3090001344680787,
+						"length": 245.0,
+						"impact_x_rotation": [
+							-0.2617989778518677,
+							-0.785398006439209
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.1344599723815919
+						],
+						"impact_type": "Slash",
+						"impact_bone": "weapon_02"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SunClanScavenger/Rathbreaker/rig.ast"
+		socket = "aux_grd_fwd"
+			parent = "root_jntBnd"
+			translation = "0 -165.88 0"
+		socket = "flare_pnt_01"
+			translation = "122.949 67.2865 -324.573"
+		socket = "flare_pnt_02"
+			translation = "122.949 44.6556 -324.573"
+		socket = "weapon_01"
+			parent = "R_Weapon"
+			translation = "0 0 -50"
+		socket = "weapon_02"
+			parent = "R_Weapon"
+			translation = "0 0 -106.431"
+		socket = "weapon_grd_01"
+			parent = "R_Weapon"
+			translation = "0 0 -80"
+		socket = "weapon_grd_02"
+			parent = "R_Weapon"
+			translation = "0 0 -150"
+		socket = "weapon_grd_03"
+			parent = "R_Weapon"
+			translation = "0 -20 -100"
+		socket = "weapon_grd_04"
+			parent = "R_Weapon"
+			translation = "0 20 -100"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SunClanScavenger/Rathbreaker/RathBreaker.sm"
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "axe_attack_01",
+				"events": [
+					{
+						"id": 616756442,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Attack",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"id": 427533832,
+						"type": "SoundEventType",
+						"time": 0.26780399680137637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/Effects/CleaveHand",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"id": 3086910146,
+						"type": "SoundEventType",
+						"time": 0.269126296043396,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_ArmSwing",
+						"bone_name": "L_finger_2_jntBnd_3"
+					},
+					{
+						"id": 1043872583,
+						"type": "SoundEventType",
+						"time": 0.27021896839141848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/Effects/AxeArmCleave",
+						"bone_name": "L_finger_2_jntBnd_3"
+					},
+					{
+						"id": 1857820100,
+						"type": "SoundEventType",
+						"time": 0.5647299885749817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 2803251951,
+						"type": "SoundEventType",
+						"time": 0.5868340134620667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_hip_jntBnd"
+					},
+					{
+						"id": 892395275,
+						"type": "SoundEventType",
+						"time": 0.8474289774894714,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"id": 630052971,
+						"type": "SoundEventType",
+						"time": 0.9698089957237244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "quad_R_wrist_jntBnd"
+					},
+					{
+						"id": 2224835490,
+						"type": "SoundEventType",
+						"time": 0.9706400036811829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 356001902,
+						"type": "SoundEventType",
+						"time": 0.9993789792060852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_attack_02",
+				"events": [
+					{
+						"id": 2164569796,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_AttackLong",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"id": 1999673112,
+						"type": "SoundEventType",
+						"time": 0.2727336287498474,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing2",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"id": 4245223332,
+						"type": "SoundEventType",
+						"time": 0.387378990650177,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 3418404803,
+						"type": "SoundEventType",
+						"time": 0.4288389980792999,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_hip_jntBnd"
+					},
+					{
+						"id": 840172849,
+						"type": "SoundEventType",
+						"time": 0.7234110236167908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 150784073,
+						"type": "SoundEventType",
+						"time": 0.7566098570823669,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeImpact1",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"id": 3779379856,
+						"type": "SoundEventType",
+						"time": 0.7728890180587769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "quad_L_hand_jntBnd"
+					},
+					{
+						"id": 2271348708,
+						"type": "SoundEventType",
+						"time": 0.7952460050582886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "quad_L_foot_jntBnd"
+					},
+					{
+						"id": 1383301281,
+						"type": "SoundEventType",
+						"time": 0.8056210279464722,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_L_hand_jntBnd"
+					},
+					{
+						"id": 1379269760,
+						"type": "SoundEventType",
+						"time": 0.8230510950088501,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeGroundSlash",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"id": 3321598187,
+						"type": "SoundEventType",
+						"time": 0.8378260135650635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 3756199465,
+						"type": "SoundEventType",
+						"time": 0.839156985282898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour"
+					},
+					{
+						"id": 1964541889,
+						"type": "SoundEventType",
+						"time": 0.8512720465660095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeImpact1",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"id": 1411397910,
+						"type": "SoundEventType",
+						"time": 0.856249988079071,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3967296653,
+						"type": "SoundEventType",
+						"time": 0.9883419871330261,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 1962091244,
+						"type": "SoundEventType",
+						"time": 1.1005799770355225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "quad_R_foot_jntBnd"
+					},
+					{
+						"id": 1468483468,
+						"type": "SoundEventType",
+						"time": 1.1119699478149415,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"id": 452065741,
+						"type": "SoundEventType",
+						"time": 1.24481999874115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeEquip",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_charge_01",
+				"events": [
+					{
+						"id": 1479303692,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_RunGrunt"
+					},
+					{
+						"id": 2382942829,
+						"type": "SoundEventType",
+						"time": 0.11703500151634217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_R_foot_jntBnd"
+					},
+					{
+						"id": 58741560,
+						"type": "SoundEventType",
+						"time": 0.17827099561691285,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge"
+					},
+					{
+						"id": 3451714467,
+						"type": "SoundEventType",
+						"time": 0.17873500287532807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 2841768097,
+						"type": "SoundEventType",
+						"time": 0.25110098719596865,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge"
+					},
+					{
+						"id": 3664686174,
+						"type": "SoundEventType",
+						"time": 0.3145099878311157,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour"
+					},
+					{
+						"id": 4039984276,
+						"type": "SoundEventType",
+						"time": 0.3588370084762573,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath2"
+					},
+					{
+						"id": 1734947434,
+						"type": "SoundEventType",
+						"time": 0.36777400970458987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_L_hand_jntBnd"
+					},
+					{
+						"id": 1796277887,
+						"type": "SoundEventType",
+						"time": 0.4199880063533783,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_charge_attack_01",
+				"events": [
+					{
+						"id": 4268374647,
+						"type": "SoundEventType",
+						"time": 0.0745398998260498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 3486770979,
+						"type": "SoundEventType",
+						"time": 0.08570258319377899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing1",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"id": 1324000668,
+						"type": "SoundEventType",
+						"time": 0.09806880354881287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Attack",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"id": 3768073632,
+						"type": "SoundEventType",
+						"time": 0.1188730001449585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_R_foot_jntBnd"
+					},
+					{
+						"id": 2626534418,
+						"type": "SoundEventType",
+						"time": 0.1840679943561554,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_L_foot_jntBnd"
+					},
+					{
+						"id": 312251153,
+						"type": "SoundEventType",
+						"time": 0.25146299600601199,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge"
+					},
+					{
+						"id": 1372782903,
+						"type": "SoundEventType",
+						"time": 0.33842501044273379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_L_hand_jntBnd"
+					},
+					{
+						"id": 3558870876,
+						"type": "SoundEventType",
+						"time": 0.608489990234375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeEquip",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"id": 1571838635,
+						"type": "SoundEventType",
+						"time": 0.6524239778518677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 4260496383,
+						"type": "SoundEventType",
+						"time": 0.6551089882850647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_R_foot_jntBnd"
+					},
+					{
+						"id": 4240863529,
+						"type": "SoundEventType",
+						"time": 0.7804780006408691,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 1287651152,
+						"type": "SoundEventType",
+						"time": 0.8399019837379456,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour"
+					},
+					{
+						"id": 3407602443,
+						"type": "SoundEventType",
+						"time": 0.9048330187797546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_L_hand_jntBnd"
+					},
+					{
+						"id": 736051547,
+						"type": "SoundEventType",
+						"time": 0.9722239971160889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_charge_end_01",
+				"events": [
+					{
+						"id": 2756271806,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace"
+					},
+					{
+						"id": 2027593755,
+						"type": "SoundEventType",
+						"time": 0.07774589955806732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2664321913,
+						"type": "SoundEventType",
+						"time": 0.18755200505256654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_L_wrist_jntBnd"
+					},
+					{
+						"id": 1772680507,
+						"type": "SoundEventType",
+						"time": 0.24365699291229249,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_L_hand_jntBnd"
+					},
+					{
+						"id": 3602010820,
+						"type": "SoundEventType",
+						"time": 0.2733129858970642,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace"
+					},
+					{
+						"id": 1345614159,
+						"type": "SoundEventType",
+						"time": 0.3390359878540039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_R_foot_jntBnd"
+					},
+					{
+						"id": 345901593,
+						"type": "SoundEventType",
+						"time": 0.3735010027885437,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_L_foot_jntBnd"
+					},
+					{
+						"id": 2276277784,
+						"type": "SoundEventType",
+						"time": 0.4384230077266693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 1167163647,
+						"type": "SoundEventType",
+						"time": 0.5001389980316162,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_L_hand_jntBnd"
+					},
+					{
+						"id": 1879007272,
+						"type": "SoundEventType",
+						"time": 0.5145649909973145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2350085675,
+						"type": "SoundEventType",
+						"time": 0.5554429888725281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_foot_jntBnd"
+					},
+					{
+						"id": 1524568567,
+						"type": "SoundEventType",
+						"time": 0.6701570153236389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 2091649744,
+						"type": "SoundEventType",
+						"time": 0.7726160287857056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeEquip",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"id": 2278114770,
+						"type": "SoundEventType",
+						"time": 0.7934889793395996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 1518226984,
+						"type": "SoundEventType",
+						"time": 0.8952789902687073,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 2842036083,
+						"type": "SoundEventType",
+						"time": 0.924934983253479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "quad_hip_jntBnd"
+					},
+					{
+						"id": 3302098761,
+						"type": "SoundEventType",
+						"time": 0.9593989849090576,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_charge_start_01",
+				"events": [
+					{
+						"id": 3571455941,
+						"type": "SoundEventType",
+						"time": 0.14074699580669404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "quad_L_hand_jntBnd"
+					},
+					{
+						"id": 3449012210,
+						"type": "SoundEventType",
+						"time": 0.20622900128364564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 4084919170,
+						"type": "SoundEventType",
+						"time": 0.24154600501060487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Charge.once.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 2197636583,
+						"type": "SoundEventType",
+						"time": 0.2833060026168823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"id": 900619685,
+						"type": "SoundEventType",
+						"time": 0.8417059779167175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_L_hand_jntBnd"
+					},
+					{
+						"id": 1787180176,
+						"type": "SoundEventType",
+						"time": 0.8457990288734436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "quad_R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_death_01",
+				"events": [
+					{
+						"id": 1467616785,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"id": 1485810054,
+						"type": "SoundEventType",
+						"time": 0.1347309947013855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "quad_R_foot_jntBnd"
+					},
+					{
+						"id": 154496006,
+						"type": "SoundEventType",
+						"time": 0.2874250113964081,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 48479854,
+						"type": "SoundEventType",
+						"time": 0.45808398723602297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 506247796,
+						"type": "SoundEventType",
+						"time": 0.5993090271949768,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2171570846,
+						"type": "SoundEventType",
+						"time": 1.7124099731445313,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeFall",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"id": 424605404,
+						"type": "SoundEventType",
+						"time": 2.088330030441284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_L_hand_jntBnd"
+					},
+					{
+						"id": 617695695,
+						"type": "SoundEventType",
+						"time": 2.2205700874328615,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_BodyFall1",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"id": 1455102143,
+						"type": "SoundEventType",
+						"time": 2.261780023574829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 3717487082,
+						"type": "SoundEventType",
+						"time": 3.2131600379943849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_DeathGrunt",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"id": 4266233945,
+						"type": "SoundEventType",
+						"time": 3.3073999881744386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 1443015168,
+						"type": "SoundEventType",
+						"time": 4.703060150146484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 2147048257,
+						"type": "SoundEventType",
+						"time": 4.8809099197387699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_BodyFall2",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"id": 1937943980,
+						"type": "SoundEventType",
+						"time": 5.0548200607299809,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour"
+					}
+				]
+			},
+			{
+				"name": "axe_doublestrike_01",
+				"events": [
+					{
+						"id": 1388302555,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Tail",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 3102902823,
+						"type": "SoundEventType",
+						"time": 0.037261001765728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 2624541908,
+						"type": "SoundEventType",
+						"time": 0.1563429981470108,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "quad_R_foot_jntBnd"
+					},
+					{
+						"id": 2694002113,
+						"type": "SoundEventType",
+						"time": 0.27034300565719607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "quad_L_foot_jntBnd"
+					},
+					{
+						"id": 3603731800,
+						"type": "SoundEventType",
+						"time": 0.5379729866981506,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing1",
+						"bone_name": "L_finger_1_jntBnd_2"
+					},
+					{
+						"id": 1546639854,
+						"type": "SoundEventType",
+						"time": 0.5984140038490295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_AttackDual1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 679867738,
+						"type": "SoundEventType",
+						"time": 0.67153000831604,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3581899416,
+						"type": "SoundEventType",
+						"time": 0.7572849988937378,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Tail"
+					},
+					{
+						"id": 611527289,
+						"type": "SoundEventType",
+						"time": 0.8814210295677185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing2",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"id": 520677912,
+						"type": "SoundEventType",
+						"time": 0.9087439775466919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 3110014456,
+						"type": "SoundEventType",
+						"time": 0.9988669753074646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_AttackDual2",
+						"bone_name": "neck_mid_jntBnd"
+					},
+					{
+						"id": 1719691793,
+						"type": "SoundEventType",
+						"time": 1.0992900133132935,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "phys_skinned_tail_jntBnd_3"
+					},
+					{
+						"id": 1642439228,
+						"type": "SoundEventType",
+						"time": 1.407080054283142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 4083959955,
+						"type": "SoundEventType",
+						"time": 1.432479977607727,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeImpact2",
+						"bone_name": "L_finger_4_jntBnd_2"
+					},
+					{
+						"id": 2046789467,
+						"type": "SoundEventType",
+						"time": 1.4624600410461426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 831420501,
+						"type": "SoundEventType",
+						"time": 1.4640899896621705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 695371094,
+						"type": "SoundEventType",
+						"time": 1.7441999912261963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"id": 217694979,
+						"type": "SoundEventType",
+						"time": 1.8034700155258179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeEquip",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_flinch_fwd_01",
+				"events": [
+					{
+						"id": 1476070577,
+						"type": "SoundEventType",
+						"time": 0.025757700204849244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1"
+					},
+					{
+						"id": 3013706651,
+						"type": "SoundEventType",
+						"time": 0.037729501724243167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"id": 1476306799,
+						"type": "SoundEventType",
+						"time": 0.10504399985074997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_hip_jntBnd"
+					},
+					{
+						"id": 467039228,
+						"type": "SoundEventType",
+						"time": 0.2820900082588196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_flinch_left_01",
+				"events": [
+					{
+						"id": 3437197995,
+						"type": "SoundEventType",
+						"time": 0.025757700204849244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1"
+					},
+					{
+						"id": 1136905107,
+						"type": "SoundEventType",
+						"time": 0.037729501724243167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"id": 3703632203,
+						"type": "SoundEventType",
+						"time": 0.10504399985074997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_hip_jntBnd"
+					},
+					{
+						"id": 3681716405,
+						"type": "SoundEventType",
+						"time": 0.2820900082588196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_flinch_right_01",
+				"events": [
+					{
+						"id": 1821415453,
+						"type": "SoundEventType",
+						"time": 0.025757700204849244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1"
+					},
+					{
+						"id": 3704202803,
+						"type": "SoundEventType",
+						"time": 0.037729501724243167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"id": 3926115670,
+						"type": "SoundEventType",
+						"time": 0.10504399985074997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_hip_jntBnd"
+					},
+					{
+						"id": 708919228,
+						"type": "SoundEventType",
+						"time": 0.2820900082588196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_flinch_small_01",
+				"events": [
+					{
+						"id": 3284029370,
+						"type": "SoundEventType",
+						"time": 0.025757700204849244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1"
+					},
+					{
+						"id": 3443806072,
+						"type": "SoundEventType",
+						"time": 0.037729501724243167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"id": 768047241,
+						"type": "SoundEventType",
+						"time": 0.10504399985074997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_hip_jntBnd"
+					},
+					{
+						"id": 671636128,
+						"type": "SoundEventType",
+						"time": 0.2820900082588196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_idle_01",
+				"events": [
+					{
+						"id": 1629491771,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath2",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"id": 1317057942,
+						"type": "SoundEventType",
+						"time": 0.10507799685001373,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Tail",
+						"bone_name": "phys_skinned_tail_jntBnd_3"
+					},
+					{
+						"id": 2345508151,
+						"type": "SoundEventType",
+						"time": 0.5772910118103027,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 2643247913,
+						"type": "SoundEventType",
+						"time": 0.7058359980583191,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Tail",
+						"bone_name": "phys_skinned_tail_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "axe_run_01",
+				"events": [
+					{
+						"id": 2134723260,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Run.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"id": 1860335019,
+						"type": "SoundEventType",
+						"time": 0.0824010968208313,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps"
+					},
+					{
+						"id": 957961446,
+						"type": "SoundEventType",
+						"time": 0.09915299713611603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 62300704,
+						"type": "SoundEventType",
+						"time": 0.15253600478172303,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_spine_1_jntBnd"
+					},
+					{
+						"id": 2163996954,
+						"type": "SoundEventType",
+						"time": 0.2245659977197647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 1110835337,
+						"type": "SoundEventType",
+						"time": 0.23633700609207154,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps"
+					},
+					{
+						"id": 3692093768,
+						"type": "SoundEventType",
+						"time": 0.4977149963378906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_foot_jntBnd"
+					},
+					{
+						"id": 4221332263,
+						"type": "SoundEventType",
+						"time": 0.5709220170974731,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps"
+					}
+				]
+			},
+			{
+				"name": "axe_slam_01",
+				"events": [
+					{
+						"id": 1073300072,
+						"type": "SoundEventType",
+						"time": 0.4221591353416443,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeImpact1",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 1299007178,
+						"type": "SoundEventType",
+						"time": 0.5939696431159973,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_SlamAttack",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 3775660387,
+						"type": "SoundEventType",
+						"time": 0.6624840497970581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeGroundSlash",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 3089203499,
+						"type": "SoundEventType",
+						"time": 0.7314168214797974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/Effects/LacerateOnAct1",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 1349148798,
+						"type": "SoundEventType",
+						"time": 1.006312608718872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing1",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 2418342670,
+						"type": "SoundEventType",
+						"time": 1.1977570056915284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2435606228,
+						"type": "SoundEventType",
+						"time": 1.4775608777999879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_RunGrunt",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 437986186,
+						"type": "SoundEventType",
+						"time": 1.8702619075775147,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing2",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 1612524427,
+						"type": "SoundEventType",
+						"time": 2.0764214992523195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Slam1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 2332571266,
+						"type": "SoundEventType",
+						"time": 2.0803983211517336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeGroundSlash",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 3457342348,
+						"type": "SoundEventType",
+						"time": 2.277696132659912,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/Effects/LacerateOnAct2",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 3319797022,
+						"type": "SoundEventType",
+						"time": 2.582047939300537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 1452782148,
+						"type": "SoundEventType",
+						"time": 2.783298969268799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 3784806161,
+						"type": "SoundEventType",
+						"time": 2.7980093955993654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 1071203104,
+						"type": "SoundEventType",
+						"time": 2.8323895931243898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing2",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 1680979133,
+						"type": "SoundEventType",
+						"time": 2.8494367599487306,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeGroundSlash",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 2920873092,
+						"type": "SoundEventType",
+						"time": 2.9894778728485109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeImpact1",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 1905547296,
+						"type": "SoundEventType",
+						"time": 3.0679900646209719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Slam1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 995883358,
+						"type": "SoundEventType",
+						"time": 3.072924852371216,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/Effects/LacerateOnAct3",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 2040282448,
+						"type": "SoundEventType",
+						"time": 3.396890640258789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 3436334953,
+						"type": "SoundEventType",
+						"time": 3.6374406814575197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeImpact1",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 2286657970,
+						"type": "SoundEventType",
+						"time": 3.676710844039917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_RunGrunt",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 1356759056,
+						"type": "SoundEventType",
+						"time": 3.8043198585510256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 4261293966,
+						"type": "SoundEventType",
+						"time": 3.9467015266418459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_SlamLong",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 3685414920,
+						"type": "SoundEventType",
+						"time": 4.368859767913818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2241467294,
+						"type": "SoundEventType",
+						"time": 4.849929332733154,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Slam2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 2579291125,
+						"type": "SoundEventType",
+						"time": 4.918633937835693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing2",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 61601689,
+						"type": "SoundEventType",
+						"time": 5.24260139465332,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_L_hand_jntBnd"
+					},
+					{
+						"id": 4204563367,
+						"type": "SoundEventType",
+						"time": 5.2524518966674809,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 1429769762,
+						"type": "SoundEventType",
+						"time": 5.370240211486816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeImpact2",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 1574688019,
+						"type": "SoundEventType",
+						"time": 5.4635009765625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 4088029688,
+						"type": "SoundEventType",
+						"time": 5.542037487030029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_R_hand_jntBnd"
+					},
+					{
+						"id": 1008434308,
+						"type": "SoundEventType",
+						"time": 5.743296146392822,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_R_foot_jntBnd"
+					},
+					{
+						"id": 487609527,
+						"type": "SoundEventType",
+						"time": 6.239128112792969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2033136105,
+						"type": "SoundEventType",
+						"time": 6.401111602783203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_RunGrunt",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 4052470756,
+						"type": "SoundEventType",
+						"time": 6.602349281311035,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"id": 2078557369,
+						"type": "SoundEventType",
+						"time": 6.695602893829346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_R_hand_jntBnd"
+					},
+					{
+						"id": 390761121,
+						"type": "SoundEventType",
+						"time": 6.837956428527832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_L_hand_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "deenrage_01",
+				"events": [
+					{
+						"id": 3391162062,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeHold",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"id": 2223322725,
+						"type": "SoundEventType",
+						"time": 0.12191499769687653,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_RunGrunt",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 4212343178,
+						"type": "SoundEventType",
+						"time": 0.16006000339984895,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_turn_01",
+				"events": [
+					{
+						"id": 849930485,
+						"type": "SoundEventType",
+						"time": 0.029917700216174127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_spine_1_jntBnd"
+					},
+					{
+						"id": 1764935607,
+						"type": "SoundEventType",
+						"time": 0.07180260121822357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_RunGrunt",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 2645888604,
+						"type": "SoundEventType",
+						"time": 0.25878798961639407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 1915553051,
+						"type": "SoundEventType",
+						"time": 0.4809269905090332,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_L_hand_jntBnd"
+					},
+					{
+						"id": 2132299598,
+						"type": "SoundEventType",
+						"time": 0.5923709869384766,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_spine_1_jntBnd"
+					},
+					{
+						"id": 3850452235,
+						"type": "SoundEventType",
+						"time": 0.6664170026779175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 928269312,
+						"type": "SoundEventType",
+						"time": 0.8100219964981079,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_L_hand_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enrage_01",
+				"events": [
+					{
+						"id": 3156647992,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_EnrageScream",
+						"bone_name": "aux_quad_R_hand_jntBnd"
+					},
+					{
+						"id": 1087032666,
+						"type": "SoundEventType",
+						"time": 0.20153400301933289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"id": 3775602839,
+						"type": "SoundEventType",
+						"time": 0.4126650094985962,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_R_hand_jntBnd"
+					},
+					{
+						"id": 2984509198,
+						"type": "SoundEventType",
+						"time": 0.4606499969959259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_EnrageScream",
+						"bone_name": "aux_quad_R_hand_jntBnd"
+					},
+					{
+						"id": 330412461,
+						"type": "SoundEventType",
+						"time": 0.6046010255813599,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing1",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"id": 605238887,
+						"type": "SoundEventType",
+						"time": 0.6177594661712647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeImpact2",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"id": 600060521,
+						"type": "SoundEventType",
+						"time": 0.7408810257911682,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing",
+						"bone_name": "aux_quad_R_hand_jntBnd"
+					},
+					{
+						"id": 684070362,
+						"type": "SoundEventType",
+						"time": 0.8362979888916016,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeImpact2",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"id": 1308513416,
+						"type": "SoundEventType",
+						"time": 0.8760560154914856,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_L_hand_jntBnd"
+					},
+					{
+						"id": 2899795962,
+						"type": "SoundEventType",
+						"time": 1.1009000539779664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"id": 3222353065,
+						"type": "SoundEventType",
+						"time": 1.1324299573898316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeEquip",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"id": 645715776,
+						"type": "SoundEventType",
+						"time": 1.2722699642181397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_R_hand_jntBnd"
+					},
+					{
+						"id": 2601041259,
+						"type": "SoundEventType",
+						"time": 1.631469964981079,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_L_hand_jntBnd"
+					},
+					{
+						"id": 158538586,
+						"type": "SoundEventType",
+						"time": 1.6739599704742432,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeHold",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enrage_flinch_bwd_01",
+				"events": [
+					{
+						"id": 2429820495,
+						"type": "SoundEventType",
+						"time": 0.12558500468730927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Flinch",
+						"bone_name": "neck_mid_jntBnd"
+					},
+					{
+						"id": 2688268234,
+						"type": "SoundEventType",
+						"time": 0.15064099431037904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enrage_flinch_fwd_01",
+				"events": [
+					{
+						"id": 3546109665,
+						"type": "SoundEventType",
+						"time": 0.12558500468730927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Flinch",
+						"bone_name": "neck_mid_jntBnd"
+					},
+					{
+						"id": 4045601315,
+						"type": "SoundEventType",
+						"time": 0.15064099431037904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enrage_flinch_left_01",
+				"events": [
+					{
+						"id": 3639923979,
+						"type": "SoundEventType",
+						"time": 0.12558500468730927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Flinch",
+						"bone_name": "neck_mid_jntBnd"
+					},
+					{
+						"id": 2703061450,
+						"type": "SoundEventType",
+						"time": 0.15064099431037904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enrage_flinch_right_01",
+				"events": [
+					{
+						"id": 3680709810,
+						"type": "SoundEventType",
+						"time": 0.12558500468730927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Flinch",
+						"bone_name": "neck_mid_jntBnd"
+					},
+					{
+						"id": 3052203469,
+						"type": "SoundEventType",
+						"time": 0.15064099431037904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enrage_idle_01",
+				"events": [
+					{
+						"id": 1282129416,
+						"type": "SoundEventType",
+						"time": 0.07893340289592743,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 2361993297,
+						"type": "SoundEventType",
+						"time": 0.5988789796829224,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath2",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enrage_run_01",
+				"events": [
+					{
+						"id": 606041637,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Run.loop.ogg",
+						"bone_name": "aux_quad_R_foot_jntBnd"
+					},
+					{
+						"id": 838980179,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 1253995963,
+						"type": "SoundEventType",
+						"time": 0.0635003000497818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_R_foot_jntBnd"
+					},
+					{
+						"id": 1637555537,
+						"type": "SoundEventType",
+						"time": 0.2595050036907196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "aux_quad_R_hand_jntBnd"
+					},
+					{
+						"id": 3514961756,
+						"type": "SoundEventType",
+						"time": 0.2785550057888031,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 3098276764,
+						"type": "SoundEventType",
+						"time": 0.3539089858531952,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_R_hand_jntBnd"
+					},
+					{
+						"id": 2468085452,
+						"type": "SoundEventType",
+						"time": 0.35856500267982485,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "aux_quad_L_hand_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_01",
+				"events": [
+					{
+						"id": 2385752469,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_EnrageAttack",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 2998246961,
+						"type": "SoundEventType",
+						"time": 0.08975309878587723,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing2",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 251866647,
+						"type": "SoundEventType",
+						"time": 0.47718700766563418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "aux_quad_L_hand_jntBnd"
+					},
+					{
+						"id": 659777488,
+						"type": "SoundEventType",
+						"time": 0.5519819855690002,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 3593869464,
+						"type": "SoundEventType",
+						"time": 0.7763649821281433,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_spine_1_jntBnd"
+					},
+					{
+						"id": 713159841,
+						"type": "SoundEventType",
+						"time": 0.8825719952583313,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing2",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 3906712290,
+						"type": "SoundEventType",
+						"time": 0.9319350123405457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_L_hand_jntBnd"
+					},
+					{
+						"id": 4242461889,
+						"type": "SoundEventType",
+						"time": 1.4016400575637818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_L_hand_jntBnd"
+					},
+					{
+						"id": 4187713451,
+						"type": "SoundEventType",
+						"time": 1.480929970741272,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "R_finger_2_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "enraged_overhead_chop_01",
+				"events": [
+					{
+						"id": 2872620871,
+						"type": "SoundEventType",
+						"time": 0.11369100213050842,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_spine_1_jntBnd"
+					},
+					{
+						"id": 1178561052,
+						"type": "SoundEventType",
+						"time": 0.36350399255752566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_EnrageChop",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 4114648313,
+						"type": "SoundEventType",
+						"time": 0.48616600036621096,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeSwing2",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 2957328013,
+						"type": "SoundEventType",
+						"time": 1.1054600477218629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "aux_quad_L_hand_jntBnd"
+					},
+					{
+						"id": 1602978578,
+						"type": "SoundEventType",
+						"time": 1.1518399715423585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsCharge",
+						"bone_name": "aux_quad_R_hand_jntBnd"
+					},
+					{
+						"id": 2290375189,
+						"type": "SoundEventType",
+						"time": 1.2027000188827515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_spine_1_jntBnd"
+					},
+					{
+						"id": 304134474,
+						"type": "SoundEventType",
+						"time": 1.4375499486923218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeEquip",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 1107727149,
+						"type": "SoundEventType",
+						"time": 1.7442100048065186,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"id": 3673373047,
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Knockdown1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 671087214,
+						"type": "SoundEventType",
+						"time": 0.10270199924707413,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Knockdown2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 3379517361,
+						"type": "SoundEventType",
+						"time": 0.312173992395401,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 1700131988,
+						"type": "SoundEventType",
+						"time": 0.3127720057964325,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_KnockbackFall1",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 2273030771,
+						"type": "SoundEventType",
+						"time": 0.6213319897651672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "quad_spine_1_jntBnd"
+					},
+					{
+						"id": 1401099641,
+						"type": "SoundEventType",
+						"time": 0.7002350091934204,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_KnockbackFall2",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"id": 3995806662,
+						"type": "SoundEventType",
+						"time": 0.7515860199928284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_KnockbackAxeHitGround",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 1953982909,
+						"type": "SoundEventType",
+						"time": 0.7889310121536255,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Knockdown3",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 3648623756,
+						"type": "SoundEventType",
+						"time": 0.854282021522522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 3442373506,
+						"type": "SoundEventType",
+						"time": 1.1142899990081788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 4100897466,
+						"type": "SoundEventType",
+						"time": 1.1706500053405762,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 2037197886,
+						"type": "SoundEventType",
+						"time": 1.2530299425125123,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 165994702,
+						"type": "SoundEventType",
+						"time": 1.5125000476837159,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "aux_quad_L_foot_jntBnd"
+					},
+					{
+						"id": 1070892316,
+						"type": "SoundEventType",
+						"time": 1.6805700063705445,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 2236905096,
+						"type": "SoundEventType",
+						"time": 1.7085700035095215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Knockdown3",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 858918787,
+						"type": "SoundEventType",
+						"time": 1.7085800170898438,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_KnockbackAxeDragGround",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 4075497212,
+						"type": "SoundEventType",
+						"time": 1.8672900199890137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 2270703036,
+						"type": "SoundEventType",
+						"time": 2.4391798973083498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_L_hand_jntBnd"
+					},
+					{
+						"id": 1430958704,
+						"type": "SoundEventType",
+						"time": 2.4601500034332277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 222767781,
+						"type": "SoundEventType",
+						"time": 2.5537500381469728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 4079048075,
+						"type": "SoundEventType",
+						"time": 2.558190107345581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_KnockbackAxeDragGround",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 2885197592,
+						"type": "SoundEventType",
+						"time": 2.705509901046753,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 2920313512,
+						"type": "SoundEventType",
+						"time": 2.7309000492095949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "quad_L_foot_jntBnd"
+					},
+					{
+						"id": 11950409,
+						"type": "SoundEventType",
+						"time": 2.90132999420166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_R_foot_jntBnd"
+					},
+					{
+						"id": 3894643911,
+						"type": "SoundEventType",
+						"time": 3.1136999130249025,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 2064995174,
+						"type": "SoundEventType",
+						"time": 3.178109884262085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"id": 1410344656,
+						"type": "SoundEventType",
+						"time": 3.2117300033569338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "aux_quad_L_hand_jntBnd"
+					},
+					{
+						"id": 648536921,
+						"type": "SoundEventType",
+						"time": 3.300420045852661,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_StepsDrag",
+						"bone_name": "quad_R_wrist_jntBnd"
+					},
+					{
+						"id": 2831385797,
+						"type": "SoundEventType",
+						"time": 3.3751299381256105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Knockdown2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 1165489857,
+						"type": "SoundEventType",
+						"time": 3.8886399269104006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_AxeEquip",
+						"bone_name": "weapon_02"
+					},
+					{
+						"id": 4014759812,
+						"type": "SoundEventType",
+						"time": 3.989029884338379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_R_foot_jntBnd"
+					},
+					{
+						"id": 1146526682,
+						"type": "SoundEventType",
+						"time": 4.073060035705566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "aux_quad_R_foot_jntBnd"
+					},
+					{
+						"id": 3870234268,
+						"type": "SoundEventType",
+						"time": 4.07942008972168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 3407417181,
+						"type": "SoundEventType",
+						"time": 4.19674015045166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Knockdown3",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 2680786690,
+						"type": "SoundEventType",
+						"time": 4.249040126800537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 414107333,
+						"type": "SoundEventType",
+						"time": 4.374129772186279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Steps",
+						"bone_name": "quad_R_hand_jntBnd"
+					},
+					{
+						"id": 3751376963,
+						"type": "SoundEventType",
+						"time": 4.800310134887695,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_Breath2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 3698144487,
+						"type": "SoundEventType",
+						"time": 5.079060077667236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathVocals/Rath_EnrageAttack",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"id": 3849118880,
+						"type": "SoundEventType",
+						"time": 5.3763298988342289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Necklace",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"id": 3007387097,
+						"type": "SoundEventType",
+						"time": 5.449510097503662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_1/RathBreaker/RathFoley/Rath_Armour",
+						"bone_name": "R_finger_2_jntBnd_3"
+					}
+				]
+			}
+		]'
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false L_shoulder_cTwist_jntBnd_1 L_shoulder_jntBnd L_clavicle_jntBnd spine_2_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+		bone_group = "elbow_L false L_elbow_jntBnd L_wrist_jntBnd L_finger_1_jntBnd_3"
+		bone_group = "elbow_R false R_elbow_jntBnd R_wrist_jntBnd R_finger_1_jntBnd_3"
+		bone_group = "leg_trl_FL false quad_L_wrist_jntBnd quad_L_hand_jntBnd"
+		bone_group = "leg_trl_FR false quad_R_wrist_jntBnd quad_R_hand_jntBnd"
+		bone_group = "leg_trl_BL false quad_L_ankle_jntBnd quad_L_foot_jntBnd"
+		bone_group = "leg_trl_BR false quad_R_ankle_jntBnd quad_R_foot_jntBnd"
+		bone_group = "grp_grdfwd false aux_grd_fwd"
+		bone_group = "flare_pnt false flare_pnt_01 flare_pnt_02"
+		bone_group = "blade false weapon_01 weapon_02"
+		bone_group = "weapontip_grd false weapon_grd_01 weapon_grd_02"
+		bone_group = "weapontip_wide_grd false weapon_grd_03 weapon_grd_04"
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "axe_attack_01",
+				"events": [
+					{
+						"id": 4178233318,
+						"type": "ParticleEffectEventType",
+						"time": 0.33352699875831606,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/blood_attack01.pet",
+						"bone_group": "elbow_L"
+					}
+				]
+			},
+			{
+				"name": "axe_attack_02",
+				"events": [
+					{
+						"id": 1349512766,
+						"type": "ParticleEffectEventType",
+						"time": 0.8372541666030884,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Rathbreaker/pet/onact/attack_02_dust.pet",
+						"bone_group": "blade"
+					}
+				]
+			},
+			{
+				"name": "axe_charge_attack_01",
+				"events": [
+					{
+						"id": 3281438545,
+						"type": "ParticleEffectEventType",
+						"time": 0.1599999964237213,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/blood.pet",
+						"bone_group": "elbow_R"
+					}
+				]
+			},
+			{
+				"name": "axe_charge_start_01",
+				"events": [
+					{
+						"id": 4017149821,
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/surge.pet",
+						"bone_group": "flare_pnt"
+					},
+					{
+						"id": 2007070448,
+						"type": "ParticleEffectEventType",
+						"time": 0.3258970081806183,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/surge_mid.pet",
+						"bone_group": "frameupper"
+					}
+				]
+			},
+			{
+				"name": "axe_doublestrike_01",
+				"events": [
+					{
+						"id": 1928916132,
+						"type": "ParticleEffectEventType",
+						"time": 0.6103609800338745,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/blood.pet",
+						"bone_group": "elbow_R"
+					},
+					{
+						"id": 4272479169,
+						"type": "ParticleEffectEventType",
+						"time": 1.208799958229065,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/blood.pet",
+						"bone_group": "elbow_R"
+					}
+				]
+			},
+			{
+				"name": "axe_slam_01",
+				"events": [
+					{
+						"id": 2341852416,
+						"type": "ParticleEffectEventType",
+						"time": 0.8426452279090881,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Rathbreaker/pet/onact/ground_draw_dust.pet",
+						"bone_group": "weapontip_grd"
+					},
+					{
+						"id": 2979408671,
+						"type": "ParticleEffectEventType",
+						"time": 2.267000675201416,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Rathbreaker/pet/onact/ground_lacerate_dust.pet",
+						"bone_group": "weapontip_grd"
+					},
+					{
+						"id": 173502898,
+						"type": "ParticleEffectEventType",
+						"time": 2.9500555992126467,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Rathbreaker/pet/onact/ground_lacerate_dust.pet",
+						"bone_group": "weapontip_grd"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_01",
+				"events": [
+					{
+						"id": 240372413,
+						"type": "ParticleEffectEventType",
+						"time": 0.5035889744758606,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/blood.pet",
+						"bone_group": "elbow_R"
+					},
+					{
+						"id": 1711090551,
+						"type": "ParticleEffectEventType",
+						"time": 1.3637900352478028,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/blood.pet",
+						"bone_group": "elbow_R"
+					}
+				]
+			}
+		]'
+	}
+
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "axe_attack_01",
+				"events": [
+					{
+						"id": 362865287,
+						"type": "TrailsEffectEventType",
+						"time": 0.39965200424194338,
+						"end_time": 0.7837679982185364,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/axe_attack01.trl",
+						"bone_group": "grp_l_forearm"
+					}
+				]
+			},
+			{
+				"name": "axe_attack_02",
+				"events": [
+					{
+						"id": 3257111626,
+						"type": "TrailsEffectEventType",
+						"time": 0.6839799880981445,
+						"end_time": 1.0403989553451539,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/weapon_attack.trl",
+						"bone_group": "blade"
+					},
+					{
+						"id": 3912402630,
+						"type": "TrailsEffectEventType",
+						"time": 0.8319699764251709,
+						"end_time": 1.0223037004470826,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Rathbreaker/pet/attack02_grdslash.trl",
+						"bone_group": "blade"
+					}
+				]
+			},
+			{
+				"name": "axe_charge_01",
+				"events": [
+					{
+						"id": 3029663104,
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/charge.trl",
+						"bone_group": "frameupper"
+					}
+				]
+			},
+			{
+				"name": "axe_charge_attack_01",
+				"events": [
+					{
+						"id": 1614231927,
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/charge.trl",
+						"bone_group": "frameupper"
+					},
+					{
+						"id": 2019074443,
+						"type": "TrailsEffectEventType",
+						"time": 0.15245500206947328,
+						"end_time": 0.4127329885959625,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/weapon_attack.trl",
+						"bone_group": "blade"
+					}
+				]
+			},
+			{
+				"name": "axe_doublestrike_01",
+				"events": [
+					{
+						"id": 2802201483,
+						"type": "TrailsEffectEventType",
+						"time": 0.6637920141220093,
+						"end_time": 0.9223480224609375,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/weapon_attack.trl",
+						"bone_group": "blade"
+					},
+					{
+						"id": 752117891,
+						"type": "TrailsEffectEventType",
+						"time": 1.2331000566482545,
+						"end_time": 1.4737160205841065,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/weapon_attack.trl",
+						"bone_group": "blade"
+					}
+				]
+			},
+			{
+				"name": "axe_slam_01",
+				"events": [
+					{
+						"id": 878861933,
+						"type": "TrailsEffectEventType",
+						"time": 0.5579906105995178,
+						"end_time": 1.37941575050354,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Rathbreaker/pet/axe_slam_grdslash.trl",
+						"bone_group": "weapontip_grd"
+					},
+					{
+						"id": 780352675,
+						"type": "TrailsEffectEventType",
+						"time": 2.273573398590088,
+						"end_time": 2.5390219688415529,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Rathbreaker/pet/axe_slam_grdslash.trl",
+						"bone_group": "weapontip_grd"
+					},
+					{
+						"id": 4237032818,
+						"type": "TrailsEffectEventType",
+						"time": 2.946038007736206,
+						"end_time": 3.2962088584899904,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Rathbreaker/pet/axe_slam_grdslash.trl",
+						"bone_group": "weapontip_wide_grd"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_01",
+				"events": [
+					{
+						"id": 969717685,
+						"type": "TrailsEffectEventType",
+						"time": 0.4688490033149719,
+						"end_time": 0.7639119625091553,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/weapon_attack.trl",
+						"bone_group": "blade"
+					},
+					{
+						"id": 441926701,
+						"type": "TrailsEffectEventType",
+						"time": 1.3666900396347047,
+						"end_time": 1.6551270484924317,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/weapon_attack.trl",
+						"bone_group": "blade"
+					}
+				]
+			},
+			{
+				"name": "enraged_overhead_chop_01",
+				"events": [
+					{
+						"id": 1043566224,
+						"type": "TrailsEffectEventType",
+						"time": 1.1264599561691285,
+						"end_time": 1.343113899230957,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Fx/weapon_attack.trl",
+						"bone_group": "blade"
+					}
+				]
+			}
+		]'
+	}
+
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "axe_charge_01",
+				"events": [
+					{
+						"id": 3192327750,
+						"type": "ScreenShakeEventType",
+						"time": 0.0,
+						"frequency": 100.0,
+						"amplitude": 7.0,
+						"duration": 1.0,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "axe_charge_attack_01",
+				"events": [
+					{
+						"id": 188270668,
+						"type": "ScreenShakeEventType",
+						"time": 0.0,
+						"frequency": 60.0,
+						"amplitude": 4.0,
+						"duration": 1.0700000524520875,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "axe_doublestrike_01",
+				"events": [
+					{
+						"id": 1781545194,
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 2.1659998893737795,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Ao/axedoublestrike01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_01",
+				"events": [
+					{
+						"id": 1519831145,
+						"type": "AnimatedObjectEventType",
+						"time": 1.4500000476837159,
+						"ao_type": "Metadata/Monsters/HyenaMonster/Effects/Ao/attack_dust.ao",
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "enraged_overhead_chop_01",
+				"events": [
+					{
+						"id": 3202259194,
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"filename": "Metadata/Monsters/HyenaMonster/Effects/Ao/enrage_overhead_chop.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					}
+				]
+			}
+		]'
+	}
+
+	Lights
+	{
+		light = "point_light"
+			state = "on"
+				colour = "0.551758 0.484763 0.463479"
+				position = "0 0 -403"
+				radius = 500
+			state = "off"
+				default_state = true
+				colour = "1 1 1"
+				position = "0 0 -125"
+				radius = 0
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "axe_slam_01",
+				"events": [
+					{
+						"id": 4137096348,
+						"type": "EffectPackEventType",
+						"time": 4.007070064544678,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "axe_attack_02",
+				"events": [
+					{
+						"id": 3884592010,
+						"type": "HapticEventType",
+						"time": 0.8644920587539673,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "axe_doublestrike_01",
+				"events": [
+					{
+						"id": 4017688568,
+						"type": "HapticEventType",
+						"time": 0.8065582513809204,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"id": 698520313,
+						"type": "HapticEventType",
+						"time": 1.4830265045166016,
+						"haptic_id": "Haptic_LargeBoss_Sunder_AoE3D"
+					}
+				]
+			},
+			{
+				"name": "axe_slam_01",
+				"events": [
+					{
+						"id": 2114083577,
+						"type": "HapticEventType",
+						"time": 0.5600190162658691,
+						"haptic_id": "Haptic_LargeBoss_Sunder_AoE3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/HyenaMonster/Attachments/RathbreakerNecklace.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SunClanScavenger/Rathbreaker/attachments/RathBreakerNecklace.amd"
+	default_animation = "idle"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SunClanScavenger/Rathbreaker/attachments/RathBreakerNecklace.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.200
+		enclosure_angle = 0.757
+	    attachment_groups = "parent_attach child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SunClanScavenger/Rathbreaker/attachments/RathBreakerNecklace.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false chest_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd neck_jntBnd "
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	
+}
+
+=== .ao Metadata/Monsters/HyenaMonster/Attachments/RathbreakerDreads.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SunClanScavenger/Rathbreaker/attachments/RathBreakerDreads.amd"
+	default_animation = "idle"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SunClanScavenger/Rathbreaker/attachments/RathBreakerDreads.ast"
+		bend_stiffness = 100.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SunClanScavenger/Rathbreaker/attachments/RathBreakerDreads.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	
+}
+
+=== .ao Metadata/Monsters/SunClanScavenger/SunClanWeapons/SunClanCleaver.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SunClanScavenger/SunClanWeapons/SunClanCleaver.amd"
+	default_animation = "idle"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SunClanScavenger/SunClanWeapons/SunClanCleaver.ast"
+		linear_allowed_contraction = 0.270
+		bend_allowed_angle = 1.260
+		enclosure_radius = 38.500
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SunClanScavenger/SunClanWeapons/SunClanCleaver.sm"
+	}
+	
+	
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/SunClanScavenger/Rathbreaker/RathBreaker.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/SunClanScavenger/Rathbreaker/rig_35164e63.smd"
+Materials 2
+	"Art/Textures/Monsters/SunClanScavenger/SunClanScavengerc.mat" 10
+	"Art/Textures/Monsters/SunClanScavenger/SunClanScavengerHairc.mat" 2
+BoundingBox -116.037 -66.057 -231.863 116.037 134.215 -0.883875
+BoneGroups 31
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh_01" 2 "quad_L_shoulder_jntBnd" "quad_L_elbow_jntBnd"
+	"grp_r_thigh_01" 2 "quad_R_shoulder_jntBnd" "quad_R_elbow_jntBnd"
+	"grp_l_shin_01" 2 "quad_L_elbow_jntBnd" "quad_L_wrist_jntBnd"
+	"grp_r_shin_01" 2 "quad_R_elbow_jntBnd" "quad_R_wrist_jntBnd"
+	"grp_l_foot_01" 2 "quad_L_wrist_jntBnd" "quad_L_hand_jntBnd"
+	"grp_r_foot_01" 2 "quad_R_wrist_jntBnd" "quad_R_hand_jntBnd"
+	"grp_l_toe_01" 2 "quad_L_hand_jntBnd" "aux_quad_L_hand_jntBnd"
+	"grp_r_toe_01" 2 "quad_R_hand_jntBnd" "aux_quad_R_hand_jntBnd"
+	"grp_l_thigh_02" 2 "quad_L_thigh_jntBnd" "quad_L_knee_jntBnd"
+	"grp_r_thigh_02" 2 "quad_R_thigh_jntBnd" "quad_R_knee_jntBnd"
+	"grp_l_shin_02" 2 "quad_L_knee_jntBnd" "quad_L_ankle_jntBnd"
+	"grp_r_shin_02" 2 "quad_R_knee_jntBnd" "quad_R_ankle_jntBnd"
+	"grp_l_foot_02" 2 "quad_L_ankle_jntBnd" "quad_L_foot_jntBnd"
+	"grp_r_foot_02" 2 "quad_R_ankle_jntBnd" "quad_R_foot_jntBnd"
+	"grp_l_toe_02" 2 "quad_L_foot_jntBnd" "aux_quad_L_foot_jntBnd"
+	"grp_r_toe_02" 2 "quad_R_foot_jntBnd" "aux_quad_R_foot_jntBnd"
+	"tail_01" 2 "phys_skinned_tail_jntBnd_1" "phys_skinned_tail_jntBnd_2"
+	"tail_02" 2 "phys_skinned_tail_jntBnd_2" "phys_skinned_tail_jntBnd_3"
+	"tail_03" 2 "phys_skinned_tail_jntBnd_3" "aux_phys_skinned_tail_jntBnd_3"
+
+=== .smd Art/Models/MONSTERS/SunClanScavenger/Rathbreaker/rig_35164e63.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 12 in the header, 12 in the block · 13485 triangles over 10773 vertices
+  names: 396 bytes said, 396 read  [agree]
+
+=== shapes (12)
+0	arm_hair_meshShape	from 0	count 240
+1	body_meshShape	from 240	count 13320
+2	bot_meshShape	from 13560	count 648
+3	earring_meshShape	from 14208	count 192
+4	shoulderpads_meshShape	from 14400	count 2496
+5	skirt_meshShape	from 16896	count 696
+6	skulls_meshShape	from 17592	count 9168
+7	tongue_meshShape	from 26760	count 216
+8	top_meshShape	from 26976	count 648
+9	waist_bones_meshShape	from 27624	count 4449
+10	hair_meshShape	from 32073	count 7668
+11	tail_hair_meshShape	from 39741	count 714
+
+=== fitting
+the monster's rig: 89 bones
+mounts: aux_position, aux_phys_skinned_tail_jntBnd_3, aux_quad_R_foot_jntBnd, aux_quad_L_foot_jntBnd, aux_quad_L_hand_jntBnd, aux_quad_R_hand_jntBnd, aux_head_jntBnd
+  RathbreakerNecklace.ao  socket chest_jntBnd [in its carrier's rig]  box (-18.4,-25.2,-40.1)..(18.4,17.8,16.5)
+    (the geometry did not read)
+    rig 12 bones, 5 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,1.7)
+      1 chest_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (-0,-24.8,-164.7)
+      2 L_clavicle_jntBnd  [shared]  under 1  rests at (5,-2.7,-17.8)  carrier has (5,-27.5,-182.5)
+      3 R_clavicle_jntBnd  [shared]  under 1  rests at (-5,-2.7,-17.8)  carrier has (-5,-27.5,-182.5)
+      4 neck_jntBnd  [shared]  under 1  rests at (0,0,-28.3)  carrier has (-0,-24.8,-192.9)
+      5 phys_skinned_pendant_jntBnd  [its own]  under 1  rests at (-0,-19.5,4.5)
+      6 phys_skinned_L_pendant_jntBnd_3  [its own]  under 1  rests at (8.4,-17.8,-12)
+      7 phys_skinned_L_pendant_jntBnd_2  [its own]  under 1  rests at (12.7,-13.2,-20.2)
+      8 phys_skinned_R_pendant_jntBnd_3  [its own]  under 1  rests at (-8.4,-17.8,-12)
+      9 phys_skinned_R_pendant_jntBnd_2  [its own]  under 1  rests at (-12.7,-13.2,-20.2)
+      10 phys_skinned_L_pendant_jntBnd_1  [its own]  under 2  rests at (15.4,-6.6,-25.7)
+      11 phys_skinned_R_pendant_jntBnd_1  [its own]  under 3  rests at (-15.4,-6.6,-25.7)
+  RathbreakerDreads.ao  socket head_jntBnd [in its carrier's rig]  box (-25.5,-3.6,-22.3)..(25.5,46.9,9.5)
+    (the geometry did not read)
+    rig 25 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,1.7)
+      1 phys_skinned_L_dreads_jntBnd_1  [its own]  under 0  rests at (4.3,-1.3,-13.4)
+      2 phys_skinned_M_dreads_jntBnd_1  [its own]  under 0  rests at (-0,1.7,-14.9)
+      3 phys_skinned_R_dreads_jntBnd_1  [its own]  under 0  rests at (-4.3,-1.3,-13.4)
+      4 phys_skinned_L_dreads_jntBnd_2  [its own]  under 1  rests at (5.8,3.7,-16.3)
+      5 phys_skinned_M_dreads_jntBnd_2  [its own]  under 2  rests at (0,8.1,-19.1)
+      6 phys_skinned_R_dreads_jntBnd_2  [its own]  under 3  rests at (-5.8,3.7,-16.3)
+      7 phys_skinned_L_dreads_jntBnd_3  [its own]  under 4  rests at (8.1,9.5,-16.9)
+      8 phys_skinned_M_dreads_jntBnd_3  [its own]  under 5  rests at (0,15.9,-20.6)
+      9 phys_skinned_R_dreads_jntBnd_3  [its own]  under 6  rests at (-8.1,9.5,-16.9)
+      10 phys_skinned_L_top_dreads_jntBnd_1  [its own]  under 7  rests at (12.3,22,-13.3)
+      11 phys_skinned_L_bot_dreads_jntBnd_1  [its own]  under 7  rests at (14.1,15.3,-10.8)
+      12 phys_skinned_M_dreads_jntBnd_4  [its own]  under 8  rests at (0,24.4,-18.6)
+      13 phys_skinned_R_top_dreads_jntBnd_1  [its own]  under 9  rests at (-12.3,22,-13.3)
+      14 phys_skinned_R_bot_dreads_jntBnd_1  [its own]  under 9  rests at (-14.1,15.3,-10.8)
+      15 phys_skinned_L_top_dreads_jntBnd_2  [its own]  under 10  rests at (16,30.5,-6)
+      16 phys_skinned_L_bot_dreads_jntBnd_2  [its own]  under 11  rests at (18.3,19.2,-2.8)
+      17 phys_skinned_M_dreads_jntBnd_5  [its own]  under 12  rests at (0,33.6,-16.4)
+      18 phys_skinned_R_top_dreads_jntBnd_2  [its own]  under 13  rests at (-16,30.5,-6)
+      19 phys_skinned_R_bot_dreads_jntBnd_2  [its own]  under 14  rests at (-18.3,19.2,-2.8)
+      20 phys_skinned_L_top_dreads_jntBnd_3  [its own]  under 15  rests at (19.1,38.5,3.3)
+      21 phys_skinned_L_bot_dreads_jntBnd_3  [its own]  under 16  rests at (21.9,21.4,6.7)
+      22 phys_skinned_M_dreads_jntBnd_6  [its own]  under 17  rests at (0,43.9,-16.9)
+      23 phys_skinned_R_top_dreads_jntBnd_3  [its own]  under 18  rests at (-19.1,38.5,3.3)
+      24 phys_skinned_R_bot_dreads_jntBnd_3  [its own]  under 19  rests at (-21.9,21.4,6.7)
+  SunClanCleaver.ao  socket R_Weapon [in its carrier's rig]  box (-51.8,-7.9,-132.4)..(29.6,8.3,43.7)
+    (the geometry did not read)
+    rig 5 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,1.7)
+      1 phys_skinned_cloth_mesh_jntBnd_1  [its own]  under 0  rests at (-6,4.6,-31.2)
+      2 phys_skinned_cloth_mesh_jntBnd_2  [its own]  under 1  rests at (-20.8,4.6,-31.2)
+      3 phys_skinned_cloth_mesh_jntBnd_3  [its own]  under 2  rests at (-35.7,4.6,-31.2)
+      4 phys_skinned_cloth_mesh_jntBnd_4  [its own]  under 3  rests at (-50.5,4.6,-31.2)

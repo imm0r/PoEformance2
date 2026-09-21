@@ -1,0 +1,4935 @@
+monster: Medved, the Fallen Seer [Metadata/Monsters/LeagueExpeditionNew/Medved/MedvedBoss]
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/Medved/MedvedBoss.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwollenMiller/Animations/LargeDualAxeBoss/Twighlight_Order/rig.amd"
+	view_of = "emerge_01"
+		view_name = "emerge_idle_01"
+		view_end = 1
+		view_looping = true
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+		view_exclude_event = "ActiveDodgeEvent"
+		view_exclude_event = "TriggerEffectEvent"
+	view_of = "axe_spin_01"
+		view_name = "holy_axe_spin_01"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	view_of = "combo_01"
+		view_name = "holy_combo_01"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	view_of = "rock_toss_01"
+		view_name = "holy_rock_toss_01"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	view_of = "leapslam_01"
+		view_name = "holy_leapslam_01"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	view_of = "emerge_02"
+		view_name = "emerge_idle_02"
+		view_end = 1
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "ScreenCaptureEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+		view_exclude_event = "ActiveDodgeEvent"
+		view_exclude_event = "TriggerEffectEvent"
+	animations = '[
+		{
+			"name": "axe_spin_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.2330000400543215,
+					"name": "move",
+					"data": "0 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.6187705397605896,
+					"name": "start_target_update",
+					"data": "60 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7513977289199829,
+					"name": "contact",
+					"position": [
+						65.79972839355469,
+						-49.56884002685547,
+						-81.87570190429688
+					],
+					"contact_ref": [
+						76.99009704589844,
+						0.0,
+						-82.67396545410156
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7513980269432068,
+					"name": "detach_weapons"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6040184497833253,
+					"name": "recover_weapons"
+				}
+			]
+		},
+		{
+			"name": "combo_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.5317073464393616,
+					"name": "start_target_update",
+					"data": "120 0 1 100 0 40 120"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.5299999713897705,
+					"end_time": 0.9330000281333923,
+					"name": "move",
+					"position": [
+						-16.05500030517578,
+						-92.43800354003906,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.9330000281333923,
+					"end_time": 1.5333333015441895,
+					"name": "move",
+					"position": [
+						20.121999740600587,
+						-108.94200134277344,
+						0.0
+					],
+					"data": "1 1 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.349674940109253,
+					"end_time": 1.7618777751922608,
+					"name": "start_target_update",
+					"data": "125 0 1 100 0 45 125"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.5333333015441895,
+					"end_time": 2.2300000190734865,
+					"name": "move",
+					"position": [
+						15.954999923706055,
+						-165.33900451660157,
+						0.0
+					],
+					"data": "1 1 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 2.2300000190734865,
+					"end_time": 2.926666736602783,
+					"name": "move",
+					"position": [
+						-20.02199935913086,
+						-155.36900329589845,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2703092098236086,
+					"name": "combo_impact",
+					"position": [
+						36.49424743652344,
+						-113.28608703613281,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "cyclone_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.4999999701976776,
+					"end_time": 1.9999998807907105,
+					"name": "move",
+					"position": [
+						0.0,
+						-536.9920043945313,
+						0.0
+					],
+					"data": "0 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.480315685272217,
+					"name": "landing"
+				}
+			]
+		},
+		{
+			"name": "emerge_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 4.199999809265137,
+					"name": "move",
+					"position": [
+						0.0,
+						-300.0,
+						0.0
+					],
+					"data": "1 0 0 Nothing 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.29360079765319826,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.170802116394043,
+					"name": "summon"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.2251479625701906,
+					"name": "pool"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.6650278568267824,
+					"name": "landing"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 4.306500434875488,
+					"end_time": 4.866000175476074,
+					"name": "move",
+					"position": [
+						0.0,
+						-28.246999740600587,
+						0.0
+					],
+					"data": "0 0 0 Nothing 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "groundslam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6035354137420655,
+					"name": "contact",
+					"position": [
+						7.7252960205078129,
+						-125.41130065917969,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "holy_axe_throw_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.9066575765609742,
+					"name": "contact",
+					"position": [
+						-11.3798828125,
+						-50.436561584472659,
+						-161.3878173828125
+					],
+					"contact_ref": [
+						-8.983978271484375,
+						0.0,
+						-192.83853149414063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9066575765609742,
+					"name": "detach_weapons",
+					"position": [
+						-11.3798828125,
+						-50.436561584472659,
+						-161.3878173828125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5382375717163088,
+					"name": "recover_weapons",
+					"position": [
+						-11.3798828125,
+						-50.436561584472659,
+						-161.3878173828125
+					]
+				}
+			]
+		},
+		{
+			"name": "leapslam_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.33000001311302187,
+					"name": "move",
+					"position": [
+						0.0,
+						-98.53399658203125,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3337939977645874,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8147040009498596,
+					"name": "hit_ground"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.8300000429153442,
+					"end_time": 1.2000000476837159,
+					"name": "move",
+					"position": [
+						0.0,
+						-132.96200561523438,
+						0.0
+					],
+					"data": "0 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8370516300201416,
+					"name": "create_wall",
+					"position": [
+						0.0,
+						-131.64608764648438,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8623872399330139,
+					"name": "slam",
+					"position": [
+						5.663864612579346,
+						-63.95301818847656,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "rock_toss_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 3.6659998893737795,
+					"name": "move",
+					"data": "1 1 0 Everything 0 10 Away 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0983589887619019,
+					"name": "boulder",
+					"position": [
+						0.0,
+						-124.38189697265625,
+						0.0
+					]
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.7328851222991944,
+					"end_time": 2.7287189960479738,
+					"name": "start_target_update",
+					"data": "150 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.911259889602661,
+					"name": "contact",
+					"position": [
+						-0.7270822525024414,
+						-79.78514099121094,
+						-163.09506225585938
+					],
+					"contact_ref": [
+						-0.9029293060302734,
+						-24.979448318481447,
+						-171.90499877929688
+					]
+				}
+			]
+		},
+		{
+			"name": "sky_beam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.860469341278076,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "spider_gyser_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.4660000801086427,
+					"name": "move",
+					"position": [
+						0.0,
+						-660.0,
+						0.0
+					],
+					"data": "0 0 0 Everything 0 10 Away 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8260170221328735,
+					"name": "boulder",
+					"position": [
+						19.229736328125,
+						-104.7538070678711,
+						0.0
+					]
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.917580246925354,
+					"end_time": 1.408902883529663,
+					"name": "start_target_update",
+					"data": "45 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4835000038146973,
+					"name": "contact",
+					"position": [
+						-33.065101623535159,
+						-123.39399719238281,
+						-215.5229949951172
+					],
+					"contact_ref": [
+						-33.065101623535159,
+						-83.90370178222656,
+						-224.08399963378907
+					]
+				}
+			]
+		},
+		{
+			"name": "summon_council_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0,
+					"name": "start_face",
+					"data": "90 60 -1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 3.1659998893737795,
+					"name": "move",
+					"position": [
+						0.0,
+						-260.8840026855469,
+						0.0
+					],
+					"data": "0 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.7691500186920166,
+					"name": "end_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8448610305786133,
+					"name": "detach_weapons"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8448610901832581,
+					"name": "contact",
+					"position": [
+						65.79972839355469,
+						-49.56884002685547,
+						-81.87570190429688
+					],
+					"contact_ref": [
+						76.99009704589844,
+						0.0,
+						-82.67396545410156
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4946999549865724,
+					"name": "recover_weapons"
+				}
+			]
+		},
+		{
+			"name": "holy_leapslam_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.3131754398345947,
+					"end_time": 0.8490936756134033,
+					"name": "move",
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/LeagueExpeditionNew/Medved/attachments/MedvedBossCloakHeld.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/LeagueExpeditionNew/Medved/attachments/MedvedBossNecklaceHeld.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/LeagueExpeditionNew/Medved/attachments/MedvedBossLoinClothHeld.ao"
+	attached_object = "R_Weapon Metadata/Monsters/LeagueExpeditionNew/Medved/attachments/MedvedBossWeaponHeld.ao"
+	attached_object = "L_Weapon Metadata/Monsters/LeagueExpeditionNew/Medved/attachments/MedvedBossWeaponHeld.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.35039371252059939,
+								0.0
+							],
+							[
+								0.35826772451400759,
+								0.25143951177597048
+							],
+							[
+								0.3858267664909363,
+								0.6007677316665649
+							],
+							[
+								0.4133858382701874,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.26179900765419009,
+						"width": 71.71299743652344,
+						"angle": 1.5009832382202149,
+						"x_axis_scale": 0.6840000152587891,
+						"length": 158.6479949951172,
+						"offset": [
+							7.0,
+							0.0
+						],
+						"local_offset": [
+							0.0,
+							13.0
+						],
+						"impact_z_rotation": [
+							0.785398006439209,
+							1.9198600053787232
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4713114798069,
+								0.0
+							],
+							[
+								0.4713114798069,
+								0.0
+							],
+							[
+								0.4713114798069,
+								0.0
+							],
+							[
+								0.4713114798069,
+								0.0
+							],
+							[
+								0.4795081913471222,
+								0.41650670766830447
+							],
+							[
+								0.48770493268966677,
+								1.0
+							]
+						],
+						"rotation": 3.1415927410125734,
+						"width": 49.46099853515625,
+						"length": 89.56400299072266,
+						"offset": [
+							-23.0,
+							0.0
+						],
+						"local_offset": [
+							-18.0,
+							-164.0
+						],
+						"impact_x_rotation": [
+							-0.34906598925590517,
+							-0.9599310159683228
+						],
+						"impact_type": "Slash",
+						"impact_bone": "saw_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.36220473051071169,
+								0.0
+							],
+							[
+								0.3700787425041199,
+								0.22072935104370118
+							],
+							[
+								0.3858267664909363,
+								0.4702495336532593
+							],
+							[
+								0.4015747904777527,
+								0.7850288152694702
+							],
+							[
+								0.4133858382701874,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"width": 95.45700073242188,
+						"angle": 1.9547688961029053,
+						"x_axis_scale": 0.6840000152587891,
+						"length": 225.0,
+						"offset": [
+							-36.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.26179900765419009
+						],
+						"impact_z_rotation": [
+							-0.5235990285873413,
+							-1.483530044555664
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "combo_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.21653543412685395,
+								0.0
+							],
+							[
+								0.22440944612026215,
+								0.24999988079071046
+							],
+							[
+								0.23622047901153565,
+								0.669865608215332
+							],
+							[
+								0.24803149700164796,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"update_target_direction": true,
+						"rotation": 0.6632251739501953,
+						"angle": 1.972222089767456,
+						"x_axis_scale": 0.8820000290870667,
+						"length": 162.52099609375,
+						"offset": [
+							-11.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.6283185482025147
+						],
+						"impact_z_rotation": [
+							0.40142571926116946,
+							2.9496066570281984
+						],
+						"impact_type": "Slash",
+						"hand": "MainHand"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.36220473051071169,
+								0.0
+							],
+							[
+								0.3688524663448334,
+								0.1401151418685913
+							],
+							[
+								0.3852458894252777,
+								0.466410756111145
+							],
+							[
+								0.39754098653793337,
+								0.7504798173904419
+							],
+							[
+								0.4057376980781555,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"update_target_direction": true,
+						"rotation": -0.8552113771438599,
+						"angle": 2.6179940700531008,
+						"x_axis_scale": 0.699999988079071,
+						"length": 160.0,
+						"offset": [
+							2.0,
+							2.0
+						],
+						"local_offset": [
+							-10.0,
+							37.0
+						],
+						"impact_z_rotation": [
+							0.0,
+							-2.967059850692749
+						],
+						"impact_type": "Slash",
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "cyclone_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.22440944612026215,
+								0.0
+							],
+							[
+								0.23228345811367036,
+								0.22072935104370118
+							],
+							[
+								0.24015748500823975,
+								0.48560458421707156
+							],
+							[
+								0.25196850299835207,
+								0.7120921611785889
+							],
+							[
+								0.26771652698516848,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": 0.8377580642700195,
+						"angle": 2.4434611797332765,
+						"x_axis_scale": 0.699999988079071,
+						"length": 180.0,
+						"offset": [
+							-30.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.3141592741012573,
+							-0.645771861076355
+						],
+						"impact_z_rotation": [
+							-0.9250245094299316,
+							2.094395160675049
+						],
+						"impact_type": "Slash",
+						"hand": "MainHand"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3401639461517334,
+								0.0
+							],
+							[
+								0.35245901346206667,
+								0.1669865846633911
+							],
+							[
+								0.3606557250022888,
+								0.39731287956237795
+							],
+							[
+								0.37295082211494448,
+								0.6890594959259033
+							],
+							[
+								0.39344263076782229,
+								0.8771592974662781
+							],
+							[
+								0.39754098653793337,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.19198623299598695,
+						"angle": 2.4085545539855959,
+						"x_axis_scale": 0.8600000143051148,
+						"length": 162.447998046875,
+						"local_offset": [
+							19.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.15707963705062867,
+							-0.6632251739501953
+						],
+						"impact_z_rotation": [
+							-1.1693706512451172,
+							1.1693706512451172
+						],
+						"impact_type": "Slash",
+						"hand": "OffHand"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4303278625011444,
+								0.0
+							],
+							[
+								0.43852460384368899,
+								0.1785028576850891
+							],
+							[
+								0.4508196711540222,
+								0.44721686840057375
+							],
+							[
+								0.4590163826942444,
+								0.6660268306732178
+							],
+							[
+								0.4836065471172333,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"angle": 2.670353889465332,
+						"x_axis_scale": 0.6359999775886536,
+						"length": 189.04600524902345,
+						"offset": [
+							-10.0,
+							0.0
+						],
+						"local_offset": [
+							3.0,
+							2.0
+						],
+						"impact_x_rotation": [
+							0.1745329350233078,
+							-0.6632251739501953
+						],
+						"impact_z_rotation": [
+							-0.7679449319839478,
+							2.4085545539855959
+						],
+						"impact_type": "Slash",
+						"hand": "MainHand"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5860655903816223,
+								0.0
+							],
+							[
+								0.5901639461517334,
+								0.1428571492433548
+							],
+							[
+								0.5901639461517334,
+								0.3320537209510803
+							],
+							[
+								0.6024590134620667,
+								0.658349335193634
+							],
+							[
+								0.6147540807723999,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.7330383658409119,
+						"angle": 1.7278759479522706,
+						"x_axis_scale": 0.8360000252723694,
+						"length": 160.0,
+						"offset": [
+							39.0,
+							17.0
+						],
+						"local_offset": [
+							-10.0,
+							-15.0
+						],
+						"impact_x_rotation": [
+							-0.2617993950843811,
+							-0.5585054159164429
+						],
+						"impact_z_rotation": [
+							0.3490658700466156,
+							1.2217305898666382
+						],
+						"impact_type": "Slash",
+						"hand": "OffHand"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.6557376980781555,
+								0.0
+							],
+							[
+								0.6557376980781555,
+								0.0
+							],
+							[
+								0.6844262480735779,
+								0.2871881425380707
+							],
+							[
+								0.7008196711540222,
+								0.6813819408416748
+							],
+							[
+								0.7090163826942444,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": 0.5235987901687622,
+						"width": 47.71799850463867,
+						"angle": 2.4434611797332765,
+						"x_axis_scale": 0.699999988079071,
+						"length": 183.19500732421876,
+						"offset": [
+							9.0,
+							-20.0
+						],
+						"local_offset": [
+							-108.0,
+							-8.0
+						],
+						"impact_x_rotation": [
+							0.40142571926116946,
+							0.4886922240257263
+						],
+						"impact_z_rotation": [
+							0.15707963705062867,
+							1.9896754026412964
+						],
+						"impact_type": "Slash",
+						"hand": "MainHand"
+					}
+				]
+			}
+		}
+	]'
+}
+
+Locators
+{
+	locator = "gwennen_1 0 240 0 0 0 0"
+	locator = "gwennen_2 240 0 0 1.5708 0 0"
+	locator = "gwennen_3 -240 0 0 -1.5708 0 0"
+	locator = "gwennen_middle 0 0 0 0 0 0"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwollenMiller/Animations/LargeDualAxeBoss/Twighlight_Order/rig.ast"
+		socket = "aux_mid"
+			translation = "0 0 -117.683"
+		socket = "aux_root"
+		socket = "aux_weapon_grd_1"
+			translation = "-48.2139 -61.0382 0"
+		socket = "aux_weapon_grd_2"
+			translation = "34.6668 -61.0382 0"
+		socket = "aux_front"
+			translation = "0 -49.706 -117.683"
+		socket = "aux_breath"
+			parent = "head_jntBnd"
+			translation = "-1 -15.7073 8.17035"
+		socket = "aux_grd_circle_01"
+			translation = "0 -98.1163 0"
+		socket = "aux_grd_circle_02"
+			translation = "-98.12 0 0"
+		socket = "aux_light_attach"
+			translation = "0 -69.9526 -203.289"
+		socket = "aux_weptrl_l1"
+			parent = "L_Weapon"
+			translation = "-31.8453 0.781124 -72.778"
+		socket = "aux_weptrl_l2"
+			parent = "L_Weapon"
+			translation = "-27.2223 -5.34275 7.41768"
+		socket = "aux_weptrl_r1"
+			parent = "R_Weapon"
+			translation = "-30.9313 1.05 -72.5378"
+		socket = "aux_weptrl_r2"
+			parent = "R_Weapon"
+			translation = "-28.0469 1.05 4.49594"
+		socket = "boulder"
+			parent = "R_Weapon"
+			translation = "-12.0854 -28.7672 -28.9566"
+		socket = "aux_weapon_mid"
+			parent = "L_Weapon"
+			translation = "-34.6693 8.76717 -51.7216"
+		normal_viscosity_multiplier = 0.300
+		enclosure_angle = 0.300
+		animation_velocity_factor = 10.000
+		animation_force_factor = 5.000
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwollenMiller/LargeDualAxeBoss.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "cloak_bone_group false chest_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd head_jntBnd"
+		bone_group = "necklace_bone_group false chest_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd spine_2_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd neck_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "front false aux_mid aux_front"
+		bone_group = "foot_l false L_foot_jntBnd"
+		bone_group = "foot_r false R_foot_jntBnd"
+		bone_group = "FX_wep_grd false aux_weapon_grd_1 aux_weapon_grd_2"
+		bone_group = "grd false aux_root"
+		bone_group = "yawp false head_jntBnd aux_breath"
+		bone_group = "arm_charge false R_wrist_jntBnd R_shoulder_jntBnd"
+		bone_group = "wep_l false aux_weptrl_l1 aux_weptrl_l2"
+		bone_group = "wep_r false aux_weptrl_r1 aux_weptrl_r2"
+		bone_group = "FX_weapon_mid false aux_weapon_mid"
+		bone_group = "FX_weapon_01 false aux_weptrl_r2 aux_weptrl_r1"
+		bone_group = "FX_weapon_02 false aux_weptrl_l2 aux_weptrl_l1"
+		bone_group = "FX_Base_01 false root_jntBnd"
+	}
+
+	Lights
+	{
+		light = "point_light"
+			usage_frequency = 1
+			style_speed = 8
+			randomise_start_time = true
+			state = "on"
+				colour = "1.63035 2.61652 7.75312"
+				position = "0 0 -250"
+				radius = 350
+				style = 1
+				distance_threshold = 100
+			state = "off"
+				default_state = true
+				position = "0 0 -250"
+				radius = 0
+				style = 1
+				distance_threshold = 100
+		animations = '[
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "off"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 2.0705559253692629,
+						"end_time": 2.75,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 2.810474395751953,
+						"state_name": "off"
+					}
+				]
+			}
+		]'
+	}
+
+	WindEvents
+	{
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "cyclone_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2800366282463074,
+						"end_time": 2.0597188472747804,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/cyclone_01_filler.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "emerge_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/emerge_02_start.pet",
+						"bone_group": "FX_Base_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.2257838249206544,
+						"end_time": 3.3014352321624758,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/emerge_02_drippy.pet",
+						"bone_groups": [
+							"cloak_bone_group",
+							"FX_weapon_01",
+							"FX_weapon_02",
+							"grp_chest",
+							"grp_l_forearm",
+							"grp_r_forearm",
+							"grp_l_shin",
+							"grp_r_shin"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.127608299255371,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/emerge_02_wave.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8866156935691834,
+						"end_time": 1.8918592929840088,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/groundslam_01_onact.pet",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_axe_throw_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.280779242515564,
+						"end_time": 1.9867204427719117,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.27440398931503298,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/medved/pets/step_dust.pet",
+						"bone_group": "foot_r"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.616720974445343,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/medved/pets/step_dust.pet",
+						"bone_group": "foot_l"
+					}
+				]
+			},
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4295163154602051,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/detonatedead_onAct_weaponTrailing.pet",
+						"bone_groups": [
+							"wep_r",
+							"wep_l"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.899999976158142,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/detonatedead_onAct_weapon.pet",
+						"bone_group": "FX_weapon_mid"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.909999966621399,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/detonatedead_onAct.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7862600088119507,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/medved/pets/step_dust.pet",
+						"bone_group": "foot_r"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5732500553131104,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/medved/pets/step_dust.pet",
+						"bone_group": "foot_l"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_spin_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.307058185338974,
+						"end_time": 0.8250956535339356,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_combo_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5078877210617065,
+						"end_time": 0.8824937343597412,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0816127061843873,
+						"end_time": 1.3457064628601075,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8504981994628907,
+						"end_time": 2.196887969970703,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_group": "wep_r"
+					}
+				]
+			},
+			{
+				"name": "holy_rock_toss_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7511846423149109,
+						"end_time": 3.0059754848480226,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_leapslam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3499999940395355,
+						"end_time": 0.8600000143051148,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			}
+		]'
+	}
+
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 2.5287184715270998,
+						"frequency": 85.0,
+						"amplitude": 16.0,
+						"duration": 0.30000001192092898,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "emerge_02",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.0,
+						"duration": 3.0,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 3.204376220703125,
+						"frequency": 100.0,
+						"amplitude": 12.0,
+						"duration": 0.30000001192092898,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.6078280210494996,
+						"frequency": 85.0,
+						"amplitude": 12.0,
+						"duration": 0.25,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "spider_gyser_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.7170850038528442,
+						"frequency": 300.0,
+						"amplitude": 2.0,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.1563199758529664,
+						"frequency": 300.0,
+						"amplitude": 3.0,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "summon_council_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.6045000553131104,
+						"frequency": 300.0,
+						"amplitude": 1.5,
+						"duration": 1.2999999523162842,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.8019599914550781,
+						"amplitude": 1.5,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.577239990234375,
+						"amplitude": 1.5,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38078051805496218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.392890602350235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5759149789810181,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6013699769973755,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/CapeFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6355699896812439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.220229983329773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21126000583171845,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4337512254714966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5303280353546143,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/CapeFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7844752073287964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1688026189804078,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_spin_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/AxeSpin",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13389360904693604,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13480623066425324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/ThrowWeapon/ThrowWeaponBuildUp",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18390999734401704,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23341000080108643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/Attack",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4487679898738861,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwingSlow",
+						"bone_name": "L_finger_1_jntBnd_1",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4918699860572815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.611600399017334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/ThrowWeapon/ThrowWeapon",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.121940016746521,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5147156715393067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05132589861750603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19697155058383943,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/ComboA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4599800109863281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5156800150871277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5405113101005554,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/Attack",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6860719919204712,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8026580214500427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9568610787391663,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/ComboB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1106499433517457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/Attack",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1199848651885987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.15392005443573,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.405079960823059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7149662971496583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/ComboC",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7986899614334107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/AttackLong",
+						"bone_name": "aux_weptrl_l1",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.852640151977539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0325000286102297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwingSlow"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.707789897918701,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cyclone_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40418875217437746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/Attack",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4328022301197052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44967275857925417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5480432510375977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/CycloneA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5933103561401367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5972099900245667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/Attack",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6570988297462463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/CapeFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6640780568122864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.729997456073761,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9743800163269043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/Attack",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0003902912139893,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0206199884414673,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2051199674606324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2476999759674073,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/Attack",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2898262739181519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4151699542999268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/CycloneB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6461000442504883,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/Attack",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7776598930358887,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8900799751281739,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/Attack",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.915260910987854,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/CycloneC",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9398008584976197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.994075894355774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.028059959411621,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2853989601135256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/DeathA",
+						"bone_name": "hip_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5156540274620056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8160139918327332,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4865998029708863,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/DeathB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5264999866485596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.014645576477051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/DeathC",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.023193836212158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.266923189163208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2936394214630129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.20478293299674989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5062900185585022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2337299585342408,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3129417896270753,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4077999591827393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6408528089523316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Roar",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7310199737548829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.776238203048706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/RockThrow/RockThrow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8303600549697877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0415000915527345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4540998935699465,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Fall",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.577810049057007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Slam/Slam",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Emerge/Float",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Emerge/Liquid",
+						"bone_name": "aux_grd_circle_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.802320957183838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Emerge/LiquidSplashes",
+						"bone_name": "aux_grd_circle_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1408801078796388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Emerge/Boom",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.932650089263916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Emerge",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.187421798706055,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.22846794128418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.3717875480651859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.13230000436306,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/GroundSlamA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3424000144004822,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4174458980560303,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/GroundSlam/Telegraph",
+						"bone_name": "R_clavicle_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6680999994277954,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/Attack",
+						"bone_name": "aux_weptrl_r2",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8752099871635437,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/AttackLong",
+						"bone_name": "aux_weptrl_l1",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1583409309387208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4097000360488892,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4405699968338013,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/GroundSlamB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.580435037612915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/GroundSlam/Slam"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5917600393295289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Slam/WeaponImpactGround"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.054419994354248,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Roar",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5699907541275024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.504390001296997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.762969970703125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7909400463104249,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Attack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8318698406219483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/ThrowWeapon/ThrowWeapon",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3418538570404054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8154820203781128,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3974800109863281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8072999715805054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7177174091339112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8835699558258058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9936177730560304,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/KnockdownC",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.118109941482544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7839503288269045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "leapslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03553299978375435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/LeapA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12341770529747009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Jump",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21222400665283204,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.253807008266449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Leap",
+						"bone_name": "hip_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2949199974536896,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5813819766044617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7351771593093872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/LeapB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7669439315795898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8172221183776856,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Slam/Slam",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8405439853668213,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1989200115203858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "rock_toss_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.32128000259399416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44269999861717226,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwingSlow",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5024799704551697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6342597603797913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/AttackLong",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7303469777107239,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/GroundSlamA",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9458316564559937,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9993399977684021,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwingSlow",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0357836484909058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1114130020141602,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/RockThrow/RockThrowBuildUp",
+						"bone_name": "neck_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1126868724823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Roar",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2508599758148195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.644627809524536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/RockThrow/RockThrow"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.648191213607788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.756105661392212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8006575107574465,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.355710029602051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.014379999600350857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Run",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25449100136756899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33419299125671389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6169099807739258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/SkyBeam",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/SkyBeam/ChargeUp",
+						"bone_name": "root_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22649572789669038,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/SkyBeam/Start",
+						"bone_name": "aux_mid",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7098640203475952,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3333300352096558,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.81777822971344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/SkyBeam/Cast",
+						"bone_name": "aux_mid",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.215315103530884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/SkyBeam/Swing",
+						"bone_name": "aux_mid",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4695253372192385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/VerisiumSwings/AttackLong",
+						"bone_name": "neck_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9921998977661135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spider_gyser_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/SpiderSummon",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27570199966430666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.545628011226654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6001250147819519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Roll",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6041968464851379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6331019997596741,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6958199739456177,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9035040140151978,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9838100075721741,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1054400205612183,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2751215696334839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/MeleeSwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3082900047302247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3447699546813965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5914058685302735,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8574899435043336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0218899250030519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "aux_R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "summon_council_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.016100000590085985,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18918099999427796,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3049609959125519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48858100175857546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/AxeThrow",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6250990033149719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7143970131874085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/Whoosh",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7859969735145569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1638599634170533,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2645900249481202,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Roar",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.090019941329956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08007899671792984,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.682233989238739,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Walk",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7992460131645203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8894149661064148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_spin_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28280940651893618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/GruntLonger",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2927300035953522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30142998695373537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/ThrowWeapon/ThrowWeaponBuildUp",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41355836391448977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.671840250492096,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/ThrowWeapon/ThrowWeapon",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6931899785995483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1012699604034424,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1110600233078004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "holy_combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.21646000444889069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3835799992084503,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/GruntShort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5077300071716309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weapon_grd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8753900527954102,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9772499799728394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/GruntShort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0059000253677369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1507400274276734,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4331916570663453,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4977099895477296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5454599857330323,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/GruntShort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9557079076766968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/LeapB",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9847499132156373,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weapon_mid"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1184399127960207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.20989990234375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2224621772766115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Slam/WeaponImpactGround",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2569100856781008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9611399173736574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "holy_rock_toss_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4688499867916107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weapon_mid"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6014699935913086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7882699966430664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2086244821548463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/Roar",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.682098627090454,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weapon_mid"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7525999546051026,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/RockThrow/RockThrowBuildUp",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7084999084472658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/RockThrow/RockThrow"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.715980052947998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weptrl_l1"
+					}
+				]
+			},
+			{
+				"name": "holy_leapslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18055999279022218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20613999664783479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21272000670433045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/LeapA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28363001346588137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3489537835121155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Leap",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45495373010635378,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weapon_mid"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7412300109863281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7712000012397766,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8033699989318848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8295903205871582,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Effects/Slam/Slam",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.833329975605011,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Vocals/LeapB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8421100378036499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MedvedBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5411672592163086,
+						"end_time": 0.7801509499549866,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/melee_trl.trl",
+						"bone_group": "wep_r"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.47814100980758669,
+						"end_time": 0.5954644083976746,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/melee_trl.trl",
+						"bone_group": "wep_l"
+					}
+				]
+			},
+			{
+				"name": "axe_spin_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.3906547725200653,
+						"end_time": 0.7955112457275391,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5431584119796753,
+						"end_time": 0.901393473148346,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.041637897491455,
+						"end_time": 1.374011754989624,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.8716620206832886,
+						"end_time": 2.196984052658081,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrail_Magical.trl",
+						"bone_group": "wep_l"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.8740116357803345,
+						"end_time": 2.3451175689697267,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrail_Magical.trl",
+						"bone_group": "wep_r"
+					}
+				]
+			},
+			{
+				"name": "cyclone_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.3797666132450104,
+						"end_time": 0.5427547693252564,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_group": "wep_l"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5728681683540344,
+						"end_time": 0.7058184146881104,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8861222863197327,
+						"end_time": 1.079148769378662,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_group": "wep_l"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.083514928817749,
+						"end_time": 1.3473451137542725,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.6692564487457276,
+						"end_time": 1.930940866470337,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_group": "wep_l"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.720750331878662,
+						"end_time": 2.0746946334838869,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_group": "wep_r"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.906095027923584,
+						"end_time": 2.530518054962158,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.2808142900466919,
+						"end_time": 1.8161338567733765,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrail_Magical.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_axe_throw_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.205183506011963,
+						"end_time": 1.9392836093902588,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/onact_holy_trl.trl",
+						"bone_groups": [
+							"wep_r",
+							"wep_l"
+						]
+					}
+				]
+			},
+			{
+				"name": "leapslam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4330458641052246,
+						"end_time": 0.8779699802398682,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4330458641052246,
+						"end_time": 0.8779699802398682,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_group": "wep_l"
+					}
+				]
+			},
+			{
+				"name": "rock_toss_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8072165846824646,
+						"end_time": 1.0827890634536744,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.6952621936798096,
+						"end_time": 2.517918348312378,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.6153366565704347,
+						"end_time": 3.065281391143799,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 3.0070109367370607,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrail_Magical.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "spider_gyser_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5961067080497742,
+						"end_time": 1.624164342880249,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/FX/MeleeTrails_VerisiumOn.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_axe_spin_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.30545008182525637,
+						"end_time": 0.7919735908508301,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/onact_holy_02_trl.trl",
+						"bone_groups": [
+							"wep_r",
+							"wep_l"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5078886151313782,
+						"end_time": 0.8862416744232178,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/combo_holy_trl.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.0863152742385865,
+						"end_time": 1.3423993587493897,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/combo_holy_trl.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.852852463722229,
+						"end_time": 2.1998658180236818,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/combo_holy_trl.trl",
+						"bone_group": "wep_l"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.862254023551941,
+						"end_time": 2.268052577972412,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/combo_holy_trl.trl",
+						"bone_group": "wep_r"
+					}
+				]
+			},
+			{
+				"name": "holy_rock_toss_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7360271215438843,
+						"end_time": 1.1863272190093995,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/onact_holy_trl.trl",
+						"bone_groups": [
+							"wep_r",
+							"wep_l"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.721705436706543,
+						"end_time": 2.6305899620056154,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/onact_holy_trl.trl",
+						"bone_groups": [
+							"wep_r",
+							"wep_l"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.6436409950256349,
+						"end_time": 3.1487059593200685,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/onact_holy_trl.trl",
+						"bone_groups": [
+							"wep_r",
+							"wep_l"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_leapslam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.35421237349510195,
+						"end_time": 0.8606915473937988,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_holy_trl.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.7632703185081482,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							11.445330619812012,
+							-125.45590209960938
+						],
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.2615511417388918,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							26.480405807495118,
+							-81.58150482177735
+						],
+						"inherit_scale": true,
+						"scale": [
+							1.149999976158142,
+							1.149999976158142,
+							1.149999976158142
+						],
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.0,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_deathimpact.ao",
+						"offset": [
+							18.26795196533203,
+							-23.8890380859375
+						],
+						"inherit_height": true,
+						"height": 120.25674438476563,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.15657250583171845,
+						"end_time": 3.1200499534606935,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_deathimpact.ao",
+						"animation": "loop",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.064344644546509,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_death_01.ao",
+						"offset": [
+							11.529022216796875,
+							-27.469497680664064
+						]
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.524066209793091,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_rock_toss.ao",
+						"offset": [
+							2.41290283203125,
+							-100.85809326171875
+						],
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "holy_axe_throw_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.5075589418411255,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_holy_axethrow.ao",
+						"offset": [
+							0.9799184799194336,
+							40.36629104614258
+						],
+						"inherit_height": true,
+						"height": 273.24981689453127,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "rock_toss_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0639917850494385,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							-3.0899200439453127,
+							-136.0558624267578
+						],
+						"height": -0.3470458984375,
+						"orientation": 0.2617993950843811
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0663224458694459,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							37.004966735839847,
+							-136.11105346679688
+						]
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0905784368515015,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_rock_toss.ao",
+						"offset": [
+							-10.22308349609375,
+							-127.17106628417969
+						]
+					}
+				]
+			},
+			{
+				"name": "spider_gyser_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.7469735145568848,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							26.480405807495118,
+							-108.58200073242188
+						],
+						"inherit_scale": true,
+						"scale": [
+							1.149999976158142,
+							1.149999976158142,
+							1.149999976158142
+						],
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.848625123500824,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							26.480405807495118,
+							-108.58200073242188
+						],
+						"inherit_scale": true,
+						"scale": [
+							1.149999976158142,
+							1.149999976158142,
+							1.149999976158142
+						],
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "holy_combo_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.7077520489692688,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_holycombo_swipes.ao",
+						"animation": "swipe_01",
+						"offset": [
+							0.0,
+							-37.253143310546878
+						],
+						"inherit_height": true,
+						"height": 135.0,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.1780163049697877,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_holycombo_swipes.ao",
+						"animation": "swipe_02",
+						"offset": [
+							0.0,
+							-37.253143310546878
+						],
+						"inherit_height": true,
+						"height": 135.0,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.139716625213623,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_holycombo_swipes.ao",
+						"animation": "swipe_03",
+						"offset": [
+							0.0,
+							10.91717529296875
+						],
+						"inherit_height": true,
+						"height": 135.0,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.270068645477295,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/leap_impact.ao",
+						"offset": [
+							20.25897216796875,
+							-105.9993896484375
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "holy_rock_toss_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0609588623046876,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							-7.752388000488281,
+							-135.81103515625
+						]
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0613102912902833,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							-48.55006408691406,
+							-136.79510498046876
+						],
+						"height": -0.3470458984375,
+						"orientation": 0.2617993950843811
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0718058347702027,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_rock_toss.ao",
+						"offset": [
+							-1.3687744140625,
+							-137.06739807128907
+						]
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/combo_01_body.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.7052974700927735,
+						"end_time": 2.80924654006958,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/groundslam_01.epk",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.70695960521698,
+						"end_time": 2.8275294303894045,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/groundslam_01.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "cyclone_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.0755693912506105,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/groundslam_01.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.0755693912506105,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/groundslam_01.epk",
+						"bone_name": "L_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/epk/boss_blood_death.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/emerge_02.epk"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/groundslam_01.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/groundslam_01.epk",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/groundslam_01_body.epk"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_throw_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.1936444491147995,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/groundslam_01.epk",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/groundslam_01.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/detonatedead_body.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "spider_gyser_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/groundslam_01.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/Medved/EPKs/groundslam_01.epk",
+						"bone_name": "L_Weapon"
+					}
+				]
+			},
+			{
+				"name": "holy_combo_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "axe_spin_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.2330000400543215,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.559934 1 Linear 2.233 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.2330000400543215,
+						"name": "surgeTime_R",
+						"curve": "4 0 0 Linear 0.26704 1 Linear 1.47786 1 Linear 2.233 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.2660000324249269,
+						"name": "surgeTime_R",
+						"curve": "5 0 0 Linear 0.193994 1 Linear 2.33741 1 Linear 2.85301 0 Flat 3.266 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 1.7053024768829346,
+						"end_time": 3.2660000324249269,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "4 1.7053 1.20327 Linear 1.94613 1.99324 Flat 2.20118 2 Linear 3.266 1.20327 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 1.7152742147445679,
+						"end_time": 3.2660000324249269,
+						"name": "FadeFloat",
+						"apply_on_children": true,
+						"curve": "5 1.71527 0 Linear 1.88042 1 Flat 2.23498 1 Flat 2.57405 0 Flat 3.266 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "cyclone_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.865999937057495,
+						"name": "FadeFloat",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.305211 1 Flat 1.91041 1 Flat 2.38253 0 Flat 2.866 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.865999937057495,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.305211 1 Flat 2.38405 1 Flat 2.58379 0 Flat 2.866 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.865999937057495,
+						"name": "surgeTime_R",
+						"curve": "4 0 0 Linear 0.421426 1 Linear 2.39464 1 Linear 2.866 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.400000095367432,
+						"name": "releaseTime_L",
+						"curve": "3 0 0 Linear 0.1 0.5 Flat 4.4 0.5 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.866000175476074,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "5 0 0.246622 Linear 0.779742 0.537162 Smooth 1.49654 0.672297 Smooth 2.29041 1 Linear 4.866 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.866000175476074,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "4 0 1 Linear 2.14911 1 Linear 2.60899 0 Flat 4.866 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.866000175476074,
+						"name": "FadeFloat",
+						"apply_on_children": true,
+						"curve": "4 0 1 Linear 3.16136 1 Linear 3.59555 0 Flat 4.866 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0999999046325685,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "6 0 1 Linear 1.08435 1 Flat 1.6081 2.21959 Flat 1.99601 1 Flat 2.61307 1 Flat 3.1 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0999999046325685,
+						"name": "FadeFloat",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.333078 0 Flat 1.08435 1 Flat 1.77014 1 Flat 2.14987 0 Flat 3.1 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_throw_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.42 0 Linear 1.15 1 Flat 2.13164 1 Linear 2.13164 0 Linear 3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "leapslam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "surgeTime_R",
+						"curve": "5 0 0 Smooth 0.426478 1 Linear 0.793163 1 Linear 1.14084 0 Flat 1.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "rock_toss_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.6659998893737795,
+						"name": "surgeTime_R",
+						"curve": "5 0 0 Linear 0.738426 1 Linear 3.03597 1 Flat 3.42889 0 Flat 3.666 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.0,
+						"name": "surgeTime_R",
+						"curve": "5 0 0 Linear 1.59979 1 Linear 2.92397 1 Linear 3.49419 0 Flat 4 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.0,
+						"name": "FadeFloat",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 1.84055 1 Linear 2.8944 1 Linear 3.20063 0.314189 Smooth 4 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.0,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "5 0 1 Linear 1.76241 1 Flat 1.91869 4 Linear 3.00422 1.85135 Smooth 4 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "spider_gyser_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.4660000801086427,
+						"name": "FadeFloat",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.410783 0.127476 Smooth 0.862583 1 Flat 1.58779 1 Flat 1.9146 0.0168919 Flat 2.466 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.4660000801086427,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "7 0 1 Linear 0.356099 1 Linear 0.780553 2.21959 Flat 0.931586 1 Flat 1.58779 1 Flat 2.07866 1 Flat 2.466 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_spin_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.2330000400543215,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.600606 1 Flat 1.43417 1 Flat 1.43417 0 Flat 2.233 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.2330000400543215,
+						"name": "releaseTime_L",
+						"curve": "3 0 0 Smooth 0.559934 1 Linear 2.233 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "holy_combo_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.2660000324249269,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.561266 1 Flat 2.45693 1 Flat 3.266 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "holy_rock_toss_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.6659998893737795,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 0.85 1 Linear 2.98593 1 Flat 3.666 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "holy_leapslam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.219082 0 Linear 0.575 1 Flat 0.97 1 Flat 1.397 0 Linear 1.5 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.5771300196647644,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "axe_spin_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.786899983882904,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.7256699800491333,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.2182199954986573,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.787345290184021,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "cyclone_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.6788159608840942,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.0574676990509034,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.2924929857254029,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 2.0334670543670656,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 3.0733799934387209,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.0,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.30125299096107485,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.5553534626960754,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.7623019218444824,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "rock_toss_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 3.3534600734710695,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.0,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.2559228539466858,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.5405458807945252,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.0,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.8091122508049011,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.572665810585022,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_spin_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.7799957394599915,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "holy_rock_toss_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 3.4372498989105226,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/Medved/attachments/MedvedBossCloakHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/Cloak/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/Cloak/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.700
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+		attachment_groups = "cloak_bone_group body_bone_group"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/Cloak/LargeDualAxeBossCloak.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "body_bone_group false root_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd head_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/Medved/attachments/MedvedBossNecklaceHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/Necklace/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/Necklace/rig.ast"
+		linear_allowed_contraction = 0.540
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.005
+		enclosure_angle = 0.422
+		attachment_groups = "necklace_bone_group body_bone_group"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/Necklace/LargeDualAxeBossNecklace.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "body_bone_group false root_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/Medved/attachments/MedvedBossLoinClothHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/LoinCloth/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/LoinCloth/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/LoinCloth/LargeDualAxeBossLoinCloth.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/Medved/attachments/MedvedBossWeaponHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/Weapon/rig.amd"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/Weapon/rig.ast"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/Weapon/ExpeditionMedVedBossWeapon.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/SwollenMiller/LargeDualAxeBoss.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/SwollenMiller/LargeDualAxeBoss_armour_5083c9a9.smd"
+Materials 1
+	"Art/Models/MONSTERS/LargeDualAxeBoss/Textures/ExpeditionMedVedBossc.mat" 11
+BoundingBox -93.4194 -33.8998 -191.165 93.4194 24.3676 -0.390469
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/SwollenMiller/LargeDualAxeBoss_armour_5083c9a9.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 11 in the header, 11 in the block · 17722 triangles over 15422 vertices
+  names: 370 bytes said, 370 read  [agree]
+
+=== shapes (16)
+0	belt_meshShape	from 0	count 204
+1	biceps_meshShape	from 204	count 3696
+2	body_meshShape	from 3900	count 14832
+3	briefs_meshShape	from 18732	count 768
+4	face_meshShape	from 19500	count 846
+5	feet_meshShape	from 20346	count 4578
+6	forearm_guards_meshShape	from 24924	count 5988
+7	scarf_meshShape	from 30912	count 3054
+8	shins_meshShape	from 33966	count 5568
+9	shoulderpad_meshShape	from 39534	count 8184
+10	thigh_plates_meshShape	from 47718	count 5448
+11	cape_metal_meshShape	from 53166	count 5340
+12	hood_meshShape	from 58506	count 5526
+13	neclkace_meshShape	from 64032	count 6168
+14	LoinClothShape	from 70200	count 555
+15	ExpeditionMedVedBossWeaponShape	from 70755	count 2184
+
+=== fitting
+the monster's rig: 71 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  MedvedBossCloakHeld.ao  socket chest_jntBnd [in its carrier's rig]  box (-60.9,-39.6,-74)..(57.2,73.8,96.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 3622 triangles over 2994 vertices
+    names: 68 bytes said, 68 read  [agree]
+    rig 25 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 23 of 25  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (12.6,0,-19.7)  carrier has (12.6,1.5,-152.5)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-12.6,0,-19.7)  carrier has (-12.6,1.5,-152.5)
+      3 neck_jntBnd  [shared]  under 0  rests at (0,-11.5,-21)  carrier has (0,-10,-153.8)
+      4 phys_skinned_R_cloth_01_jntBnd  [its own]  under 0  rests at (-27.9,17.3,-15.1)
+      5 phys_skinned_M_cloth_01_jntBnd  [its own]  under 0  rests at (0,17.3,-15.1)
+      6 phys_skinned_L_cloth_01_jntBnd  [its own]  under 0  rests at (27.9,17.3,-15.1)
+      7 phys_croissant_jntBnd  [its own]  under 0  rests at (0,17.3,-15.1)
+      8 L_shoulder_jntBnd  [shared]  under 1  rests at (28.5,0,-11.5)  carrier has (28.5,1.6,-144.3)
+      9 R_shoulder_jntBnd  [shared]  under 2  rests at (-28.5,0,-11.5)  carrier has (-28.5,1.6,-144.3)
+      10 head_jntBnd  [shared]  under 3  rests at (0,-19.2,-28)  carrier has (0,-17.6,-160.8)
+      11 phys_skinned_R_cloth_02_jntBnd  [its own]  under 4  rests at (-27.9,27.9,9.9)
+      12 phys_skinned_M_cloth_02_jntBnd  [its own]  under 5  rests at (0,27.9,9.9)
+      13 phys_skinned_L_cloth_02_jntBnd  [its own]  under 6  rests at (27.9,27.9,9.9)
+      14 phys_hood_jntBnd  [its own]  under 10  rests at (0.4,-1.5,-63)
+      15 phys_skinned_R_cloth_03_jntBnd  [its own]  under 11  rests at (-27.9,38.6,34.9)
+      16 phys_skinned_M_cloth_03_jntBnd  [its own]  under 12  rests at (0,38.6,34.9)
+      17 phys_skinned_L_cloth_03_jntBnd  [its own]  under 13  rests at (27.9,38.6,34.9)
+      18 phys_skinned_R_cloth_04_jntBnd  [its own]  under 15  rests at (-27.9,49.2,59.8)
+      19 phys_skinned_M_cloth_04_jntBnd  [its own]  under 16  rests at (0,49.2,59.8)
+      20 phys_skinned_L_cloth_04_jntBnd  [its own]  under 17  rests at (27.9,49.2,59.8)
+      21 phys_skinned_R_cloth_05_jntBnd  [its own]  under 18  rests at (-27.9,59.9,84.8)
+      22 phys_skinned_M_cloth_05_jntBnd  [its own]  under 19  rests at (0,59.9,84.8)
+      23 phys_skinned_L_cloth_05_jntBnd  [its own]  under 20  rests at (27.9,59.9,84.8)
+      24 aux_animation_control_ratio  [its own]  under 0  rests at (0,0,0)
+  MedvedBossNecklaceHeld.ao  socket chest_jntBnd [in its carrier's rig]  box (-19.9,-35.5,-20)..(19.9,-18.4,13.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 2056 triangles over 2664 vertices
+    names: 36 bytes said, 36 read  [agree]
+    rig 6 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 5 of 6  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (12.6,-0,-19.7)  carrier has (12.6,1.5,-152.5)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-12.6,-0,-19.7)  carrier has (-12.6,1.5,-152.5)
+      3 phys_croissant_jntBnd  [its own]  under 0  rests at (1.2,-28.3,3.7)
+      4 L_shoulder_jntBnd  [shared]  under 1  rests at (28.5,0,-11.5)  carrier has (28.5,1.6,-144.3)
+      5 R_shoulder_jntBnd  [shared]  under 2  rests at (-28.5,0,-11.5)  carrier has (-28.5,1.6,-144.3)
+  MedvedBossLoinClothHeld.ao  socket hip_jntBnd [in its carrier's rig]  box (-25.6,-30,-4.3)..(25.3,-11.8,46.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 185 triangles over 116 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 8 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_R_cloth_01_jntBnd  [its own]  under 0  rests at (-7.7,-18.3,11.4)
+      2 phys_skinned_L_cloth_01_jntBnd  [its own]  under 0  rests at (7.7,-18.3,11.4)
+      3 phys_skinned_R_cloth_02_jntBnd  [its own]  under 1  rests at (-7.7,-16.6,26)
+      4 phys_skinned_L_cloth_02_jntBnd  [its own]  under 2  rests at (7.7,-16.6,26)
+      5 phys_skinned_R_cloth_03_jntBnd  [its own]  under 3  rests at (-7.7,-14.8,40.5)
+      6 phys_skinned_L_cloth_03_jntBnd  [its own]  under 4  rests at (7.7,-14.8,40.5)
+      7 aux_animation_control_ratio  [its own]  under 0  rests at (0,0,0)
+  MedvedBossWeaponHeld.ao  socket R_Weapon [in its carrier's rig]  box (-40.4,-5.1,-79.3)..(13.3,5.1,29.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23D · stride 36
+    shapes 1 in the header, 1 in the block · 728 triangles over 653 vertices
+    names: 62 bytes said, 62 read  [agree]
+    rig 18 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 18  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 root_02  [its own]  under 0  rests at (0,-2,0)
+      2 blade_base  [its own]  under 0  rests at (-29.4,0,14)
+      3 mid_base  [its own]  under 0  rests at (-3.9,0,-58.4)
+      4 handle_base  [its own]  under 0  rests at (-3.3,0,-62.7)
+      5 blade_cyl  [its own]  under 2  rests at (-35.2,0,15.2)
+      6 blade_mid_1  [its own]  under 2  rests at (-33,0,-4.1)
+      7 mid_end  [its own]  under 3  rests at (-3.9,0,-61.4)
+      8 handle_mid_1  [its own]  under 4  rests at (-4.2,0,-44.3)
+      9 blade_mid_2  [its own]  under 6  rests at (-35.3,0,-22.5)
+      10 handle_mid_2  [its own]  under 8  rests at (-3.9,0,-26)
+      11 blade_mid_3  [its own]  under 9  rests at (-36.2,0,-41)
+      12 handle_mid_3  [its own]  under 10  rests at (-1.8,0,-7.7)
+      13 blade_mid_4  [its own]  under 11  rests at (-35.9,0,-59.5)
+      14 handle_mid_4  [its own]  under 12  rests at (-0.4,0,10.6)
+      15 blade_tip  [its own]  under 13  rests at (-34.2,0,-78.7)
+      16 handle_end  [its own]  under 14  rests at (-3.2,0,28.7)
+      17 handle_cyl  [its own]  under 16  rests at (-8.7,0,27.8)
+  MedvedBossWeaponHeld.ao  socket L_Weapon [in its carrier's rig]  box (-40.4,-5.1,-79.3)..(13.3,5.1,29.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23D · stride 36
+    shapes 1 in the header, 1 in the block · 728 triangles over 653 vertices
+    names: 62 bytes said, 62 read  [agree]
+    rig 18 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 18  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 root_02  [its own]  under 0  rests at (0,-2,0)
+      2 blade_base  [its own]  under 0  rests at (-29.4,0,14)
+      3 mid_base  [its own]  under 0  rests at (-3.9,0,-58.4)
+      4 handle_base  [its own]  under 0  rests at (-3.3,0,-62.7)
+      5 blade_cyl  [its own]  under 2  rests at (-35.2,0,15.2)
+      6 blade_mid_1  [its own]  under 2  rests at (-33,0,-4.1)
+      7 mid_end  [its own]  under 3  rests at (-3.9,0,-61.4)
+      8 handle_mid_1  [its own]  under 4  rests at (-4.2,0,-44.3)
+      9 blade_mid_2  [its own]  under 6  rests at (-35.3,0,-22.5)
+      10 handle_mid_2  [its own]  under 8  rests at (-3.9,0,-26)
+      11 blade_mid_3  [its own]  under 9  rests at (-36.2,0,-41)
+      12 handle_mid_3  [its own]  under 10  rests at (-1.8,0,-7.7)
+      13 blade_mid_4  [its own]  under 11  rests at (-35.9,0,-59.5)
+      14 handle_mid_4  [its own]  under 12  rests at (-0.4,0,10.6)
+      15 blade_tip  [its own]  under 13  rests at (-34.2,0,-78.7)
+      16 handle_end  [its own]  under 14  rests at (-3.2,0,28.7)
+      17 handle_cyl  [its own]  under 16  rests at (-8.7,0,27.8)

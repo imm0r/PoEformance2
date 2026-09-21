@@ -1,0 +1,2050 @@
+monster: Igrulog, the Incubator Queen [Metadata/Monsters/LeagueAbyss/Pit/PrimordialMonster/MonolithicSlug_]
+
+=== .ao Metadata/Monsters/LeagueAbyss/Pit/PrimordialMonster/MonolithicSlug.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/PrimordialMonsters/PrimordialMonster1/Animations/MonolithSlug/rig.amd"
+	animations = '[
+		{
+			"name": "discharge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						-37.238548278808597,
+						0.5021016597747803,
+						-13.13443660736084
+					],
+					"contact_ref": [
+						-74.12332153320313,
+						0.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						-29.58378028869629,
+						34.564945220947269,
+						-10.993669509887696
+					],
+					"contact_ref": [
+						-85.25609588623047,
+						29.096065521240236,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						-22.354393005371095,
+						48.82866668701172,
+						-10.544837951660157
+					],
+					"contact_ref": [
+						-73.3963394165039,
+						56.86614227294922,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						-18.854524612426759,
+						59.50948715209961,
+						-8.687442779541016
+					],
+					"contact_ref": [
+						-53.03081130981445,
+						72.72068786621094,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						-9.005358695983887,
+						80.60498046875,
+						-6.4876251220703129
+					],
+					"contact_ref": [
+						-46.87682342529297,
+						102.45750427246094,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						0.9417495727539063,
+						96.03218078613281,
+						-7.0404510498046879
+					],
+					"contact_ref": [
+						-25.233779907226564,
+						131.32733154296876,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						11.790271759033204,
+						126.07282257080078,
+						-14.812084197998047
+					],
+					"contact_ref": [
+						21.67786407470703,
+						151.934326171875,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						18.596542358398439,
+						99.3572998046875,
+						-6.435600280761719
+					],
+					"contact_ref": [
+						56.04090881347656,
+						129.72776794433595,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						20.685380935668947,
+						77.70729064941406,
+						-5.189964294433594
+					],
+					"contact_ref": [
+						55.16264343261719,
+						94.32184600830078,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						22.936264038085939,
+						69.9109115600586,
+						-4.563407897949219
+					],
+					"contact_ref": [
+						61.99137878417969,
+						74.22565460205078,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						22.700756072998048,
+						54.16197204589844,
+						-9.56784439086914
+					],
+					"contact_ref": [
+						59.28504180908203,
+						59.159732818603519,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						24.146968841552736,
+						41.95225524902344,
+						-8.222434997558594
+					],
+					"contact_ref": [
+						60.6454963684082,
+						43.03417205810547,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						26.060733795166017,
+						31.095348358154298,
+						-11.038695335388184
+					],
+					"contact_ref": [
+						60.819122314453128,
+						32.79045486450195,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						37.09254837036133,
+						15.698982238769532,
+						-12.373008728027344
+					],
+					"contact_ref": [
+						64.79315185546875,
+						14.930468559265137,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						38.35665512084961,
+						-3.384706497192383,
+						-12.187200546264649
+					],
+					"contact_ref": [
+						61.65697479248047,
+						-15.71133041381836,
+						9.30010986328125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						43.52202606201172,
+						-23.414072036743165,
+						-14.634125709533692
+					],
+					"contact_ref": [
+						59.47940444946289,
+						-22.733089447021486,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769121527671814,
+					"name": "contact",
+					"position": [
+						47.235660552978519,
+						-53.34630584716797,
+						-20.43988800048828
+					],
+					"contact_ref": [
+						75.99104309082031,
+						-63.18683624267578,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7709901332855225,
+					"name": "contact",
+					"position": [
+						-39.23273468017578,
+						-14.40402889251709,
+						-16.096424102783204
+					],
+					"contact_ref": [
+						-76.50206756591797,
+						-21.319782257080079,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						0.0,
+						30.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "release_fireflies_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.5298001766204835,
+					"name": "contact",
+					"position": [
+						0.0,
+						-12.379533767700196,
+						-63.65286636352539
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5298001766204835,
+					"name": "contact",
+					"position": [
+						0.0,
+						-12.379533767700196,
+						-63.65286636352539
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5298001766204835,
+					"name": "contact",
+					"position": [
+						0.0,
+						-12.379533767700196,
+						-63.65286636352539
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6020056009292603,
+					"name": "contact",
+					"position": [
+						0.0,
+						-22.815143585205079,
+						-77.78105163574219
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6020056009292603,
+					"name": "contact",
+					"position": [
+						0.0,
+						-22.815143585205079,
+						-77.78105163574219
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6020056009292603,
+					"name": "contact",
+					"position": [
+						0.0,
+						-22.815143585205079,
+						-77.78105163574219
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.651106595993042,
+					"name": "contact",
+					"position": [
+						0.0,
+						-45.05913543701172,
+						-89.41175842285156
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.651106595993042,
+					"name": "contact",
+					"position": [
+						0.0,
+						-45.05913543701172,
+						-89.41175842285156
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.651106595993042,
+					"name": "contact",
+					"position": [
+						0.0,
+						-45.05913543701172,
+						-89.41175842285156
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7262003421783448,
+					"name": "contact",
+					"position": [
+						0.0,
+						-66.72600555419922,
+						-106.40203857421875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7262003421783448,
+					"name": "contact",
+					"position": [
+						0.0,
+						-66.72600555419922,
+						-106.40203857421875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7262003421783448,
+					"name": "contact",
+					"position": [
+						0.0,
+						-66.72600555419922,
+						-106.40203857421875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8186233043670655,
+					"name": "contact",
+					"position": [
+						0.0,
+						-66.72600555419922,
+						-106.40203857421875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8186233043670655,
+					"name": "contact",
+					"position": [
+						0.0,
+						-66.72600555419922,
+						-106.40203857421875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8186233043670655,
+					"name": "contact",
+					"position": [
+						0.0,
+						-66.72600555419922,
+						-106.40203857421875
+					]
+				}
+			]
+		}
+	]'
+
+	anim_driven_subobject = "L_leg_01_jntBnd_3 1 5 50.0 50.0 100.0 0 0.0 0 none"
+	anim_driven_subobject = "R_leg_01_jntBnd_3 1 5 50.0 50.0 100.0 0 0.0 0 none"
+	anim_driven_subobject = "tail_jntBnd_1 1 12 50.0 50.0 100.0 0 0.0 0 none"
+	anim_driven_subobject = "tail_jntBnd_11 1 4 50.0 50.0 100.0 0 0.0 4 tail_jntBnd_7"
+	anim_driven_subobject = "tail_jntBnd_7 1 7 50.0 50.0 100.0 0 0.0 4 tail_jntBnd_1"
+}
+
+Locators
+{
+	locator = "firefly_spawner1 11.4037 -43.0646 -62.9928 -0.102974 -0.333358 0"
+	locator = "firefly_spawner2 -8.40785 -42.7517 -54.5511 0.102974 -0.514872 0"
+	locator = "firefly_spawner3 5.73278 -43.7451 -39.1457 -0.155334 0 0"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "halo_01 Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_pit_01.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.39664798974990847,
+								0.0
+							],
+							[
+								0.46927401423454287,
+								1.0
+							]
+						],
+						"width": 92.48600006103516,
+						"angle": 0.5235990285873413,
+						"length": 242.77499389648438,
+						"impact_type": "Slash",
+						"impact_bone": "L_upper_finger_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4189940094947815,
+								0.0
+							],
+							[
+								0.519553005695343,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"width": 34.68199920654297,
+						"angle": 1.4137200117111207,
+						"length": 202.31199645996095,
+						"impact_z_rotation": [
+							-0.6981319785118103,
+							-1.309000015258789
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_upper_finger_jntBnd"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/PrimordialMonsters/PrimordialMonster1/Animations/MonolithSlug/rig.ast"
+		socket = "halo_01"
+			parent = "head_jntBnd"
+			scale = "0.5 0.5 0.5"
+			translation = "0 0 -50"
+			ignore_parent_rotation = "yawpitchroll"
+		linear_allowed_contraction = 0.100
+		bend_stiffness = 300.000
+		bend_allowed_angle = 0.250
+		normal_viscosity_multiplier = 0.400
+		tangent_viscosity_multiplier = 0.350
+		enclosure_angle = 0.250
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/PrimordialMonsters/PrimordialMonster1/PrimordialMonsters1.sm"
+			PrimordialMonsters1_DoubleShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssPrimordialMonsters1Wings.mat:0"
+			PrimordialMonsters1_OpaqueShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssPrimordialMonsters1.mat:0"
+		skin = "Art/Models/MONSTERS/PrimordialMonsters/PrimordialMonster1/PrimordialMonsters1Phys.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_upper_elbow_jntBnd R_upper_shoulder_jntBnd R_upper_clavicle_jntBnd shoulder_blades_jntBnd L_upper_clavicle_jntBnd L_upper_shoulder_jntBnd L_upper_elbow_jntBnd"
+		bone_group = "FX_L_Trail false aux_L_upper_wrist L_upper_wrist_jntBnd L_upper_elbow_jntBnd"
+		bone_group = "FX_R_Trail false aux_R_upper_wrist R_upper_wrist_jntBnd R_upper_elbow_jntBnd"
+		bone_group = "FX_Feet_L false aux_L_leg_01_end aux_L_leg_02_end aux_L_leg_03_end aux_L_leg_04_end aux_L_leg_05_end aux_L_leg_06_end aux_L_leg_07_end aux_L_leg_08_end aux_L_leg_09_end aux_L_leg_10_end"
+		bone_group = "FX_Feet_R false aux_R_leg_01_end aux_R_leg_02_end aux_R_leg_03_end aux_R_leg_04_end aux_R_leg_05_end aux_R_leg_07_end aux_R_leg_08_end aux_R_leg_09_end aux_R_leg_10_end"
+		bone_group = "FX_Tail false aux_tail_end tail_jntBnd_11 tail_jntBnd_10 tail_jntBnd_9 tail_jntBnd_8 tail_jntBnd_7 tail_jntBnd_6 tail_jntBnd_5 tail_jntBnd_4 tail_jntBnd_3 tail_jntBnd_2 tail_jntBnd_1"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "abyss_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/EmergeA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/EmergeRumble",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementRumbleShort",
+						"bone_name": "belly_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45680999755859377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_lower_wrist_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5686264634132385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_lower_wrist_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0506700277328492,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementRumbleShort",
+						"bone_name": "belly_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3186700344085694,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5470799207687379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6384401321411133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_lower_wrist_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8668501377105713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.140939950942993,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4485199451446535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementRumbleShort",
+						"bone_name": "belly_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.533799886703491,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.870896100997925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/EmergeB",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2981998920440676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.02800989151001,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.208191394805908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementLong"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Attack1",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementCreak",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29233500361442568,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/FeetMoveMed",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3348706364631653,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Effects/Attack01",
+						"bone_name": "phys_skinned_L_wing_01_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4960489869117737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Arm01Swoosh",
+						"bone_name": "L_upper_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8561800122261047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0680952072143555,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementRumbleShort",
+						"bone_name": "belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1799099445343018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5004500150680543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.796489953994751,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Attack2",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementCreak",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19006001949310304,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2729269862174988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/FeetMoveMed",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4743920564651489,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Effects/Attack02",
+						"bone_name": "phys_skinned_L_wing_01_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5892477631568909,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Arm01Swoosh",
+						"bone_name": "R_upper_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7704700231552124,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.841313362121582,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementRumbleShort",
+						"bone_name": "belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8708258271217346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9754499793052673,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1749815940856934,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.524940013885498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7262099981307984,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8710299730300904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Death",
+						"bone_name": "phys_skinned_L_branch_01_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementCreak"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09743998944759369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5742768049240112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/DeathMove",
+						"bone_name": "shoulder_blades_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7197700142860413,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7498453259468079,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/DeathDrop",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4681199789047242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "discharge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Attack1",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementCreak"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Effects/Discharge/Discharge_ChargeUp",
+						"bone_name": "belly_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10711699724197388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Discharge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18782100081443788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Arm03Swoosh",
+						"bone_name": "shoulder_blades_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32428500056266787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/FeetMoveMed",
+						"bone_name": "shoulder_blades_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7992200255393982,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.623642921447754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Screech",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7724844217300416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Effects/DischargeExplode",
+						"bone_name": "belly_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03312377259135246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06993000209331513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/FlinchMove",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03312377259135246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06993000209331513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/FlinchMove",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03312377259135246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06993000209331513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/FlinchMove",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03312377259135246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06993000209331513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/FlinchMove",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/CalmFeet",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/ArmIdling",
+						"bone_name": "shoulder_blades_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Idle.loop.ogg",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7649999856948853,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3264458179473878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1983835697174074,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6888813972473146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.858030080795288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0601999759674074,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6329898834228517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.964670181274414,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.247570037841797,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.132693767547607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_R_leg_01_end"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/KnockdownA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementLong",
+						"bone_name": "belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.044929999858140948,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.752369999885559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7773300409317017,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementLong",
+						"bone_name": "belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7850756645202637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/KnockdownB",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9605600833892824,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementLong",
+						"bone_name": "belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4822800159454347,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.233650207519531,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort"
+					}
+				]
+			},
+			{
+				"name": "release_fireflies_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementLong"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Fireflies",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14358499646186829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/ReleaseFireflies"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17823000252246858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementCreak"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1932055503129959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Effects/Fireflies/FirefliesChargeUp",
+						"bone_name": "belly_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2832280099391937,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Arm03Swoosh",
+						"bone_name": "L_upper_finger_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28453999757766726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32566699385643008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Arm03Swoosh",
+						"bone_name": "R_upper_finger_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5109000205993652,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7684100270271301,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7719740271568298,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/FeetMoveShort",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8374700546264649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0233700275421144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.202939987182617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/Footsteps",
+						"bone_name": "aux_L_leg_01_end"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/ArmRunning",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Vocals/Run.loop.ogg",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/ErraticFeet",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementRumble",
+						"bone_name": "belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.273389995098114,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9108200073242188,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.027780055999756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/PrimordialMonster1/Foley/MovementShort"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.3823978900909426,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/EPKs/OnAct_Attack_L.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.3823978900909426,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/EPKs/OnAct_Attack_R.epk"
+					}
+				]
+			},
+			{
+				"name": "discharge_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/EPKs/OnAct_Discharge.epk"
+					}
+				]
+			},
+			{
+				"name": "release_fireflies_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.725576162338257,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/EPKs/OnAct_Buildup_01.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "6 0 0 Smooth 0.217798 0 Flat 0.410123 0.247236 Flat 0.957889 0.673776 Linear 1.17896 0 Flat 2.133 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "6 0 0 Smooth 0.0767019 0.0655612 Flat 0.335365 0.120853 Flat 0.948278 0.847551 Linear 1.17896 0 Flat 2.133 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "discharge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.561211585998535,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "5 0 0 Smooth 0.344942 0 Linear 1.66814 0.594787 Flat 2.1146 1 Flat 2.56121 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "release_fireflies_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5329999923706056,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "5 0 0 Smooth 0.330556 0.0497634 Smooth 1.75508 0.239337 Linear 1.89228 0 Flat 2.533 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "abyss_emerge_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.0,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/onact_emerge.ao",
+						"animation": "once",
+						"offset": [
+							0.0,
+							133.0
+						],
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.8237108588218689,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/deathKickup.ao",
+						"offset": [
+							0.0,
+							67.0
+						],
+						"inherit_scale": true
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.261279433965683,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							38.77841567993164,
+							-100.03764343261719
+						],
+						"height": 6.444679260253906,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.4202021360397339,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							-43.43060302734375,
+							-96.4368896484375
+						],
+						"height": 5.460884094238281,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.9077427387237549,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							38.77841567993164,
+							-100.03764343261719
+						],
+						"height": 6.444679260253906,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0505037307739258,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							-39.289669036865237,
+							-97.38858032226563
+						],
+						"height": 6.283363342285156,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.416835069656372,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							43.18833541870117,
+							-98.11363220214844
+						],
+						"height": 4.340175628662109,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.5973072052001954,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							-39.289669036865237,
+							-97.38858032226563
+						],
+						"height": 6.283363342285156,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.0228984355926515,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							39.16996383666992,
+							-95.64051818847656
+						],
+						"height": 4.781469345092773,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.133338212966919,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							-39.18450164794922,
+							-94.60885620117188
+						],
+						"height": 5.264041900634766,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.5454697608947756,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							42.77452087402344,
+							-98.04720306396485
+						],
+						"height": 4.730613708496094,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.7016985416412355,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							-43.315277099609378,
+							-97.4395751953125
+						],
+						"height": 4.627758026123047,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.148845911026001,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							42.77452087402344,
+							-98.04720306396485
+						],
+						"height": 4.730613708496094,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.288914680480957,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							-39.41398620605469,
+							-94.84033203125
+						],
+						"height": 4.537186622619629,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.7037384510040285,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							42.77452087402344,
+							-98.04720306396485
+						],
+						"height": 4.730613708496094,
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.8195643424987795,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/dustkickup.ao",
+						"animation": "footstep",
+						"offset": [
+							-40.10111618041992,
+							-98.86247253417969
+						],
+						"height": 6.282356262207031,
+						"inherit_scale": true
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "abyss_emerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_groups": [
+							"FX_Feet_L",
+							"FX_Feet_R"
+						]
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.29233500361442568,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_R"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.29233500361442568,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_L"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8467052578926086,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/attack.pet",
+						"bone_group": "grp_l_palm"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2842986285686493,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_L"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3299080431461334,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_R"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7907450199127197,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/attack.pet",
+						"bone_group": "grp_r_palm"
+					}
+				]
+			},
+			{
+				"name": "discharge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_groups": [
+							"FX_Feet_R",
+							"FX_Feet_L"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8391690254211426,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/OnAct_DischargeRelease.pet",
+						"bone_group": "FX_Tail"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_R"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_L"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_R"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_L"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_R"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_L"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_R"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_L"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_R"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_L"
+					}
+				]
+			},
+			{
+				"name": "release_fireflies_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0399184226989747,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_groups": [
+							"FX_Feet_L",
+							"FX_Feet_R"
+						]
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_L"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/FX/dust_legs.pet",
+						"bone_group": "FX_Feet_R"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6037334203720093,
+						"end_time": 0.9851239919662476,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/trl/Attack_Trail.trl",
+						"bone_group": "FX_L_Trail"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6200625896453857,
+						"end_time": 0.9538935422897339,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MonolithicSlug/trl/Attack_Trail.trl",
+						"bone_group": "FX_R_Trail"
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.8012664318084717,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_pit_01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "animate"
+		view_looping = true
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+		socket = "aux_line_01"
+			translation = "0 0 -100"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_line false root aux_line_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "animate",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/fx/halo_pit_01.pet",
+						"bone_group": "FX_line"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/PrimordialMonsters/PrimordialMonster1/PrimordialMonsters1.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/PrimordialMonsters/PrimordialMonster1/rig_f534b87c.smd"
+Materials 2
+	"Art/Models/MONSTERS/PrimordialMonsters/PrimordialMonster1/Textures/PrimordialMonsters1Wingsc.mat" 1
+	"Art/Models/MONSTERS/PrimordialMonsters/PrimordialMonster1/Textures/PrimordialMonsters1c.mat" 1
+BoundingBox -101.978 -50.5121 -214.016 101.978 146.046 -0.871202
+BoneGroups 56
+	"grp_head" 2 "head_jntBnd" "aux_head_end"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "belly_jntBnd" "chest_jntBnd"
+	"grp_l_clavicle" 2 "L_upper_clavicle_jntBnd" "L_upper_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_upper_clavicle_jntBnd" "R_upper_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_upper_shoulder_jntBnd" "L_upper_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_upper_shoulder_jntBnd" "R_upper_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_upper_elbow_jntBnd" "L_upper_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_upper_elbow_jntBnd" "R_upper_wrist_jntBnd"
+	"grp_l_palm" 2 "L_upper_wrist_jntBnd" "aux_L_upper_wrist"
+	"grp_r_palm" 2 "R_upper_wrist_jntBnd" "aux_R_upper_wrist"
+	"grp_l_thigh" 2 "L_leg_01_jntBnd_1" "L_leg_01_jntBnd_2"
+	"grp_r_thigh" 2 "R_leg_01_jntBnd_1" "R_leg_01_jntBnd_2"
+	"grp_l_shin" 2 "L_leg_01_jntBnd_2" "L_leg_01_jntBnd_3"
+	"grp_r_shin" 2 "R_leg_01_jntBnd_2" "R_leg_01_jntBnd_3"
+	"grp_l_foot" 2 "L_leg_01_jntBnd_3" "aux_L_leg_01_end"
+	"grp_r_foot" 2 "R_leg_01_jntBnd_3" "aux_R_leg_01_end"
+	"grp_l_leg_02" 2 "L_leg_02_jntBnd_2" "aux_L_leg_02_end"
+	"grp_r_leg_02" 2 "R_leg_02_jntBnd_2" "aux_R_leg_02_end"
+	"grp_l_leg_03" 2 "L_leg_03_jntBnd_2" "aux_L_leg_03_end"
+	"grp_r_leg_03" 2 "R_leg_03_jntBnd_2" "aux_R_leg_03_end"
+	"grp_l_leg_04" 2 "L_leg_04_jntBnd_2" "aux_L_leg_04_end"
+	"grp_r_leg_04" 2 "R_leg_04_jntBnd_2" "aux_R_leg_04_end"
+	"grp_l_leg_05" 2 "L_leg_05_jntBnd_2" "aux_L_leg_05_end"
+	"grp_r_leg_05" 2 "R_leg_05_jntBnd_2" "aux_R_leg_05_end"
+	"grp_l_leg_06" 2 "L_leg_06_jntBnd_2" "aux_L_leg_06_end"
+	"grp_r_leg_06" 2 "R_leg_06_jntBnd_2" "aux_R_leg_06_end"
+	"grp_l_leg_07" 2 "L_leg_07_jntBnd_2" "aux_L_leg_07_end"
+	"grp_r_leg_07" 2 "R_leg_07_jntBnd_2" "aux_R_leg_07_end"
+	"grp_l_leg_08" 2 "L_leg_08_jntBnd_2" "aux_L_leg_08_end"
+	"grp_r_leg_08" 2 "R_leg_08_jntBnd_2" "aux_R_leg_08_end"
+	"grp_l_leg_09" 2 "L_leg_09_jntBnd_2" "aux_L_leg_09_end"
+	"grp_r_leg_09" 2 "R_leg_09_jntBnd_2" "aux_R_leg_09_end"
+	"grp_l_leg_10" 2 "L_leg_10_jntBnd_2" "aux_L_leg_10_end"
+	"grp_r_leg_10" 2 "R_leg_10_jntBnd_2" "aux_R_leg_10_end"
+	"grp_tail_01" 2 "tail_jntBnd_1" "tail_jntBnd_2"
+	"grp_tail_02" 2 "tail_jntBnd_2" "tail_jntBnd_3"
+	"grp_tail_03" 2 "tail_jntBnd_3" "tail_jntBnd_4"
+	"grp_tail_04" 2 "tail_jntBnd_4" "tail_jntBnd_5"
+	"grp_tail_05" 2 "tail_jntBnd_5" "tail_jntBnd_6"
+	"grp_tail_06" 2 "tail_jntBnd_6" "tail_jntBnd_7"
+	"grp_tail_07" 2 "tail_jntBnd_7" "tail_jntBnd_8"
+	"grp_tail_08" 2 "tail_jntBnd_8" "tail_jntBnd_9"
+	"grp_tail_09" 2 "tail_jntBnd_9" "tail_jntBnd_10"
+	"grp_tail_10" 2 "tail_jntBnd_10" "tail_jntBnd_11"
+	"grp_tail_11" 2 "tail_jntBnd_11" "aux_tail_end"
+	"grp_l_clavicle_2" 2 "L_lower_clavicle_jntBnd" "L_lower_shoulder_jntBnd"
+	"grp_r_clavicle_2" 2 "R_lower_clavicle_jntBnd" "R_lower_shoulder_jntBnd"
+	"grp_l_bicep_2" 2 "L_lower_shoulder_jntBnd" "L_lower_elbow_jntBnd"
+	"grp_r_bicep_2" 2 "R_lower_shoulder_jntBnd" "R_lower_elbow_jntBnd"
+	"grp_l_forearm_2" 2 "L_lower_elbow_jntBnd" "L_lower_wrist_jntBnd"
+	"grp_r_forearm_2" 2 "R_lower_elbow_jntBnd" "R_lower_wrist_jntBnd"
+	"grp_l_palm_2" 2 "L_lower_wrist_jntBnd" "aux_L_lower_wrist_end"
+	"grp_r_palm_2" 2 "R_lower_wrist_jntBnd" "aux_R_lower_wrist_end"
+	"grp_belly" 2 "belly_jntBnd" "aux_belly_end"
+
+=== .smd Art/Models/MONSTERS/PrimordialMonsters/PrimordialMonster1/rig_f534b87c.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 2 in the header, 2 in the block · 16468 triangles over 10548 vertices
+  names: 124 bytes said, 124 read  [agree]
+
+=== shapes (3)
+0	PrimordialMonsters1_DoubleShape	from 0	count 1686
+1	PrimordialMonsters1_OpaqueShape	from 1686	count 47718
+2	export_meshShape	from 49404	count 6
+
+=== fitting
+the monster's rig: 135 bones
+mounts: aux_position, aux_animation_control_ratio, aux_belly_end, aux_L_leg_02_end, aux_R_leg_02_end, aux_L_leg_03_end, aux_R_leg_03_end, aux_L_leg_04_end, aux_R_leg_04_end, aux_L_leg_05_end, aux_R_leg_05_end, aux_L_leg_06_end, aux_R_leg_06_end, aux_L_leg_07_end, aux_R_leg_07_end, aux_L_leg_08_end, aux_R_leg_08_end, aux_L_leg_09_end, aux_R_leg_09_end, aux_L_leg_10_end, aux_R_leg_10_end, aux_L_leg_01_end, aux_R_leg_01_end, aux_head_end, aux_L_lower_wrist_end, aux_R_lower_wrist_end, aux_L_upper_wrist, aux_R_upper_wrist, aux_tail_end
+  halo_pit_01.ao  socket halo_01 [NOT in its carrier's rig]  (no mesh - an effect or a sound)

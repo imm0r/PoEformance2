@@ -1,0 +1,1405 @@
+monster: Lightless Moray [Metadata/Monsters/LeagueAbyss/Lightless/MorayClanCasterSpectre]
+
+=== .ao Metadata/Monsters/LeagueAbyss/Lightless/MorayClanMonster/MorayClanMonster.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SerpentClanMonster/rig.amd"
+	group = "summon_start_01_grp"
+		group_play_in_sequence = true
+		group_entry = "summon_start_01 1"
+		group_entry = "spin_detonate_01 1"
+	animations = '[
+		{
+			"name": "abyss_emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.045393466949463,
+					"name": "halo_emerge"
+				}
+			]
+		},
+		{
+			"name": "spellcast_projectile_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7783690690994263,
+					"name": "contact",
+					"position": [
+						1.648292064666748,
+						-127.31961059570313,
+						-155.1665802001953
+					]
+				}
+			]
+		},
+		{
+			"name": "spin_detonate_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.0,
+					"name": "erupt"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0,
+					"name": "sweep"
+				}
+			]
+		},
+		{
+			"name": "spit_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0149682760238648,
+					"name": "contact",
+					"position": [
+						-0.11695659160614014,
+						-111.7280044555664,
+						-117.50504302978516
+					],
+					"contact_ref": [
+						32.6673698425293,
+						-173.17079162597657,
+						-104.89994812011719
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0149682760238648,
+					"name": "contact",
+					"position": [
+						-0.11695659160614014,
+						-111.7280044555664,
+						-117.50504302978516
+					],
+					"contact_ref": [
+						0.0,
+						-173.17079162597657,
+						-104.89994812011719
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0149682760238648,
+					"name": "contact",
+					"position": [
+						-0.11695659160614014,
+						-111.7280044555664,
+						-117.50504302978516
+					],
+					"contact_ref": [
+						-27.67633628845215,
+						-173.17079162597657,
+						-104.89994812011719
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/LeagueAbyss/Lightless/MorayClanMonster/attachments/MorayClanRobe.ao"
+	attached_object = "halo_01 Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_lightless_01.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.51351398229599,
+								0.0
+							],
+							[
+								0.6102362275123596,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"width": 28.902000427246095,
+						"angle": 1.1344599723815919,
+						"length": 167.6300048828125,
+						"impact_z_rotation": [
+							0.2617993950843811,
+							0.8726646900177002
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.5748031735420227,
+								0.0
+							],
+							[
+								0.6181102395057678,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"width": 52.02299880981445,
+						"angle": 1.1344599723815919,
+						"length": 167.0,
+						"impact_z_rotation": [
+							-0.2617993950843811,
+							-1.0471975803375245
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "tail_whip_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.6377952694892883,
+								0.0
+							],
+							[
+								0.7007874250411987,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.6981319785118103,
+						"angle": 3.1241402626037599,
+						"length": 236.99400329589845,
+						"local_offset": [
+							29.0,
+							13.0
+						],
+						"impact_z_rotation": [
+							0.5235987901687622,
+							3.682645082473755
+						],
+						"impact_type": "Slash",
+						"impact_bone": "tail_jntBnd_7"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.7007874250411987,
+								0.0
+							],
+							[
+								0.7716535329818726,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -3.246309518814087,
+						"angle": 1.5533398389816285,
+						"length": 236.0,
+						"local_offset": [
+							29.0,
+							13.0
+						],
+						"impact_z_rotation": [
+							3.7175514698028566,
+							5.3058013916015629
+						],
+						"impact_type": "Slash",
+						"impact_bone": "tail_jntBnd_7"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SerpentClanMonster/rig.ast"
+		socket = "aux_grd_emerge"
+			parent = "root_jntBnd"
+			translation = "0 185.197 0"
+		socket = "aux_grd_emerge_fwdpt"
+			parent = "root_jntBnd"
+			translation = "0 90 0"
+		socket = "aux_grd_submerge_fwdpt"
+			parent = "root_jntBnd"
+			translation = "0 -222.585 0"
+		socket = "aux_grd_submerge"
+			parent = "root_jntBnd"
+			translation = "0 -121.822 0"
+		socket = "aux_grd_channel"
+			parent = "root_jntBnd"
+			translation = "0 -25.7036 0"
+		socket = "aux_grd_emerge_box1"
+			translation = "-55.9425 169.802 0"
+		socket = "aux_grd_emerge_box2"
+			translation = "47.3608 241.815 -5"
+		socket = "aux_grd_emerge_box3"
+			translation = "47.36 169.8 -5"
+		socket = "aux_grd_submerge_box1"
+			translation = "-55.9425 -133.821 0"
+		socket = "aux_grd_submerge_box2"
+			translation = "47.3608 -68.4588 -5"
+		socket = "aux_grd_submerge_box3"
+			translation = "47.36 -133.82 -5"
+		socket = "halo_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -50"
+			ignore_parent_rotation = "yawpitchroll"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SerpentClanMonster/MorayClan.sm"
+			bodyShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssMorayClanMonster.mat:0"
+			finsShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssMorayClanMonster.mat:0"
+			robe_NoPhysShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssMorayClanMonster.mat:0"
+			hide_segments = "robe_NoPhysShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false L_elbow_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd chest_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd R_elbow_jntBnd"
+		bone_group = "tail_line false aux_tail_jntBnd_end tail_jntBnd_13 tail_jntBnd_12 tail_jntBnd_11"
+		bone_group = "arm_L_fx false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "arm_R_fx false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "palm_L_fx false L_wrist_jntBnd"
+		bone_group = "palm_R_fx false R_wrist_jntBnd"
+		bone_group = "tail false tail_jntBnd_4 tail_jntBnd_5 tail_jntBnd_6 tail_jntBnd_7 tail_jntBnd_8 tail_jntBnd_9 tail_jntBnd_10 tail_jntBnd_11"
+		bone_group = "tail_tip false aux_tail_jntBnd_end tail_jntBnd_13 tail_jntBnd_12 tail_jntBnd_11 tail_jntBnd_10 tail_jntBnd_9 tail_jntBnd_8 tail_jntBnd_7 tail_jntBnd_6 tail_jntBnd_5 tail_jntBnd_4"
+		bone_group = "tail_trail false tail_jntBnd_8"
+		bone_group = "tail_idle false tail_jntBnd_5 tail_jntBnd_6 tail_jntBnd_7"
+		bone_group = "tail_idle_01 false tail_jntBnd_11 tail_jntBnd_12 tail_jntBnd_13 aux_tail_jntBnd_end"
+		bone_group = "tail_trail_01 false tail_jntBnd_8 aux_tail_jntBnd_end"
+		bone_group = "tail_trail_02 false tail_jntBnd_12"
+		bone_group = "tail_trail_03 false aux_tail_jntBnd_end"
+		bone_group = "dir false tail_jntBnd_2 aux_tail_jntBnd_end tail_jntBnd_11"
+		bone_group = "grd_submerge false aux_grd_submerge aux_grd_submerge_fwdpt"
+		bone_group = "grd_emerge false aux_grd_emerge aux_grd_emerge_fwdpt"
+		bone_group = "grd_channel false aux_grd_submerge tail_jntBnd_11"
+		bone_group = "grd_emerge_box false aux_grd_emerge_box1 aux_grd_emerge_box2 aux_grd_emerge_box3"
+		bone_group = "grd_submerge_box false aux_grd_submerge_box1 aux_grd_submerge_box2 aux_grd_submerge_box3"
+		bone_group = "tail_swing false tail_jntBnd_8 tail_jntBnd_9 tail_jntBnd_10 tail_jntBnd_11 tail_jntBnd_12 tail_jntBnd_13 aux_tail_jntBnd_end"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/MorayClan/pet/on_act/emerge_01/box.pet",
+						"bone_group": "grd_emerge_box"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0006629999843426049,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/MorayClan/pet/on_act/emerge_01/fwdline.pet",
+						"bone_group": "grd_emerge"
+					}
+				]
+			},
+			{
+				"name": "spin_detonate_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.3404182195663453,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MorayClanMonster/fx/onact_spin_detonate.pet",
+						"bone_group": "tail_tip"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.4533196687698365,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ShadeForm/FX/Shadeform_end.pet",
+						"bone_group": "frameupper"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.933074474334717,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ShadeForm/FX/TailWhip.pet",
+						"bone_group": "tail_idle_01"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.45633000135421755,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SerpentClanBoss/pets/act_submerge.pet",
+						"bone_group": "grd_submerge"
+					}
+				]
+			},
+			{
+				"name": "tail_whip_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6159200072288513,
+						"end_time": 0.8421170115470886,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/MorayClan/pet/on_act/tail_whip_01/tail_line.pet",
+						"bone_group": "tail_line"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.650416910648346,
+						"end_time": 0.9374383687973023,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MorayClanMonster/fx/melee_swipe.trl",
+						"bone_group": "arm_R_fx"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6928492784500122,
+						"end_time": 1.0432021617889405,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MorayClanMonster/fx/melee_swipe.trl",
+						"bone_group": "arm_R_fx"
+					}
+				]
+			},
+			{
+				"name": "spin_detonate_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.9370532035827638,
+						"end_time": 3.5082437992095949,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ShadeForm/TRL/SpinDetonateTail.trl",
+						"bone_group": "tail_swing"
+					}
+				]
+			},
+			{
+				"name": "tail_whip_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6131439805030823,
+						"end_time": 0.8400629758834839,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/MorayClan/pet/on_act/tail_whip_01/tail_line.trl",
+						"bone_group": "tail_line"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "abyss_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.20687000453472138,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementShort",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5906400084495544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6213410496711731,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementTailShort",
+						"bone_name": "tail_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7105299830436707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7759008407592773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Aggro",
+						"bone_name": "tongue_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementShort",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37429898977279665,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/Swing",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5978299975395203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementShort",
+						"bone_name": "R_finger_1_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementShort",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41372355818748476,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/Swing",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6255999803543091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementShort",
+						"bone_name": "R_finger_1_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementShort",
+						"bone_name": "tail_jntBnd_8"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13255000114440919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.984902560710907,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/FallSmall",
+						"bone_name": "tail_jntBnd_10"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "tail_jntBnd_8"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6199773550033569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4945752620697022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/FallSmall",
+						"bone_name": "tail_jntBnd_10"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementShort",
+						"bone_name": "tail_jntBnd_8"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2820010483264923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3565925061702728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/FallSmall",
+						"bone_name": "tail_jntBnd_10"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.058970000594854358,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.058970000594854358,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.058970000594854358,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.058970000594854358,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/FlinchMovement",
+						"bone_name": "tail_jntBnd_8"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "tail_jntBnd_8",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7662315368652344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/IdleHiss",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0013298988342287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "tail_jntBnd_8",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20725999772548676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7018700242042542,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/FallSmall"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3062392473220826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementTailShort",
+						"bone_name": "tail_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5379899740219117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6581101417541505,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.901284098625183,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.264448642730713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3536593914031984,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0453200340270997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementTailShort",
+						"bone_name": "tail_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.037569999694824,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/Movement.loop.ogg",
+						"bone_name": "tail_jntBnd_8"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Run",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "spellcast_curse_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementTailShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.368149995803833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5137792229652405,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Effects/Abyss/FireballCast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5500015020370483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/Swing",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spellcast_projectile_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_7"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Effects/BloodChargeUp"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20520968735218049,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Effects/Abyss/FireballCast",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5005509853363037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5532439947128296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_7"
+					}
+				]
+			},
+			{
+				"name": "spin_detonate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Effects/Abyss/AbyssSurge",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/TailSwipe",
+						"bone_name": "aux_head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9088090062141419,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1890100240707398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Effects/Abyss/FireballCast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1669576168060304,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Effects/Abyss/AbyssSurge",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2693960666656496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6814348697662355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/TailSwipe",
+						"bone_name": "aux_tongue_end_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8748459815979006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/Swing",
+						"bone_name": "tail_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "spit_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1248694583773613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/Spit",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.830560028553009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Effects/Spit",
+						"bone_name": "neck_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "tail_whip_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Vocals/TailSwipe",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2329633235931397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Effects/TailSwipe",
+						"bone_name": "tail_jntBnd_13"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2983100414276124,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Effects/TailSwipeSand",
+						"bone_name": "tail_jntBnd_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.792739987373352,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/MorayClanMonster/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.21171599626541139,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/MorayClan/on_act/death_01/grd_impact.ao",
+						"offset": [
+							-48.3942985534668,
+							40.27629852294922
+						],
+						"min_orientation": -3.141590118408203,
+						"max_orientation": 3.141590118408203
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.6266094446182251,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/MorayClan/on_act/death_01/grd_impact.ao",
+						"offset": [
+							-48.3942985534668,
+							40.27629852294922
+						],
+						"min_orientation": -3.141590118408203,
+						"max_orientation": 3.141590118408203
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MorayClanMonster/epk/R_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MorayClanMonster/epk/R_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "spellcast_curse_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.26852893829345705,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ShadeForm/EPKs/Shade_02_Start.epk"
+					}
+				]
+			},
+			{
+				"name": "spellcast_projectile_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/MorayClanMonster/epk/L_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "spin_detonate_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 2.8292577266693117,
+						"end_time": 4.166858196258545,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ShadeForm/EPKs/TailSwing.epk"
+					}
+				]
+			},
+			{
+				"name": "summon_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.18142235279083253,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ShadeForm/EPKs/Shade_02_Start.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.2660000324249268,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Linear 0.287936 0 Flat 0.656967 1 Linear 0.834917 1 Linear 1.0214 0 Flat 1.266 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.2660000324249268,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Linear 0.287936 0 Flat 0.656967 1 Linear 0.834917 1 Linear 1.0214 0 Flat 1.266 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.600000023841858,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1.6 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "spellcast_curse_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.460091233253479,
+						"end_time": 1.4999998807907105,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "2 0.460091 0 Smooth 1.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "spellcast_projectile_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "surgeTime_L",
+						"curve": "6 0 0 Linear 0.245462 0 Flat 0.778397 1 Linear 0.989238 1 Linear 1.21019 0 Flat 1.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "spin_detonate_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3852267265319826,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 1.01921 1 Flat 2.38523 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "summon_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.1885848343372345,
+						"end_time": 0.9999998807907105,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "2 0.188585 0 Smooth 1 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Lightless/MorayClanMonster/attachments/MorayClanRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SerpentClanMonster/attachments/MorayClanRobe.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SerpentClanMonster/attachments/MorayClanRobe.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SerpentClanMonster/attachments/MorayClanRobe.sm"
+			robeShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssMorayClanMonster.mat:0"
+	}
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_lightless_01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "animate"
+		view_looping = true
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+		socket = "aux_line_01"
+			translation = "0 0 -100"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_line false root aux_line_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "animate",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/fx/halo_lightless_01.pet",
+						"bone_group": "FX_line"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/SerpentClanMonster/MorayClan.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/SerpentClanMonster/MorayClan_armour_f168d406.smd"
+Materials 1
+	"Art/Models/MONSTERS/SerpentClanMonster/Textures/MorayClanc.mat" 3
+BoundingBox -93.5664 -32.4705 -214.845 93.5664 47.3277 261.473
+BoneGroups 13
+	"grp_head" 2 "jaw_jntBnd" "head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_tail" 14 "tail_jntBnd_1" "tail_jntBnd_2" "tail_jntBnd_3" "tail_jntBnd_4" "tail_jntBnd_5" "tail_jntBnd_6" "tail_jntBnd_7" "tail_jntBnd_8" "tail_jntBnd_9" "tail_jntBnd_10" "tail_jntBnd_11" "tail_jntBnd_12" "tail_jntBnd_13" "aux_tail_jntBnd_end"
+
+=== .smd Art/Models/MONSTERS/SerpentClanMonster/MorayClan_armour_f168d406.smd
+  version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 3 in the header, 3 in the block · 6924 triangles over 5011 vertices
+  names: 68 bytes said, 68 read  [agree]
+
+=== shapes (4)
+0	bodyShape	from 0	count 19578
+1	finsShape	from 19578	count 504
+2	robe_NoPhysShape	from 20082	count 690
+3	robeShape	from 20772	count 690
+
+=== fitting
+the monster's rig: 57 bones
+mounts: aux_position, aux_head_jntBnd, aux_tongue_end_jntBnd, aux_tail_jntBnd_end
+  MorayClanRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-35.9,-29.6,-11)..(34.9,31,118.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 230 triangles over 154 vertices
+    names: 18 bytes said, 18 read  [agree]
+    rig 34 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 31 of 34  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L_front_jntBnd_1  [its own]  under 0  rests at (10.1,-21,21)
+      2 phys_skinned_L_front_side_jntBnd_1  [its own]  under 0  rests at (23.7,-9.2,14.6)
+      3 phys_skinned_L_back_side_jntBnd_1  [its own]  under 0  rests at (24,7.3,8.9)
+      4 phys_skinned_L_back_jntBnd_1  [its own]  under 0  rests at (10.2,19.2,5.3)
+      5 phys_skinned_R_front_jntBnd_1  [its own]  under 0  rests at (-10.1,-21,21)
+      6 phys_skinned_R_front_side_jntBnd_1  [its own]  under 0  rests at (-23.7,-9.2,14.6)
+      7 phys_skinned_R_back_side_jntBnd_1  [its own]  under 0  rests at (-24,7.3,8.9)
+      8 phys_skinned_R_back_jntBnd_1  [its own]  under 0  rests at (-10.2,19.2,5.3)
+      9 phys_skinned_front_jntBnd  [its own]  under 0  rests at (-0.1,-25.2,97.5)
+      10 phys_skinned_L_front_jntBnd_2  [its own]  under 1  rests at (10.9,-20.4,37.4)
+      11 phys_skinned_L_front_side_jntBnd_2  [its own]  under 2  rests at (25,-8.3,34.4)
+      12 phys_skinned_L_back_side_jntBnd_2  [its own]  under 3  rests at (24.8,8.5,30.3)
+      13 phys_skinned_L_back_jntBnd_2  [its own]  under 4  rests at (10.1,21.1,27.6)
+      14 phys_skinned_R_front_jntBnd_2  [its own]  under 5  rests at (-10.9,-20.4,37.4)
+      15 phys_skinned_R_front_side_jntBnd_2  [its own]  under 6  rests at (-25,-8.3,34.4)
+      16 phys_skinned_R_back_side_jntBnd_2  [its own]  under 7  rests at (-24.8,8.5,30.3)
+      17 phys_skinned_R_back_jntBnd_2  [its own]  under 8  rests at (-10.1,21.1,27.6)
+      18 phys_skinned_L_front_jntBnd_3  [its own]  under 10  rests at (10.9,-20,59.4)
+      19 phys_skinned_L_front_side_jntBnd_3  [its own]  under 11  rests at (25.5,-7.6,57.5)
+      20 phys_skinned_L_back_side_jntBnd_3  [its own]  under 12  rests at (25,10,55.4)
+      21 phys_skinned_L_back_jntBnd_3  [its own]  under 13  rests at (10.3,22.4,54.3)
+      22 phys_skinned_R_front_jntBnd_3  [its own]  under 14  rests at (-10.9,-20,59.4)
+      23 phys_skinned_R_front_side_jntBnd_3  [its own]  under 15  rests at (-25.5,-7.6,57.5)
+      24 phys_skinned_R_back_side_jntBnd_3  [its own]  under 16  rests at (-25,10,55.4)
+      25 phys_skinned_R_back_jntBnd_3  [its own]  under 17  rests at (-10.3,22.4,54.3)
+      26 phys_skinned_L_front_jntBnd_4  [its own]  under 18  rests at (10.6,-20.7,81.3)
+      27 phys_skinned_L_front_side_jntBnd_4  [its own]  under 19  rests at (24.9,-8.6,80.8)
+      28 phys_skinned_L_back_side_jntBnd_4  [its own]  under 20  rests at (24.9,9.7,80.3)
+      29 phys_skinned_R_front_jntBnd_4  [its own]  under 22  rests at (-10.6,-20.7,81.3)
+      30 phys_skinned_R_front_side_jntBnd_4  [its own]  under 23  rests at (-24.9,-8.6,80.8)
+      31 phys_skinned_R_back_side_jntBnd_4  [its own]  under 24  rests at (-24.9,9.7,80.3)
+      32 phys_skinned_L_front_side_jntBnd_5  [its own]  under 27  rests at (26.3,-9.5,105.6)
+      33 phys_skinned_R_front_side_jntBnd_5  [its own]  under 30  rests at (-26.3,-9.5,105.6)
+  halo_lightless_01.ao  socket halo_01 [NOT in its carrier's rig]  (no mesh - an effect or a sound)

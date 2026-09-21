@@ -1,0 +1,1693 @@
+monster: Blackblooded Elite [Metadata/Monsters/LeagueAbyss/Blackblood/PaleElitePinnacle]
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/PaleElite/HellscapePaleElite1.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/rig.amd"
+	animations = '[
+		{
+			"name": "abyss_emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6862487196922302,
+					"name": "halo_appear"
+				}
+			]
+		},
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.8052157759666443,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9612947106361389,
+					"name": "contact",
+					"position": [
+						-19.981515884399415,
+						-78.76309204101563,
+						-170.07839965820313
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.818915843963623,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0375163555145264,
+					"name": "contact",
+					"position": [
+						13.466861724853516,
+						-78.70829772949219,
+						-168.76100158691407
+					]
+				}
+			]
+		},
+		{
+			"name": "beam_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.3492141962051392,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6017606258392335,
+					"name": "contact",
+					"position": [
+						0.0,
+						-66.41649627685547,
+						-130.09996032714845
+					],
+					"contact_ref": [
+						0.0,
+						-400.0,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "beam_long_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.6447440385818482,
+					"name": "start_target_update",
+					"data": "30 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.644743800163269,
+					"name": "contact"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.6457440853118897,
+					"end_time": 3.597928047180176,
+					"name": "start_target_update",
+					"data": "15 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.787626028060913,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9173836708068848,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.055464744567871,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.197805404663086,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.317744016647339,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4483327865600588,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.557624101638794,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6799161434173586,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.8501765727996828,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.948746681213379,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.056279182434082,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.1906940937042238,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.2753307819366457,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.387342929840088,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.25999999046325686,
+					"name": "move",
+					"position": [
+						105.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.2580842673778534,
+					"name": "move",
+					"position": [
+						-105.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "emerge_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.081554889678955,
+					"name": "emerged"
+				}
+			]
+		},
+		{
+			"name": "teleport_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.25999999046325686,
+					"name": "teleport_out"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.37727999687194826,
+					"name": "teleport_in"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "halo_01 Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_blackblood_01.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/rig.ast"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 -1.6974 -8.67004"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -12.2104 -8.67004"
+		socket = "halo_01"
+			parent = "head_jntBnd"
+			translation = "0 -10 -60"
+			ignore_parent_rotation = "yawpitch"
+		linear_stiffness = 10000.000
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		enclosure_angle = 0.700
+		animation_velocity_factor = 5.000
+		animation_force_factor = 5.000
+		gravity = 800.000
+		use_shock_propagation = false
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/FleshPaleMysteriousSpellcasterDemonPhysics.sm"
+			FleshPaleMysteriousSpellcasterDemonShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssHellscapePaleElite1.mat:0"
+	}
+
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd aux_target_head_01"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_wrist_01 false L_upper_wrist_jntBnd L_upper_elbow_jntBnd"
+		bone_group = "grp_R_wrist_01 false R_upper_wrist_jntBnd R_upper_elbow_jntBnd"
+		bone_group = "grp_L_hand_01 false L_upper_finger_2_jntBnd_1 L_upper_wrist_jntBnd"
+		bone_group = "grp_R_hand_01 false R_upper_finger_2_jntBnd_1 R_upper_wrist_jntBnd"
+		bone_group = "grp_L_wrist_02 false L_mid_wrist_jntBnd L_mid_elbow_jntBnd"
+		bone_group = "grp_R_wrist_02 false R_mid_wrist_jntBnd R_mid_elbow_jntBnd"
+		bone_group = "grp_L_hand_02 false L_mid_finger_2_jntBnd_1 L_mid_wrist_jntBnd"
+		bone_group = "grp_R_hand_02 false R_mid_finger_2_jntBnd_1 R_mid_wrist_jntBnd"
+		bone_group = "grp_L_wrist_03 false L_lower_wrist_jntBnd L_lower_elbow_jntBnd"
+		bone_group = "grp_R_wrist_03 false R_lower_wrist_jntBnd R_lower_elbow_jntBnd"
+		bone_group = "grp_L_hand_03 false L_lower_finger_2_jntBnd_1 L_lower_wrist_jntBnd"
+		bone_group = "grp_R_hand_03 false R_lower_finger_2_jntBnd_1 R_lower_wrist_jntBnd"
+		bone_group = "grp_L_wing_01_01 false phys_tri_L_fleshcape_01_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_wing_01_01 false phys_tri_R_fleshcape_01_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_wing_01_02 false phys_tri_L_fleshcape_02_jntBnd phys_tri_L_fleshcape_01_jntBnd"
+		bone_group = "grp_R_wing_01_02 false phys_tri_R_fleshcape_02_jntBnd phys_tri_R_fleshcape_01_jntBnd"
+		bone_group = "grp_L_wing_01_03 false phys_tri_L_fleshcape_03_jntBnd phys_tri_L_fleshcape_02_jntBnd"
+		bone_group = "grp_R_wing_01_03 false phys_tri_R_fleshcape_03_jntBnd phys_tri_R_fleshcape_02_jntBnd"
+		bone_group = "grp_L_wing_01_04 false phys_tri_L_fleshcape_04_jntBnd phys_tri_L_fleshcape_03_jntBnd"
+		bone_group = "grp_R_wing_01_04 false phys_tri_R_fleshcape_04_jntBnd phys_tri_R_fleshcape_03_jntBnd"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_L_knee false L_knee_jntBnd L_thigh_jntBnd"
+		bone_group = "grp_R_knee false R_knee_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false phys_tri_R_fleshcape_01_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd phys_tri_L_fleshcape_01_jntBnd"
+		bone_group = "L_lightning_01 false L_upper_elbow_jntBnd chest_jntBnd"
+		bone_group = "L_lightning_02 false L_mid_elbow_jntBnd chest_jntBnd"
+		bone_group = "L_lightning_03 false L_lower_elbow_jntBnd chest_jntBnd"
+		bone_group = "R_lightning_01 false R_upper_elbow_jntBnd chest_jntBnd"
+		bone_group = "R_lightning_02 false R_mid_elbow_jntBnd chest_jntBnd"
+		bone_group = "R_lightning_03 false R_lower_elbow_jntBnd chest_jntBnd"
+		bone_group = "L_light_to_hand_01 false L_upper_wrist_jntBnd L_mid_wrist_jntBnd"
+		bone_group = "L_light_to_hand_02 false L_mid_wrist_jntBnd L_lower_wrist_jntBnd"
+		bone_group = "R_light_to_hand_01 false R_upper_wrist_jntBnd R_mid_wrist_jntBnd"
+		bone_group = "R_light_to_hand_02 false R_mid_wrist_jntBnd R_lower_wrist_jntBnd"
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "abyss_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Effects/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4408800005912781,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5185099840164185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6103240847587586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Emerge",
+						"bone_name": "face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3031100034713746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4613399505615235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Attack1",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.057128600776195529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5677109956741333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Swish",
+						"bone_name": "R_mid_finger_3_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6246057748794556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6674972772598267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9587699770927429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Effects/ShortCast",
+						"bone_name": "R_mid_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Attack2",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09741149842739105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5650129914283752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Swish",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7108486890792847,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9474965929985046,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Effects/ShortCast",
+						"bone_name": "L_mid_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Attack3",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17934100329875947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6761190295219421,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Swish",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8871250152587891,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9551382064819336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "beam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Effects/BeamChargeA",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Effects/BeamChargeB",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Beam",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1064103841781617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Swish",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3225337266921998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/BeamRelease",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4867717027664185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Effects/Beam",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9343101978302003,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9368292093276978,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "beam_long_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/BeamRelease",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Death",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21340399980545045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Falls",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4078409969806671,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "R_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43639999628067019,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.476267009973526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5846629738807678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "R_upper_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.661217987537384,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "L_upper_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/DeathDot",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8063969612121582,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5650218725204468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Falls",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6516770124435425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/VO/VO_DeathFall",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7375253438949586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7874575853347779,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "R_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9238591194152833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9602108001708985,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "R_upper_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0426833629608156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "L_upper_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Death",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1422693431377411,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Falls",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27189400792121889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "R_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2972699999809265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31751134991645815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3897753357887268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "R_upper_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44081199169158938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "L_upper_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Death",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1422693431377411,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Falls",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27189400792121889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "R_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31751134991645815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3747600018978119,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3897753357887268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "R_upper_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44081199169158938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "L_upper_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Death",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1422693431377411,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Falls",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27189400792121889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "R_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31751134991645815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3405880630016327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3897753357887268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "R_upper_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44081199169158938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "L_upper_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Death",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1422693431377411,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Falls",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27189400792121889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "R_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2832225561141968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31751134991645815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3897753357887268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "R_upper_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44081199169158938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Footsteps",
+						"bone_name": "L_upper_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Emerge",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25895512104034426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3847583532333374,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Emerge",
+						"bone_name": "face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0674599409103394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Flinch",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.026923099532723428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.048023540526628497,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Flinch",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02484999969601631,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.026923099532723428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Flinch",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.026923099532723428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0282600000500679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Flinch",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.026923099532723428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.038989998400211337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.428571343421936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Idle",
+						"bone_name": "face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15237070620059968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6176999807357788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0803799629211426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.175320029258728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3031703233718873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8518999814987183,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementLong"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15854956209659577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6427485942840576,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1241909265518189,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.356015682220459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4493099451065064,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.926997184753418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2929669916629791,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37856173515319826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Run.loop.ogg",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1482632160186768,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.577739953994751,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/Flap",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13932110369205476,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Vocals/Teleport",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2546199858188629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Effects/TeleportA",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.285165011882782,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Effects/TeleportB",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5784723162651062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/PaleElite1/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	DecalEvents
+	{
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.9121791124343872,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/OnAct/OnAct_Muzzle_Cold.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-32.95000076293945,
+								-71.1500015258789,
+								-179.45001220703126
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.9627457857131958,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/OnAct/OnAct_Muzzle_Cold.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-42.10000228881836,
+								-77.60000610351563,
+								-179.45001220703126
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.9151530861854553,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/OnAct/OnAct_Muzzle_Cold.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								28.100000381469728,
+								-81.1500015258789,
+								-180.00001525878907
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.960762619972229,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/OnAct/OnAct_Muzzle_Cold.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								36.05000305175781,
+								-71.1500015258789,
+								-179.45001220703126
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "beam_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0018793718190863729,
+						"end_time": 2.632999897003174,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/OnAct/OnAct_Beam_Cold_01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.6031004190444947,
+						"end_time": 2.632999897003174,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/beam_Cold_01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								-62.20000457763672,
+								-128.40000915527345
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.6623753309249879,
+						"end_time": 2.632999897003174,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/OnAct/OnAct_Beam_Cold_02.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								-62.20000457763672,
+								-128.40000915527345
+							],
+							"rotation": [
+								0.0,
+								-1.5707999467849732,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "beam_long_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 4.699999809265137,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/OnAct/OnAct_BeamLong_Cold_01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.487626075744629,
+						"end_time": 4.699999809265137,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/beam_long_Cold_01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Inherit",
+						"offset": {
+							"translation": [
+								0.0,
+								-28.55000114440918,
+								-129.65000915527345
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "emerge_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 1.8329999446868897,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Hellscape/league_EPKs/emerge_lightning.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch"
+					}
+				]
+			},
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/teleport01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Inherit"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/EPKs/surge_attack_01.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/EPKs/surge_attack_02.epk"
+					}
+				]
+			},
+			{
+				"name": "beam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.3708720207214357,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/EPKs/surge_beam_01.epk"
+					}
+				]
+			},
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 0.37727999687194826,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/EPKs/teleport_out.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.37727999687194826,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/PaleElite/EPKs/teleport_in.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "Albedo_Mult",
+						"curve": "5 0 0 Linear 0.210976 0.895648 Smooth 0.922003 1 Flat 1.20028 0 Flat 1.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "Albedo_Mult",
+						"curve": "5 0 0 Linear 0.210976 0.895648 Smooth 0.922003 1 Flat 1.20028 0 Flat 1.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "beam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.632999897003174,
+						"name": "Albedo_Mult",
+						"curve": "6 0 0 Linear 0.587293 0.846192 Smooth 1.54413 1 Flat 1.81405 0.450544 CustomSmooth -2.85523 2.29952 0 Flat 2.633 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "beam_long_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.699999809265137,
+						"name": "Albedo_Mult",
+						"curve": "4 0 0 Linear 1.95792 0.99763 Smooth 3.9358 1 Flat 4.7 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_blackblood_01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "animate"
+		view_looping = true
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+		socket = "aux_line_01"
+			translation = "0 0 -100"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_line false root aux_line_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "animate",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/fx/halo_blackblood_01.pet",
+						"bone_group": "FX_line"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/FleshPaleMysteriousSpellcasterDemonPhysics.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/FleshPaleMysteriousSpellcasterDemonPhysics_armour_12ecb434.smd"
+Materials 1
+	"Art/Models/MONSTERS/3.16Monsters/Textures/FleshPaleMysteriousSpellcasterDemonc.mat" 1
+BoundingBox -77.2916 -31.8519 -187.413 77.2916 70.7284 -0.3016
+BoneGroups 34
+	"grp_root" 1 "hip_jntBnd"
+	"grp_frameupper" 5 "phys_tri_R_fleshcape_01_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "phys_tri_L_fleshcape_01_jntBnd"
+	"grp_head" 2 "head_jntBnd" "face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "phys_tri_L_fleshcape_01_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "phys_tri_R_fleshcape_01_jntBnd"
+	"grp_l_fleshcape_01" 2 "phys_tri_L_fleshcape_01_jntBnd" "phys_tri_L_fleshcape_02_jntBnd"
+	"grp_l_fleshcape_02" 2 "phys_tri_L_fleshcape_02_jntBnd" "phys_tri_L_fleshcape_03_jntBnd"
+	"grp_l_fleshcape_03" 2 "phys_tri_L_fleshcape_03_jntBnd" "phys_tri_L_fleshcape_04_jntBnd"
+	"grp_r_fleshcape_01" 2 "phys_tri_R_fleshcape_01_jntBnd" "phys_tri_R_fleshcape_02_jntBnd"
+	"grp_r_fleshcape_02" 2 "phys_tri_R_fleshcape_02_jntBnd" "phys_tri_R_fleshcape_03_jntBnd"
+	"grp_r_fleshcape_03" 2 "phys_tri_R_fleshcape_03_jntBnd" "phys_tri_R_fleshcape_04_jntBnd"
+	"grp_l_upper_forearm" 2 "L_upper_elbow_jntBnd" "L_upper_wrist_jntBnd"
+	"grp_r_upper_forearm" 2 "R_upper_elbow_jntBnd" "R_upper_thumb_1_jntBnd_2"
+	"grp_l_upper_palm" 2 "L_upper_wrist_jntBnd" "L_upper_finger_2_jntBnd_1"
+	"grp_r_upper_palm" 2 "R_upper_wrist_jntBnd" "R_upper_finger_2_jntBnd_1"
+	"grp_l_mid_forearm" 2 "L_mid_elbow_jntBnd" "L_mid_wrist_jntBnd"
+	"grp_r_mid_forearm" 2 "R_mid_elbow_jntBnd" "R_mid_thumb_1_jntBnd_2"
+	"grp_l_mid_palm" 2 "L_mid_wrist_jntBnd" "L_mid_finger_2_jntBnd_1"
+	"grp_r_mid_palm" 2 "R_mid_wrist_jntBnd" "R_mid_finger_2_jntBnd_1"
+	"grp_l_lower_forearm" 2 "L_lower_elbow_jntBnd" "L_lower_wrist_jntBnd"
+	"grp_r_lower_forearm" 2 "R_lower_elbow_jntBnd" "R_lower_thumb_1_jntBnd_2"
+	"grp_l_lower_palm" 2 "L_lower_wrist_jntBnd" "L_lower_finger_2_jntBnd_1"
+	"grp_r_lower_palm" 2 "R_lower_wrist_jntBnd" "R_lower_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/FleshPaleMysteriousSpellcasterDemonPhysics_armour_12ecb434.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 1 in the header, 1 in the block · 5582 triangles over 4061 vertices
+  names: 80 bytes said, 80 read  [agree]
+
+=== shapes (1)
+0	FleshPaleMysteriousSpellcasterDemonShape	from 0	count 16746
+
+=== fitting
+the monster's rig: 137 bones
+mounts: aux_position
+  halo_blackblood_01.ao  socket halo_01 [NOT in its carrier's rig]  (no mesh - an effect or a sound)

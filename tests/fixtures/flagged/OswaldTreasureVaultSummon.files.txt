@@ -1,0 +1,402 @@
+monster: Oswald [Metadata/NPC/Four_Act3/OswaldTreasureVaultSummon]
+
+=== .ao Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/OswaldTreasureVaultSummon.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/Animations/town/rig.amd"
+	view_of = "walk_01"
+		view_name = "walk_noblend_01"
+		view_blend_in_time = 0
+		view_blend_out_time = 0
+	default_animation = "idle_town_01"
+	animations = '[
+		{
+			"name": "sit_idle_01",
+			"blend_in_time": 0,
+			"blend_out_time": 0
+		},
+		{
+			"name": "sit_to_stand_01",
+			"blend_in_time": 0,
+			"blend_out_time": 0
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/attachments/CoatAttachment.ao"
+	attached_object = "hip_jntBnd Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/attachments/SwordHolder.ao"
+	attached_object = "hip_jntBnd Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/attachments/SmallBags.ao"
+	attached_object = "hip_jntBnd Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/attachments/ClothAttachment.ao"
+	attached_object = "aux_SmallChestBag Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/attachments/ChestBag.ao"
+	attached_object = "head_jntBnd Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/attachments/HatFeather.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/Animations/town/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		linear_allowed_contraction = 0.200
+		bend_stiffness = 85.000
+		bend_allowed_angle = 0.131
+		normal_viscosity_multiplier = 0.600
+		tangent_viscosity_multiplier = 0.300
+		animation_velocity_factor = 5.000
+		animation_force_factor = 2.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/Boatswain04.sm"
+	}
+	
+	AnimatedRender
+	{
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "emerge_from_portal_walk",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								78.0,
+								0.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "emerge_from_portal_walk",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Alva_portal_fade.epk"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/attachments/CoatAttachment.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/Coat/Coat.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/Coat/Coat.ast"
+		linear_allowed_contraction = 0.400
+		bend_stiffness = 250.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.193
+		tangent_viscosity_multiplier = 0.100
+		animation_velocity_factor = 6.000
+		animation_force_factor = 1.500
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/Coat/Coat.sm"
+	}
+}
+
+=== .ao Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/attachments/SwordHolder.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/SwordHolder/SwordHolder.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/SwordHolder/SwordHolder.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/SwordHolder/SwordHolder.sm"
+	}
+}
+
+=== .ao Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/attachments/SmallBags.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/SmallBags/SmallBags.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/SmallBags/SmallBags.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/SmallBags/SmallBags.sm"
+	}
+}
+
+=== .ao Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/attachments/ClothAttachment.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/ClothAttachment/ClothDangley.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/ClothAttachment/ClothDangley.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/ClothAttachment/ClothDangley.sm"
+	}
+}
+
+=== .ao Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/attachments/ChestBag.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/ChestBag/ChestBag.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/ChestBag/ChestBag.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/ChestBag/ChestBag.sm"
+	}
+}
+
+=== .ao Metadata/NPC/Four_Act3/TreasureHunters/TreasureHunter_04/attachments/HatFeather.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/HatFeather/HatFeather.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/HatFeather/HatFeather.ast"
+		linear_allowed_contraction = 0.192
+		bend_allowed_angle = 0.010
+		normal_viscosity_multiplier = 0.816
+		tangent_viscosity_multiplier = 0.441
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/TreasureHunters/TreasureHunter_04/attachments/HatFeather/HatFeather.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/NPC/TreasureHunters/TreasureHunter_04/Boatswain04.sm
+version 6
+SkinnedMeshData "Art/Models/NPC/TreasureHunters/TreasureHunter_04/TreasureHunter_04_armour_1d8f814f.smd"
+Materials 1
+	"Art/Models/NPC/TreasureHunters/Textures/Boatswain04c.mat" 4
+BoundingBox -68.1556 -15.9308 -176.909 68.1556 19.854 -0.0471593
+BoneGroups 0
+
+=== .smd Art/Models/NPC/TreasureHunters/TreasureHunter_04/TreasureHunter_04_armour_1d8f814f.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 4 in the header, 4 in the block · 8413 triangles over 6442 vertices
+  names: 122 bytes said, 122 read  [agree]
+
+=== shapes (8)
+0	BeardShape	from 0	count 2322
+1	Boatswain04CoatPiecesShape	from 2322	count 78
+2	Boatswain0Shape4	from 2400	count 21639
+3	HairShape	from 24039	count 1200
+4	SwordHolderHangerBackShape	from 25239	count 240
+5	SwordHolderHangerFrontShape	from 25479	count 288
+6	SwordHolderShape	from 25767	count 846
+7	SwordShape	from 26613	count 2103
+
+=== fitting
+the monster's rig: 85 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_SmallChestBag, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  CoatAttachment.ao  socket hip_jntBnd [in its carrier's rig]  box (-30.2,-16.6,-11.7)..(30.3,27.6,40.6)
+    (the geometry did not read)
+    rig 37 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L_coat_1_jntBnd  [its own]  under 0  rests at (12.5,-11.7,-5)
+      2 phys_skinned_L_coat_5_jntBnd  [its own]  under 0  rests at (17.1,-5.6,-5.2)
+      3 phys_skinned_L_coat_9_jntBnd  [its own]  under 0  rests at (18.4,1.2,-5.1)
+      4 phys_skinned_L_coat_13_jntBnd  [its own]  under 0  rests at (10.8,11.4,-5.1)
+      5 phys_skinned_back_coat_1_jntBnd  [its own]  under 0  rests at (0,13.2,-5.1)
+      6 phys_skinned_R_coat_13_jntBnd  [its own]  under 0  rests at (-10.8,11.4,-5.1)
+      7 phys_skinned_R_coat_9_jntBnd  [its own]  under 0  rests at (-18.4,1.2,-5.1)
+      8 phys_skinned_R_coat_5_jntBnd  [its own]  under 0  rests at (-16.7,-5.9,-5.1)
+      9 phys_skinned_R_coat_1_jntBnd  [its own]  under 0  rests at (-11.9,-12.2,-4.9)
+      10 phys_skinned_L_coat_2_jntBnd  [its own]  under 1  rests at (14.6,-11.2,7.7)
+      11 phys_skinned_L_coat_6_jntBnd  [its own]  under 2  rests at (19.7,-4.9,7.4)
+      12 phys_skinned_L_coat_10_jntBnd  [its own]  under 3  rests at (21,2.6,7.2)
+      13 phys_skinned_L_coat_14_jntBnd  [its own]  under 4  rests at (12.3,14.2,7)
+      14 phys_skinned_back_coat_2_jntBnd  [its own]  under 5  rests at (0,17,7)
+      15 phys_skinned_R_coat_14_jntBnd  [its own]  under 6  rests at (-12.3,14.2,7)
+      16 phys_skinned_R_coat_10_jntBnd  [its own]  under 7  rests at (-21,2.6,7.2)
+      17 phys_skinned_R_coat_6_jntBnd  [its own]  under 8  rests at (-19.1,-5.4,7.5)
+      18 phys_skinned_R_coat_2_jntBnd  [its own]  under 9  rests at (-13.3,-12.1,7.9)
+      19 phys_skinned_L_coat_3_jntBnd  [its own]  under 10  rests at (16.8,-10.8,20.4)
+      20 phys_skinned_L_coat_7_jntBnd  [its own]  under 11  rests at (22.3,-4.2,19.8)
+      21 phys_skinned_L_coat_11_jntBnd  [its own]  under 12  rests at (23.6,3.9,19.4)
+      22 phys_skinned_L_coat_15_jntBnd  [its own]  under 13  rests at (13.8,17,19.1)
+      23 phys_skinned_back_coat_3_jntBnd  [its own]  under 14  rests at (0,20.7,19)
+      24 phys_skinned_R_coat_15_jntBnd  [its own]  under 15  rests at (-13.8,17,19.1)
+      25 phys_skinned_R_coat_11_jntBnd  [its own]  under 16  rests at (-23.6,3.9,19.4)
+      26 phys_skinned_R_coat_7_jntBnd  [its own]  under 17  rests at (-21.5,-4.8,20)
+      27 phys_skinned_R_coat_3_jntBnd  [its own]  under 18  rests at (-14.8,-12.1,20.7)
+      28 phys_skinned_L_coat_4_jntBnd  [its own]  under 19  rests at (18.9,-10.4,33.1)
+      29 phys_skinned_L_coat_8_jntBnd  [its own]  under 20  rests at (24.9,-3.6,32.2)
+      30 phys_skinned_L_coat_12_jntBnd  [its own]  under 21  rests at (26.3,5.2,31.7)
+      31 phys_skinned_L_coat_16_jntBnd  [its own]  under 22  rests at (15.3,19.9,31.3)
+      32 phys_skinned_back_coat_4_jntBnd  [its own]  under 23  rests at (0,24.5,31.1)
+      33 phys_skinned_R_coat_16_jntBnd  [its own]  under 24  rests at (-15.3,19.9,31.3)
+      34 phys_skinned_R_coat_12_jntBnd  [its own]  under 25  rests at (-26.3,5.2,31.7)
+      35 phys_skinned_R_coat_8_jntBnd  [its own]  under 26  rests at (-23.8,-4.2,32.4)
+      36 phys_skinned_R_coat_4_jntBnd  [its own]  under 27  rests at (-16.2,-12.1,33.5)
+  SwordHolder.ao  socket hip_jntBnd [in its carrier's rig]  box (7.6,-30.5,-19.8)..(38.4,46.1,21.3)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 4 in the header, 4 in the block · 1159 triangles over 1482 vertices
+    names: 158 bytes said, 158 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_swordHolder_jntBnd  [its own]  under 0  rests at (17.7,-3.9,-13.4)
+  SmallBags.ao  socket hip_jntBnd [in its carrier's rig]  box (-2.7,-17.9,-7.5)..(13.7,-9.4,1.4)
+    (the geometry did not read)
+    rig 3 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_bags_front_bag_jntBnd  [its own]  under 0  rests at (1.8,-14.7,-6.3)
+      2 phys_bags_L_bag_jntBnd  [its own]  under 0  rests at (9,-11.9,-5.4)
+  ClothAttachment.ao  socket hip_jntBnd [in its carrier's rig]  box (4.6,-15.9,-9.8)..(15,-9.7,24)
+    (the geometry did not read)
+    rig 4 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_cloth_base_jntBnd  [its own]  under 0  rests at (6.7,-11.5,-8.8)
+      2 phys_skinned_cloth_1_jntBnd  [its own]  under 1  rests at (7.7,-11.8,-0.5)
+      3 phys_skinned_cloth_2_jntBnd  [its own]  under 2  rests at (9.6,-12.2,15.9)
+  ChestBag.ao  socket aux_SmallChestBag [in its carrier's rig]  box (-6.1,-5.6,-3.3)..(5,2.6,8)
+    (the geometry did not read)
+    rig 2 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_ChestBag_jntBnd  [its own]  under 0  rests at (-0.2,0.3,-0.1)
+  HatFeather.ao  socket head_jntBnd [in its carrier's rig]  box (-4.4,7,-22.4)..(4.5,20.5,-15.2)
+    (the geometry did not read)
+    rig 3 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_mesh_1_jntBnd  [its own]  under 0  rests at (0,10.6,-16.2)
+      2 phys_skinned_mesh_2_jntBnd  [its own]  under 1  rests at (-0,17.2,-16.8)

@@ -1,0 +1,2559 @@
+monster: Sekhema Asala [Metadata/Monsters/NPC/MarakethMatriarchDreadnought_]
+
+=== .ao Metadata/NPC/Four_Act2/MarakethMatriarch.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/MarakethMatriarch/Animations/rig.amd"
+	view_of = "getup_01"
+		view_name = "knockdown_01_TEMP"
+		view_begin = 1
+		view_end = 2
+	view_of = "cart_jump_01"
+		view_name = "cart_jump_01_fixed"
+		view_end = 2000
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3957499861717224,
+					"name": "footstep",
+					"position": [
+						-4.632559776306152,
+						-56.377601623535159,
+						-0.6792510151863098
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9296150207519531,
+					"name": "footstep",
+					"position": [
+						-12.9443998336792,
+						-18.63279914855957,
+						0.002390919951722026
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3997330069541931,
+					"name": "footstep",
+					"position": [
+						-5.73459005355835,
+						-57.380699157714847,
+						-1.2282099723815919
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.46136000752449038,
+					"name": "footstep",
+					"position": [
+						5.431930065155029,
+						5.037670135498047,
+						-1.9697500467300416
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8183540105819702,
+					"name": "footstep",
+					"position": [
+						12.873200416564942,
+						33.69710159301758,
+						-2.748270034790039
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9268699884414673,
+					"name": "footstep",
+					"position": [
+						-12.933199882507325,
+						-18.633399963378908,
+						0.015041399747133255
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5928400158882141,
+					"name": "footstep",
+					"position": [
+						13.09630012512207,
+						36.860801696777347,
+						-2.571000099182129
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6286029815673828,
+					"name": "footstep",
+					"position": [
+						-18.967500686645509,
+						-39.33539962768555,
+						-1.0618599653244019
+					]
+				}
+			]
+		},
+		{
+			"name": "decapitation_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 5.570690155029297,
+					"name": "acquire_head"
+				}
+			]
+		},
+		{
+			"name": "decapitation_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 5.570690155029297,
+					"name": "acquire_head"
+				}
+			]
+		},
+		{
+			"name": "epic_lightning_bolt_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.30635198950767519,
+					"name": "footstep",
+					"position": [
+						-20.01129913330078,
+						-54.94060134887695,
+						-2.991070032119751
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3149619996547699,
+					"name": "footstep",
+					"position": [
+						9.54636001586914,
+						17.663299560546876,
+						-6.551350116729736
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8420310020446777,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8443599939346314,
+					"name": "end_epk"
+				}
+			]
+		},
+		{
+			"name": "epic_lightning_bolt_end_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8923799991607666,
+					"name": "big_bonk"
+				}
+			]
+		},
+		{
+			"name": "epic_lightning_bolt_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.1596499681472779,
+					"name": "start_epk"
+				}
+			]
+		},
+		{
+			"name": "epic_lightning_bolt_start_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.4260900020599366,
+					"name": "shields_up"
+				}
+			]
+		},
+		{
+			"name": "getup_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.550879955291748,
+					"name": "start_face_pk"
+				}
+			]
+		},
+		{
+			"name": "jog_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.39112699031829836,
+					"name": "footstep",
+					"position": [
+						-3.8486499786376955,
+						-2.732870101928711,
+						-3.5878500938415529
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8465409874916077,
+					"name": "footstep",
+					"position": [
+						3.7153899669647219,
+						4.009200096130371,
+						-1.4074599742889405
+					]
+				}
+			]
+		},
+		{
+			"name": "push_crank_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4708159863948822,
+					"name": "location_update_again"
+				}
+			]
+		},
+		{
+			"name": "run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.07076288759708405,
+					"name": "footstep",
+					"position": [
+						3.51705002784729,
+						12.218199729919434,
+						-1.401479959487915
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4060252606868744,
+					"name": "footstep",
+					"position": [
+						-4.660669803619385,
+						16.548099517822267,
+						-0.6440010070800781
+					]
+				}
+			]
+		},
+		{
+			"name": "spellcast_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.46154001355171206,
+					"name": "footstep",
+					"position": [
+						1.3365199565887452,
+						23.274499893188478,
+						-0.32291799783706667
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8337000012397766,
+					"name": "footstep",
+					"position": [
+						-14.942399978637696,
+						-44.91680145263672,
+						-1.2689199447631837
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8398550152778626,
+					"name": "left_beams",
+					"position": [
+						15.789799690246582,
+						-95.17469787597656,
+						-102.43900299072266
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2753700017929078,
+					"name": "right_beams",
+					"position": [
+						-17.623600006103517,
+						-96.63719940185547,
+						-102.94200134277344
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9242199659347535,
+					"name": "footstep",
+					"position": [
+						-13.206199645996094,
+						-19.167800903320314,
+						-0.6026690006256104
+					]
+				}
+			]
+		},
+		{
+			"name": "spellcast_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.4858499765396119,
+					"name": "footstep",
+					"position": [
+						-12.891900062561036,
+						-18.510400772094728,
+						-0.22077199816703797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5490700006484986,
+					"name": "footstep",
+					"position": [
+						13.591400146484375,
+						54.03030014038086,
+						-1.3828200101852418
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.613024115562439,
+					"name": "contact",
+					"position": [
+						-12.588399887084961,
+						-152.125,
+						-101.05400085449219
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6580122709274293,
+					"name": "contact",
+					"position": [
+						-5.500400066375732,
+						-160.55799865722657,
+						-58.892799377441409
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7127315998077393,
+					"name": "contact",
+					"position": [
+						1.6319400072097779,
+						-159.74200439453126,
+						-56.332401275634769
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7697609663009644,
+					"name": "contact",
+					"position": [
+						5.0561299324035648,
+						-156.1750030517578,
+						-57.90549850463867
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8277599811553956,
+					"name": "contact",
+					"position": [
+						4.713089942932129,
+						-149.7100067138672,
+						-61.64059829711914
+					]
+				}
+			]
+		},
+		{
+			"name": "walk_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.09160859882831574,
+					"name": "footstep",
+					"position": [
+						7.272950172424316,
+						-23.756799697875978,
+						-1.1431100368499756
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6268669962882996,
+					"name": "footstep",
+					"position": [
+						-7.275990009307861,
+						-23.478200912475587,
+						-1.296030044555664
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "R_Weapon Metadata/NPC/Four_Act2/MarakethMatriarchWeapon.ao"
+	attached_object = "head_jntBnd Metadata/NPC/Four_Act2/MarakethMatriarch/attachments/MarakethMatriarchHair.ao"
+	attached_object = "hip_jntBnd Metadata/NPC/Four_Act2/MarakethMatriarch/attachments/MarakethMatriarchSkirt.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4262300133705139,
+								0.0
+							],
+							[
+								0.4858759939670563,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.05235990136861801,
+						"angle": 0.5585049986839294,
+						"x_axis_scale": 0.3630000054836273,
+						"length": 179.1540069580078,
+						"offset": [
+							-8.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.26179900765419009,
+							-0.6981319785118103
+						],
+						"impact_z_rotation": [
+							0.08726649731397629,
+							0.5235990285873413
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4180789887905121,
+								0.0
+							],
+							[
+								0.50273197889328,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.15707999467849732,
+						"angle": 2.7401700019836427,
+						"x_axis_scale": 0.7639999985694885,
+						"length": 130.0,
+						"offset": [
+							-42.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.17453299462795258,
+							-0.5235990285873413
+						],
+						"impact_z_rotation": [
+							-0.5235990285873413,
+							-1.0471999645233155
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.47541001439094546,
+								0.0
+							],
+							[
+								0.535519003868103,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.5934119820594788,
+						"angle": 3.9095399379730226,
+						"x_axis_scale": 0.9089999794960022,
+						"length": 118.0,
+						"local_offset": [
+							-22.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.19198599457740785,
+							-0.5235990285873413
+						],
+						"impact_z_rotation": [
+							-0.26179900765419009,
+							-4.0142598152160648
+						]
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/MarakethMatriarch/Animations/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "head_light_attachment"
+			parent = "root_jntBnd"
+			translation = "0 0 -200"
+		socket = "aux_melee_trail_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -15"
+		socket = "aux_melee_trail_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -87"
+		socket = "aux_sword_sec_trail"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-1.30994 0.449829 -66.1283"
+		socket = "aux_cleave"
+			parent = "root_jntBnd"
+			translation = "0 0 -103.351"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/MarakethMatriarch/MarakethMatriarch.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd neck_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "melee_trails false aux_melee_trail_02 aux_melee_trail_01"
+		bone_group = "melee_01 false aux_melee_trail_01 aux_sword_sec_trail"
+		bone_group = "arc_lightning false aux_melee_trail_02 aux_melee_trail_01"
+		bone_group = "arc_reverse false aux_melee_trail_01 aux_melee_trail_02"
+		bone_group = "cleaves false aux_cleave root_jntBnd"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0065268101170659069,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourAttack",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26541298627853396,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/WeaponSwing1",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2762399911880493,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingSpark",
+						"bone_name": "aux_melee_trail_02",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2807379961013794,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39097699522972109,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9300739765167236,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourAttack"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2542630136013031,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27379900217056277,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingSpark",
+						"bone_name": "aux_melee_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2917900085449219,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/WeaponSwing2",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4053240120410919,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9406620264053345,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09155000001192093,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourAttack",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3542959988117218,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/WeaponSwing1",
+						"bone_name": "aux_melee_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39510399103164675,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingSpark",
+						"bone_name": "aux_melee_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4772084355354309,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5860419869422913,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6261699795722961,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cart_jump_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3743763864040375,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4406376779079437,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6609561443328857,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.735500693321228,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8821491003036499,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Soft",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0618369579315186,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3467609882354737,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4776266813278199,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8917577266693116,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "decapitation_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13149000704288484,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13149000704288484,
+						"filename": "Audio/Music/A2/A2_PerennialKing/CommandInstruments/PKingPhase_04",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4268343150615692,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Soft",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7430710196495056,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8225749731063843,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.024399995803833,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7949800491333008,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9234199523925782,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4616100788116457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Gore",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4616100788116457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Saw",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1557600498199465,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Gore",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.174109935760498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Saw",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.935529947280884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Gore",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.956939935684204,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Saw",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.397280216217041,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Gore",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.47983980178833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Saw",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.859029769897461,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Gore",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.219860076904297,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingSpark",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.320779800415039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Gore",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.858950138092041,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.158559799194336,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.338899612426758,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.63245964050293,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.965789794921875,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "decapitation_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11503292620182038,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Soft",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1366100013256073,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7720029950141907,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8546029925346375,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0642800331115723,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8648699522018433,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9983099699020386,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.557460069656372,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Saw",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.557460069656372,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Gore",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.278630018234253,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Gore",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.297689914703369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Saw",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.088769912719727,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Gore",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.1110100746154789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Saw",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.568490028381348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Gore",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.654270172119141,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Saw",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.048220157623291,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Gore",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.423099994659424,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingSpark",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.527949810028076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_2/PerennialKing/Foley/Decapitate/Decapitate_Gore",
+						"bone_name": "aux_melee_trail_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.087069988250732,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.437290191650391,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.663579940795899,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.96858024597168,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.31488037109375,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_from_portal_walk",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.558413028717041,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7591689825057983,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9421250224113464,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6128400564193726,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.667580008506775,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingPortal",
+						"bone_name": "aux_melee_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.731529951095581,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Effects/LightningBolt_EpicWand.loop.ogg",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Effects/LightningBolt_EpicWand.loop.ogg",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.026487499475479127,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Effects/LightningBolt_OnAct",
+						"bone_name": "aux_sword_sec_trail"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1216059997677803,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourAttack",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15495066344738007,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Soft",
+						"bone_name": "neck_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22203800082206727,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/WeaponSwing1",
+						"bone_name": "aux_melee_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3726849853992462,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5455309748649597,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingSpark",
+						"bone_name": "aux_melee_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6681560277938843,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_end_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.026487499475479127,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Effects/LightningBolt_OnAct",
+						"bone_name": "aux_sword_sec_trail"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1216059997677803,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourAttack",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22203800082206727,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/WeaponSwing1",
+						"bone_name": "aux_melee_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3726849853992462,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5455309748649597,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingSpark",
+						"bone_name": "aux_melee_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6229524612426758,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7692530751228333,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Effects/HolyGroundImpact",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4509520530700685,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.786918878555298,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/EpicStart",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06476700305938721,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Effects/LightningBolt_OnAct",
+						"bone_name": "aux_sword_sec_trail"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5671790242195129,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourAttack",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9857760071754456,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingSpark",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_start_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/EpicStart",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06476700305938721,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Effects/LightningBolt_OnAct",
+						"bone_name": "aux_sword_sec_trail"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5671790242195129,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourAttack",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.286131501197815,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingSpark",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.012524600140750409,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02173909917473793,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.014242899604141713,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.028641600161790849,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04101039841771126,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.016116900369524957,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04101039841771126,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.025487300008535386,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04101039841771126,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "getup_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.20052845776081086,
+						"filename": "Audio/Music/A2/A2_PerennialKing/CommandInstruments/PKingPhase_03",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4270617961883545,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Soft",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6109284162521362,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.083014726638794,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/Soft",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.556375503540039,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1054224967956545,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.468794345855713,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.049549102783203,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.3986430168151859,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "jog_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/RunLoop.ogg",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39045199751853945,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8465409874916077,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.49541401863098147,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "leave_through_portal_run",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.558413028717041,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7591689825057983,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9421250224113464,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6128400564193726,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.731529951095581,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourWalk",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2360599040985109,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "push_crank_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20789200067520142,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.610683023929596,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6111600399017335,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2868099212646486,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3517799377441408,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.364759922027588,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/PushCrank.loop.ogg",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.209320068359375,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6640899181365969,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.404699802398682,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.080329895019531,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.093790054321289,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.613550186157227,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.782410144805908,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.055780410766602,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.79634952545166,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.6279296875,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 10.147700309753418,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 10.355600357055664,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.706899642944336,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 12.382499694824219,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 13.253100395202637,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 13.473999977111817,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 13.902799606323243,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 15.18910026550293,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 15.656900405883789,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 16.60540008544922,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingPortal",
+						"bone_name": "aux_melee_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 16.61840057373047,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "push_crank_prebake_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2482759952545166,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7664170265197754,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6299899816513062,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8998500108718873,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.353209972381592,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4503700733184816,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/PushCrank.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6122899055480959,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.594589948654175,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.339399814605713,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.321700096130371,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.494440078735352,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.9153900146484379,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.253920078277588,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.955560207366943,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.430580139160157,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.894729614257813,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.585570335388184,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 10.049799919128418,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 10.78380012512207,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.194000244140625,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.625800132751465,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 12.608099937438965,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 13.007499694824219,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/RunLoop.ogg",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07130620628595352,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24136200547218324,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4064462184906006,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.4471760094165802,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourAttack",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.795399010181427,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingArm",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8033748269081116,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/SpellCast",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9372159838676453,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourRun",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2744200229644776,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingArm",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2837982177734376,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/SpellCast",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7925000190734864,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingPortal",
+						"bone_name": "aux_melee_trail_02"
+					}
+				]
+			},
+			{
+				"name": "spellcast_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3433600068092346,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourAttack",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5790410041809082,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingPortal",
+						"bone_name": "aux_melee_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.404360055923462,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/ArmourAttack",
+						"bone_name": "aux_melee_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5575940608978272,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Vocal/SpellCast",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5824700593948365,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/SwingSpark",
+						"bone_name": "aux_melee_trail_02"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07293680310249329,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5883030295372009,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act2/G2_3/Asala/Foley/FootstepWalk",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.3911919891834259,
+						"end_time": 0.49845799803733828,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/sword_trauk.trl",
+						"bone_group": "melee_trails"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.35346999764442446,
+						"end_time": 0.5296559929847717,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/sword_trauk.trl",
+						"bone_group": "melee_trails"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.3935849964618683,
+						"end_time": 0.7302809953689575,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/sword_trauk.trl",
+						"bone_group": "melee_trails"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_end_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.92399001121521,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/sword_trauk.trl",
+						"bone_group": "melee_trails"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.92399001121521,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/sword_trail_01.trl",
+						"bone_group": "melee_01"
+					}
+				]
+			},
+			{
+				"name": "spellcast_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.5090399980545045,
+						"end_time": 2.1717119216918947,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/sword_trauk.trl",
+						"bone_group": "melee_trails"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.5090399980545045,
+						"end_time": 2.1717119216918947,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/spellcast_02_trail.trl",
+						"bone_group": "melee_trails"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.5103600025177003,
+						"end_time": 2.175661087036133,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/sword_trail_01.trl",
+						"bone_group": "melee_01"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "epic_lightning_bolt_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/arc_epk.pet",
+						"bone_group": "arc_lightning"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/arc_energy_idle.pet",
+						"bone_group": "arc_reverse"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/sandstorm_clear/weapon_barrier_charge.pet",
+						"bone_group": "melee_01"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_end_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/arc_energy_start.pet",
+						"bone_group": "arc_reverse"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_end_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.9495310187339783,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/sandstorm_clear/weapon_barrier_charge_once.pet",
+						"bone_group": "melee_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7799999713897705,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/sandstorm_clear/stab_pulse.pet",
+						"bone_group": "melee_01"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4653399884700775,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/arc_energy_start.pet",
+						"bone_group": "arc_reverse"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_start_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.600000023841858,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/sandstorm_clear/weapon_barrier_charge_once.pet",
+						"bone_group": "melee_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6441699862480164,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/pet/sandstorm_clear/weapon_barrier_charge.pet",
+						"bone_group": "melee_01"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			state = ""
+				colour = "0.505186 0.38134 0.313474"
+				position = "0 0 -206"
+				radius = 180
+			state = "on_death"
+				colour = "0.00126296 0.000953351 0.000783686"
+				position = "0 0 -125"
+				radius = 400
+		animations = '[
+			{
+				"name": "getup_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 2.5962700843811037,
+						"end_time": 3.4659972190856935,
+						"state_name": ""
+					}
+				]
+			},
+			{
+				"name": "knockdown_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.1894810050725937,
+						"end_time": 0.4010530114173889,
+						"state_name": "on_death"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "emerge_from_portal_walk",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.9672799110412599,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Alva_portal_fade.epk"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/epk/weapon_barrier_charge.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_end_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/epk/weapon_barrier_charge.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_start_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/Asala/epk/weapon_barrier_charge.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "epic_lightning_bolt_end_02",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.7799999713897705,
+						"frequency": 120.0,
+						"amplitude": 2.5,
+						"duration": 1.0,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.7799999713897705,
+						"amplitude": 15.0,
+						"duration": 0.20000000298023225
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "epic_lightning_bolt_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "glow",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 1.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_end_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.065999984741211,
+						"name": "glow",
+						"apply_on_children": true,
+						"curve": "4 0 1 Smooth 0.721405 1.40489 Flat 1.12176 0 CustomSmooth 0 3.066 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "epic_lightning_bolt_start_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.600000023841858,
+						"name": "glow",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.915819 0.361523 Smooth 1.43132 1 Flat 1.6 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/NPC/Four_Act2/MarakethMatriarchWeapon.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/MarakethMatriarch/attachments/Weapon/loop_MarakethMatriarchWeapon.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/MarakethMatriarch/attachments/Weapon/loop_MarakethMatriarchWeapon.ast"
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.005
+		enclosure_angle = 1.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/MarakethMatriarch/attachments/Weapon/loop_MarakethMatriarchWeapon.sm"
+	}
+}
+
+=== .ao Metadata/NPC/Four_Act2/MarakethMatriarch/attachments/MarakethMatriarchHair.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/MarakethMatriarch/attachments/Hair/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/MarakethMatriarch/attachments/Hair/rig.ast"
+		linear_allowed_contraction = 0.200
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.100
+		attachment_bones = "neck_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/MarakethMatriarch/attachments/Hair/MMHair.sm"
+	}
+	
+	BoneGroups
+	{
+	    bone_group = "child_attach false neck_jntBnd"
+	}
+}
+
+=== .ao Metadata/NPC/Four_Act2/MarakethMatriarch/attachments/MarakethMatriarchSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/MarakethMatriarch/attachments/Skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/MarakethMatriarch/attachments/Skirt/rig.ast"
+		linear_allowed_contraction = 0.600
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.800
+		enclosure_radius = 5.000
+		enclosure_angle = 0.050
+		animation_velocity_factor = 10.000
+		animation_force_factor = 5.000
+		attachment_bones = "spine_1_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/MarakethMatriarch/attachments/Skirt/MMSkirt.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false spine_1_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/NPC/MarakethMatriarch/MarakethMatriarch.sm
+version 6
+SkinnedMeshData "Art/Models/NPC/MarakethMatriarch/MarakethMatriarch_armour_1312ff0d.smd"
+Materials 1
+	"Art/Textures/NPC/MarakethMatriarch/MarakethMatriarchc.mat" 2
+BoundingBox -68.8599 -15.1697 -179 73.3742 13.9749 0.507761
+BoneGroups 22
+	"root" 2 "root_jntBnd" "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/NPC/MarakethMatriarch/MarakethMatriarch_armour_1312ff0d.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 2 in the header, 2 in the block · 5582 triangles over 4518 vertices
+  names: 60 bytes said, 60 read  [agree]
+
+=== shapes (10)
+0	new_BodyShape	from 0	count 14394
+1	new_TopDecorShape	from 14394	count 2352
+2	Hair_01Shape	from 16746	count 4638
+3	Hair_Shape2	from 21384	count 4638
+4	Hair_Shape3	from 26022	count 4638
+5	new_HairDecorShape	from 30660	count 60
+6	new_Skirt_01Shape	from 30720	count 9252
+7	new_Skirt_02Shape	from 39972	count 1476
+8	new_Skirt_03Shape	from 41448	count 2112
+9	new_SkirtDecorShape	from 43560	count 2736
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  MarakethMatriarchWeapon.ao  socket R_Weapon [NOT in its carrier's rig]  box (-13.1,-2.2,-87.1)..(7.2,2.6,13.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 3052 triangles over 2206 vertices
+    names: 56 bytes said, 56 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_trinket_jntBnd_1  [its own]  under 0  rests at (-11.9,-0.1,-11.8)
+  MarakethMatriarchHair.ao  socket head_jntBnd [in its carrier's rig]  box (-14.2,-8.6,-16.7)..(14.4,16.2,12.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 4658 triangles over 3366 vertices
+    names: 104 bytes said, 104 read  [agree]
+    rig 3 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 neck_jntBnd  [shared]  under 0  rests at (0,3,12.3)  carrier has (0,3.2,-146.4)
+      2 phys_tri_hair_jntBnd  [its own]  under 0  rests at (0,8.3,0)
+  MarakethMatriarchSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-43.1,-22.1,-23.5)..(38.2,32.3,76.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 5192 triangles over 4174 vertices
+    names: 140 bytes said, 140 read  [agree]
+    rig 18 bones, 6 of them names its carrier's rig also has
+    mesh weights reach bone 17 of 18  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      4 phys_tri_skirt_F01_jntBnd  [its own]  under 0  rests at (0,-15.7,21.1)
+      5 phys_tri_skirt_01_01_jntBnd  [its own]  under 0  rests at (24.7,-7,25.4)
+      6 phys_tri_skirt_02_01_jntBnd  [its own]  under 0  rests at (21.3,7.4,25.4)
+      7 phys_tri_skirt_03_01_jntBnd  [its own]  under 0  rests at (0,13.8,25.4)
+      8 phys_tri_skirt_04_01_jntBnd  [its own]  under 0  rests at (-21.3,7.4,25.4)
+      9 phys_tri_skirt_05_01_jntBnd  [its own]  under 0  rests at (-24.7,-7,25.4)
+      10 L_knee_jntBnd  [shared]  under 2  rests at (13.5,0,40.2)  carrier has (13.5,3.2,-49.8)
+      11 R_knee_jntBnd  [shared]  under 3  rests at (-13.5,-0,40.2)  carrier has (-13.5,3.2,-49.8)
+      12 phys_tri_skirt_F02_jntBnd  [its own]  under 4  rests at (0,-15.7,42)
+      13 phys_tri_skirt_01_02_jntBnd  [its own]  under 5  rests at (24.7,-7,58)
+      14 phys_tri_skirt_02_02_jntBnd  [its own]  under 6  rests at (21.3,7.4,58)
+      15 phys_tri_skirt_03_02_jntBnd  [its own]  under 7  rests at (-0,13.8,58)
+      16 phys_tri_skirt_04_02_jntBnd  [its own]  under 8  rests at (-21.3,7.4,58)
+      17 phys_tri_skirt_05_02_jntBnd  [its own]  under 9  rests at (-24.7,-7,58)

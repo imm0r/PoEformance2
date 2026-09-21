@@ -1,0 +1,3427 @@
+monster: L'im the Impaler [Metadata/Monsters/Mutewind/MutewindWomanSpearCorrodedEliteRareName]
+
+=== .ao Metadata/Monsters/Mutewind/BanditWoman/SpearElite.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/rig.amd"
+	view_of = "javelin_unarmed_idle_01"
+		view_name = "javelin_unarmed_temp_nothing_01"
+		view_end = 34
+	animations = '[
+		{
+			"name": "2hspear_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.35044801235198977,
+					"name": "footstep",
+					"position": [
+						27.949800491333009,
+						-40.775699615478519,
+						-2.719360113143921
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.37456101179122927,
+					"name": "contact",
+					"position": [
+						-20.337200164794923,
+						-65.04399871826172,
+						-80.92720031738281
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.017300009727478,
+					"name": "footstep",
+					"position": [
+						27.4783992767334,
+						-42.36289978027344,
+						-2.65844988822937
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0552500486373902,
+					"name": "contact",
+					"position": [
+						-8.760740280151368,
+						-79.20330047607422,
+						-105.65599822998047
+					]
+				}
+			]
+		},
+		{
+			"name": "2hspear_attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.2840209901332855,
+					"name": "footstep",
+					"position": [
+						19.641599655151368,
+						-44.643699645996097,
+						-1.8439099788665772
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3999449908733368,
+					"name": "attack1",
+					"position": [
+						0.0,
+						-235.4980010986328,
+						-151.21299743652345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.668586015701294,
+					"name": "footstep",
+					"position": [
+						2.0563299655914308,
+						-51.55699920654297,
+						-4.198440074920654
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0145900249481202,
+					"name": "footstep",
+					"position": [
+						-30.722999572753908,
+						-8.59259033203125,
+						-2.474940061569214
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.055899977684021,
+					"name": "footstep",
+					"position": [
+						28.437000274658204,
+						-91.93890380859375,
+						-2.037029981613159
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0832300186157227,
+					"name": "attack2",
+					"position": [
+						0.0,
+						-183.35699462890626,
+						-1.6035499572753907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4987200498580933,
+					"name": "footstep",
+					"position": [
+						23.531099319458009,
+						-38.544700622558597,
+						-1.2362799644470215
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5824099779129029,
+					"name": "footstep",
+					"position": [
+						-32.157901763916019,
+						43.115501403808597,
+						-1.3177800178527833
+					]
+				}
+			]
+		},
+		{
+			"name": "2hspear_attack_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.22728000581264497,
+					"name": "footstep",
+					"position": [
+						-1.532439947128296,
+						9.484780311584473,
+						-0.7379909753799439
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4659869968891144,
+					"name": "footstep",
+					"position": [
+						-27.343900680541993,
+						-2.5674400329589845,
+						-2.2167599201202394
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5025460124015808,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9945300221443176,
+					"name": "footstep",
+					"position": [
+						23.699600219726564,
+						-38.23509979248047,
+						-1.6114699840545655
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1068300008773804,
+					"name": "footstep",
+					"position": [
+						-30.134700775146486,
+						40.464900970458987,
+						-1.576390027999878
+					]
+				}
+			]
+		},
+		{
+			"name": "2hspear_death_boss_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.1717100143432619,
+					"name": "blood_pool"
+				}
+			]
+		},
+		{
+			"name": "2hspear_emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0941499471664429,
+					"name": "footstep",
+					"position": [
+						-29.868000030517579,
+						45.68109893798828,
+						-1.0517799854278565
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0986100435256959,
+					"name": "footstep",
+					"position": [
+						23.620100021362306,
+						-37.08879852294922,
+						-2.695810079574585
+					]
+				}
+			]
+		},
+		{
+			"name": "2hspear_groundslam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.08951997756958,
+					"name": "contact",
+					"position": [
+						-4.704619884490967,
+						-88.70719909667969,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "2hspear_idle_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.26767098903656008,
+					"name": "footstep",
+					"position": [
+						26.641799926757814,
+						-42.17210006713867,
+						-1.1371599435806275
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.26767098903656008,
+					"name": "footstep",
+					"position": [
+						-30.162399291992189,
+						37.76620101928711,
+						-1.2627400159835816
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6514400243759155,
+					"name": "footstep",
+					"position": [
+						-29.960800170898439,
+						41.218299865722659,
+						-1.2434300184249879
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6514400243759155,
+					"name": "footstep",
+					"position": [
+						25.118099212646486,
+						-34.50659942626953,
+						-1.1410000324249268
+					]
+				}
+			]
+		},
+		{
+			"name": "2hspear_leapslam_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.6719570159912109,
+					"name": "move",
+					"position": [
+						0.0,
+						-443.3179931640625,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6734099984169006,
+					"name": "footstep",
+					"position": [
+						40.88909912109375,
+						29.313100814819337,
+						-1.061560034751892
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.700410008430481,
+					"name": "footstep",
+					"position": [
+						-31.062299728393556,
+						-22.307899475097658,
+						-1.0870599746704102
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7358779907226563,
+					"name": "contact",
+					"position": [
+						0.0,
+						-83.45960235595703,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999399900436402,
+					"name": "footstep",
+					"position": [
+						-26.04840087890625,
+						38.01409912109375,
+						-1.1600199937820435
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3979400396347047,
+					"name": "footstep",
+					"position": [
+						24.72719955444336,
+						-35.683101654052737,
+						-1.1994999647140504
+					]
+				}
+			]
+		},
+		{
+			"name": "2hspear_leapslam_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.6719570159912109,
+					"name": "move",
+					"position": [
+						0.0,
+						-443.3179931640625,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6600599884986877,
+					"name": "footstep",
+					"position": [
+						39.43330001831055,
+						27.684900283813478,
+						-3.4902799129486086
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6994500160217285,
+					"name": "footstep",
+					"position": [
+						-27.52199935913086,
+						-22.36240005493164,
+						-1.9730199575424195
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7358779907226563,
+					"name": "contact",
+					"position": [
+						0.0,
+						-83.45960235595703,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2990100383758546,
+					"name": "footstep",
+					"position": [
+						-24.398399353027345,
+						39.50680160522461,
+						-1.1985299587249756
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3998600244522095,
+					"name": "footstep",
+					"position": [
+						24.803699493408204,
+						-35.69969940185547,
+						-1.160040020942688
+					]
+				}
+			]
+		},
+		{
+			"name": "2hspear_run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.06603319942951203,
+					"name": "footstep",
+					"position": [
+						7.423590183258057,
+						-4.566659927368164,
+						-1.2750799655914307
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3331950008869171,
+					"name": "footstep",
+					"position": [
+						-7.428730010986328,
+						-0.2901020050048828,
+						-1.1807299852371216
+					]
+				}
+			]
+		},
+		{
+			"name": "2hspear_spear_prison_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9072309732437134,
+					"name": "contact",
+					"position": [
+						0.0,
+						53.1973991394043,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "2hspear_tendril_throw_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0816899985074997,
+					"name": "start_face",
+					"data": "0 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 1.5254499912261963,
+					"name": "end_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.1577999591827394,
+					"name": "contact",
+					"position": [
+						-23.097700119018556,
+						-48.14350128173828,
+						-155.10800170898438
+					]
+				}
+			]
+		},
+		{
+			"name": "2hspear_walk_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.08023899793624878,
+					"name": "footstep",
+					"position": [
+						4.462289810180664,
+						-28.563400268554689,
+						-2.6230499744415285
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.48513901233673098,
+					"name": "footstep",
+					"position": [
+						-17.771799087524415,
+						-14.581999778747559,
+						-2.9524600505828859
+					]
+				}
+			]
+		},
+		{
+			"name": "dagger_dagger_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5953940153121948,
+					"name": "footstep",
+					"position": [
+						46.559600830078128,
+						-15.116399765014649,
+						-2.564300060272217
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9527580142021179,
+					"name": "footstep",
+					"position": [
+						-33.8651008605957,
+						36.207801818847659,
+						-1.0699100494384766
+					]
+				}
+			]
+		},
+		{
+			"name": "dagger_dagger_attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.27682000398635867,
+					"name": "footstep",
+					"position": [
+						-51.030799865722659,
+						12.692500114440918,
+						-1.1421400308609009
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.30003899335861208,
+					"name": "footstep",
+					"position": [
+						51.10340118408203,
+						2.7027299404144289,
+						-1.657170057296753
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.65413898229599,
+					"name": "footstep",
+					"position": [
+						25.939699172973634,
+						-37.29779815673828,
+						-1.6271699666976929
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.375980019569397,
+					"name": "footstep",
+					"position": [
+						37.22100067138672,
+						-29.000999450683595,
+						-3.178109884262085
+					]
+				}
+			]
+		},
+		{
+			"name": "dagger_dagger_attack_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.1648849993944168,
+					"name": "footstep",
+					"position": [
+						43.15850067138672,
+						-12.84469985961914,
+						-2.6997299194335939
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.2205750048160553,
+					"name": "footstep",
+					"position": [
+						-65.10900115966797,
+						43.9817008972168,
+						-2.8512399196624758
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.38652199506759646,
+					"name": "footstep",
+					"position": [
+						50.31290054321289,
+						17.39780044555664,
+						-2.6803998947143556
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6654829978942871,
+					"name": "footstep",
+					"position": [
+						-9.500570297241211,
+						12.043899536132813,
+						-6.432839870452881
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1382999420166016,
+					"name": "footstep",
+					"position": [
+						50.06800079345703,
+						55.141300201416019,
+						-3.899240016937256
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5660799741744996,
+					"name": "footstep",
+					"position": [
+						26.542299270629884,
+						-45.14120101928711,
+						-1.1619999408721924
+					]
+				}
+			]
+		},
+		{
+			"name": "dagger_dagger_attack_04",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.13190299272537232,
+					"name": "footstep",
+					"position": [
+						5.696400165557861,
+						-11.645000457763672,
+						-1.0257799625396729
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3880600035190582,
+					"name": "footstep",
+					"position": [
+						31.960800170898439,
+						24.504600524902345,
+						-2.0859599113464357
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3920910060405731,
+					"name": "footstep",
+					"position": [
+						-55.481201171875,
+						-22.06529998779297,
+						-2.726720094680786
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.001099944114685,
+					"name": "footstep",
+					"position": [
+						-70.15290069580078,
+						49.67879867553711,
+						-2.9671900272369386
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1014399528503419,
+					"name": "footstep",
+					"position": [
+						28.816099166870118,
+						-44.19779968261719,
+						-1.1204299926757813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2623399496078492,
+					"name": "footstep",
+					"position": [
+						-34.32210159301758,
+						41.98320007324219,
+						-1.1758899688720704
+					]
+				}
+			]
+		},
+		{
+			"name": "dagger_dagger_run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.2515000104904175,
+					"name": "footstep",
+					"position": [
+						-9.97782039642334,
+						-9.824870109558106,
+						-3.104569911956787
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.58235102891922,
+					"name": "footstep",
+					"position": [
+						9.498109817504883,
+						-10.40839958190918,
+						-4.581130027770996
+					]
+				}
+			]
+		},
+		{
+			"name": "javelin_unarmed_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3142490088939667,
+					"name": "footstep",
+					"position": [
+						24.067800521850587,
+						-35.180198669433597,
+						-1.6217700242996216
+					]
+				}
+			]
+		},
+		{
+			"name": "javelin_unarmed_run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.19632600247859956,
+					"name": "footstep",
+					"position": [
+						-7.38709020614624,
+						3.4956300258636476,
+						-1.8141000270843506
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.44463300704956057,
+					"name": "footstep",
+					"position": [
+						7.313469886779785,
+						6.654029846191406,
+						-5.662680149078369
+					]
+				}
+			]
+		},
+		{
+			"name": "javelin_unarmed_throw_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.34324899315834048,
+					"name": "footstep",
+					"position": [
+						23.677799224853517,
+						-34.962398529052737,
+						-1.6645900011062623
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3581230044364929,
+					"name": "contact",
+					"position": [
+						-10.921299934387207,
+						-53.89939880371094,
+						-157.5070037841797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9900000095367432,
+					"name": "respawn_spear"
+				}
+			]
+		},
+		{
+			"name": "spear_shieldlarge_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.40824300050735476,
+					"name": "footstep",
+					"position": [
+						27.913000106811525,
+						-43.20119857788086,
+						-1.7344399690628052
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.032960057258606,
+					"name": "footstep",
+					"position": [
+						27.913000106811525,
+						-43.20119857788086,
+						-1.7344399690628052
+					]
+				}
+			]
+		},
+		{
+			"name": "spear_shieldlarge_run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.12354599684476853,
+					"name": "footstep",
+					"position": [
+						7.390270233154297,
+						-10.615900039672852,
+						-0.7912030220031738
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5215299725532532,
+					"name": "footstep",
+					"position": [
+						-7.4034600257873539,
+						-7.985219955444336,
+						-0.7783439755439758
+					]
+				}
+			]
+		},
+		{
+			"name": "spear_shieldlarge_walk_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.024515800178050996,
+					"name": "footstep",
+					"position": [
+						7.602560043334961,
+						-34.23550033569336,
+						-2.340290069580078
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.46303099393844607,
+					"name": "footstep",
+					"position": [
+						-12.904600143432618,
+						-36.87030029296875,
+						-5.878429889678955
+					]
+				}
+			]
+		},
+		{
+			"name": "sword_sword_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.39182499051094057,
+					"name": "footstep",
+					"position": [
+						-19.256500244140626,
+						-61.919498443603519,
+						-1.062459945678711
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4061740040779114,
+					"name": "footstep",
+					"position": [
+						23.451900482177736,
+						-58.01319885253906,
+						-0.4914720058441162
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8921279907226563,
+					"name": "footstep",
+					"position": [
+						31.59440040588379,
+						-52.355098724365237,
+						-2.023020029067993
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9077749848365784,
+					"name": "footstep",
+					"position": [
+						-29.78860092163086,
+						27.098600387573243,
+						-1.0728700160980225
+					]
+				}
+			]
+		},
+		{
+			"name": "sword_sword_attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.47306299209594729,
+					"name": "footstep",
+					"position": [
+						23.548999786376954,
+						-59.7510986328125,
+						-1.132580041885376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4949969947338104,
+					"name": "footstep",
+					"position": [
+						-31.6968994140625,
+						33.57929992675781,
+						-1.1952300071716309
+					]
+				}
+			]
+		},
+		{
+			"name": "sword_sword_attack_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8753640055656433,
+					"name": "footstep",
+					"position": [
+						-19.604999542236329,
+						30.72949981689453,
+						3.8082098960876467
+					]
+				}
+			]
+		},
+		{
+			"name": "sword_sword_attack_04",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.32940900325775149,
+					"name": "footstep",
+					"position": [
+						-35.40840148925781,
+						38.58720016479492,
+						-1.2264399528503419
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4681700468063355,
+					"name": "footstep",
+					"position": [
+						-29.81570053100586,
+						27.07390022277832,
+						-1.1265599727630616
+					]
+				}
+			]
+		},
+		{
+			"name": "sword_sword_dodge_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.6660000085830689,
+					"name": "move",
+					"position": [
+						200.0,
+						-333.20001220703127,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3717209994792938,
+					"name": "footstep",
+					"position": [
+						76.27749633789063,
+						-25.302400588989259,
+						-3.352099895477295
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6660000085830689,
+					"name": "footstep",
+					"position": [
+						7.166289806365967,
+						-38.640499114990237,
+						-7.810890197753906
+					]
+				}
+			]
+		},
+		{
+			"name": "sword_sword_dodge_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.6660000085830689,
+					"name": "move",
+					"position": [
+						-200.0,
+						-333.20001220703127,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.38620999455451968,
+					"name": "footstep",
+					"position": [
+						-67.09380340576172,
+						-12.868599891662598,
+						-3.2680399417877199
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.649869978427887,
+					"name": "footstep",
+					"position": [
+						6.761990070343018,
+						-47.849700927734378,
+						-8.263250350952149
+					]
+				}
+			]
+		},
+		{
+			"name": "sword_sword_run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.06545080244541168,
+					"name": "footstep",
+					"position": [
+						6.234340190887451,
+						-18.940799713134767,
+						-1.0893000364303589
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3822129964828491,
+					"name": "footstep",
+					"position": [
+						-13.569000244140625,
+						-27.179899215698243,
+						-2.4439198970794679
+					]
+				}
+			]
+		},
+		{
+			"name": "sword_sword_walk_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.032548900693655017,
+					"name": "footstep",
+					"position": [
+						-4.895219802856445,
+						-34.574501037597659,
+						-1.4531400203704835
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.37456199526786806,
+					"name": "footstep",
+					"position": [
+						4.97130012512207,
+						-29.19300079345703,
+						-1.033869981765747
+					]
+				}
+			]
+		},
+		{
+			"name": "sword_sword_whirlingblades_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "footstep",
+					"position": [
+						7.168680191040039,
+						-54.64590072631836,
+						-12.22070026397705
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.20000000298023225,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6333000063896179,
+					"name": "hit_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7800160050392151,
+					"name": "footstep",
+					"position": [
+						29.497299194335939,
+						-53.47309875488281,
+						-2.677459955215454
+					]
+				}
+			]
+		},
+		{
+			"name": "javelin_unarmed_temp_nothing_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/Mutewind/BanditWoman/attachments/UniqueFarudinBanditWomanHeadCloth.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/Mutewind/BanditWoman/attachments/UniqueFarudinBanditWomanPonytail.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/Mutewind/BanditWoman/attachments/UniqueFarudinBanditWomanRobe.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "2hspear_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.2378380000591278,
+								0.0
+							],
+							[
+								0.29729700088500979,
+								1.0
+							]
+						],
+						"damage_statset_index": 1,
+						"width": 46.24300003051758,
+						"length": 230.0,
+						"impact_type": "Piercing",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.6787880063056946,
+								0.0
+							],
+							[
+								0.7333329916000366,
+								1.0
+							]
+						],
+						"damage_statset_index": 1,
+						"width": 46.24300003051758,
+						"length": 230.0,
+						"impact_type": "Piercing",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "2hspear_attack_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3743019998073578,
+								0.0
+							],
+							[
+								0.464480996131897,
+								1.0
+							]
+						],
+						"damage_statset_index": 3,
+						"width": 46.24300003051758,
+						"length": 152.156005859375,
+						"impact_x_rotation": [
+							-0.34906598925590517,
+							-1.1344599723815919
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.47058799862861636,
+								0.0
+							],
+							[
+								0.47058799862861636,
+								1.0
+							]
+						],
+						"angle": 6.28318977355957,
+						"length": 64.3280029296875,
+						"offset": [
+							-12.0,
+							-154.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "dagger_dagger_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.1807910054922104,
+								0.0
+							],
+							[
+								0.2824859917163849,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 4,
+						"angle": 3.141590118408203,
+						"x_axis_scale": 1.1180000305175782,
+						"length": 73.94000244140625,
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							-0.5934119820594788,
+							-1.9198600053787232
+						],
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4519230127334595,
+								0.0
+							],
+							[
+								0.5729169845581055,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 4,
+						"rotation": -0.5061450004577637,
+						"angle": 2.4609100818634035,
+						"x_axis_scale": 0.8360000252723694,
+						"length": 87.98300170898438,
+						"impact_z_rotation": [
+							0.5235990285873413,
+							1.3962600231170655
+						],
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6822919845581055,
+								0.0
+							],
+							[
+								0.8020830154418945,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 4,
+						"rotation": 0.05235990136861801,
+						"angle": 2.897249937057495,
+						"x_axis_scale": 0.9350000023841858,
+						"length": 81.96700286865235,
+						"impact_z_rotation": [
+							-0.3839719891548157,
+							-1.0471999645233155
+						],
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "dagger_dagger_attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.1129940003156662,
+								0.0
+							],
+							[
+								0.16384199261665345,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 3,
+						"rotation": -0.15707999467849732,
+						"angle": 2.862339973449707,
+						"x_axis_scale": 0.8820000290870667,
+						"length": 80.75199890136719,
+						"offset": [
+							-1.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.1344599723815919
+						],
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.30208298563957217,
+								0.0
+							],
+							[
+								0.35416701436042788,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 3,
+						"angle": 2.862339973449707,
+						"x_axis_scale": 0.8899999856948853,
+						"length": 92.5,
+						"offset": [
+							-11.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.1344599723815919
+						],
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6927080154418945,
+								0.0
+							],
+							[
+								0.7631580233573914,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 3,
+						"rotation": -0.3316130042076111,
+						"angle": 3.036870002746582,
+						"x_axis_scale": 0.781000018119812,
+						"length": 104.0459976196289,
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.3962600231170655
+						],
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "dagger_dagger_attack_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.10734499990940094,
+								0.0
+							],
+							[
+								0.16949200630187989,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 4,
+						"angle": 3.141590118408203,
+						"length": 62.89500045776367,
+						"offset": [
+							11.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.309000015258789
+						],
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.20111699402332307,
+								0.0
+							],
+							[
+								0.25,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 4,
+						"angle": 3.0543301105499269,
+						"length": 81.87200164794922,
+						"offset": [
+							20.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.43633198738098147,
+							1.483530044555664
+						],
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.38020798563957217,
+								0.0
+							],
+							[
+								0.45833298563957217,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 4,
+						"rotation": -0.541051983833313,
+						"angle": 3.0892300605773927,
+						"x_axis_scale": 0.699999988079071,
+						"length": 125.90399932861328,
+						"offset": [
+							23.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.08726649731397629,
+							0.43633198738098147
+						],
+						"impact_z_rotation": [
+							-0.43633198738098147,
+							0.785398006439209
+						],
+						"impact_bone": "L_foot_jntBnd"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.7083330154418945,
+								0.0
+							],
+							[
+								0.7760419845581055,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 4,
+						"rotation": 0.34906598925590517,
+						"angle": 3.1241400241851808,
+						"x_axis_scale": 0.8500000238418579,
+						"length": 92.48600006103516,
+						"offset": [
+							4.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.17453299462795258,
+							-0.9599310159683228
+						],
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "dagger_dagger_attack_04",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.1920900046825409,
+								0.0
+							],
+							[
+								0.2598870098590851,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 4,
+						"rotation": 0.4014259874820709,
+						"angle": 3.0892300605773927,
+						"x_axis_scale": 0.6650000214576721,
+						"length": 115.77899932861328,
+						"offset": [
+							-6.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.309000015258789
+						],
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.26041701436042788,
+								0.0
+							],
+							[
+								0.32291701436042788,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"increment_damage_stage": false,
+						"damage_statset_index": 4,
+						"rotation": 0.4886919856071472,
+						"angle": 2.1816599369049074,
+						"x_axis_scale": 0.8920000195503235,
+						"length": 99.21399688720703,
+						"impact_x_rotation": [
+							-0.17453299462795258,
+							-0.34906598925590517
+						],
+						"impact_z_rotation": [
+							-0.17453299462795258,
+							-1.2217299938201905
+						],
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.484375,
+								0.0
+							],
+							[
+								0.5260419845581055,
+								1.0
+							]
+						],
+						"damage_statset_index": 4,
+						"rotation": 0.8901180028915405,
+						"width": 60.00299835205078,
+						"angle": 1.7278800010681153,
+						"length": 123.11199951171875,
+						"offset": [
+							-45.0,
+							26.0
+						],
+						"impact_z_rotation": [
+							0.17453299462795258,
+							0.6981319785118103
+						],
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.671875,
+								0.0
+							],
+							[
+								0.7291669845581055,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 4,
+						"rotation": 0.47123900055885317,
+						"width": 26.143999099731447,
+						"angle": 3.0194199085235597,
+						"length": 75.1449966430664,
+						"impact_z_rotation": [
+							-0.17453299462795258,
+							-0.9599310159683228
+						],
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "javelin_unarmed_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4301680028438568,
+								0.0
+							],
+							[
+								0.5642459988594055,
+								1.0
+							]
+						],
+						"width": 40.46200180053711,
+						"length": 115.60700225830078,
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "spear_shieldlarge_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.2234639972448349,
+								0.0
+							],
+							[
+								0.3296090066432953,
+								1.0
+							]
+						],
+						"width": 80.92500305175781,
+						"length": 213.8730010986328,
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.6648039817810059,
+								0.0
+							],
+							[
+								0.7374299764633179,
+								1.0
+							]
+						],
+						"width": 80.92500305175781,
+						"length": 231.21400451660157,
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "sword_sword_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.1955309957265854,
+								0.0
+							],
+							[
+								0.24581000208854676,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"width": 30.0,
+						"angle": 1.5707999467849732,
+						"length": 150.0,
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.309000015258789
+						],
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.31088098883628847,
+								0.0
+							],
+							[
+								0.3631579875946045,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"width": 30.0,
+						"angle": 1.5707999467849732,
+						"length": 150.0,
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.309000015258789
+						],
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.5647670030593872,
+								0.0
+							],
+							[
+								0.6062179803848267,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"width": 30.0,
+						"angle": 1.5707999467849732,
+						"length": 150.0,
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.309000015258789
+						],
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.6789469718933106,
+								0.0
+							],
+							[
+								0.7315790057182312,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"width": 30.0,
+						"angle": 1.5707999467849732,
+						"length": 150.0,
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.309000015258789
+						],
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "sword_sword_attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.31843599677085879,
+								0.0
+							],
+							[
+								0.40782099962234499,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"width": 30.0,
+						"angle": 1.5707999467849732,
+						"length": 150.0,
+						"impact_x_rotation": [
+							0.0,
+							-0.43633198738098147
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.309000015258789
+						],
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.45077699422836306,
+								0.0
+							],
+							[
+								0.5336790084838867,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"width": 30.0,
+						"angle": 1.5707999467849732,
+						"length": 150.0,
+						"impact_x_rotation": [
+							0.0,
+							-0.34906598925590517
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.309000015258789
+						],
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "sword_sword_attack_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.18994399905204774,
+								0.0
+							],
+							[
+								0.24581000208854676,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"width": 30.0,
+						"angle": 1.5707999467849732,
+						"length": 180.0,
+						"impact_x_rotation": [
+							0.17453299462795258,
+							0.6108649969100952
+						],
+						"impact_z_rotation": [
+							0.5235990285873413,
+							1.483530044555664
+						],
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.27979299426078799,
+								0.0
+							],
+							[
+								0.36787599325180056,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"width": 30.0,
+						"angle": 1.5707999467849732,
+						"length": 180.0,
+						"impact_x_rotation": [
+							0.17453299462795258,
+							0.6108649969100952
+						],
+						"impact_z_rotation": [
+							0.5235990285873413,
+							1.483530044555664
+						],
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.6217619776725769,
+								0.0
+							],
+							[
+								0.6683940291404724,
+								1.0
+							]
+						],
+						"width": 80.0,
+						"length": 200.0,
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "sword_sword_attack_04",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.1787710040807724,
+								0.0
+							],
+							[
+								0.23463700711727143,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"width": 30.0,
+						"angle": 1.5707999467849732,
+						"length": 180.0,
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							0.43633198738098147,
+							1.483530044555664
+						],
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.398963987827301,
+								0.0
+							],
+							[
+								0.4559589922428131,
+								1.0
+							]
+						],
+						"width": 80.0,
+						"length": 220.0,
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.7098450064659119,
+								0.0
+							],
+							[
+								0.7823830246925354,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"width": 30.0,
+						"angle": 1.5707999467849732,
+						"length": 180.0,
+						"impact_z_rotation": [
+							-0.43633198738098147,
+							-1.483530044555664
+						],
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/rig.ast"
+		socket = "Back"
+			parent = "aux_back_attachment"
+		socket = "soc_spear1"
+			parent = "R_Weapon"
+			translation = "0 0 -80"
+		socket = "soc_spear2"
+			parent = "R_Weapon"
+			translation = "0 0 -150"
+		socket = "soc_sword1"
+			parent = "R_Weapon"
+			translation = "-10 0 -80"
+		socket = "soc_sword2"
+			parent = "L_Weapon"
+			translation = "-10 0 -80"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/SuperUniqueFarudinWoman.sm"
+			hide_segments = "bladed_staff_meshShape,sword_1_meshShape,sword_2_meshShape"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "2hspear_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20411300659179688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/SpearSwing1",
+						"bone_name": "soc_spear2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20458899438381196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4140630066394806,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.873786985874176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/SpearSwing1",
+						"bone_name": "soc_spear2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8950889706611633,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9081019759178162,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0915600061416627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3319100141525269,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Breath",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.22120800614356996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/MutewindBandits/GenericFoley/ArmourClothTiny",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23752400279045106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/foley/effects/Fol_SpearStab",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25878700613975527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Fol_SpearStab",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6349030137062073,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/MutewindBandits/GenericFoley/FootstepsBoots",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9233019948005676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/foley/effects/Fol_Chop",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9633259773254395,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Fol_SpearStab",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0933599472045899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/MutewindBandits/GenericFoley/FootstepsBoots",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.141890048980713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/MutewindBandits/GenericFoley/ArmourClothTiny",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/SpearSwing2",
+						"bone_name": "soc_spear2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.098506398499012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Haijah",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1882600039243698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_ArmourCloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22728000581264497,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4680890142917633,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5378869771957398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5480369925498962,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/SpearGroundSmack",
+						"bone_name": "soc_spear2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8612859845161438,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9125880002975464,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9976159930229187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0972900390625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_death_boss_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.584359884262085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7514500617980959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.808389902114868,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8859899044036867,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1804099082946779,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.378659963607788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FallSmall",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.484149932861328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7467799186706545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FallSmall",
+						"bone_name": "R_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05209900066256523,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.095238097012043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13504500687122346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05209900066256523,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.095238097012043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13504500687122346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05209900066256523,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.095238097012043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13504500687122346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05209900066256523,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.095238097012043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13504500687122346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05209900066256523,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.095238097012043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13504500687122346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_groundslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act2/SpearElite/Impaler_YouAreMine_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/SpellASG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "head_jntBnd",
+						"chance": 0.4000000059604645,
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09325840324163437,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20539799332618714,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/SpearSwing3",
+						"bone_name": "soc_spear2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6175600290298462,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_ArmourCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7127969861030579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9598190188407898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0729199647903443,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.116070032119751,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.686229944229126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7991100549697877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8913600444793702,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07860080152750015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Breath",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11785700172185898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26767098903656008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_Footsteps",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4765999913215637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5600060224533081,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Breath",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6514400243759155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_Footsteps"
+					}
+				]
+			},
+			{
+				"name": "2hspear_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.14626899361610413,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Knockdown1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22358199954032899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/FootstepsBoots",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3236680030822754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4617899954319,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/FootstepsBoots",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6614540219306946,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Knockdown2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.704177975654602,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/FootstepsBoots",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7541159987449646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.394629955291748,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Knockdown3",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.484260082244873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5388100147247316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/FootstepsBoots",
+						"bone_name": "aux_L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.13926899433135987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Knockdown1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19497600197792054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30817800760269167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31633898615837099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4078580141067505,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/FallSmall",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4673430025577545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5547230243682861,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Knockdown2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.492169976234436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.156680107116699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/FootstepsBoots",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3098700046539308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Knockdown3",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.365370035171509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_prefight_action_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1637440025806427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17638100683689118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34671899676322939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/SpearPullback",
+						"bone_name": "soc_spear2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5384849905967712,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02176390029489994,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23181599378585816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28360098600387576,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30754199624061587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/BreathRun",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5996000170707703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_spear_prison_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08504520356655121,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act2/SpearElite/Impaler_SpearWall_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/SpellBSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "head_jntBnd",
+						"chance": 0.5,
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3676910102367401,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/SpearSwing2",
+						"bone_name": "soc_spear2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38392698764801028,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Fol_Jump",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.595982015132904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8021429777145386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8046849966049194,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Swing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8381680250167847,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8571419715881348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9508900046348572,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_tendril_throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06723079830408097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17255499958992005,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act2/SpearElite/Impaler_SpearWall_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/SpellCSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "head_jntBnd",
+						"chance": 0.5,
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1780720055103302,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6151890158653259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7274199724197388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/SpearSwingProj",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0057599544525148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Vocals/SpellC2",
+						"bone_name": "head_jntBnd",
+						"chance": 0.5,
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2089200019836427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_ArmourCloth",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2hspear_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08210209757089615,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10432399809360504,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48587000370025637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/Add_FootstepsBoots",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5092939734458923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_2/SpearElite/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false spine_1_jntBnd spine_2_jntBnd chest_jntBnd"
+		bone_group = "frameupper false R_elbow_jntBnd R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_elbow_jntBnd"
+		bone_group = "sword2 false L_Weapon soc_sword2"
+		bone_group = "sword1 false R_Weapon soc_sword1"
+		bone_group = "spear false soc_spear1 soc_spear2"
+		bone_group = "grd_offset false root_jntBnd"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "2hspear_attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.37578898668289187,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/stab.pet",
+						"bone_group": "spear"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.06318998336792,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/stab.pet",
+						"bone_group": "spear"
+					}
+				]
+			},
+			{
+				"name": "2hspear_attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3989419937133789,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/stab.pet",
+						"bone_group": "spear"
+					}
+				]
+			},
+			{
+				"name": "2hspear_leapslam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.1391800045967102,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/speardust.pet",
+						"bone_group": "spear"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7664999961853027,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/speardust.pet",
+						"bone_group": "spear"
+					}
+				]
+			},
+			{
+				"name": "2hspear_leapslam_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.13711999356746674,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/speardust.pet",
+						"bone_group": "spear"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7678700089454651,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/speardust.pet",
+						"bone_group": "spear"
+					}
+				]
+			},
+			{
+				"name": "dagger_dagger_attack_03",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.4766499996185303,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditWoman/pets/dagg_1_double.pet",
+						"bone_group": "grd_offset"
+					}
+				]
+			},
+			{
+				"name": "javelin_unarmed_attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.420960009098053,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditWoman/pets/stab_javelin.pet",
+						"bone_group": "sword1"
+					}
+				]
+			},
+			{
+				"name": "spear_shieldlarge_attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.42963001132011416,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditWoman/pets/stab.pet",
+						"bone_group": "spear"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0992300510406495,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditWoman/pets/stab.pet",
+						"bone_group": "spear"
+					}
+				]
+			},
+			{
+				"name": "sword_sword_dodge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditWoman/pets/dodgedust.pet",
+						"bone_group": "grd_offset"
+					}
+				]
+			},
+			{
+				"name": "sword_sword_dodge_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditWoman/pets/dodgedust.pet",
+						"bone_group": "grd_offset"
+					}
+				]
+			},
+			{
+				"name": "sword_sword_whirlingblades_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.1984580010175705,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditWoman/pets/dodgedust.pet",
+						"bone_group": "grd_offset"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "2hspear_attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.0231399536132813,
+						"end_time": 1.1064701080322266,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/act.trl",
+						"bone_group": "spear"
+					}
+				]
+			},
+			{
+				"name": "2hspear_attack_03",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.417944997549057,
+						"end_time": 0.5592789649963379,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/act.trl",
+						"bone_group": "spear"
+					}
+				]
+			},
+			{
+				"name": "2hspear_leapslam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6855999827384949,
+						"end_time": 0.7941519618034363,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/spear_leapslam.trl",
+						"bone_group": "spear"
+					}
+				]
+			},
+			{
+				"name": "2hspear_leapslam_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6561200022697449,
+						"end_time": 0.7823960185050964,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/spear_leapslam.trl",
+						"bone_group": "spear"
+					}
+				]
+			},
+			{
+				"name": "sword_sword_whirlingblades_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.25925999879837038,
+						"end_time": 0.7073140144348145,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/act.trl",
+						"bone_group": "sword1"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.25925999879837038,
+						"end_time": 0.6270589828491211,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/pets/act.trl",
+						"bone_group": "sword2"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "2hspear_attack_02",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.082759976387024,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/act_slam.ao",
+						"offset": [
+							-7.012010097503662,
+							-216.57200622558595
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "2hspear_attack_03",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.5282679796218872,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoss/act_slam.ao",
+						"offset": [
+							-7.012010097503662,
+							-216.57200622558595
+						],
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditWoman/attachments/UniqueFarudinBanditWomanHeadCloth.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/attachments/HeadCloth/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/attachments/HeadCloth/rig.ast"
+		linear_allowed_contraction = 0.655
+		bend_stiffness = 100.000
+		tangent_viscosity_multiplier = 0.120
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/attachments/HeadCloth/UniqueFarudinWomanHeadCloth.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditWoman/attachments/UniqueFarudinBanditWomanPonytail.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/attachments/Ponytail/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/attachments/Ponytail/rig.ast"
+		linear_allowed_contraction = 0.150
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.200
+		normal_viscosity_multiplier = 0.001
+		tangent_viscosity_multiplier = 0.001
+		enclosure_angle = 0.700
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/attachments/Ponytail/UniqueFarudinWomanPonytail.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	ObjectHiding
+	{
+		hide_parent_segments = "hairbun_meshShape"
+	}
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditWoman/attachments/UniqueFarudinBanditWomanRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/attachments/Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/attachments/Robe/rig.ast"
+		linear_allowed_contraction = 0.400
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.800
+		use_shock_propagation = false
+		enable_collisions = false
+		attachment_bones = "spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/attachments/Robe/SuperUniqueFarudinWomanRobe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/SuperUniqueFarudinWoman.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/SuperUniqueFarudinWoman_armour_e9f84ff9.smd"
+Materials 6
+	"Art/Textures/Monsters/MutewindBandits/SuperUniqueBanditWomanWeaponsc.mat" 3
+	"Art/Models/MONSTERS/MutewindBandits/Textures/SuperUniqueFarudinWomanc.mat" 1
+	"Art/Textures/Monsters/MutewindBandits/MutewindBanditWomanhairc.mat" 1
+	"Art/Models/MONSTERS/MutewindBandits/Textures/SuperUniqueFarudinWomanHelmetc.mat" 1
+	"Art/Models/MONSTERS/MutewindBandits/Textures/SuperUniqueFarudinWomanBodc.mat" 2
+	"Art/Models/MONSTERS/BeastSeed/Doodads/Textures/Tenc.mat" 2
+BoundingBox -70.292 -17.0953 -212.355 70.292 21.5111 96.0404
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/MutewindBandits/MutewindBanditWoman/SuperUniqueFarudinWoman_armour_e9f84ff9.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 10 in the header, 10 in the block · 13660 triangles over 9467 vertices
+  names: 362 bytes said, 362 read  [agree]
+
+=== shapes (15)
+0	bladed_staff_meshShape	from 0	count 3348
+1	sword_1_meshShape	from 3348	count 798
+2	sword_2_meshShape	from 4146	count 930
+3	body_meshShape	from 5076	count 13818
+4	hair_meshShape	from 18894	count 258
+5	helmet_meshShape	from 19152	count 6144
+6	pants_meshShape	from 25296	count 2892
+7	wasit_band_meshShape	from 28188	count 2118
+8	tendrils_arms_meshShape	from 30306	count 8718
+9	tendrils_head_meshShape	from 39024	count 1956
+10	UniqueFarudinWomanHeadCloth_meshShape	from 40980	count 456
+11	hair_base_meshShape	from 41436	count 264
+12	ponytail_meshShape	from 41700	count 1362
+13	veins_meshShape	from 43062	count 18612
+14	SkirtShape	from 61674	count 6504
+
+=== fitting
+the monster's rig: 57 bones
+mounts: aux_position, aux_back_attachment, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  UniqueFarudinBanditWomanHeadCloth.ao  socket head_jntBnd [in its carrier's rig]  box (-17.6,-5.3,-13.5)..(17.6,10.7,13.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 152 triangles over 102 vertices
+    names: 74 bytes said, 74 read  [agree]
+    rig 3 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_L_cloth_jntBnd_1  [its own]  under 0  rests at (10.6,0.5,3.9)
+      2 phys_tri_R_cloth_jntBnd_1  [its own]  under 0  rests at (-10.6,0.5,3.9)
+  UniqueFarudinBanditWomanPonytail.ao  socket head_jntBnd [in its carrier's rig]  box (-11.6,8,-21.5)..(15.2,49,136.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 6746 triangles over 4178 vertices
+    names: 104 bytes said, 104 read  [agree]
+    rig 9 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 9  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_ponytail_jntBnd_1  [its own]  under 0  rests at (0,17.1,-0.9)
+      2 phys_tri_ponytail_jntBnd_2  [its own]  under 1  rests at (-0,25,13.2)
+      3 phys_tri_ponytail_jntBnd_3  [its own]  under 2  rests at (-0,24.4,37.6)
+      4 phys_tri_ponytail_jntBnd_4  [its own]  under 3  rests at (-0,33.1,59.7)
+      5 phys_tri_ponytail_jntBnd_5  [its own]  under 4  rests at (-0,33.4,83.7)
+      6 phys_tri_ponytail_jntBnd_6  [its own]  under 5  rests at (-0,41.2,106.1)
+      7 phys_tri_ponytail_jntBnd_7  [its own]  under 6  rests at (-0,40.7,122.3)
+      8 aux_animation_control_ratio  [its own]  under 0  rests at (0,0,0)
+  UniqueFarudinBanditWomanRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-39.7,-17.9,-12.8)..(39.7,30.3,82.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 2168 triangles over 1564 vertices
+    names: 20 bytes said, 20 read  [agree]
+    rig 16 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 15 of 16  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,-0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-11)  carrier has (0,-0.6,-111.9)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (9.9,0,-0)  carrier has (9.9,1,-101)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-9.9,-0,0)  carrier has (-9.9,1,-101)
+      4 phys_tri_M_robe_1_jntBnd_1  [its own]  under 0  rests at (0,-11.8,-3)
+      5 phys_tri_L_robe_1_jntBnd_1  [its own]  under 0  rests at (18.3,6.8,32.2)
+      6 phys_tri_L_robe_2_jntBnd_1  [its own]  under 0  rests at (9.7,14.7,34)
+      7 phys_tri_R_robe_1_jntBnd_1  [its own]  under 0  rests at (-18.6,6.8,33.6)
+      8 phys_tri_R_robe_2_jntBnd_1  [its own]  under 0  rests at (-9.7,14.7,34)
+      9 phys_tri_M_robe_1_jntBnd_2  [its own]  under 4  rests at (0,-14.2,15.5)
+      10 phys_tri_L_robe_1_jntBnd_2  [its own]  under 5  rests at (27.3,3.7,68.5)
+      11 phys_tri_L_robe_2_jntBnd_2  [its own]  under 6  rests at (15.5,17.5,69.2)
+      12 phys_tri_R_robe_1_jntBnd_2  [its own]  under 7  rests at (-27.3,3.7,68.5)
+      13 phys_tri_R_robe_2_jntBnd_2  [its own]  under 8  rests at (-12.8,19.1,69.3)
+      14 phys_tri_M_robe_1_jntBnd_3  [its own]  under 9  rests at (0,-14.8,34.2)
+      15 phys_tri_M_robe_1_jntBnd_4  [its own]  under 14  rests at (0,-15.6,52.9)

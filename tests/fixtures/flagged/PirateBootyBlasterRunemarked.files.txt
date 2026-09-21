@@ -1,0 +1,1479 @@
+monster: Rotting Soulcatcher [Metadata/Monsters/Pirates/Runemarked/PirateBootyBlasterRunemarked]
+
+=== .ao Metadata/Monsters/Pirates/Runemarked/PirateBootyBlasterRunemarked.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/AdditionalPirateMonsters/chest/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.25418999791145327,
+					"name": "addghostepk"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6647949814796448,
+					"name": "release",
+					"position": [
+						-2.8991200923919679,
+						-77.26329803466797,
+						-112.52799987792969
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7768499851226807,
+					"name": "contact",
+					"position": [
+						-4.277249813079834,
+						-83.98390197753906,
+						-123.48100280761719
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8704180121421814,
+					"name": "contact",
+					"position": [
+						-5.0094099044799809,
+						-83.21040344238281,
+						-126.51000213623047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9643250703811646,
+					"name": "contact",
+					"position": [
+						-5.399370193481445,
+						-82.56539916992188,
+						-128.2100067138672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0585700273513795,
+					"name": "release",
+					"position": [
+						31.204599380493165,
+						-150.04800415039063,
+						-103.8280029296875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.397439956665039,
+					"name": "removeghostepk"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.25418999791145327,
+					"name": "addghostepk"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6647949814796448,
+					"name": "release",
+					"position": [
+						-2.8991200923919679,
+						-77.26329803466797,
+						-112.52799987792969
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7768499851226807,
+					"name": "contact",
+					"position": [
+						-4.277249813079834,
+						-83.98390197753906,
+						-123.48100280761719
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8704180121421814,
+					"name": "contact",
+					"position": [
+						-5.0094099044799809,
+						-83.21040344238281,
+						-126.51000213623047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9643250107765198,
+					"name": "contact",
+					"position": [
+						-5.399370193481445,
+						-82.56539916992188,
+						-128.2100067138672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0585700273513795,
+					"name": "release",
+					"position": [
+						31.204599380493165,
+						-150.04800415039063,
+						-103.8280029296875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.397439956665039,
+					"name": "removeghostepk"
+				}
+			]
+		},
+		{
+			"name": "attack_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.25418999791145327,
+					"name": "addghostepk"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6647949814796448,
+					"name": "release",
+					"position": [
+						-2.8991200923919679,
+						-77.26329803466797,
+						-112.52799987792969
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7768499851226807,
+					"name": "contact",
+					"position": [
+						-4.277249813079834,
+						-83.98390197753906,
+						-123.48100280761719
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8704180121421814,
+					"name": "contact",
+					"position": [
+						-5.0094099044799809,
+						-83.21040344238281,
+						-126.51000213623047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9643250107765198,
+					"name": "contact",
+					"position": [
+						-5.399370193481445,
+						-82.56539916992188,
+						-128.2100067138672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0585700273513795,
+					"name": "release",
+					"position": [
+						31.204599380493165,
+						-150.04800415039063,
+						-103.8280029296875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.397439956665039,
+					"name": "removeghostepk"
+				}
+			]
+		},
+		{
+			"name": "attack_04",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.1025599241256714,
+					"name": "release",
+					"position": [
+						21.140581130981447,
+						-92.07359313964844,
+						-111.32081604003906
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3025599718093873,
+					"name": "release",
+					"position": [
+						15.404667854309082,
+						-92.07359313964844,
+						-111.32081604003906
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5025599002838135,
+					"name": "release",
+					"position": [
+						13.501167297363282,
+						-92.07359313964844,
+						-115.09550476074219
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7025598287582398,
+					"name": "release",
+					"position": [
+						12.266824722290039,
+						-92.07359313964844,
+						-115.09550476074219
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9025599956512452,
+					"name": "release",
+					"position": [
+						11.032480239868164,
+						-92.07359313964844,
+						-116.47164916992188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.102560043334961,
+					"name": "release",
+					"position": [
+						14.10016918182373,
+						-86.03227996826172,
+						-116.47164916992188
+					]
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						110.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5000001788139343,
+					"name": "move",
+					"position": [
+						-110.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "flinch_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.1788949966430664,
+					"name": "soul",
+					"position": [
+						-2.9381799697875978,
+						50.32979965209961,
+						-127.80400085449219
+					]
+				}
+			]
+		},
+		{
+			"name": "flinch_fwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.21135300397872926,
+					"name": "soul",
+					"position": [
+						-1.0895700454711915,
+						-11.480500221252442,
+						-146.2550048828125
+					]
+				}
+			]
+		},
+		{
+			"name": "flinch_left_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.21059800684452058,
+					"name": "soul",
+					"position": [
+						23.401100158691408,
+						15.677499771118164,
+						-139.1959991455078
+					]
+				}
+			]
+		},
+		{
+			"name": "flinch_right_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.18946300446987153,
+					"name": "soul",
+					"position": [
+						-31.6643009185791,
+						16.050399780273439,
+						-136.9149932861328
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "L_elbow_Twist_jntBnd_3 Metadata/Monsters/PirateMonsters/attachments/PirateMonster02/L_ArmDangler.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/PirateMonsters/attachments/PirateMonster02/Skirt.ao"
+	attached_object = "L_knee_jntBnd Metadata/Monsters/PirateMonsters/attachments/PirateMonster01/LegDangler.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/PirateMonsters/attachments/PirateMonster02/Hair.ao"
+	attached_object = "aux_Back_attachment_1 Metadata/Monsters/ZombieTreasureHunters/Attachments/Wheel_Tri.ao"
+	attached_object = "aux_Back_attachment_2 Metadata/Monsters/ZombieTreasureHunters/Attachments/TreasureChest_Openable/TreasureChest_OpenableNoPhys.ao"
+	attached_object = "R_Weapon Metadata/Monsters/ZombieTreasureHunters/Attachments/TreasureChest_Smaller/TreasureChestSmaller.ao"
+}
+
+Locators
+{
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/AdditionalPirateMonsters/chest/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/AdditionalPirateMonster02.sm"
+			hide_segments = "L_arm_danglerShape,L_leg_danglerShape,R_arm_danglerShape,hairShape,skirtShape,skirt_ropesShape"
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "frameupper false aux_R_shoulder_attachment head_jntBnd aux_L_shoulder_attachment"
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/Idle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3117310106754303,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/BarrelPickUp",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40959298610687258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/BootyBlast",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5838770270347595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/FX/Spell/Spellcast",
+						"bone_name": "aux_R_Weapon_attachment",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2287800312042237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/BarrelPickUp",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/Idle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3546150028705597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/BarrelPickUp",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45852500200271609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/BootyBlast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6229119896888733,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/FX/Spell/Spellcast",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.113319993019104,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/BarrelPickUp",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/Idle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3034839928150177,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/BarrelPickUp",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5162529945373535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/BootyBlast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5822280049324036,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/FX/Spell/Spellcast",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1622600555419922,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/BarrelPickUp",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04247533529996872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/FallA",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28603464365005495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4430583417415619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.289675235748291,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3676907420158386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/FallB_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3869728744029999,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1509373188018799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/FallA",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4097487926483155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18410757184028626,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/FallA",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39828068017959597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5649471879005432,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23701530694961549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/FallA",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39485400915145876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.533004105091095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2055770605802536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/FallA",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45415300130844118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6007620096206665,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16475580632686616,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/FallA",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4998660087585449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5820109248161316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.41560399532318118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/IdleQuiet"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.514585018157959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/Idle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4228399991989136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/Idle"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/MovementLoop",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/FallA",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/CannonMoveFoley",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05123160034418106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2410951405763626,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/KnockbackA_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3526017963886261,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1004267930984498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/FallB_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1004267930984498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/CannonMoveFoley",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2668893337249756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/BootyBlastKnockbackB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5291502475738526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownStep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5556261539459229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownBarrelUp",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9522494077682496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/BarrelPickUp",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.976683259010315,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.133070945739746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/CannonMoveFoley",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.28407883644104,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownStep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4627461433410646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownBarrelUp",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.869884729385376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownStep",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.214902639389038,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/BootyBlastKnockdownC"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.82041335105896,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownBarrelUp",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/CannonMoveFoley",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/KnockbackA_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1681714802980423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownStep",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29328247904777529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/FallA",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5502375960350037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/ChestDrop"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9352072477340698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1004267930984498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/CannonMoveFoley",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4864448308944703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownStep",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5756945610046387,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/FallB_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6960326433181763,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/BootyBlastKnockbackB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8093351125717164,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownBarrelUp",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9522494077682496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/BarrelPickUp",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9522494077682496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/CannonMoveFoley",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1368567943573,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownStep",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.775789499282837,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4932496547698976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/BootyBlastKnockdownC"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5151615142822267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/KnockdownBarrelUp",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2660219967365265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/MovementLoop",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2889782190322876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/Steps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7371446490287781,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2627959251403809,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/GunpowderPirates/Vocal/Cannoneer/WalkLoop",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/PirateMonsters/attachments/PirateMonster02/L_ArmDangler.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/attachments/PirateMonster02/L_arm_dangler/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/attachments/PirateMonster02/L_arm_dangler/rig.ast"
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.500
+		normal_viscosity_multiplier = 0.150
+		attachment_bones = "L_elbow_Twist_jntBnd_3_jntBnd root_jntBnd L_elbow_Twist_jntBnd_2_jntBnd L_elbow_Twist_jntBnd_1_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/attachments/PirateMonster02/L_arm_dangler/L_dangler.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_elbow_Twist_jntBnd_2_jntBnd L_elbow_Twist_jntBnd_1_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/PirateMonsters/attachments/PirateMonster02/Skirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/attachments/PirateMonster02/Skirt/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/attachments/PirateMonster02/Skirt/rig.ast"
+		linear_allowed_contraction = 0.350
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.550
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "spine_1_jntBnd hip_jntBnd R_thigh_jntBnd L_thigh_jntBnd child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/attachments/PirateMonster02/Skirt/Skirt.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd hip_jntBnd R_thigh_jntBnd L_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/PirateMonsters/attachments/PirateMonster01/LegDangler.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/attachments/PirateMonster01/Leg_dangler/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/attachments/PirateMonster01/Leg_dangler/rig.ast"
+		linear_allowed_contraction = 0.300
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/attachments/PirateMonster01/Leg_dangler/LegDangler.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/PirateMonsters/attachments/PirateMonster02/Hair.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/attachments/PirateMonster02/Hair/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/attachments/PirateMonster02/Hair/rig.ast"
+		linear_allowed_contraction = 0.200
+		enclosure_angle = 0.200
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/attachments/PirateMonster02/Hair/Hair.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/ZombieTreasureHunters/Attachments/Wheel_Tri.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/attachments/PiratesAttachments/WheelTri/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/attachments/PiratesAttachments/WheelTri/rig.ast"
+		linear_allowed_contraction = 0.100
+		bend_allowed_angle = 0.150
+		normal_viscosity_multiplier = 0.120
+		enclosure_angle = 0.800
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/attachments/PiratesAttachments/WheelTri/SteeringWheel.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/ZombieTreasureHunters/Attachments/TreasureChest_Openable/TreasureChest_OpenableNoPhys.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/attachments/PiratesAttachments/TreasureChest/TreasureChestNoPhys/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/attachments/PiratesAttachments/TreasureChest/TreasureChestNoPhys/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/attachments/PiratesAttachments/TreasureChest/TreasureChestNoPhys/TreasureChest.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/ZombieTreasureHunters/Attachments/TreasureChest_Smaller/TreasureChestSmaller.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/attachments/PiratesAttachments/TreasureChest/TreasureChestSmaller/rig.amd"
+	default_animation = "idle_01"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "lid_jntBnd Metadata/Monsters/ZombieTreasureHunters/Attachments/TreasureChest_Smaller/TreasureChestSmaller_Latch.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/attachments/PiratesAttachments/TreasureChest/TreasureChestSmaller/rig.ast"
+		socket = "aux_box_1"
+			parent = "root_jntBnd"
+			translation = "-14.5408 -9.09411 0"
+		socket = "aux_box_2"
+			parent = "root_jntBnd"
+			translation = "14.3148 11.8496 -12.7298"
+		socket = "aux_box_3"
+			parent = "root_jntBnd"
+			translation = "13.9344 0 -29.025"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/attachments/PiratesAttachments/TreasureChest/TreasureChestSmaller/TreasureChest_smaller.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "box false aux_box_1 aux_box_2 aux_box_3"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5433890223503113,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/PirateChestHolder/pet/soul_onact_glow.pet",
+						"bone_group": "mid"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5433899760246277,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/PirateChestHolder/pet/soul_onact.pet",
+						"bone_group": "box"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Monsters/ZombieTreasureHunters/Attachments/TreasureChest_Smaller/TreasureChestSmaller_Latch.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/attachments/PiratesAttachments/TreasureChest/TreasureChestSmaller/attachments/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/attachments/PiratesAttachments/TreasureChest/TreasureChestSmaller/attachments/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.250
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/attachments/PiratesAttachments/TreasureChest/TreasureChestSmaller/attachments/Latch.sm"
+	}
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/AdditionalPirateMonster02.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/PirateMonster02_armour_24d31439.smd"
+Materials 1
+	"Art/Models/MONSTERS/AdditionalPirateMonster/Textures/AdditionalPirateMonster02c.mat" 11
+BoundingBox -69.0129 -18.3291 -174.673 69.1973 16.6392 0.48025
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/AdditionalPirateMonsters/PirateMonster02_armour_24d31439.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 11 in the header, 11 in the block · 12618 triangles over 9366 vertices
+  names: 408 bytes said, 408 read  [agree]
+
+=== shapes (24)
+0	AdditionalPirateMonster02_DoubleShape	from 0	count 2082
+1	AdditionalPirateMonster02_OpaqueShape	from 2082	count 27594
+2	hairShape	from 29676	count 468
+3	L_arm_danglerShape	from 30144	count 78
+4	L_leg_danglerShape	from 30222	count 252
+5	neck_braceShape	from 30474	count 924
+6	R_arm_danglerShape	from 31398	count 48
+7	shirt_physShape	from 31446	count 300
+8	shortsShape	from 31746	count 1494
+9	skirt_ropesShape	from 33240	count 3630
+10	skirtShape	from 36870	count 984
+11	L_arm_danglerShape	from 37854	count 78
+12	skirt_ropesShape	from 37932	count 3630
+13	skirtShape	from 41562	count 984
+14	leg_danglerShape	from 42546	count 252
+15	hairShape	from 42798	count 468
+16	AdditionalPirateMonsters03_OpaqueShape	from 43266	count 7968
+17	ropeShape	from 51234	count 72
+18	seaweedShape	from 51306	count 246
+19	chestShape	from 51552	count 3474
+20	DSidedCaseShape	from 55026	count 60
+21	DSidedLidShape	from 55086	count 48
+22	latchShape	from 55134	count 1152
+23	lidShape	from 56286	count 4062
+
+=== fitting
+the monster's rig: 86 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment_1, aux_Back_attachment_2, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  L_ArmDangler.ao  socket L_elbow_Twist_jntBnd_3 [in its carrier's rig]  box (-7.6,-4,-1.7)..(9.7,-2,14.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 26 triangles over 26 vertices
+    names: 36 bytes said, 36 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_elbow_Twist_jntBnd_2_jntBnd  [its own]  under 0  rests at (-6.8,0,-0)
+      2 L_elbow_Twist_jntBnd_1_jntBnd  [its own]  under 0  rests at (-13.5,0,-0)
+      3 phys_tri_1_jntBnd  [its own]  under 0  rests at (1.4,-2.9,6.8)
+  Skirt.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-15.7,-12.5,-8.5)..(16,14.7,65.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 1538 triangles over 1076 vertices
+    names: 52 bytes said, 52 read  [agree]
+    rig 9 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 9  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,3.2,15.4)  carrier has (0,3.2,-89.9)
+      2 phys_tri_B_skirt_1_jntBnd  [its own]  under 1  rests at (0.8,8.8,20.7)
+      3 phys_tri_F_skirt_1_jntBnd  [its own]  under 1  rests at (0.7,-8,21.9)
+      4 L_thigh_jntBnd  [shared]  under 1  rests at (10.1,3.2,15.4)  carrier has (10.1,3.2,-89.9)
+      5 R_thigh_jntBnd  [shared]  under 1  rests at (-10.1,3.2,15.4)  carrier has (-10.1,3.2,-89.9)
+      6 phys_tri_B_skirt_2_jntBnd  [its own]  under 2  rests at (0.8,9.1,40.3)
+      7 phys_tri_F_skirt_2_jntBnd  [its own]  under 3  rests at (0.7,-8,43.1)
+      8 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  LegDangler.ao  socket L_knee_jntBnd [in its carrier's rig]  box (3.5,-3.7,5.1)..(26.5,1.7,9.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 84 triangles over 60 vertices
+    names: 32 bytes said, 32 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_1_jntBnd  [its own]  under 0  rests at (16.4,-0.9,6.6)
+  Hair.ao  socket head_jntBnd [in its carrier's rig]  box (-11.5,-9.1,-11.5)..(11.6,7.8,15.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 156 triangles over 140 vertices
+    names: 18 bytes said, 18 read  [agree]
+    rig 3 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,-0,0)  carrier has (0,0,0)
+      1 phys_tri_hair_jntBnd  [its own]  under 0  rests at (-0,-0,2)
+      2 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  Wheel_Tri.ao  socket aux_Back_attachment_1 [in its carrier's rig]  box (-68.7,-8.3,-60)..(68.7,10.9,59.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 2762 triangles over 2673 vertices
+    names: 118 bytes said, 118 read  [agree]
+    rig 4 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 wheel_jntBnd  [its own]  under 0  rests at (0,0,0)
+      2 phys_tri_seaweed_1_jntBnd  [its own]  under 1  rests at (-53.5,4,19.8)
+      3 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  TreasureChest_OpenableNoPhys.ao  socket aux_Back_attachment_2 [in its carrier's rig]  box (-20.7,-0.9,-41.1)..(18.9,39.9,41.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 5 in the header, 5 in the block · 2932 triangles over 2730 vertices
+    names: 114 bytes said, 114 read  [agree]
+    rig 3 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 chest_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (0,-0.3,-127.3)
+      2 lid_jntBnd  [its own]  under 1  rests at (16.3,21.9,0.1)
+  TreasureChestSmaller.ao  socket R_Weapon [NOT in its carrier's rig]  box (-17.1,-15.5,-32.4)..(16.2,15.5,0.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23D · stride 36
+    shapes 4 in the header, 4 in the block · 3446 triangles over 3006 vertices
+    names: 112 bytes said, 112 read  [agree]
+    rig 13 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 13  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 chest_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (0,-0.3,-127.3)
+      2 lid_jntBnd  [its own]  under 0  rests at (0,13.1,-17.6)
+      3 light_jntBnd  [its own]  under 1  rests at (0,0,-21.9)
+      4 aux_root_end_jntBnd  [its own]  under 0  rests at (0,-3,0)
+      5 aux_handle_1_jntBnd  [its own]  under 1  rests at (0,0,0)
+      6 aux_mid_1_jntBnd  [its own]  under 1  rests at (0,0,-12)
+      7 aux_blade_1_jntBnd  [its own]  under 2  rests at (0,0,-17.9)
+      8 aux_handle_2_jntBnd  [its own]  under 5  rests at (0,0,-17.6)
+      9 aux_handle_cyl_1_jntBnd  [its own]  under 5  rests at (15,0,0)
+      10 aux_mid_2_jntBnd  [its own]  under 6  rests at (0,0,-13)
+      11 aux_blade_2_jntBnd  [its own]  under 7  rests at (0,0,-32.4)
+      12 aux_blade_cyl_1_jntBnd  [its own]  under 7  rests at (16,0,-17.9)
+    TreasureChestSmaller_Latch.ao  socket lid_jntBnd [in its carrier's rig]  box (-2.2,-30.6,-6.5)..(1.6,-25,13.3)
+      version 3 · c0h 4 · 1 level(s) of detail · format 0x23D · stride 36
+      shapes 1 in the header, 1 in the block · 384 triangles over 448 vertices
+      names: 20 bytes said, 20 read  [agree]
+      rig 2 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 1 of 2  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_skinned_latch_jntBnd  [its own]  under 0  rests at (0,-26.4,4.5)

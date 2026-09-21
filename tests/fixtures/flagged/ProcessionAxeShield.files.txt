@@ -1,0 +1,1069 @@
+monster: Vaal Embalmed Axeman [Metadata/Monsters/Procession/ProcessionAxeShield]
+
+=== .ao Metadata/Monsters/Procession/Procession04/Procession04AAxe.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Procession/axe_shield/rig.amd"
+	animations = '[
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000000298023225,
+					"name": "move",
+					"position": [
+						140.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000001788139344,
+					"name": "move",
+					"position": [
+						-140.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/Procession/Procession04/attachments/Procession04A_Loincloth.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.48076921701431277,
+								0.0
+							],
+							[
+								0.5230769515037537,
+								0.4774436354637146
+							],
+							[
+								0.5961538553237915,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.20943951606750489,
+						"angle": 2.7052605152130129,
+						"x_axis_scale": 0.7649999856948853,
+						"length": 115.60700225830078,
+						"offset": [
+							-4.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.15707963705062867,
+							2.373647928237915
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.42692306637763979,
+								0.0
+							],
+							[
+								0.44999998807907107,
+								0.5
+							],
+							[
+								0.4653846025466919,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.7504916191101074,
+						"angle": 1.9024089574813843,
+						"x_axis_scale": 0.7260000109672546,
+						"length": 87.93900299072266,
+						"offset": [
+							-14.0,
+							0.0
+						],
+						"local_offset": [
+							0.0,
+							-5.0
+						],
+						"impact_z_rotation": [
+							1.2566370964050294,
+							-0.6806784272193909
+						]
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Procession/axe_shield/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Procession/Procession04A.sm"
+			hide_segments = "loinclothShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false aux_R_shoulder_attachment head_jntBnd aux_L_shoulder_attachment"
+		bone_group = "buff_core false chest_jntBnd"
+	}
+	
+	AnimatedRender
+	{
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Attack",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4055200219154358,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/AttackClothA",
+						"bone_name": "R_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5509560108184815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WhooshAxe",
+						"bone_name": "R_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5902339816093445,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "R_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0413999557495118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0413999557495118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/Shield_Swipe",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10337130725383759,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Attack",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.539277970790863,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/AttackClothA",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5541399717330933,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6019110083580017,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WhooshAxe",
+						"bone_name": "R_thumb_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7048850059509277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/Shield_Swipe",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0413999557495118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "block_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Aggro",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/FlinchCloth",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13152700662612916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Fall",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13481999933719636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WeaponDrop_Spear",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15050099790096284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20806799829006196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WeaponDrop_Shield",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7274240255355835,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/AttackClothA",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7394649982452393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7765889763832092,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08987980335950852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WeaponDrop_Spear",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13871200382709504,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WeaponDrop_Shield",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18809999525547028,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6027479767799377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Jewllery",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.612555980682373,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.016053499653935434,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Jewllery",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.059197500348091128,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08943849802017212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13481999933719636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WeaponDrop_Spear",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20806799829006196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WeaponDrop_Shield",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08385790139436722,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WeaponDrop_Spear",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12356799840927124,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Jewllery",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1294189989566803,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WeaponDrop_Shield",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15870000422000886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Fall",
+						"bone_name": "L_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19096900522708894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "L_shoulder_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02674509957432747,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Jewllery",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09583680331707001,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10480000078678131,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WeaponDrop_Spear",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1422480046749115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16173900663852693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WeaponDrop_Shield",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10535100102424622,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Jewllery",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1214900016784668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Fall",
+						"bone_name": "R_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13481999933719636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WeaponDrop_Spear",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17959900200366975,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20806799829006196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Foley/WeaponDrop_Shield",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08528420329093933,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10936500132083893,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Jewllery",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05719060078263283,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07525090128183365,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Jewllery",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.057859599590301517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "aux_R_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08662209659814835,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Jewllery",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03879600018262863,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0709030032157898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Jewllery",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.9694100618362427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/Idle",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/KnockdownA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14353488385677339,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28529733419418337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3313699960708618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0968871116638184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1837164163589478,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/KnockdownB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5416679382324219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9403748512268067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/KnockdownA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08328551054000855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20732764899730683,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23922307789325715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0065126419067383,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2227020263671876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/KnockdownB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6036889553070069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8889859914779664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/AttackClothB",
+						"bone_name": "L_knee_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27176299691200259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6069369912147522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0168499946594239,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1029000282287598,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/AttackClothB",
+						"bone_name": "L_knee_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.415429949760437,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8253300189971924,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9973783493041993,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/RunAxe.loop.ogg",
+						"bone_name": "L_knee_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1922099590301515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.214859962463379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/AttackClothB",
+						"bone_name": "L_knee_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.651940107345581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.005229949951172,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "run_block_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/AttackClothB",
+						"bone_name": "L_knee_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27176299691200259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6069369912147522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0168499946594239,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1029000282287598,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/AttackClothB",
+						"bone_name": "L_knee_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.415429949760437,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8253300189971924,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9973783493041993,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/4_ProcessionBowAxeDagger/Vocals/Axe/RunAxe.loop.ogg",
+						"bone_name": "L_knee_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1922099590301515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.214859962463379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/AttackClothB",
+						"bone_name": "L_knee_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.651940107345581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.005229949951172,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_9/Procession/ProcessionFoley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.6605709791183472,
+						"end_time": 0.929179310798645,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/ProcessionDagger/epk/melee_trail.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.6372743844985962,
+						"end_time": 0.9164032340049744,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/ProcessionDagger/epk/melee_trail.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Procession/Procession04/attachments/Procession04A_Loincloth.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Procession/attachments/Procession04/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Procession/attachments/Procession04/rig.ast"
+		linear_allowed_contraction = 0.350
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.700
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Procession/attachments/Procession04/Procession04_Loincloth.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd "
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Procession/Procession04A.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Procession/Procession04A_armour_3515b2e0.smd"
+Materials 1
+	"Art/Models/MONSTERS/Procession/Textures/Procession04c.mat" 3
+BoundingBox -68.909 -15.7615 -174.484 68.909 14.2914 0.391754
+BoneGroups 22
+	"root" 2 "root_jntBnd" "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_attachment"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_attachment"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Procession/Procession04A_armour_3515b2e0.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 3 in the header, 3 in the block · 4216 triangles over 3361 vertices
+  names: 78 bytes said, 78 read  [agree]
+
+=== shapes (4)
+0	bodyShape	from 0	count 11280
+1	loinclothShape	from 11280	count 636
+2	shoulderpadShape	from 11916	count 732
+3	loinclothShape	from 12648	count 636
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  Procession04A_Loincloth.ao  socket hip_jntBnd [in its carrier's rig]  box (-18,-19,-13.2)..(17.7,12.8,44.2)
+    version 3 · c0h 2 · 2 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 212 triangles over 152 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 23 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 22 of 23  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 phys_skinned_front_1_jntBnd  [its own]  under 0  rests at (0,-14.8,0.8)
+      3 phys_skinned_R_5_jntBnd  [its own]  under 0  rests at (-15,-1.6,0.9)
+      4 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (-10.6,6.6,0.9)
+      5 phys_skinned_back_1_jntBnd  [its own]  under 0  rests at (0,9.8,0.9)
+      6 phys_skinned_R_1_jntBnd1  [its own]  under 0  rests at (10.6,6.6,0.9)
+      7 phys_skinned_R_5_jntBnd1  [its own]  under 0  rests at (15,-1.6,0.9)
+      8 spine_2_jntBnd  [shared]  under 1  rests at (-0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      9 phys_skinned_front_2_jntBnd  [its own]  under 2  rests at (0,-14.8,13.3)
+      10 phys_skinned_R_5_jntBnd|phys_skinned_R_6_jntBnd  [its own]  under 3  rests at (-15,-1.6,13.3)
+      11 phys_skinned_R_1_jntBnd|phys_skinned_R_2_jntBnd  [its own]  under 4  rests at (-10.6,6.6,13.3)
+      12 phys_skinned_back_2_jntBnd  [its own]  under 5  rests at (0,9.8,13.3)
+      13 phys_skinned_R_1_jntBnd1|phys_skinned_R_2_jntBnd  [its own]  under 6  rests at (10.6,6.6,13.3)
+      14 phys_skinned_R_5_jntBnd1|phys_skinned_R_6_jntBnd  [its own]  under 7  rests at (15,-1.6,13.3)
+      15 phys_skinned_front_3_jntBnd  [its own]  under 9  rests at (0,-14.8,25.7)
+      16 phys_skinned_R_1_jntBnd|phys_skinned_R_2_jntBnd|phys_skinned_R_3_jntBnd  [its own]  under 11  rests at (-10.6,6.6,25.8)
+      17 phys_skinned_back_3_jntBnd  [its own]  under 12  rests at (0,9.8,25.8)
+      18 phys_skinned_R_1_jntBnd1|phys_skinned_R_2_jntBnd|phys_skinned_R_3_jntBnd  [its own]  under 13  rests at (10.6,6.6,25.8)
+      19 phys_skinned_front_4_jntBnd  [its own]  under 15  rests at (0,-14.8,38.2)
+      20 phys_skinned_R_1_jntBnd|phys_skinned_R_2_jntBnd|phys_skinned_R_3_jntBnd|phys_skinned_R_4_jntBnd  [its own]  under 16  rests at (-10.6,6.6,38.2)
+      21 phys_skinned_back_4_jntBnd  [its own]  under 17  rests at (0,9.8,38.2)
+      22 phys_skinned_R_1_jntBnd1|phys_skinned_R_2_jntBnd|phys_skinned_R_3_jntBnd|phys_skinned_R_4_jntBnd  [its own]  under 18  rests at (10.6,6.6,38.2)

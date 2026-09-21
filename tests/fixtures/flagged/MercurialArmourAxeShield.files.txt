@@ -1,0 +1,1316 @@
+monster: Unearthed Soldier [Metadata/Monsters/LeagueExpeditionNew/MercurialArmour/MercurialArmourAxeShield]
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/MercurialArmour/MercurialArmourAxeShield.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Military/sword_shield/rig.amd"
+	animations = '[
+		{
+			"name": "cleave_projectile_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.6712799072265626,
+					"name": "contact",
+					"position": [
+						-22.71929931640625,
+						-86.34140014648438,
+						-133.1168670654297
+					]
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23284664750099183,
+					"name": "move",
+					"position": [
+						0.0,
+						50.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.2329999953508377,
+					"name": "move",
+					"position": [
+						150.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.2329999804496765,
+					"name": "move",
+					"position": [
+						-150.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "shield_wall_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4023840129375458,
+					"name": "wall"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/LeagueExpeditionNew/MercurialArmour/attachments/MercurialArmourRobe.ao"
+	attached_object = "L_Weapon Metadata/Monsters/LeagueExpeditionNew/MercurialArmour/attachments/MercurialArmourShield.ao"
+	attached_object = "R_Weapon Art/Models/Items/Weapons/Microtransactions/NecroLordWeapons/Necrolord1hAxe_Biped.fmt"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4076923131942749,
+								0.0
+							],
+							[
+								0.446153849363327,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.0872664675116539,
+						"angle": 0.6632251739501953,
+						"x_axis_scale": 0.5540000200271606,
+						"length": 128.99600219726563,
+						"impact_x_rotation": [
+							0.1745329350233078,
+							-0.3665192127227783
+						],
+						"impact_z_rotation": [
+							0.645771861076355,
+							2.0420353412628176
+						],
+						"impact_type": "Slash"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4076923131942749,
+								0.0
+							],
+							[
+								0.4423076808452606,
+								0.5714285373687744
+							],
+							[
+								0.4769230782985687,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.3490658700466156,
+						"angle": 2.4434611797332765,
+						"x_axis_scale": 0.8040000200271606,
+						"length": 108.0,
+						"local_offset": [
+							-7.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.40142571926116946
+						],
+						"impact_z_rotation": [
+							0.40142571926116946,
+							-2.5307276248931886
+						],
+						"impact_type": "Slash"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Military/sword_shield/rig.ast"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -5.9192"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -10.6918 -4.11053"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_melee"
+			parent = "root_jntBnd"
+			translation = "9.18579e-41 0 -90.1068"
+		socket = "aux_weapon_tip"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-5 0 -46"
+		socket = "aux_weapon_mid"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-5 0 -38"
+		socket = "aux_spectral_attach"
+			parent = "aux_L_Weapon_attachment"
+			translation = "11.0969 -18.2042 0"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/MercurialWarrior.sm"
+			hide_segments = "skirt_meshShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder false L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder false R_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow false L_elbow_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_elbow false R_elbow_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_wrist false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_wrist false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_hand false L_finger_2_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "grp_R_hand false R_finger_2_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_L_knee false L_knee_jntBnd L_thigh_jntBnd"
+		bone_group = "grp_R_knee false R_knee_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd neck_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "melee false aux_melee root_jntBnd"
+		bone_group = "weapon_on_act false aux_weapon_mid aux_weapon_tip"
+		bone_group = "weapon_line false R_Weapon aux_weapon_mid"
+		bone_group = "weapon_line_02 false R_Weapon aux_weapon_tip"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10634899884462357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3774009943008423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/Swing",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.389724999666214,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18350499868392945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4503600001335144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47534701228141787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1371500492095948,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cleave_projectile_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12727999687194825,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/SprectralThrow_Surge",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25056326389312746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/SpectralThrow",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.507830023765564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/SprectralThrow_Throw",
+						"bone_name": "aux_weapon_mid"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11022000014781952,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19701099395751954,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4113500118255615,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4486885070800781,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5836099982261658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6949449777603149,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8671460151672363,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9287940263748169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09725293517112732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1738332211971283,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36295586824417117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36295586824417117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5149499773979187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6131867170333862,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7651287913322449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8195241093635559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07559794932603836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13512635231018067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2821376919746399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32883796095848086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40028777718544009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4766504764556885,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5947601199150086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6370434165000916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12967057526111604,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1860465705394745,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.231777623295784,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4839411675930023,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6865999698638916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8175822496414185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0201717615127564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0926988124847413,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07559794932603836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13512635231018067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2821376919746399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2821376919746399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40028777718544009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4766504764556885,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5947601199150086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6370434165000916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07559794932603836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13512635231018067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2821376919746399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2821376919746399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40028777718544009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4766504764556885,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5947601199150086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6370434165000916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11122480779886246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Appear",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5359870195388794,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5568559765815735,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.010751485824585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.018406599760055543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.028865981847047807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.028865981847047807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.028865981847047807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.028865981847047807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23374000191688538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed50%",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5009890198707581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06354225426912308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12206807732582092,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19898851215839387,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/ShieldDrop",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32607245445251467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.498260498046875,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5233410596847535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9698115587234498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06354225426912308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1304289698600769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19898851215839387,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/ShieldDrop",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32105597853660586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.498260498046875,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5233410596847535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9698115587234498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort50%",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06960999965667725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33837801218032839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6694309711456299,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.999019980430603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.999019980430603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3234800100326539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "shield_wall_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12369000166654587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/ShieldWall"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19684000313282014,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4906589984893799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "shield_wall_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/ShieldStart",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2236270010471344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.325778990983963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/ShieldWall"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5371000170707703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "shield_wall_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.038148555904626849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialAxe/Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05993000045418739,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48490700125694277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "cleave_projectile_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3812299966812134,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/on_act_weapon_charge.pet",
+						"bone_group": "weapon_on_act"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5669729709625244,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/on_act_weapon_charge_throw.pet",
+						"bone_group": "weapon_line"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.42236021161079409,
+						"end_time": 0.5158334970474243,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/attack_01.trl",
+						"bone_group": "weapon_line_02"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4281562566757202,
+						"end_time": 0.5847261548042297,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/attack_01.trl",
+						"bone_group": "weapon_line_02"
+					}
+				]
+			},
+			{
+				"name": "cleave_projectile_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.3025299906730652,
+						"end_time": 1.738759994506836,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/weapon_on_act.trl",
+						"bone_group": "weapon_on_act"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/MercurialArmour/attachments/MercurialArmourRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/attachments/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/attachments/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/attachments/MercurialWarriorRobe.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/MercurialArmour/attachments/MercurialArmourShield.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/Items/Armours/Shields/Monsters/League_ExpeditionRuneShield.fmt"
+	}
+}
+
+=== .ao Art/Models/Items/Weapons/Microtransactions/NecroLordWeapons/Necrolord1hAxe_Biped.fmt (depth 1)
+  4     ����D�@�����@aAN\�A               k   r   v    C 2 ( 3P��� ��I ��q � q r �� D �� �F�� 4I ��J.@� L(q r � �� � (� �� � LJ .@� �� (Fw � �w A�� A��z?0z�?� D� �� �0�z:�v�" � q � x� �x��q � � r� � r:v� q � ��= � � �V" � �� z��z��� v� � � �h � 0k���z����� ��� M�� ��� �� G |� q[ <% �; %��G �    s\ \A; T% <Y� � � 0 � ��� � ������h gp h h �gj :� j �:@D� ���q � 
+4�
+&4� 
+� �T�� j � " ��� �� " �� :�� � b
+�= 5k�� k� �z� � z� ��� 
+�
+������:>� � ���?�
+b�&
+�T.�r�.M �� T�� x�A� � �:M ��M ���?�� F V � V � �=� � � VVC�� � � V � � � 0 � 0 : :�� � �� �V� w � � V� ��w �� ��e=��`u E�u `I�� �' N � /9� 9� g�� E$m�  A� A_0 ��� �-�� � $w��!��� ] �� i�)p A   �$� &� &w�: A p : P A � h )i� ��� &��� 0 ��0 �: p � :  �� ]  ]  �  � �� w� ? v � �w � i? /� � ? �v� ��� ��U U��<���<c � �a � � � � � �� �c �c � ] � � #7e��e7!��� ��] a ��P : �: 0 � �� � � H�^�n � �' �yn � � �n �"In S � �� � �c � n � � �S n � ��W9 �i W9 i W���i `!��# h p )� jF� {�e� e.���j� �� e  ��  �  � F� a �c �� � �Uv� �{] � w] wa  66 �� � /� � ]  ���!!�� �c � �� a &� � �� �� � rs � _r�� � ? �� � �  �  &a w��Z� �R��"Em`R   � u �E�9 W���>3��� R�"�� ��X�R � ;a c ��c ������>��*� c ��� � q"^���� ��� W RMM�%1��M5 H� �g�GB�{G� ~ ?� �  �^ |�<B+<�B� ,�  � �3�H ~� W � � Q 7�� f @ � ^ �W � � �� ��W  � G) `G`i H  ~V��C���+B9 � ,� BGi Bi 9 +9 Wuy  �	|* y �� � ���� � �� G{�G�) 0 � W � � � ?�  
+�[?��� ~ � 
+� ?$ � 
+ ��@ � �{����,& � �0�	7 |@ f � � � @ � �� �nf��y��Q �GQ GZJ1 � 7 � ���� \� \� f��� t
+ ��@ �� @ �	'���
+�� � � x � ��x H�  �C � 1  G�( P k��hUSE~��  � 
+ �f d � ��d � � � ��� � �
+ t�fd 6d �� n�i� � �0�  �� �� 6d f �� ��i�  �� � 	� �Dm �D2$Qg X +  Y �Y o��o� �g � �� c� ��b �������-$�uD������u�D�8 � ��� �p_� � 8 + �o�� p���v ��� �T �	7 � �+�� f�d O �� O ���O S ��O "��"�����"���+� �� � � � � � ���� � ��l �� � ��� ���! � �OX g OX � { �Q�2g + b]������n2� �X 8 ���# � ���c2���+ 8 u-�$0Q]n�a�6 ��n��2�$Ya6 �%#_�#. �n%�. ��. � b2� g b� b� c� 2� � x�2#  � X  + Y �o��>�� �G t � � �$�t 1 �1 >� 3��  ��l *K X�c�$t m �I" �b ���p��|G K �ZS O � � O � 8� � �v �� �Ml�m��! � 5'�9�&� �?EI~@6 ��@������ 8��8��b�xbbx2�8�8� � )8N��)N8b ��5�� )@�� @�+��+��� ��� �  � � ��� 	��(��4 B � < > ��}� , � �  � (��, � S�=;��� e ~ 
+��=�B �NS�d�e }�� B > �> < �{ ��� J  | � > 4 o B �b+ ������+ L^(��F�LL ^k r � � *hF@�D�� � ��l����~ �/  ��l��  !�(\ �J � ! / ` � �- ���5�����K���_ �| > �5��- Os��s�O����_ 2> B N � � ��Os���aK��s�����a�oa_ 12s���� �2�� �B �| > N�o  B �p���p�s��  � � | ��dpV�5� V5��l��j�jm� � �\ ��\ ���j��j�* * ��* �����/(\ (� � �� ���z �z / �	 �/  *F(�� F-� 	 �� � � q }�(I ��@�1q �I ���J �[J ��){�  ;�����  � ` � ` 	� � � )/� � Q/R�;t;�t;=L �;L � � � R�\ CR�	�� ��]�KP]KK� � ��� � �� �	, ` � � / Q� L � Q��� .�@@� J1�}�.,� @1�,��� ( �� \ � RE � � � � � � PK� �| � de  � e #��� #����   ` ]BZ ��� E \  R��3 �S3 	` ��'�C` R� � o� �o� o� �� � �&L&�L�I� � �L PB]R\ E �` CR` ��h�3 hh3 93 ~9���~��I�~9~�3 S~L��Uh�h9�q[�} U�9&��:@-�⿞��U�	����P2���g���K�?�7�x�}���}���äR����~?��+�����t6�����    ��F��~��5
+��    Å<§	����}T�y�����    �a��������������    qx�A񀻀�x���Ũf��    �����������9���I��    �6�g���}�M6�6���    �g:�ax��a~�,D�:�x���0�O=�߀,����G5h�f��    ����ɀ��c�;ﰇI��    �6¢����^~��*ٶ�g���K�?�7�~������!o����    �¡�������:�x���0�O=z���5~��I��j���I�A���G���7�df��QS��J:����t~�3;�� ������VD����p��#4�� ������VD�ql��p�#4�
+�5��V�Cr/����{y�&8,��-��qŦ��+� -z��)P�:M�0���a���a<�as��a~�-u����    �¢����^���"��8��8����x�Z9ʹ2�k�A�8�����7������3й��:@-�⿞�«�����P2��G�r@-�⿨F��|��������
+�z�    0�A�̀��{r9�eD����ѽX� �_���_w�,w��)f=���\/�m��~��26���:@-��?���~�y�����䩜�\���    '��^���]w�*�����    �\�A�̀�~��m��d�AO�?���f���f����
+�z�    0�A�����p���~��)f=���\/�wx��w�v:��eD����ѽX� ���S�����6����:@-�⿞��~y��}��;���.����r=/.��~��~��7&S�2������������~��5ͷ�]�?    ���@�q������;��d�AO�?���g%+��V�7��|����F?$t�t�����z�̺��
+�z�    0�A������p'9~��]�?    ���@�����������d�AO�?���Հ�V��7��!6��    W�B�gm��g~�/
+�p���񫿏G��y���{�l;-��.����r=/.��c�~�7&S��    Å<�i�����W3$���?JH���?�x���D;M�R�    ���4�����;0��.��    aAN���������5|�����,2�? ��@킀���Ϸ��j����?�>²������N5�����    8��`�����{�ϻֲ�yؿ�� #?��x��Gz��:M�/Wa�����G�h�^������:D�$���Ӌ=�����}8�ts��5ŻCa�,���B¡G�����:�����    ����i������¶/Wa�����G������:D�Ca�,���B�r�������k;_� �X��@�>V�������8���8��c����Ƀ��e��:ܲp���񫿏G��:����{l;-�0���a�=�a<��A����3�\�    �+�����.���~��PW���E�}4�|��}�6����:@-�⿞�����}���;��Ԯ�?-�⿓�±�����P2⸑��~�=�5��l�}�6ͷ�����}>��H������Y������}���H�ml��m��3Y�Y����Ŀa׷À�����9(��d�AO����~����8���"�?     V?�������M�(+��    8,����~��')
+� �X��@��V���X���Ș�j8��Ca�,���B�_��������:�\�    �+�}��~�K/ƹG�r@-�⿨F�2�����P2�� �X�    N���T��������8��\�    �+���r��.����~�\�    �+���������;~�G�r@-�⿨F����z���;l���:@-��?��«������!���ޮ����=_��a�~�����ͻ�$���Ӌ=����i�����v���E�\�    �+���r�����;~����    Y�H��s �x���-^��P����M�ߪ-�s}��s|�1��P����M�ߪ-����s|��1�:"a��-�?�4��u��p0(���῏�?>,���s��C{������e����K����s���ru�1e�������F��r����tz��0��:"a��-�?�4�v��w��?����e����K����{��ru��1e� �X��@��V������Șj8��2���j���}�A���۾��8� �X�    N�����	�����8������)��=��#�b�~�������v�#&��Xrȿ�k��J�����9����?JH���?>숀���D;M�
+�5��V?Cr/����y��,�nW��    ����o���qn��:"a��-¿�4�~��������(��.��    aAN�l�l��������� �X��@�>V���X��8����8��n{޿    �G���y���z�;�����1��Q�b��mt�:G��e����K?��{���u��e��k�����=�� r���tm�w�
+�z�    0�A�4���{�r9���?��ؿ�������P2�R�    ��i������.�����    H�A�H�w��������Ə?���?�������:�l�G�r@-�⿨F�����������$���Ӌ=�����Ȁts�5ŻR�    ���̀��֠0�nW��    ���\�����q�n������1��Q�q���mt:G�����    �����}�9���Ə?���?���z�~�����:�l�	���    ��4������,��Ԯ�?-��?���~�y��������6���    �g:����~o�D�B���     �A�����|5~�c����Ƀ�pG��e�:ܲԮ�?-�⿓��~y��}�=;�����    qx�A�E��x��Ũ�.����r=/.�b�}��������
+�z�    0�A_���p��~�Ԯ�?-�⿓�����}��=;��4�f�<_@��AH^��?�	���2���j���}�A{"Հ篺^8~�:�x���0�O=�!�Ԁ����G5h�������?���b~���~��5򻵦����?����%���؍̱�o�_�O����*}��݀B9Z�o�_�O���#փ��݀�B9Z��{��    :��������8�2���������a~��a�B&�4�f�<_���A������{8��c����Ƀ�mx��nh�:<��k�����=�� �b�����t�m�w��"�    ̿4�����#�&���D�@�#�	�.�z��z��;��6���    �g:����a~��,D�4�f�<_���AH�^�����{8�����    ~�4�<��}�M6?� �X�    ����[��U���8=�lԕ��ʎ��&H�ip��i��1O����    �\�A�4��~�m�����-¿k�4������.� �X�    ��������U��8=����    qx�A�E���x��9Ũ�-��qŦ?�+�|�������6'����    Q�8����a~�(, ��u)�    ŠA�������;9�;%���D����.��π~�')k�������?���q�����x�˳���u)�    ŠA�G���|��;�Ԯ�?-�⿓��O�����P2�?ȧ�    �c9�at��a}},+�t��<_�縜AIn��G��6�����    ~�4�Xt��X|�*����?��ؿ���d�����P2�����������(%{��(��:�t��<_�縜A���G���6���2����r��.����b���(�@x�=��?\/�����$���$���Ӌ=�����p���v��E��PW���E?}4����}�����a5����?�U��V���V|�����I��j���I�APb��G��7�2�k�A�8������z��~q��5N�}��    ��������~��9>�� ����>�VD��:����6���?��ؿ������z���:l�4�f�<_@��A�����?��	������    H�A�H�w��4��2�k�A�8�����ɀ����3й��?��ؿ���z~��z��:l�LI����M?(�-����|���?ȧ�    �c9����a}�},+����    H�A򀸀w���4��}��    �������~��>�����-¿k�4�uv��yQ�:���{��    :��������8�2���j�?�}�A�"+��Q�B�~�����!���r�����x��9 �����    �~��a��� ��R����~���+����xx�K9Եo�_�O?����}��#��z�Z� �X�    ����[���U]�F8=�����)��=��#��~�~���$=����~�=�5�b�w���~�i�жnW��    ���t����v6_�\�    �+���~��K/ƹ�u)�    ŠA��m����;9��u)�    ŠA򀹀��|�;ﵮ���-¿k�4����yQ��:���g���K�?�7����}��äR�    ���4����֠0��I��j���I�A9!���N�7~���c����?�ǜA��g��Q��V��G�r@-�⿨F�΀䀀�P2��D�@�#�?	�.���������2���ʗ�    ������n��cr��0a�2���j���}�AL�^�۾���8��g���KͿ�7�y}��y}:ä���    Y�H�.���x��-^��)f=���\/���~���26���:@-��?���U�	�����!��j����?�>�x���������}�����B�?#ilAAl��>�߭�eD����ѽX� ¡�v��_w��,w����    �\�A�̀��~q9m��PW���E�}4�Ѐ����C5ȹ�d�AO�����f�������8����:@-��?�������䩜�@x�=��?\/�w�y�����$���|����F?$t����z̺��X�׾�z�?>�+�����ɲ�
+�z�    0�A�̀�{���eD����ѽX� �
+y�����6���q1��ir����~��z��d8*�}��    ���_��D��L9̰������?�������~�5���P?a����s���vù���Y��    ����������8b��d�AO�����g�+������:��-��qŦ?�+��-����P̱M�~^0�Oxh�j��0�4���}�e;ﰨ{��    :���������8��I��j���I�A��R��N��7~�@x�=��?\/�m���� 6�X�׾�z�?>�+���~�� ����    8��`���`{&ֲ��Q�J�V�+�Հހ����3Y�Ԯ�?-��?���O������!��-��qŦ?�+� �z���P�̱M�d͟�    ����h���fu�.W�zB��    敀���������9���-��qŦ?�+����r��͵:"a��-�?�4�r���w�?����Y��    �����{�����9z��-��qŦ��+����4'�D�@�#�	�.����z���;���-��qŦ?�+������6'���G���s?�$����A��� �v�T��?3Y��u���m��������    �a���a�� ���Y��    �����{������z�����,2ǿ ��#��Up�6:�n�r@-��?�F��|������2��D�@�#�	�.��|���������O��B�?y�aAK�m�츣����6���    �g:�݀ր���W3��d͟�    �����o���u!�W��q1��ir����z���z�d8*�;%���D����.�U�s���y��� �t��<_@縜A���๼��������!���r�������4޻�-��qŦ��+����qr�:͵2�k�A�8?����z���q�N�D�@�#�	�.�������2�2���j�?�}�A{�Հ�Q��B�~���Q�J�V?+�Հހ���5Y� �v�T��?3Y��u���{Ϸж���    8� }���{ϻֲzB��    敀�����������q1��ir����C�������3�n�r@-��?�F���������2��2���j�?�}�A��B�����D�@�#�?	�.��������0���a���a<�����3�R����~���+�b�������5�� �v�T��3Y���u��@m��:�����    Y�H�l�j�������W�����)��=��#����~��$=�R�    �������.������    j�A;����p�s����c����?�ǜA�흀�?��߭ﵵ�����?����T�����������    ����i�����6¶�I��j�?�I�A���޹���}��    ���������~�9>��g���K�?�7������!o�~^0�Oxh?j��п̀�}�֬����    H�A򀸀w����������    j�A�G����N�ﵥ���)��=��#�������v�~^0�Oxh?j����|��"��z����"�    ̿4�~��������,ݚ�u)�    ŠA򀹀�|����G�r@-�⿨F�z��z��;l�D�@�#�?	�.����� �ʨ��    CJ����m��j��2r�2���j���}�A��+�篺�^8~��g���KͿ�7�~�����P2o�0�D�    �����f������	�z^��QS?�K:�t�w���~�>�;�{���    G��$�)�~��5z�����    j�Aŀ뀙�ps��̊��    ����y���������{��    :���������8�O,��	�?��+�}���� ��{���    G��M�q������ɴ
+�z�    0�A_����p�'9~�O,��	����+���|���2��|i����տ���@���@|8���k�����=�� ��H����N6��O,��	�?��+��������
+�z�    0�A�4��{���~��z��>�+�z~��z�M:�z^��QS?�K:����~>�;������ĿgG�A�����P���7m��"�    ̿4���`�����;��O,��	����+����z���9�:�x���0?O=����|�~��t �X�?B�������!������    j�Aŀ뀙p�5��~��z��>�+�<��}��2�D�@�#�	�.���������������!���r�c�������4޻(+��    8,��E�~�')
+�Ca�,���By����k;_�Ki�����^g�AKf��E��:�	���    ��4�������I(�ڵR����~?��+�w�{���x�h�Ե�7��    �#�_�~�����ܻc�:"a��-¿�4v��X;��~^0�Oxh�j���*|��ހB9��� ����>�VD��ƀ����6�a���    ؿ�*�ހ��[9�I��    ύ���wf�ts��5��"�    ̿4���������;���~��z��>�+����z��M:���῏�>,�C�p�D;��������?gG�À�����8��a���    ؿ���������������    �\�À����N9�O,��	����+�z~��z��9��k�����=�� �{����N6��a���    ؿ�*�ހ����I�ﰯ7��    �#¡�����ܻc�Y����Ŀa׷AN�`�ٻ���8m��t �X��B���~�P2��̊��    ��������������I��j�?�I�A�!R�粷{�~��-��qŦ��+�|�������4'�Y����Ŀa׷A���ٻ��8m������}���H����m���3Y� �X�    ���������U]F8=�a���    ؿ�ր"����[9�(+��    8,¨����}λ�Y����Ŀa׷A3�倀��9(�Ki�����^g�A�����L���6��.��    aAN���m�����5|�Ca�,��?B�_���\�M��a���    ؿ�ր"����I�����    �\�A3�倀�N9鵫�c���⿺ǜA�g�毻T8�c���@Ƀ�m�x���h���<�ȗ1��b�����n���n��9;����    �\�A�4���~�q9m�B���     �A����|���6�:�x���0?O=�߀,����>6h�I��    ύ�����ts�5�:"a��-¿�4�r�����X;���Y��    �����������9z�:�x���0?O=�z���|�~�ȗ1��b����~��xP2���u)�    ŠA��������	���    ��4��l��I5:ڵԮ�?-��?��±������!�����    =©A�E�{��6m����~����5��l�}��6ͷ\���    '�¢�x��]w��*������B�#ilA����¤D;鷐��P�a�����s��qw�y4��@x�=��?\/������ 6�����    =©A�E�{�����m�!��    :U)�d~��h��$��\���    '��H���v6���O��B�y�aA���H���:������}���H���������5&�Ԯ�?-��?���������������ĿgG�AXe��P��7m�lԕ��ʎ��&H�$)�x��U.B�d͟�    ����h�����u�!�W�Ki�����^g�A���E���:��a5�j�տ�U��V�����|��8��
+�5��V?Cr/²�����X67����~����5��~��}���6ͷ�"�    ̿4���`��#��&����a5�j�տ�U���{���|�8��c���@Ƀ�p�G�������ܲ��῏�?>,���s��Bp�߭��ȗ1��b������@@���R;5�d͟�    ������o��fu��.W�!�%�    '��@�q���9�B���     �A�E�|����������1@�Qb���t��G�I��    ύ���m���z�����"�    ̿4������,ݚ��῏�>,�C�{��8���I��j�?�I�AP�b�޹�����7��    �#��~��W'ݶ\���    '��^�����v�����̊��    ��������6��c���@Ƀ�������ܲȗ1��b�?�������Ӵ;�nW��    �����o��\y��,㯆��    8� �|��`{�&ֲD�@�#�	�.����2亮��    Y�H����l���1W�������?����>�������������������T>��
+��9���u)�    ŠA��m����������    ~�4¨����{����p����?�G��Ƈ��{���-���?JH�?��?>���>߭M��    Å<§����Y}�Y-y�\���    '�¢y���v����������?gG�AX�e�߰���m�zB��    敀���u�����9��#&��Xr�?�k��LJ���s�������    =©À����N9��B���     �A�E�|��6�p����?�G�:y��{��-�#&��Xr�?�k�������s�������    :�+�����T���e�B���     �A�������A�~�������?gG�A���߰��m�/Wa���@�G�h^��g���D�'Bտ>�?�@H�y������(+��    8,�X�z���}�λ�\���    '�¸z����v6���)f=���\/����w��v:���.��    aAN����k��4��j����?�>}������}�Ki�����?^g�A���廱���(+��    8,¨����X~�%&ᵸ���    j�A;���p5�����-�?k�4�u�v���Q�ⰶ�B���     �A��a����A�~�j����?�>�N������N5��Ki�����?^g�Al�B�㴽����!��    :U)��~e�~��W'������    j�A�G���9�Y�����?a׷AN`��E���m��.��    aAN���������:�x���0?O=�!�Ԁ����>6h� �v�T��?3Y�A��m�����ȗ1��b��������n���9;�����    j�A񀹀���9�Y�����?a׷À�����8(����    Y�H�������W�
+�5��V?Cr/�{�{���y���,�Ki�����?^g�A���㴽���{���    G�³������ɴ����    j�A񀹀��N�ﵮ���-�?k�4��i��p0.����P�a����G�����44�
+�5��V?Cr/�N�������X67�����    =©A����{����m�I��    ύ��j�����z�����:"a��-¿�4������(�����-�?k�4����Qⰶ��Y��    ����������z�������?���(�{��؍�̱�����    :�+������50����    �º~�~���5
+��u)�    ŠA�G��|��ﵮ���-�?k�4�~���i���p0.�~^0�Oxh�j��"ք��ހ�B9��~^0�Oxh?j��"*���"�z���df��QS��J:�tw��t~3;�R����~?��+�b�������t6��2�k�A�8�������~q�5N�R����~?��+����xh�ԵO,��	�?��+�>���L���V��    Å<�Y	l��Y}Y-y����    qx�A񀻀��x�9Ũ/Wa���@�G����g����D�f��    �����{��������Y�����?a׷A���E����m��t �X�?B�����~J���-��qŦ��+��ӆ��)P��:M�� ����>�VD������������}>��H���Y�����5&�|i�����?���@��|�Ϸ���7��    �#¢����^��{$c�����    ����i��}N������~�=�5����~i�жf��    ����7���c��;�:"a��-�?�4�~���u���p0(�������?������x˳��|i�����?����}���|Ϸ��p��>>�?9��@�툀�?��߭�o�_�O����}�8��o�_�O���[����8�����~�=�5��~��}��6ͷ��G���s?�$�|�����A���t��<_@縜AI�n�๼�����p��>>�?9��@?x��?�߭�����    ����i�}��9����Q�J�V?+�+�"�����5Y�~^0�Oxh?j��0A4��}֬ﰨ���!���r�����x��ϵ ����P�a���񀹀���44�2�k�A�8?����7�����5й�-��qŦ?�+�p�|���r���͵ �v�T��?3Y�A��{�Ϸж���    ��_�~������촐��P�a���r���qwy4��n�r@-��?�F�z�~������l�����    ~��������2���j�?�}�AL^��B����D�@�#�?	�.�������� 亵������������qx�:��R����~���+�����5����Q�J�V?+}���yd������    ~�4�Ā�}��M6?��I��j�?�I�A9߮�粷�{�~�ȗ1��b�?���n�������Ӵ;�O,��	�?��+�{�~��������t>���Ӌ������.�ts�6Żf��    �����{�����9�� �v�T��3Y�A���@m�:��c���@Ƀ����h��<��2����r��.��b�~�*+S��    Å<�����W3$�����    :�+������	T�:e�ʨ��    CJ���m���@�r��8��8�x~��xZ9ʹ�g���KͿ�7����y}�:ä0�D�    �����f��������t>���Ӌ������Ҁts6Żt>���Ӌ�������p��hu�`1E�j������>�N������r3��f��    ����ɀ�c�l��!6��    W�B�g�m���~��
+�ʨ��    CJ���a������4��z,��    �T\A�V���9�0�D�    �����f�����9	��I��    �6¢����~��ٶ������������
+���9��!��    :U)����ٻ��!�%�    '��@�������9����    EH�������M����    EH�j�r�������M�!6��    W�B����~�
+�n{޿    �G�����z���!�%�    '��@������N�����P?a����G������44��I��    �6�^�v���~���ٶ!��    :U)����~�W'���ʗ�    �����n���xȺa�z,��    �T\A�V����N�鷒��    EH����i��N1M��X��    1�K����k���2��8�?8�x�~����J�ʹ'Bտ>׿�@Hy��G��:��8�?8����J�ʹn�r@-��?�F�2������!��z,��    �T\A�������9�����,2ǿ ��@���@8���PW���E?}4�0�　���B6ȹz,��    �T\A������N���d�AO�?���~��f�������c����?�ǜAFc��?�߭�'Bտ>׿�@���G���:���Q�J�V�+�~���~y77�������}>��H�m�l������Y��]�?    ���@��������;��.����r=/.��������p��>>׿9��@?�x�����D;�0���a�=�a<����3��1�    ��qA������|�;�0���a�=�a<����~C�u�����    �����������¶�ޮ����=_������ͻ������}>��H���������5&��d�AO����%Հ����:��"�?     V?��q������M��ޮ����=_�����~�d5ͷ0���a�=�a<�a�s���~�C�u���G���s��$�|��|}7���"�?     V?��q�����;M���῏�?>,�C���Bp߭��G�(�     F?������9M�����,2�? ���~���Ϸ��G�(�     F?��n�����9M������ĿgG�À�����9��nW��    ����������v6_�O,��	����+�}�|��2���.��    aAN�ll��k�4������    =©A����{���6m�O,��	����+��y�ݴ��;V��ޮ����=_���~s�~��d5ͷn{޿    �G���y��z�����"�?     V?��������;M�2�k�A�8?��������q��N�LI����M?(�-�s�}���|����?ȧ�    �c9�a�u���}�p�+�����    ������}�N���	���    ��4������I�5:ڵY�����?a׷A3�倀��8(�����)�����#��~��~��)=��yؿ�� #?H���Gz�:M�c����Ƀ����nh��:<�����,2�? �+#���p&��G�(�     F?��n����N�M�΃��    ����R���������g���KͿ�7�����P2o�����,2�? ��n�݀��p�&�ﰐ��P?a���r�����v�ù��G�(�     F?�������N�M������ʎ==2H��̀x��=-B���῏�?>,�C���C{������?JH�?��?��x��>�߭M�����    ��������6¶�����ʎ==2H�i�p�������O��q1��ir?��~����6�*�����)�����#����b�� (v��1�    ��qA�X��|���;%���D����.��~1�~��')k�'Bտ>�?�@�����������B�#ilAA�l��¤�D;鷈q1��ir?��½���-5����    Q�8����}z� �p��>>׿9��@������D;����    ~�4�X�t���{�����o�_�O?��#*���#�z�Z��1�    ��qA�����|����o�_�O?��[��>���9��6���    �g:�a�x���~�o�D��1�    ��qA�X���|��;�f��    ���������������P?a���񀹀����44�nW��    ���]���\y�,㯬]�?    ���@�q������;%���D����.ª����Vy��' �a���    ؿ���{����������c���⿺ǜAF�c�����D;﵈q1��ir?���z�������6�*�t>���Ӌ�����i���hu`1E�}��    ��������~���>��2����r��.��~��~��*+S��PW���E?}4�Ѐ����B6ȹ���������~�����3�}��    ��������Dc�7̰���    ~�4¨����X|��*���PW���E?}4��|���}������a5����?�U����{��V|�����}��    �������D�L9̰� ����>�VD�q�l��������q1��ir?���C������-5�O,��	�?��+����� ��2����������~t�~���5ͷ��G���s��$����|�}7�� �v�T��3Y�A���@{8ж�X��    1�K�ll��k��2���Q�J�V?+�~�����y�d���X�׾�z�?>�+�;��~� ��t �X�?B��s�~���~�J�奯7��    �#�>��~�W'ݶ����,2ǿ ��n+݀�Up6:ﰬ�῏�>,��s��{�8�������ʎ==2H��3�x�=-B�f��    ����7��cl������    :�+�������T��e�����)�����#����~�)=��t �X��B��r~��r~�9��X��    1�K�����U������B�?#ilA�씀�>��߭鷖�Q�J�V�+�+�"������3Y�D�@�#�?	�.�z���������}��    ���_���Dc��7̰Ki�����?^g�AK�f�廱���ﵤO��B�?y�aA���츣��鷖�Q�J�V�+�}��~y�77������,2ǿ ����~��@�8��2�k�A�8?����ɀ���5й�yؿ��? #?H��z���M�������F��r�t���tz�0���Ə?���?��������!���c����?�ǜA@���Q�V�����    ��^~��^��"초q1��ir���½����3�;%���D����.�V	s��Vy�' �X�׾�z�?>�+�z�~�����ɲ�����)�����#�b~��b� (v�ȗ1��b�����n��x�P2�����    Y�H�lj��l��1W�O,��	�?��+���y��L����V� �v�T��3Y���u��@{�8жn�r@-��?�F������l���῏�>,��s��pD;������    :�+�|��������50�ȗ1��b�?��¶�}��K���w�ȗ1��b�����'������R;5�Ca�,��?B�r���t���_��t �X�?B��i������!��ȗ1��b�?�����@����m�5��t �X��B��i���~P2��Ca�,��?B¡�G��\��M������    =©A3�倀�N9��{���    G�´��L��N#ɴO,��	����+�>쇀ݴ���;V�̊��    ����y�����6��a���    ؿ�������6���7��    �#�^~��^�{$c��~��z��>�+���}���2�~^0�Oxh�j���À��}e;�a���    ؿ���{�����6������������q���qx:���t �X��B�����r~��9������}���H���Y�����5&�΃��    ��
+�����(9��ȗ1��b����¶}���;w���c���⿺ǜA������D;�B���     �A��a����|5~�΃��    ��
+�����������I��    ύ��j���i{~1���O��B�y�aAKm��H��:鷷Y��    ���V��������8b�΃��    ����R����(9��ȗ1��b�����J����;w���c���⿺ǜA@뙀毻�T8�B���     �A����|����������ĿgG�A3�倀��9�����~����5����b~��,жKi�����^g�AlB��L��6�|i����տ�����}��@|�8������    :�+����	T:e�I��    ύ����m��i{�~1��!�%�    '��@�q����N��0�D�    �����f�����;��ȗ1��b�?���'@����m�5�{���    G��Lq��L�N#ɴ������?gG�A3�倀��8��0�D�    ����������	�ȗ1��b�?���J���K��w����    Q�8�a�s���}�z� �����1@�Q�q�����t���G�;%���D����.«	����y�� �ȗ1��b�?��������!��Ca�,��?B�y��t����_�ȗ1��b�?���n~�����!�������ʎ==2H�������O��yؿ��? #?�x��z��M�{���    G��܀׀~���5z�n�r@-��?�F�΀䀀��!���X��    1�K�l�l�����U������!���r��Z�x�9 �6���    �g:�#�*���W3���Ə?���?���d������!�	���    ��4�~��������,��R�    ���̀�����;0�D�@�#�?	�.��|������2���ʗ�    ����f�����x�Ⱥa�����-¿k�4�~��������.�����!���r��Z�x���ϵ ��ʗ�    ����e���cr�0a�o�_�O?����}�>��9��#&��Xrȿ�k�L�����9��n{޿    �G������z��;�0���a���a<����a~��-u��e����K?���s�����u���e�j������>²������r3��ʨ��    CJ����������4�����~����5�bw��b~�,ж0�D�    �����������;���PW���E�}4����}��6��ʨ��    CJ��j������@�r�� ������VD��ƀ����k5�0�D�    �����������9	�
+�5��V�Cr/�N�������-57�� ������VD��:����k5�!6��    W�B����g~��/
+��-��qŦ��+�p|��qr:͵
+�5��V�Cr/�{{��{y&8,�����������b������3�I��    �6~�}��M6�lԕ��ʎ��&H����i���1O�:�x���0�O=�������5~�!��    :U)�d�~����ٻ�����    Q�8�as��a~(, �lԕ��ʎ��&H�܁׀x�U.B�
+�5��V�Cr/²�����-57������������ۅ��(���:�(+��    8,�Xz��X~%&�0���a���a<��A�����3����    EH�jr��i�N1M����    EH���x���-�j������>�}��x���9}�!��    :U)����h���$���ʗ�    �������ts��5�2������������a��B&ഒ��    EH�uw�x��-��2����r��.�b}��b��(�j������>�x���x��9}��ʗ�    ����|t��ts�5�	���    ��4��l���I�(�ڵʨ��    CJ��j���j�2r��I��    �6�^v��^~�*ٶ0�D�    ������������R����~���+�w{��xxK9Ե�    Å<�Y�l���}�T�y�?ȧ�    �c9����}p�+�zB��    敀���u���������PW���E�}4�0�　���C5ȹ���    �/�R���    ��¹��    ��_�Q�    �>!�le?    f�@Gr�    ��A
+{��    �ܢA���    �-#¯��    �!�Q<��    L ���    %��hx��    ����]���    	���    %z��"��    ��5�:���    �E�|   p o l y S u r f a c e S h a p e 2   A r t / M o d e l s / I t e m s / W e a p o n s / M i c r o t r a n s a c t i o n s / N e c r o L o r d W e a p o n s / t e x t u r e s / N e c r o l o r d A x e 0 1 c . m a t   h a n d l e   m i d   b l a d e   
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/MercurialWarrior.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/MercurialWarrior_armour_8a88cd29.smd"
+Materials 3
+	"Art/Models/MONSTERS/GenericBiped/BipedMedium/Textures/ExpeditionLeague2c.mat" 5
+	"Art/Models/MONSTERS/GenericBiped/BipedMedium/Textures/ExpeditionMonster2Insidec.mat" 1
+	"Art/Models/MONSTERS/GenericBiped/BipedMedium/Textures/ExpeditionLeague2c.mat" 1
+BoundingBox -68.7344 -18.455 -187.187 68.7344 23.5331 -0.359799
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/MercurialWarrior_armour_8a88cd29.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 7 in the header, 7 in the block · 5093 triangles over 3885 vertices
+  names: 220 bytes said, 220 read  [agree]
+
+=== shapes (7)
+0	body_meshShape	from 0	count 7518
+1	cloth_meshShape	from 7518	count 264
+2	hood_meshShape	from 7782	count 4008
+3	plates_meshShape	from 11790	count 1566
+4	shoulderpads_meshShape	from 13356	count 840
+5	mask_meshShape	from 14196	count 561
+6	skirt_meshShape	from 14757	count 522
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  MercurialArmourRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-22.8,-14.6,-11.8)..(23.2,18.3,78.5)
+    (the geometry did not read)
+    rig 23 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L_skirt_jntBnd_1  [its own]  under 0  rests at (14.5,-5.5,1.8)
+      2 phys_skinned_L_skirt_jntBnd_4  [its own]  under 0  rests at (13.9,3,-0.1)
+      3 phys_skinned_L_skirt_jntBnd_8  [its own]  under 0  rests at (5.5,7.2,-0.4)
+      4 phys_skinned_R_skirt_jntBnd_8  [its own]  under 0  rests at (-5.5,7.2,-0.4)
+      5 phys_skinned_R_skirt_jntBnd_4  [its own]  under 0  rests at (-13.9,3,-0.1)
+      6 phys_skinned_R_skirt_jntBnd_1  [its own]  under 0  rests at (-14.5,-5.5,1.8)
+      7 phys_skinned_L_skirt_jntBnd_2  [its own]  under 1  rests at (20,-2.8,24.3)
+      8 phys_skinned_L_skirt_jntBnd_5  [its own]  under 2  rests at (15.4,6.7,22.4)
+      9 phys_skinned_L_skirt_jntBnd_9  [its own]  under 3  rests at (6,11.5,22.5)
+      10 phys_skinned_R_skirt_jntBnd_9  [its own]  under 4  rests at (-6,11.5,22.5)
+      11 phys_skinned_R_skirt_jntBnd_5  [its own]  under 5  rests at (-15.4,6.7,22.4)
+      12 phys_skinned_R_skirt_jntBnd_2  [its own]  under 6  rests at (-20,-2.8,24.3)
+      13 phys_skinned_L_skirt_jntBnd_3  [its own]  under 7  rests at (20.3,0.2,46.1)
+      14 phys_skinned_L_skirt_jntBnd_6  [its own]  under 8  rests at (15.5,9.5,45.7)
+      15 phys_skinned_L_skirt_jntBnd_10  [its own]  under 9  rests at (6,14.5,46.5)
+      16 phys_skinned_R_skirt_jntBnd_10  [its own]  under 10  rests at (-6,14.5,46.5)
+      17 phys_skinned_R_skirt_jntBnd_6  [its own]  under 11  rests at (-15.5,9.5,45.7)
+      18 phys_skinned_R_skirt_jntBnd_3  [its own]  under 12  rests at (-20.3,0.2,46.1)
+      19 phys_skinned_L_skirt_jntBnd_7  [its own]  under 14  rests at (16,8.2,63.3)
+      20 phys_skinned_L_skirt_jntBnd_11  [its own]  under 15  rests at (5.8,14.7,69.1)
+      21 phys_skinned_R_skirt_jntBnd_11  [its own]  under 16  rests at (-5.8,14.7,69.1)
+      22 phys_skinned_R_skirt_jntBnd_7  [its own]  under 17  rests at (-16,8.2,63.3)
+  MercurialArmourShield.ao  socket L_Weapon [NOT in its carrier's rig]  fixed mesh League_ExpeditionRuneShield.fmt  (did not read: version 8 puts its geometry outside a DOLm block, which this does not read)

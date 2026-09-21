@@ -1,0 +1,1202 @@
+monster: Unearthed Runecaster [Metadata/Monsters/LeagueExpeditionNew/MercurialArmour/MercurialArmourCaster]
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/MercurialArmour/MercurialArmourCaster.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Military/caster/rig.amd"
+	view_of = "attack_01"
+		view_name = "attack_enrage_01"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+	view_of = "attack_02"
+		view_name = "attack_enrage_02"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5349739789962769,
+					"name": "contact",
+					"position": [
+						-19.46780014038086,
+						-90.75199890136719,
+						-104.35600280761719
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5819399952888489,
+					"name": "contact",
+					"position": [
+						7.921440124511719,
+						-95.08529663085938,
+						-102.2979965209961
+					]
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23284664750099183,
+					"name": "move",
+					"position": [
+						0.0,
+						50.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.19900000095367433,
+					"name": "move",
+					"position": [
+						150.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.19900000095367433,
+					"name": "move",
+					"position": [
+						-150.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "flameblast_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/LeagueExpeditionNew/MercurialArmour/attachments/MercurialArmourRobe.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Military/caster/rig.ast"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -5.9192"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -10.6918 -4.11053"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_orb"
+			parent = "aux_L_Weapon_attachment"
+			translation = "0 7.10571 0"
+		socket = "aux_orb_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 -7.106 0"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/MercurialWarrior.sm"
+			hide_segments = "skirt_meshShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder false L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder false R_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow false L_elbow_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_elbow false R_elbow_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_wrist false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_wrist false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_hand false L_finger_2_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "grp_R_hand false R_finger_2_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_L_knee false L_knee_jntBnd L_thigh_jntBnd"
+		bone_group = "grp_R_knee false R_knee_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd neck_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "l_orb_01 false aux_L_Weapon_attachment aux_orb"
+		bone_group = "r_orb_01 false aux_R_Weapon_attachment aux_orb_01"
+		bone_group = "head false head_jntBnd"
+		bone_group = "r_hand_trail false R_wrist_jntBnd"
+		bone_group = "L_hand_fx false L_elbow_Twist_jntBnd_3 L_wrist_jntBnd"
+		bone_group = "R_hand_fx false R_elbow_Twist_jntBnd_3 R_wrist_jntBnd"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/attack_01_hand.pet",
+						"bone_group": "r_orb_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6015200018882752,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/onact_attack01/onact_attack01.pet",
+						"bone_group": "R_hand_fx"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/attack_02_hand.pet",
+						"bone_group": "l_orb_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6133999824523926,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/onact_attack01/onact_attack01.pet",
+						"bone_group": "L_hand_fx"
+					}
+				]
+			},
+			{
+				"name": "flameblast_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3336159884929657,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/flameblast_hands.pet",
+						"bone_group": "r_orb_01"
+					}
+				]
+			},
+			{
+				"name": "attack_enrage_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/enraged_attack_01_hand.pet",
+						"bone_group": "r_orb_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6015200018882752,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/onact_attack01/onact_attack01.pet",
+						"bone_group": "R_hand_fx"
+					}
+				]
+			},
+			{
+				"name": "attack_enrage_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/enraged_attack_01_hand.pet",
+						"bone_group": "l_orb_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6133999824523926,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/mercurial_armour/pet/onact_attack01/onact_attack01.pet",
+						"bone_group": "L_hand_fx"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/CastSurge",
+						"bone_name": "R_elbow_Twist_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10634899884462357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19701999425888062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4988967180252075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/CastShot",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/CastSurge",
+						"bone_name": "R_elbow_Twist_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10634899884462357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43775779008865359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/CastShot",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5464630126953125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13771699368953706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1752060055732727,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38007301092147829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8221740126609802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8679249882698059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9327200055122376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23400135338306428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29544341564178469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42312493920326235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6522286534309387,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7594932913780212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07950861006975174,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10115226358175278,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21942882239818574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4746684730052948,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5010820031166077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.538490355014801,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08565997332334519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10897814482450485,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23640543222427369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5113922953605652,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5398494005203247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5801518559455872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10705200582742691,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13619346916675569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29544341564178469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6391032338142395,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6746670007705689,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7250343561172485,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08565997332334519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10897814482450485,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23640543222427369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5113922953605652,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5398494005203247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5801518559455872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/FallShort",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18001168966293336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Aggro",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39408600330352785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43608999252319338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "flameblast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07751938700675965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/FlameBlast",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3114599883556366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4231266975402832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/LongCastSurge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5812699794769288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/CastShot"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6417499780654908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Flinch",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.018406599760055543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Flinch",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.018406599760055543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Flinch",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.018406599760055543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Flinch",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.018406599760055543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Flinch",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.018406599760055543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23374000191688538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateMed50%",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.465800017118454,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Idle",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06790376454591751,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13044677674770356,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34845390915870669,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4629201889038087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6279025077819825,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.105018377304077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06006871163845062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12329906225204468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18811078369617463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/ShieldDrop",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30350542068481448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2733206748962403,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4400675296783448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8621315956115723,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04109000042080879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24492137134075166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Run",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4080129861831665,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_enrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0017222220776602626,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/CastSurge",
+						"bone_name": "R_elbow_Twist_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14023999869823457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2321760058403015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43775779008865359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/CastShot",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0075000524520875,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_enrage_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Vocals/MercurialCaster/Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0017222220776602626,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/CastSurge",
+						"bone_name": "R_elbow_Twist_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23020200431346894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateShort",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43775779008865359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Effects/CastShot",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0547699928283692,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/MercurialArmour/Foley/PlateStep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "Glow_Sphere_Fade",
+						"curve": "6 0 0 Smooth 0.142457 0 Flat 0.436803 1 Linear 0.648246 1 Flat 0.995833 0 Flat 1.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "LeftRightHand",
+						"curve": "2 0 1 Linear 1.333 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "Glow_Sphere_Fade",
+						"curve": "6 0 0 Linear 0.182768 0 Flat 0.537201 1 Linear 0.648246 1 Flat 1.00876 0 Flat 1.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "flameblast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.4961087703704836,
+						"name": "Glow_Sphere_Fade",
+						"curve": "5 0 0 Linear 0.361339 0 Flat 1.16019 1 Linear 1.69657 1 Flat 2.49611 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_enrage_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "Glow_Sphere_Fade",
+						"curve": "6 0 0 Smooth 0.142457 0 Flat 0.436803 1 Linear 0.648246 1 Flat 0.995833 0 Flat 1.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_enrage_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "LeftRightHand",
+						"curve": "2 0 1 Linear 1.333 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "Glow_Sphere_Fade",
+						"curve": "6 0 0 Linear 0.182768 0 Flat 0.537201 1 Linear 0.648246 1 Flat 1.00876 0 Flat 1.333 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/MercurialArmour/attachments/MercurialArmourRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/attachments/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/attachments/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/attachments/MercurialWarriorRobe.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/MercurialWarrior.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/MercurialWarrior_armour_8a88cd29.smd"
+Materials 3
+	"Art/Models/MONSTERS/GenericBiped/BipedMedium/Textures/ExpeditionLeague2c.mat" 5
+	"Art/Models/MONSTERS/GenericBiped/BipedMedium/Textures/ExpeditionMonster2Insidec.mat" 1
+	"Art/Models/MONSTERS/GenericBiped/BipedMedium/Textures/ExpeditionLeague2c.mat" 1
+BoundingBox -68.7344 -18.455 -187.187 68.7344 23.5331 -0.359799
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/MercurialWarrior/MercurialWarrior_armour_8a88cd29.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 7 in the header, 7 in the block · 5093 triangles over 3885 vertices
+  names: 220 bytes said, 220 read  [agree]
+
+=== shapes (7)
+0	body_meshShape	from 0	count 7518
+1	cloth_meshShape	from 7518	count 264
+2	hood_meshShape	from 7782	count 4008
+3	plates_meshShape	from 11790	count 1566
+4	shoulderpads_meshShape	from 13356	count 840
+5	mask_meshShape	from 14196	count 561
+6	skirt_meshShape	from 14757	count 522
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  MercurialArmourRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-22.8,-14.6,-11.8)..(23.2,18.3,78.5)
+    (the geometry did not read)
+    rig 23 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L_skirt_jntBnd_1  [its own]  under 0  rests at (14.5,-5.5,1.8)
+      2 phys_skinned_L_skirt_jntBnd_4  [its own]  under 0  rests at (13.9,3,-0.1)
+      3 phys_skinned_L_skirt_jntBnd_8  [its own]  under 0  rests at (5.5,7.2,-0.4)
+      4 phys_skinned_R_skirt_jntBnd_8  [its own]  under 0  rests at (-5.5,7.2,-0.4)
+      5 phys_skinned_R_skirt_jntBnd_4  [its own]  under 0  rests at (-13.9,3,-0.1)
+      6 phys_skinned_R_skirt_jntBnd_1  [its own]  under 0  rests at (-14.5,-5.5,1.8)
+      7 phys_skinned_L_skirt_jntBnd_2  [its own]  under 1  rests at (20,-2.8,24.3)
+      8 phys_skinned_L_skirt_jntBnd_5  [its own]  under 2  rests at (15.4,6.7,22.4)
+      9 phys_skinned_L_skirt_jntBnd_9  [its own]  under 3  rests at (6,11.5,22.5)
+      10 phys_skinned_R_skirt_jntBnd_9  [its own]  under 4  rests at (-6,11.5,22.5)
+      11 phys_skinned_R_skirt_jntBnd_5  [its own]  under 5  rests at (-15.4,6.7,22.4)
+      12 phys_skinned_R_skirt_jntBnd_2  [its own]  under 6  rests at (-20,-2.8,24.3)
+      13 phys_skinned_L_skirt_jntBnd_3  [its own]  under 7  rests at (20.3,0.2,46.1)
+      14 phys_skinned_L_skirt_jntBnd_6  [its own]  under 8  rests at (15.5,9.5,45.7)
+      15 phys_skinned_L_skirt_jntBnd_10  [its own]  under 9  rests at (6,14.5,46.5)
+      16 phys_skinned_R_skirt_jntBnd_10  [its own]  under 10  rests at (-6,14.5,46.5)
+      17 phys_skinned_R_skirt_jntBnd_6  [its own]  under 11  rests at (-15.5,9.5,45.7)
+      18 phys_skinned_R_skirt_jntBnd_3  [its own]  under 12  rests at (-20.3,0.2,46.1)
+      19 phys_skinned_L_skirt_jntBnd_7  [its own]  under 14  rests at (16,8.2,63.3)
+      20 phys_skinned_L_skirt_jntBnd_11  [its own]  under 15  rests at (5.8,14.7,69.1)
+      21 phys_skinned_R_skirt_jntBnd_11  [its own]  under 16  rests at (-5.8,14.7,69.1)
+      22 phys_skinned_R_skirt_jntBnd_7  [its own]  under 17  rests at (-16,8.2,63.3)

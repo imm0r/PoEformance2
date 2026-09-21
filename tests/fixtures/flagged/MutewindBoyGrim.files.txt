@@ -1,0 +1,2506 @@
+monster: Faridun Neophyte [Metadata/Monsters/Mutewind/MutewindBoyGrim]
+
+=== .ao Metadata/Monsters/Mutewind/BanditBoy/GrimCorruptedMutewindBanditBoy.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Mutewind/BanditBoy/GrimCorruptedMutewindBanditBoyNoPhys"
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/Mutewind/BanditBoy/attachments/GrimCorruptedMutewindBanditBoyHeadPiece.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/Mutewind/BanditBoy/attachments/GrimCorruptedMutewindBanditBoyNecklace.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/Mutewind/BanditBoy/attachments/GrimCorruptedMutewindBanditBoyRobeMain.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/MutewindBanditsBoyNoPhys.sm"
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/MutewindBanditBoy.sm"
+			BodyCombinedShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+			MetallicSkirtShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+			SkirtFrontBeltShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+			SkirtFrontShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+			SkirtShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/GrimCorruptedBoyTentacles.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditBoy/GrimCorruptedMutewindBanditBoyNoPhys.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Mutewind/BanditBoy/BaseMutewindBanditBoy"
+
+AttachedAnimatedObject
+{
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/MutewindBanditsBoyNoPhys.sm"
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/MutewindBanditsBoyNoPhys.sm"
+			BodyCombinedShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+			MetallicSkirtShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+			SkirtFrontBeltShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+			SkirtFrontShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+			SkirtShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/GrimCorruptedBoyTentacles.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3100000023841858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Attack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32782799005508425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Effects/SwingSmall",
+						"bone_name": "R_thumb_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33969399333000185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/SwordPlay",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33969399333000185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.375775009393692,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5458499789237976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Effects/SwingSmall",
+						"bone_name": "L_aux_weapon_base"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5498539805412293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/SwordPlay",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6159420013427734,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8416919708251953,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Effects/SwingSmall",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8525390028953552,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/SwordPlay",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.86245197057724,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0118199586868287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Effects/SwingSmall",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0137900114059449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/SwordPlay",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0137900114059449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23108799755573274,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30709099769592287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4281029999256134,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Effects/SwingBig",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4395830035209656,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45601600408554079,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Attack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49167901277542117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5440589785575867,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5472130179405212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/SwordPlay",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6170579791069031,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Effects/SwingBig",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6449959874153137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6697940230369568,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6768350005149841,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6982380151748657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/SwordPlay",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9058700203895569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08901090174913407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17778199911117555,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2540290057659149,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Attack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30038198828697207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3557789921760559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7479289770126343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/DeathLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03866859897971153,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20718300342559815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2914400100708008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30598700046539309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1130950003862381,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23958300054073335,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3110109865665436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "L_sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.818452000617981,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/FallSmall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2425600290298463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1901790052652359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3185270130634308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "L_sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45022299885749819,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "R_sword_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/DeathLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20734700560569764,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2819570004940033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "L_sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3721829950809479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "R_sword_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1901790052652359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3185270130634308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "L_sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45022299885749819,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "R_sword_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2377229928970337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04501130059361458,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06418419629335404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07946020364761353,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30223000049591067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07421290129423142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30223000049591067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06409300118684769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30223000049591067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09820090234279633,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30223000049591067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23268400132656098,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/BreathIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40180501341819765,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClothTiny"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11569400131702423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27838900685310366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3070949912071228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4390600025653839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2889100313186646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3537700176239014,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_aux_weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4206500053405762,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "R_aux_weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6285400390625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6504499912261963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6990400552749634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11916500329971314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18433399498462678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20645299553871156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2660360038280487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Knockdown2",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39101099967956545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9067720174789429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5843000411987305,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8542900085449219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_aux_weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8877999782562256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "L_aux_weapon_tip"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05184030160307884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1004130020737648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20111599564552308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/BreathRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3632130026817322,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3837440013885498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4043700098991394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditBoy/GrimCorruptedMutewindBanditBoyNoPhys.ao (depth 1)
+version 3
+extends "Metadata/Monsters/Mutewind/BanditBoy/BaseMutewindBanditBoy"
+
+AttachedAnimatedObject
+{
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/MutewindBanditsBoyNoPhys.sm"
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/MutewindBanditsBoyNoPhys.sm"
+			BodyCombinedShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+			MetallicSkirtShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+			SkirtFrontBeltShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+			SkirtFrontShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+			SkirtShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat:0"
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/GrimCorruptedBoyTentacles.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3100000023841858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Attack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32782799005508425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Effects/SwingSmall",
+						"bone_name": "R_thumb_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33969399333000185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/SwordPlay",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33969399333000185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.375775009393692,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5458499789237976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Effects/SwingSmall",
+						"bone_name": "L_aux_weapon_base"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5498539805412293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/SwordPlay",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6159420013427734,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8416919708251953,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Effects/SwingSmall",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8525390028953552,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/SwordPlay",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.86245197057724,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0118199586868287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Effects/SwingSmall",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0137900114059449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/SwordPlay",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0137900114059449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23108799755573274,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30709099769592287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4281029999256134,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Effects/SwingBig",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4395830035209656,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45601600408554079,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Attack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49167901277542117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5440589785575867,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5472130179405212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/SwordPlay",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6170579791069031,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Effects/SwingBig",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6449959874153137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6697940230369568,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6768350005149841,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6982380151748657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/SwordPlay",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9058700203895569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08901090174913407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17778199911117555,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2540290057659149,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Attack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30038198828697207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3557789921760559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7479289770126343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/DeathLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03866859897971153,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20718300342559815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2914400100708008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30598700046539309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1130950003862381,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23958300054073335,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3110109865665436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "L_sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.818452000617981,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/FallSmall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2425600290298463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1901790052652359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3185270130634308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "L_sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45022299885749819,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "R_sword_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/DeathLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20734700560569764,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2819570004940033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "L_sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3721829950809479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "R_sword_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1901790052652359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3185270130634308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "L_sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45022299885749819,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/WeaponDrop2",
+						"bone_name": "R_sword_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2377229928970337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04501130059361458,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06418419629335404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07946020364761353,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30223000049591067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07421290129423142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30223000049591067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06409300118684769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30223000049591067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09820090234279633,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30223000049591067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23268400132656098,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/BreathIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40180501341819765,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClothTiny"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11569400131702423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27838900685310366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3070949912071228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4390600025653839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2889100313186646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3537700176239014,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_aux_weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4206500053405762,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "R_aux_weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6285400390625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6504499912261963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6990400552749634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11916500329971314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18433399498462678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20645299553871156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2660360038280487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Knockdown2",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39101099967956545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9067720174789429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5843000411987305,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8542900085449219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/DaggerSwing",
+						"bone_name": "L_aux_weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8877999782562256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourCloth",
+						"bone_name": "L_aux_weapon_tip"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05184030160307884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1004130020737648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20111599564552308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_12_1/FaridunBandits_Grim/BanditBoyGrim/BreathRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3632130026817322,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3837440013885498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClankTiny",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4043700098991394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/part1/act2/g2_12_1/FaridunBandits_Grim/BanditBoyGrim/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditBoy/attachments/GrimCorruptedMutewindBanditBoyHeadPiece.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/attachments/MutewindBanditBoyHeadPiece/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/attachments/MutewindBanditBoyHeadPiece/rig.ast"
+		linear_allowed_contraction = 0.049
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.005
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/attachments/MutewindBanditBoyHeadPiece/MutewindBanditBoyHeadPiece.sm"
+			FrontTopRingShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditBoy/attachments/GrimCorruptedMutewindBanditBoyNecklace.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/attachments/MutewindBanditBoyNecklace/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/attachments/MutewindBanditBoyNecklace/rig.ast"
+		linear_allowed_contraction = 0.050
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.025
+		enclosure_angle = 0.300
+		use_shock_propagation = false
+		enable_collisions = false
+		attachment_bones = "L_clavicle_jntBnd R_clavicle_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/attachments/MutewindBanditBoyNecklace/MutewindBanditBoyNecklace.sm"
+			BackDingleShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		BackLeftDingleShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		BackLeftRing_1Shape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		BackLeftRing_Shape2 = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		BackRightDingleShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		BackRightRing_Shape1 = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		BackRightRing_Shape2 = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		FrontDingleShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		FrontLeftDingleShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		FrontLeftRing_Shape1 = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		FrontLeftRing_Shape2 = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		FrontRightDingleShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		FrontRightRing_Shape1 = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		FrontRightRing_Shape2 = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_clavicle_jntBnd R_clavicle_jntBnd "
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditBoy/attachments/GrimCorruptedMutewindBanditBoyRobeMain.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/attachments/MutewindBanditBoyRobeMain/rig.amd"
+	default_animation = "idle_01"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Mutewind/BanditBoy/attachments/GrimCorruptedMutewindBanditBoyRobeFront.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/attachments/MutewindBanditBoyRobeMain/rig.ast"
+		linear_allowed_contraction = 0.410
+		bend_stiffness = 180.000
+		bend_allowed_angle = 0.100
+		tangent_viscosity_multiplier = 0.150
+		enclosure_angle = 0.800
+		animation_velocity_factor = 10.000
+		animation_force_factor = 0.100
+		attachment_bones = "spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/attachments/MutewindBanditBoyRobeMain/MutewindBanditsBoyRobeMain.sm"
+			MetallicShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		SkirtShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+	}
+	
+	ObjectHiding
+	{
+		hide_parent_segments = "SkirtFrontShape,SkirtShape,SkirtFrontBeltShape,MetallicSkirtShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd "
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditBoy/BaseMutewindBanditBoy.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/rig.amd"
+	animations = '[
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.16380999982357026,
+					"name": "footstep",
+					"position": [
+						1.3462300300598145,
+						36.88180160522461,
+						-1.6139899492263795
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.30250999331474306,
+					"name": "footstep",
+					"position": [
+						-5.727240085601807,
+						25.390100479125978,
+						-1.576990008354187
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5987409949302673,
+					"name": "footstep",
+					"position": [
+						-24.454299926757814,
+						-34.78379821777344,
+						-2.0901999473571779
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8632779717445374,
+					"name": "footstep",
+					"position": [
+						27.031099319458009,
+						-29.7406005859375,
+						-1.5987399816513062
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1958600282669068,
+					"name": "footstep",
+					"position": [
+						-26.48200035095215,
+						51.054100036621097,
+						-1.6041500568389893
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.2619200050830841,
+					"name": "addglowepk"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4317370057106018,
+					"name": "footstep",
+					"position": [
+						20.059900283813478,
+						-33.7224006652832,
+						-1.5756399631500245
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5617409944534302,
+					"name": "footstep",
+					"position": [
+						-40.130401611328128,
+						22.149099349975587,
+						-1.8558800220489503
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8635799884796143,
+					"name": "removeglowepk"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0211000442504883,
+					"name": "footstep",
+					"position": [
+						-28.864900588989259,
+						52.33570098876953,
+						-1.9280500411987305
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1249200105667115,
+					"name": "footstep",
+					"position": [
+						26.522300720214845,
+						-16.00349998474121,
+						-1.6260199546813965
+					]
+				}
+			]
+		},
+		{
+			"name": "death_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.33000001311302187,
+					"name": "move",
+					"position": [
+						16.0,
+						90.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_dot_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 1.5,
+					"name": "move",
+					"position": [
+						-38.0,
+						-47.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000001788139344,
+					"name": "move",
+					"position": [
+						13.0,
+						-70.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23000000417232514,
+					"name": "move",
+					"position": [
+						95.0,
+						8.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_move_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.30000001192092898,
+					"name": "move",
+					"position": [
+						11.79699993133545,
+						-174.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.2329999804496765,
+					"name": "move",
+					"position": [
+						-80.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.39874476194381716,
+					"name": "move",
+					"position": [
+						0.0,
+						-200.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 Away 1.000000"
+				}
+			]
+		},
+		{
+			"name": "run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.05184030160307884,
+					"name": "footstep",
+					"position": [
+						0.08347609639167786,
+						15.205300331115723,
+						-2.0804600715637209
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3632130026817322,
+					"name": "footstep",
+					"position": [
+						-3.6705400943756105,
+						9.254229545593262,
+						-4.45619010925293
+					]
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.33513501286506655,
+								0.0
+							],
+							[
+								0.3675679862499237,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 4,
+						"width": 28.0,
+						"angle": 1.553339958190918,
+						"length": 115.0,
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.1344599723815919
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.46745601296424868,
+								0.0
+							],
+							[
+								0.5029590129852295,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 4,
+						"width": 28.0,
+						"angle": 1.553339958190918,
+						"length": 115.0,
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.1344599723815919
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.6390529870986939,
+								0.0
+							],
+							[
+								0.6804730296134949,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 4,
+						"width": 28.0,
+						"angle": 1.553339958190918,
+						"length": 115.0,
+						"impact_x_rotation": [
+							0.0,
+							-0.34906598925590517
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.1344599723815919
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.7573959827423096,
+								0.0
+							],
+							[
+								0.786981999874115,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 4,
+						"width": 28.0,
+						"angle": 1.553339958190918,
+						"length": 115.0,
+						"impact_x_rotation": [
+							0.0,
+							-0.34906598925590517
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.1344599723815919
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.3405410051345825,
+								0.0
+							],
+							[
+								0.3945949971675873,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 2,
+						"width": 23.121000289916993,
+						"angle": 0.8028510212898254,
+						"length": 120.0,
+						"impact_x_rotation": [
+							-0.17453299462795258,
+							-0.5235990285873413
+						],
+						"impact_z_rotation": [
+							-0.6981319785118103,
+							-1.2217299938201905
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4848479926586151,
+								0.0
+							],
+							[
+								0.5606060028076172,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 2,
+						"width": 23.0,
+						"angle": 0.8203049898147583,
+						"length": 120.0,
+						"impact_x_rotation": [
+							0.0,
+							-0.26179900765419009
+						],
+						"impact_z_rotation": [
+							-0.43633198738098147,
+							-1.309000015258789
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.23243199288845063,
+								0.0
+							],
+							[
+								0.3675679862499237,
+								1.0
+							]
+						],
+						"damage_statset_index": 0,
+						"width": 80.92500305175781,
+						"length": 120.0,
+						"impact_x_rotation": [
+							-0.08726649731397629,
+							-0.34906598925590517
+						],
+						"impact_z_rotation": [
+							0.17453299462795258,
+							0.34906598925590517
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/rig.ast"
+		socket = "R_aux_weapon_tip"
+			parent = "R_sword_jntBnd"
+			translation = "0 0 61"
+		socket = "R_aux_weapon_base"
+			parent = "R_sword_jntBnd"
+			translation = "0 0 10"
+		socket = "L_aux_weapon_tip"
+			parent = "L_sword_jntBnd"
+			translation = "0 0 61"
+		socket = "L_aux_weapon_base"
+			parent = "L_sword_jntBnd"
+			translation = "0 0 10"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/MutewindBanditsBoyNoPhys.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "parent_attach false L_clavicle_jntBnd R_clavicle_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd chest_jntBnd"
+		bone_group = "frameupper false L_elbow_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd R_elbow_jntBnd"
+		bone_group = "R_sword false R_aux_weapon_base R_aux_weapon_tip"
+		bone_group = "L_sword false L_aux_weapon_base L_aux_weapon_tip"
+	}
+	
+	TrailsEffects
+	{
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.43105798959732058,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoy/dagger_dagger_meleecut.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 8.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-60.000003814697269
+							],
+							"rotation": [
+								-0.8726999759674072,
+								-0.1744999885559082,
+								-0.12219999730587006
+							],
+							"scale": [
+								0.8500000238418579,
+								0.8500000238418579,
+								0.8500000238418579
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.5800840258598328,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoy/dagger_dagger_meleecut.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 8.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-60.000003814697269
+							],
+							"rotation": [
+								-2.1469998359680177,
+								0.2442999929189682,
+								-0.22689999639987946
+							],
+							"scale": [
+								0.8500000238418579,
+								0.8500000238418579,
+								0.8500000238418579
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.804078996181488,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoy/dagger_dagger_meleecut.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 8.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-60.000003814697269
+							],
+							"rotation": [
+								-2.1469998359680177,
+								0.2442999929189682,
+								-0.22689999639987946
+							],
+							"scale": [
+								0.8500000238418579,
+								0.8500000238418579,
+								0.8500000238418579
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.9576749801635742,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoy/dagger_dagger_meleecut.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 8.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-60.000003814697269
+							],
+							"rotation": [
+								-0.7329999804496765,
+								-0.1395999938249588,
+								-0.12219999730587006
+							],
+							"scale": [
+								0.800000011920929,
+								0.800000011920929,
+								0.800000011920929
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.4788990020751953,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoy/dagger_dagger_meleecut.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 8.0,
+						"offset": {
+							"translation": [
+								-15.30000114440918,
+								-21.400001525878908,
+								-81.95000457763672
+							],
+							"rotation": [
+								-2.111999988555908,
+								0.08726999908685684,
+								-0.06980999559164047
+							],
+							"scale": [
+								0.8500000238418579,
+								0.8500000238418579,
+								0.8500000238418579
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.6578459739685059,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoy/dagger_dagger_meleecut.ao",
+						"animation": "attack_220",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 8.0,
+						"offset": {
+							"translation": [
+								19.350000381469728,
+								-25.600000381469728,
+								-81.95000457763672
+							],
+							"rotation": [
+								-2.1989998817443849,
+								0.15709999203681947,
+								-0.06980999559164047
+							],
+							"scale": [
+								0.8500000238418579,
+								0.8500000238418579,
+								0.8500000238418579
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4312959909439087,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoy/pet/dagger_dagger_meleefx/dagger_punch.pet",
+						"bone_group": "grp_r_palm"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditBoy/attachments/GrimCorruptedMutewindBanditBoyRobeFront.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/attachments/MutewindBanditBoyRobeFront/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/attachments/MutewindBanditBoyRobeFront/rig.ast"
+		bend_stiffness = 180.000
+		bend_allowed_angle = 0.100
+		tangent_viscosity_multiplier = 0.150
+		enclosure_angle = 0.800
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/attachments/MutewindBanditBoyRobeFront/MutewindBanditsBoyRobeFront.sm"
+			SkirtFrontBeltShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+		SkirtFrontShape = "Art/Models/MONSTERS/MutewindBandits/Textures/GrimCorruptedBanditBoyc.mat"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/MutewindBanditBoy.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/rig_a42bbff9.smd"
+Materials 1
+	"Art/Textures/Monsters/MutewindBandits/MutewindBanditBoyc.mat" 1
+BoundingBox -65.7549 -13.9201 -173.878 65.7549 13.178 -0.0180866
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/rig_a42bbff9.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 1 in the header, 1 in the block · 4612 triangles over 3379 vertices
+  names: 34 bytes said, 34 read  [agree]
+
+=== shapes (9)
+0	BodyCombinedShape	from 0	count 13836
+1	TentaclesShape	from 13836	count 22716
+2	FrontTopRingShape	from 36552	count 2832
+3	BackNecklaceShape	from 39384	count 2694
+4	FrontNecklaceShape	from 42078	count 2832
+5	MetallicShape	from 44910	count 948
+6	SkirtShape	from 45858	count 1212
+7	SkirtFrontBeltShape	from 47070	count 192
+8	SkirtFrontShape	from 47262	count 546
+
+=== fitting
+the monster's rig: 55 bones
+mounts: aux_position, aux_head_jntBnd, aux_L_foot_jntBnd, aux_R_foot_jntBnd
+  GrimCorruptedMutewindBanditBoyHeadPiece.ao  socket head_jntBnd [in its carrier's rig]  box (-11.6,-13,-10.6)..(11.6,3.5,9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 944 triangles over 776 vertices
+    names: 34 bytes said, 34 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_M_piece_jntBnd_1  [its own]  under 0  rests at (0.2,-11.2,-1.3)
+      2 phys_tri_L_piece_jntBnd_1  [its own]  under 0  rests at (9.4,-0.6,0.8)
+      3 phys_tri_R_piece_jntBnd_1  [its own]  under 0  rests at (-9.4,-0.6,0.8)
+  GrimCorruptedMutewindBanditBoyNecklace.ao  socket chest_jntBnd [in its carrier's rig]  box (-15,-14.2,-15.3)..(15,13.8,6.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 1842 triangles over 1624 vertices
+    names: 70 bytes said, 70 read  [agree]
+    rig 5 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (4.7,0,-15.7)  carrier has (4.7,0,-131.4)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-4.7,0,-15.7)  carrier has (-4.7,0,-131.4)
+      3 phys_tri_necklace_front_jntBnd_1  [its own]  under 0  rests at (0,-8.2,-6.9)
+      4 phys_tri_necklace_back_jntBnd_1  [its own]  under 0  rests at (0,13.1,-9.5)
+  GrimCorruptedMutewindBanditBoyRobeMain.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-24.6,-13.3,-22.1)..(24.8,21.9,34.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 720 triangles over 454 vertices
+    names: 46 bytes said, 46 read  [agree]
+    rig 12 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 11 of 12  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-14.7)  carrier has (0,0,-99.9)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (8.7,-0,-0.1)  carrier has (8.7,-0,-85.3)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-8.7,-0,-0.1)  carrier has (-8.7,-0,-85.3)
+      4 phys_tri_robe_1_jntBnd_1  [its own]  under 0  rests at (19.1,6.2,22.9)
+      5 phys_tri_robe_2_jntBnd_1  [its own]  under 0  rests at (10.2,11.2,13.9)
+      6 phys_tri_robe_3_jntBnd_1  [its own]  under 0  rests at (-0,14,14.3)
+      7 phys_tri_robe_4_jntBnd_1  [its own]  under 0  rests at (-10.2,11.2,13.9)
+      8 phys_tri_robe_5_jntBnd_1  [its own]  under 0  rests at (-19.1,6.2,22.9)
+      9 phys_tri_robe_2_jntBnd_2  [its own]  under 5  rests at (11.3,13.4,25.6)
+      10 phys_tri_robe_3_jntBnd_2  [its own]  under 6  rests at (-0,16.8,26.9)
+      11 phys_tri_robe_4_jntBnd_2  [its own]  under 7  rests at (-11.3,13.4,25.6)
+    GrimCorruptedMutewindBanditBoyRobeFront.ao  socket <root> [NOT in its carrier's rig]  box (-15.4,-16.5,-1.1)..(15.7,-8.8,48.7)
+      version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+      shapes 2 in the header, 2 in the block · 246 triangles over 170 vertices
+      names: 68 bytes said, 68 read  [agree]
+      rig 4 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 3 of 4  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_tri_robe_jntBnd_1  [its own]  under 0  rests at (-0,-10.7,5.6)
+        2 phys_tri_robe_jntBnd_2  [its own]  under 1  rests at (0,-11,20.1)
+        3 phys_tri_robe_jntBnd_3  [its own]  under 2  rests at (0.1,-11.3,34.7)

@@ -1,0 +1,4059 @@
+monster: Olroth, Origin of the Fall [Metadata/Monsters/LeagueExpeditionNew/Olroth/Olroth]
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/Olroth/Olroth.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/NPC/Jamanra/boss/rig.amd"
+	view_of = "triple_lacerate_01"
+		view_name = "triple_lacerate_01_01"
+		view_exclude_event = "ParticleEffectEvent"
+	view_of = "intro_01"
+		view_name = "intro_01_idle"
+		view_end = 50
+		view_looping = true
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	view_of = "walk_01"
+		view_name = "walk_02"
+		view_looping = true
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 1.3329999446868897,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3329999446868897,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.00433354964479804,
+					"end_time": 1.3329999446868897,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "dash_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.6517986059188843,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.833329975605011,
+					"end_time": 1.1666598320007325,
+					"name": "move",
+					"position": [
+						0.0,
+						-764.5330200195313,
+						0.0
+					],
+					"data": "1 1 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8951390385627747,
+					"name": "thrust",
+					"position": [
+						0.0,
+						-61.57360076904297,
+						-118.35299682617188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1030486822128297,
+					"name": "swing",
+					"position": [
+						27.31719970703125,
+						19.679399490356447,
+						-118.23300170898438
+					]
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.5,
+					"end_time": 1.8666599988937379,
+					"name": "move",
+					"position": [
+						0.0,
+						-86.40899658203125,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 5 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "dash_02",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.6068236827850342,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7990000247955322,
+					"name": "thrust1",
+					"position": [
+						0.0,
+						0.0,
+						-111.55899810791016
+					]
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.9025543928146362,
+					"end_time": 1.0996618270874024,
+					"name": "move",
+					"position": [
+						0.0,
+						-500.0,
+						0.0
+					],
+					"data": "1 1 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3038100004196168,
+					"name": "thrust2",
+					"position": [
+						-21.089599609375,
+						-73.85320281982422,
+						-88.46540069580078
+					]
+				}
+			]
+		},
+		{
+			"name": "death_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.05653649941086769,
+					"name": "light_off"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6031919717788696,
+					"name": "energy_lost"
+				}
+			]
+		},
+		{
+			"name": "death_fake_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.6059699058532719,
+					"name": "audio2"
+				}
+			]
+		},
+		{
+			"name": "fake_dead_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "light_off"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.699999988079071,
+					"name": "energy_lost"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.699999988079071,
+					"name": "life_off"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.200000047683716,
+					"name": "heal"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.0072712898254398,
+					"name": "life_on"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.599999904632568,
+					"name": "light_on"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.819661617279053,
+					"name": "audio2"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.0,
+					"name": "energy_gain"
+				}
+			]
+		},
+		{
+			"name": "groundslam_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.6536620259284973,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5043482780456545,
+					"name": "contact",
+					"position": [
+						5.060999870300293,
+						-214.97471618652345,
+						-0.0000010843799600479543
+					]
+				}
+			]
+		},
+		{
+			"name": "groundslam_dash_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.29899999499320986,
+					"name": "move",
+					"position": [
+						0.0,
+						-453.5,
+						-0.0000010843799600479543
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.052142899483442309,
+					"name": "thrust",
+					"position": [
+						0.0,
+						-52.21289825439453,
+						-91.25019836425781
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.25928598642349245,
+					"name": "swing",
+					"position": [
+						0.0,
+						18.997499465942384,
+						-106.8219985961914
+					]
+				}
+			]
+		},
+		{
+			"name": "intro_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 7.38789701461792,
+					"name": "light_on"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 8.103300094604493,
+					"name": "audio"
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				}
+			]
+		},
+		{
+			"name": "slam_rupture_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				}
+			]
+		},
+		{
+			"name": "sword_throw_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.8485034704208374,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 3.632999897003174,
+					"name": "move",
+					"data": "1 1 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8661699891090393,
+					"name": "contact",
+					"position": [
+						0.0,
+						-90.36199951171875,
+						-121.7770004272461
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.722092628479004,
+					"name": "explode",
+					"position": [
+						-23.411771774291993,
+						10.379512786865235,
+						-121.7770004272461
+					]
+				}
+			]
+		},
+		{
+			"name": "triple_lacerate_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.5,
+					"end_time": 1.2899999618530274,
+					"name": "move",
+					"position": [
+						0.0,
+						-115.94599914550781,
+						-0.0000010843799600479543
+					],
+					"data": "1 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.5,
+					"end_time": 1.2886102199554444,
+					"name": "start_target_update",
+					"data": "145 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9122189879417419,
+					"name": "lacerate",
+					"position": [
+						-0.3823566436767578,
+						-127.82893371582031,
+						-58.51919937133789
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1865538358688355,
+					"name": "lacerate",
+					"position": [
+						0.33608436584472659,
+						-150.33200073242188,
+						-90.53450012207031
+					]
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.2886102199554444,
+					"end_time": 1.7903800010681153,
+					"name": "start_target_update",
+					"data": "75 0 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.2999999523162842,
+					"end_time": 1.7903800010681153,
+					"name": "move",
+					"position": [
+						0.0,
+						-171.4759979248047,
+						-0.0000010843799600479543
+					],
+					"data": "1 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.853675365447998,
+					"name": "lacerate",
+					"position": [
+						0.0,
+						-157.1909942626953,
+						-81.88240051269531
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "L_elbow_jntBnd Metadata/Monsters/LeagueExpeditionNew/Olroth/Attachments/Olroth_L_SleeveHeld.ao"
+	attached_object = "R_elbow_jntBnd Metadata/Monsters/LeagueExpeditionNew/Olroth/Attachments/Olroth_R_SleeveHeld.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/LeagueExpeditionNew/Olroth/Attachments/Olroth_SkirtHeld.ao"
+	attached_object = "R_Weapon Metadata/Monsters/LeagueExpedition/Olroth/Attachments/Olroth_SwordHeld.ao"
+	attached_object = "R_Weapon Metadata/Monsters/LeagueExpedition/Olroth/Attachments/Olroth_SwordHeld.ao"
+	attached_object = "R_Weapon Metadata/Monsters/LeagueExpedition/Olroth/Attachments/Olroth_SwordHeld.ao"
+	attached_object = "L_elbow_jntBnd Metadata/Monsters/LeagueExpeditionNew/Olroth/Attachments/Olroth_L_SleeveHeld.ao"
+	attached_object = "R_elbow_jntBnd Metadata/Monsters/LeagueExpeditionNew/Olroth/Attachments/Olroth_R_SleeveHeld.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/LeagueExpeditionNew/Olroth/Attachments/Olroth_SkirtHeld.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4615384638309479,
+								0.0
+							],
+							[
+								0.5115384459495544,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.41887903213500979,
+						"angle": 2.094395160675049,
+						"x_axis_scale": 0.8040000200271606,
+						"length": 234.8699951171875,
+						"impact_x_rotation": [
+							-0.5759586691856384,
+							0.1745329350233078
+						],
+						"impact_z_rotation": [
+							-0.24434611201286317,
+							-2.6354472637176515
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4038461446762085,
+								0.0
+							],
+							[
+								0.4346153736114502,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.2967059910297394,
+						"width": 63.24100112915039,
+						"angle": 1.7802400588989258,
+						"length": 185.61099243164063,
+						"offset": [
+							34.0,
+							6.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "dash_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4923076927661896,
+								0.0
+							],
+							[
+								0.5115384459495544,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.7504916191101074,
+						"angle": 2.4434611797332765,
+						"length": 181.8179931640625,
+						"offset": [
+							8.0,
+							0.0
+						],
+						"local_offset": [
+							0.0,
+							-28.0
+						],
+						"impact_z_rotation": [
+							-0.5934119820594788,
+							1.1868239641189576
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5158730149269104,
+								0.0
+							],
+							[
+								0.5284552574157715,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": 0.9773844480514526,
+						"angle": 1.0471975803375245,
+						"length": 200.0,
+						"offset": [
+							0.0,
+							-17.0
+						],
+						"local_offset": [
+							-7.0,
+							-21.0
+						],
+						"impact_z_rotation": [
+							1.9547688961029053,
+							2.6179940700531008
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "dash_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3730769157409668,
+								0.0
+							],
+							[
+								0.3730769157409668,
+								0.5075187683105469
+							],
+							[
+								0.44999998807907107,
+								0.6165413856506348
+							],
+							[
+								0.5038461685180664,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": 0.05235987901687622,
+						"width": 71.14700317382813,
+						"length": 209.48599243164063,
+						"offset": [
+							9.0,
+							-32.0
+						],
+						"local_offset": [
+							-20.0,
+							0.0
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5079365372657776,
+								0.0
+							],
+							[
+								0.5555555820465088,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": 0.05235987901687622,
+						"width": 71.14700317382813,
+						"length": 210.0,
+						"offset": [
+							9.0,
+							-32.0
+						],
+						"local_offset": [
+							-20.0,
+							0.0
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5595238208770752,
+								0.0
+							],
+							[
+								0.591269850730896,
+								1.0
+							]
+						],
+						"rotation": 0.05235987901687622,
+						"width": 71.14700317382813,
+						"length": 210.0,
+						"offset": [
+							9.0,
+							-32.0
+						],
+						"local_offset": [
+							-20.0,
+							0.0
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "sword_throw_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.23846153914928437,
+								0.0
+							],
+							[
+								0.25,
+								0.5037593841552734
+							],
+							[
+								0.2576923072338104,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.0872664675116539,
+						"width": 134.38699340820313,
+						"length": 478.260986328125,
+						"offset": [
+							57.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.24434611201286317,
+							-0.24434611201286317
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.2601625919342041,
+								0.0
+							],
+							[
+								0.26422762870788576,
+								0.24436092376708985
+							],
+							[
+								0.27642276883125307,
+								0.530075192451477
+							],
+							[
+								0.3048780560493469,
+								0.8872180581092835
+							],
+							[
+								0.33739838004112246,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"width": 146.44400024414063,
+						"length": 577.405029296875,
+						"offset": [
+							9.0,
+							0.0
+						],
+						"local_offset": [
+							0.0,
+							-482.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.33739838004112246,
+								0.0
+							],
+							[
+								0.35772356390953066,
+								0.3345864415168762
+							],
+							[
+								0.36991870403289797,
+								0.5902255773544312
+							],
+							[
+								0.3943089544773102,
+								0.8421052694320679
+							],
+							[
+								0.434959352016449,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.6806784272193909,
+						"angle": 6.2831854820251469,
+						"length": 92.04900360107422,
+						"local_offset": [
+							5.0,
+							-1106.0
+						],
+						"impact_z_rotation": [
+							0.47123897075653078,
+							-5.986478805541992
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.43824702501296999,
+								0.0
+							],
+							[
+								0.45816734433174136,
+								0.30451124906539919
+							],
+							[
+								0.4940239191055298,
+								0.7030075192451477
+							],
+							[
+								0.5697211027145386,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": 0.7155849933624268,
+						"angle": 2.1118485927581789,
+						"length": 100.1969985961914,
+						"local_offset": [
+							5.0,
+							-1099.0
+						],
+						"impact_z_rotation": [
+							0.47123897075653078,
+							-0.7679449319839478
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5737051963806152,
+								0.0
+							],
+							[
+								0.6334661245346069,
+								0.3308270573616028
+							],
+							[
+								0.6454183459281921,
+								0.6015037298202515
+							],
+							[
+								0.6613546013832092,
+								0.8233082890510559
+							],
+							[
+								0.6693227291107178,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -3.2463126182556154,
+						"angle": 6.2831854820251469,
+						"length": 100.0,
+						"local_offset": [
+							2.0,
+							-1058.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.6772908568382263,
+								0.0
+							],
+							[
+								0.701195240020752,
+								0.25563907623291018
+							],
+							[
+								0.717131495475769,
+								0.4774436354637146
+							],
+							[
+								0.7330677509307861,
+								0.7255638837814331
+							],
+							[
+								0.7410358786582947,
+								0.9135338068008423
+							],
+							[
+								0.7490040063858032,
+								1.0
+							],
+							[
+								0.7490040063858032,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": 3.1415927410125734,
+						"width": 161.88499450683595,
+						"length": 1000.0,
+						"local_offset": [
+							-18.0,
+							-1014.0
+						],
+						"impact_z_rotation": [
+							3.1415927410125734,
+							3.1415927410125734
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "triple_lacerate_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3499999940395355,
+								0.0
+							],
+							[
+								0.3769230842590332,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": 0.19198623299598695,
+						"angle": 3.1415927410125734,
+						"x_axis_scale": 0.21699999272823335,
+						"length": 225.29600524902345,
+						"offset": [
+							-56.0,
+							16.0
+						],
+						"impact_z_rotation": [
+							-0.40142571926116946,
+							0.3490658700466156
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4325396716594696,
+								0.0
+							],
+							[
+								0.4801587164402008,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.19198623299598695,
+						"angle": 3.1415927410125734,
+						"x_axis_scale": 0.21699999272823335,
+						"length": 204.79200744628907,
+						"offset": [
+							56.0,
+							16.0
+						],
+						"impact_z_rotation": [
+							-0.20943951606750489,
+							-0.20943951606750489
+						],
+						"impact_type": "Slash"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.738095223903656,
+								0.0
+							],
+							[
+								0.7460317611694336,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": 0.820304811000824,
+						"angle": 4.485496520996094,
+						"length": 171.08200073242188,
+						"offset": [
+							-13.0,
+							17.0
+						],
+						"impact_z_rotation": [
+							0.20943951606750489,
+							5.2883477210998539
+						],
+						"impact_type": "Slash"
+					}
+				]
+			}
+		}
+	]'
+}
+
+Locators
+{
+	locator = "dannig_1 0 240 0 0 0 0"
+	locator = "dannig_2 240 0 0 1.5708 0 0"
+	locator = "dannig_3 -240 0 0 -1.5708 0 0"
+	locator = "dannig_middle 0 0 0 0 0 0"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/NPC/Jamanra/boss/rig.ast"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -11.4483"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -10.3458 -10.1457"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_weapon_blade_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-0.995125 -0.993481 -14.5253"
+		socket = "aux_weapon_blade_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -120.385"
+		socket = "aux_weapon_blade_03"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -150.709"
+		socket = "aux_weapon_blade_04"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 21.5785"
+		socket = "aux_trail_fix_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-0.995125 0 -40"
+		socket = "aux_trail_fix_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-0.995125 0 -80"
+		socket = "aux_light_attach"
+			parent = "chest_jntBnd"
+			translation = "0 -47.655 15.4511"
+		socket = "aux_bak_attach_fx"
+			parent = "aux_Back_attachment"
+			translation = "0 24.6339 4.74504"
+		socket = "aux_eyeR"
+			parent = "head_jntBnd"
+			translation = "-3.86423 -9.44268 -9.97743"
+		socket = "aux_eyeL"
+			parent = "head_jntBnd"
+			translation = "3.86 -9.44268 -9.97743"
+		socket = "aux_sholder_R_01"
+			parent = "aux_R_shoulder_attachment"
+			translation = "-12.9989 -13.5957 -3.75033"
+		socket = "aux_sholder_R_02"
+			parent = "aux_R_shoulder_attachment"
+			translation = "5.65468 -12.6954 -2.12607"
+		socket = "aux_sholder_L_01"
+			parent = "aux_L_shoulder_attachment"
+			translation = "13 -13.6 -3.75033"
+		socket = "aux_sholder_L_02"
+			parent = "aux_L_shoulder_attachment"
+			translation = "-5.65 -12.7 -6.25952"
+		socket = "aux_weapon_blade_side_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-11.158 0 -150.709"
+		socket = "aux_weapon_blade_side_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "11.676 0 -150.709"
+		socket = "aux_weapon_blade_center"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -69.53"
+		linear_allowed_contraction = 0.034
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.001
+		enclosure_radius = 5.000
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+		enable_collisions = false
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/JamanratheGreat.sm"
+			back_atachmentShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+		faceShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+		glovesShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+		head_clothShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+		helmetShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+		pantsShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+		shoulderpads_01Shape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+		shoulderpads_02Shape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+		upperbody_base_cutShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+		upperbody_extra_clothShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+		waist_armourShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+	}
+
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder false L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder false R_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow false L_elbow_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_elbow false R_elbow_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_wrist false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_wrist false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_hand false L_finger_2_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "grp_R_hand false R_finger_2_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_L_knee false L_knee_jntBnd L_thigh_jntBnd"
+		bone_group = "grp_R_knee false R_knee_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd"
+		bone_group = "frameupper false R_elbow_jntBnd R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_elbow_jntBnd"
+		bone_group = "L_sleeve_bone_group false L_shoulder_cTwist_jntBnd_1 L_elbow_attachment_jntBnd"
+		bone_group = "R_sleeve_bone_group false R_shoulder_cTwist_jntBnd_1 R_elbow_attachment_jntBnd"
+		bone_group = "hips_bone_group false hip_jntBnd R_thigh_jntBnd L_thigh_jntBnd"
+		bone_group = "sword_handle false aux_weapon_blade_01 aux_weapon_blade_04"
+		bone_group = "sword_blade false aux_weapon_blade_01 aux_trail_fix_01 aux_trail_fix_02 aux_weapon_blade_02 aux_weapon_blade_03"
+		bone_group = "sword_tip false aux_weapon_blade_02 aux_weapon_blade_03"
+		bone_group = "sword_down_trl false aux_trail_fix_01"
+		bone_group = "eye_R false aux_target_head_02 aux_eyeR"
+		bone_group = "eye_L false aux_target_head_02 aux_eyeL"
+		bone_group = "aux_R_shoulder false aux_sholder_R_01 aux_sholder_R_02"
+		bone_group = "aux_L_shoulder false aux_sholder_L_01 aux_sholder_L_02"
+		bone_group = "dash_blade false aux_weapon_blade_side_01 aux_weapon_blade_side_02"
+		bone_group = "full_sword false aux_weapon_blade_04 aux_weapon_blade_03"
+		bone_group = "sword_center false aux_weapon_blade_center"
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2160930037498474,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordBody",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5060189962387085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFast",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5532469749450684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5787979960441589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6033650040626526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.16387642920017243,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordBody",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2955619990825653,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFast",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4603790044784546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4950149953365326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "dash_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.26929327845573428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/DashIn",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3366279900074005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6423028707504273,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Dash/DashSweetener",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7614424824714661,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordIn",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9917647838592529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Lacerate/Lacerate_CleaveB",
+						"bone_name": "aux_trail_fix_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9995766282081604,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/DashOut",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0422300100326539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0922000408172608,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFast",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1216000318527222,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6155200004577637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8639500141143799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "dash_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18887899816036225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19516000151634217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/DashIn",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4323137402534485,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Dash/DashSweetener",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8036180138587952,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordBody",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8243780136108398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordIn",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8993470072746277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9071900248527527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Lacerate/Lacerate_CleaveC",
+						"bone_name": "aux_weapon_blade_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.964460015296936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/DashOut",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.015239953994751,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.248810052871704,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordOut",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8844599723815919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Death",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7269260287284851,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/Clang",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0895500183105469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2125500440597535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/KneeFall",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3036600351333619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/KneeFall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1010499000549318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Fall",
+						"bone_name": "L_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fake_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Death",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFaster",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7269260287284851,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/Clang",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0895500183105469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2125500440597535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/KneeFall",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3036600351333619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/KneeFall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.471442937850952,
+						"end_time": 6.436413764953613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/TimeTrial/TimeTrial_Surge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.291208267211914,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/BoomerangDagger/BoomerangDagger_Surge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.9093241691589359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/Teleport/Teleport_Submerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.093303203582764,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordReturn",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.223235607147217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.389846324920654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/TimeTrap/TimeTrap_Surge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.44122838973999,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/TimeTrial/TimeTrial_Countdown_Start",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.536583423614502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.80277681350708,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Death",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFaster",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/TimeTrial/TimeTrial_Countdown_Start",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7269260287284851,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/Clang",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0895500183105469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2125500440597535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/KneeFall",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3036600351333619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/KneeFall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7948877811431886,
+						"end_time": 6.303719520568848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/TimeTrial/TimeTrial_Surge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.432195663452148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/BoomerangDagger/BoomerangDagger_Surge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.9093217849731449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/Teleport/Teleport_Submerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.093303203582764,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordReturn",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.223235607147217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.389846324920654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/TimeTrap/TimeTrap_Surge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.536583423614502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.80277681350708,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFaster",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0069222599267959599,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFaster",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0069222599267959599,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFaster",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0069222599267959599,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFaster",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0069222599267959599,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFaster",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0069222599267959599,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/BuildUpAttack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07544530183076859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordBody",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2603040039539337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32333704829216006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3920930027961731,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5152588486671448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Uberslam/GroundSlam_SwordLevitate",
+						"bone_name": "aux_weapon_blade_center"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5718129873275757,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6344900131225586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7946549654006958,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordFly",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0059016942977906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/OnAct/GroundslamOnAct",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0752400159835816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0813469886779786,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Uberslam/GroundSlam_IceOnAct",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.305139422416687,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Uberslam/GroundSlam_SwordSpin",
+						"bone_name": "aux_weapon_blade_center"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5757999420166016,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSpin",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9759600162506104,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSpin",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2155699729919435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSpin",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4504098892211916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSpin",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.625339984893799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSpin",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.773900032043457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSpin",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.898509979248047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSpin",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.970400094985962,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.127739191055298,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Uberslam/GroundSlam_Slam",
+						"bone_name": "aux_weapon_blade_center"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.29386043548584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3425498008728029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordFly",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.394279718399048,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordGround",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4197299480438234,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4776270389556886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Uberslam/GroundSlam_Nova",
+						"bone_name": "aux_weapon_blade_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9110498428344728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.009747505187988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/DashOut",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.316351890563965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.369429111480713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFast",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.8249993324279789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "groundslam_dash_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.026239899918437005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.060159001499414447,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1698053628206253,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/ShortAttack01",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20679600536823274,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24071499705314637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2613149881362915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27255699038505556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8290650248527527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.108240008354187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Idle",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Intro/Four_Intro_Placeholder",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7710149884223938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Intro/IntroFoley",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0596519708633423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/EmergeSequence_01_",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7623846530914308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.093715667724609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/EmergeSequence_02_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.2077860832214359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.268747329711914,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Intro/IntroSword",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.398820400238037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/TimeTrap/TimeTrap_Surge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.733312129974365,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordOut",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.812689304351807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/Teleport/Teleport_Submerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.184179782867432,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.273829936981201,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFast",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.279809951782227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.351530075073242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.356631278991699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Zarokh/Effects/TimeTrial/TimeTrial_Countdown_Start",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.690567016601563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2107183337211609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4304034113883972,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5171765089035034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6315023303031921,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/Clang",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.990615963935852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.133221387863159,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.292825698852539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/KnockdownC",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.314589500427246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.382496356964111,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.86893892288208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.193329811096191,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.284884452819824,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.406946182250977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2499299943447113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28219500184059145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherRun",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5692049860954285,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/LongAttack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03601288050413132,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18817655742168427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29512524604797366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4226584732532501,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9507352709770203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0391497611999512,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0607659816741944,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4724692106246949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5002316236495972,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3010287284851076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.420424461364746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06712860614061356,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39132100343704226,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5090489387512207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/BaronBoss/Effects/Phase1/Sword/SpearCleave",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5571672916412354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5777722597122192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/BaronBoss/Effects/Phase2/IceBreath/Wind",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.587224006652832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.68863844871521,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6958960294723511,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7431448698043823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordFly",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7768589854240418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.82218998670578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/SpinSword/SpinSword_ThrowSweetener",
+						"bone_name": "aux_weapon_blade_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8483254909515381,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/BaronBoss/Foley/Human/Sword/Human_Sword_Slash",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1662499904632569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.234740972518921,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/SpinSword/SpinSword_ReturnSweetener",
+						"bone_name": "aux_trail_fix_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8023899793624879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9696197509765626,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordReturn",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0574097633361818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/BaronBoss/Foley/Human/Sword/Human_Sword_Return_Start",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.222287654876709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/BaronBoss/Foley/Human/Sword/Human_Sword_Return_Whoosh",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5002100467681886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5477793216705324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/BaronBoss/Foley/Human/Sword/Human_Sword_Return_End",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.654452323913574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/SpinSword/SpinSword_Catch",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6650240421295168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/ShortAttack01",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "triple_lacerate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2448262870311737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3713966906070709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4049999713897705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/ShortAttack01",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6891435384750366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7093560099601746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7153252959251404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Lacerate/Lacerate_CleaveA",
+						"bone_name": "aux_weapon_blade_center"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7557267546653748,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8318526148796082,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/ShortAttack01",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8684300184249878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9694079160690308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Lacerate/Lacerate_CleaveB",
+						"bone_name": "aux_weapon_blade_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1193599700927735,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.152649998664856,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1969135999679566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/ShortAttack01",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2986500263214112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.486780047416687,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6312600374221802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6672407388687134,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Effects/Lacerate/Lacerate_CleaveC",
+						"bone_name": "aux_weapon_blade_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6878199577331544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/ShortAttack01",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7996200323104859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8572200536727906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1880199909210207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3886980414390564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherRun",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40024232864379885,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.93796306848526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherRun",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9654334783554077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Vocal/Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40024232864379885,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9654334783554077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.37851792573928835,
+						"end_time": 0.676264762878418,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.42089664936065676,
+						"end_time": 0.8583003282546997,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "dash_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.4371151626110077,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6873251795768738,
+						"end_time": 1.3103368282318116,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "dash_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8291100859642029,
+						"end_time": 1.515352725982666,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8291100859642029,
+						"end_time": 1.2188209295272828,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_dash.trl",
+						"bone_group": "dash_blade"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.6261424422264099,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7055636644363403,
+						"end_time": 1.196981430053711,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 3.1722803115844728,
+						"end_time": 3.5268120765686037,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/groundslam/sword_down_trl.trl",
+						"bone_group": "sword_down_trl"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 4.333094120025635,
+						"end_time": 4.51947546005249,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "groundslam_dash_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.2738099992275238,
+						"end_time": 0.6075153350830078,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 6.415989875793457,
+						"end_time": 7.385409355163574,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6025400161743164,
+						"end_time": 3.632999897003174,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_throw.trl",
+						"bone_group": "full_sword"
+					}
+				]
+			},
+			{
+				"name": "triple_lacerate_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.500072181224823,
+						"end_time": 1.4411048889160157,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.7230783700942994,
+						"end_time": 1.8822879791259766,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "dash_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/dash_02/dash.pet",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7980865240097046,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/dash_02/dash_step.pet",
+						"bone_groups": [
+							"grp_L_foot",
+							"grp_R_foot"
+						]
+					}
+				]
+			},
+			{
+				"name": "dash_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/dash_02/dash.pet",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7731599807739258,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/dash_02/dash_step.pet",
+						"bone_groups": [
+							"grp_L_foot",
+							"grp_R_foot"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8945606350898743,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/sword_stab.pet",
+						"bone_group": "sword_tip"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/death_fake/burst_bones.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_neck",
+							"grp_chest",
+							"grp_belly",
+							"grp_L_elbow",
+							"grp_R_elbow",
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_L_hand",
+							"grp_R_hand",
+							"grp_R_thigh",
+							"grp_L_thigh",
+							"grp_L_knee",
+							"grp_R_knee"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/death_fake/burst.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 6.249929904937744,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/death_fake/burst_revive.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/groundslam_01/body_wisps.pet",
+						"bone_groups": [
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_L_hand",
+							"grp_R_hand",
+							"grp_L_thigh",
+							"grp_L_knee",
+							"grp_R_thigh",
+							"grp_R_knee"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/groundslam_01/swing_particles.pet",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/intro/intro_core.pet",
+						"bone_group": "grp_head"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/intro/intro_bones.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_neck",
+							"grp_chest",
+							"grp_belly",
+							"grp_waist",
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"grp_L_elbow",
+							"grp_R_elbow",
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_L_hand",
+							"grp_R_hand",
+							"grp_L_thigh",
+							"grp_R_thigh",
+							"grp_L_knee",
+							"grp_R_knee",
+							"grp_R_foot",
+							"grp_L_foot"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.769439935684204,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/intro/intro_sword.pet",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 7.504115104675293,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/death_fake/burst_revive.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7858301401138306,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/sword_throw/sword_swirl.pet",
+						"bone_group": "sword_center"
+					}
+				]
+			},
+			{
+				"name": "triple_lacerate_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/groundslam_01/body_wisps.pet",
+						"bone_groups": [
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_L_hand",
+							"grp_R_hand",
+							"grp_L_thigh",
+							"grp_L_knee",
+							"grp_R_thigh",
+							"grp_R_knee"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/triple_lacerate_01/swing_particles.pet",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9122189879417419,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/lacerate/lacerate_01_blur.pet",
+						"bone_group": "grp_head"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1451934576034547,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/lacerate/lacerate_02_blur.pet",
+						"bone_group": "grp_head"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8351577520370484,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/lacerate/lacerate_03_blur.pet",
+						"bone_group": "grp_head"
+					}
+				]
+			},
+			{
+				"name": "triple_lacerate_01_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/triple_lacerate_01/swing_particles.pet",
+						"bone_group": "sword_blade"
+					}
+				]
+			}
+		]'
+	}
+
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 3.496150016784668,
+						"frequency": 1200.0,
+						"amplitude": 20.0,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 7.4932146072387699,
+						"frequency": 50.0,
+						"amplitude": 40.0,
+						"duration": 0.30000001192092898,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "2 0 1 Linear 1.333 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "dash_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.2330000400543215,
+						"name": "EmissiveMultiSword",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 1.27419 4.96622 Linear 1.6621 0 Flat 2.233 0 Flat"
+					}
+				]
+			},
+			{
+				"name": "dash_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.1659998893737795,
+						"name": "EmissiveMultiSword",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 1.23596 4.96622 Linear 1.61223 0 Flat 2.166 0 Flat"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "3 0 1 Linear 0.482036 1 Linear 3 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "death_fake_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 7.065999984741211,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "3 0 1 Linear 3.1757 0 Smooth 7.066 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 7.065999984741211,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "4 0 1 Linear 3.1757 0 Flat 5.22678 0 Flat 7.066 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.836699962615967,
+						"name": "Glow_Sphere_Fade",
+						"curve": "7 0 0 Linear 0.805508 0 Flat 1.20694 1 Linear 2.96083 0 Flat 4.20288 0 Flat 4.65222 0.5 Smooth 4.8367 0 Flat"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.841031074523926,
+						"name": "EmissiveMultiSword",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "7 0 0 Linear 0.783488 0 Flat 3.18373 1.18323 Linear 3.82896 1.18323 Linear 3.96905 0 Flat 4.49629 1.18323 Linear 4.84103 0 Flat"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.849491596221924,
+						"name": "SwordPulse",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "7 0 0 Linear 1.40535 0 Linear 2.54663 1 Linear 2.54663 0 Flat 3.87258 0 Linear 4.5891 1 Flat 4.84949 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.846527099609375,
+						"name": "VortexStrength",
+						"curve": "7 0 0 Linear 1.66657 0 Linear 2.47493 1 Flat 3.45311 1 Flat 3.68934 0 Linear 4.58631 0 Linear 4.84653 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.8422160148620609,
+						"name": "WindVelocity",
+						"auto_reset": false,
+						"curve": "7 0 1 Linear 0.890633 1 Flat 1.24836 0 Linear 1.66509 0 Linear 1.86423 1 Flat 3.93314 1 Flat 4.84222 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.600000023841858,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "2 0 1 Linear 1.6 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 8.265999794006348,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "3 0 1.19209e-07 Linear 1.32817 1.19209e-07 Linear 8.266 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 8.265999794006348,
+						"name": "Stab",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "6 0 1.19209e-07 Linear 4.23295 0 Linear 5.07255 1 Flat 6.25197 1 Flat 6.87167 0 Flat 8.266 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.632999897003174,
+						"name": "Glow_Sphere_Fade",
+						"curve": "7 0 0 Smooth 0.817794 0.307432 Linear 1.12424 0 Flat 2.52722 0.131757 CustomSmooth 0 2.84105 1 Linear 3.15692 0 Flat 3.633 0 Flat"
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+	}
+
+	Lights
+	{
+		light = "point_light"
+			bone_name = "aux_face_jntBnd"
+			state = ""
+				colour = "0.787697 0.973393 1.23891"
+				position = "0 0 -125"
+				radius = 300
+			state = "on"
+				colour = "0.787697 0.973393 1.23891"
+				position = "0 0 -125"
+				radius = 300
+			state = "off"
+				default_state = true
+				position = "0 0 -125"
+				radius = 300
+			state = "flash"
+				colour = "1.57539 1.94679 2.47782"
+				position = "0 0 -125"
+				radius = 300
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.036213468760252,
+						"end_time": 1.787214994430542,
+						"state_name": "off"
+					}
+				]
+			},
+			{
+				"name": "death_fake_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.3277115225791931,
+						"end_time": 2.40242862701416,
+						"state_name": "off"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 4.480224132537842,
+						"end_time": 7.065999984741211,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.511210024356842,
+						"end_time": 2.1403727531433107,
+						"state_name": "off"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 5.385117530822754,
+						"end_time": 7.065999984741211,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 1.1550192832946778,
+						"end_time": 1.3984804153442383,
+						"state_name": "flash"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 1.4209024906158448,
+						"end_time": 1.8902214765548707,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "off"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 3.796898126602173,
+						"end_time": 7.237516403198242,
+						"state_name": "on"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "fake_dead_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 2.628385543823242,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/epk/revive_pulse.epk"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 2.7071211338043215,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/epk/catch_pulse.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.6341000199317932,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.5841323733329773,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "dash_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.1824432611465455,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "dash_02",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.184059977531433,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 6.28561544418335,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.1449300050735474,
+						"haptic_id": "Haptic_LargeBoss_Rumble_Loop3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 3.491102695465088,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "groundslam_dash_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.35858362913131716,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 7.491250514984131,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.1991426944732667,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.8615800142288208,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 2.712181329727173,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "triple_lacerate_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.9376599192619324,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.1959750652313233,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.918629765510559,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/Olroth/Attachments/Olroth_L_SleeveHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Heist/Jamanra/attachments/L_Sleeve/JamanratheGreat_L_Sleeve.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Heist/Jamanra/attachments/L_Sleeve/JamanratheGreat_L_Sleeve.ast"
+		linear_allowed_contraction = 0.599
+		normal_viscosity_multiplier = 0.215
+		tangent_viscosity_multiplier = 0.078
+		animation_velocity_factor = 0.620
+		animation_force_factor = 4.600
+		attachment_groups = "L_sleeve_bone_group L_Sleeve_attachment_bone_group"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/attachments/L_Sleeve/JamanratheGreat_L_Sleeve.sm"
+			L_Sleeve_extra_clothShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+			L_SleeveShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "L_Sleeve_attachment_bone_group false L_shoulder_cTwist_jntBnd_1 L_elbow_attachment_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/Olroth/Attachments/Olroth_R_SleeveHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Heist/Jamanra/attachments/R_Sleeve/JamanratheGreat_R_Sleeve.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Heist/Jamanra/attachments/R_Sleeve/JamanratheGreat_R_Sleeve.ast"
+		linear_allowed_contraction = 0.599
+		normal_viscosity_multiplier = 0.215
+		tangent_viscosity_multiplier = 0.078
+		animation_velocity_factor = 0.620
+		animation_force_factor = 4.600
+		attachment_groups = "R_sleeve_bone_group R_Sleeve_attachment_bone_group"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/attachments/R_Sleeve/JamanratheGreat_R_Sleeve.sm"
+			R_Sleeve_extra_clothShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+			R_SleeveShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "R_Sleeve_attachment_bone_group false R_shoulder_cTwist_jntBnd_1 R_elbow_attachment_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/Olroth/Attachments/Olroth_SkirtHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Heist/Jamanra/attachments/Skirt/JamanratheGreat_Skirt.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Heist/Jamanra/attachments/Skirt/JamanratheGreat_Skirt.ast"
+		bend_stiffness = 400.000
+		normal_viscosity_multiplier = 0.030
+		tangent_viscosity_multiplier = 0.015
+		enclosure_angle = 0.800
+		animation_velocity_factor = 4.000
+		animation_force_factor = 1.000
+		attachment_groups = "hips_bone_group hips_attachment_bone_group"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/attachments/Skirt/JamanratheGreat_Skirt.sm"
+			skirt_backShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+			skirt_baseShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+			skirt_frontShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+			upperbody_extra_clothShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanra.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "hips_attachment_bone_group false hip_jntBnd R_thigh_jntBnd L_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueExpedition/Olroth/Attachments/Olroth_SwordHeld.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/NPC/Heist/Jamanra/attachments/Sword/JamanratheGreatSword.fmt"
+			JamanraSwordShape = "Art/Models/NPC/Heist/Jamanra/Textures/ExpeditionJamanraWeapon.mat"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/NPC/Heist/Jamanra/JamanratheGreat.sm
+version 6
+SkinnedMeshData "Art/Models/NPC/Heist/Jamanra/JamanratheGreat_armour_b954a8bc.smd"
+Materials 1
+	"Art/Models/NPC/Heist/Jamanra/Textures/JamanratheGreatc.mat" 11
+BoundingBox -83.4375 -20.4163 -222.382 83.436 52.0681 0.516287
+BoneGroups 0
+
+=== .smd Art/Models/NPC/Heist/Jamanra/JamanratheGreat_armour_b954a8bc.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 11 in the header, 11 in the block · 11078 triangles over 9817 vertices
+  names: 362 bytes said, 362 read  [agree]
+
+=== shapes (11)
+0	back_atachmentShape	from 0	count 6672
+1	faceShape	from 6672	count 2088
+2	glovesShape	from 8760	count 3570
+3	head_clothShape	from 12330	count 1932
+4	helmetShape	from 14262	count 4284
+5	pantsShape	from 18546	count 3300
+6	shoulderpads_01Shape	from 21846	count 2844
+7	shoulderpads_02Shape	from 24690	count 3600
+8	upperbody_base_cutShape	from 28290	count 3816
+9	upperbody_extra_clothShape	from 32106	count 246
+10	waist_armourShape	from 32352	count 882
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  Olroth_L_SleeveHeld.ao  socket L_elbow_jntBnd [in its carrier's rig]  box (-1.8,-19.9,-15.3)..(49.3,17.1,19.4)
+    (the geometry did not read)
+    rig 26 bones, 3 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_sleeve_01_jntBnd  [its own]  under 0  rests at (11.2,-1.8,10.4)
+      2 phys_skinned_sleeve_04_jntBnd  [its own]  under 0  rests at (10,4.5,7.5)
+      3 phys_skinned_sleeve_07_jntBnd  [its own]  under 0  rests at (8.3,7.7,1.1)
+      4 phys_skinned_sleeve_10_jntBnd  [its own]  under 0  rests at (7.2,5.2,-5.2)
+      5 phys_skinned_sleeve_13_jntBnd  [its own]  under 0  rests at (7.2,-1.3,-8.1)
+      6 phys_skinned_sleeve_15_jntBnd  [its own]  under 0  rests at (8.3,-7.4,-5.6)
+      7 phys_skinned_sleeve_18_jntBnd  [its own]  under 0  rests at (9.8,-10.3,1)
+      8 phys_skinned_sleeve_21_jntBnd  [its own]  under 0  rests at (11,-8.1,7.6)
+      9 L_shoulder_cTwist_jntBnd_1  [shared]  under 0  rests at (-12.9,-3.7,-0)  carrier has (34.2,9.3,-149.1)
+      10 L_elbow_attachment_jntBnd  [shared]  under 0  rests at (-0,0,0)  carrier has (44.5,9.3,-140.6)
+      11 phys_skinned_sleeve_02_jntBnd  [its own]  under 1  rests at (26,-2.1,12.2)
+      12 phys_skinned_sleeve_05_jntBnd  [its own]  under 2  rests at (24.3,6.8,9)
+      13 phys_skinned_sleeve_08_jntBnd  [its own]  under 3  rests at (20.5,10.9,0.9)
+      14 phys_skinned_sleeve_11_jntBnd  [its own]  under 4  rests at (17.3,7,-7)
+      15 phys_skinned_sleeve_14_jntBnd  [its own]  under 5  rests at (16,-1.9,-10.7)
+      16 phys_skinned_sleeve_16_jntBnd  [its own]  under 6  rests at (17.5,-9.7,-7.5)
+      17 phys_skinned_sleeve_19_jntBnd  [its own]  under 7  rests at (20.4,-13.2,0.1)
+      18 phys_skinned_sleeve_22_jntBnd  [its own]  under 8  rests at (23.9,-10.4,8)
+      19 phys_skinned_sleeve_03_jntBnd  [its own]  under 11  rests at (40.9,-2.5,14.1)
+      20 phys_skinned_sleeve_06_jntBnd  [its own]  under 12  rests at (38.5,9.1,10.4)
+      21 phys_skinned_sleeve_09_jntBnd  [its own]  under 13  rests at (32.7,14.1,0.6)
+      22 phys_skinned_sleeve_12_jntBnd  [its own]  under 14  rests at (27.4,9,-8.8)
+      23 phys_skinned_sleeve_17_jntBnd  [its own]  under 16  rests at (26,-12.4,-9.1)
+      24 phys_skinned_sleeve_20_jntBnd  [its own]  under 17  rests at (30.7,-16.1,-0.7)
+      25 phys_skinned_sleeve_23_jntBnd  [its own]  under 18  rests at (36.8,-12.8,8.5)
+  Olroth_R_SleeveHeld.ao  socket R_elbow_jntBnd [in its carrier's rig]  box (-49.3,-17.1,-19.6)..(1.8,19.9,15.3)
+    (the geometry did not read)
+    rig 26 bones, 3 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_shoulder_cTwist_jntBnd_1  [shared]  under 0  rests at (12.9,3.7,-0)  carrier has (-34.2,9.3,-149.1)
+      2 R_elbow_attachment_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (-44.5,9.3,-140.6)
+      3 phys_skinned_sleeve_01_jntBnd  [its own]  under 0  rests at (-11.2,1.8,-10.4)
+      4 phys_skinned_sleeve_04_jntBnd  [its own]  under 0  rests at (-10,-4.5,-7.5)
+      5 phys_skinned_sleeve_07_jntBnd  [its own]  under 0  rests at (-8.3,-7.7,-1.1)
+      6 phys_skinned_sleeve_10_jntBnd  [its own]  under 0  rests at (-7.2,-5.2,5.2)
+      7 phys_skinned_sleeve_13_jntBnd  [its own]  under 0  rests at (-7.2,1.3,8.1)
+      8 phys_skinned_sleeve_15_jntBnd  [its own]  under 0  rests at (-8.3,7.4,5.6)
+      9 phys_skinned_sleeve_18_jntBnd  [its own]  under 0  rests at (-9.8,10.3,-1)
+      10 phys_skinned_sleeve_21_jntBnd  [its own]  under 0  rests at (-11,8.1,-7.6)
+      11 phys_skinned_sleeve_02_jntBnd  [its own]  under 3  rests at (-26,2.1,-12.2)
+      12 phys_skinned_sleeve_05_jntBnd  [its own]  under 4  rests at (-24.3,-6.8,-9)
+      13 phys_skinned_sleeve_08_jntBnd  [its own]  under 5  rests at (-20.5,-10.9,-0.9)
+      14 phys_skinned_sleeve_11_jntBnd  [its own]  under 6  rests at (-17.3,-7,7)
+      15 phys_skinned_sleeve_14_jntBnd  [its own]  under 7  rests at (-16,1.9,10.7)
+      16 phys_skinned_sleeve_16_jntBnd  [its own]  under 8  rests at (-17.5,9.7,7.5)
+      17 phys_skinned_sleeve_19_jntBnd  [its own]  under 9  rests at (-20.4,13.2,-0.1)
+      18 phys_skinned_sleeve_22_jntBnd  [its own]  under 10  rests at (-23.9,10.4,-8)
+      19 phys_skinned_sleeve_03_jntBnd  [its own]  under 11  rests at (-40.9,2.5,-14.1)
+      20 phys_skinned_sleeve_06_jntBnd  [its own]  under 12  rests at (-38.5,-9.1,-10.4)
+      21 phys_skinned_sleeve_09_jntBnd  [its own]  under 13  rests at (-32.7,-14.1,-0.6)
+      22 phys_skinned_sleeve_12_jntBnd  [its own]  under 14  rests at (-27.4,-9,8.8)
+      23 phys_skinned_sleeve_17_jntBnd  [its own]  under 16  rests at (-26,12.4,9.1)
+      24 phys_skinned_sleeve_20_jntBnd  [its own]  under 17  rests at (-30.7,16.1,0.7)
+      25 phys_skinned_sleeve_23_jntBnd  [its own]  under 18  rests at (-36.8,12.8,-8.5)
+  Olroth_SkirtHeld.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-52.9,-27.3,-1.2)..(52.9,42.1,111.4)
+    (the geometry did not read)
+    rig 50 bones, 4 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,-0,12.8)  carrier has (0,2,-106.8)
+      2 phys_skinned_L_skirt_front_01_jntBnd  [its own]  under 0  rests at (5.5,-12.5,1.1)
+      3 phys_skinned_L_skirt_back_01_jntBnd  [its own]  under 0  rests at (5,8.4,-0)
+      4 phys_skinned_L_skirt_side_01_jntBnd  [its own]  under 0  rests at (10.6,-9.2,-0)
+      5 phys_skinned_L_skirt_side_06_jntBnd  [its own]  under 0  rests at (15.4,-1.6,-0)
+      6 phys_skinned_L_skirt_side_11_jntBnd  [its own]  under 0  rests at (12.9,5.4,-0)
+      7 phys_skinned_R_skirt_front_01_jntBnd  [its own]  under 0  rests at (-5.5,-12.5,1.1)
+      8 phys_skinned_R_skirt_side_01_jntBnd  [its own]  under 0  rests at (-10.6,-9.2,-0)
+      9 phys_skinned_R_skirt_side_06_jntBnd  [its own]  under 0  rests at (-15.4,-1.6,-0)
+      10 phys_skinned_R_skirt_side_11_jntBnd  [its own]  under 0  rests at (-12.9,5.4,-0)
+      11 phys_skinned_R_skirt_back_01_jntBnd  [its own]  under 0  rests at (-5,8.4,-0)
+      12 R_thigh_jntBnd  [shared]  under 1  rests at (-11,-0,12.8)  carrier has (-11,2,-106.8)
+      13 L_thigh_jntBnd  [shared]  under 1  rests at (11,0,12.8)  carrier has (11,2,-106.8)
+      14 phys_skinned_L_skirt_front_02_jntBnd  [its own]  under 2  rests at (6.5,-14.1,31.3)
+      15 phys_skinned_L_skirt_back_02_jntBnd  [its own]  under 3  rests at (6.2,12.3,22.2)
+      16 phys_skinned_L_skirt_side_02_jntBnd  [its own]  under 4  rests at (15.2,-10.7,22.2)
+      17 phys_skinned_L_skirt_side_07_jntBnd  [its own]  under 5  rests at (20.1,-1.2,22.2)
+      18 phys_skinned_L_skirt_side_12_jntBnd  [its own]  under 6  rests at (16.4,8,22.2)
+      19 phys_skinned_R_skirt_front_02_jntBnd  [its own]  under 7  rests at (-6.5,-14.1,31.3)
+      20 phys_skinned_R_skirt_side_02_jntBnd  [its own]  under 8  rests at (-15.2,-10.7,22.2)
+      21 phys_skinned_R_skirt_side_07_jntBnd  [its own]  under 9  rests at (-20.1,-1.2,22.2)
+      22 phys_skinned_R_skirt_side_12_jntBnd  [its own]  under 10  rests at (-16.4,8,22.2)
+      23 phys_skinned_R_skirt_back_02_jntBnd  [its own]  under 11  rests at (-6.2,12.3,22.2)
+      24 phys_skinned_L_skirt_front_03_jntBnd  [its own]  under 14  rests at (7.5,-15.7,61.5)
+      25 phys_skinned_L_skirt_back_03_jntBnd  [its own]  under 15  rests at (7.5,16.3,44.4)
+      26 phys_skinned_L_skirt_side_03_jntBnd  [its own]  under 16  rests at (19.8,-12.1,44.4)
+      27 phys_skinned_L_skirt_side_08_jntBnd  [its own]  under 17  rests at (24.8,-0.7,44.4)
+      28 phys_skinned_L_skirt_side_13_jntBnd  [its own]  under 18  rests at (19.8,10.5,44.4)
+      29 phys_skinned_R_skirt_front_03_jntBnd  [its own]  under 19  rests at (-7.5,-15.7,61.5)
+      30 phys_skinned_R_skirt_side_03_jntBnd  [its own]  under 20  rests at (-19.8,-12.1,44.4)
+      31 phys_skinned_R_skirt_side_08_jntBnd  [its own]  under 21  rests at (-24.8,-0.7,44.4)
+      32 phys_skinned_R_skirt_side_13_jntBnd  [its own]  under 22  rests at (-19.8,10.5,44.4)
+      33 phys_skinned_R_skirt_back_03_jntBnd  [its own]  under 23  rests at (-7.5,16.3,44.4)
+      34 phys_skinned_L_skirt_back_04_jntBnd  [its own]  under 25  rests at (8.7,20.3,66.6)
+      35 phys_skinned_L_skirt_side_04_jntBnd  [its own]  under 26  rests at (24.4,-13.6,66.6)
+      36 phys_skinned_L_skirt_side_09_jntBnd  [its own]  under 27  rests at (29.5,-0.3,66.6)
+      37 phys_skinned_L_skirt_side_14_jntBnd  [its own]  under 28  rests at (23.2,13.1,66.6)
+      38 phys_skinned_R_skirt_side_04_jntBnd  [its own]  under 30  rests at (-24.4,-13.6,66.6)
+      39 phys_skinned_R_skirt_side_09_jntBnd  [its own]  under 31  rests at (-29.5,-0.3,66.6)
+      40 phys_skinned_R_skirt_side_14_jntBnd  [its own]  under 32  rests at (-23.2,13.1,66.6)
+      41 phys_skinned_R_skirt_back_04_jntBnd  [its own]  under 33  rests at (-8.7,20.3,66.6)
+      42 phys_skinned_L_skirt_back_05_jntBnd  [its own]  under 34  rests at (10,24.3,88.8)
+      43 phys_skinned_L_skirt_side_05_jntBnd  [its own]  under 35  rests at (29.1,-15,88.8)
+      44 phys_skinned_L_skirt_side_10_jntBnd  [its own]  under 36  rests at (34.2,0.1,88.8)
+      45 phys_skinned_L_skirt_side_15_jntBnd  [its own]  under 37  rests at (26.6,15.6,88.8)
+      46 phys_skinned_R_skirt_side_05_jntBnd  [its own]  under 38  rests at (-29.1,-15,88.8)
+      47 phys_skinned_R_skirt_side_10_jntBnd  [its own]  under 39  rests at (-34.2,0.1,88.8)
+      48 phys_skinned_R_skirt_side_15_jntBnd  [its own]  under 40  rests at (-26.6,15.6,88.8)
+      49 phys_skinned_R_skirt_back_05_jntBnd  [its own]  under 41  rests at (-10,24.3,88.8)
+  Olroth_SwordHeld.ao  socket R_Weapon [NOT in its carrier's rig]  fixed mesh JamanratheGreatSword.fmt  (did not read: version 7 puts its geometry outside a DOLm block, which this does not read)
+  Olroth_SwordHeld.ao  socket R_Weapon [NOT in its carrier's rig]  fixed mesh JamanratheGreatSword.fmt  (did not read: version 7 puts its geometry outside a DOLm block, which this does not read)
+  Olroth_SwordHeld.ao  socket R_Weapon [NOT in its carrier's rig]  fixed mesh JamanratheGreatSword.fmt  (did not read: version 7 puts its geometry outside a DOLm block, which this does not read)
+  Olroth_L_SleeveHeld.ao  socket L_elbow_jntBnd [in its carrier's rig]  box (-1.8,-19.9,-15.3)..(49.3,17.1,19.4)
+    (the geometry did not read)
+    rig 26 bones, 3 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_sleeve_01_jntBnd  [its own]  under 0  rests at (11.2,-1.8,10.4)
+      2 phys_skinned_sleeve_04_jntBnd  [its own]  under 0  rests at (10,4.5,7.5)
+      3 phys_skinned_sleeve_07_jntBnd  [its own]  under 0  rests at (8.3,7.7,1.1)
+      4 phys_skinned_sleeve_10_jntBnd  [its own]  under 0  rests at (7.2,5.2,-5.2)
+      5 phys_skinned_sleeve_13_jntBnd  [its own]  under 0  rests at (7.2,-1.3,-8.1)
+      6 phys_skinned_sleeve_15_jntBnd  [its own]  under 0  rests at (8.3,-7.4,-5.6)
+      7 phys_skinned_sleeve_18_jntBnd  [its own]  under 0  rests at (9.8,-10.3,1)
+      8 phys_skinned_sleeve_21_jntBnd  [its own]  under 0  rests at (11,-8.1,7.6)
+      9 L_shoulder_cTwist_jntBnd_1  [shared]  under 0  rests at (-12.9,-3.7,-0)  carrier has (34.2,9.3,-149.1)
+      10 L_elbow_attachment_jntBnd  [shared]  under 0  rests at (-0,0,0)  carrier has (44.5,9.3,-140.6)
+      11 phys_skinned_sleeve_02_jntBnd  [its own]  under 1  rests at (26,-2.1,12.2)
+      12 phys_skinned_sleeve_05_jntBnd  [its own]  under 2  rests at (24.3,6.8,9)
+      13 phys_skinned_sleeve_08_jntBnd  [its own]  under 3  rests at (20.5,10.9,0.9)
+      14 phys_skinned_sleeve_11_jntBnd  [its own]  under 4  rests at (17.3,7,-7)
+      15 phys_skinned_sleeve_14_jntBnd  [its own]  under 5  rests at (16,-1.9,-10.7)
+      16 phys_skinned_sleeve_16_jntBnd  [its own]  under 6  rests at (17.5,-9.7,-7.5)
+      17 phys_skinned_sleeve_19_jntBnd  [its own]  under 7  rests at (20.4,-13.2,0.1)
+      18 phys_skinned_sleeve_22_jntBnd  [its own]  under 8  rests at (23.9,-10.4,8)
+      19 phys_skinned_sleeve_03_jntBnd  [its own]  under 11  rests at (40.9,-2.5,14.1)
+      20 phys_skinned_sleeve_06_jntBnd  [its own]  under 12  rests at (38.5,9.1,10.4)
+      21 phys_skinned_sleeve_09_jntBnd  [its own]  under 13  rests at (32.7,14.1,0.6)
+      22 phys_skinned_sleeve_12_jntBnd  [its own]  under 14  rests at (27.4,9,-8.8)
+      23 phys_skinned_sleeve_17_jntBnd  [its own]  under 16  rests at (26,-12.4,-9.1)
+      24 phys_skinned_sleeve_20_jntBnd  [its own]  under 17  rests at (30.7,-16.1,-0.7)
+      25 phys_skinned_sleeve_23_jntBnd  [its own]  under 18  rests at (36.8,-12.8,8.5)
+  Olroth_R_SleeveHeld.ao  socket R_elbow_jntBnd [in its carrier's rig]  box (-49.3,-17.1,-19.6)..(1.8,19.9,15.3)
+    (the geometry did not read)
+    rig 26 bones, 3 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_shoulder_cTwist_jntBnd_1  [shared]  under 0  rests at (12.9,3.7,-0)  carrier has (-34.2,9.3,-149.1)
+      2 R_elbow_attachment_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (-44.5,9.3,-140.6)
+      3 phys_skinned_sleeve_01_jntBnd  [its own]  under 0  rests at (-11.2,1.8,-10.4)
+      4 phys_skinned_sleeve_04_jntBnd  [its own]  under 0  rests at (-10,-4.5,-7.5)
+      5 phys_skinned_sleeve_07_jntBnd  [its own]  under 0  rests at (-8.3,-7.7,-1.1)
+      6 phys_skinned_sleeve_10_jntBnd  [its own]  under 0  rests at (-7.2,-5.2,5.2)
+      7 phys_skinned_sleeve_13_jntBnd  [its own]  under 0  rests at (-7.2,1.3,8.1)
+      8 phys_skinned_sleeve_15_jntBnd  [its own]  under 0  rests at (-8.3,7.4,5.6)
+      9 phys_skinned_sleeve_18_jntBnd  [its own]  under 0  rests at (-9.8,10.3,-1)
+      10 phys_skinned_sleeve_21_jntBnd  [its own]  under 0  rests at (-11,8.1,-7.6)
+      11 phys_skinned_sleeve_02_jntBnd  [its own]  under 3  rests at (-26,2.1,-12.2)
+      12 phys_skinned_sleeve_05_jntBnd  [its own]  under 4  rests at (-24.3,-6.8,-9)
+      13 phys_skinned_sleeve_08_jntBnd  [its own]  under 5  rests at (-20.5,-10.9,-0.9)
+      14 phys_skinned_sleeve_11_jntBnd  [its own]  under 6  rests at (-17.3,-7,7)
+      15 phys_skinned_sleeve_14_jntBnd  [its own]  under 7  rests at (-16,1.9,10.7)
+      16 phys_skinned_sleeve_16_jntBnd  [its own]  under 8  rests at (-17.5,9.7,7.5)
+      17 phys_skinned_sleeve_19_jntBnd  [its own]  under 9  rests at (-20.4,13.2,-0.1)
+      18 phys_skinned_sleeve_22_jntBnd  [its own]  under 10  rests at (-23.9,10.4,-8)
+      19 phys_skinned_sleeve_03_jntBnd  [its own]  under 11  rests at (-40.9,2.5,-14.1)
+      20 phys_skinned_sleeve_06_jntBnd  [its own]  under 12  rests at (-38.5,-9.1,-10.4)
+      21 phys_skinned_sleeve_09_jntBnd  [its own]  under 13  rests at (-32.7,-14.1,-0.6)
+      22 phys_skinned_sleeve_12_jntBnd  [its own]  under 14  rests at (-27.4,-9,8.8)
+      23 phys_skinned_sleeve_17_jntBnd  [its own]  under 16  rests at (-26,12.4,9.1)
+      24 phys_skinned_sleeve_20_jntBnd  [its own]  under 17  rests at (-30.7,16.1,0.7)
+      25 phys_skinned_sleeve_23_jntBnd  [its own]  under 18  rests at (-36.8,12.8,-8.5)
+  Olroth_SkirtHeld.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-52.9,-27.3,-1.2)..(52.9,42.1,111.4)
+    (the geometry did not read)
+    rig 50 bones, 4 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,-0,12.8)  carrier has (0,2,-106.8)
+      2 phys_skinned_L_skirt_front_01_jntBnd  [its own]  under 0  rests at (5.5,-12.5,1.1)
+      3 phys_skinned_L_skirt_back_01_jntBnd  [its own]  under 0  rests at (5,8.4,-0)
+      4 phys_skinned_L_skirt_side_01_jntBnd  [its own]  under 0  rests at (10.6,-9.2,-0)
+      5 phys_skinned_L_skirt_side_06_jntBnd  [its own]  under 0  rests at (15.4,-1.6,-0)
+      6 phys_skinned_L_skirt_side_11_jntBnd  [its own]  under 0  rests at (12.9,5.4,-0)
+      7 phys_skinned_R_skirt_front_01_jntBnd  [its own]  under 0  rests at (-5.5,-12.5,1.1)
+      8 phys_skinned_R_skirt_side_01_jntBnd  [its own]  under 0  rests at (-10.6,-9.2,-0)
+      9 phys_skinned_R_skirt_side_06_jntBnd  [its own]  under 0  rests at (-15.4,-1.6,-0)
+      10 phys_skinned_R_skirt_side_11_jntBnd  [its own]  under 0  rests at (-12.9,5.4,-0)
+      11 phys_skinned_R_skirt_back_01_jntBnd  [its own]  under 0  rests at (-5,8.4,-0)
+      12 R_thigh_jntBnd  [shared]  under 1  rests at (-11,-0,12.8)  carrier has (-11,2,-106.8)
+      13 L_thigh_jntBnd  [shared]  under 1  rests at (11,0,12.8)  carrier has (11,2,-106.8)
+      14 phys_skinned_L_skirt_front_02_jntBnd  [its own]  under 2  rests at (6.5,-14.1,31.3)
+      15 phys_skinned_L_skirt_back_02_jntBnd  [its own]  under 3  rests at (6.2,12.3,22.2)
+      16 phys_skinned_L_skirt_side_02_jntBnd  [its own]  under 4  rests at (15.2,-10.7,22.2)
+      17 phys_skinned_L_skirt_side_07_jntBnd  [its own]  under 5  rests at (20.1,-1.2,22.2)
+      18 phys_skinned_L_skirt_side_12_jntBnd  [its own]  under 6  rests at (16.4,8,22.2)
+      19 phys_skinned_R_skirt_front_02_jntBnd  [its own]  under 7  rests at (-6.5,-14.1,31.3)
+      20 phys_skinned_R_skirt_side_02_jntBnd  [its own]  under 8  rests at (-15.2,-10.7,22.2)
+      21 phys_skinned_R_skirt_side_07_jntBnd  [its own]  under 9  rests at (-20.1,-1.2,22.2)
+      22 phys_skinned_R_skirt_side_12_jntBnd  [its own]  under 10  rests at (-16.4,8,22.2)
+      23 phys_skinned_R_skirt_back_02_jntBnd  [its own]  under 11  rests at (-6.2,12.3,22.2)
+      24 phys_skinned_L_skirt_front_03_jntBnd  [its own]  under 14  rests at (7.5,-15.7,61.5)
+      25 phys_skinned_L_skirt_back_03_jntBnd  [its own]  under 15  rests at (7.5,16.3,44.4)
+      26 phys_skinned_L_skirt_side_03_jntBnd  [its own]  under 16  rests at (19.8,-12.1,44.4)
+      27 phys_skinned_L_skirt_side_08_jntBnd  [its own]  under 17  rests at (24.8,-0.7,44.4)
+      28 phys_skinned_L_skirt_side_13_jntBnd  [its own]  under 18  rests at (19.8,10.5,44.4)
+      29 phys_skinned_R_skirt_front_03_jntBnd  [its own]  under 19  rests at (-7.5,-15.7,61.5)
+      30 phys_skinned_R_skirt_side_03_jntBnd  [its own]  under 20  rests at (-19.8,-12.1,44.4)
+      31 phys_skinned_R_skirt_side_08_jntBnd  [its own]  under 21  rests at (-24.8,-0.7,44.4)
+      32 phys_skinned_R_skirt_side_13_jntBnd  [its own]  under 22  rests at (-19.8,10.5,44.4)
+      33 phys_skinned_R_skirt_back_03_jntBnd  [its own]  under 23  rests at (-7.5,16.3,44.4)
+      34 phys_skinned_L_skirt_back_04_jntBnd  [its own]  under 25  rests at (8.7,20.3,66.6)
+      35 phys_skinned_L_skirt_side_04_jntBnd  [its own]  under 26  rests at (24.4,-13.6,66.6)
+      36 phys_skinned_L_skirt_side_09_jntBnd  [its own]  under 27  rests at (29.5,-0.3,66.6)
+      37 phys_skinned_L_skirt_side_14_jntBnd  [its own]  under 28  rests at (23.2,13.1,66.6)
+      38 phys_skinned_R_skirt_side_04_jntBnd  [its own]  under 30  rests at (-24.4,-13.6,66.6)
+      39 phys_skinned_R_skirt_side_09_jntBnd  [its own]  under 31  rests at (-29.5,-0.3,66.6)
+      40 phys_skinned_R_skirt_side_14_jntBnd  [its own]  under 32  rests at (-23.2,13.1,66.6)
+      41 phys_skinned_R_skirt_back_04_jntBnd  [its own]  under 33  rests at (-8.7,20.3,66.6)
+      42 phys_skinned_L_skirt_back_05_jntBnd  [its own]  under 34  rests at (10,24.3,88.8)
+      43 phys_skinned_L_skirt_side_05_jntBnd  [its own]  under 35  rests at (29.1,-15,88.8)
+      44 phys_skinned_L_skirt_side_10_jntBnd  [its own]  under 36  rests at (34.2,0.1,88.8)
+      45 phys_skinned_L_skirt_side_15_jntBnd  [its own]  under 37  rests at (26.6,15.6,88.8)
+      46 phys_skinned_R_skirt_side_05_jntBnd  [its own]  under 38  rests at (-29.1,-15,88.8)
+      47 phys_skinned_R_skirt_side_10_jntBnd  [its own]  under 39  rests at (-34.2,0.1,88.8)
+      48 phys_skinned_R_skirt_side_15_jntBnd  [its own]  under 40  rests at (-26.6,15.6,88.8)
+      49 phys_skinned_R_skirt_back_05_jntBnd  [its own]  under 41  rests at (-10,24.3,88.8)

@@ -1,0 +1,1005 @@
+monster: Bulbous Maw [Metadata/Monsters/RumCarrier/PaleCrawler_]
+
+=== .ao Metadata/Monsters/RumCarrier/RumCarrier.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Bloodsucker/Animations/rum_carrier/rig.amd"
+	animations = '[
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8741670250892639,
+					"name": "slurp"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.2333333045244217,
+					"name": "move",
+					"position": [
+						75.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23333334922790528,
+					"name": "move",
+					"position": [
+						-75.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "explode_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.4415700435638428,
+					"name": "explode"
+				}
+			]
+		},
+		{
+			"name": "feed_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.6039400100708008,
+					"name": "slurp"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/RumCarrier/Attachments/RumCarrierTentacles.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.22904999554157258,
+								0.0
+							],
+							[
+								0.3128489851951599,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.3316130042076111,
+						"angle": 1.8151400089263917,
+						"length": 115.60700225830078,
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.1344599723815919
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Bloodsucker/Animations/rum_carrier/rig.ast"
+		socket = "light"
+			translation = "0 1.32298 -154.962"
+		linear_allowed_contraction = 0.100
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_angle = 0.250
+		animation_velocity_factor = 10.000
+		animation_force_factor = 15.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Bloodsucker/Bloodsucker.sm"
+			Bloodsucker_bodyShape = "Art/Models/MONSTERS/Bloodsucker/Textures/RumCarrierPopped.mat:0"
+			Bloodsucker_pimple1Shape = "Art/Models/MONSTERS/Bloodsucker/Textures/RumCarrier.mat:0"
+			Bloodsucker_pimple2Shape = "Art/Models/MONSTERS/Bloodsucker/Textures/RumCarrier.mat:0"
+			Bloodsucker_pimple3Shape = "Art/Models/MONSTERS/Bloodsucker/Textures/RumCarrier.mat:0"
+			Bloodsucker_pimple4Shape = "Art/Models/MONSTERS/Bloodsucker/Textures/RumCarrier.mat:0"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "pimple_6_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12033799290657044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1713549941778183,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Whoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4563809931278229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "pimple_6_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12033799290657044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1713549941778183,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Whoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4563809931278229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08881620317697525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15847499668598176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Death_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3796829879283905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1118700504302979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08881620317697525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15847499668598176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Death_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3796829879283905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1118700504302979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08881620317697525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15847499668598176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Death_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3796829879283905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1118700504302979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08881620317697525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15847499668598176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Death_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3796829879283905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1118700504302979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08881620317697525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15847499668598176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Death_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3796829879283905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1118700504302979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08881620317697525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15847499668598176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Death_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3796829879283905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1118700504302979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "explode_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0012335500214248896,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09027290344238281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/BigFlinch",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.379518985748291,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5521339774131775,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/BigFlinch",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6148540377616882,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Effects/Drink_Telegraph",
+						"bone_name": "phys_tri_belly_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6968680024147034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7637869715690613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8811309933662415,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1577999591827393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "feed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/Idle",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05888190120458603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32366347312927248,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Effects/Drink_Slurp",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4002799987792969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Feed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6349356174468994,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Effects/Drink_Gulp",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8099859952926636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9956726431846619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Effects/Drink_Slurp",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0692800283432007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Feed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2735899686813355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5890042781829835,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Effects/Drink_Gulp",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.872689962387085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0858380794525148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3309097290039064,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.033521901816129687,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/SmallFlinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15346099436283112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.033521901816129687,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/SmallFlinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15346099436283112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.033521901816129687,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/SmallFlinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15346099436283112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.033521901816129687,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/SmallFlinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15346099436283112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3510890007019043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/Idle",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17920149862766267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29189497232437136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/MovementLong",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.335750013589859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.06150484085083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0945700407028199,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/MovementLong",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9375799894332886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9708399772644044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17642904818058015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31725001335144045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/MovementLong",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3305555582046509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0450820922851563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.099120020866394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/MovementLong",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.90760338306427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.940348744392395,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11827799677848816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26372799277305605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/Chase",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43294399976730349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7937309741973877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1232800483703614,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09428799897432327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6692910194396973,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2639100551605225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.429129958152771,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Vocal/Chase",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8423899412155152,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_2/RumCarrier/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd chest_jntBnd neck_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	AttachedAnimatedObject
+	{
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/RumCarrier/Attachments/RumCarrierTentacles.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Bloodsucker/attachments/Tentacles/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Bloodsucker/attachments/Tentacles/rig.ast"
+		linear_stiffness = 10000.000
+		linear_allowed_contraction = 0.150
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.200
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_radius = 7.000
+		enclosure_angle = 0.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Bloodsucker/attachments/Tentacles/RumCarrierTentacles.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/Bloodsucker/Bloodsucker.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/Bloodsucker/rig_760a501f.smd"
+Materials 2
+	"Art/Textures/Monsters/Bloodsucker/BloodsuckerPoppedc.mat" 1
+	"Art/Textures/Monsters/Bloodsucker/Bloodsucker02c.mat" 4
+BoundingBox -74.03 -31.9113 -140.323 74.03 45.9926 1.12926
+BoneGroups 28
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+	"grp_belly" 2 "hip_jntBnd" "phys_tri_belly_jntBnd"
+	"grp_pimple_1" 2 "hip_jntBnd" "pimple_2_jntBnd"
+	"grp_pimple_2" 2 "hip_jntBnd" "pimple_3_jntBnd"
+	"grp_pimple_3" 2 "hip_jntBnd" "pimple_4_jntBnd"
+	"grp_pimple_4" 2 "hip_jntBnd" "pimple_5_jntBnd"
+	"grp_pimple_5" 2 "hip_jntBnd" "pimple_6_jntBnd"
+	"grp_pimple_6" 2 "hip_jntBnd" "pimple_7_jntBnd"
+	"grp_pimple_7" 2 "hip_jntBnd" "pimple_1_jntBnd"
+
+=== .smd Art/Models/MONSTERS/Bloodsucker/rig_760a501f.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 5 in the header, 5 in the block · 12902 triangles over 8157 vertices
+  names: 234 bytes said, 234 read  [agree]
+
+=== shapes (6)
+0	Bloodsucker_bodyShape	from 0	count 35970
+1	Bloodsucker_pimple1Shape	from 35970	count 825
+2	Bloodsucker_pimple2Shape	from 36795	count 612
+3	Bloodsucker_pimple3Shape	from 37407	count 303
+4	Bloodsucker_pimple4Shape	from 37710	count 996
+5	TentacleShape	from 38706	count 7956
+
+=== fitting
+the monster's rig: 56 bones
+mounts: aux_position, aux_head_jntBnd, aux_L_foot_jntBnd, aux_R_foot_jntBnd
+  RumCarrierTentacles.ao  socket head_jntBnd [in its carrier's rig]  box (-30.1,-34.7,-24.5)..(30.1,-4,38.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 2652 triangles over 1664 vertices
+    names: 26 bytes said, 26 read  [agree]
+    rig 3 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_tentacles_jntBnd  [its own]  under 0  rests at (0,-18.4,7.3)
+      2 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)

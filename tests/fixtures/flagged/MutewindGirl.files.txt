@@ -1,0 +1,2303 @@
+monster: Faridun Fledgling [Metadata/Monsters/Mutewind/MutewindGirl]
+
+=== .ao Metadata/Monsters/Mutewind/BanditGirl/MutewindBanditGirl.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Mutewind/BanditGirl/MutewindBanditGirlNoPhys"
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/Mutewind/BanditGirl/attachments/MutewindBanditGirlRobe.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/Mutewind/BanditGirl/attachments/MutewindBanditGirlsMantle.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/MutewindBanditGirlNoPhys.sm"
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/MutewindBanditGirl.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditGirl/MutewindBanditGirlNoPhys.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Mutewind/BanditGirl/BaseMutewindBanditGirlNoPhys"
+
+AttachedAnimatedObject
+{
+	attached_object = "R_Weapon Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/MutewindGirlWeapon.fmt"
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/MutewindBanditGirlNoPhys.sm"
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/MutewindBanditGirlNoPhys.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09906619787216187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14012399315834046,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Attack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.208063006401062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearThrustB",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5435100197792053,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearStab",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.552003026008606,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearThrustA",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5987809896469116,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6364780068397522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7150560021400452,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearPullback"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.057289958000183,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClothTiny",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2094859927892685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21627500653266908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearPullback"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24837400019168855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Attack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3831380009651184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4258759915828705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearPullback",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5995150208473206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7756540179252625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Attack1",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8904669880867004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearPullback"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.937798023223877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9454429745674133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9961060285568237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0377800464630128,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3270200490951539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearPullback",
+						"bone_name": "R_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6827800273895264,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClothTiny",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/ScreamLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14820000529289246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27522900700569155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearThrow"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31594300270080569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3175710141658783,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.682371973991394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7002859711647034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearThrow"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2849400043487549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3109699487686158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Attack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3956899642944337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4021999835968018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearStab",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.441290020942688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9754600524902344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.019399881362915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1413789987564087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35185301303863528,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4631029963493347,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.504194974899292,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/WeaponDrop1",
+						"bone_name": "blade_2"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.14256000518798829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Death",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32291701436042788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/WeaponDrop1",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7645829916000366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/FallSmall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2095199823379517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20089299976825715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43080300092697146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/WeaponDrop1",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Death",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19780400395393372,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35049399733543398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/WeaponDrop1",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20089299976825715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43080300092697146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/WeaponDrop1",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Death",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2064729928970337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23325900733470918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/WeaponDrop1",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01061473973095417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.020479492843151094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01061473973095417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.020479492843151094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01061473973095417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.020479492843151094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01061473973095417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.020479492843151094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.01045919954776764,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.023617099970579149,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03151179850101471,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10165700316429138,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/BreathIdle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28936299681663515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7344359755516052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClothRun"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11569400131702423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27838900685310366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3070949912071228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4390600025653839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2889100313186646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.312190055847168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearThrustB",
+						"bone_name": "blade_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6285400390625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6504499912261963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6990400552749634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11916500329971314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18433399498462678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20645299553871156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2660360038280487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Knockdown2",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39101099967956545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9067720174789429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5843000411987305,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8542900085449219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/DaggerSwing",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8877999782562256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "aux_R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02861800044775009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04414130002260208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0601654015481472,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22142300009727479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/BreathRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34780898690223696,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3628320097923279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3908739984035492,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditGirl/MutewindBanditGirlNoPhys.ao (depth 1)
+version 3
+extends "Metadata/Monsters/Mutewind/BanditGirl/BaseMutewindBanditGirlNoPhys"
+
+AttachedAnimatedObject
+{
+	attached_object = "R_Weapon Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/MutewindGirlWeapon.fmt"
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/MutewindBanditGirlNoPhys.sm"
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/MutewindBanditGirlNoPhys.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09906619787216187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14012399315834046,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Attack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.208063006401062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearThrustB",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5435100197792053,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearStab",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.552003026008606,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearThrustA",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5987809896469116,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6364780068397522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7150560021400452,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearPullback"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.057289958000183,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClothTiny",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2094859927892685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21627500653266908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearPullback"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24837400019168855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Attack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3831380009651184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4258759915828705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearPullback",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5995150208473206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7756540179252625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Attack1",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8904669880867004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearPullback"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.937798023223877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9454429745674133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9961060285568237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0377800464630128,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3270200490951539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearPullback",
+						"bone_name": "R_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6827800273895264,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClothTiny",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/ScreamLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14820000529289246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27522900700569155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearThrow"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31594300270080569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3175710141658783,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.682371973991394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7002859711647034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearThrow"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2849400043487549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3109699487686158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Attack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3956899642944337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4021999835968018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearStab",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.441290020942688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9754600524902344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.019399881362915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1413789987564087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35185301303863528,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4631029963493347,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.504194974899292,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/WeaponDrop1",
+						"bone_name": "blade_2"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.14256000518798829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Death",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32291701436042788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/WeaponDrop1",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7645829916000366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/FallSmall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2095199823379517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20089299976825715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43080300092697146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/WeaponDrop1",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Death",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19780400395393372,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35049399733543398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/WeaponDrop1",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20089299976825715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43080300092697146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/WeaponDrop1",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Death",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2064729928970337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23325900733470918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/WeaponDrop1",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01061473973095417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.020479492843151094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01061473973095417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.020479492843151094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01061473973095417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.020479492843151094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01061473973095417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.020479492843151094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.01045919954776764,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.023617099970579149,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03151179850101471,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10165700316429138,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/BreathIdle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28936299681663515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7344359755516052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClothRun"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11569400131702423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27838900685310366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3070949912071228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4390600025653839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2889100313186646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.312190055847168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/SpearThrustB",
+						"bone_name": "blade_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6285400390625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6504499912261963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6990400552749634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11916500329971314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18433399498462678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20645299553871156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2660360038280487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Knockdown2",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39101099967956545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9067720174789429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5843000411987305,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8542900085449219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/DaggerSwing",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8877999782562256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourCloth",
+						"bone_name": "aux_R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02861800044775009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04414130002260208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0601654015481472,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22142300009727479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/BreathRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34780898690223696,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3628320097923279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3908739984035492,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_3/FaridunBandits/BanditGirl/Foley/ArmourClothRun",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditGirl/attachments/MutewindBanditGirlRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/attachments/MutewindBanditGirlRobe/rig.amd"
+	default_animation = "idle_01"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/attachments/MutewindBanditGirlRobe/rig.ast"
+		linear_allowed_contraction = 0.600
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.800
+		normal_viscosity_multiplier = 0.200
+		tangent_viscosity_multiplier = 0.020
+		attachment_bones = "spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/attachments/MutewindBanditGirlRobe/MutewindBanditsGirlRobe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd "
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditGirl/attachments/MutewindBanditGirlsMantle.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/attachments/MutewindBanditGirlMantle/rig.amd"
+	default_animation = "idle_01"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/attachments/MutewindBanditGirlMantle/rig.ast"
+		linear_allowed_contraction = 0.600
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.800
+		use_shock_propagation = false
+		enable_collisions = false
+		attachment_bones = "neck_jntBnd head_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/attachments/MutewindBanditGirlMantle/MutewindBanditGirlMantle.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false neck_jntBnd head_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+	}
+	
+	WindEvents
+	{
+	}
+	
+	
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditGirl/BaseMutewindBanditGirlNoPhys.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/rig.amd"
+	animations = '[
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0391299724578858,
+					"name": "contact",
+					"position": [
+						10.003199577331543,
+						-77.8501968383789,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.4734300374984742,
+					"name": "contact",
+					"position": [
+						15.190199851989746,
+						-134.91400146484376,
+						-82.76609802246094
+					]
+				}
+			]
+		},
+		{
+			"name": "death_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						-5.0,
+						75.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_dot_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 1.159999966621399,
+					"name": "move",
+					"position": [
+						-40.0,
+						-40.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000001788139344,
+					"name": "move",
+					"position": [
+						-6.0,
+						-60.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.33000001311302187,
+					"name": "move",
+					"position": [
+						92.0,
+						-7.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_move_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23000000417232514,
+					"name": "move",
+					"position": [
+						15.0,
+						-115.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000001788139344,
+					"name": "move",
+					"position": [
+						-94.0,
+						-9.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.39673060178756716,
+					"name": "move",
+					"position": [
+						0.0,
+						-200.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 Away 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.14525100588798524,
+								0.0
+							],
+							[
+								0.2960889935493469,
+								1.0
+							]
+						],
+						"damage_statset_index": 3,
+						"width": 46.24300003051758,
+						"length": 127.16799926757813,
+						"local_offset": [
+							-10.0,
+							0.0
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "blade_end"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.45251399278640749,
+								0.0
+							],
+							[
+								0.5642459988594055,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 3,
+						"rotation": -1.4311699867248536,
+						"angle": 3.1241400241851808,
+						"length": 111.11100006103516,
+						"impact_z_rotation": [
+							-1.0471999645233155,
+							1.1344599723815919
+						],
+						"impact_type": "Slash",
+						"impact_bone": "blade_2"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.1955309957265854,
+								0.0
+							],
+							[
+								0.2402230054140091,
+								1.0
+							]
+						],
+						"damage_statset_index": 0,
+						"width": 52.02299880981445,
+						"length": 100.0,
+						"impact_x_rotation": [
+							-0.17453299462795258,
+							-0.5235990285873413
+						],
+						"impact_type": "Slash",
+						"impact_bone": "blade_end"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.519553005695343,
+								0.0
+							],
+							[
+								0.553072988986969,
+								1.0
+							]
+						],
+						"damage_statset_index": 0,
+						"width": 63.58399963378906,
+						"length": 115.60700225830078,
+						"local_offset": [
+							-10.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.26179900765419009,
+							-0.8726649880409241
+						],
+						"impact_type": "Slash",
+						"impact_bone": "blade_2"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.18994399905204774,
+								0.0
+							],
+							[
+								0.24581000208854676,
+								1.0
+							]
+						],
+						"damage_statset_index": 0,
+						"width": 46.24300003051758,
+						"length": 100.0,
+						"offset": [
+							-10.0,
+							20.0
+						],
+						"impact_x_rotation": [
+							-0.17453299462795258,
+							-0.5235990285873413
+						],
+						"impact_type": "Slash",
+						"impact_bone": "blade_end"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.6312850117683411,
+								0.0
+							],
+							[
+								0.6927369832992554,
+								1.0
+							]
+						],
+						"damage_statset_index": 0,
+						"width": 58.82400131225586,
+						"length": 150.28900146484376,
+						"offset": [
+							5.0,
+							0.0
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "blade_2"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/rig.ast"
+		socket = "blade_1"
+			parent = "R_Weapon"
+			translation = "0 0 -8"
+		socket = "blade_2"
+			parent = "R_Weapon"
+			translation = "0 0 -50"
+		socket = "blade_end"
+			parent = "R_Weapon"
+			translation = "0 0 108"
+		socket = "aux_spear_butt_01"
+			parent = "R_Weapon"
+			translation = "0 0 70.1458"
+		socket = "aux_spear_butt_02"
+			parent = "R_Weapon"
+			translation = "0 0 114.454"
+		socket = "aux_spear_blade_01"
+			parent = "R_Weapon"
+			translation = "0 0 11.7191"
+		socket = "aux_spear_blade_02"
+			parent = "R_Weapon"
+			translation = "0 0 -48.7583"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/MutewindBanditGirlNoPhys.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "chest_parent_attach false chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd head_jntBnd"
+		bone_group = "root false R_thigh_jntBnd hip_jntBnd L_thigh_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd neck_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "blade false blade_1 blade_2"
+		bone_group = "blade_end false blade_end aux_spear_blade_02"
+		bone_group = "spear_butt false aux_spear_butt_01 aux_spear_butt_02"
+		bone_group = "spear_blade false aux_spear_blade_01 aux_spear_blade_02"
+		bone_group = "fx_glaive false R_Weapon aux_spear_blade_02"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.5151389837265015,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditWoman/sword_sword_meleecut.ao",
+						"animation": "attack_280",
+						"from": {
+							"parent_bone": "root_jntBnd"
+						},
+						"speed": 6.0,
+						"offset": {
+							"translation": [
+								0.0,
+								-54.150001525878909,
+								-77.70000457763672
+							],
+							"rotation": [
+								0.0,
+								0.0,
+								-1.500999927520752
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.2538830041885376,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditWoman/sword_sword_meleecut.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "root_jntBnd"
+						},
+						"speed": 4.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-99.45000457763672
+							],
+							"rotation": [
+								-1.2919999361038209,
+								0.06980999559164047,
+								-0.8202999830245972
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.9189419746398926,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditGirl/charged_meleecut.ao",
+						"animation": "attack_220",
+						"from": {
+							"parent_bone": "root_jntBnd"
+						},
+						"speed": 7.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-99.45000457763672
+							],
+							"rotation": [
+								-1.2919999361038209,
+								0.06980999559164047,
+								-0.36649999022483828
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.2896910011768341,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditGirl/charged_meleecut.ao",
+						"animation": "attack_180",
+						"from": {
+							"parent_bone": "root_jntBnd"
+						},
+						"speed": 4.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-99.45000457763672
+							],
+							"rotation": [
+								-1.2919999361038209,
+								0.06980999559164047,
+								-1.100000023841858
+							],
+							"scale": [
+								0.800000011920929,
+								0.800000011920929,
+								0.800000011920929
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.6551480293273926,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditGirl/charged_meleecut.ao",
+						"animation": "attack_220",
+						"from": {
+							"parent_bone": "root_jntBnd"
+						},
+						"speed": 5.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-99.45000457763672
+							],
+							"rotation": [
+								-1.8679999113082886,
+								-0.03491000086069107,
+								-2.618000030517578
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.29794201254844668,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoy/pet/spear_meleefx/spear_stab_small.pet",
+						"bone_group": "spear_butt"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0014860000228509307,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditGirl/pets/act_glaiveslam_gather_blade.pet",
+						"bone_group": "fx_glaive"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0014860000228509307,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditGirl/pets/act_glaiveproj_gather_blade.pet",
+						"bone_group": "fx_glaive"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.4581929445266724,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditBoy/pet/spear_meleefx/spear_stab_small.pet",
+						"bone_group": "spear_blade"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Art/Models/MONSTERS/MutewindBandits/MutewindBanditBoy/MutewindGirlWeapon.fmt (depth 1)
+�       �� �w��AlE��kE�@�wU��Q�B           V   ]   c    � � � � w i  � � � � � } w � � } A ?  ? � � � { � � { ���  �: ��� � �� �
+  > & {. y � x  �y ��y �� � H � H � � � x����q 
+ �q
+ ~}���y� ���y� i ��: �� � �u q�� � T� 4^. � y � i y  ���� �~��y~ ��  q����}�u� �  � i���� � �� i  i �   �  �� �}  ��m �   � �� � } � >p\��p�������� �� �|% ��� �y { �w�����������{ � { w��w�7 ��&�w&�l� &�r�&r7 �w �����&& z{6 �� ��� > {� 6 ��{x� �� �&�& % z% |z� �% ��� ��w � ��w �� � ���y � � �yn���"s�� ���������s�n��n�� ���o���\p�\��� s"7 ; � �7 � m "o��&w�w7 �l�rl�� � ���� � r�l�&�������� ��  ��� � � � � � � 2  � �  9� � %9� )  � ! ) �  � � �  � �  � � � �  ) � � 1 � i � �� y����i � {  m���~� � � � \ � � \ � � � �� � 9�� � � � ��� � � 	� � � � 	� �  �� ��� � � �� � � � � �  � �  � ��� � � �  ! � �� � � ! � ! � �  � � � � � � � � � � � pL � p� �� � � � ���  � � � - � �� � � � � � � � � \ � � � � �  E   , � �  � � �F M  � C /  ] � D  / �  � � ,  � ,  Z � � � � � � � Z � � � Z D � � D !  � � ) � < / ]  C � E  _ P � X X � � ! � � � � X + � P # + P ) � [  )   ) � � ) [ )  � ) ! � ] 	 � < ] � 	 X � � C � W T p�L �Y L  E _ 1W 5 ?M T U T W 1I Q   Oo q �Oq Aq 3AAO~m o Om �� a G 
+vF�zv�FJ��}�A�q �}z}dzvuF�F�RUY_4^KVHKVQRYHwK\X^[\^KR(@� QR��w�$w@K;Z@(@;� 5� � �� �A3=.�� C�?�E��G �
+6=P+�z '��/� �.��u �K u �x �h s 8 u 8 ~ u u | | b c p u ~ | O -  �" W T j " T  ��b  � f �N I    b p ��h v g B v g  d  0 r @ K 0 @ e �e 0 �V R j ��K �0 K T U  v c c �j T    l d   S V j ��Y � ��� � � x p e "e � �� "x e "�x h `  �^ Y ` d  c b �x h  b ���' h |l k ' ` h l  k �G z (8 ~ | ������t t 8 *| *| ��������A��A _ Q j  l BDrB:0� 0_   Q B�D~ 8 (t O | ~ (C�� C;:��� ��� � ������ � �� ��� �� /�� �� L7��L�C� ��C� � �G�5�� �� � �� � �������)�)� �� �������G���G����� ������.=����=��)� �� �� � �� ���C��������C��::68� �� ����C�8��� � � ��ZU@UR@� '�7L�'7�� � �� �� �� � 6�� �\[zv[b\zduvb��D�3E��� ��� �����������`��`��������������v�������������v��`�����������������������������������������������t�����������t�t���������������������������������������������������������� �Sh-hNl������������������=Nh���������J6P������UYcY9c������`?`!%	`	8	18�81414� �� ���,��� ���� ���.$#%[//$.�2[[35)d��<
+��5<<$�!.�%$!�#�c9e9:e& �������S�d��e:_:c_���)bdS-�#�+&W0s0Ls%#+�#.�.sLVLFV �.VF'Fj''j j+  .��,��H2J +U+YUQZ@*������lQ@ZE{LKFKAF@Z{B>G0DLDKL������������YR9RC9����26JG>H^BG>2H,�����:;c;Ic4O7O72O72��Mo+���9C:������������ ��������������������������������� ���X�����������X������ �������� ��� ������g'j������' jj k UkkUTV'gfVg]sfsVfe_a�W]ce,,eaWs]UcTTc,oRYjM++oY�������������������t��t�����������������������������w� �;!�w!;!� �� ;� ~Ox<�O��� O� �� �� #�� �w$!Q^Q[^[vz\iXQY[Yb[4VKw;���Hw���qJF
+�i\duqFifXXf_K@R^X_�����v������������������FAjAMjNQlP=hNS l � � � l S j |Nl NMS M� S S � V � ( V � I�� � �>� M� � � z 
+�z ++z �e p r -O B � ��0 e r x��� �� @ s K s u K x  p ���b   �� g -B �� � � � � � � I� q o $%+%k  ` ' k ` � � � x� � � � ( a ���� �� o m �&G a ��� � � � o � q G �
+>� � � � � � q z G 
+��� �n � � � � * 3 - n � n 3 * # * + # � � � ��� ��  � %1 %� 1 �
+
+8 s t x�� y i { = 9 � � = � p c v x� �  $ �   d w }  $ H � = ? 9 `  d ? A 9 ��  U  d   7  : �?^ ; 7 : B O @ O s @ @ r B r v B r p v I N J N 4 J  U f s O t � � � � � �  �  7 w  U f � �  � � � ?M ^ $   e� � � � � n� �� � � � � t� � � � nt� � � m� � te� � � m� g� � gm� � �� � ]� kg� � � � � � � � � � ak� � � � � a� a� T� e]� � ]� � � � � � WS� T� � ]W� � W� ������������������������������������������SP� � PI3 � - 2 �  ���  � m ��������Xp�?ە@d��Bs�����ڻ������%��x�~�������������? 0t��Q�B�����c���DP�?�IT�NΔ����<{�#�G�xL�?4p���B}��]=�M�O�p�%?i풿tr������u�K�@�xL�?4p���B������]���p�+�b�\�7��L{��y���_��0�?��	� �B������W���� >v��W��A��m�>���0�?��	� �B�7�A#E�Ϲ�����S^�L	��Oy��w�ɵ>�p�?ە@d��B�o�������|���E
+��/������|���A����? 0t��Q�B�������_�}���@����*�B�o��or�ֹ����?�F@��B����,��𺾤�ox�|'�@�����������k���?�F@��B���������B��@q@�B�B绬������z�j0�@8�?\��B����}�ºU��w�?����B�n��ps��­_�@X��?���B����x��S��o2��S��s3�Og�����������~; ���n�������*��@Y�Ͽv��Ax��!����
+��*D@2(�l��s��������Y�D�D@*0Ҽ|���Е�/�	7m��@Y�Ͽv�����b{�r������%��x�r��|���-�}�zhi@�t��`"��r�X}�ҸG��J:@������*��p�Z}�����s$��w�����{���������|?v�4���y�r~��'�M���AN��p�7�sz����a�h���3@�b���,��r�LM�����L�@�n@xZ�B��x�N���j0�@8�?\��B��*��(r�ɺ���L�@�n@xZ�B��J��^��^���D�D@*0Ҽ|���0��/��{�m���3@�b���,����ss�f�&��zA@�ɿ������[|���òzhi@�t��`"��m,�.G2�8����J:@������*��r�KN�
+���R���պ����xĀ�����c��a�@�w������kf�_9�[�s��rH@�OR@���B��p��M��R��;$5��ؿ�R1�Og��������}�A��C�@�¬	��	Ty�������5@��&��f�������|*[���5@��&��f�s�������)�^��q@0���#��m,�.D3�J����.�8F9�L�/���]��{~�Q����.�8F9�L�/�C"��Ι��N�Tz"@����vK�B���}U���,R�@,n.�Z�B�"��#*u�ɹ���A��\�`LJ�}l��o�T�����R@���l}�B���~���F���)@��n��8�B���W^�L����I@��`��y�B�p�Lr�X�-�F)�`㿤O5�<W����񹤷��I@��`��y�B���|��I�=��[Z@z��@"i�B��h��{��Ļe���)@��n��8�B�y��zz�<��:�@M�^��G+��n�Ǹ��Tz"@����vK�B�y��zy����n�@��^��_+�jx��|�v�v�F)�`㿤O5�sh��������m����r,�1m�$���{���R���պ�������������j��.�8F9�L�/�DK��5L5I�n�@�cQ?�_+�j�x�i|D8v��[Z@z��@"i�B�����z���Q��m����r,���k��|�������o2��S��s3���]��{~�T�¹�?/A6�L�| +©	��Th������ox�|'�@���ˀ5�n3Y���W��#�RL*�dY���
+�4R���W��#�RL*���k��|~�z���w$�@�W�i�=�jv��o�
+��@��?�VZ�̷3��r�Mb�ںǷ.���x������{���������T?{�j���7��~�xn���F�p� @�p>�t `��e�
+Ts�R�
+� q0�F1^��#Z�N��������9��)\��o��L���z���?�@��?�VZ�̷3����qv��?��o2��S��s3�@������^�T?{�j���7��h�FF���۷�	�����Z	����u�4Y�.���x�����nK�K���N�����g@�P���	����[|�Ӹ:���g@�P���	��q��+=���G�M���AN��p�7�<W����ܹķs$��w�����I���s4W��	�����Z	�~������������@�RV������Cz�4�m���>�0Ҽ�q+�T�q�	T��8~��)���+V�Vj��T
+p�
+�v�����P���4Y�8� �fp��q�����2��}���n������x���e�"��@��T�d�  ��_w�k�
+��Zh�1Ҽlu��+!y�"�z��^���>�0Ҽ�q+�T
+q�	���A�~� �c@˔X�h������L{�l�B����@��,@���B��}��7������� >v��W����~~�!�ܴ҇@%1Ҽ� ���;��<{�b�I�Tr�?vP�~Hu��v�<t�-�f�҇@%1Ҽ� ���ņ�<�{;7I��Zh�1Ҽlu��+�y�"+zx9^�DP�?�&G?NΔ��녀�{�7G�T�@P���? �r������x�?/��������|�8A��g�@%�X� �~��t�V�����A��V�:|>��l�� �$W�@`�T���E�hi��l�<�I�ʙZADzK��?��ct�v�:� _d?` Z����hy��s�ᶦ��!�@�K���B���"/c�2���`��@_�U��W�����^x�����T)�@P�!@�I�B�܇��(��ݺ�z�@N�Q?jG+����nq6���Z�@S�?L��B�ߨ��-��u���l�A"�G��J��eu�����"ӹ@�b5����B�4q�2m�0�.�LdAOQ���Km��q�~���6ؕ@�9�"�B�~�5d�ù*��,�@�g�fI�B�|��|��V�*��q@0���#����iv����J@@kE�@DR�By�������һ��t�@Q���o�t�������ܺq�t^S@��(�� ����Pv�����.�@Θ�c.����nw���B�Pź@�p?z��B��u����|�1�N�@7a?���J���J,X�R��@���&LX��~�_��h����+@��a@�k�B�����Z��_�� ���¿&�O��A��m�B��Nf�@��	���x����b��q�U��+@��a@�k�B�������n�� ���¿&�O��n�~~�J�o�r�@훿���n���1�w�_�J@@kE�@DR�B�����������X?��ܿ�\6��a�|�׷���<@�����p���v���&n���(�$s�@0+]?D/�B��t����{�ᯉ��@y�
+�V���kf�_9�n����hV@�:���ـۀ%���(]����@m���
+�B�ڀ~��X����0�@>l�\�B�^r�\o�5����t�@Q���o��n���2���y�N�@7a?���Ax��!��ֻ(��Wx@u�	���T��b�y{���ܴ��@��.�����h����,��<@�����p�����a{�����rH@�OR@���B�����v�a�*��X?%*�?�\6���a��8��_�@X��?���B��S��9{��4��X?��ܿ�\6��h�FG�����悪@�-�����o��������R@���l}�B�l�zd���Y�r�@훿�����V|��<¿@�
+���v�g�����D�V�:��@{��>��B�!H�8��˹<���@{���i���bf������C�t^S@��(�� �p�~�������:��@{��>��B�s��k��¹[��<�@�y����B�v��q��O�b�t^S@��(�� ��/P�o3��"T�N�@7a?���n�������P�]��<�@�y����B�M�ez�>���$^�@����L��B�{�}��^�ó$^�@����L��B���|��]�����@�/I? ����z�7m�ࡳ@n2Ҽ��#���ʀ���5�t^S@��?� �p~��p�/���1AZ�Z��R��yY��l���'��a�@�w������y�V|���t^S@��?� ��辀�v�6�|�?�IԿ�1��a�f~�G�ѳ�|�?�IԿ�1��r�Mb�ͺ�����@��;���B���}��Y�˲��A	L��������fn��Ͷ�.?��a�n������㻱���Y��?&�O���n��~Z8o�1<�伤�����Y�����ϵ����Y��?&�O����ym�2�D�\�"ߨ���^�����������@�ͧ��Ǥ�qg��p�j����g��`�����V����ך���3�v��@�����B�/-�0��͹����m�F���֒*�\~����l���v��@�����B�nf��չN��2����?n�������x�8e��s���|��r��|���<�i�ff���忤��}����}�0?��I!A�:�Ĩ���|�qj�A�;����!�ο��������T1C��g@���.B�p����������ff���忤��k���������g@���.B��*b�zQ�q$\����@��;���Bā����Y���p�+�H�O?7��L�{�Ky$9_�|��?)�Ɣ����e|�E�|�1<�伤�����������a����Sl@������t���������x��҈��؊�nK�K���^�|��+�?Fh�,�P���~P�-T��g��`�����c�����j� �|��?)�Ɣ�B�����ɻᶅ�m�F���֒*�1m�$��������+�?Fh�,�B���������;$5��ؿ�R1�Wt�����ɳ�.?��a��������.9��Sl@�������^��G|�4']��b�@Al�N�.����u|��>���5@ڠ?�f�����|�x*u�i!��`5�^�Ҁ���?����R(l@������w���������b��@�H�?x�������{7���@ ���[�pq�������7$5��F�?R1�O��H��4��R(l@�������q��+=���c�lu���"�?����Ā�.��5O�lu��6������xĀ�����O��*D@	?l��������nB(I����!�ο����zȀ��.���ض�s���|��_�������Ĳ�*D@	?l��s���s�!/Y�lu��6������d������S����!�ο����	��x������.?��a����}�﷊��hV@�?��w���w��/h��]7�1ҼX���6�s�6yi9���s��]�?z��_���_��9ĲD)㿆��?�O5�s�h�s��8�i!��`5�^�π���2X��*D@2(�l���v���&n���I��zA@��?��������|�6ò�X?%*�?�\6�ʘ��G�1���q@0���#�p�~������hV@�:���w�������	�h�v�@�[�?�������|#6�����@y�
+�V��p�������׺����쿞j�?����Ȁ�4.�6ض;�Y�\.��������x��|�a��҈��؊�b������/�j!��=(?^�Ѐ��3@�6�;�Y�\.���L���L�2Z�d��7ſ��������$��@��xL?8� �f�p�dq�8븈M�@&�Lތ�b�����ָ����@�`�>V����f�_��,���0���+�l��������s��S�\���g@g��?�	�Ϗ���=$+G��0i�A��Tv��V����՚���H��.?Hp @a������8���0i�A��Tv�������x����Y�9�Y�L?��L��|L�2y�&���0Ҽ�^�T	u��n�����&���0Ҽ�^�T�u�Sn.9���0t�1ҼU��,��!,~q9<��0t�1ҼU��,!�!�~��<��҈�d�?؊�b���b�s9/�d��7ſ��Ҁ���?�ظ���<�@�GL?f��~��tS7���0���+�l���������\2Y��0i�-�	?Tv��Vy���+�$6H��0���+�l���������a�͸(��9��O?�o��L�Lz9?��g�1τ?���c���b�J9 ��o2��F?�s3�O��H��4���o2��F?�s3��]���~�2¹��Q@�0Ҽ
+�b���6���6#�T�@��?? ���r8��+�?�"[?*�Bx������hV@�?��ـۀ%|��(t��g@�
+?,B�p���p0��P�@2>2?��A���ߥ(%(�|��?���?Ɣ�Bx����&��@�H�?x��A���ߥ�(
+����@�/Ҽ"Us�Yv�	���׸g��tp�1Ҽ�X�,!��!ԋ�D��ʙZA#W>?�?����t'2:�|hi@#�?^"���r��}Z6G�<¿@�)�>��v�h���h�w5V�J!i�
+1Ҽ>�,��J����4i��d,@1Ҽ �h���@�(�o7>��q@�? #������v�6��x�@�1ҼH�����
+Sy�D���P�@2>2?��n���n�}-]���3@�??��,������s37&�P�@2>2?��J��~J,x�R�=A�4Ҽu�*��ᢀ �o�2���q@�? #�ݓ,�.�3�-����@�/Ҽv/%���Ԁ�s�4�Q���˗?����Ā�.��5c� �1��{
+@�$������-���A��I?>�>����l�5 �08�@ 0Ҽ�����尀�~'6n�0R@�0Ҽ]�=�U
+m�	�{�ж��Q���˗?���������61j�D)㿆��?�O5�<��B�4���q@�? #�p~��pE0��J!i�
+1Ҽ>�,�4��!җ�P�R� �1�����+��Q�����k-��tp�1Ҽ�X�,߂�!,�]9����@�0Ҽ8T��X���
+V�P6���J:@gm�?��*���p��}�6���t�@=�?�o�t���t��0q���3@�??��,�����MP/���t�@=�?�o�������,+y��+�?�"[?*�P���|P�-}����@�`�>V��p���p��0���b�@:��>N�.������|�5>�t^S@��?� ���P�q��b"|��ox�g?@���������1k����@1Ҽ��e�iT������-���W�׋?RL*��Y��n�4���.�@�u?c.������w�4B� q0�4Q?�#Z�N���N�9��W�׋?RL*��k���~2���?��
+@4����y��~8'��m���?r,��k�����1��J!i�
+1Ҽ>�,�4᠀!.�W9R��I!A�$>Ĩ����|��j�2;��m���?r,�1��$B�5�����@1Ҽ��e�i�T�j��6-�ࡳ@n2Ҽ��#��ʀm��*��G 5A#/Ҽ��������i�1k���@�>�[�u�q�v��5���J:@gm�?��*�����N�/����Q@�0Ҽ
+�b��6�e���#��d,@1Ҽ �h��:@�(&o�t�>�Tr�?SC?~Hu���v��t�7f���@�/Ҽv/%��!Ԁss����Nf�@ت�>��x�������5U�R��@�K�>&LX���~���.5��G A�2Ҽ�R%����
+Sq�˹����@�0Ҽ8T��X��
+���׸���%�@0Ҽ�hT���|��z�4����@�/Ҽ"Us�X�y�
+Z�Q6g��%�@0Ҽ�hT��|�Cz���㴆M�@~ ?Lތ�b���b�R6�L��@�/Ҽh/y������4T�G A�2Ҽ�R%���
+�qh4���@���>.���������4,���@l��>i���b�f�f�6C�L��@�/Ҽh/y����G����T�悪@��>����o���l��5�À@�0ҼK���i���b�~6Ƶ<�ȿ}̿�+�&&{��&�*$��À@�0ҼK���i
+�������Ƶ��A�2Ҽ������z4+��B��2Ҽ�
+�B�`�}��;�����@�/ҼS��_�V�]~�5����A�2Ҽ������Hz��+���C@�/ҼRՅ�P���P��6�"�@�/Ҽ=��EU����ȸS�䗹?�T�?������2�z=2�"�@�/Ҽ=��E�U�N�o6S�䗹?漿�
+�B�)`��ڀl:����C@�/ҼRՅ�P�������� �1�s�@�������zj3����@�/ҼS��_V��~�����2)A;/Ҽ�7�����Tk�g�>�=@ 2Ҽ����������:���ox�g?@���ˀ5}l3y��2)A;/Ҽ�7�����kc2>��.�$#,?L�/��]���~�2��0�ֿ]%ڿ<2�B''���&��9���A�2Ҽ�ԣ����Mm�3�Ӷ�A�2Ҽ�ԣ����m03Ӷ��A�z>��������n�3Ͷ�Wx@�P�>��T���b��{�6ܴ:�@�/Ҽ�.���v����!h�D�@k�Q@���B�����Q��D�4���@���>�Ǥ�q�g�mp+5���B��2Ҽ��Q���V	o�4��@�0Ҽ"t��Cl�Ap�f�i����@0ҼWخ�o�M�fm�4��@�0Ҽ"t��l�A�p27i����@0ҼWخ�oM��m�����1A&>�R��y�Y�rl$4'�Wި� 2ҼT��B�Ѐ���9��k�A+/Ҽ/��}�N�sk�3U�P�n��7h?T��B�����܀a2ԸG 5A#/Ҽ������oi���k��.�$#,?L�/�C޻�2�9N��.�$#,?L�/�D���h6Q5��D�@k�Q@���B�������Q��8�n?�Zu�T��B�����܀V2��|�??��?�1���a��~q7ѳ�7@e�[�t]�B���LE�p��:�@�/Ҽ�.������~b6��/���^�?���{���1���L�@�B�V:�B���:Y�Ϲ׮�d�@s4��^�B�~��~�W�J���@�Mu<G�B�����_����c�@��9@��B�맀�=��ݺ���@���T�B�G��Ip����:�@�/Ҽ�.����W~�θ���o2��F?�s3�@폀?�9^�8�	@����d�B�7�2+L�޹��G���ty?n�7�s�z�t��8h��w�?����B{��yH����$��?�&t����B}��\<�k�;��7@e�[�t]�B�n��pq�b�ƭT��@�a�(3�B؃܀���Z���H_A�2Ҽ�����/z�ҹ��	��1Ҽ=� �L�j�JvX9�R(l@�s
+?���Ϗ���=�)c�t$��_�?��{���x1���7���{��r�BJ|��z�2J�����?�x����|3��5}�T?l]?��7���~��n,8F�����?�x�~��~��0��k�?|�r@@s�Bv｀�h��v���G���ty?n�7�<��B�F4ķ ��?CƖ����B�o�������m�T?l]?��7�ʘ��Fu1۷��￬&t����Bo���q5ު$���Mu<G�BF��z��2��@��?�3M?ʷ3������v�7?�@��?�3M?ʷ3�����b�0Ƿ ��?CƖ����B{��yI��c���￬&t����B����\<)5;��������d�Bv���u34J�t$��_�?���I��|t4|����i?�W������~o8ܴ�%�?jE�� ��B���}X�������i?�W����zm3�`C�?��@���B�\�������7�$���Mu<G�B�����2��	����?Z	�~��~�Z1����@����*�B�1ۀ;"M�޹��%�?jE�� ��B�\�������>��	����?Z	����u}4z�k�A+/Ҽ/��}N��k��U�|��@�G��A�B�.�������/���^�?����K�K:�b5��p��?�@��B���������魀�'@Do�����B�O���������gH�1Ҽ�*��/u��y�#�=���'@Do�����B�l�wr�Ƹn��#�@�/Ҽ�D���ڤ�"Ղ�6?�p� @�M1?t `���e�
+�sZ7
+���@ɕ����B!�+�����g�<��]7�1ҼX���6s��y�,���t�%?�[�?tr�������uZ8@�p��?�@��Bs�����������@ɕ����B�{�}��^�	��#�@�/Ҽ�D���&��"+����?��	@ �<p�B������`�/�����/Q?L	��O�y�Nw9>��gH�1Ҽ�*��/�u�.yn9=�>�A+O��0��B�g����Q�Ͱ"�c@�qK?i������{&7B�v�@@��?���B��ڀ���������|@G����R�B�J݀Nb��_�08�@ 0Ҽ�������>~��n�R�=A�4Ҽu�*���� /o�P����x�@�1ҼH���
+�yw5��`��@F�H?�W�������x6��{�A��6?@�¬���	�y�4��	��1Ҽ=� �Lj��v�O��R(l@�s
+?���w���w�-0b� _d?G�L?���h�y�hs�8���0���?h����������2\��)���I?Vj��T�p�
+Sv9���|�??��?�1�����b�0�����v��?��n���m��8*���5@ڠ?�f�s���s��.^��a�@3�?�����y��|6겓a�@3�?�����f�_�&-s��s��]�?z�����|3��5i�|hi@#�?^"�ݓ,�.�2>.���<@Q/�?�p��������n�)(�v�@�[�?��������D,_��0���?h����z���1me6(�9�Y�L?��������2a���쿞j�?����������8��d�����?���������8�d�����?��Ҁ��3?O6����m���?֒*�1��$B��4����쿞j�?�������Q1����g@g��?�	������|X6:���m���?֒*�\�~�\�I9��7$5��F�?R1�W�t�X�9ɳ�0i�-�	?Tv���������1Y��<@Q/�?�p�������{�6�lu���"�?���d���d�t9S�D�\��M�?��^���^�89��1<�]+�?����Y���X�9���(�@����D5�B�*p�+"�����0���?h����z��|�Z2z��g@�
+?,B���b�{��g$t��Sl@��?����H��+'s�8�@���?Z��B��逫����ܫ�.?Hp @a�����}��.���.?Hp @a�ni����;#���҈�d�?؊��K�K;�B5|�wsA�0ҼFU�Y�}qr1��hf�� ��?���}���}�0��v$�@ �J?i�=�j�v�io�7��A�2Ҽ������ws4͸|��?���?Ɣ������|u7|�j!��=(?^�Ѐ�}�2z��	�A1Ҽ2�I¶涀�x#-��hf�� ��?���k���k�8��JlD@ 1Ҽx F�W�g�Snh8?���mA6/Ҽ �>¾嬀���0/��z�A�0ҼaT\��o�K����Sl@��?���t���t�.0x�H_A�2Ҽ���ᕀ�z[4����mA6/Ҽ �>¾��@��Ӻ/��"� 2Ҽ�$��{��~� 0�"��@p�G?d�  ����w)5
+��"� 2Ҽ�$��{����40��g�1τ?���Vy���)�63� �1�����$��{���i-0�0R@�0Ҽ]�=�U�m�	T{�8��H%�?�sɿ�$�������0 ���@0Y?j,�B��`��;��f�ٰ1<�]+�?�����t���3a.6�l@ 2Ҽ�$���{���10��A�2Ҽ�������Dw�ƹ͸V0ƿ�sɿ�$�&&{��&*0� �1��{
+@�$���{��j30��?/A
+s??| +©����g
+4��֗�@"g?60�B�و��&������ �1�����+��{����j-$�V0ƿ��?�$�������-�V0ƿ��?�$�&�{�&&M40�H%�?��?�$�������-"��z�A�0ҼaT�\��o�-��l@ 2Ҽ�$������ 0.��͙@2Ҽ��O�g�]�ao8��wsA�0ҼFUY��q�����w��A�0ҼB:S����s"��JlD@ 1Ҽx F�W
+g��n�.�?��	�A1Ҽ2�I¶��Ax�[����͙@2Ҽ��O�g	]��n�񷗻X�@ 2Ҽ<2�B��������:����&A�2Ҽ�vT�z�W�uq5ۻ8�	@����d�B�v��wu��J�$W�@@�G?��E�h�i�em�7I�LdA,D?��K�m�q2����AŝO?�rJ�}�l�zoV5�� ��@�O�����B�}��}��W�ϱ$��?]%ڿ<2�B�'���ڀn:����&A�2Ҽ�vT�zW��p�y�ۻWި� 2ҼT��B�����܀�1۸w��A�0ҼB:S��`s����=@ 2Ҽ�
+�B��`�����:��P�n��7h?T��B:�Ѐ"+w|;�� �1�3��?T��B�����܀�2ܸl�A�:?�J����u0���� 2Ҽ�+��{����4$��B��2Ҽ�
+�B�`��s�9��H%�?�sɿ�$��&{����/0� �1��[@�+���{���j3$� �1�����$������a1��h�@ 2Ҽ�+���{����1$�V0ƿ�sɿ�$�������0߸0��?{̿�+��^�����/�H%�?��?�$���{�&�=20�0��?{̿�+��&{��ځ�/$� �1�s�@�
+�B��`���M;��𢹿�T�?�
+�B)�`�&&��;��𢹿�T�?��&ڀ�&&��;���"� 2Ҽ�$�������/Ӹh�@ 2Ҽ�+�����q��1�<�ȿ}̿�+�^^���2�*��� 2Ҽ�+��{��~� $�𢹿�T�?��^���2zK4� �1�;����������!:���� 2Ҽ�+�Q����	�� � �1�s�@��������M;���B��2Ҽ��������9���� 2Ҽ�+�Q���V	o�4� �1�;���
+�B�`����!:���漿��^^���z"*� �1�;�����Q���qzk-��B��2Ҽ��������;��䗹?漿���^����z�/��漿��&&���&��9���漿�
+�B))`��&��9��䗹?漿���&���ڀl:��0��?��?�+�����Ά=2�0��?��?�+���{�&ځ=2$�=@ 2Ҽ��������z1� �1��[@�+�����q�j3�䗹?�T�?���ڀ�&ڀ;���Ө? 2ҼT��B�����܀�2� �1�3��?T��B��Ѐ�w?;��$��?ѓ�?<2�B�ً�&ڀ ;�� �1����<2�B������$:������2Ҽ<2�B������9���_��|�r@@s�B��������8֨䗹?�T�?�
+�B��`�&ڀ;��>�ȿ��?�+�^���2�L4�>�ȿ��?�+�&�{�&&�L4%���@(_	@�s�B��������3�N�n��Zu�T��B::Ѐ�"w�9���B��2Ҽ��Q����	��!�����2Ҽ<2�B����{�;���_��|�r@@s�B�｀h�J,��Wި� 2ҼT��B�Ѐlg�;��N�n��Zu�T��B�����܀1� �1��I@<2�B������I;�� �1��!��T��B�����܀�1�2�ֿՓ�?<2�B'ً�&&��;�� �1��!��T��B�Ѐ�yw1:��8�n?�Zu�T��B�:Ѐ��ws:��8�n?�7h?T��B�����܀73�k�?|�r@@s�B��������֨�Ө? 2ҼT��B�Ѐ��w�:��8�n?�7h?T��B��Ѐ+�w�:�� 5�@����#�B�.����Y�C�$��?�&t����B�o��oq�y�ު��@(_	@�s�B��Ҁ�-���m��1@��#�B�a��ek�#����
+�?�}w@@z�B�������H�.��	@ �<p�B�������`�k����@�暽�N�B������W�	��1@��#�B�v��wz� ��楾�����D5�B$*p��"��3䱒�@מ@�Q�B����)��ߺ)��������d�Bu7��+LC4�����@�{��r�B�J|�Jz�H�J�`C�?��@���By����������'/@��@\��B�O���������v�@�m@�u�B��J��Wt�z��'/@��@\��B��h��{���|��S�@?{�?��B��*��(r�ۺҳ�S�@?{�?��B�.������� ��v�@�m@�u�B�<������'���@�Mu<G�B�������_��(��@p�7��P�B�`�9q�K�װ�
+�?�}w@@z�Bv｀�`��W���8�@���?Z��B���������Y���@מ@�Q�B�������׺`�l:�@�)�>"��B�������f�E��﫿�F@��B{��5,�<0���!�@n�Ľ�B�~W���W�	�2z���J�pR�BAr���3���@���?�H�B��u��y���ݱ6VW�z��@"i�Bw�h�{�q'e����@�{���B�%��&(r�*� ��t�����vK�B���}U36���p@�"���&�B�<�����h��������м��~�Bm��~�2J��]�@	Ѽ��~�B�m�~�W�J�#����K���B8���/c73��|��@�G��A�B�/-� /����̳p!,���@\��Bw�h�{�6!|���p@�"���&�B�M�_�� �Ĳ(���m@�u�B�<����8'��m�@�4?p8�B�w��x�r�	��� 0t��Q�B������N8����@��J�pR�B�Ar�A��?��GmE��OR@���B���|v�,*�T�(���a@�k�B���x��,�bϢ�.n.�Z�B+"���*ul4�:�kE�@DR�B���x�J(��t�����vK�By���y6�����0�?\��B���j}�0U��O����l}�B
+�����5F�Nܕ�T��?���B?�S�9{^04��$�Do�����B��O����6�����G��A�B�.����7�7�F���`��y�B
+����m5=��-�������BM/-��0�e4��ʓ��n@xZ�B`�J�^�-��XP���b5����B4q��m=3.�0.����;���B<����2��ʓ��n@xZ�B�qx�-������y����Bv����`5b�W-�>��?���B@�ڀK��1���:�kE�@DR�B�������%����.h�fI�B|�����2*�.��Rm���
+�B&ڀ���2���-�������Bn��T4N�����y����BeM��ez�5��Nܕ�T��?���B���nx=0S�p6��{��>��BB!H��8�i4<�p6��{��>��Bs����z4[�����0�?\��BF�*�&(r�0�����>l�\�B^r��o(3��0.����;���B�����2˲C������*�BW1ۀ�"MC4�Z�������L��B�����2��Z�������L��B9{����2ó7�F���`��y�BJp��LrN5-�	���@��B�������(��p!,���@\��B��O���+9���מ@�Q�B{��:)��0)���מ@�Q�B���t��0`�����S�?L��B6ߨ�%-�(2��2����4?p8�B�w�Dx62	�"e���暽�N�B����2	��� 0t��Q�Bo���~��2}�t%����	� �Bu7瀿#Ea4��t%����	� �B�������7W���CƖ����B��o�����6m���俎}w@@z�B�｀`�C-��.,���#�BLa���kq3����CƖ����B����yI?6c�GmE��OR@���BK�p�M�j-�NA��4p���B�������E7��88߿��@���B��\����097�H嘿ە@d��B�������$��88߿��@���B����
+��1�H2�e�[�t]�Bn���q:5ƭNA��4p���B����]=e5O�H嘿ە@d��B��o����$9|���lE�� ��B��\�����6>�.,���#�Bv���z~3���lE�� ��B���}X�6�U�������#�B�.����2C�Vu���O�����B}�����2ϱC������*�Bo���rR4���﫿�F@��B�������8�����!g?60�B&و�'&��1��ѯ�;{�?��BF�*�&(r�0ҳ(���m@�u�B`�J�Wt,,�&����ɕ����B߀+���L8<�ѯ�;{�?��B�.����8 �&����ɕ����B9{����2	�T�(���a@�k�BY���Z�-��B���p?z��B�u�5�21�$�����Ľ�B~W����2	��m��"���&�B�<���/7���m��"���&�BeM��_��5Ĳ����G��A�BM/-��/��4̳:?��0Y?j,�B9�`�;�e2ٰ�� �kO��0��Bg����2Ͱ^���h�7��P�B8`��9q�2װ6VW�z��@"i�B���~z)Q�7���<p�B���~2/�����{���B(%���(rU3 ����s4��^�B~����2J��$�Do�����Bul��wrs6n��l���Bn���s�5­����	*�>"��B���P�g2E��l���B����yH�5��΃�����?�H�B�u�1y�1ݱ7���<p�Bo���~�}2k��O����l}�Bul��zd%6Y��^�����T�BG���p�3��[U���9�"�B3~��5dx4*�������9@��BH맀=��0�x��q@�B�B���G�R1z�.ʉ��B�V:�BF���:Y`4׮����P�!@�I�B(܇�%(��0�	���@��B���m�*�Z���0+]?D/�B�t�`�2᯲��i�Q@���B^���Q��-4������,@���B5�}�7�l0����i�Q@���B���n�q-�c�&���n��8�BW���W^g5�������?Z��BK��U�c1ܫc�&���n��8�By���z�5���俎}w@@z�B���l��-.�H2�e�[�t]�B\���LE5���*_	@�s�B���k�F03�����a�(3�B(�܀~��2����*_	@�s�BX�Ҁ.-�f0m�h�y�Q����R�B=J݀�b�3_�������?Z��B���s�Q1Y�        Yx��        �z�B        _E�B        ��A��!�?�!w&�W �H�EAH��'�wU��`@��&<���v@���&P�g   M u t e w i n d G i r l W e a p o n S h a p e   A r t / T e x t u r e s / M o n s t e r s / M u t e w i n d B a n d i t s / M u t e w i n d G i r l W e a p o n c . m a t   h a n d l e   b l a d e   m i d   
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/MutewindBanditGirl.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/rig_331fe801.smd"
+Materials 2
+	"Art/Textures/Monsters/MutewindBandits/Mutewindgirlc.mat" 1
+	"Art/Textures/Monsters/MutewindBandits/Hairc.mat" 1
+BoundingBox -65.3513 -12.4816 -175.622 65.3513 29.2071 -0.415631
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/MutewindBandits/MutewindBanditGirl/rig_331fe801.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 2 in the header, 2 in the block · 8010 triangles over 6586 vertices
+  names: 36 bytes said, 36 read  [agree]
+
+=== shapes (8)
+0	BodyShape	from 0	count 21054
+1	HairShape	from 21054	count 2976
+2	beltShape	from 24030	count 3132
+3	front_underlayerShape	from 27162	count 216
+4	skirt_newShape	from 27378	count 3276
+5	necklace_mainShape	from 30654	count 1326
+6	necklace_stringShape	from 31980	count 864
+7	top_clothShape	from 32844	count 2010
+
+=== fitting
+the monster's rig: 59 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  MutewindBanditGirlRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-25.7,-20.7,-15.6)..(24.7,19.7,58.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 2208 triangles over 1554 vertices
+    names: 88 bytes said, 88 read  [agree]
+    rig 16 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 15 of 16  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-0,-10.5)  carrier has (0,-0,-97.1)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (8.2,-0,0)  carrier has (8.2,-0,-86.6)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-8.2,-0,0)  carrier has (-8.2,0,-86.6)
+      4 phys_tri_front_robe_jntBnd_1  [its own]  under 0  rests at (0,-10.3,9.6)
+      5 phys_tri_L_back_robe_1_jntBnd_1  [its own]  under 0  rests at (17.8,11.4,37)
+      6 phys_tri_R_back_robe_1_jntBnd_1  [its own]  under 0  rests at (-17.8,11.4,37)
+      7 phys_tri_L_back_robe_2_jntBnd_3  [its own]  under 0  rests at (7.9,14.6,19.3)
+      8 phys_tri_L_back_robe_2_jntBnd_1  [its own]  under 0  rests at (6.8,16.7,37.3)
+      9 phys_tri_R_back_robe_2_jntBnd_3  [its own]  under 0  rests at (-7.9,14.6,19.3)
+      10 phys_tri_R_back_robe_2_jntBnd_1  [its own]  under 0  rests at (-6.8,16.7,37.3)
+      11 phys_tri_front_robe_jntBnd_3  [its own]  under 4  rests at (-0,-14.3,39.7)
+      12 phys_tri_L_front_robe_jntBnd_2  [its own]  under 4  rests at (7.2,-12.6,24.6)
+      13 phys_tri_R_front_robe_jntBnd_2  [its own]  under 4  rests at (-7.2,-12.6,24.6)
+      14 phys_tri_L_back_robe_2_jntBnd_2  [its own]  under 8  rests at (6.7,17.5,50.9)
+      15 phys_tri_R_back_robe_2_jntBnd_2  [its own]  under 10  rests at (-6.7,17.5,50.9)
+  MutewindBanditGirlsMantle.ao  socket chest_jntBnd [in its carrier's rig]  box (-16,-15.5,-34.6)..(15,27.1,4.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 1400 triangles over 1151 vertices
+    names: 104 bytes said, 104 read  [agree]
+    rig 11 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 10 of 11  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (4.8,-0,-16)  carrier has (4.7,-0,-131.4)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-4.8,-0,-16)  carrier has (-4.7,-0,-131.4)
+      3 neck_jntBnd  [shared]  under 0  rests at (0,3.1,-21.4)  carrier has (0,3,-136.7)
+      4 phys_tri_back_mantle_jntBnd_1  [its own]  under 0  rests at (-0.5,20.7,-8.1)
+      5 phys_tri_necklace_jntBnd_1  [its own]  under 0  rests at (-0,-12.3,-8.2)
+      6 phys_tri_L_front_mantle_jntBnd_1  [its own]  under 0  rests at (9.5,-9.9,-7.8)
+      7 phys_tri_R_front_mantle_jntBnd_1  [its own]  under 0  rests at (-9.5,-9.9,-7.8)
+      8 L_shoulder_jntBnd  [shared]  under 1  rests at (16.8,5.3,-13.4)  carrier has (16.5,5.2,-128.9)
+      9 R_shoulder_jntBnd  [shared]  under 2  rests at (-16.8,5.3,-13.4)  carrier has (-16.5,5.2,-128.9)
+      10 head_jntBnd  [shared]  under 3  rests at (0,0.1,-30.5)  carrier has (0,0,-145.8)

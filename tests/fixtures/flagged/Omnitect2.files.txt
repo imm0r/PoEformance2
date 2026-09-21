@@ -1,0 +1,851 @@
+monster: Omnitect [Metadata/Monsters/LeagueUltimatum/Omnitect/Omnitect2]
+
+=== .ao Metadata/Monsters/LeagueUltimatum/Omnitect/Omnitect2.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/IncarnationOfSacrifice/rig.amd"
+	view_of = "idle_01"
+		view_name = "wave_cast_01"
+		view_end = 506
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	default_animation = "idle_01"
+	animations = '[
+		{
+			"name": "command_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.9950000047683716,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.495999813079834,
+					"name": "stop"
+				}
+			]
+		},
+		{
+			"name": "landed_spellcast",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.06915900111198425,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "wave_cast_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.25984999537467959,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+
+	fixed_subobject = "1 0.0 0.0 0"
+}
+
+AttachedAnimatedObject
+{
+	attached_slaved_animated_object = "<root> Metadata/Effects/Spells/monsters_effects/League_Incursion/Vaal_Saucer_Boss/thruster/thruster.ao"
+	attached_object = "aux_drapes_attachment_1 Metadata/Monsters/LeagueUltimatum/Omnitect/VaalSaucerBossDrapesHeld.ao"
+	attached_object = "aux_drapes_attachment_2 Metadata/Monsters/LeagueUltimatum/Omnitect/VaalSaucerBossDrapesHeld.ao"
+	attached_object = "aux_drapes_attachment_3 Metadata/Monsters/LeagueUltimatum/Omnitect/VaalSaucerBossDrapesHeld.ao"
+	attached_object = "aux_drapes_attachment_4 Metadata/Monsters/LeagueUltimatum/Omnitect/VaalSaucerBossDrapesHeld.ao"
+	attached_object = "aux_front_attachment Metadata/Monsters/LeagueUltimatum/Omnitect/OmniTurret01.ao"
+	attached_object = "aux_back_attachment Metadata/Monsters/LeagueUltimatum/Omnitect/OmniTurret03.ao"
+		attached_object_rotation = "0 -0 -3.141"
+}
+
+Locators
+{
+	locator = "turret_01 0 -108.075 -175.063 0 0 0"
+	locator = "turret_02 0 94.5811 -172.794 -3.14159 0 0"
+	locator = "turret_03 -111.9 0 -174.983 1.5708 0 0"
+	locator = "turret_04 96.7929 0 -174.95 -1.5708 0 0"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/IncarnationOfSacrifice/rig.ast"
+		socket = "aux_target_core_01"
+			parent = "root_jntBnd"
+			translation = "0 -145 -25"
+		socket = "aux_target_core_02"
+			parent = "root_jntBnd"
+			translation = "0 145 -25"
+		socket = "aux_target_core_03"
+			parent = "root_jntBnd"
+			translation = "-145 0 -25"
+		socket = "aux_target_core_04"
+			parent = "root_jntBnd"
+			translation = "145 0 -25"
+		socket = "aux_target_core_05"
+			parent = "root_jntBnd"
+			translation = "110 -110 -25"
+		socket = "aux_target_core_06"
+			parent = "root_jntBnd"
+			translation = "-110 110 -25"
+		socket = "aux_target_core_07"
+			parent = "root_jntBnd"
+			translation = "110 110 -25"
+		socket = "aux_target_core_08"
+			parent = "root_jntBnd"
+			translation = "-110 -110 -25"
+		socket = "aux_target_core_09"
+			parent = "root_jntBnd"
+			translation = "0 0 -140"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/IncarnationOfSacrifice/IncarnationOfSacrifice.sm"
+	}
+	
+	SoundEvents
+	{
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_core false root_jntBnd aux_target_core_09"
+		bone_group = "grp_multi_target false aux_target_core_01 aux_target_core_08 aux_target_core_03 aux_target_core_06 aux_target_core_02 aux_target_core_07 aux_target_core_04 aux_target_core_05 aux_front_attachment aux_right_attachment aux_back_attachment aux_left_attachment root_jntBnd aux_target_core_09"
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false aux_back_attachment aux_right_attachment aux_front_attachment aux_left_attachment"
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			state = ""
+				colour = "1 1 1"
+				position = "0 0 -125"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "lightning"
+				colour = "0.226144 0.312753 1.8731"
+				position = "0 0 -12"
+				radius = 1023
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+				style = 2
+			state = "off"
+				position = "0 0 -125"
+				radius = 0
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+		animations = '[
+			{
+				"name": "wave_cast_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.3934614956378937,
+						"state_name": "off"
+					}
+				]
+			}
+		]'
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueUltimatum/Omnitect/VaalSaucerBossDrapesHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/IncarnationOfSacrifice/Drapes/drapes.amd"
+	default_animation = "idle"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/IncarnationOfSacrifice/Drapes/drapes.ast"
+		linear_allowed_contraction = 0.713
+		bend_stiffness = 11.000
+		bend_allowed_angle = 2.524
+		normal_viscosity_multiplier = 0.385
+		tangent_viscosity_multiplier = 0.177
+		enclosure_angle = 1.354
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/IncarnationOfSacrifice/Drapes/drapes.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "idle",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Environment/4.0/Part1/Act3/G3_10/Daemons/Omnitect/Foley/IdleFloatLoop",
+						"bone_name": "phys_skinned_drapes_mesh_jnt_16"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueUltimatum/Omnitect/OmniTurret01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/IncarnationOfSacrifice/ChaosGodTrial/Turrets/VaalTurrets01/rig.amd"
+	animations = '[
+		{
+			"name": "spellcast_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9857499599456787,
+					"name": "contact",
+					"position": [
+						0.726226806640625,
+						-17.886463165283204,
+						-27.408039093017579
+					]
+				}
+			]
+		}
+	]'
+}
+
+Locators
+{
+	locator = "new 0 0 0 0 0 0"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/IncarnationOfSacrifice/ChaosGodTrial/Turrets/VaalTurrets01/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/IncarnationOfSacrifice/ChaosGodTrial/Turrets/VaalTurrets01/VaalTurret01.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false mouth_jntBnd root_jntBnd"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Ultimatum/general_combat/daemons/projectile_turrets/fx/spellcast_windup_fire_01.pet",
+						"bone_group": "frameupper"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9857499599456787,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Ultimatum/general_combat/daemons/projectile_turrets/fx/spellcast_burst_fire_01.pet",
+						"bone_group": "frameupper"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Ultimatum/general_combat/daemons/projectile_turrets/epk/onact_surge_01.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "Surge",
+						"curve": "3 0 1 Smooth 1 0 Linear 1.5 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			state = ""
+				colour = "3.67677 5.3517 8.97153"
+				position = "0 -23 -32"
+				radius = 90
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "on"
+				default_state = true
+				colour = "0.636655 0.241086 0.121259"
+				position = "0 -28 -27"
+				radius = 90
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "flash"
+				colour = "1.91188 0.723983 0.364142"
+				position = "0 -28 -27"
+				radius = 90
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+		animations = '[
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.950086236000061,
+						"end_time": 1.012197494506836,
+						"state_name": "flash"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 1.0443193912506104,
+						"end_time": 1.5,
+						"state_name": "on"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Environment/4.0/Part1/Act3/G3_10/Daemons/Omnitect/Effects/Projectile_Fireball_Charge",
+						"bone_name": "mouth_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9944750070571899,
+						"filename": "Audio/Sound Effects/Environment/4.0/Part1/Act3/G3_10/Daemons/Omnitect/Effects/Projectile_Fireball_Shot",
+						"bone_name": "mouth_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueUltimatum/Omnitect/OmniTurret03.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/IncarnationOfSacrifice/ChaosGodTrial/Turrets/VaalTurrets01/rig.amd"
+	animations = '[
+		{
+			"name": "spellcast_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9857499599456787,
+					"name": "contact",
+					"position": [
+						0.726226806640625,
+						-17.886463165283204,
+						-27.408039093017579
+					]
+				}
+			]
+		}
+	]'
+}
+
+Locators
+{
+	locator = "new 0 0 0 0 0 0"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/IncarnationOfSacrifice/ChaosGodTrial/Turrets/VaalTurrets01/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/IncarnationOfSacrifice/ChaosGodTrial/Turrets/VaalTurrets01/VaalTurret01.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false mouth_jntBnd root_jntBnd"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Ultimatum/general_combat/daemons/projectile_turrets/fx/spellcast_windup_fire_01.pet",
+						"bone_group": "frameupper"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9857499599456787,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Ultimatum/general_combat/daemons/projectile_turrets/fx/spellcast_burst_fire_01.pet",
+						"bone_group": "frameupper"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Ultimatum/general_combat/daemons/projectile_turrets/epk/onact_surge_01.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "Surge",
+						"curve": "3 0 1 Smooth 1 0 Linear 1.5 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			state = ""
+				colour = "3.67677 5.3517 8.97153"
+				position = "0 -23 -32"
+				radius = 90
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "on"
+				default_state = true
+				colour = "0.636655 0.241086 0.121259"
+				position = "0 -28 -27"
+				radius = 90
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "flash"
+				colour = "1.91188 0.723983 0.364142"
+				position = "0 -28 -27"
+				radius = 90
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+		animations = '[
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.950086236000061,
+						"end_time": 1.012197494506836,
+						"state_name": "flash"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 1.0443193912506104,
+						"end_time": 1.5,
+						"state_name": "on"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Environment/4.0/Part1/Act3/G3_10/Daemons/ProjectileTurrets/Effects/Projectile_Fireball_Charge",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9944750070571899,
+						"filename": "Audio/Sound Effects/Environment/4.0/Part1/Act3/G3_10/Daemons/ProjectileTurrets/Effects/Projectile_Fireball_Shot",
+						"bone_name": "mouth_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/IncarnationOfSacrifice/IncarnationOfSacrifice.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/IncarnationOfSacrifice/rig_a8883662.smd"
+Materials 8
+	"Art/Models/Terrain/Jungle/Tiles/VaalExterior/Textures/Clean/VaalExt_ThinWallTrimsClean01c.mat" 1
+	"Art/Models/Terrain/Jungle/Tiles/VaalExterior/Textures/Clean/VaalExt_StatueClean01c.mat" 1
+	"Art/Models/Terrain/Jungle/Tiles/VaalExterior/Textures/Clean/VaalExt_ThickWallStepsClean01c.mat" 1
+	"Art/Models/Terrain/Jungle/Tiles/VaalInterior/Textures/Clean/VaalInt_ThinWallEndClean01c.mat" 1
+	"Art/Models/Terrain/Jungle/Tiles/VaalInterior/Textures/Clean/VaalInt_ThinWallPillarsClean01c.mat" 1
+	"Art/Models/Terrain/Jungle/Tiles/VaalExterior/Textures/Clean/VaalExt_ThickWallCornerClean01c.mat" 1
+	"Art/Models/Terrain/Jungle/Tiles/VaalExterior/Textures/Clean/VaalExt_AbyssWallClean01c.mat" 1
+	"Art/Models/Terrain/Jungle/Tiles/VaalExterior/Textures/Clean/VaalExt_ThickWallStraightClean01c.mat" 1
+BoundingBox -175.08 -175.08 -140.924 175.08 175.08 10.3712
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/IncarnationOfSacrifice/rig_a8883662.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 8 in the header, 8 in the block · 24572 triangles over 22099 vertices
+  names: 158 bytes said, 158 read  [agree]
+
+=== shapes (16)
+0	mesh1Shape	from 0	count 2352
+1	mesh4Shape	from 2352	count 24408
+2	mesh5Shape	from 26760	count 3828
+3	mesh6Shape	from 30588	count 10836
+4	mesh7Shape	from 41424	count 19812
+5	mesh8Shape	from 61236	count 5832
+6	mesh9Shape	from 67068	count 6432
+7	meshShape	from 73500	count 216
+8	mesh25Shape	from 73716	count 2310
+9	mesh26Shape	from 76026	count 816
+10	mesh27Shape	from 76842	count 2823
+11	mesh28Shape	from 79665	count 2958
+12	mesh25Shape	from 82623	count 2310
+13	mesh26Shape	from 84933	count 816
+14	mesh27Shape	from 85749	count 2823
+15	mesh28Shape	from 88572	count 2958
+
+=== fitting
+the monster's rig: 9 bones
+mounts: aux_front_attachment, aux_left_attachment, aux_back_attachment, aux_right_attachment, aux_drapes_attachment_1, aux_drapes_attachment_2, aux_drapes_attachment_3, aux_drapes_attachment_4
+  VaalSaucerBossDrapesHeld.ao  socket aux_drapes_attachment_1 [in its carrier's rig]  box (0,0,0)..(0,0,0)
+    (the geometry did not read)
+    rig 31 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,-0.2)  carrier has (0,0,0)
+      1 phys_skinned_drapes_mesh_jnt_28  [its own]  under 0  rests at (49.9,-115.3,9.6)
+      2 phys_skinned_drapes_mesh_jnt_23  [its own]  under 0  rests at (69.7,-115.3,9.6)
+      3 phys_skinned_drapes_mesh_jnt_22  [its own]  under 0  rests at (89.5,-115.2,9.6)
+      4 phys_skinned_drapes_mesh_jnt_17  [its own]  under 0  rests at (-39.5,-115.6,9.6)
+      5 phys_skinned_drapes_mesh_jnt_16  [its own]  under 0  rests at (-13.7,-115.6,9.6)
+      6 phys_skinned_drapes_mesh_jnt_13  [its own]  under 0  rests at (12.1,-115.6,9.6)
+      7 phys_skinned_drapes_mesh_jnt_12  [its own]  under 0  rests at (37.9,-115.6,9.6)
+      8 phys_skinned_drapes_mesh_jnt_7  [its own]  under 0  rests at (-49.9,-115.3,9.6)
+      9 phys_skinned_drapes_mesh_jnt_2  [its own]  under 0  rests at (-89.5,-115.2,9.6)
+      10 phys_skinned_drapes_mesh_jnt_1  [its own]  under 0  rests at (-69.7,-115.3,9.6)
+      11 phys_skinned_drapes_mesh_jnt_29  [its own]  under 1  rests at (49.9,-115.4,30.6)
+      12 phys_skinned_drapes_mesh_jnt_25  [its own]  under 2  rests at (69.8,-115.3,30.6)
+      13 phys_skinned_drapes_mesh_jnt_24  [its own]  under 3  rests at (89.7,-115.2,30.6)
+      14 phys_skinned_drapes_mesh_jnt_19  [its own]  under 4  rests at (-39.5,-115.6,30.6)
+      15 phys_skinned_drapes_mesh_jnt_18  [its own]  under 5  rests at (-13.6,-115.6,30.6)
+      16 phys_skinned_drapes_mesh_jnt_15  [its own]  under 6  rests at (12.3,-115.6,30.6)
+      17 phys_skinned_drapes_mesh_jnt_14  [its own]  under 7  rests at (38.1,-115.6,30.6)
+      18 phys_skinned_drapes_mesh_jnt_8  [its own]  under 8  rests at (-49.9,-115.4,30.6)
+      19 phys_skinned_drapes_mesh_jnt_4  [its own]  under 9  rests at (-89.7,-115.2,30.6)
+      20 phys_skinned_drapes_mesh_jnt_3  [its own]  under 10  rests at (-69.8,-115.3,30.6)
+      21 phys_skinned_drapes_mesh_jnt_30  [its own]  under 11  rests at (49.9,-115.5,51.5)
+      22 phys_skinned_drapes_mesh_jnt_27  [its own]  under 12  rests at (70,-115.4,51.5)
+      23 phys_skinned_drapes_mesh_jnt_26  [its own]  under 13  rests at (90,-115.2,51.5)
+      24 phys_skinned_drapes_mesh_jnt_21  [its own]  under 14  rests at (-39.5,-115.6,51.5)
+      25 phys_skinned_drapes_mesh_jnt_20  [its own]  under 15  rests at (-13.6,-115.6,51.5)
+      26 phys_skinned_drapes_mesh_jnt_11  [its own]  under 16  rests at (12.4,-115.6,51.5)
+      27 phys_skinned_drapes_mesh_jnt_10  [its own]  under 17  rests at (38.4,-115.6,51.5)
+      28 phys_skinned_drapes_mesh_jnt_9  [its own]  under 18  rests at (-49.9,-115.5,51.5)
+      29 phys_skinned_drapes_mesh_jnt_6  [its own]  under 19  rests at (-90,-115.2,51.5)
+      30 phys_skinned_drapes_mesh_jnt_5  [its own]  under 20  rests at (-70,-115.4,51.5)
+  VaalSaucerBossDrapesHeld.ao  socket aux_drapes_attachment_2 [in its carrier's rig]  box (0,0,0)..(0,0,0)
+    (the geometry did not read)
+    rig 31 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,-0.2)  carrier has (0,0,0)
+      1 phys_skinned_drapes_mesh_jnt_28  [its own]  under 0  rests at (49.9,-115.3,9.6)
+      2 phys_skinned_drapes_mesh_jnt_23  [its own]  under 0  rests at (69.7,-115.3,9.6)
+      3 phys_skinned_drapes_mesh_jnt_22  [its own]  under 0  rests at (89.5,-115.2,9.6)
+      4 phys_skinned_drapes_mesh_jnt_17  [its own]  under 0  rests at (-39.5,-115.6,9.6)
+      5 phys_skinned_drapes_mesh_jnt_16  [its own]  under 0  rests at (-13.7,-115.6,9.6)
+      6 phys_skinned_drapes_mesh_jnt_13  [its own]  under 0  rests at (12.1,-115.6,9.6)
+      7 phys_skinned_drapes_mesh_jnt_12  [its own]  under 0  rests at (37.9,-115.6,9.6)
+      8 phys_skinned_drapes_mesh_jnt_7  [its own]  under 0  rests at (-49.9,-115.3,9.6)
+      9 phys_skinned_drapes_mesh_jnt_2  [its own]  under 0  rests at (-89.5,-115.2,9.6)
+      10 phys_skinned_drapes_mesh_jnt_1  [its own]  under 0  rests at (-69.7,-115.3,9.6)
+      11 phys_skinned_drapes_mesh_jnt_29  [its own]  under 1  rests at (49.9,-115.4,30.6)
+      12 phys_skinned_drapes_mesh_jnt_25  [its own]  under 2  rests at (69.8,-115.3,30.6)
+      13 phys_skinned_drapes_mesh_jnt_24  [its own]  under 3  rests at (89.7,-115.2,30.6)
+      14 phys_skinned_drapes_mesh_jnt_19  [its own]  under 4  rests at (-39.5,-115.6,30.6)
+      15 phys_skinned_drapes_mesh_jnt_18  [its own]  under 5  rests at (-13.6,-115.6,30.6)
+      16 phys_skinned_drapes_mesh_jnt_15  [its own]  under 6  rests at (12.3,-115.6,30.6)
+      17 phys_skinned_drapes_mesh_jnt_14  [its own]  under 7  rests at (38.1,-115.6,30.6)
+      18 phys_skinned_drapes_mesh_jnt_8  [its own]  under 8  rests at (-49.9,-115.4,30.6)
+      19 phys_skinned_drapes_mesh_jnt_4  [its own]  under 9  rests at (-89.7,-115.2,30.6)
+      20 phys_skinned_drapes_mesh_jnt_3  [its own]  under 10  rests at (-69.8,-115.3,30.6)
+      21 phys_skinned_drapes_mesh_jnt_30  [its own]  under 11  rests at (49.9,-115.5,51.5)
+      22 phys_skinned_drapes_mesh_jnt_27  [its own]  under 12  rests at (70,-115.4,51.5)
+      23 phys_skinned_drapes_mesh_jnt_26  [its own]  under 13  rests at (90,-115.2,51.5)
+      24 phys_skinned_drapes_mesh_jnt_21  [its own]  under 14  rests at (-39.5,-115.6,51.5)
+      25 phys_skinned_drapes_mesh_jnt_20  [its own]  under 15  rests at (-13.6,-115.6,51.5)
+      26 phys_skinned_drapes_mesh_jnt_11  [its own]  under 16  rests at (12.4,-115.6,51.5)
+      27 phys_skinned_drapes_mesh_jnt_10  [its own]  under 17  rests at (38.4,-115.6,51.5)
+      28 phys_skinned_drapes_mesh_jnt_9  [its own]  under 18  rests at (-49.9,-115.5,51.5)
+      29 phys_skinned_drapes_mesh_jnt_6  [its own]  under 19  rests at (-90,-115.2,51.5)
+      30 phys_skinned_drapes_mesh_jnt_5  [its own]  under 20  rests at (-70,-115.4,51.5)
+  VaalSaucerBossDrapesHeld.ao  socket aux_drapes_attachment_3 [in its carrier's rig]  box (0,0,0)..(0,0,0)
+    (the geometry did not read)
+    rig 31 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,-0.2)  carrier has (0,0,0)
+      1 phys_skinned_drapes_mesh_jnt_28  [its own]  under 0  rests at (49.9,-115.3,9.6)
+      2 phys_skinned_drapes_mesh_jnt_23  [its own]  under 0  rests at (69.7,-115.3,9.6)
+      3 phys_skinned_drapes_mesh_jnt_22  [its own]  under 0  rests at (89.5,-115.2,9.6)
+      4 phys_skinned_drapes_mesh_jnt_17  [its own]  under 0  rests at (-39.5,-115.6,9.6)
+      5 phys_skinned_drapes_mesh_jnt_16  [its own]  under 0  rests at (-13.7,-115.6,9.6)
+      6 phys_skinned_drapes_mesh_jnt_13  [its own]  under 0  rests at (12.1,-115.6,9.6)
+      7 phys_skinned_drapes_mesh_jnt_12  [its own]  under 0  rests at (37.9,-115.6,9.6)
+      8 phys_skinned_drapes_mesh_jnt_7  [its own]  under 0  rests at (-49.9,-115.3,9.6)
+      9 phys_skinned_drapes_mesh_jnt_2  [its own]  under 0  rests at (-89.5,-115.2,9.6)
+      10 phys_skinned_drapes_mesh_jnt_1  [its own]  under 0  rests at (-69.7,-115.3,9.6)
+      11 phys_skinned_drapes_mesh_jnt_29  [its own]  under 1  rests at (49.9,-115.4,30.6)
+      12 phys_skinned_drapes_mesh_jnt_25  [its own]  under 2  rests at (69.8,-115.3,30.6)
+      13 phys_skinned_drapes_mesh_jnt_24  [its own]  under 3  rests at (89.7,-115.2,30.6)
+      14 phys_skinned_drapes_mesh_jnt_19  [its own]  under 4  rests at (-39.5,-115.6,30.6)
+      15 phys_skinned_drapes_mesh_jnt_18  [its own]  under 5  rests at (-13.6,-115.6,30.6)
+      16 phys_skinned_drapes_mesh_jnt_15  [its own]  under 6  rests at (12.3,-115.6,30.6)
+      17 phys_skinned_drapes_mesh_jnt_14  [its own]  under 7  rests at (38.1,-115.6,30.6)
+      18 phys_skinned_drapes_mesh_jnt_8  [its own]  under 8  rests at (-49.9,-115.4,30.6)
+      19 phys_skinned_drapes_mesh_jnt_4  [its own]  under 9  rests at (-89.7,-115.2,30.6)
+      20 phys_skinned_drapes_mesh_jnt_3  [its own]  under 10  rests at (-69.8,-115.3,30.6)
+      21 phys_skinned_drapes_mesh_jnt_30  [its own]  under 11  rests at (49.9,-115.5,51.5)
+      22 phys_skinned_drapes_mesh_jnt_27  [its own]  under 12  rests at (70,-115.4,51.5)
+      23 phys_skinned_drapes_mesh_jnt_26  [its own]  under 13  rests at (90,-115.2,51.5)
+      24 phys_skinned_drapes_mesh_jnt_21  [its own]  under 14  rests at (-39.5,-115.6,51.5)
+      25 phys_skinned_drapes_mesh_jnt_20  [its own]  under 15  rests at (-13.6,-115.6,51.5)
+      26 phys_skinned_drapes_mesh_jnt_11  [its own]  under 16  rests at (12.4,-115.6,51.5)
+      27 phys_skinned_drapes_mesh_jnt_10  [its own]  under 17  rests at (38.4,-115.6,51.5)
+      28 phys_skinned_drapes_mesh_jnt_9  [its own]  under 18  rests at (-49.9,-115.5,51.5)
+      29 phys_skinned_drapes_mesh_jnt_6  [its own]  under 19  rests at (-90,-115.2,51.5)
+      30 phys_skinned_drapes_mesh_jnt_5  [its own]  under 20  rests at (-70,-115.4,51.5)
+  VaalSaucerBossDrapesHeld.ao  socket aux_drapes_attachment_4 [in its carrier's rig]  box (0,0,0)..(0,0,0)
+    (the geometry did not read)
+    rig 31 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,-0.2)  carrier has (0,0,0)
+      1 phys_skinned_drapes_mesh_jnt_28  [its own]  under 0  rests at (49.9,-115.3,9.6)
+      2 phys_skinned_drapes_mesh_jnt_23  [its own]  under 0  rests at (69.7,-115.3,9.6)
+      3 phys_skinned_drapes_mesh_jnt_22  [its own]  under 0  rests at (89.5,-115.2,9.6)
+      4 phys_skinned_drapes_mesh_jnt_17  [its own]  under 0  rests at (-39.5,-115.6,9.6)
+      5 phys_skinned_drapes_mesh_jnt_16  [its own]  under 0  rests at (-13.7,-115.6,9.6)
+      6 phys_skinned_drapes_mesh_jnt_13  [its own]  under 0  rests at (12.1,-115.6,9.6)
+      7 phys_skinned_drapes_mesh_jnt_12  [its own]  under 0  rests at (37.9,-115.6,9.6)
+      8 phys_skinned_drapes_mesh_jnt_7  [its own]  under 0  rests at (-49.9,-115.3,9.6)
+      9 phys_skinned_drapes_mesh_jnt_2  [its own]  under 0  rests at (-89.5,-115.2,9.6)
+      10 phys_skinned_drapes_mesh_jnt_1  [its own]  under 0  rests at (-69.7,-115.3,9.6)
+      11 phys_skinned_drapes_mesh_jnt_29  [its own]  under 1  rests at (49.9,-115.4,30.6)
+      12 phys_skinned_drapes_mesh_jnt_25  [its own]  under 2  rests at (69.8,-115.3,30.6)
+      13 phys_skinned_drapes_mesh_jnt_24  [its own]  under 3  rests at (89.7,-115.2,30.6)
+      14 phys_skinned_drapes_mesh_jnt_19  [its own]  under 4  rests at (-39.5,-115.6,30.6)
+      15 phys_skinned_drapes_mesh_jnt_18  [its own]  under 5  rests at (-13.6,-115.6,30.6)
+      16 phys_skinned_drapes_mesh_jnt_15  [its own]  under 6  rests at (12.3,-115.6,30.6)
+      17 phys_skinned_drapes_mesh_jnt_14  [its own]  under 7  rests at (38.1,-115.6,30.6)
+      18 phys_skinned_drapes_mesh_jnt_8  [its own]  under 8  rests at (-49.9,-115.4,30.6)
+      19 phys_skinned_drapes_mesh_jnt_4  [its own]  under 9  rests at (-89.7,-115.2,30.6)
+      20 phys_skinned_drapes_mesh_jnt_3  [its own]  under 10  rests at (-69.8,-115.3,30.6)
+      21 phys_skinned_drapes_mesh_jnt_30  [its own]  under 11  rests at (49.9,-115.5,51.5)
+      22 phys_skinned_drapes_mesh_jnt_27  [its own]  under 12  rests at (70,-115.4,51.5)
+      23 phys_skinned_drapes_mesh_jnt_26  [its own]  under 13  rests at (90,-115.2,51.5)
+      24 phys_skinned_drapes_mesh_jnt_21  [its own]  under 14  rests at (-39.5,-115.6,51.5)
+      25 phys_skinned_drapes_mesh_jnt_20  [its own]  under 15  rests at (-13.6,-115.6,51.5)
+      26 phys_skinned_drapes_mesh_jnt_11  [its own]  under 16  rests at (12.4,-115.6,51.5)
+      27 phys_skinned_drapes_mesh_jnt_10  [its own]  under 17  rests at (38.4,-115.6,51.5)
+      28 phys_skinned_drapes_mesh_jnt_9  [its own]  under 18  rests at (-49.9,-115.5,51.5)
+      29 phys_skinned_drapes_mesh_jnt_6  [its own]  under 19  rests at (-90,-115.2,51.5)
+      30 phys_skinned_drapes_mesh_jnt_5  [its own]  under 20  rests at (-70,-115.4,51.5)
+  OmniTurret01.ao  socket aux_front_attachment [in its carrier's rig]  box (-30.6,-28.5,-91.9)..(30.6,24.9,0)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 4 in the header, 4 in the block · 2969 triangles over 3060 vertices
+    names: 88 bytes said, 88 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 mouth_jntBnd  [its own]  under 0  rests at (-0,-22.1,-27.2)
+  OmniTurret03.ao  socket aux_back_attachment [in its carrier's rig]  attached_object_rotation = "0 -0 -3.141"  box (-30.6,-28.5,-91.9)..(30.6,24.9,0)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 4 in the header, 4 in the block · 2969 triangles over 3060 vertices
+    names: 88 bytes said, 88 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 mouth_jntBnd  [its own]  under 0  rests at (-0,-22.1,-27.2)

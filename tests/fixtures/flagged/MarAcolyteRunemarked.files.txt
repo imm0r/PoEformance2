@@ -1,0 +1,1890 @@
+monster: Mar Acolyte [Metadata/Monsters/MarAcolyte/Runemarked/MarAcolyteRunemarked]
+
+=== .ao Metadata/Monsters/MarAcolyte/Runemarked/MarAcolyteRunemarked.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MarAcolyte/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.417508989572525,
+					"name": "footstep",
+					"position": [
+						20.50149917602539,
+						-54.757198333740237,
+						-4.305260181427002
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_projectile_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3416210114955902,
+					"name": "footstep",
+					"position": [
+						17.509199142456056,
+						-65.48780059814453,
+						-4.135290145874023
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.461558997631073,
+					"name": "footstep",
+					"position": [
+						-29.51140022277832,
+						25.869600296020509,
+						-3.954669952392578
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5584890246391296,
+					"name": "contact",
+					"position": [
+						-19.255199432373048,
+						-173.48500061035157,
+						-31.72760009765625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1581300497055054,
+					"name": "footstep",
+					"position": [
+						18.154300689697267,
+						-31.905899047851564,
+						-3.9506399631500246
+					]
+				}
+			]
+		},
+		{
+			"name": "death_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.26460808515548708,
+					"name": "move",
+					"position": [
+						0.0,
+						30.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8658519983291626,
+					"name": "footstep",
+					"position": [
+						-13.516500473022461,
+						-84.8915023803711,
+						-13.692299842834473
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9272140264511108,
+					"name": "footstep",
+					"position": [
+						12.611700057983399,
+						-91.77519989013672,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "death_dot_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.36917850375175478,
+					"name": "move",
+					"position": [
+						0.0,
+						-60.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.30000001192092898,
+					"name": "move",
+					"position": [
+						0.0,
+						-160.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23332999646663667,
+					"name": "move",
+					"position": [
+						160.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23332999646663667,
+					"name": "move",
+					"position": [
+						-160.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_run_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.43333300948143008,
+					"name": "move",
+					"position": [
+						0.0,
+						-265.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "groundslam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6770709753036499,
+					"name": "footstep",
+					"position": [
+						34.64310073852539,
+						108.50800323486328,
+						-3.9396800994873049
+					],
+					"contact_ref": [
+						8.462949752807618,
+						-199.07899475097657,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8321160078048706,
+					"name": "contact",
+					"position": [
+						4.402378082275391,
+						-117.02120971679688,
+						0.0
+					],
+					"contact_ref": [
+						1.8355083465576172,
+						-199.07899475097657,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.06441929936408997,
+					"name": "footstep",
+					"position": [
+						7.479859828948975,
+						1.5157500505447388,
+						-4.336060047149658
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4013809859752655,
+					"name": "footstep",
+					"position": [
+						-7.487259864807129,
+						1.4485599994659424,
+						-3.936690092086792
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7338590025901794,
+					"name": "footstep",
+					"position": [
+						7.479859828948975,
+						1.5157500505447388,
+						-4.336060047149658
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0659199953079224,
+					"name": "footstep",
+					"position": [
+						-7.487259864807129,
+						1.4485599994659424,
+						-3.936690092086792
+					]
+				}
+			]
+		},
+		{
+			"name": "sanctum_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.38618004322052,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "sanctum_attack_projectile_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.5203114748001099,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "sanctum_groundslam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.611639976501465,
+					"name": "contact",
+					"position": [
+						0.386505126953125,
+						-122.91996002197266,
+						0.0
+					],
+					"contact_ref": [
+						0.0,
+						-221.51129150390626,
+						0.0
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/MarAcolyte/attachments/MarAcolyteEarrings.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/MarAcolyte/attachments/MarAcolytePendant.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/MarAcolyte/attachments/MarAcolyteRobe.ao"
+	attached_object = "staff_jntBnd Metadata/Monsters/MarAcolyte/attachments/MarAcolyteKeyChain.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4923076927661896,
+								0.0
+							],
+							[
+								0.5961538553237915,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.907571017742157,
+						"width": 46.24300003051758,
+						"angle": 2.687809705734253,
+						"x_axis_scale": 0.8830000162124634,
+						"length": 167.6300048828125,
+						"offset": [
+							26.0,
+							0.0
+						],
+						"local_offset": [
+							16.0,
+							-40.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.08726649731397629
+						],
+						"impact_z_rotation": [
+							0.2617989778518677,
+							0.785398006439209
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "phys_keychain_jntBnd_1"
+					}
+				]
+			}
+		},
+		{
+			"name": "sanctum_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6697247624397278,
+								0.0
+							],
+							[
+								0.7308868765830994,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.907571017742157,
+						"width": 46.24300003051758,
+						"angle": 2.687809705734253,
+						"x_axis_scale": 0.8830000162124634,
+						"length": 167.6300048828125,
+						"offset": [
+							26.0,
+							0.0
+						],
+						"local_offset": [
+							16.0,
+							-40.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.08726649731397629
+						],
+						"impact_z_rotation": [
+							0.2617989778518677,
+							0.785398006439209
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "phys_keychain_jntBnd_1"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MarAcolyte/rig.ast"
+		socket = "build01"
+			parent = "phys_keychain_jntBnd_4"
+			translation = "0 -18 4"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MarAcolyte/MarAcolyte.sm"
+			hide_segments = "cape_upper_physShape,earringplanes_noPhysShape,earrings_noPhysShape,pendant_noPhysShape,pendantchain_noPhysShape,robebottom_noPhysShape,robecape_noPhysShape,robeclothes_noPhysShape,robegold_noPhysShape"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22692885994911195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3007049858570099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourNecklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3035280108451843,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.515066921710968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainImpact",
+						"bone_name": "phys_keychain_jntBnd_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6853240132331848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponSwing1",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8430800437927246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0617358684539796,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "attack_projectile_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03410949930548668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21472199261188508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponSwing2",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35852500796318056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42898601293563845,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44672301411628725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49285200238227847,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Effects/MortarFire",
+						"bone_name": "build01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5979470014572144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6231780052185059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainImpact",
+						"bone_name": "phys_keychain_jntBnd_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0857199430465699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2064639925956726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/BodyFalls",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25423699617385867,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2638530135154724,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2871659994125366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainImpact",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3106279969215393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponFall",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.405364990234375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.023169437423348428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponFall",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06620720773935318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07000399380922318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainImpact",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22013980150222779,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/BodyFalls",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22593192756175996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3602343499660492,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.020266741514205934,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponFall",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.057912684977054599,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06123380362987518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainImpact",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08813018351793289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/BodyFalls",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19762688875198365,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3151037395000458,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01621687039732933,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponFall",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.046340081840753558,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04899754747748375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainImpact",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09025837481021881,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/BodyFalls",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15813541412353517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25213703513145449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01621687039732933,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponFall",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.046340081840753558,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04899754747748375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainImpact",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11920901387929917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/BodyFalls",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15813541412353517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25213703513145449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.017381424084305764,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponFall",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05815788358449936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainImpact",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07558334618806839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/BodyFalls",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16949133574962617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2702433466911316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4043925702571869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_keychain_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02722560055553913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10427600145339966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainRun",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02722560055553913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10427600145339966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainRun",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02722560055553913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10427600145339966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainRun",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02722560055553913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10427600145339966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainRun",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02722560055553913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10427600145339966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainRun",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/SpellFront",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03272499889135361,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Effects/SlamSpell",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23175999522209168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponSwingLong",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27301499247550967,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3131810128688812,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3868730068206787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5411610007286072,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5845800042152405,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponSlam",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6338220238685608,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/RunFootsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6903039813041687,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/SpellEnd",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7779080271720886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8050490021705627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainImpact",
+						"bone_name": "phys_keychain_jntBnd_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8349639773368836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2330199480056763,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.313599944114685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/RunFootsteps",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 2.843869924545288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.327600002288818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.870279788970947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Breath",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Flinch",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2327219396829605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24400581419467927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/RunFootsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28913962841033938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourNecklace",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0423134565353394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourNecklace",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2341331243515015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2637518644332886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/SpellFront",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3977429866790772,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5416059494018555,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/RunFootsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Flinch",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17566297948360444,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/RunFootsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2520378530025482,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3131381869316101,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourNecklace",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33146828413009646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/RunFootsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1288254261016846,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourNecklace",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3365660905838013,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5137555599212647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.602351427078247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/SpellFront",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01605910062789917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainRun",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04505909979343414,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/RunFootsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33375099301338198,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourNecklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3440589904785156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainRun",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.361411988735199,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/RunFootsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6594840288162231,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourRun",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6710590124130249,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainRun",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6890299916267395,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/RunFootsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0042599439620972,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourNecklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0150599479675294,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainRun",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0288499593734742,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/RunFootsteps",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1172410398721695,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2924356460571289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38750848174095156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourNecklace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3911464214324951,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7137773633003235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9029086232185364,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0132899284362794,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2150700092315674,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponSwing1",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2487512826919556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3682235479354859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4898810386657715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainImpact",
+						"bone_name": "phys_keychain_jntBnd_4"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_projectile_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3423537313938141,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponSwing2",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6186103224754334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8393953442573547,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponSwing2",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0263447761535645,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.265360713005066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4458953142166138,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Effects/MortarFire",
+						"bone_name": "build01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4595938920974732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7024134397506714,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainImpact",
+						"bone_name": "phys_keychain_jntBnd_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.873335361480713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "sanctum_groundslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/SpellFront",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0654696375131607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Effects/SlamSpell",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4636590778827667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponSwingLong",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5461938381195068,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6265499591827393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7739781737327576,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0826467275619507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.169510841369629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponSlam",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2680244445800782,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/RunFootsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6802927255630494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/ArmourCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.87196683883667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Vocal/SpellEnd",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.047553777694702,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.466779947280884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChain",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4752533435821535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/WeaponChainImpact",
+						"bone_name": "phys_keychain_jntBnd_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5235965251922609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Effects/SlamSpell",
+						"bone_name": "phys_keychain_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.62798810005188,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_3/MarAcolyte/Foley/RunFootsteps",
+						"bone_name": "phys_skinned_keychain_jntBnd_3"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false R_thigh_jntBnd hip_jntBnd L_thigh_jntBnd"
+		bone_group = "frameupper false L_shoulder_jntBnd L_clavicle_jntBnd neck_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+		bone_group = "cast_fx false build01 phys_keychain_jntBnd_4"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Monsters/MarAcolyte/Effects/Pet/brazierfire_slamcharge.pet",
+						"bone_group": "cast_fx"
+					}
+				]
+			},
+			{
+				"name": "attack_projectile_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Monsters/MarAcolyte/Effects/Pet/brazierfire_slamcharge.pet",
+						"bone_group": "cast_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5974100232124329,
+						"filename": "Metadata/Monsters/MarAcolyte/Effects/Pet/mortarfire_cast.pet",
+						"bone_group": "cast_fx"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Monsters/MarAcolyte/Effects/Pet/brazierfire_slamcharge.pet",
+						"bone_group": "cast_fx"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		continuous_effect = "cast_fx Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MarAcolyte/fx/censer_mortar.trl"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/MarAcolyte/attachments/MarAcolyteEarrings.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MarAcolyte/attachments/Earrings/loop_MarAcolyteEarrings.amd"
+	default_animation = "idle"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MarAcolyte/attachments/Earrings/loop_MarAcolyteEarrings.ast"
+		linear_allowed_contraction = 0.300
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.005
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MarAcolyte/attachments/Earrings/loop_MarAcolyteEarrings.sm"
+	}
+	
+	
+}
+
+=== .ao Metadata/Monsters/MarAcolyte/attachments/MarAcolytePendant.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MarAcolyte/attachments/Pendant/loop_MarAcolytePendant.amd"
+	default_animation = "idle"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MarAcolyte/attachments/Pendant/loop_MarAcolytePendant.ast"
+		linear_allowed_contraction = 0.300
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.005
+		enclosure_angle = 0.900
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MarAcolyte/attachments/Pendant/loop_MarAcolytePendant.sm"
+	}
+	
+	
+}
+
+=== .ao Metadata/Monsters/MarAcolyte/attachments/MarAcolyteRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MarAcolyte/attachments/Robe/Robe_armour.amd"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MarAcolyte/attachments/Robe/Robe_armour.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MarAcolyte/attachments/Robe/MarAcolyteRobe.sm"
+	}
+	
+	
+}
+
+=== .ao Metadata/Monsters/MarAcolyte/attachments/MarAcolyteKeyChain.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MarAcolyte/attachments/Keychain/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MarAcolyte/attachments/Keychain/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.001
+		tangent_viscosity_multiplier = 0.001
+		enclosure_radius = 10.000
+		enclosure_angle = 0.100
+		animation_force_factor = 1.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MarAcolyte/attachments/Keychain/Keychain.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/MarAcolyte/MarAcolyte.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/MarAcolyte/rig_65a44eca.smd"
+Materials 2
+	"Art/Textures/Monsters/MarAcolyte/MarAcolytec.mat" 23
+	"Art/Textures/Monsters/MarAcolyte/MarAcolyteArmsc.mat" 1
+BoundingBox -73.6386 -19.1492 -209.004 107.202 40.759 1.21133
+BoneGroups 21
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+	"grp_staff" 2 "staff_jntBnd" "phys_keychain_jntBnd_1"
+
+=== .smd Art/Models/MONSTERS/MarAcolyte/rig_65a44eca.smd
+  version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 24 in the header, 24 in the block · 22551 triangles over 17728 vertices
+  names: 784 bytes said, 784 read  [agree]
+
+=== shapes (36)
+0	accessoriesShape	from 0	count 21288
+1	beltShape	from 21288	count 948
+2	cape_noPhysShape	from 22236	count 4680
+3	cape_upper_physShape	from 26916	count 2712
+4	clothesShape	from 29628	count 5268
+5	earringplanes_noPhysShape	from 34896	count 24
+6	earrings_noPhysShape	from 34920	count 1200
+7	l_armShape	from 36120	count 3798
+8	l_bracelet03Shape	from 39918	count 108
+9	l_bracelet0Shape1	from 40026	count 216
+10	l_bracelet0Shape2	from 40242	count 216
+11	legsShape	from 40458	count 2568
+12	pendant_noPhysShape	from 43026	count 1656
+13	pendantchain_noPhysShape	from 44682	count 408
+14	r_armShape	from 45090	count 1935
+15	r_braceletsShape	from 47025	count 1248
+16	robe_bottomShape	from 48273	count 102
+17	robebottom_noPhysShape	from 48375	count 2220
+18	robecape_noPhysShape	from 50595	count 1968
+19	robeclothes_noPhysShape	from 52563	count 1200
+20	robegold_noPhysShape	from 53763	count 396
+21	shawlShape	from 54159	count 8250
+22	shinpadsShape	from 62409	count 648
+23	weaponShape	from 63057	count 4596
+24	chain_link_Shape1	from 67653	count 480
+25	chain_link_Shape10	from 68133	count 480
+26	chain_link_Shape2	from 68613	count 288
+27	chain_link_Shape3	from 68901	count 288
+28	chain_link_Shape4	from 69189	count 288
+29	chain_link_Shape5	from 69477	count 288
+30	chain_link_Shape6	from 69765	count 288
+31	chain_link_Shape7	from 70053	count 288
+32	chain_link_Shape8	from 70341	count 288
+33	chain_link_Shape9	from 70629	count 288
+34	headShape	from 70917	count 4152
+35	ringShape	from 75069	count 360
+
+=== fitting
+the monster's rig: 53 bones
+mounts: aux_animation_control_ratio, aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  MarAcolyteEarrings.ao  socket head_jntBnd [in its carrier's rig]  box (-10.8,-11.2,-5.2)..(12.4,-6,15.3)
+    (the geometry did not read)
+    rig 3 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_L_earring_jntBnd_1  [its own]  under 0  rests at (8.2,-8.2,-2.6)
+      2 phys_R_earring_jntBnd_1  [its own]  under 0  rests at (-7.6,-8.5,-3.1)
+  MarAcolytePendant.ao  socket chest_jntBnd [in its carrier's rig]  box (-8.3,-15.8,-2.8)..(6,-12.6,21.5)
+    (the geometry did not read)
+    rig 3 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_pendant_jntBnd_1  [its own]  under 0  rests at (-1.7,-13.4,-3.5)
+      2 phys_pendant_jntBnd_2  [its own]  under 1  rests at (-1.7,-14,0.1)
+  MarAcolyteRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-45.2,-19.1,-12.9)..(42.6,40.8,87.6)
+    (the geometry did not read)
+    rig 47 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L_front_robe_jntBnd_1  [its own]  under 0  rests at (6.9,-14.8,-4.7)
+      2 phys_skinned_L_front_side_robe_jntBnd_1  [its own]  under 0  rests at (18.1,-10.2,-4.7)
+      3 phys_skinned_L_side_robe_jntBnd_1  [its own]  under 0  rests at (23.4,-0.4,-4.7)
+      4 phys_skinned_L_back_side_robe_jntBnd_1  [its own]  under 0  rests at (18.7,12.5,-4.7)
+      5 phys_skinned_L_back_robe_jntBnd_1  [its own]  under 0  rests at (6.9,20.7,-4.6)
+      6 phys_skinned_R_front_robe_jntBnd_1  [its own]  under 0  rests at (-6.9,-14.8,-4.7)
+      7 phys_skinned_R_front_side_robe_jntBnd_1  [its own]  under 0  rests at (-18.1,-10.2,-4.7)
+      8 phys_skinned_R_side_robe_jntBnd_1  [its own]  under 0  rests at (-23.4,-0.4,-4.7)
+      9 phys_skinned_R_back_side_robe_jntBnd_1  [its own]  under 0  rests at (-18.7,12.5,-4.7)
+      10 phys_skinned_R_back_robe_jntBnd_1  [its own]  under 0  rests at (-6.9,20.7,-4.6)
+      11 phys_skinned_L_front_robe_jntBnd_2  [its own]  under 1  rests at (7.6,-14.7,12)
+      12 phys_skinned_L_front_side_robe_jntBnd_2  [its own]  under 2  rests at (20,-9.9,12)
+      13 phys_skinned_L_side_robe_jntBnd_2  [its own]  under 3  rests at (26,0.5,12)
+      14 phys_skinned_L_back_side_robe_jntBnd_2  [its own]  under 4  rests at (21,13.9,12)
+      15 phys_skinned_L_back_robe_jntBnd_2  [its own]  under 5  rests at (7.9,22.6,12)
+      16 phys_skinned_R_front_robe_jntBnd_2  [its own]  under 6  rests at (-7.6,-14.7,12)
+      17 phys_skinned_R_front_side_robe_jntBnd_2  [its own]  under 7  rests at (-20,-9.9,12)
+      18 phys_skinned_R_side_robe_jntBnd_2  [its own]  under 8  rests at (-26,0.5,12)
+      19 phys_skinned_R_back_side_robe_jntBnd_2  [its own]  under 9  rests at (-21,13.9,12)
+      20 phys_skinned_R_back_robe_jntBnd_2  [its own]  under 10  rests at (-7.9,22.6,12)
+      21 phys_skinned_L_front_robe_jntBnd_3  [its own]  under 11  rests at (8.4,-14.6,28.7)
+      22 phys_skinned_L_front_side_robe_jntBnd_3  [its own]  under 12  rests at (21.8,-9.4,28.6)
+      23 phys_skinned_L_side_robe_jntBnd_3  [its own]  under 13  rests at (28.4,1.5,28.6)
+      24 phys_skinned_L_back_side_robe_jntBnd_3  [its own]  under 14  rests at (23.1,15.7,28.7)
+      25 phys_skinned_L_back_robe_jntBnd_3  [its own]  under 15  rests at (8.8,25,28.7)
+      26 phys_skinned_R_front_robe_jntBnd_3  [its own]  under 16  rests at (-8.4,-14.6,28.7)
+      27 phys_skinned_R_front_side_robe_jntBnd_3  [its own]  under 17  rests at (-21.8,-9.4,28.6)
+      28 phys_skinned_R_side_robe_jntBnd_3  [its own]  under 18  rests at (-28.4,1.5,28.6)
+      29 phys_skinned_R_back_side_robe_jntBnd_3  [its own]  under 19  rests at (-23.1,15.7,28.7)
+      30 phys_skinned_R_back_robe_jntBnd_3  [its own]  under 20  rests at (-8.8,25,28.7)
+      31 phys_skinned_L_front_side_robe_jntBnd_4  [its own]  under 22  rests at (23.6,-9,45.3)
+      32 phys_skinned_L_side_robe_jntBnd_4  [its own]  under 23  rests at (30.7,2.7,45.3)
+      33 phys_skinned_L_back_side_robe_jntBnd_4  [its own]  under 24  rests at (25.3,17.8,45.3)
+      34 phys_skinned_L_back_robe_jntBnd_4  [its own]  under 25  rests at (9.7,27.7,45.4)
+      35 phys_skinned_R_front_side_robe_jntBnd_4  [its own]  under 27  rests at (-23.6,-9,45.3)
+      36 phys_skinned_R_side_robe_jntBnd_4  [its own]  under 28  rests at (-30.7,2.7,45.3)
+      37 phys_skinned_R_back_side_robe_jntBnd_4  [its own]  under 29  rests at (-25.3,17.8,45.3)
+      38 phys_skinned_R_back_robe_jntBnd_4  [its own]  under 30  rests at (-9.7,27.7,45.4)
+      39 phys_skinned_L_front_side_robe_jntBnd_5  [its own]  under 31  rests at (25.3,-8.8,62)
+      40 phys_skinned_L_side_robe_jntBnd_5  [its own]  under 32  rests at (33,3.9,62)
+      41 phys_skinned_L_back_side_robe_jntBnd_5  [its own]  under 33  rests at (27.5,20.1,62)
+      42 phys_skinned_L_back_robe_jntBnd_5  [its own]  under 34  rests at (10.6,30.9,62)
+      43 phys_skinned_R_front_side_robe_jntBnd_5  [its own]  under 35  rests at (-25.3,-8.8,62)
+      44 phys_skinned_R_side_robe_jntBnd_5  [its own]  under 36  rests at (-33,3.9,62)
+      45 phys_skinned_R_back_side_robe_jntBnd_5  [its own]  under 37  rests at (-27.5,20.1,62)
+      46 phys_skinned_R_back_robe_jntBnd_5  [its own]  under 38  rests at (-10.6,30.9,62)
+  MarAcolyteKeyChain.ao  socket staff_jntBnd [in its carrier's rig]  box (-9.6,-9.6,-185.5)..(9.6,9.6,-126.4)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 12 in the header, 12 in the block · 2592 triangles over 2022 vertices
+    names: 378 bytes said, 378 read  [agree]
+    rig 4 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_keychain_jntBnd_1  [shared]  under 0  rests at (-0,-0,-136)  carrier has (96.7,2.4,-211.3)
+      2 phys_keychain_jntBnd_2  [its own]  under 1  rests at (-0,-0,-153.3)
+      3 phys_keychain_jntBnd_3  [its own]  under 2  rests at (-0,-0,-172)

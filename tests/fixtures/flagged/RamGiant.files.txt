@@ -1,0 +1,1753 @@
+monster: Desert Hulk [Metadata/Monsters/RamGiant/RamGiant]
+
+=== .ao Metadata/Monsters/RamGiant/RamGiant.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/RamGiant/rig.amd"
+	animations = '[
+		{
+			"name": "Wheel_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0092999935150147,
+					"name": "contact",
+					"position": [
+						0.0,
+						-117.69400024414063,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "Wheel_attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.209030032157898,
+					"name": "contact",
+					"position": [
+						0.0,
+						-132.4969940185547,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3098000288009644,
+					"name": "hidewheel"
+				}
+			]
+		},
+		{
+			"name": "Wheel_death_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.30000001192092898,
+					"name": "move",
+					"position": [
+						0.0,
+						102.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "Wheel_death_dot_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.7940379977226257,
+					"end_time": 1.2999999523162842,
+					"name": "move",
+					"position": [
+						0.0,
+						102.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "Wheel_knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.8659999966621399,
+					"name": "move",
+					"position": [
+						0.0,
+						240.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "dropwheel"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.9660000801086426,
+					"end_time": 3.0329999923706056,
+					"name": "move",
+					"position": [
+						0.0,
+						-88.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "Wheel_knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.765999972820282,
+					"name": "move",
+					"position": [
+						0.0,
+						-153.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "dropwheel"
+				}
+			]
+		},
+		{
+			"name": "Wheel_throw_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.096809983253479,
+					"name": "contact",
+					"position": [
+						-2.9523000717163088,
+						-124.07499694824219,
+						-252.572998046875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1282099485397339,
+					"name": "hidewheel",
+					"position": [
+						-2.9523000717163088,
+						-149.56199645996095,
+						-234.1959991455078
+					]
+				}
+			]
+		},
+		{
+			"name": "death_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.33329999446868899,
+					"name": "move",
+					"position": [
+						0.0,
+						130.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_dot_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.8999999761581421,
+					"end_time": 1.2999999523162842,
+					"name": "move",
+					"position": [
+						0.0,
+						102.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "groundslam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8677800297737122,
+					"name": "contact",
+					"position": [
+						40.42959976196289,
+						-88.11689758300781,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.8330000042915344,
+					"name": "move",
+					"position": [
+						0.0,
+						230.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.9330000281333923,
+					"name": "move",
+					"position": [
+						0.0,
+						230.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 2.0320000648498537,
+					"end_time": 3.0989999771118166,
+					"name": "move",
+					"position": [
+						0.0,
+						-61.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.9330000281333923,
+					"name": "move",
+					"position": [
+						0.0,
+						-196.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.6330000162124634,
+					"name": "move",
+					"position": [
+						0.0,
+						-162.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/RamGiant/attachments/RamGiantLoinCloth.ao"
+	attached_object = "wheel_jntBnd Metadata/Monsters/RamGiant/attachments/RamGiantFaridunWheel.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "Wheel_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.26256999373435976,
+								0.0
+							],
+							[
+								0.3016760051250458,
+								1.0
+							]
+						],
+						"width": 175.43899536132813,
+						"length": 140.3509979248047,
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4134080111980438,
+								0.0
+							],
+							[
+								0.49720698595046999,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.26179900765419009,
+						"width": 11.560999870300293,
+						"angle": 1.8849600553512574,
+						"length": 156.06900024414063,
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							0.43633198738098147,
+							1.309000015258789
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4134080111980438,
+								0.0
+							],
+							[
+								0.4916200041770935,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.3316130042076111,
+						"angle": 1.9547699689865113,
+						"length": 150.28900146484376,
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							-0.43633198738098147,
+							-1.309000015258789
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/RamGiant/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/RamGiant/RamGiant.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "Wheel_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23986700177192689,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Attack",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36114999651908877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "wheel_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38266798853874209,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5685060024261475,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalFlinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7093449831008911,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WheelSlam",
+						"bone_name": "wheel_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4096599817276,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4311800003051758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/BreathRun",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "Wheel_attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/AttackWheelThrow1",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8571360111236572,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/AttackWheelThrow2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8607209920883179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8607209920883179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1208900213241578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalFlinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2108700275421143,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WheelSlam",
+						"bone_name": "wheel_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "Wheel_death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08266620337963104,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3012999892234802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/RamGiant/Movement/DeathFall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "Wheel_death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1144961267709732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24404272437095643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1740919351577759,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.382546305656433,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WheelDeathFall",
+						"bone_name": "wheel_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7780344486236573,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WeakFootstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.980169415473938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WeakFootstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "Wheel_flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05007829889655113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09585289657115936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalFlinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "Wheel_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.42593398690223696,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/BreathIdle",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "Wheel_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17771491408348084,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25669917464256289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28208693861961367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WheelSlam",
+						"bone_name": "wheel_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3723549246788025,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5303241610527039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6830310225486755,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9393481612205505,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0014089345932007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9101097583770753,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9999966621398926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1950149536132814,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4235048294067385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/KnockdownChestHit",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4569780826568605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5162177085876467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0662848949432375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "Wheel_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12537887692451478,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1880682408809662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3224025070667267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WheelSlam",
+						"bone_name": "wheel_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3940475881099701,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5612198114395142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7433158159255981,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9317878484725952,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0597491264343262,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8120222091674805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3463754653930666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.433345079421997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.597137212753296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.603102207183838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.689678192138672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.880725145339966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1076018810272219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "Wheel_throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10172200202941895,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2738650143146515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WeakFootstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8667442798614502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9311419725418091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.983959972858429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalFlinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0582900047302247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0739400386810303,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/BreathRun",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2300400733947756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.284820079803467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WeakFootstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "Wheel_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0068148598074913029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6935999989509583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6981440186500549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "L_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.084220051765442,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/BreathRun",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.22300399839878083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3978869915008545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5903750061988831,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WeakFootstep",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6103289723396301,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.20892000198364259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3978869915008545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5903750061988831,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WeakFootstep",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6103289723396301,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10404100269079209,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3043540120124817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.15606150031089784,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1319622993469239,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7605572938919068,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WeakFootstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9577627182006837,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WeakFootstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05007829889655113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09585289657115936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalFlinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05007829889655113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09585289657115936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalFlinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05007829889655113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09585289657115936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalFlinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05007829889655113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09585289657115936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalFlinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05007829889655113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09585289657115936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalFlinch",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.4618629515171051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5153589844703674,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8377379775047302,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8612120151519775,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalFlinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8684459924697876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/FootstepSlam",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7892199754714966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8486900329589844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WeakFootstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.6431919932365418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/BreathIdle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.15871655941009522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21917973458766938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3325488567352295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6424247622489929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8943525552749634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9853895306587219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0102430582046509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5770877599716187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8567311763763428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1943180561065676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2551205158233644,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2799766063690187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4739608764648439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17942321300506593,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2591667175292969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3759342133998871,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5354219079017639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6895967125892639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9483777284622192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0110350847244263,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9284708499908448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.019221782684326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2161147594451906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.446800947189331,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/KnockdownChestHit",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.480595827102661,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.540405035018921,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.095759630203247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18118327856063844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3019721210002899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3796219825744629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5493023991584778,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9548045992851257,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0640913248062134,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0903629064559937,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7830737829208375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2892403602600099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "L_finger_3_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3442633152008058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.507805824279785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.591212272644043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6170904636383058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.617098331451416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/KnockdownChestHit",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6688637733459474,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.890315055847168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/KnockdownChestHit",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9938361644744875,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1405112743377687,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12537887692451478,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1880682408809662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3940475881099701,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5612198114395142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7433158159255981,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9317878484725952,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0597491264343262,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8120222091674805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3463754653930666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.433345079421997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.597137212753296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.603102207183838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.689678192138672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Swing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.880725145339966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1076018810272219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.031244799494743348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4474000036716461,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "L_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45443400740623476,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/Footstep",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6683380007743836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/BreathRun",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WeakFootstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0446401983499527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6392109990119934,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/MetalWalk",
+						"bone_name": "L_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6492609977722168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Foley/WeakFootstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9548699855804443,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/RamGiant2/Vocals/BreathIdle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false chest_jntBnd spine_2_jntBnd spine_1_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/RamGiant/attachments/RamGiantLoinCloth.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/RamGiant/attachments/LoinCloth.amd"
+	default_animation = "idle"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/RamGiant/attachments/LoinCloth.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.500
+		enclosure_angle = 0.852
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/RamGiant/attachments/LoinCloth.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	
+}
+
+=== .ao Metadata/Monsters/RamGiant/attachments/RamGiantFaridunWheel.ao (depth 1)
+version 3
+extends "Metadata/Monsters/RamGiant/attachments/RamGiantWheel"
+
+client
+{
+	SkinMesh
+	{
+	    remove_skin = "Art/Models/MONSTERS/RamGiant/attachments/Weapons/RamGiantWheel.sm"
+		skin = "Art/Models/MONSTERS/RamGiant/attachments/Weapons/RamGiantFaridunWheel.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Monsters/RamGiant/attachments/RamGiantWheel.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/RamGiant/attachments/Weapons/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/RamGiant/attachments/Weapons/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/RamGiant/attachments/Weapons/RamGiantWheel.sm"
+	}
+}
+
+=== .sm Art/Models/MONSTERS/RamGiant/RamGiant.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/RamGiant/rig_e19e5caf.smd"
+Materials 1
+	"Art/Textures/Monsters/RamGiant/RamGiantc.mat" 5
+BoundingBox -130.755 -38.9413 -244.965 130.755 42.3322 -1.45839
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/RamGiant/rig_e19e5caf.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 5 in the header, 5 in the block · 5160 triangles over 3621 vertices
+  names: 146 bytes said, 146 read  [agree]
+
+=== shapes (6)
+0	armour_meshShape	from 0	count 3252
+1	body_meshShape	from 3252	count 6558
+2	head_meshShape	from 9810	count 1374
+3	mask_meshShape	from 11184	count 894
+4	skirt_meshShape	from 12078	count 3402
+5	faridun_wheel_mesh1Shape	from 15480	count 10320
+
+=== fitting
+the monster's rig: 56 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  RamGiantLoinCloth.ao  socket hip_jntBnd [in its carrier's rig]  box (-15.3,-45.9,-4)..(20.8,-37,54.7)
+    (the geometry did not read)
+    rig 5 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_loincloth_jntBnd_1  [its own]  under 0  rests at (-0,-42.5,-1.8)
+      2 phys_skinned_loincloth_jntBnd_2  [its own]  under 1  rests at (0,-42.3,13)
+      3 phys_skinned_loincloth_jntBnd_3  [its own]  under 2  rests at (0,-42.1,27.7)
+      4 phys_skinned_loincloth_jntBnd_4  [its own]  under 3  rests at (0,-42,42.5)
+  RamGiantFaridunWheel.ao  socket wheel_jntBnd [in its carrier's rig]  box (-87.5,-34.6,-87.3)..(87.5,19.1,87.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 3440 triangles over 2868 vertices
+    names: 48 bytes said, 48 read  [agree]
+    rig 3 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 wheel_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+      2 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)

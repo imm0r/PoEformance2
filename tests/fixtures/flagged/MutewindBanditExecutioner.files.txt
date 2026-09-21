@@ -1,0 +1,1610 @@
+monster: Faridun Butcher [Metadata/Monsters/Mutewind/MutewindBanditExecutioner]
+
+=== .ao Metadata/Monsters/Mutewind/BanditExecutioner/BanditExecutioner.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/BanditExecutioner/rig.amd"
+	animations = '[
+		{
+			"name": "attack_ranged_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.44275200366973879,
+					"name": "contact",
+					"position": [
+						-50.0,
+						-90.0,
+						-174.95700073242188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4689919948577881,
+					"name": "contact",
+					"position": [
+						0.0,
+						-90.0,
+						-177.3769989013672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.49723801016807558,
+					"name": "contact",
+					"position": [
+						50.0,
+						-90.0,
+						-179.8719940185547
+					]
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.365999937057495,
+					"name": "move",
+					"data": "1 0 0 Terrain 0 10 Away 1.000000"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.5,
+					"name": "move",
+					"data": "1 0 0 Terrain 0 10 Away 1.000000"
+				}
+			]
+		},
+		{
+			"name": "leap_slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4009209871292114,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.060789942741394,
+					"name": "hit_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1317100524902344,
+					"name": "contact",
+					"position": [
+						0.0,
+						-131.86000061035157,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "leap_slam_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7362149953842163,
+					"name": "hit_ground",
+					"position": [
+						4.8011698722839359,
+						108.80400085449219,
+						-1.8283599615097047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.862758994102478,
+					"name": "contact",
+					"position": [
+						0.0,
+						-48.85940170288086,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "sweep_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.6660000085830689,
+					"name": "move",
+					"position": [
+						0.0,
+						-205.0,
+						-0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6284930109977722,
+					"name": "sweep",
+					"position": [
+						0.0,
+						21.546100616455079,
+						-129.40699768066407
+					]
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4916200041770935,
+								0.0
+							],
+							[
+								0.519553005695343,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": 0.26179900765419009,
+						"width": 104.0459976196289,
+						"length": 167.6300048828125,
+						"offset": [
+							-27.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.34906598925590517
+						],
+						"impact_z_rotation": [
+							0.26179900765419009,
+							0.26179900765419009
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.2234639972448349,
+								0.0
+							],
+							[
+								0.2681559920310974,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": 0.6108649969100952,
+						"width": 17.340999603271486,
+						"angle": 1.5184400081634522,
+						"length": 167.6300048828125,
+						"local_offset": [
+							-36.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							0.26179900765419009
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-0.8726649880409241
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5862069725990295,
+								0.0
+							],
+							[
+								0.5960590243339539,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 15,
+						"width": 80.92500305175781,
+						"length": 358.3819885253906,
+						"impact_x_rotation": [
+							-0.17453299462795258,
+							-0.785398006439209
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.24581000208854676,
+								0.0
+							],
+							[
+								0.33519598841667178,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 10,
+						"rotation": -0.6981319785118103,
+						"angle": 2.722709894180298,
+						"length": 208.0919952392578,
+						"impact_x_rotation": [
+							0.17453299462795258,
+							0.5235990285873413
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.3962600231170655
+						],
+						"impact_type": "Slash"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.608938992023468,
+								0.0
+							],
+							[
+								0.7150840163230896,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 10,
+						"rotation": -0.034906599670648578,
+						"width": 92.48600006103516,
+						"angle": 2.8099799156188967,
+						"length": 233.5030059814453,
+						"impact_x_rotation": [
+							0.0,
+							0.26179900765419009
+						],
+						"impact_z_rotation": [
+							-0.5235990285873413,
+							-1.483530044555664
+						],
+						"impact_type": "Slash"
+					}
+				]
+			}
+		},
+		{
+			"name": "sweep_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4180789887905121,
+								0.0
+							],
+							[
+								0.5310729742050171,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.22689299285411836,
+						"angle": 4.276060104370117,
+						"length": 212.0,
+						"offset": [
+							-51.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.22689299285411836,
+							-3.734999895095825
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/Mutewind/BanditExecutioner/attachments/BanditExecutionerRobe.ao"
+	attached_object = "R_elbow_jntBnd Metadata/Monsters/Mutewind/BanditExecutioner/attachments/BanditExecutionerSleeve.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/BanditExecutioner/rig.ast"
+		socket = "aux_blade_start"
+			parent = "R_Weapon"
+			translation = "-10 0 -25"
+		socket = "aux_blade_handle_end"
+			parent = "R_Weapon"
+			translation = "0 0 105"
+		socket = "aux_blade_tip"
+			parent = "R_Weapon"
+			translation = "20 0 -190"
+		enclosure_angle = 0.350
+		use_shock_propagation = false
+		enable_collisions = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/BanditExecutioner/BanditExecutioner.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false spine_2_jntBnd chest_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd head_jntBnd L_shoulder_jntBnd"
+		bone_group = "blade false aux_blade_start aux_blade_tip"
+		bone_group = "blade_handle false L_Weapon aux_blade_handle_end"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.167494997382164,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20510999858379365,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/SwingRegular",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39602500200271609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/Attack1Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39815500378608706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Attack2",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.448650985956192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5159689784049988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5691980123519898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7332490086555481,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/FootScuffing",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3753120005130768,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/Attack1Swing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37596699595451357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Attack2",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4397119879722595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4930489957332611,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6023269891738892,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7402250170707703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/FootScuffing",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8039699792861939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/Attack2Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9366639852523804,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Attack3",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9939039945602417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1864399909973145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.330839991569519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.464840054512024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/FootScuffing",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6638799905776978,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6924999952316285,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18327200412750245,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Attack1",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21637800335884095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/Attack3Swings",
+						"bone_name": "R_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35353800654411318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4445819854736328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.553363025188446,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9541950225830078,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0145000219345093,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2024999856948853,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "L_elbow_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_ranged_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04613199830055237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/FootScuffing",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29541900753974917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Attack2",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42493900656700137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/SwingRegular",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43931901454925539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/SwingRegular",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.469651997089386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/AttackRanged",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5136539936065674,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6939250230789185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7636619806289673,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/SwingRegular"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Death",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1734199523925782,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/DeathFallSmall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.217419981956482,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/DeathFallSmall",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6006699800491334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/DeathFall",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7851999998092652,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/DeathFallSmall",
+						"bone_name": "R_shoulder_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07633999735116959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Flinch"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.30518099665641787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Breath",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2505300045013428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/BreathOut",
+						"bone_name": "L_clavicle_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0818599984049797,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17757000029087068,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21907000243663789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28018999099731448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4554400146007538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/FootScuffing",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4669800102710724,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5377069115638733,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5857300162315369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/DeathFallSmall",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4605456590652466,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/FootScuffing",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4605456590652466,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7641199827194214,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8183101415634156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Attack3",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08649619668722153,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18762680888175965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2067212611436844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23147720098495484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2960587441921234,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40165001153945925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4473850429058075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/FootScuffing",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4495599865913391,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/DeathFallSmall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.568160355091095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5375200510025025,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.606128454208374,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/FootScuffing",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.86403226852417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.921291470527649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Attack3",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "leap_slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.045422300696372989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/LeapSlam",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38183000683784487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/Attack1Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39034798741340639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/LeapSlamJump"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4045419991016388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4300920069217682,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0063899755477906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/SwingRegular"
+					},
+					//{
+					//	"type": "SoundEventType",
+					//	"time": 1.0451600551605225,
+					//	"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/Attack2Swing",
+					//	"bone_name": "phys_skinned_R_ArmGuard_jntBnd_7"
+					//},
+					//{
+					//	"type": "SoundEventType",
+					//	"time": 1.065999984741211,
+					//	"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/LeapSlamLand",
+					//	"bone_name": "phys_skinned_robe_jntBnd_15"
+					//},
+					{
+						"type": "SoundEventType",
+						"time": 1.3498899936676026,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5770000219345093,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.809790015220642,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "leap_slam_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.13715800642967225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Attack3",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27076900005340578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/LeapSlamJump",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27076900005340578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/Attack1Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31333601474761965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37718498706817629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37836799025535586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/SwingRegular",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4043799936771393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/LeapSlamJump",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42329901456832888,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/SwingRegular",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.55690997838974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/SwingRegular",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6030229926109314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6562309861183167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/SwingRegular",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.688156008720398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6940680146217346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/Attack2Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7271749973297119,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/SwingRegular",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7413640022277832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7969359755516052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Attack1",
+						"bone_name": "neck_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8312270045280457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8761569857597351,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/LeapSlamLand",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.158750057220459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/FootScuffing",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1918599605560303,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.364490032196045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.036337800323963168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/Vocals/Breath",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31852400302886965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3542940020561218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.391198992729187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7102900147438049,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7483320236206055,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7801269888877869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sweep_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04897090047597885,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/AttackSweep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1383959949016571,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/FootScuffing",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31937500834465029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3555710017681122,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43435001373291018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/FootScuffing",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6802700161933899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/FootScuffing",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9666429758071899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourSteel",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1274000406265259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourLeather",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1391099691390992,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_11/ObeliskButcher/BanditsFoley/ArmourStep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.3822459876537323,
+						"end_time": 0.6666380167007446,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/epks/attack_02/handletrail.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.9962149858474731,
+						"end_time": 1.147915005683899,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/epks/attack_02/weapontrail.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.35732099413871767,
+						"end_time": 0.6554059982299805,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/epks/attack_03/weapontrail.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.9504550099372864,
+						"end_time": 1.186439037322998,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/epks/attack_03/weapontrail.epk"
+					}
+				]
+			},
+			{
+				"name": "leap_slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.3976210057735443,
+						"end_time": 0.859192967414856,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/epks/leapslam/weapontrail.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.0318700075149537,
+						"end_time": 1.256814956665039,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/epks/leapslam/weapontrail2.epk"
+					}
+				]
+			},
+			{
+				"name": "leap_slam_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.22771400213241578,
+						"end_time": 0.6239050030708313,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/epks/leapslam/weapontrail3.epk"
+					}
+				]
+			},
+			{
+				"name": "sweep_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.2957859933376312,
+						"end_time": 1.0105479955673218,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/epks/sweep_01/weapontrail.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "leap_slam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.331712007522583,
+						"end_time": 0.4475240111351013,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/fx/leapslam/OnAct_feetdust.pet",
+						"bone_groups": [
+							"root",
+							"grp_l_foot",
+							"grp_r_foot"
+						]
+					}
+				]
+			},
+			{
+				"name": "leap_slam_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2574149966239929,
+						"end_time": 0.44839200377464297,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/fx/leapslam/OnAct_feetdust.pet",
+						"bone_groups": [
+							"root",
+							"grp_l_foot",
+							"grp_r_foot"
+						]
+					}
+				]
+			},
+			{
+				"name": "sweep_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.10372699797153473,
+						"end_time": 0.4142490029335022,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/fx/leapslam/OnAct_feetdust.pet",
+						"bone_group": "grp_r_foot"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "leap_slam_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.1299999952316285,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/ao/leapslam.ao",
+						"offset": [
+							0.0,
+							-49.0
+						],
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "leap_slam_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.6462370157241821,
+						"end_time": 0.8777170181274414,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/ao/melee_trail.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								100.00000762939453,
+								-100.00000762939453
+							],
+							"rotation": [
+								-1.3959999084472657,
+								0.0,
+								-1.9199999570846558
+							],
+							"scale": [
+								2.0,
+								2.0,
+								1.0
+							]
+						}
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.868552029132843,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MutewindBanditExecutioner/ao/leapslam.ao",
+						"offset": [
+							0.0,
+							32.0
+						],
+						"inherit_orientation": true
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "sweep_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "FadeFloat",
+						"curve": "4 0 1 Linear 0.875983 1 Linear 1.01671 0 Linear 1.5 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditExecutioner/attachments/BanditExecutionerRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/BanditExecutioner/attachments/BanditExecutionerRobe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/BanditExecutioner/attachments/BanditExecutionerRobe/rig.ast"
+		bend_stiffness = 250.000
+		bend_allowed_angle = 0.500
+		normal_viscosity_multiplier = 0.150
+		enclosure_radius = 20.000
+		enclosure_angle = 0.000
+		use_shock_propagation = false
+		enable_collisions = false
+		attachment_bones = "spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/BanditExecutioner/attachments/BanditExecutionerRobe/BanditExecutionerRobe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/Mutewind/BanditExecutioner/attachments/BanditExecutionerSleeve.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/MutewindBandits/BanditExecutioner/attachments/BanditExecutionerSleeve/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/MutewindBandits/BanditExecutioner/attachments/BanditExecutionerSleeve/rig.ast"
+		linear_allowed_contraction = 0.350
+		bend_stiffness = 800.000
+		normal_viscosity_multiplier = 0.010
+		tangent_viscosity_multiplier = 0.010
+		enclosure_angle = 0.400
+		animation_velocity_factor = 10.000
+		animation_force_factor = 10.000
+		use_shock_propagation = false
+		enable_collisions = false
+	    attachment_bones = "r_arm_roll_02 R_shoulder_jntBnd child_attach"
+	}
+	 
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/MutewindBandits/BanditExecutioner/attachments/BanditExecutionerSleeve/BanditExecutionerSleeve.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false r_arm_roll_02 R_shoulder_jntBnd"
+	}
+	
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/MutewindBandits/BanditExecutioner/BanditExecutioner.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/MutewindBandits/BanditExecutioner/rig_199636b7.smd"
+Materials 2
+	"Art/Textures/Monsters/MutewindBandits/BanditExecutionerc.mat" 2
+	"Art/Textures/Monsters/MutewindBandits/BanditExecutionerc.mat" 16
+BoundingBox -101.325 -42.5315 -261.921 102.049 34.6603 -0.261382
+BoneGroups 22
+	"root" 1 "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/MutewindBandits/BanditExecutioner/rig_199636b7.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 18 in the header, 18 in the block · 9086 triangles over 7152 vertices
+  names: 746 bytes said, 746 read  [agree]
+
+=== shapes (22)
+0	BeltDinglyShape	from 0	count 450
+1	scarfDinglyBackShape	from 450	count 216
+2	BeltShape	from 666	count 1782
+3	BodyShape	from 2448	count 8616
+4	chestBeltShape	from 11064	count 324
+5	chestTopMetalShape	from 11388	count 2832
+6	HeadShape	from 14220	count 1374
+7	HelmetShape	from 15594	count 3816
+8	L_ArmDevice_WeaponBaseShape	from 19410	count 72
+9	L_ArmDevice_WeaponShape	from 19482	count 1272
+10	L_ArmDevice_WeaponTopShape	from 20754	count 330
+11	L_LegMetalShape	from 21084	count 108
+12	L_ShoulderPadShape	from 21192	count 978
+13	R_BraceletShape	from 22170	count 1440
+14	scarfShape	from 23610	count 1488
+15	shuriken_01_grp2|shuriken_01|shuriken_0Shape1	from 25098	count 720
+16	shuriken_01_grp1|shuriken_01|shuriken_0Shape1	from 25818	count 720
+17	shuriken_01_grp|shuriken_01|shuriken_0Shape1	from 26538	count 720
+18	robeBackShape	from 27258	count 1812
+19	robeFrontShape	from 29070	count 948
+20	skirtMetalShape	from 30018	count 660
+21	R_ArmGuardShape	from 30678	count 954
+
+=== fitting
+the monster's rig: 71 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  BanditExecutionerRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-37.5,-29.4,-25.1)..(37.5,33,93.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 1140 triangles over 1048 vertices
+    names: 84 bytes said, 84 read  [agree]
+    rig 12 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 11 of 12  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-20)  carrier has (0,-3.8,-139.6)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (11.8,0,0)  carrier has (11.8,-3.8,-119.6)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-11.8,0,0)  carrier has (-11.8,-3.8,-119.6)
+      4 phys_tri_robe_front_jntBnd_1  [its own]  under 0  rests at (-0,-22.6,28)
+      5 phys_tri_L_robe_front_jntBnd_1  [its own]  under 0  rests at (10.2,-18.9,13.8)
+      6 phys_tri_R_robe_front_jntBnd_1  [its own]  under 0  rests at (-10.2,-18.9,13.8)
+      7 phys_tri_L_robe_front_1_jntBnd_1  [its own]  under 0  rests at (18.6,15.6,31.1)
+      8 phys_tri_R_robe_front_1_jntBnd_1  [its own]  under 0  rests at (-18.6,15.6,31.1)
+      9 phys_tri_robe_front_jntBnd_2  [its own]  under 4  rests at (-0,-25,53.6)
+      10 phys_tri_L_robe_front_1_jntBnd_2  [its own]  under 7  rests at (22.5,23.9,61.2)
+      11 phys_tri_R_robe_front_1_jntBnd_2  [its own]  under 8  rests at (-22.5,23.9,61.2)
+  BanditExecutionerSleeve.ao  socket R_elbow_jntBnd [in its carrier's rig]  box (-27.9,-9.8,-9.7)..(24.9,15.9,10.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 318 triangles over 254 vertices
+    names: 30 bytes said, 30 read  [agree]
+    rig 5 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_shoulder_jntBnd  [shared]  under 0  rests at (30.5,10.8,1)  carrier has (-25.3,1.8,-187.1)
+      2 r_arm_roll_02  [shared]  under 0  rests at (15.3,5.4,0.5)  carrier has (-38.7,0.8,-178.1)
+      3 phys_tri_sleeve_jntBnd_1  [its own]  under 0  rests at (-14.1,-1.7,7.4)
+      4 phys_tri_sleeve_jntBnd_2  [its own]  under 3  rests at (-21.6,-3,9.7)

@@ -1,0 +1,544 @@
+monster: Demon Magus [Metadata/Monsters/MetaDemonCaster]
+
+=== .ao Metadata/Monsters/Companions/DemonFireCaster/DemonFireCaster.ao (depth 0)
+version 3
+extends "Metadata/Characters/Character"
+
+AttachedAnimatedObject
+{
+	clear_inherited_attached_objects = true
+	attached_object = "hip_jntBnd Metadata/Monsters/Companions/DemonFireCaster/attachments/DFCRobe.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/CharactersFour/Templar.sm"
+		skin = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/DemonMinion/DemonMinion.sm"
+	}
+	
+	SoundEvents
+	{
+		audio_character_class = "DemonCaster"
+	}
+}
+
+=== .ao Metadata/Characters/Character.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/CharactersFour/OneRig.amd"
+}
+
+Melee
+{
+}
+
+AttachedAnimatedObject
+{
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/CharactersFour/OneRig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "aux_L_shoulder_attachment"
+			parent = "L_shoulder_attachment_jntBnd"
+		socket = "aux_R_shoulder_attachment"
+			parent = "R_shoulder_attachment_jntBnd"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment_jntBnd"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment_jntBnd"
+		socket = "aux_NR_waist_attachment"
+			parent = "root_jntBnd"
+			translation = "0 0 -99.848"
+		socket = "aux_target_head_01"
+			parent = "neck_jntBnd"
+			translation = "0 3.25867 -22.0645"
+		socket = "aux_target_head_02"
+			parent = "neck_jntBnd"
+			translation = "0 -7.4446 -22.0645"
+		socket = "aux_melee_pivot"
+			parent = "chest_jntBnd"
+			ignore_parent_axis = "xy"
+		socket = "aux_melee_direction"
+			parent = "chest_jntBnd"
+			translation = "0 -25 0"
+			ignore_parent_axis = "xy"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "aux_chest_attachment"
+			parent = "chest_jntBnd"
+		socket = "R_Weapon2"
+			parent = "aux_Back_attachment"
+			rotation = "-0 -2.70526 0"
+			translation = "-10 5 0"
+		socket = "L_Weapon2"
+			parent = "aux_Back_attachment"
+			rotation = "-0 2.70526 0"
+			translation = "10 5 0"
+		socket = "sheath_2HMace"
+			parent = "aux_Back_attachment"
+			scale = "0.8 0.8 0.8"
+			rotation = "-0 -2.617 0"
+			translation = "-7.6632 5.852 4.4248"
+		socket = "sheath_Shield"
+			parent = "aux_Back_attachment"
+			rotation = "-0 0 3.14"
+			translation = "12.591 5.196 10"
+		socket = "sheath_2HSword"
+			parent = "aux_Back_attachment"
+			rotation = "-0 -2.671 0"
+			translation = "-23.451 7.315 -21.957"
+		socket = "sheath_Crossbow"
+			parent = "aux_Back_attachment"
+			rotation = "-0 -2.878 1.57"
+			translation = "-6.362 7.315 -12.702"
+		socket = "sheath_Staff"
+			parent = "aux_Back_attachment"
+			rotation = "-0 0.532 0"
+			translation = "23.564 7.315 62.935"
+		socket = "sheath_Spear"
+			parent = "aux_Back_attachment"
+			rotation = "-0 -2.617 0"
+			translation = "-7.025 7.315 4.056"
+		socket = "sheath_Bow"
+			parent = "aux_Back_attachment"
+			rotation = "-0 0.523 3.14"
+			translation = "7.802 7.315 0.313"
+		socket = "sheath_RWeapon"
+			parent = "hip_jntBnd"
+			rotation = "0.778 -3.053 1.515"
+			translation = "-25.65 -8.198 -6.846"
+		socket = "sheath_RClaw"
+			parent = "hip_jntBnd"
+			rotation = "-1.449 -1.498 2.975"
+			translation = "-23.617 -0.023 1.284"
+		socket = "sheath_LWeapon"
+			parent = "hip_jntBnd"
+			rotation = "0.778 3.03 1.52"
+			translation = "25.843 -8.199 -6.826"
+		socket = "sheath_LClaw"
+			parent = "hip_jntBnd"
+			rotation = "1.449 -1.642 2.975"
+			translation = "23.617 -0.023 1.284"
+		socket = "sheath_Flail"
+			parent = "hip_jntBnd"
+			rotation = "-0.204 -0.309 1.242"
+			translation = "-42.331 12.492 50.532"
+		socket = "sheath_LSceptre"
+			parent = "hip_jntBnd"
+			rotation = "0.778 3.03 1.52"
+			translation = "24.431 4.426 5.905"
+		socket = "sheath_RSceptre"
+			parent = "hip_jntBnd"
+			rotation = "0.778 -3.053 1.515"
+			translation = "-24.536 4.426 5.916"
+		socket = "sheath_Buckler"
+			parent = "hip_jntBnd"
+			rotation = "-0.042 0.124 1.897"
+			translation = "20.167 4.223 2.164"
+		socket = "sheath_Focus"
+			parent = "hip_jntBnd"
+			rotation = "-0.042 0.124 1.897"
+			translation = "20.167 4.223 2.164"
+		socket = "aux_STRIKE_POSITION"
+			translation = "0 -65 0"
+		socket = "L_hand_FX"
+			parent = "L_wrist_jntBnd"
+			translation = "7.5 0 0"
+		socket = "R_hand_FX"
+			parent = "R_wrist_jntBnd"
+			rotation = "-0 0 -3.14159"
+			translation = "-7.5 0 0"
+		socket = "sheath_2HOffhand"
+			parent = "aux_Back_attachment"
+			rotation = "-0.00159255 -0.521407 3.14159"
+			translation = "9.579 7.315 5.531"
+		socket = "flask_attachment_01"
+			parent = "spine_1_jntBnd"
+			translation = "-5.327 -15.86 1.464"
+		socket = "flask_attachment_02"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 -1.047"
+			translation = "-14.31 -11.204 1.035"
+		socket = "flask_attachment_03"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 -1.57"
+			translation = "-18.739 -3.342 0.309"
+		socket = "flask_attachment_04"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 -2.09619"
+			translation = "-17.207 5.197 -0.48"
+		socket = "flask_attachment_05"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 -2.62019"
+			translation = "-10.236 11.72 -1.082"
+		socket = "flask_attachment_06"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 3.14"
+			translation = "0 14.165 -1.308"
+		socket = "flask_attachment_07"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 2.617"
+			translation = "10.236 11.72 -1.082"
+		socket = "flask_attachment_08"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 2.093"
+			translation = "17.207 5.197 -0.48"
+		socket = "flask_attachment_09"
+			parent = "spine_1_jntBnd"
+			translation = "18.739 -3.342 0.309"
+		socket = "flask_attachment_10"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 0.523"
+			translation = "14.31 -11.204 1.035"
+		socket = "flask_attachment_11"
+			parent = "spine_1_jntBnd"
+			translation = "5.327 -15.86 1.464"
+		socket = "aux_waist_attachment"
+			parent = "spine_1_jntBnd"
+		socket = "amulet_attachment"
+			parent = "chest_jntBnd"
+			rotation = "0.572 0 0"
+			translation = "0 -10 -10"
+		socket = "left_ring_attachment"
+			parent = "L_finger_3_jntBnd_1"
+			rotation = "-0 0 1.57"
+			translation = "2 0 0"
+		socket = "right_ring_attachment"
+			parent = "R_finger_3_jntBnd_1"
+			rotation = "-0.00159255 3.14159 -1.57159"
+			translation = "-2 0 0"
+		socket = "bug_attachment_01"
+			parent = "head_jntBnd"
+		socket = "bug_attachment_02"
+			parent = "R_clavicle_jntBnd"
+		socket = "bug_attachment_03"
+			parent = "spine_2_jntBnd"
+		socket = "bug_attachment_04"
+			parent = "L_elbow_jntBnd"
+		socket = "bug_attachment_05"
+			parent = "L_clavicle_jntBnd"
+		socket = "arcane_mageblood_attachment"
+			parent = "neck_jntBnd"
+		socket = "R_shoulder_pet_01"
+			parent = "R_shoulder_attachment_jntBnd"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "back_orbsocket_1"
+			parent = "aux_Back_attachment"
+			translation = "0 12.2741 -11.9684"
+		socket = "back_orbsocket_2"
+			parent = "aux_Back_attachment"
+			translation = "0 12.2741 6.48659"
+		socket = "back_orbsocket_3"
+			parent = "aux_Back_attachment"
+			translation = "0 12.2741 23.4886"
+		socket = "back_orbsocket_4"
+			parent = "aux_Back_attachment"
+			translation = "0 12.2741 40.174"
+	    socket = "sheath_Talisman"
+	        parent = "hip_jntBnd"
+	        rotation = "-0.0 0.0 -0.677"
+	        translation = "-14.791 -11.025 -11.267"
+	    socket = "sheath_Talisman2"
+	        parent = "hip_jntBnd"
+	        rotation = "-0.0 0.0 0.677"
+	        translation = "14.791 -11.025 -11.267"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/CharactersFour/Templar.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_2_jntBnd"
+		bone_group = "grp_L_clavicle false L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_clavicle false R_clavicle_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_bicep false L_shoulder_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_bicep false R_shoulder_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_forearm false L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "grp_R_forearm false R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "grp_L_hand false L_wrist_jntBnd L_finger_2_jntBnd_1"
+		bone_group = "grp_R_hand false R_wrist_jntBnd R_finger_2_jntBnd_1"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd R_knee_jntBnd"
+		bone_group = "grp_L_shin false L_knee_jntBnd L_ankle_jntBnd"
+		bone_group = "grp_R_shin false R_knee_jntBnd R_ankle_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_foot_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_foot_jntBnd"
+		bone_group = "fx_melee false aux_melee_pivot aux_melee_direction"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "wand false R_elbow_jntBnd R_thumb_1_jntBnd_1"
+		bone_group = "frameupper false aux_R_shoulder_attachment neck_jntBnd aux_L_shoulder_attachment"
+		bone_group = "lwand false L_elbow_jntBnd L_thumb_1_jntBnd_1"
+		bone_group = "foot1 false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "foot2 false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "body false R_elbow_jntBnd R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd L_shoulder_cTwist_jntBnd_1 L_shoulder_jntBnd L_clavicle_jntBnd chest_jntBnd spine_2_jntBnd spine_1_jntBnd R_thigh_jntBnd R_knee_jntBnd R_ankle_jntBnd R_knee_jntBnd R_thigh_jntBnd L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd"
+		bone_group = "splashfoot1 false R_foot_jntBnd R_ankle_jntBnd"
+		bone_group = "splashfoot2 false L_foot_jntBnd L_ankle_jntBnd"
+		bone_group = "Larmfx false L_thumb_1_jntBnd_1 L_wrist_jntBnd L_elbow_Twist_jntBnd_3 L_elbow_Twist_jntBnd_2 L_elbow_Twist_jntBnd_1 L_elbow_jntBnd"
+		bone_group = "Rarmfx false R_thumb_1_jntBnd_1 R_wrist_jntBnd R_elbow_Twist_jntBnd_3 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_1 R_elbow_jntBnd"
+		bone_group = "bodyfx false R_clavicle_jntBnd L_clavicle_jntBnd chest_jntBnd spine_2_jntBnd spine_1_jntBnd R_thigh_jntBnd L_thigh_jntBnd spine_1_jntBnd"
+		bone_group = "lweaponbuff false L_wrist_jntBnd aux_L_Weapon_attachment_jntBnd"
+		bone_group = "rweaponbuff false R_wrist_jntBnd aux_R_Weapon_attachment_jntBnd"
+		bone_group = "sourcearcgroup false L_finger_2_jntBnd_1 L_finger_1_jntBnd_1"
+		bone_group = "waist_parent_attach false L_thigh_jntBnd R_thigh_jntBnd"
+		bone_group = "shoulder_parent_attach false aux_L_shoulder_attachment aux_R_shoulder_attachment"
+		bone_group = "full_L_arm false L_shoulder_jntBnd L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "full_R_arm false R_shoulder_jntBnd R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "full_L_leg false L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd"
+		bone_group = "full_R_leg false R_thigh_jntBnd R_knee_jntBnd R_ankle_jntBnd"
+		bone_group = "trailfoot_01 false R_foot_jntBnd R_ankle_jntBnd"
+		bone_group = "trailfoot_02 false L_foot_jntBnd L_ankle_jntBnd"
+		bone_group = "head_and_shoulders false aux_R_shoulder_attachment head_jntBnd aux_L_shoulder_attachment"
+		bone_group = "chest_fx false spine_1_jntBnd spine_2_jntBnd chest_jntBnd aux_Back_attachment"
+		bone_group = "wrist_FX_L false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "wrist_FX_R false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "L_upper_arm false L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd"
+		bone_group = "R_upper_arm false R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd"
+		bone_group = "waistfx false spine_1_jntBnd spine_2_jntBnd"
+		bone_group = "upper_body false aux_Back_attachment L_clavicle_jntBnd R_clavicle_jntBnd R_shoulder_attachment_jntBnd L_shoulder_attachment_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd L_elbow_Twist_jntBnd_1 L_elbow_Twist_jntBnd_2 L_elbow_Twist_jntBnd_3 L_wrist_jntBnd L_thumb_1_jntBnd_1 L_thumb_1_jntBnd_2 L_thumb_1_jntBnd_3 aux_L_Weapon_attachment_jntBnd L_finger_1_jntBnd_1 L_finger_1_jntBnd_2 L_finger_1_jntBnd_3 L_finger_2_jntBnd_3 L_finger_2_jntBnd_2 L_finger_2_jntBnd_1 L_finger_3_jntBnd_1 L_finger_3_jntBnd_2 L_finger_3_jntBnd_3 L_finger_4_jntBnd_3 L_finger_4_jntBnd_2 L_finger_4_jntBnd_1 R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 R_wrist_jntBnd R_thumb_1_jntBnd_1 R_thumb_1_jntBnd_2 R_thumb_1_jntBnd_3 aux_R_Weapon_attachment_jntBnd R_finger_1_jntBnd_1 R_finger_1_jntBnd_2 R_finger_1_jntBnd_3 R_finger_2_jntBnd_3 R_finger_2_jntBnd_2 R_finger_2_jntBnd_1 R_finger_3_jntBnd_1 R_finger_3_jntBnd_2 R_finger_3_jntBnd_3 R_finger_4_jntBnd_3 R_finger_4_jntBnd_2 R_finger_4_jntBnd_1 neck_jntBnd head_jntBnd"
+		bone_group = "lower_body false R_foot_jntBnd R_ankle_jntBnd R_knee_jntBnd R_thigh_jntBnd hip_jntBnd L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd L_foot_jntBnd"
+		bone_group = "floating_mask false R_foot_jntBnd aux_R_foot_attachment R_ankle_jntBnd R_knee_jntBnd R_thigh_jntBnd L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd aux_L_foot_attachment L_foot_jntBnd"
+		bone_group = "floating_mask_translation false R_foot_jntBnd aux_R_foot_attachment R_ankle_jntBnd R_knee_jntBnd R_thigh_jntBnd L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd aux_L_foot_attachment L_foot_jntBnd hip_jntBnd root_jntBnd"
+		bone_group = "run_floating_mask_translation false R_foot_jntBnd aux_R_foot_attachment R_ankle_jntBnd R_knee_jntBnd root_jntBnd R_thigh_jntBnd L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd aux_L_foot_attachment L_foot_jntBnd hip_jntBnd head_jntBnd neck_jntBnd chest_jntBnd spine_1_jntBnd spine_2_jntBnd"
+		bone_group = "weapon_swap_mask false aux_Back_attachment L_upperArm_attachment_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd L_elbow_attachment_jntBnd L_elbow_Twist_jntBnd_1 L_elbow_Twist_jntBnd_2 L_elbow_Twist_jntBnd_3 L_wrist_jntBnd L_thumb_1_jntBnd_1 L_thumb_1_jntBnd_2 L_thumb_1_jntBnd_3 L_finger_1_jntBnd_3 L_finger_2_jntBnd_3 L_finger_1_jntBnd_2 L_finger_1_jntBnd_1 L_finger_2_jntBnd_2 L_finger_2_jntBnd_1 aux_L_Weapon_attachment_jntBnd L_finger_3_jntBnd_2 spine_1_jntBnd phys_skinned_L_chest_jntBnd phys_skinned_R_chest_jntBnd L_chest_jntBnd R_chest_jntBnd L_finger_2_jntBnd_1 L_finger_3_jntBnd_2 L_finger_3_jntBnd_1 L_finger_4_jntBnd_1 L_finger_4_jntBnd_2 L_finger_4_jntBnd_2 R_clavicle_jntBnd R_shoulder_attachment_jntBnd R_shoulder_jntBnd R_upperArm_attachment_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd R_elbow_attachment_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 R_wrist_jntBnd R_thumb_1_jntBnd_2 R_thumb_1_jntBnd_3 R_finger_1_jntBnd_2 R_finger_1_jntBnd_3 R_finger_2_jntBnd_2 R_finger_2_jntBnd_3 R_finger_2_jntBnd_2 R_finger_3_jntBnd_2 R_finger_3_jntBnd_3 R_finger_3_jntBnd_2 R_finger_4_jntBnd_2 R_finger_4_jntBnd_3 R_finger_4_jntBnd_2 R_thumb_1_jntBnd_1 R_finger_1_jntBnd_1 R_thumb_1_jntBnd_1 R_finger_2_jntBnd_1 R_finger_3_jntBnd_1 R_finger_4_jntBnd_1 aux_R_Weapon_attachment_jntBnd spine_2_jntBnd chest_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd neck_jntBnd L_clavicle_jntBnd L_finger_4_jntBnd_3 L_shoulder_jntBnd L_shoulder_attachment_jntBnd"
+		bone_group = "weapon_swap_mask_moving false aux_Back_attachment L_upperArm_attachment_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd L_elbow_attachment_jntBnd L_elbow_Twist_jntBnd_1 L_elbow_Twist_jntBnd_2 L_elbow_Twist_jntBnd_3 L_wrist_jntBnd L_thumb_1_jntBnd_1 L_thumb_1_jntBnd_2 L_thumb_1_jntBnd_3 L_finger_1_jntBnd_3 L_finger_2_jntBnd_3 L_finger_1_jntBnd_2 L_finger_1_jntBnd_1 L_finger_2_jntBnd_2 L_finger_2_jntBnd_1 aux_L_Weapon_attachment_jntBnd L_finger_3_jntBnd_2 L_finger_2_jntBnd_1 L_finger_3_jntBnd_2 L_finger_3_jntBnd_1 L_finger_4_jntBnd_1 L_finger_4_jntBnd_2 L_finger_4_jntBnd_2 R_clavicle_jntBnd R_shoulder_attachment_jntBnd R_shoulder_jntBnd R_upperArm_attachment_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd R_elbow_attachment_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 R_wrist_jntBnd R_thumb_1_jntBnd_2 R_thumb_1_jntBnd_3 R_finger_1_jntBnd_2 R_finger_1_jntBnd_3 R_finger_2_jntBnd_2 R_finger_2_jntBnd_3 R_finger_2_jntBnd_2 R_finger_3_jntBnd_2 R_finger_3_jntBnd_3 R_finger_3_jntBnd_2 R_finger_4_jntBnd_2 R_finger_4_jntBnd_3 R_finger_4_jntBnd_2 R_thumb_1_jntBnd_1 R_finger_1_jntBnd_1 R_thumb_1_jntBnd_1 R_finger_2_jntBnd_1 R_finger_3_jntBnd_1 R_finger_4_jntBnd_1 aux_R_Weapon_attachment_jntBnd L_clavicle_jntBnd L_finger_4_jntBnd_3 L_shoulder_jntBnd L_shoulder_attachment_jntBnd"
+		bone_group = "body_and_arms false R_wrist_jntBnd R_elbow_Twist_jntBnd_3 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_1 R_elbow_jntBnd R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd R_thumb_1_jntBnd_3 R_thumb_1_jntBnd_2 R_thumb_1_jntBnd_1 R_finger_1_jntBnd_3 R_finger_1_jntBnd_2 R_finger_1_jntBnd_1 R_finger_2_jntBnd_3 R_finger_2_jntBnd_2 R_finger_2_jntBnd_1 R_finger_3_jntBnd_3 R_finger_3_jntBnd_2 R_finger_3_jntBnd_1 R_finger_4_jntBnd_3 R_finger_4_jntBnd_2 R_finger_4_jntBnd_1 chest_jntBnd L_clavicle_jntBnd head_jntBnd neck_jntBnd spine_2_jntBnd spine_1_jntBnd aux_R_Weapon_attachment_jntBnd hip_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd L_elbow_Twist_jntBnd_1 L_elbow_Twist_jntBnd_2 L_elbow_Twist_jntBnd_3 L_wrist_jntBnd L_thumb_1_jntBnd_3 L_thumb_1_jntBnd_2 L_thumb_1_jntBnd_1 L_finger_1_jntBnd_3 L_finger_1_jntBnd_2 L_finger_1_jntBnd_1 aux_L_Weapon_attachment_jntBnd L_finger_2_jntBnd_3 L_finger_2_jntBnd_2 L_finger_2_jntBnd_1 L_finger_4_jntBnd_3 L_finger_3_jntBnd_2 L_finger_3_jntBnd_1 L_finger_4_jntBnd_2 L_finger_4_jntBnd_1 aux_Back_attachment phys_skinned_R_chest_jntBnd phys_skinned_L_chest_jntBnd"
+		bone_group = "L_fingertips_01 false L_finger_4_jntBnd_2 L_finger_4_jntBnd_3"
+		bone_group = "L_fingertips_02 false L_finger_3_jntBnd_2 L_finger_3_jntBnd_3"
+		bone_group = "L_fingertips_03 false L_finger_2_jntBnd_2 L_finger_2_jntBnd_3"
+		bone_group = "L_fingertips_04 false L_finger_1_jntBnd_2 L_finger_1_jntBnd_3"
+		bone_group = "L_fingertips_05 false L_thumb_1_jntBnd_2 L_thumb_1_jntBnd_3"
+		bone_group = "R_fingertips_01 false R_finger_4_jntBnd_2 R_finger_4_jntBnd_3"
+		bone_group = "R_fingertips_02 false R_finger_3_jntBnd_2 R_finger_3_jntBnd_3"
+		bone_group = "R_fingertips_03 false R_finger_2_jntBnd_2 R_finger_2_jntBnd_3"
+		bone_group = "R_fingertips_04 false R_finger_1_jntBnd_2 R_finger_1_jntBnd_3"
+		bone_group = "R_fingertips_05 false R_thumb_1_jntBnd_2 R_thumb_1_jntBnd_3"
+		bone_group = "right_arm_mask false R_shoulder_attachment_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 R_wrist_jntBnd R_thumb_1_jntBnd_1 R_thumb_1_jntBnd_2 R_thumb_1_jntBnd_3 aux_R_Weapon_attachment_jntBnd R_hand_FX R_Weapon right_ring_attachment R_finger_1_jntBnd_1 R_finger_1_jntBnd_2 R_finger_1_jntBnd_3 R_finger_2_jntBnd_3 R_finger_2_jntBnd_2 R_finger_2_jntBnd_1 R_finger_3_jntBnd_1 R_finger_3_jntBnd_2 R_finger_3_jntBnd_3 R_finger_4_jntBnd_3 R_finger_4_jntBnd_2 R_finger_4_jntBnd_1"
+		bone_group = "back_orb_visuals false back_orbsocket_1 back_orbsocket_2 back_orbsocket_3 back_orbsocket_4"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+		continuous_effect = "this effect runs permanently"
+			shape = "Wake"
+			size = "250.000 100.000 100.000"
+			duration = 5.000
+			is_persistent = true
+			bone_name = "root"
+	}
+	
+	SoundEvents
+	{
+	}
+	
+	AttachedAnimatedObject
+	{
+	}
+	
+	ParticleEffects
+	{
+	}
+	
+	TimelineParameters
+	{
+	}
+	
+	EffectPack
+	{
+	}
+	
+	TrailsEffects
+	{
+	}
+	
+	ScreenShake
+	{
+	}
+	
+	SoundParams
+	{
+	}
+	
+	AnimationController
+	{
+		on_event_mount_start = { game_object.target.PlayAdditiveAnimation( mount_01_additive, 2, '', true ); }
+	}
+}
+
+=== .ao Metadata/Monsters/Companions/DemonFireCaster/attachments/DFCRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/DemonMinion/attachments/DemonMinionDefault/Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/DemonMinion/attachments/DemonMinionDefault/Robe/rig.ast"
+		linear_allowed_contraction = 0.400
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.500
+		enclosure_radius = 1.000
+		enclosure_angle = 0.700
+	    attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/DemonMinion/attachments/DemonMinionDefault/Robe/DMRobe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/DemonMinion/DemonMinion.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/DemonMinion/DemonMinion_armour_abe4233b.smd"
+Materials 1
+	"Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/DemonMinion/Textures/DemonMinionSummonc.mat" 3
+BoundingBox -75.6605 -18.8748 -200.624 75.6605 23.6655 0.891358
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/DemonMinion/DemonMinion_armour_abe4233b.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 3 in the header, 3 in the block · 10776 triangles over 7838 vertices
+  names: 88 bytes said, 88 read  [agree]
+
+=== shapes (6)
+0	body_meshShape	from 0	count 22956
+1	eyes_meshShape	from 22956	count 1920
+2	spikes_meshShape	from 24876	count 7452
+3	body_chain_meshShape	from 32328	count 5652
+4	robe_chains_meshShape	from 37980	count 4176
+5	robe_meshShape	from 42156	count 3666
+
+=== fitting
+the monster's rig: 87 bones
+mounts: aux_position, aux_camera_position, aux_L_Weapon_attachment_jntBnd_02, aux_R_Weapon_attachment_jntBnd_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_Head_attachment, aux_L_Weapon_attachment_jntBnd, aux_R_Weapon_attachment_jntBnd
+  DFCRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-45.6,-14.6,-21.6)..(48.4,35,89.1)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 4498 triangles over 7386 vertices
+    names: 110 bytes said, 110 read  [agree]
+    rig 65 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 64 of 65  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-13.4)  carrier has (0,0,-113.2)
+      2 phys_skinned_L_robe_jntBnd_01  [its own]  under 0  rests at (13.3,-6,-0.6)
+      3 phys_skinned_L_robe_jntBnd_07  [its own]  under 0  rests at (17.2,2.5,-0.7)
+      4 phys_skinned_L_robe_jntBnd_13  [its own]  under 0  rests at (13.3,11.7,-0.9)
+      5 phys_skinned_R_robe_jntBnd_01  [its own]  under 0  rests at (-13.3,-6,-0.6)
+      6 phys_skinned_R_robe_jntBnd_07  [its own]  under 0  rests at (-17.2,2.5,-0.7)
+      7 phys_skinned_R_robe_jntBnd_13  [its own]  under 0  rests at (-13.3,11.7,-0.9)
+      8 phys_L_F_chain_jntBnd_1  [its own]  under 0  rests at (8.1,-9.8,-1.8)
+      9 phys_M_F_chain_jntBnd_1  [its own]  under 0  rests at (0.4,-11.1,-1.7)
+      10 phys_R_F_chain_jntBnd_1  [its own]  under 0  rests at (-7.9,-9.8,-2.3)
+      11 phys_R_B_chain_jntBnd_1  [its own]  under 0  rests at (-8.8,14.8,-1)
+      12 phys_L_B_chain_jntBnd_1  [its own]  under 0  rests at (8.5,13.7,-4.5)
+      13 phys_M_B_chain_jntBnd_1  [its own]  under 0  rests at (-0.7,13.9,-2.5)
+      14 spine_2_jntBnd  [shared]  under 1  rests at (0,0,-25.7)  carrier has (0,0,-125.5)
+      15 phys_skinned_L_robe_jntBnd_02  [its own]  under 2  rests at (16.3,-5.9,16.1)
+      16 phys_skinned_L_robe_jntBnd_08  [its own]  under 3  rests at (21.1,4,15.7)
+      17 phys_skinned_L_robe_jntBnd_14  [its own]  under 4  rests at (16.3,14.9,15.3)
+      18 phys_skinned_R_robe_jntBnd_02  [its own]  under 5  rests at (-16.3,-5.9,16.1)
+      19 phys_skinned_R_robe_jntBnd_08  [its own]  under 6  rests at (-21.1,4,15.7)
+      20 phys_skinned_R_robe_jntBnd_14  [its own]  under 7  rests at (-16.3,14.9,15.3)
+      21 phys_L_F_chain_jntBnd_2  [its own]  under 8  rests at (8.2,-10,8.3)
+      22 phys_M_F_chain_jntBnd_2  [its own]  under 9  rests at (0.4,-11,8.6)
+      23 phys_R_F_chain_jntBnd_2  [its own]  under 10  rests at (-7.9,-10,6.8)
+      24 phys_R_B_chain_jntBnd_2  [its own]  under 11  rests at (-8.8,15.8,5.4)
+      25 phys_L_B_chain_jntBnd_2  [its own]  under 12  rests at (8.5,14.5,0.4)
+      26 phys_M_B_chain_jntBnd_2  [its own]  under 13  rests at (-0.5,15.3,6.4)
+      27 phys_skinned_L_robe_jntBnd_03  [its own]  under 15  rests at (19.3,-5.9,32.9)
+      28 phys_skinned_L_robe_jntBnd_09  [its own]  under 16  rests at (25,5.6,32.2)
+      29 phys_skinned_L_robe_jntBnd_15  [its own]  under 17  rests at (19.3,18.1,31.5)
+      30 phys_skinned_R_robe_jntBnd_03  [its own]  under 18  rests at (-19.3,-5.9,32.9)
+      31 phys_skinned_R_robe_jntBnd_09  [its own]  under 19  rests at (-25,5.6,32.2)
+      32 phys_skinned_R_robe_jntBnd_15  [its own]  under 20  rests at (-19.3,18.1,31.5)
+      33 phys_L_F_chain_jntBnd_3  [its own]  under 21  rests at (8.3,-10.2,18.4)
+      34 phys_M_F_chain_jntBnd_3  [its own]  under 22  rests at (0.4,-10.9,18.9)
+      35 phys_R_F_chain_jntBnd_3  [its own]  under 23  rests at (-7.9,-10.2,15.9)
+      36 phys_R_B_chain_jntBnd_3  [its own]  under 24  rests at (-8.9,16.9,11.8)
+      37 phys_L_B_chain_jntBnd_3  [its own]  under 25  rests at (8.6,15.3,5.3)
+      38 phys_M_B_chain_jntBnd_3  [its own]  under 26  rests at (-0.3,16.8,15.2)
+      39 phys_skinned_L_robe_jntBnd_04  [its own]  under 27  rests at (22.3,-5.8,49.6)
+      40 phys_skinned_L_robe_jntBnd_10  [its own]  under 28  rests at (28.9,7.2,48.7)
+      41 phys_skinned_L_robe_jntBnd_16  [its own]  under 29  rests at (22.3,21.3,47.6)
+      42 phys_skinned_R_robe_jntBnd_04  [its own]  under 30  rests at (-22.3,-5.8,49.6)
+      43 phys_skinned_R_robe_jntBnd_10  [its own]  under 31  rests at (-28.9,7.2,48.7)
+      44 phys_skinned_R_robe_jntBnd_16  [its own]  under 32  rests at (-22.3,21.3,47.6)
+      45 phys_L_F_chain_jntBnd_4  [its own]  under 33  rests at (8.3,-10.5,28.5)
+      46 phys_M_F_chain_jntBnd_4  [its own]  under 34  rests at (0.4,-10.8,29.2)
+      47 phys_R_F_chain_jntBnd_4  [its own]  under 35  rests at (-7.9,-10.5,25.1)
+      48 phys_R_B_chain_jntBnd_4  [its own]  under 36  rests at (-9,17.9,18.2)
+      49 phys_L_B_chain_jntBnd_4  [its own]  under 37  rests at (8.7,16.1,10.2)
+      50 phys_M_B_chain_jntBnd_4  [its own]  under 38  rests at (-0.1,18.3,24.1)
+      51 phys_skinned_L_robe_jntBnd_05  [its own]  under 39  rests at (25.3,-5.7,66.3)
+      52 phys_skinned_L_robe_jntBnd_11  [its own]  under 40  rests at (32.8,8.7,65.1)
+      53 phys_skinned_L_robe_jntBnd_17  [its own]  under 41  rests at (25.3,24.5,63.8)
+      54 phys_skinned_R_robe_jntBnd_05  [its own]  under 42  rests at (-25.3,-5.7,66.3)
+      55 phys_skinned_R_robe_jntBnd_11  [its own]  under 43  rests at (-32.8,8.7,65.1)
+      56 phys_skinned_R_robe_jntBnd_17  [its own]  under 44  rests at (-25.3,24.5,63.8)
+      57 phys_L_F_chain_jntBnd_5  [its own]  under 45  rests at (8.4,-10.7,38.7)
+      58 phys_R_F_chain_jntBnd_5  [its own]  under 47  rests at (-7.9,-10.7,34.2)
+      59 phys_skinned_L_robe_jntBnd_06  [its own]  under 51  rests at (28.3,-5.7,83.1)
+      60 phys_skinned_L_robe_jntBnd_12  [its own]  under 52  rests at (36.7,10.3,81.6)
+      61 phys_skinned_L_robe_jntBnd_18  [its own]  under 53  rests at (28.3,27.7,80)
+      62 phys_skinned_R_robe_jntBnd_06  [its own]  under 54  rests at (-28.3,-5.7,83.1)
+      63 phys_skinned_R_robe_jntBnd_12  [its own]  under 55  rests at (-36.7,10.3,81.6)
+      64 phys_skinned_R_robe_jntBnd_18  [its own]  under 56  rests at (-28.3,27.7,80)
