@@ -1,0 +1,720 @@
+monster: Bloodthief Wasp [Metadata/Monsters/PlagueSwarm/BloodDroneSacEmerge]
+
+=== .ao Metadata/Monsters/PlagueSwarm/BloodDrone.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/PlagueSwarm/rig.amd"
+	view_of = "attack_01"
+		view_name = "dash_attach_TEMP"
+		view_exclude_event = "StandardEvent"
+	animations = '[
+		{
+			"name": "attach_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8028169870376587,
+					"name": "hit_ground"
+				}
+			]
+		},
+		{
+			"name": "dash_attach_TEMP",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3992899954319,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.467070996761322,
+					"name": "hit_ground"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "abdomen_02_jntBnd Metadata/Monsters/PlagueSwarm/attachments/BloodSack.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.391061007976532,
+								0.0
+							],
+							[
+								0.4748600125312805,
+								1.0
+							]
+						],
+						"width": 69.36399841308594,
+						"length": 98.26599884033203,
+						"local_offset": [
+							0.0,
+							50.0
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "abdomen_04_jntBnd"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/PlagueSwarm/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/PlagueSwarm/PlagueSwarm.sm"
+			bodyShape = "Art/Models/MONSTERS/PlagueSwarm/textures/BloodDrone01c.mat:0"
+			HornsShape = "Art/Models/MONSTERS/PlagueSwarm/textures/BloodDrone01c.mat:0"
+			legsShape = "Art/Models/MONSTERS/PlagueSwarm/textures/BloodDrone01c.mat:0"
+			shellShape = "Art/Models/MONSTERS/PlagueSwarm/textures/BloodDrone01c.mat:0"
+			wingsShape = "Art/Models/MONSTERS/PlagueSwarm/textures/BloodDrone01c.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "parent_attach false abdomen_02_jntBnd abdomen_03_jntBnd abdomen_04_jntBnd"
+		bone_group = "root false cog_jntBnd abdomen_02_jntBnd"
+		bone_group = "frameupper false cog_jntBnd abdomen_01_jntBnd abdomen_02_jntBnd"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attach_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10956700146198273,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42354801297187807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Attack",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5666379928588867,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Swish",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6762049794197083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Attach_Stab",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Attack",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21913300454616548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Swish",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25919899344444277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Death",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1899999976158142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Fall",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Death",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.036475107073783877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "front_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8636695146560669,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Fall",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_explode_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Death",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08854459971189499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Flinch",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7300000190734863,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Fall",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Death",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1899999976158142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Fall",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "detach_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Buzz",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0678647980093956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Swish",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1251019984483719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "detach_stun_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Buzz",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.021795600652694703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Flinch",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04222799837589264,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Swish",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10420999675989151,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_swarmhost_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Emerge",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05000000074505806,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Buzz",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20000000298023225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Buzz",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32600200176239016,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_swarmhost_death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Emerge",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05000000074505806,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Buzz",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20000000298023225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Buzz",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32600200176239016,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_swarmhost_live_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Emerge",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06666669994592667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Buzz",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2666670083999634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Buzz",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43466898798942568,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Flinch",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.029999999329447748,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Flinch",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02500000037252903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Flinch",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02500000037252903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_large_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Flinch",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.029999999329447748,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Flinch",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02500000037252903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Flinch",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02500000037252903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/Flinch",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.029999999329447748,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Idle_Loop",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.016299916431307794,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/KnockdownA",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2571320533752442,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4282801151275635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/KnockdownB",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.016299916431307794,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/KnockdownA",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2571320533752442,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Wing_Flutter",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4282801151275635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Vocal/KnockdownB",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Run_Loop",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/BloodDrone/Buzz",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/PlagueSwarm/attachments/BloodSack.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/PlagueSwarm/attachments/BloodSack/rig.amd"
+	default_animation = "idle_01"
+}
+
+BaseAnimationEvents
+{
+	attach_bone_override = "abdomen_02_jntBnd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/PlagueSwarm/attachments/BloodSack/rig.ast"
+		linear_allowed_contraction = 0.400
+		enclosure_radius = 1.000
+		enclosure_angle = 0.400
+		attachment_groups = "parent_attach attach_group"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/PlagueSwarm/attachments/BloodSack/BloodSack.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "attach_group false root_jntBnd abdomen_03_jntBnd abdomen_04_jntBnd "
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/PlagueSwarm/PlagueSwarm.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/PlagueSwarm/rig_7d894c72.smd"
+Materials 2
+	"Art/Models/MONSTERS/PlagueSwarm/textures/PlagueSwarmc.mat" 4
+	"Art/Models/MONSTERS/PlagueSwarm/textures/PlagueSwarm_proxyc.mat" 1
+BoundingBox -18.9444 -18.464 -12.748 18.9444 50.1474 -0.160215
+BoneGroups 28
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_chest" 2 "cog_jntBnd" "head_jntBnd"
+	"grp_waist" 2 "cog_jntBnd" "abdomen_01_jntBnd"
+	"grp_body_abdomen_01" 2 "abdomen_01_jntBnd" "abdomen_02_jntBnd"
+	"grp_body_abdomen_02" 2 "abdomen_02_jntBnd" "abdomen_03_jntBnd"
+	"grp_body_abdomen_03" 2 "abdomen_03_jntBnd" "abdomen_04_jntBnd"
+	"grp_l_wing_01" 2 "L_wing_01_jntBnd" "L_wing_02_jntBnd"
+	"grp_l_wing_02" 2 "L_wing_02_jntBnd" "L_wing_03_jntBnd"
+	"grp_r_wing_01" 2 "R_wing_01_jntBnd" "R_wing_02_jntBnd"
+	"grp_r_wing_02" 2 "R_wing_02_jntBnd" "R_wing_03_jntBnd"
+	"grp_l_thigh_01" 2 "front_L_hip_jntBnd" "front_L_thigh_jntBnd"
+	"grp_l_shin_01" 2 "front_L_thigh_jntBnd" "front_L_knee_jntBnd"
+	"grp_l_foot_01" 2 "front_L_knee_jntBnd" "front_L_foot_jntBnd"
+	"grp_l_thigh_02" 2 "mid_L_hip_jntBnd" "mid_L_thigh_jntBnd"
+	"grp_l_shin_02" 2 "mid_L_thigh_jntBnd" "mid_L_knee_jntBnd"
+	"grp_l_foot_02" 2 "mid_L_knee_jntBnd" "mid_L_foot_jntBnd"
+	"grp_l_thigh_03" 2 "back_L_hip_jntBnd" "back_L_thigh_jntBnd"
+	"grp_l_shin_03" 2 "back_L_thigh_jntBnd" "back_L_knee_jntBnd"
+	"grp_l_foot_03" 2 "back_L_knee_jntBnd" "back_L_foot_jntBnd"
+	"grp_r_thigh_01" 2 "front_R_hip_jntBnd" "front_R_thigh_jntBnd"
+	"grp_r_shin_01" 2 "front_R_thigh_jntBnd" "front_R_knee_jntBnd"
+	"grp_r_foot_01" 2 "front_R_knee_jntBnd" "front_R_foot_jntBnd"
+	"grp_r_thigh_02" 2 "mid_R_hip_jntBnd" "mid_R_thigh_jntBnd"
+	"grp_r_shin_02" 2 "mid_R_thigh_jntBnd" "mid_R_knee_jntBnd"
+	"grp_r_foot_02" 2 "mid_R_knee_jntBnd" "mid_R_foot_jntBnd"
+	"grp_r_thigh_03" 2 "back_R_hip_jntBnd" "back_R_thigh_jntBnd"
+	"grp_r_shin_03" 2 "back_R_thigh_jntBnd" "back_R_knee_jntBnd"
+	"grp_r_foot_03" 2 "back_R_knee_jntBnd" "back_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/PlagueSwarm/rig_7d894c72.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 5 in the header, 5 in the block · 1618 triangles over 1231 vertices
+  names: 96 bytes said, 96 read  [agree]
+
+=== shapes (6)
+0	bodyShape	from 0	count 1632
+1	HornsShape	from 1632	count 384
+2	legsShape	from 2016	count 1512
+3	shellShape	from 3528	count 930
+4	wingsShape	from 4458	count 396
+5	blood_sackShape	from 4854	count 984
+
+=== fitting
+the monster's rig: 45 bones
+mounts: aux_position, aux_head_jntBnd
+  BloodSack.ao  socket abdomen_02_jntBnd [in its carrier's rig]  box (-5.6,-0.9,0.1)..(5.6,19,15.4)
+    version 3 · c0h 1 · 2 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 328 triangles over 220 vertices
+    names: 30 bytes said, 30 read  [agree]
+    rig 4 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 abdomen_03_jntBnd  [shared]  under 0  rests at (0,5.5,1.2)  carrier has (-0,15.7,-6.4)
+      2 phys_skinned_sack_jntBnd  [its own]  under 0  rests at (0,11.4,9.5)
+      3 abdomen_04_jntBnd  [shared]  under 1  rests at (0,10.6,3.2)  carrier has (-0,20.9,-4.4)

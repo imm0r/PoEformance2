@@ -1,0 +1,1651 @@
+monster: Bloated Anchorman [Metadata/Monsters/Anchorman/BloatedAnchorman]
+
+=== .ao Metadata/Monsters/Anchorman/AnchormanGreen.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Anchorman/rig.amd"
+	view_of = "throw_anchor_retract_01"
+		view_name = "throw_anchor_retract_01_01"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.1836299896240235,
+					"name": "contact",
+					"position": [
+						10.001399993896485,
+						-163.5500030517578,
+						-228.38699340820313
+					],
+					"contact_ref": [
+						10.001399993896485,
+						-115.50499725341797,
+						-228.51300048828126
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.658536970615387,
+					"name": "pull"
+				}
+			]
+		},
+		{
+			"name": "combo_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.6659998893737795,
+					"name": "move",
+					"position": [
+						0.0,
+						-224.96099853515626,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 5 Away 1.000000"
+				}
+			]
+		},
+		{
+			"name": "slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.5924466848373414,
+					"name": "contact",
+					"position": [
+						13.418987274169922,
+						-169.62216186523438,
+						0.0
+					],
+					"contact_ref": [
+						10.288012504577637,
+						-134.0237579345703,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "throw_anchor_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "pickup",
+					"position": [
+						27.75510025024414,
+						-351.60198974609377,
+						0.0
+					]
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.26600000262260439,
+					"end_time": 0.5666000247001648,
+					"name": "move",
+					"position": [
+						0.0,
+						119.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 5 Away 1.000000"
+				}
+			]
+		},
+		{
+			"name": "throw_anchor_retract_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "pull"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3708299994468689,
+					"name": "stop_pull"
+				}
+			]
+		},
+		{
+			"name": "throw_anchor_start_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.39899998903274538,
+					"end_time": 0.7011501789093018,
+					"name": "move",
+					"position": [
+						0.0,
+						-119.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 5 Away 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5064385533332825,
+					"name": "contact",
+					"position": [
+						-75.5927963256836,
+						-235.54600524902345,
+						-1.3172173500061036
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Anchorman/AnchormanWeapon.ao"
+	attached_object = "<root> Metadata/Monsters/Anchorman/attachments/Drawstrings.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.36312800645828249,
+								0.0
+							],
+							[
+								0.4133858382701874,
+								0.5124759674072266
+							],
+							[
+								0.4527558982372284,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 3,
+						"angle": 3.141590118408203,
+						"x_axis_scale": 0.9210000038146973,
+						"length": 139.1199951171875,
+						"local_offset": [
+							-12.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.8500490188598633
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_finger_2_jntBnd_2"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.40782099962234499,
+								0.0
+							],
+							[
+								0.4645669162273407,
+								0.5072758197784424
+							],
+							[
+								0.5196850299835205,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 3,
+						"angle": 3.141590118408203,
+						"x_axis_scale": 0.8820000290870667,
+						"length": 144.50900268554688,
+						"offset": [
+							26.0,
+							0.0
+						],
+						"local_offset": [
+							9.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.26179900765419009,
+							1.483530044555664
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_finger_3_jntBnd_3"
+					}
+				]
+			}
+		},
+		{
+			"name": "combo_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.34645670652389529,
+								0.0
+							],
+							[
+								0.36614173650741579,
+								0.27063339948654177
+							],
+							[
+								0.3937007784843445,
+								0.5897310972213745
+							],
+							[
+								0.4133858382701874,
+								0.850287914276123
+							],
+							[
+								0.4291338622570038,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 10,
+						"rotation": 0.645771861076355,
+						"angle": 3.07177996635437,
+						"x_axis_scale": 0.8289999961853027,
+						"length": 293.2359924316406,
+						"offset": [
+							-25.0,
+							0.0
+						],
+						"local_offset": [
+							10.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.5061450004577637,
+							2.775073766708374
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "aux_target_R_weapon_02"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6521739363670349,
+								0.0
+							],
+							[
+								0.6856187582015991,
+								0.3205374479293823
+							],
+							[
+								0.7023411393165588,
+								0.5777351260185242
+							],
+							[
+								0.7257525324821472,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 10,
+						"rotation": -0.12217305600643158,
+						"angle": 3.4208455085754396,
+						"x_axis_scale": 0.8679999709129334,
+						"length": 233.33299255371095,
+						"local_offset": [
+							-62.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.5585049986839294,
+							-1.71042001247406
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "aux_target_L_weapon_02"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Anchorman/rig.ast"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 -3.79935 -11.1725"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -11.4998 -9.24704"
+		socket = "aux_target_weapon_01"
+			parent = "R_Weapon"
+			translation = "9.80104 0.143219 -116.301"
+		socket = "aux_target_R_weapon_01"
+			parent = "R_Weapon"
+			translation = "-14.7961 0.143219 -116.241"
+		socket = "aux_target_R_weapon_02"
+			parent = "R_Weapon"
+			translation = "-36.2517 0.143219 -95.1517"
+		socket = "aux_target_L_weapon_01"
+			parent = "R_Weapon"
+			translation = "35.1497 0.143219 -110.986"
+		socket = "aux_target_L_weapon_02"
+			parent = "R_Weapon"
+			translation = "50.3949 0.143219 -92.4403"
+		linear_allowed_contraction = 0.100
+		enclosure_angle = 0.100
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Anchorman/Anchorman.sm"
+			bodyShape = "Art/Models/MONSTERS/3.15Monsters/Textures/Anchormanc.mat:0"
+			legsShape = "Art/Models/MONSTERS/3.15Monsters/Textures/Anchormanc.mat:0"
+			ropeShape = "Art/Models/MONSTERS/3.15Monsters/Textures/Anchormanc.mat:0"
+			seaweedShape = "Art/Models/MONSTERS/3.15Monsters/Textures/Anchormanc.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd aux_target_head_01"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false phys_tri_belly_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder false L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder false R_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow false L_elbow_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_elbow false R_elbow_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_wrist false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_wrist false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_hand false L_finger_2_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "grp_R_hand false R_finger_2_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_R_weapon false saw_jntBnd aux_target_weapon_01"
+		bone_group = "grp_R_weapon_blade_01_01 false aux_target_R_weapon_02 aux_target_R_weapon_01"
+		bone_group = "grp_R_weapon_blade_01_02 false aux_target_R_weapon_01 aux_target_weapon_01"
+		bone_group = "grp_R_weapon_blade_02_01 false aux_target_L_weapon_02 aux_target_L_weapon_01"
+		bone_group = "grp_R_weapon_blade_02_02 false aux_target_L_weapon_01 aux_target_weapon_01"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_L_knee false L_knee_jntBnd L_thigh_jntBnd"
+		bone_group = "grp_R_knee false R_knee_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd head_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "melee_trail false saw_jntBnd aux_target_weapon_01"
+		bone_group = "melee_trail_low false R_Weapon aux_target_R_weapon_02"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.009843120351433754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5560759902000427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Attack1A",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6767140030860901,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8853330016136169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Swish",
+						"bone_name": "aux_target_R_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8853330016136169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "aux_target_R_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2182600498199463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2476199865341187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.293450117111206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.314610004425049,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Attack1B",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.40664005279541,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4143900871276857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/SwishSoft",
+						"bone_name": "aux_target_R_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.592940092086792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6920900344848635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06229399889707565,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2742629945278168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Attack2",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31310370564460757,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/SwishSoft",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37487199902534487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.453901469707489,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1433749943971634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3203519880771637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Attack3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5009350180625916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5116919875144959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/SwishSoft",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5116919875144959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "aux_target_R_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.008437709882855416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4766789972782135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Attack1A",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5800920128822327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7529100179672241,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Swish",
+						"bone_name": "aux_target_R_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8968430161476135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "aux_target_R_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0694799423217774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.205180048942566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "aux_target_R_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6192400455474854,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Attack1B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6428600549697877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/SwishSoft",
+						"bone_name": "aux_target_R_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9285800457000733,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "aux_target_R_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9659899473190308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0630199909210207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0821499824523927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/DeathBuild",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21028399467468263,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22424200177192689,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "aux_target_R_weapon_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4624670147895813,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8924210071563721,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/AnchorImpactSoft",
+						"bone_name": "aux_target_R_weapon_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.337499976158142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02710220031440258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02154270000755787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02223760075867176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.024322399869561197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.024322399869561197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovement.loop.ogg",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7501749992370606,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9234020113945007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellMedium",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9547780156135559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/KnockdownA",
+						"bone_name": "aux_head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.055881109088659289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.219813272356987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26431533694267275,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "aux_target_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5043582320213318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1981014013290406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4173272848129273,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "aux_target_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5710583925247193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/KnockdownB",
+						"bone_name": "aux_head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9661952257156373,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/KnockdownA",
+						"bone_name": "aux_head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.055881109088659289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.219813272356987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26431533694267275,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "aux_target_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5043582320213318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1981014013290406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4173272848129273,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "aux_target_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5710583925247193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/KnockdownB",
+						"bone_name": "aux_head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9661952257156373,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3063110113143921,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37605300545692446,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Walk.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5885829925537109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "saw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7668390274047852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29965999722480776,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Slam1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5897250175476074,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "aux_target_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6673409938812256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Swish",
+						"bone_name": "aux_target_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0757700204849244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1832599639892579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "aux_target_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1997599601745606,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2526299953460694,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Swish",
+						"bone_name": "aux_target_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2648899555206299,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/SwishSoft"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.317370057106018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Slam2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4313299655914307,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.460960030555725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/Slam",
+						"bone_name": "aux_target_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0530200004577638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "aux_target_weapon_01"
+					}
+				]
+			},
+			{
+				"name": "throw_anchor_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14150899648666383,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3103179931640625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/AnchorEndA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5018870234489441,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.139799952507019,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/AnchorEndB",
+						"bone_name": "R_shoulder_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "throw_anchor_retract_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "saw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.033608999103307727,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04755000025033951,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/AnchorPull",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5840510129928589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "throw_anchor_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22356300055980683,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Swish",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2711769938468933,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Attack2",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2989940047264099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5480179786682129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainLong",
+						"bone_name": "aux_target_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6425679922103882,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8720909953117371,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "aux_target_weapon_01"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6448929905891419,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/Walk.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.714372992515564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0093599557876588,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainIdle",
+						"bone_name": "saw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5063400268554688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "throw_anchor_retract_01_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Effects/ChainShort",
+						"bone_name": "saw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.033608999103307727,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/ShellShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04755000025033951,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Vocals/AnchorPull",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5840510129928589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_1/Anchorman/Foley/FatMovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.9324169754981995,
+						"end_time": 1.315956950187683,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Anchorman/pet/melee_swipe.trl",
+						"bone_group": "melee_trail"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5589839816093445,
+						"end_time": 0.8117729425430298,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Anchorman/pet/melee_swipe_hand.trl",
+						"bone_group": "grp_L_hand"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6018700003623962,
+						"end_time": 0.9216099977493286,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Anchorman/pet/melee_swipe_hand.trl",
+						"bone_group": "grp_L_hand"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.48337501287460329,
+						"end_time": 1.3494179248809815,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Anchorman/pet/melee_swipe.trl",
+						"bone_group": "melee_trail_low"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.4241000413894654,
+						"end_time": 2.2306571006774904,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Anchorman/pet/melee_swipe.trl",
+						"bone_group": "melee_trail"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.3157399892807007,
+						"end_time": 1.6062439680099488,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Anchorman/pet/melee_swipe.trl",
+						"bone_group": "melee_trail"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.24526003003120423,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Anchorman/pet/death.pet",
+						"bone_groups": [
+							"grp_R_weapon_blade_01_02",
+							"grp_R_weapon_blade_02_02"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.480028748512268,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Anchorman/pet/death_chest.pet",
+						"bone_group": "root"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Anchorman/AnchormanWeapon.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Anchorman/attachments/Anchor/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Anchorman/attachments/Anchor/rig.ast"
+		linear_allowed_contraction = 0.300
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_angle = 0.600
+		animation_velocity_factor = 10.000
+		animation_force_factor = 3.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Anchorman/attachments/Anchor/AnchormanWeapon.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Anchorman/attachments/Drawstrings.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Anchorman/attachments/Drawstrings/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Anchorman/attachments/Drawstrings/rig.ast"
+		linear_allowed_contraction = 0.150
+		enclosure_angle = 0.250
+		attachment_bones = "hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Anchorman/attachments/Drawstrings/Drawstrings.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/Anchorman/Anchorman.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/Anchorman/rig_7510ca75.smd"
+Materials 1
+	"Art/Models/MONSTERS/3.15Monsters/Textures/Anchorman2c.mat" 4
+BoundingBox -93.8218 -43.9054 -181.064 93.4339 35.2446 -0.0778421
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/Anchorman/rig_7510ca75.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 4 in the header, 4 in the block · 12236 triangles over 8916 vertices
+  names: 78 bytes said, 78 read  [agree]
+
+=== shapes (9)
+0	bodyShape	from 0	count 25452
+1	legsShape	from 25452	count 4428
+2	ropeShape	from 29880	count 5376
+3	seaweedShape	from 35256	count 1452
+4	AnchormanWeaponChainShape	from 36708	count 2760
+5	AnchormanWeaponSeaweed2Shape	from 39468	count 3330
+6	AnchormanWeaponShape	from 42798	count 3996
+7	drawstringsShape	from 46794	count 1200
+8	rope_endsShape	from 47994	count 1644
+
+=== fitting
+the monster's rig: 70 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  AnchormanWeapon.ao  socket <root> [NOT in its carrier's rig]  box (-69.6,-12.8,-137.6)..(69.6,12.8,335.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 3362 triangles over 4076 vertices
+    names: 146 bytes said, 146 read  [agree]
+    rig 16 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 15 of 16  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,0,0)  carrier has (0,0,0)
+      1 chain_ring_jntBnd_1  [its own]  under 0  rests at (0,-0.1,55.1)
+      2 phys_tri_1_jntBnd  [its own]  under 0  rests at (-33.7,0,-111.6)
+      3 phys_tri_2_jntBnd  [its own]  under 0  rests at (9.2,0,-37.9)
+      4 chain_jntBnd_1  [its own]  under 1  rests at (0,0,72.3)
+      5 chain_jntBnd_2  [its own]  under 4  rests at (-0,0,91.3)
+      6 chain_jntBnd_3  [its own]  under 5  rests at (-0,0,114.7)
+      7 chain_jntBnd_4  [its own]  under 6  rests at (-0,0,138.1)
+      8 chain_jntBnd_5  [its own]  under 7  rests at (-0,0,161.5)
+      9 chain_jntBnd_6  [its own]  under 8  rests at (-0,0,184.9)
+      10 chain_jntBnd_7  [its own]  under 9  rests at (-0,-0,208.3)
+      11 chain_jntBnd_8  [its own]  under 10  rests at (-0,-0,231.7)
+      12 chain_jntBnd_9  [its own]  under 11  rests at (-0,-0,255.1)
+      13 chain_jntBnd_10  [its own]  under 12  rests at (-0,-0,278.5)
+      14 chain_jntBnd_11  [its own]  under 13  rests at (-0,-0,301.8)
+      15 chain_jntBnd_12  [its own]  under 14  rests at (-0,-0,325.2)
+  Drawstrings.ao  socket <root> [NOT in its carrier's rig]  box (-50.4,-28.7,-2.6)..(12.2,-6.4,47.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 948 triangles over 682 vertices
+    names: 60 bytes said, 60 read  [agree]
+    rig 5 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_thigh_jntBnd  [shared]  under 0  rests at (14.8,-0.9,-2.7)  carrier has (14.8,0.6,-90.1)
+      2 R_thigh_jntBnd  [shared]  under 0  rests at (-14.8,-0.9,-2.7)  carrier has (-14.8,0.6,-90.1)
+      3 phys_tri_drawstring_front_jntBnd  [its own]  under 0  rests at (0,-24.3,37.4)
+      4 phys_tri_rope_end_jntBnd  [its own]  under 0  rests at (-41.7,-10.4,20.5)

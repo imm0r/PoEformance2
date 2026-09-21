@@ -1,0 +1,5222 @@
+monster: Oloton, the Remorseless [Metadata/Monsters/BlackJawSuperunique/BlackJawMap]
+
+=== .ao Metadata/Monsters/BlackJawSuperunique/BlackJawSuperunique.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/BlackJawSuperunique/rig.amd"
+	animations = '[
+		{
+			"name": "emerge_statue_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 4.271590232849121,
+					"name": "addemissiveepk",
+					"contact_ref": [
+						77.9999008178711,
+						0.9514470100402832,
+						-125.74199676513672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.399040222167969,
+					"name": "breathstart",
+					"position": [
+						64.10420227050781,
+						-68.09549713134766,
+						-121.53299713134766
+					],
+					"contact_ref": [
+						77.9999008178711,
+						0.9514470100402832,
+						-125.74199676513672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.40500020980835,
+					"name": "contact",
+					"position": [
+						113.31900024414063,
+						-16.224300384521486,
+						-114.25199890136719
+					],
+					"contact_ref": [
+						77.9999008178711,
+						0.9514470100402832,
+						-125.74199676513672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.465000152587891,
+					"name": "contact",
+					"position": [
+						113.2020034790039,
+						-20.121000289916993,
+						-112.43599700927735
+					],
+					"contact_ref": [
+						78.88829803466797,
+						-0.5777419805526733,
+						-123.22899627685547
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.525000095367432,
+					"name": "contact",
+					"position": [
+						111.13700103759766,
+						-26.154199600219728,
+						-111.28299713134766
+					],
+					"contact_ref": [
+						78.60169982910156,
+						-3.309149980545044,
+						-121.11599731445313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.585000038146973,
+					"name": "contact",
+					"position": [
+						107.04199981689453,
+						-33.50749969482422,
+						-110.5999984741211
+					],
+					"contact_ref": [
+						77.11840057373047,
+						-6.935520172119141,
+						-119.3479995727539
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.644999980926514,
+					"name": "contact",
+					"position": [
+						100.91799926757813,
+						-41.4297981262207,
+						-110.22899627685547
+					],
+					"contact_ref": [
+						74.4188003540039,
+						-11.140600204467774,
+						-117.88700103759766
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.704999923706055,
+					"name": "contact",
+					"position": [
+						92.98390197753906,
+						-49.203399658203128,
+						-110.00700378417969
+					],
+					"contact_ref": [
+						70.53269958496094,
+						-15.599100112915039,
+						-116.69400024414063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.764999866485596,
+					"name": "contact",
+					"position": [
+						83.68840026855469,
+						-56.239601135253909,
+						-109.75199890136719
+					],
+					"contact_ref": [
+						65.57620239257813,
+						-19.994300842285158,
+						-115.7239990234375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.824999809265137,
+					"name": "contact",
+					"position": [
+						73.70909881591797,
+						-62.12179946899414,
+						-109.25
+					],
+					"contact_ref": [
+						59.74639892578125,
+						-24.041200637817384,
+						-114.9209976196289
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.885000228881836,
+					"name": "contact",
+					"position": [
+						63.16569900512695,
+						-67.04550170898438,
+						-108.5979995727539
+					],
+					"contact_ref": [
+						53.0890007019043,
+						-27.768199920654298,
+						-114.25800323486328
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.945000171661377,
+					"name": "contact",
+					"position": [
+						51.59339904785156,
+						-71.33660125732422,
+						-108.08799743652344
+					],
+					"contact_ref": [
+						45.465999603271487,
+						-31.271099090576173,
+						-113.76300048828125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.005000114440918,
+					"name": "contact",
+					"position": [
+						39.0968017578125,
+						-74.8134994506836,
+						-107.72899627685547
+					],
+					"contact_ref": [
+						36.98059844970703,
+						-34.354000091552737,
+						-113.4209976196289
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.065000057220459,
+					"name": "contact",
+					"position": [
+						25.865699768066408,
+						-77.28050231933594,
+						-107.50199890136719
+					],
+					"contact_ref": [
+						27.78689956665039,
+						-36.82360076904297,
+						-113.21399688720703
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.125,
+					"name": "contact",
+					"position": [
+						12.120699882507325,
+						-78.57260131835938,
+						-107.38999938964844
+					],
+					"contact_ref": [
+						18.073200225830079,
+						-38.519100189208987,
+						-113.125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.184999942779541,
+					"name": "contact",
+					"position": [
+						-1.8699300289154053,
+						-78.55799865722656,
+						-107.37799835205078
+					],
+					"contact_ref": [
+						8.06814956665039,
+						-39.309898376464847,
+						-113.13899993896485
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.244999885559082,
+					"name": "contact",
+					"position": [
+						-15.82229995727539,
+						-77.16190338134766,
+						-107.45600128173828
+					],
+					"contact_ref": [
+						-1.98294997215271,
+						-39.117000579833987,
+						-113.24299621582031
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.304999828338623,
+					"name": "contact",
+					"position": [
+						-29.44179916381836,
+						-74.36830139160156,
+						-107.61000061035156
+					],
+					"contact_ref": [
+						-11.825499534606934,
+						-37.916900634765628,
+						-113.4280014038086
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.364999771118164,
+					"name": "contact",
+					"position": [
+						-42.43220138549805,
+						-70.22250366210938,
+						-107.83100128173828
+					],
+					"contact_ref": [
+						-21.208799362182618,
+						-35.742698669433597,
+						-113.68199920654297
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.425000190734863,
+					"name": "contact",
+					"position": [
+						-54.51470184326172,
+						-64.82440185546875,
+						-108.10600280761719
+					],
+					"contact_ref": [
+						-29.875999450683595,
+						-32.68899917602539,
+						-113.99099731445313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.485000133514404,
+					"name": "contact",
+					"position": [
+						-65.47139739990235,
+						-58.31589889526367,
+						-108.4260025024414
+					],
+					"contact_ref": [
+						-37.64670181274414,
+						-28.881000518798829,
+						-114.34500122070313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.545000076293945,
+					"name": "contact",
+					"position": [
+						-75.10320281982422,
+						-50.887298583984378,
+						-108.77200317382813
+					],
+					"contact_ref": [
+						-44.368099212646487,
+						-24.484399795532228,
+						-114.72599792480469
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.605000019073486,
+					"name": "contact",
+					"position": [
+						-83.26470184326172,
+						-42.75299835205078,
+						-109.1259994506836
+					],
+					"contact_ref": [
+						-49.93069839477539,
+						-19.68869972229004,
+						-115.11499786376953
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.664999961853027,
+					"name": "contact",
+					"position": [
+						-89.84829711914063,
+						-34.14759826660156,
+						-109.46299743652344
+					],
+					"contact_ref": [
+						-54.26459884643555,
+						-14.682700157165528,
+						-115.50900268554688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.724999904632568,
+					"name": "contact",
+					"position": [
+						-94.76969909667969,
+						-22.99169921875,
+						-111.04000091552735
+					],
+					"contact_ref": [
+						-56.652198791503909,
+						-8.960630416870118,
+						-117.19499969482422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.784999847412109,
+					"name": "contact",
+					"position": [
+						-96.76190185546875,
+						-12.303500175476075,
+						-113.10399627685547
+					],
+					"contact_ref": [
+						-57.248600006103519,
+						-2.8874900341033937,
+						-119.41999816894531
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.84499979019165,
+					"name": "contact",
+					"position": [
+						-96.77279663085938,
+						-6.308420181274414,
+						-113.54000091552735
+					],
+					"contact_ref": [
+						-57.313201904296878,
+						2.606369972229004,
+						-120.8270034790039
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.90500020980835,
+					"name": "contact",
+					"position": [
+						-95.83000183105469,
+						-1.8538099527359009,
+						-112.57099914550781
+					],
+					"contact_ref": [
+						-56.95899963378906,
+						7.5051798820495609,
+						-122.26799774169922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.90500020980835,
+					"name": "breathend",
+					"position": [
+						-95.83000183105469,
+						-1.8538099527359009,
+						-112.57099914550781
+					],
+					"contact_ref": [
+						-56.95899963378906,
+						7.5051798820495609,
+						-122.26799774169922
+					]
+				}
+			]
+		},
+		{
+			"name": "fire_breath_lacerate_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.331589937210083,
+					"name": "fire_start",
+					"contact_ref": [
+						-59.051700592041019,
+						-61.227901458740237,
+						-105.46900177001953
+					]
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 2.8782598972320558,
+					"name": "start_face",
+					"data": "235 0 -1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.635010004043579,
+					"name": "fireball",
+					"position": [
+						-58.68156433105469,
+						-62.40210723876953,
+						-100.8525161743164
+					],
+					"contact_ref": [
+						-61.47975540161133,
+						-28.559307098388673,
+						-96.8672103881836
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.6416101455688478,
+					"name": "lacerate_l",
+					"position": [
+						-59.051700592041019,
+						-45.0,
+						0.0
+					],
+					"contact_ref": [
+						-59.051700592041019,
+						0.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.015389919281006,
+					"name": "fireball",
+					"position": [
+						52.0,
+						-38.145999908447269,
+						-97.91110229492188
+					],
+					"contact_ref": [
+						54.34495162963867,
+						-11.807727813720704,
+						-95.80851745605469
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.021749973297119,
+					"name": "lacerate_r",
+					"position": [
+						52.0,
+						-38.145999908447269,
+						0.0
+					],
+					"contact_ref": [
+						52.0,
+						0.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.474339962005615,
+					"name": "fireball",
+					"position": [
+						-51.22514724731445,
+						-74.48088073730469,
+						-95.2295913696289
+					],
+					"contact_ref": [
+						-61.967464447021487,
+						-47.45393753051758,
+						-90.1207275390625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.48675012588501,
+					"name": "lacerate_l",
+					"position": [
+						-59.68960189819336,
+						-52.0,
+						0.0
+					],
+					"contact_ref": [
+						-59.68960189819336,
+						0.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.800000190734863,
+					"name": "fireball",
+					"position": [
+						56.32173156738281,
+						-47.09868621826172,
+						-82.2213363647461
+					],
+					"contact_ref": [
+						59.0,
+						-22.54146957397461,
+						-79.62683868408203
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.828350067138672,
+					"name": "lacerate_r",
+					"position": [
+						59.0,
+						-31.277299880981447,
+						0.0
+					],
+					"contact_ref": [
+						59.0,
+						0.0,
+						0.0
+					]
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 4.847169876098633,
+					"name": "end_face"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 5.400000095367432,
+					"end_time": 5.73330020904541,
+					"name": "move",
+					"position": [
+						0.0,
+						-134.93800354003907,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.643270015716553,
+					"name": "cleave",
+					"position": [
+						219.63699340820313,
+						-92.39250183105469,
+						-144.72300720214845
+					],
+					"contact_ref": [
+						62.63800048828125,
+						-31.51580047607422,
+						-144.72300720214845
+					]
+				}
+			]
+		},
+		{
+			"name": "fire_breath_left_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7149999737739563,
+					"name": "contact",
+					"position": [
+						81.30819702148438,
+						-61.84239959716797,
+						-103.45800018310547
+					],
+					"contact_ref": [
+						53.05379867553711,
+						-33.6260986328125,
+						-112.91100311279297
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7749999761581421,
+					"name": "contact",
+					"position": [
+						77.71859741210938,
+						-63.672698974609378,
+						-100.52300262451172
+					],
+					"contact_ref": [
+						49.792999267578128,
+						-34.942501068115237,
+						-109.56500244140625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8349999785423279,
+					"name": "contact",
+					"position": [
+						72.04440307617188,
+						-66.46420288085938,
+						-98.54340362548828
+					],
+					"contact_ref": [
+						45.00600051879883,
+						-36.61050033569336,
+						-106.69400024414063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8949999809265137,
+					"name": "contact",
+					"position": [
+						64.38929748535156,
+						-70.08499908447266,
+						-97.18329620361328
+					],
+					"contact_ref": [
+						38.874000549316409,
+						-38.614898681640628,
+						-104.12000274658203
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9549999833106995,
+					"name": "contact",
+					"position": [
+						54.90660095214844,
+						-74.16190338134766,
+						-96.25250244140625
+					],
+					"contact_ref": [
+						31.55120086669922,
+						-40.790199279785159,
+						-101.83200073242188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0149999856948853,
+					"name": "contact",
+					"position": [
+						43.75320053100586,
+						-78.3135986328125,
+						-95.6061019897461
+					],
+					"contact_ref": [
+						23.23710060119629,
+						-42.937400817871097,
+						-99.84030151367188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0750000476837159,
+					"name": "contact",
+					"position": [
+						31.139999389648439,
+						-82.16570281982422,
+						-95.11689758300781
+					],
+					"contact_ref": [
+						14.127300262451172,
+						-44.87099838256836,
+						-98.1769027709961
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1349999904632569,
+					"name": "contact",
+					"position": [
+						17.363500595092775,
+						-85.36820220947266,
+						-94.66729736328125
+					],
+					"contact_ref": [
+						4.4582600593566898,
+						-46.4182014465332,
+						-96.8823013305664
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1950000524520875,
+					"name": "contact",
+					"position": [
+						2.7878599166870119,
+						-87.622802734375,
+						-94.09020233154297
+					],
+					"contact_ref": [
+						-5.490240097045898,
+						-47.43360137939453,
+						-95.99810028076172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2549999952316285,
+					"name": "contact",
+					"position": [
+						-12.129300117492676,
+						-88.71199798583985,
+						-93.54969787597656
+					],
+					"contact_ref": [
+						-15.395099639892579,
+						-47.8306999206543,
+						-95.47630310058594
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.315000057220459,
+					"name": "contact",
+					"position": [
+						-26.917600631713868,
+						-88.52100372314453,
+						-93.29340362548828
+					],
+					"contact_ref": [
+						-24.939699172973634,
+						-47.57709884643555,
+						-95.23680114746094
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.375,
+					"name": "contact",
+					"position": [
+						-41.09510040283203,
+						-86.99549865722656,
+						-93.30449676513672
+					],
+					"contact_ref": [
+						-33.805999755859378,
+						-46.672298431396487,
+						-95.26860046386719
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.434999942779541,
+					"name": "contact",
+					"position": [
+						-54.18320083618164,
+						-84.18609619140625,
+						-93.54979705810547
+					],
+					"contact_ref": [
+						-41.68550109863281,
+						-45.17020034790039,
+						-95.56009674072266
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4950000047683716,
+					"name": "contact",
+					"position": [
+						-65.67109680175781,
+						-80.25409698486328,
+						-93.9738998413086
+					],
+					"contact_ref": [
+						-48.25669860839844,
+						-43.17919921875,
+						-96.09300231933594
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5549999475479127,
+					"name": "contact",
+					"position": [
+						-75.16560363769531,
+						-75.43830108642578,
+						-94.56099700927735
+					],
+					"contact_ref": [
+						-53.22520065307617,
+						-40.844200134277347,
+						-96.85559844970703
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6150000095367432,
+					"name": "contact",
+					"position": [
+						-82.36060333251953,
+						-70.03990173339844,
+						-95.2699966430664
+					],
+					"contact_ref": [
+						-56.41630172729492,
+						-38.32600021362305,
+						-97.82669830322266
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6749999523162842,
+					"name": "contact",
+					"position": [
+						-87.2499008178711,
+						-64.40299987792969,
+						-95.81700134277344
+					],
+					"contact_ref": [
+						-57.91680145263672,
+						-35.8307991027832,
+						-98.98500061035156
+					]
+				}
+			]
+		},
+		{
+			"name": "fire_breath_loop_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "startface#30"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 1.620360016822815,
+					"name": "end_face"
+				}
+			]
+		},
+		{
+			"name": "fire_breath_right_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8199999928474426,
+					"name": "contact",
+					"position": [
+						-108.97899627685547,
+						-77.14070129394531,
+						-95.10060119628906
+					],
+					"contact_ref": [
+						-77.85130310058594,
+						-51.392601013183597,
+						-102.49400329589844
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8799999952316284,
+					"name": "contact",
+					"position": [
+						-104.70600128173828,
+						-79.31439971923828,
+						-94.35310363769531
+					],
+					"contact_ref": [
+						-74.01740264892578,
+						-52.981998443603519,
+						-101.76300048828125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9399999976158142,
+					"name": "contact",
+					"position": [
+						-98.90769958496094,
+						-81.86209869384766,
+						-93.72000122070313
+					],
+					"contact_ref": [
+						-68.96379852294922,
+						-54.661399841308597,
+						-101.13300323486328
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0,
+					"name": "contact",
+					"position": [
+						-91.99240112304688,
+						-84.63760375976563,
+						-93.18409729003906
+					],
+					"contact_ref": [
+						-63.11000061035156,
+						-56.28689956665039,
+						-100.5999984741211
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.059999942779541,
+					"name": "contact",
+					"position": [
+						-83.8821029663086,
+						-87.47380065917969,
+						-92.80259704589844
+					],
+					"contact_ref": [
+						-56.429500579833987,
+						-57.72249984741211,
+						-100.2229995727539
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1200000047683716,
+					"name": "contact",
+					"position": [
+						-74.49400329589844,
+						-90.28379821777344,
+						-92.48909759521485
+					],
+					"contact_ref": [
+						-48.84920120239258,
+						-58.943199157714847,
+						-99.9093017578125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1799999475479127,
+					"name": "contact",
+					"position": [
+						-63.973899841308597,
+						-92.88880157470703,
+						-92.27649688720703
+					],
+					"contact_ref": [
+						-40.57789993286133,
+						-59.82630157470703,
+						-99.69339752197266
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2400000095367432,
+					"name": "contact",
+					"position": [
+						-52.496299743652347,
+						-95.11930084228516,
+						-92.18879699707031
+					],
+					"contact_ref": [
+						-31.836200714111329,
+						-60.280399322509769,
+						-99.59829711914063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "contact",
+					"position": [
+						-40.263099670410159,
+						-96.82270050048828,
+						-92.23899841308594
+					],
+					"contact_ref": [
+						-22.864200592041017,
+						-60.2515983581543,
+						-99.63600158691406
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3600000143051148,
+					"name": "contact",
+					"position": [
+						-27.468799591064454,
+						-97.88359832763672,
+						-92.4032974243164
+					],
+					"contact_ref": [
+						-13.91510009765625,
+						-59.73379898071289,
+						-99.80329895019531
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4199999570846558,
+					"name": "contact",
+					"position": [
+						-14.377099990844727,
+						-98.18280029296875,
+						-92.69329833984375
+					],
+					"contact_ref": [
+						-5.241559982299805,
+						-58.761199951171878,
+						-100.08999633789063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4800000190734864,
+					"name": "contact",
+					"position": [
+						-1.224329948425293,
+						-97.6364974975586,
+						-93.08760070800781
+					],
+					"contact_ref": [
+						2.933079957962036,
+						-57.408199310302737,
+						-100.4749984741211
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5399999618530274,
+					"name": "contact",
+					"position": [
+						11.74839973449707,
+						-96.17790222167969,
+						-93.5552978515625
+					],
+					"contact_ref": [
+						10.417699813842774,
+						-55.782901763916019,
+						-100.93099975585938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.600000023841858,
+					"name": "contact",
+					"position": [
+						24.29159927368164,
+						-93.75270080566406,
+						-94.060302734375
+					],
+					"contact_ref": [
+						17.055999755859376,
+						-54.01409912109375,
+						-101.4219970703125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.659999966621399,
+					"name": "contact",
+					"position": [
+						36.11259841918945,
+						-90.32659912109375,
+						-94.5470962524414
+					],
+					"contact_ref": [
+						22.68829917907715,
+						-52.25469970703125,
+						-101.90699768066406
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7200000286102296,
+					"name": "contact",
+					"position": [
+						46.91780090332031,
+						-85.86150360107422,
+						-94.99970245361328
+					],
+					"contact_ref": [
+						27.226600646972658,
+						-50.64059829711914,
+						-102.35199737548828
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7799999713897706,
+					"name": "contact",
+					"position": [
+						56.35639953613281,
+						-80.35659790039063,
+						-95.38159942626953
+					],
+					"contact_ref": [
+						30.60610008239746,
+						-49.29750061035156,
+						-102.72599792480469
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.840000033378601,
+					"name": "contact",
+					"position": [
+						64.06739807128906,
+						-73.70490264892578,
+						-95.70449829101563
+					],
+					"contact_ref": [
+						32.7671012878418,
+						-48.232398986816409,
+						-103.14299774169922
+					]
+				}
+			]
+		},
+		{
+			"name": "fire_breath_spin_cleave_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.6152499914169312,
+					"name": "weapon_epk",
+					"contact_ref": [
+						-62.63750076293945,
+						-31.51580047607422,
+						-144.72300720214845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.041536331176758,
+					"name": "contact",
+					"position": [
+						0.9971427917480469,
+						-92.39250183105469,
+						-144.72300720214845
+					]
+				}
+			]
+		},
+		{
+			"name": "fire_breath_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0006200075149537,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "leap_slam_phase02_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.8600000143051148,
+					"name": "start_target_update",
+					"data": "140 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9686124324798584,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6057100296020508,
+					"name": "hit_ground",
+					"position": [
+						0.0,
+						39.887699127197269,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6696319580078126,
+					"name": "contact",
+					"position": [
+						5.11152982711792,
+						-162.07809448242188,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "slam_phase01_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.7040695548057556,
+					"name": "start_target_update",
+					"data": "130 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0324852466583253,
+					"name": "contact",
+					"position": [
+						-16.138200759887697,
+						-218.1790008544922,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "slam_triple_phase01_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.699999988079071,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9659219980239868,
+					"name": "slam1",
+					"position": [
+						-23.78689956665039,
+						-148.3000030517578,
+						0.0
+					]
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.244274616241455,
+					"end_time": 1.7811189889907838,
+					"name": "start_target_update",
+					"data": "115 0 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 2.169339895248413,
+					"end_time": 2.8047499656677248,
+					"name": "move",
+					"position": [
+						0.0,
+						-238.89999389648438,
+						0.0
+					],
+					"data": "0 1 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 2.169339895248413,
+					"end_time": 2.700000047683716,
+					"name": "start_target_update",
+					"data": "180 -90 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.1702699661254885,
+					"name": "slam2",
+					"position": [
+						0.0,
+						-203.57200622558595,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.9369869232177736,
+					"name": "slam3",
+					"position": [
+						0.0,
+						-170.72900390625,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "stun_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.06700000166893006,
+					"end_time": 0.699999988079071,
+					"name": "move",
+					"position": [
+						0.0,
+						66.18399810791016,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 3.1669998168945314,
+					"end_time": 4.166999816894531,
+					"name": "move",
+					"position": [
+						0.0,
+						-66.18399810791016,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "aux_skirtbase Metadata/Monsters/BlackJawSuperunique/attachments/BlackJawSuperuniqueSkirtHeld.ao"
+	attached_object = "R_Weapon Metadata/Monsters/BlackJawSuperunique/attachments/BlackJawSuperuniqueWeaponHeld.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_phase01_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.303846150636673,
+								0.0
+							],
+							[
+								0.3192307651042938,
+								0.432330846786499
+							],
+							[
+								0.3692307770252228,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 3,
+						"rotation": 0.5934119820594788,
+						"width": 180.17799377441407,
+						"angle": 2.5132699012756349,
+						"length": 104.68599700927735,
+						"offset": [
+							-2.0,
+							-21.0
+						],
+						"local_offset": [
+							-61.0,
+							-15.0
+						],
+						"impact_z_rotation": [
+							0.40142571926116946,
+							0.3490658700466156
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon_02"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_phase01_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.34020617604255679,
+								0.0
+							],
+							[
+								0.3814432919025421,
+								0.24848484992980958
+							],
+							[
+								0.3969072103500366,
+								0.524848461151123
+							],
+							[
+								0.41237112879753115,
+								0.8060606122016907
+							],
+							[
+								0.42783504724502566,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 3,
+						"rotation": -1.1519173383712769,
+						"angle": 3.2114057540893556,
+						"x_axis_scale": 1.3550000190734864,
+						"length": 128.2050018310547,
+						"local_offset": [
+							17.0,
+							-44.0
+						],
+						"impact_x_rotation": [
+							0.2617993950843811,
+							0.4886922240257263
+						],
+						"impact_z_rotation": [
+							0.45378562808036806,
+							0.9773844480514526
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_phase02_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.22904999554157258,
+								0.0
+							],
+							[
+								0.2576923072338104,
+								0.2030075192451477
+							],
+							[
+								0.2769230902194977,
+								0.37593984603881838
+							],
+							[
+								0.303846150636673,
+								0.5864661931991577
+							],
+							[
+								0.3499999940395355,
+								0.834586501121521
+							],
+							[
+								0.3807692229747772,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": 0.2443459928035736,
+						"angle": 6.28318977355957,
+						"length": 156.06900024414063,
+						"local_offset": [
+							24.0,
+							-39.0
+						],
+						"impact_z_rotation": [
+							-1.867502212524414,
+							3.735004425048828
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon_01"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/BlackJawSuperunique/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "firebreath"
+			parent = "head_jntBnd"
+			translation = "0 -41.0349 0"
+		socket = "aux_melee_01"
+			parent = "root_jntBnd"
+			translation = "0 0 -106.991"
+		socket = "aux_melee_02"
+			parent = "root_jntBnd"
+			translation = "-39.9293 0 -106.991"
+		socket = "R_Weapon_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -109.157"
+		socket = "R_Weapon_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -54.16"
+		socket = "head_light"
+			parent = "head_jntBnd"
+			translation = "0 -32.8455 -266.202"
+			ignore_parent_axis = "xyz"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "fire_breath_audio"
+			parent = "head_jntBnd"
+			translation = "0 -212.353 0"
+		socket = "firebreath_ext"
+			parent = "head_jntBnd"
+			translation = "0 -231.265 0"
+		socket = "donut"
+			parent = "root_jntBnd"
+			translation = "4.31134 22.4506 0"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "aux_weaponBlade_L_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-20.976 0 -79.0065"
+		socket = "aux_weaponBlade_R_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "22.6061 0 -79.0065"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_velocity_factor = 5.000
+		animation_force_factor = 7.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/BlackJawSuperunique/BlackJaw.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false phys_skinned_upperhair_01_jntBnd phys_skinned_upperhair_02_jntBnd phys_skinned_upperhair_05_jntBnd aux_L_shoulder_attachment aux_R_shoulder_attachment R_shoulder_jntBnd L_upperArm_attachment_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "flame_spray false aux_face_jntBnd firebreath"
+		bone_group = "melee_01 false aux_melee_01 aux_melee_02"
+		bone_group = "weapon_01 false R_Weapon R_Weapon_01"
+		bone_group = "weapon_blade_01 false R_Weapon_01 R_Weapon_02"
+		bone_group = "breath_trail false head_jntBnd firebreath_ext"
+		bone_group = "FX_weaponBlade false R_Weapon_01 aux_weaponBlade_L_01 R_Weapon_02 aux_weaponBlade_R_01 R_Weapon_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "emerge_statue_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6300380229949951,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/emerge_statue_01/crackline.pet",
+						"bone_group": "grp_neck"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.2815519571304322,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/emerge_statue_01/crackline.pet",
+						"bone_group": "grp_l_bicep"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.9779959917068482,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/emerge_statue_01/crackline.pet",
+						"bone_group": "grp_r_bicep"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.5171759128570558,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/emerge_statue_01/crackline.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.1109180450439455,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/emerge_statue_01/crackline.pet",
+						"bone_group": "grp_r_thigh"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.576284885406494,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/emerge_statue_01/crackline.pet",
+						"bone_group": "grp_l_thigh"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_spin_cleave_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1255515813827515,
+						"end_time": 2.2473440170288088,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/flamebreath_cleave.pet",
+						"bone_group": "breath_trail"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1380980014801026,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/fire_weapon.pet",
+						"bone_group": "weapon_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.3176851272583008,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/fire_weapon.pet",
+						"bone_group": "FX_weaponBlade"
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimatedRender
+	{
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_phase01_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Attack_Phase01_01_",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07473920285701752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09093029797077179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "R_Weapon_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2268259972333908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swing_Short",
+						"bone_name": "R_Weapon_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2710840106010437,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "R_Weapon_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2790580093860626,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_Weapon_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49873998761177065,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49873998761177065,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.532073974609375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "R_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8800389766693115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_phase01_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Attack_Phase01_02_",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2773979902267456,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46424600481987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swish",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4872420132160187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5763540267944336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7215200066566467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9227409958839417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0822800397872925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "L_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4401700496673585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6845099925994874,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7693099975585938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_phase02_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Attack_Phase02_01_",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23016400635242463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3176420032978058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swing",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47574400901794436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6165980100631714,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8026970028877258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2280800342559815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5425699949264527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0554399490356447,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03726710006594658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swing_Short",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06692580133676529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23620900511741639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2628139853477478,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3260830044746399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Rock_Hit",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3416149914264679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38853099942207339,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/FootstepDust",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4663499891757965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5652179718017578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_knee_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7520639896392822,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8794000148773193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.024109959602356,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0496900081634522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1610000133514405,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/WeaponFall",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2828700542449952,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4139200448989869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4179199934005738,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/WeaponFall",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.424739956855774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepLanding",
+						"bone_name": "L_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.541599988937378,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9621299505233765,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2435200214385988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2919299602508547,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2952799797058107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/FootstepDust",
+						"bone_name": "L_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.000773723004385829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.000773723004385829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.000773723004385829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2491389960050583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2831819951534271,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31722700595855715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41721299290657046,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5185710191726685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5208920240402222,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/WeaponFall",
+						"bone_name": "R_Weapon_01"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23134300112724305,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41506698727607729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/WeaponFall",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41661399602890017,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48392799496650698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35232898592948916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36519700288772585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3856000006198883,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43434399366378786,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/WeaponFall",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.663362979888916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/WeaponFall",
+						"bone_name": "R_Weapon_01"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21199999749660493,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3267109990119934,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/WeaponFall",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41800999641418459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45746999979019167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39072999358177187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3974190056324005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43610501289367678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48562300205230715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/WeaponFall",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7363100051879883,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/WeaponFall",
+						"bone_name": "R_Weapon_01"
+					}
+				]
+			},
+			{
+				"name": "emerge_statue_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.517533004283905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5484960079193115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5484960079193115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.667639970779419,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Rock_Hit",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8061140179634094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/FootstepDust",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0173699855804444,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0173699855804444,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.127959966659546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2314300537109376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Rock_Hit",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.335279941558838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/FootstepDust",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7649199962615967,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8003000020980836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "aux_R_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8003000020980836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "aux_R_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8003000020980836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "aux_R_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9237899780273438,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Rock_Hit",
+						"bone_name": "R_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0869998931884767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/FootstepDust",
+						"bone_name": "R_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3399500846862795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.428420066833496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.428420066833496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4682300090789797,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5469300746917726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Rock_Hit",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.592089891433716,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.720360040664673,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.964479923248291,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.036530017852783,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Rock_Hit",
+						"bone_name": "L_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.220210075378418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2953999042510988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.923069953918457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/EmergeScream",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9832499027252199,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.989870071411133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.008389949798584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.228390216827393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireBreath/FireBreath",
+						"bone_name": "fire_breath_audio"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.587029933929443,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.4761199951171879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.277589797973633,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.6040802001953129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_blast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1800210028886795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "aux_R_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5716260075569153,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Attack_Phase01_01_",
+						"bone_name": "Head_Attachment",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6370880007743836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5827900171279908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "aux_R_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9217900037765504,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "aux_R_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29290899634361269,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8320919871330261,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_lacerate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7729259729385376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Lacerate_A_",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8056349754333496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9558060169219971,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3146599531173707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4464499950408937,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0429298877716066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Lacerate_B_",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.060659885406494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.070650100708008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.34906005859375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swish",
+						"bone_name": "R_Weapon_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5812699794769289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireLacerate/Scratch",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6849300861358644,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8205599784851076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swish",
+						"bone_name": "R_Weapon_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8628299236297609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9627299308776857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireLacerate/Scratch",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.123479843139648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.238570213317871,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swish",
+						"bone_name": "R_Weapon_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.2652997970581059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.325769901275635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.394959926605225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireLacerate/Scratch",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.622439861297607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swish",
+						"bone_name": "R_Weapon_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.630209922790527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.774089813232422,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireLacerate/Scratch",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.777470111846924,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.893380165100098,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.9475297927856449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.014359951019287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Lacerate_C_",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.079480171203613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.206610202789307,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireLacerate/CleaveWhoosh",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.231880187988281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.302350044250488,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.307089805603027,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.381959915161133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swing",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.539909839630127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.99960994720459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31828027963638308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/FireBreath",
+						"bone_name": "firebreath",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32898199558258059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4530540108680725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5000519752502441,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.53177809715271,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireBreath/FireBreath",
+						"bone_name": "fire_breath_audio"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6802235245704651,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireBreath/Flame_Start.once.ogg",
+						"bone_name": "fire_breath_audio"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7049599885940552,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3930000066757203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9532099962234498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.532219886779785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.594249963760376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_loop_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2622329890727997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8040390014648438,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0662699937820435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36845895648002627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/FireBreath",
+						"bone_name": "firebreath",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38756319880485537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.528249979019165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6209967732429504,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireBreath/FireBreath",
+						"bone_name": "fire_breath_audio"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.744352400302887,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireBreath/Flame_Start.once.ogg",
+						"bone_name": "fire_breath_audio"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7820339798927307,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2407300472259522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.943809986114502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6456000804901125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_spin_cleave_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43125200271606448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4754830002784729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7021650075912476,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7696809768676758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/SpinCleave_A_",
+						"bone_name": "firebreath"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7970669865608215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireWhoosh/Charged",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9462980031967163,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.014549970626831,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0529500246047974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireWhoosh/FireCoating",
+						"bone_name": "firebreath"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.068690061569214,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/SpinCleave_B_",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.125849962234497,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3064000606536867,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4769399166107179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swing",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.487989902496338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5488200187683107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/FireWhoosh/FireWhoosh",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.64274001121521,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_elbow_Twist_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.720210075378418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swish",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.73403000831604,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8086700439453127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8648200035095217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.975399971008301,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0325300693511965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_elbow_Twist_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2924399375915529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.625040054321289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.92084002494812,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9235999584198,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10600399971008301,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.703773021697998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0042599439620972,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_static_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18330900371074677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5131250023841858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_static_loop_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7100200057029724,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.965499997138977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_static_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10624299943447113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9427329897880554,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Idle",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6464679837226868,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6464679837226868,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7405750155448914,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0147099494934083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7593799829483033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7593799829483033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7839299440383912,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9025800228118897,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.450850009918213,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.023669958114624,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4287400245666506,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.866529941558838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.866529941558838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.931999921798706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.956549882888794,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.12021017074585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.189770221710205,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.87306022644043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.769130229949951,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "leap_slam_phase02_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "Head_Attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "Head_Attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13735899329185487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13735899329185487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33244800567626955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4041140079498291,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6111479997634888,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7226279973983765,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "Head_Attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7405440211296082,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8858649730682373,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swish",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9077630043029785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/LeapSwoosh",
+						"bone_name": "Head_Attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9535499811172485,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9953539967536926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2222900390625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3258099555969239,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3795599937438965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.44923996925354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5069700479507447,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5547399520874024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepLanding",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.582200050354004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/Slam/ImpactLayerLow",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6005300283432007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepLanding",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6423300504684449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/Slam/Impact",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7737300395965577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8772399425506592,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "Head_Attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0703399181365969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Run",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30758801102638247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6483219861984253,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_phase01_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05639680102467537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Slam_Phase01_",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2425059974193573,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38913801312446597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swing",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9173880219459534,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9343069791793823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/Slam/ImpactLayerMid",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9813010096549988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/Slam/RockImpactLayer",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.144860029220581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockCrack",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3121700286865235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.554669976234436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.554669976234436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3912200927734377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_triple_phase01_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08873389661312103,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/TripleSlam",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33337000012397768,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4123519957065582,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9395350217819214,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/Slam/RockImpactLayer",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0595899820327759,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2370599508285523,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7198699712753297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7244000434875489,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swish",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9234399795532227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1191799640655519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/Slam/ImpactLayerMid",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.12962007522583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/Slam/RockImpact",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.22025990486145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Swing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2914299964904787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.338399887084961,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.71943998336792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8107800483703615,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/Slam/ImpactLayerMid",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.917789936065674,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.925610065460205,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/Slam/RockImpactLayer",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.938659906387329,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/Slam/RockImpact",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.078900098800659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Effects/Slam/ImpactLayerLow",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.22052001953125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4710800647735597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "stun_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4158239960670471,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5737730264663696,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6414650082588196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6608060002326965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Rock_Hit",
+						"bone_name": "R_Weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7317219972610474,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8090839982032776,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/StepLanding",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9283519983291626,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7599999904632569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7825599908828736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9147299528121949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Walk",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.501389980316162,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveSlow",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1460800170898439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/RockFoley",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.329819917678833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5748000144958498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9197099208831789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/MoveFast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.145349979400635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Vocal/Walk",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4862639904022217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8079609870910645,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Move",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2889200448989869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BlackJaw/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_phase02_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.5849419832229614,
+						"end_time": 1.1388978958129883,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/melee_trail.ao",
+						"animation": "attack_360",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-150.0
+							],
+							"rotation": [
+								0.0,
+								0.0,
+								1.309000015258789
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.4664260149002075,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/footsteps.ao",
+						"animation": "once",
+						"offset": [
+							-8.573360443115235,
+							-108.43399810791016
+						],
+						"height": 10.66919994354248
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.4391550123691559,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/footsteps.ao",
+						"animation": "once",
+						"offset": [
+							-6.546609878540039,
+							-157.1999969482422
+						],
+						"height": 18.07539939880371
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.47378501296043398,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/footsteps.ao",
+						"animation": "once",
+						"offset": [
+							164.62100219726563,
+							3.971019983291626
+						],
+						"height": 13.796500205993653
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.4468640089035034,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/footsteps.ao",
+						"animation": "once",
+						"offset": [
+							-6.443069934844971,
+							-58.28049850463867
+						],
+						"height": 16.655799865722658
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.4412910044193268,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/footsteps.ao",
+						"animation": "once",
+						"offset": [
+							-161.54200744628907,
+							0.7941589951515198
+						],
+						"height": 14.83080005645752
+					}
+				]
+			},
+			{
+				"name": "emerge_statue_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 4.345089912414551,
+						"end_time": 5.739999771118164,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RudjaDreadEngineer/flamethrower.ao",
+						"from": {
+							"parent_bone": "Head_Attachment"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								17.0,
+								0.0
+							],
+							"scale": [
+								1.725000023841858,
+								1.725000023841858,
+								1.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "fire_breath_lacerate_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.0,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/on_act_lacerate.ao",
+						"inherit_speed": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.560763120651245,
+						"end_time": 3.8277831077575685,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/fire_cleave.ao",
+						"animation": "attack_360",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								-40.20000076293945,
+								-150.0
+							],
+							"rotation": [
+								1.0122900009155274,
+								-0.05235999822616577,
+								0.0
+							],
+							"scale": [
+								0.9000000357627869,
+								0.9000000357627869,
+								0.9000000357627869
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.979276657104492,
+						"end_time": 4.239358425140381,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/fire_cleave.ao",
+						"animation": "attack_360",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								-40.20000076293945,
+								-150.0
+							],
+							"rotation": [
+								2.1292998790740969,
+								0.0,
+								0.0
+							],
+							"scale": [
+								0.9000000357627869,
+								0.9000000357627869,
+								0.9000000357627869
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 4.390868186950684,
+						"end_time": 4.675230979919434,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/fire_cleave.ao",
+						"animation": "attack_360",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								-40.20000076293945,
+								-150.0
+							],
+							"rotation": [
+								1.0122900009155274,
+								0.0,
+								0.0
+							],
+							"scale": [
+								0.9000000357627869,
+								0.9000000357627869,
+								0.9000000357627869
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 4.754035472869873,
+						"end_time": 5.052164554595947,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/fire_cleave.ao",
+						"animation": "attack_360",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								-40.20000076293945,
+								-150.0
+							],
+							"rotation": [
+								2.1292998790740969,
+								0.0,
+								0.0
+							],
+							"scale": [
+								0.9000000357627869,
+								0.9000000357627869,
+								0.9000000357627869
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 5.608280658721924,
+						"end_time": 5.986783981323242,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/fire_cleave.ao",
+						"animation": "attack_360",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-150.0
+							],
+							"rotation": [
+								-3.1410000324249269,
+								0.0,
+								0.0
+							],
+							"scale": [
+								0.9000000357627869,
+								0.9000000357627869,
+								0.9000000357627869
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "fire_breath_left_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.7141199707984924,
+						"end_time": 1.7451491355895997,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RudjaDreadEngineer/flamethrower.ao",
+						"from": {
+							"parent_bone": "Head_Attachment"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								17.0,
+								0.0
+							],
+							"scale": [
+								1.725000023841858,
+								1.725000023841858,
+								1.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "fire_breath_right_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.7900817394256592,
+						"end_time": 1.8578547239303589,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/RudjaDreadEngineer/flamethrower.ao",
+						"from": {
+							"parent_bone": "Head_Attachment"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								17.0,
+								0.0
+							],
+							"scale": [
+								1.725000023841858,
+								1.725000023841858,
+								1.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "fire_breath_spin_cleave_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.999452829360962,
+						"end_time": 3.265376567840576,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/fire_cleave.ao",
+						"animation": "attack_280",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-150.0
+							],
+							"scale": [
+								1.2000000476837159,
+								1.2000000476837159,
+								1.2000000476837159
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "leap_slam_phase02_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.522570013999939,
+						"end_time": 1.7034239768981934,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/melee_trail.ao",
+						"animation": "attack_280",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-150.0
+							],
+							"rotation": [
+								-1.5709999799728394,
+								0.0,
+								-1.1869999170303345
+							],
+							"scale": [
+								1.3000000715255738,
+								1.3000000715255738,
+								1.3000000715255738
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.05685950070619583,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/footsteps.ao",
+						"animation": "once",
+						"offset": [
+							9.610360145568848,
+							11.932999610900879
+						],
+						"height": 1.3618099689483643,
+						"scale": [
+							0.5,
+							0.5,
+							0.5
+						]
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.3819110095500946,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/footsteps.ao",
+						"animation": "once",
+						"offset": [
+							-7.673699855804443,
+							8.040140151977539
+						],
+						"height": 1.8382799625396729,
+						"scale": [
+							0.5,
+							0.5,
+							0.5
+						]
+					}
+				]
+			},
+			{
+				"name": "slam_phase01_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.8117088079452515,
+						"end_time": 1.057997703552246,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/melee_trail.ao",
+						"animation": "attack_280",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								-50.000003814697269,
+								-100.00000762939453
+							],
+							"rotation": [
+								-1.5709999799728394,
+								0.0,
+								0.0
+							],
+							"scale": [
+								1.25,
+								1.25,
+								1.25
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "slam_triple_phase01_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.7030810117721558,
+						"end_time": 1.0064539909362794,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/melee_trail.ao",
+						"animation": "attack_280",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								-17.100000381469728,
+								-50.000003814697269,
+								-100.00000762939453
+							],
+							"rotation": [
+								-1.5709999799728394,
+								0.03491000086069107,
+								-1.1869999170303345
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.9029699563980103,
+						"end_time": 2.255574941635132,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/melee_trail.ao",
+						"animation": "attack_360",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								-50.000003814697269,
+								-100.00000762939453
+							],
+							"rotation": [
+								-1.5709999799728394,
+								0.0,
+								-1.1869999170303345
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.726680040359497,
+						"end_time": 2.992171049118042,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/melee_trail.ao",
+						"animation": "attack_360",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								-50.000003814697269,
+								-100.00000762939453
+							],
+							"rotation": [
+								-1.5709999799728394,
+								0.0,
+								-1.1869999170303345
+							]
+						}
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.779599905014038,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/footsteps.ao",
+						"animation": "once",
+						"offset": [
+							24.59239959716797,
+							-32.865501403808597
+						],
+						"height": 6.418540000915527,
+						"scale": [
+							0.5,
+							0.5,
+							0.5
+						]
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.002650022506714,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/footsteps.ao",
+						"animation": "once",
+						"offset": [
+							-44.39540100097656,
+							-30.19179916381836
+						],
+						"height": 1.901960015296936,
+						"scale": [
+							0.5,
+							0.5,
+							0.5
+						]
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.4862639904022217,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/footsteps.ao",
+						"animation": "once",
+						"offset": [
+							-25.697999954223634,
+							-54.43050003051758
+						],
+						"height": 0.9577149748802185,
+						"scale": [
+							0.25,
+							0.25,
+							0.25
+						]
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.2896900177001954,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/ao/footsteps.ao",
+						"animation": "once",
+						"offset": [
+							25.72879981994629,
+							-54.99959945678711
+						],
+						"height": 0.9371680021286011,
+						"scale": [
+							0.25,
+							0.25,
+							0.25
+						]
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_phase01_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6364409923553467,
+						"end_time": 0.9807980060577393,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/melee_trail_attack_phase01_01/blade.trl",
+						"bone_group": "weapon_blade_01"
+					}
+				]
+			},
+			{
+				"name": "attack_phase01_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5757179856300354,
+						"end_time": 1.066072940826416,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/melee_trail_attack_phase01_01/blade.trl",
+						"bone_group": "weapon_blade_01"
+					}
+				]
+			},
+			{
+				"name": "leap_slam_phase02_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.35158100724220278,
+						"end_time": 0.6956460475921631,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/melee_trail_attack_phase01_01/blade.trl",
+						"bone_group": "weapon_blade_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.9452260136604309,
+						"end_time": 1.4250630140304566,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/pet/melee_trail_attack_phase01_01/blade.trl",
+						"bone_group": "weapon_blade_01"
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "emerge_statue_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 4.272610187530518,
+						"amplitude": 2.5,
+						"duration": 1.5,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_lacerate_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.9645130038261414,
+						"amplitude": 2.5,
+						"duration": 1.5,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_left_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.7191159725189209,
+						"amplitude": 2.5,
+						"duration": 1.5,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_right_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.7942720055580139,
+						"amplitude": 2.5,
+						"duration": 1.7999999523162842,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_spin_cleave_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 3.0592100620269777,
+						"frequency": 450.0,
+						"duration": 0.15000000596046449,
+						"bone_group": "weapon_blade_01",
+						"damp": "LinearUp"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "emerge_statue_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 4.271590232849121,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/epk/emissive_off.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 4.271590232849121,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/epk/emerge_emissive_on.epk"
+					}
+				]
+			},
+			{
+				"name": "idle_statue_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BlackJawSuperUnique/epk/emissive_off.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "head_light"
+			state = "On"
+				colour = "1.2276 0.529318 0.193078"
+				position = "0 0 -125"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "Default"
+				colour = "0.00238991 0.000500542 0.000109553"
+				position = "0 0 -125"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "on_death"
+				colour = "0.00238991 0.000500542 0.000109553"
+				position = "0 0 -125"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_phase02_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.6659998893737795,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.50941 0 Linear 1.42896 0 Linear 1.94948 0 Flat 2.666 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_statue_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 3.7179200649261476,
+						"end_time": 6.631289958953857,
+						"name": "glow",
+						"curve": "4 3.71792 1 Linear 5.26038 1 Flat 6.26559 0 Flat 6.63129 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_lacerate_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.900000095367432,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "6 0 0 Smooth 2.12603 0 Flat 3.28026 1 Linear 5.9139 1 Linear 6.57142 0 Flat 6.9 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_left_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.8329999446868898,
+						"name": "glow",
+						"curve": "4 0 1 Linear 1.24867 1 Flat 2.23721 0 Flat 2.833 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.8329999446868898,
+						"name": "glow",
+						"curve": "4 0 1 Linear 1.32235 1 Flat 2.39276 0 Flat 2.833 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_spin_cleave_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.165999889373779,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "6 0 0 Smooth 0.52849 0 Flat 1.2901 1 Linear 3.57062 1 Linear 3.9482 0 Flat 4.166 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "leap_slam_phase02_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "6 0 0 Smooth 0.854446 0 Flat 1.4262 1 Linear 1.85502 1 Linear 2.31646 0 Flat 3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "slam_phase01_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.8329999446868898,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.529583 1 Linear 1.22503 1 Linear 1.67839 0 Flat 2.833 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.46465998888015749,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.2641700506210328,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.5430946350097657,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.4666700065135956,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.44473996758461,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.5521588325500488,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.47788500785827639,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.5273779034614563,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "emerge_statue_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.57819002866745,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.8833928108215332,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.3461500406265259,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.9970300197601319,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 2.5116899013519289,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 3.2539331912994386,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 3.6352367401123049,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 4.110384464263916,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "fire_breath_spin_cleave_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.477194905281067,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/BlackJawSuperunique/attachments/BlackJawSuperuniqueSkirtHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/BlackJawSuperunique/Attachments/skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/BlackJawSuperunique/Attachments/skirt/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 1.000
+		animation_velocity_factor = 2.000
+		animation_force_factor = 2.000
+		attachment_bones = "aux_animation_control_ratio aux_skirtspine_1 aux_L_skirt_01 aux_L_skirt_02 aux_L_skirt_03 aux_L_skirt_04 aux_L_skirt_05 aux_L_skirt_06 aux_R_skirt_01 aux_R_skirt_02 aux_R_skirt_03 aux_R_skirt_04 aux_R_skirt_05 aux_R_skirt_06 child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/BlackJawSuperunique/Attachments/skirt/BlackJawSkirt.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false aux_animation_control_ratio spine_1_jntBnd phys_L_skirt_01_jntBnd phys_skinned_L_skirt_02_jntBnd phys_skinned_L_skirt_03_jntBnd phys_skinned_L_skirt_04_jntBnd phys_skinned_L_skirt_05_jntBnd phys_skinned_L_skirt_06_jntBnd phys_R_skirt_01_jntBnd phys_skinned_R_skirt_02_jntBnd phys_skinned_R_skirt_03_jntBnd phys_skinned_R_skirt_04_jntBnd phys_skinned_R_skirt_05_jntBnd phys_skinned_R_skirt_06_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/BlackJawSuperunique/attachments/BlackJawSuperuniqueWeaponHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/BlackJawSuperunique/Attachments/weapon/BlackJawSuperuniqueWeapon.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/BlackJawSuperunique/Attachments/weapon/BlackJawSuperuniqueWeapon.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/BlackJawSuperunique/Attachments/weapon/BlackJawSuperuniqueWeapon.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/BlackJawSuperunique/BlackJaw.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/BlackJawSuperunique/BlackjawSuperunique_armour_afdb944a.smd"
+Materials 1
+	"Art/Models/MONSTERS/BlackJawSuperunique/Textures/BlackJawSuperuniqueV2c.mat" 9
+BoundingBox -84.8742 -23.9414 -212.385 84.8742 90.1192 0.812182
+BoneGroups 27
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_attachment"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_attachment"
+	"grp_tail_01" 2 "phys_skinned_tail_01_jntBnd" "phys_skinned_tail_02_jntBnd"
+	"grp_tail_02" 2 "phys_skinned_tail_02_jntBnd" "phys_skinned_tail_03_jntBnd"
+	"grp_tail_03" 2 "phys_skinned_tail_03_jntBnd" "phys_skinned_tail_04_jntBnd"
+	"grp_tail_04" 2 "phys_skinned_tail_04_jntBnd" "phys_skinned_tail_05_jntBnd"
+	"grp_tail_05" 2 "phys_skinned_tail_05_jntBnd" "phys_skinned_tail_06_jntBnd"
+	"grp_tail_06" 2 "phys_skinned_tail_06_jntBnd" "phys_skinned_tail_07_jntBnd"
+	"grp_tail_07" 2 "phys_skinned_tail_07_jntBnd" "phys_skinned_tail_08_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/BlackJawSuperunique/BlackjawSuperunique_armour_afdb944a.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 9 in the header, 9 in the block · 8584 triangles over 7414 vertices
+  names: 244 bytes said, 244 read  [agree]
+
+=== shapes (10)
+0	BodyShape	from 0	count 12234
+1	chestplateShape	from 12234	count 2448
+2	forearm_plateShape	from 14682	count 1494
+3	hairShape	from 16176	count 1044
+4	leg_platesShape	from 17220	count 2160
+5	shinpadsShape	from 19380	count 576
+6	shoulderpadsShape	from 19956	count 912
+7	spinespikesShape	from 20868	count 4452
+8	teethShape	from 25320	count 432
+9	skirtShape	from 25752	count 1266
+
+=== fitting
+the monster's rig: 121 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_animation_control_ratio, aux_skirtspine_1, aux_skirtbase, aux_L_skirt_01, aux_R_skirt_01, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_skirt_02, aux_R_skirt_02, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_skirt_03, aux_R_skirt_03, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_skirt_04, aux_R_skirt_04, aux_L_skirt_05, aux_R_skirt_05, aux_L_Weapon_attachment, aux_R_Weapon_attachment, aux_L_skirt_06, aux_R_skirt_06
+  BlackJawSuperuniqueSkirtHeld.ao  socket aux_skirtbase [in its carrier's rig]  box (-19.3,-2.7,-5.9)..(19.3,23.2,72.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 422 triangles over 500 vertices
+    names: 20 bytes said, 20 read  [agree]
+    rig 15 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 15  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,17.3,0.9)  carrier has (0,2,-119.5)
+      2 phys_L_skirt_01_jntBnd  [its own]  under 0  rests at (5.5,0.3,6.1)
+      3 phys_R_skirt_01_jntBnd  [its own]  under 0  rests at (-5.5,0.3,6.1)
+      4 phys_skinned_L_skirt_02_jntBnd  [its own]  under 2  rests at (5.5,0.9,18.2)
+      5 phys_skinned_R_skirt_02_jntBnd  [its own]  under 3  rests at (-5.5,0.9,18.2)
+      6 phys_skinned_L_skirt_03_jntBnd  [its own]  under 4  rests at (5.5,1.5,30.4)
+      7 phys_skinned_R_skirt_03_jntBnd  [its own]  under 5  rests at (-5.5,1.5,30.4)
+      8 phys_skinned_L_skirt_04_jntBnd  [its own]  under 6  rests at (5.5,2.1,42.5)
+      9 phys_skinned_R_skirt_04_jntBnd  [its own]  under 7  rests at (-5.5,2.1,42.5)
+      10 phys_skinned_L_skirt_05_jntBnd  [its own]  under 8  rests at (5.5,2.8,54.7)
+      11 phys_skinned_R_skirt_05_jntBnd  [its own]  under 9  rests at (-5.5,2.8,54.7)
+      12 phys_skinned_L_skirt_06_jntBnd  [its own]  under 10  rests at (5.5,3.4,66.8)
+      13 phys_skinned_R_skirt_06_jntBnd  [its own]  under 11  rests at (-5.5,3.4,66.8)
+      14 aux_animation_control_ratio  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  BlackJawSuperuniqueWeaponHeld.ao  socket R_Weapon [NOT in its carrier's rig]  box (-35.7,-23.4,-110.2)..(35.6,7.1,65.7)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 11 in the header, 11 in the block · 4076 triangles over 4333 vertices
+    names: 958 bytes said, 958 read  [agree]
+    rig 1 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 1  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)

@@ -1,0 +1,207 @@
+monster: Sea-tribe Harpooner [Metadata/Monsters/BloodClan/BloodClanHarpooner]
+
+=== .ao Metadata/Monsters/BloodClan/BloodClanDuo/BloodClanDuoBottomNoHorn.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BloodClan/BloodClanDuo/BottomClansman/Animations/harpoon/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/BloodClan/BloodClanDuo/Attachments/BloodClanDuoCloakBottom.ao"
+}
+
+Melee
+{
+	animation = "attack_01"
+		shape = "Rectangle"
+			frame = "0.49162 0"
+			frame = "0.608939 1"
+			width = 75.145
+			length = 196.532
+			impact_x_rotation = "-0.0872665 -0.349066"
+			impact_type = "Piercing"
+			impact_bone = "aux_serverbone_xyzy_staff_top"
+	animation = "attack_02"
+		shape = "Rectangle"
+			frame = "0.418994 0"
+			frame = "0.52514 1"
+			width = 75.145
+			length = 196.532
+			impact_x_rotation = "0.174533 0.349066"
+			impact_type = "Piercing"
+			impact_bone = "aux_serverbone_xyzy_staff_top"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BloodClan/BloodClanDuo/BottomClansman/Animations/harpoon/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BloodClan/BloodClanDuo/BottomClansman/BloodClanDuoBottomNoHorn.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd neck_jntBnd"
+		bone_group = "frameupper false R_wrist_jntBnd R_elbow_jntBnd R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_elbow_jntBnd L_wrist_jntBnd"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/BloodClan/BloodClanDuo/Attachments/BloodClanDuoCloakBottom.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BloodClan/BloodClanDuo/attachments/BloodClanDuoCloak_armour.amd"
+	default_animation = "BloodClanDuoBottom"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BloodClan/BloodClanDuo/attachments/BloodClanDuoCloak_armour.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BloodClan/BloodClanDuo/attachments/BloodClanDuoCloak.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BloodClan/BloodClanDuo/BottomClansman/BloodClanDuoBottomNoHorn.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BloodClan/BloodClanDuo/BottomClansman/BloodClanDuoBottomNoHorn_armour_c06b9588.smd"
+Materials 1
+	"Art/Textures/Monsters/BloodClan/DuoBotcns.mat" 1
+BoundingBox -69.1177 -14.703 -146.401 69.1177 25.9952 0.335292
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/BloodClan/BloodClanDuo/BottomClansman/BloodClanDuoBottomNoHorn_armour_c06b9588.smd
+  version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 1 in the header, 1 in the block · 3050 triangles over 2078 vertices
+  names: 36 bytes said, 36 read  [agree]
+
+=== shapes (1)
+0	DuoBottom_lowShape	from 0	count 9150
+
+=== fitting
+the monster's rig: 58 bones
+mounts: aux_head_jntBnd, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_serverbone_xyzy_staff_top, aux_serverbone_xyzy_staff_bot
+  BloodClanDuoCloakBottom.ao  socket chest_jntBnd [in its carrier's rig]  box (-24,-4.9,-15.4)..(24,64.8,72.6)
+    (the geometry did not read)
+    rig 29 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 skinned_phys_L_inner_01_jntBnd  [its own]  under 0  rests at (4.2,8.5,-8)
+      2 skinned_phys_R_inner_01_jntBnd  [its own]  under 0  rests at (-4.2,8.5,-8)
+      3 skinned_phys_L_outer_01_jntBnd  [its own]  under 0  rests at (12.5,8.5,-8)
+      4 skinned_phys_R_outer_01_jntBnd  [its own]  under 0  rests at (-12.5,8.5,-8)
+      5 skinned_phys_L_front_01_jntBnd  [its own]  under 0  rests at (13.2,-3.3,1.1)
+      6 skinned_phys_R_front_01_jntBnd  [its own]  under 0  rests at (-13.2,-3.3,1.1)
+      7 skinned_phys_L_inner_02_jntBnd  [its own]  under 1  rests at (4.3,20.8,3.9)
+      8 skinned_phys_R_inner_02_jntBnd  [its own]  under 2  rests at (-4.3,20.8,3.9)
+      9 skinned_phys_L_outer_02_jntBnd  [its own]  under 3  rests at (12.9,20.8,3.9)
+      10 skinned_phys_R_outer_02_jntBnd  [its own]  under 4  rests at (-12.9,20.8,3.9)
+      11 skinned_phys_L_front_02_jntBnd  [its own]  under 5  rests at (15.7,-2.8,21.5)
+      12 skinned_phys_R_front_02_jntBnd  [its own]  under 6  rests at (-15.7,-2.8,21.5)
+      13 skinned_phys_L_inner_03_jntBnd  [its own]  under 7  rests at (4.5,33.1,15.7)
+      14 skinned_phys_R_inner_03_jntBnd  [its own]  under 8  rests at (-4.5,33.1,15.7)
+      15 skinned_phys_L_outer_03_jntBnd  [its own]  under 9  rests at (13.3,33.1,15.7)
+      16 skinned_phys_R_outer_03_jntBnd  [its own]  under 10  rests at (-13.3,33.1,15.7)
+      17 skinned_phys_L_front_03_jntBnd  [its own]  under 11  rests at (18.2,-2.4,41.8)
+      18 skinned_phys_R_front_03_jntBnd  [its own]  under 12  rests at (-18.2,-2.4,41.8)
+      19 skinned_phys_L_inner_04_jntBnd  [its own]  under 13  rests at (4.6,45.4,27.6)
+      20 skinned_phys_R_inner_04_jntBnd  [its own]  under 14  rests at (-4.6,45.4,27.6)
+      21 skinned_phys_L_outer_04_jntBnd  [its own]  under 15  rests at (13.7,45.4,27.6)
+      22 skinned_phys_R_outer_04_jntBnd  [its own]  under 16  rests at (-13.7,45.4,27.6)
+      23 skinned_phys_L_front_04_jntBnd  [its own]  under 17  rests at (20.7,-2,62.2)
+      24 skinned_phys_R_front_04_jntBnd  [its own]  under 18  rests at (-20.7,-2,62.2)
+      25 skinned_phys_L_inner_05_jntBnd  [its own]  under 19  rests at (4.7,57.8,39.4)
+      26 skinned_phys_R_inner_05_jntBnd  [its own]  under 20  rests at (-4.7,57.8,39.4)
+      27 skinned_phys_L_outer_05_jntBnd  [its own]  under 21  rests at (14.1,57.8,39.4)
+      28 skinned_phys_R_outer_05_jntBnd  [its own]  under 22  rests at (-14.1,57.8,39.4)

@@ -1,0 +1,980 @@
+monster: Isabel, Mourning Wife [Metadata/Monsters/BitterGuy/BitterGuyWifeGhost]
+
+=== .ao Metadata/Monsters/BitterGuy/BitterGuyWifeGhostSummoned.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BitterWifeGhost/rig.amd"
+	default_animation = "circle_player_01"
+	animations = '[
+		{
+			"name": "circle_player_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3919999897480011,
+					"name": "ripple"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "contact",
+					"position": [
+						-135.74200439453126,
+						-40.80580139160156,
+						-113.35900115966797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5,
+					"name": "contact",
+					"position": [
+						-44.53260040283203,
+						-159.697998046875,
+						-118.5989990234375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7000000476837159,
+					"name": "contact",
+					"position": [
+						126.27400207519531,
+						-140.23699951171876,
+						-119.94499969482422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.899999976158142,
+					"name": "contact",
+					"position": [
+						206.5570068359375,
+						34.554500579833987,
+						-119.58100128173828
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "contact",
+					"position": [
+						171.76699829101563,
+						135.25100708007813,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0999999046325685,
+					"name": "contact",
+					"position": [
+						85.11859893798828,
+						200.6320037841797,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.200000047683716,
+					"name": "contact",
+					"position": [
+						-22.087099075317384,
+						216.9459991455078,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.299999952316284,
+					"name": "contact",
+					"position": [
+						-124.1989974975586,
+						179.9199981689453,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4000000953674318,
+					"name": "contact",
+					"position": [
+						-196.0019989013672,
+						98.09980010986328,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5,
+					"name": "contact",
+					"position": [
+						-219.14500427246095,
+						-8.454130172729493,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5999999046325685,
+					"name": "contact",
+					"position": [
+						-187.36399841308595,
+						-112.65699768066406,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.700000047683716,
+					"name": "contact",
+					"position": [
+						-109.59300231933594,
+						-188.3820037841797,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "contact",
+					"position": [
+						-5.277919769287109,
+						-218.00399780273438,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.9000000953674318,
+					"name": "contact",
+					"position": [
+						100.66999816894531,
+						-194.0679931640625,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0,
+					"name": "contact",
+					"position": [
+						182.16099548339845,
+						-121.89199829101563,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0999999046325685,
+					"name": "contact",
+					"position": [
+						218.4759979248047,
+						-19.07859992980957,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.200000047683716,
+					"name": "contact",
+					"position": [
+						200.00599670410157,
+						88.2853012084961,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.299999952316284,
+					"name": "contact",
+					"position": [
+						132.33999633789063,
+						173.16099548339845,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.4000000953674318,
+					"name": "contact",
+					"position": [
+						32.559200286865237,
+						215.62399291992188,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5,
+					"name": "contact",
+					"position": [
+						-75.55259704589844,
+						205.15499877929688,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5999999046325685,
+					"name": "contact",
+					"position": [
+						-165.447998046875,
+						143.76199340820313,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.700000047683716,
+					"name": "contact",
+					"position": [
+						-214.36199951171876,
+						46.31050109863281,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.799999952316284,
+					"name": "contact",
+					"position": [
+						-209.49400329589845,
+						-62.52170181274414,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.9000000953674318,
+					"name": "contact",
+					"position": [
+						-152.99899291992188,
+						-155.20899963378907,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.0,
+					"name": "contact",
+					"position": [
+						-59.327301025390628,
+						-209.84300231933595,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.099999904632568,
+					"name": "contact",
+					"position": [
+						49.24380111694336,
+						-213.0070037841797,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.199999809265137,
+					"name": "contact",
+					"position": [
+						146.125,
+						-163.36399841308595,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.300000190734863,
+					"name": "contact",
+					"position": [
+						206.8679962158203,
+						-72.81179809570313,
+						-119.43499755859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.400000095367432,
+					"name": "contact",
+					"position": [
+						214.71800231933595,
+						35.64590072631836,
+						-117.94000244140625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.5,
+					"name": "contact",
+					"position": [
+						166.64599609375,
+						131.41700744628907,
+						-111.18900299072266
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.599999904632568,
+					"name": "contact",
+					"position": [
+						79.38710021972656,
+						188.24200439453126,
+						-101.13400268554688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.699999809265137,
+					"name": "contact",
+					"position": [
+						-20.507999420166017,
+						193.11300659179688,
+						-90.13890075683594
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.800000190734863,
+					"name": "contact",
+					"position": [
+						-104.65599822998047,
+						149.1929931640625,
+						-80.47059631347656
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.170179843902588,
+					"name": "stopmoving"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.821499824523926,
+					"name": "groundimpact"
+				}
+			]
+		},
+		{
+			"name": "fly_away_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.05000000074505806,
+					"name": "contact",
+					"position": [
+						0.0,
+						-167.90699768066407,
+						-157.12899780273438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.17000000178813935,
+					"name": "contact",
+					"position": [
+						0.0,
+						-227.89599609375,
+						-148.80599975585938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.28999999165534975,
+					"name": "contact",
+					"position": [
+						0.0,
+						-347.9179992675781,
+						-132.09500122070313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4099999964237213,
+					"name": "contact",
+					"position": [
+						0.0,
+						-467.8529968261719,
+						-135.8000030517578
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5299999713897705,
+					"name": "contact",
+					"position": [
+						0.0,
+						-587.7999877929688,
+						-157.35899353027345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6499999761581421,
+					"name": "contact",
+					"position": [
+						0.0,
+						-707.9030151367188,
+						-168.01100158691407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7699999809265137,
+					"name": "contact",
+					"position": [
+						0.0,
+						-827.906005859375,
+						-159.37899780273438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8899999856948853,
+					"name": "contact",
+					"position": [
+						0.0,
+						-947.9039916992188,
+						-140.04299926757813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0099999904632569,
+					"name": "contact",
+					"position": [
+						0.0,
+						-1067.9100341796876,
+						-130.74099731445313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1299999952316285,
+					"name": "contact",
+					"position": [
+						0.0,
+						-1187.800048828125,
+						-144.01400756835938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.25,
+					"name": "contact",
+					"position": [
+						0.0,
+						-1307.8499755859376,
+						-164.48500061035157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3700000047683716,
+					"name": "contact",
+					"position": [
+						0.0,
+						-1427.9200439453126,
+						-166.6060028076172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4900000095367432,
+					"name": "contact",
+					"position": [
+						0.0,
+						-1547.9000244140626,
+						-151.02200317382813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5618699789047242,
+					"name": "disintegrate"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6100000143051148,
+					"name": "contact",
+					"position": [
+						0.0,
+						-1667.9200439453126,
+						-133.2469940185547
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6660000085830689,
+					"name": "contact",
+					"position": [
+						0.0,
+						-1723.9100341796876,
+						-130.39100646972657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6660000085830689,
+					"name": "rippleend",
+					"position": [
+						0.0,
+						-1723.9100341796876,
+						-130.39100646972657
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/BitterGuy/BitterWifeGhostHair.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BitterWifeGhost/rig.ast"
+		linear_allowed_contraction = 0.100
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+	}
+	
+	AnimatedRender
+	{
+		z_translation = -35.000000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BitterWifeGhost/BitterWifeGhost.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "circle_player_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 5.262750148773193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_2/Lachlann/Effects/Wife/EffectWifeNoise",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.473989963531494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_2/Lachlann/EffectWhoosh",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fly_away_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_2/Lachlann/Effects/Wife/WifeFly",
+						"bone_name": "phys_skinned_ankles_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_2/Lachlann/Effects/Wife/WifeChase",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false L_shoulder_jntBnd L_clavicle_jntBnd chest_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+		bone_group = "trail_tail false chest_jntBnd"
+		bone_group = "arm_R false R_clavicle_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_wrist_jntBnd"
+		bone_group = "arm_L false L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd L_elbow_Twist_jntBnd_1 L_elbow_Twist_jntBnd_2 L_wrist_jntBnd"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "circle_player_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 7.0,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_body_idle.pet",
+						"bone_groups": [
+							"arm_R",
+							"arm_L"
+						]
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_body_idle.pet",
+						"bone_group": "frameupper"
+					}
+				]
+			},
+			{
+				"name": "emerge_upsidedown_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_body_idle.pet",
+						"bone_group": "frameupper"
+					}
+				]
+			},
+			{
+				"name": "fly_away_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_body_idle.pet",
+						"bone_group": "frameupper"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_body_idle.pet",
+						"bone_group": "frameupper"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_body_idle.pet",
+						"bone_group": "frameupper"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_body_idle.pet",
+						"bone_group": "frameupper"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5099999904632568,
+						"end_time": 0.7078719735145569,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/ghost_cleave.trl",
+						"bone_group": "arm_R"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.31699201464653017,
+						"end_time": 0.8112770318984985,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/ghost_cleave.trl",
+						"bone_group": "arm_R"
+					}
+				]
+			},
+			{
+				"name": "circle_player_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.45438599586486819,
+						"end_time": 6.86081600189209,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_trail.trl",
+						"bone_group": "trail_tail"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.8851060271263123,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_kids_trail.trl",
+						"bone_group": "trail_tail"
+					}
+				]
+			},
+			{
+				"name": "emerge_upsidedown_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.6529629826545715,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_kids_trail.trl",
+						"bone_group": "trail_tail"
+					}
+				]
+			},
+			{
+				"name": "fly_away_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.16589100658893586,
+						"end_time": 1.6454410552978516,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_kids_trail.trl",
+						"bone_group": "trail_tail"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 2.9578700065612795,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_kids_trail.trl",
+						"bone_group": "trail_tail"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.2614949941635132,
+						"end_time": 1.2609610557556153,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/BitterGuy_Boss/wife_kids_trail.trl",
+						"bone_group": "trail_tail"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "circle_player_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 6.831009864807129,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/BitterGuy_Boss/childNovaImpact.ao"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/BitterGuy/BitterWifeGhostHair.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BitterWifeGhost/attachments/BitterWifeGhostHair.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BitterWifeGhost/attachments/BitterWifeGhostHair.ast"
+		linear_allowed_contraction = 0.457
+		bend_stiffness = 285.000
+		bend_allowed_angle = 2.000
+		normal_viscosity_multiplier = 0.815
+		tangent_viscosity_multiplier = 0.654
+		enclosure_angle = 0.662
+		animation_velocity_factor = 10.000
+		gravity = -100.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BitterWifeGhost/attachments/BitterWifeGhostHair.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BitterWifeGhost/BitterWifeGhost.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BitterWifeGhost/BitterWifeGhost_armour_8df2333a.smd"
+Materials 2
+	"Art/Textures/Monsters/BitterGuy/Mother_Bodyc.mat" 5
+	"Art/Textures/masks/transparentobjects_nooutline2c.mat" 2
+BoundingBox -1800.5 -1800.5 -1800 1800.5 1800.5 1800
+BoneGroups 16
+	"root" 1 "phys_skinned_hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "jaw_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "phys_skinned_spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "phys_skinned_hip_jntBnd" "phys_skinned_spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "phys_skinned_hip_jntBnd" "phys_skinned_knees_jntBnd"
+	"grp_l_shin" 2 "phys_skinned_knees_jntBnd" "phys_skinned_ankles_jntBnd"
+
+=== .smd Art/Models/MONSTERS/BitterWifeGhost/BitterWifeGhost_armour_8df2333a.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 7 in the header, 7 in the block · 5031 triangles over 3566 vertices
+  names: 184 bytes said, 184 read  [agree]
+
+=== shapes (7)
+0	BodyShape	from 0	count 12036
+1	GumsShape	from 12036	count 381
+2	SalivaShape	from 12417	count 588
+3	TongueShape	from 13005	count 84
+4	VinesShape	from 13089	count 1998
+5	bbox_extension_Shape1	from 15087	count 3
+6	bbox_extension_Shape2	from 15090	count 3
+
+=== fitting
+the monster's rig: 49 bones
+mounts: aux_animation_control_ratio
+  BitterWifeGhostHair.ao  socket head_jntBnd [in its carrier's rig]  box (-24.7,-9.8,-19.2)..(22.9,23.3,18.4)
+    (the geometry did not read)
+    rig 37 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L_bot_hair_jntBnd_4  [its own]  under 0  rests at (3,7.8,-0.5)
+      2 phys_skinned_L_bot_hair_jntBnd_1  [its own]  under 0  rests at (7.9,4.6,-0.5)
+      3 phys_skinned_L_mid_hair_jntBnd_7  [its own]  under 0  rests at (3.3,10.6,-7.6)
+      4 phys_skinned_L_mid_hair_jntBnd_4  [its own]  under 0  rests at (7.2,7.3,-7.6)
+      5 phys_skinned_L_mid_hair_jntBnd_1  [its own]  under 0  rests at (9,1.5,-7.6)
+      6 phys_skinned_L_top_hair_jntBnd_1  [its own]  under 0  rests at (3.7,-3.8,-12.3)
+      7 phys_skinned_R_top_hair_jntBnd_1  [its own]  under 0  rests at (-3.7,-3.8,-12.3)
+      8 phys_skinned_R_mid_hair_jntBnd_1  [its own]  under 0  rests at (-9,1.5,-7.6)
+      9 phys_skinned_R_mid_hair_jntBnd_4  [its own]  under 0  rests at (-7.2,7.3,-7.6)
+      10 phys_skinned_R_mid_hair_jntBnd_7  [its own]  under 0  rests at (-3.3,10.6,-7.6)
+      11 phys_skinned_R_bot_hair_jntBnd_1  [its own]  under 0  rests at (-7.9,4.6,-0.5)
+      12 phys_skinned_R_bot_hair_jntBnd_4  [its own]  under 0  rests at (-3,7.8,-0.5)
+      13 phys_skinned_L_bot_hair_jntBnd_5  [its own]  under 1  rests at (3.9,10.3,5.6)
+      14 phys_skinned_L_bot_hair_jntBnd_2  [its own]  under 2  rests at (10,6.8,5.5)
+      15 phys_skinned_L_mid_hair_jntBnd_8  [its own]  under 3  rests at (4.4,14.3,-6)
+      16 phys_skinned_L_mid_hair_jntBnd_5  [its own]  under 4  rests at (10,10.1,-6)
+      17 phys_skinned_L_mid_hair_jntBnd_2  [its own]  under 5  rests at (13,2.8,-6)
+      18 phys_skinned_L_top_hair_jntBnd_2  [its own]  under 6  rests at (5.4,1.2,-14.3)
+      19 phys_skinned_R_top_hair_jntBnd_2  [its own]  under 7  rests at (-5.4,1.2,-14.3)
+      20 phys_skinned_R_mid_hair_jntBnd_2  [its own]  under 8  rests at (-13,2.8,-6)
+      21 phys_skinned_R_mid_hair_jntBnd_5  [its own]  under 9  rests at (-10,10.1,-6)
+      22 phys_skinned_R_mid_hair_jntBnd_8  [its own]  under 10  rests at (-4.4,14.3,-6)
+      23 phys_skinned_R_bot_hair_jntBnd_2  [its own]  under 11  rests at (-10,6.8,5.5)
+      24 phys_skinned_R_bot_hair_jntBnd_5  [its own]  under 12  rests at (-3.9,10.3,5.6)
+      25 phys_skinned_L_bot_hair_jntBnd_6  [its own]  under 13  rests at (4.8,13.8,11.4)
+      26 phys_skinned_L_bot_hair_jntBnd_3  [its own]  under 14  rests at (12.7,9.8,11.3)
+      27 phys_skinned_L_mid_hair_jntBnd_9  [its own]  under 15  rests at (5.5,18,-4.5)
+      28 phys_skinned_L_mid_hair_jntBnd_6  [its own]  under 16  rests at (12.8,12.9,-4.4)
+      29 phys_skinned_L_mid_hair_jntBnd_3  [its own]  under 17  rests at (17.1,4.1,-4.4)
+      30 phys_skinned_L_top_hair_jntBnd_3  [its own]  under 18  rests at (6.9,7.5,-15.2)
+      31 phys_skinned_R_top_hair_jntBnd_3  [its own]  under 19  rests at (-6.9,7.5,-15.2)
+      32 phys_skinned_R_mid_hair_jntBnd_3  [its own]  under 20  rests at (-17.1,4.1,-4.4)
+      33 phys_skinned_R_mid_hair_jntBnd_6  [its own]  under 21  rests at (-12.8,12.9,-4.4)
+      34 phys_skinned_R_mid_hair_jntBnd_9  [its own]  under 22  rests at (-5.5,18,-4.5)
+      35 phys_skinned_R_bot_hair_jntBnd_3  [its own]  under 23  rests at (-12.7,9.8,11.3)
+      36 phys_skinned_R_bot_hair_jntBnd_6  [its own]  under 24  rests at (-4.8,13.8,11.4)

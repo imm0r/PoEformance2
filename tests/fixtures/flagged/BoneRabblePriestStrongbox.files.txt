@@ -1,0 +1,2174 @@
+monster: Vaal Skeletal Priest [Metadata/Monsters/Skeletons/BoneRabble/BoneRabblePriestStrongbox]
+
+=== .ao Metadata/Monsters/Skeletons/BoneRabble/Priest/BoneRabblePriest.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Skeletons/BoneRabble/Priest/BoneRabblePriestNoPhys"
+
+AnimationController
+{
+	animations = '[
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.33344000577926638,
+					"name": "move",
+					"position": [
+						0.0,
+						150.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.7000000476837159,
+					"end_time": 1.9329999685287476,
+					"name": "move",
+					"position": [
+						0.0,
+						-50.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3659999966621399,
+					"name": "move",
+					"position": [
+						0.0,
+						-155.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.565999984741211,
+					"end_time": 1.8330000638961793,
+					"name": "move",
+					"position": [
+						0.0,
+						40.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "sword_shield_knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.6660000085830689,
+					"name": "move",
+					"position": [
+						0.0,
+						150.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.7000000476837159,
+					"end_time": 2.132999897003174,
+					"name": "move",
+					"position": [
+						0.0,
+						-50.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "sword_shield_knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3659999966621399,
+					"name": "move",
+					"position": [
+						0.0,
+						-155.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.565999984741211,
+					"end_time": 1.8330000638961793,
+					"name": "move",
+					"position": [
+						0.0,
+						40.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		}
+	]'
+}
+
+client
+{
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "death_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.00675570173189044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13116435706615449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.00675570173189044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13116435706615449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09496770054101944,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveMetal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18088899552822114,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09496770054101944,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveMetal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18088899552822114,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09496770054101944,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveMetal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18088899552822114,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09496770054101944,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveMetal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18088899552822114,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "maraketh_mage_death_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.020287392660975457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3938869833946228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6001687049865723,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Attachments/Drop_Bow",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "maraketh_mage_death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02535923942923546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3678376078605652,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5942176580429077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Attachments/Drop_Bow",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "sword_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.944135069847107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1631929874420168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sword_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.1582043170928956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.722623348236084,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9167221784591675,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Skeletons/BoneRabble/Priest/BoneRabblePriestNoPhys.ao (depth 1)
+version 3
+extends "Metadata/Monsters/Skeletons/Basic/SkeletonBasic"
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/Skeletons/BoneRabble/Priest/BoneRabblePriestCape.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/Skeletons/BoneRabble/Priest/BoneRabblePriestCrown.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/Skeletons/BoneRabble/Priest/BoneRabblePriestRobe.ao"
+	attached_object = "R_Weapon Art/Models/Items/Weapons/OneHandWeapons/Scepters/Monsters/BoneRabbleSceptreAncient.fmt"
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/BasicSkeleton/BasicSkeleton.sm"
+		skin = "Art/Models/MONSTERS/BasicSkeleton/BoneRabblePriestNoPhys.sm"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "spellcast_sword_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8670949935913086,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BoneRabble/pet/on_act_spellcast_beam_hit.pet",
+						"bone_group": "aux_lightning"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "spellcast_sword_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.8660000562667847,
+						"name": "NewParameter",
+						"curve": "3 0 0 Linear 0.871528 1 Linear 1.866 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16976599395275117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveMetal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3788979947566986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5876529812812805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Swish",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17228899896144868,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveMetal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3587709963321686,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5510179996490479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Swish",
+						"bone_name": "R_thumb_1_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "flinch_big_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16216999292373658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveMetal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17497199773788453,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17497199773788453,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17979300022125245,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveMetal",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveSlow",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8227760195732117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6118600368499756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveSlow",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7682199478149416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveSlow",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2985100746154787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9614999294281008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveSlow",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "maraketh_mage_death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.023330500349402429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4529699981212616,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6901940107345581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Attachments/Drop_Bow",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "maraketh_mage_death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04860519990324974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21680200099945069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5089219808578491,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Attachments/Drop_Bow",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "maraketh_mage_death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Death",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.046661000698804858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30104199051856997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.474386990070343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Attachments/Drop_Bow",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "maraketh_mage_death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.031107399612665178,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2751150131225586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32551100850105288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Attachments/Drop_Bow",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "maraketh_mage_revive_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Revive",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6268500089645386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/BreathOut",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "maraketh_mage_revive_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Revive",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6080610156059265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/BreathOut",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "maraketh_mage_revive_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Revive",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6080610156059265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/BreathOut",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "maraketh_mage_revive_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Revive",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6080610156059265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/BreathOut",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spellcast_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.033555399626493457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveMetal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3191570043563843,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/BreathIn",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.450300008058548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6758450269699097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Swish",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7039279937744141,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/SwishSceptre",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8036800026893616,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Roar",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8963972926139832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Effects/CastLightning",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.111739993095398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveMetal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1296900510787964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sword_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2546566128730774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1330103874206544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5650345087051392,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/KnockdownB",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sword_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2256414294242859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0039169788360596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3867168426513672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/KnockdownB",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04744889959692955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveMetal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1826999932527542,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Vocal/Priest/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.285645991563797,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5355499982833862,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/MoveMetal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5606259703636169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9189580082893372,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_6_1/BoneRabble/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Skeletons/Basic/SkeletonBasic.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/rig.amd"
+	view_of = "spellcast_unarmed_01"
+		view_name = "spellcast_unarmed_01_fire"
+	view_of = "spellcast_unarmed_01"
+		view_name = "spellcast_unarmed_01_cold"
+	view_of = "spellcast_unarmed_01"
+		view_name = "spellcast_unarmed_01_lightning"
+	view_of = "spellcast_unarmed_01"
+		view_name = "spellcast_unarmed_01_chaos"
+	view_of = "spellcast_unarmed_02"
+		view_name = "spellcast_unarmed_02_fire"
+	view_of = "spellcast_unarmed_02"
+		view_name = "spellcast_unarmed_02_cold"
+	view_of = "spellcast_unarmed_02"
+		view_name = "spellcast_unarmed_02_lightning"
+	view_of = "spellcast_unarmed_02"
+		view_name = "spellcast_unarmed_02_chaos"
+	view_of = "death_unarmed_broken_bwd_01"
+		view_name = "pre_revive_unarmed_broken_bwd_idle_01"
+		view_begin = 2451
+	view_of = "attack_bow_01"
+		view_name = "attack_bow_lightning_01"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.5072060227394104,
+					"end_time": 0.5991830229759216,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.5072060227394104,
+					"end_time": 0.5991830229759216,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_bow_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "arrow_appear",
+					"position": [
+						0.0,
+						26.111600875854493,
+						-159.0749969482422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6751059889793396,
+					"name": "contact",
+					"position": [
+						-10.918399810791016,
+						-74.58799743652344,
+						-155.78700256347657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9922500252723694,
+					"name": "arrow_appear",
+					"position": [
+						0.0,
+						26.111600875854493,
+						-159.0749969482422
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_crossbow_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3731290102005005,
+					"name": "contact",
+					"position": [
+						-23.515199661254884,
+						-58.18389892578125,
+						-149.8470001220703
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9991440176963806,
+					"name": "arrow_appear",
+					"position": [
+						0.0,
+						-26.817800521850587,
+						-105.33100128173828
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_crossbow_large_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3731290102005005,
+					"name": "contact",
+					"position": [
+						-23.515199661254884,
+						-52.371299743652347,
+						-129.16000366210938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9991440176963806,
+					"name": "arrow_appear",
+					"position": [
+						0.0,
+						-26.817800521850587,
+						-105.33100128173828
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_sword_01",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.7237499952316284,
+					"end_time": 0.8084999918937683,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.7237499952316284,
+					"end_time": 0.8084999918937683,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_02",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.6637499928474426,
+					"end_time": 0.7515000104904175,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.6637499928474426,
+					"end_time": 0.7515000104904175,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_03",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.6377189755439758,
+					"end_time": 0.703499972820282,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.6377189755439758,
+					"end_time": 0.703499972820282,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_01",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.7192500233650208,
+					"end_time": 0.8084999918937683,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.7192500233650208,
+					"end_time": 0.8084999918937683,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_02",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.6614999771118164,
+					"end_time": 0.746999979019165,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.6614999771118164,
+					"end_time": 0.746999979019165,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_03",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.6277499794960022,
+					"end_time": 0.6847500205039978,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.6277499794960022,
+					"end_time": 0.6847500205039978,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "snipe_bow_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.2682900428771973,
+					"name": "contact",
+					"position": [
+						-2.5147900581359865,
+						-61.52040100097656,
+						-157.11000061035157
+					]
+				}
+			]
+		},
+		{
+			"name": "spellcast_sword_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8470500111579895,
+					"name": "contact",
+					"position": [
+						-18.877166748046876,
+						-42.64695739746094,
+						-219.5092315673828
+					]
+				}
+			]
+		},
+		{
+			"name": "spellcast_unarmed_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8041120171546936,
+					"name": "contact",
+					"position": [
+						-5.4320502281188969,
+						-77.94879913330078,
+						-136.43800354003907
+					]
+				}
+			]
+		},
+		{
+			"name": "spellcast_unarmed_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8041120171546936,
+					"name": "contact",
+					"position": [
+						17.386999130249025,
+						-76.24610137939453,
+						-137.68899536132813
+					]
+				}
+			]
+		},
+		{
+			"name": "throw_sword_unarmed_left_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.49707698822021487,
+					"name": "contact",
+					"position": [
+						15.695899963378907,
+						-69.49579620361328,
+						-130.59500122070313
+					]
+				}
+			]
+		},
+		{
+			"name": "throw_sword_unarmed_right_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.49391698837280276,
+					"name": "contact",
+					"position": [
+						-5.490230083465576,
+						-89.10749816894531,
+						-119.09300231933594
+					]
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4748600125312805,
+								0.0
+							],
+							[
+								0.5649719834327698,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.17453299462795258,
+						"angle": 3.141590118408203,
+						"x_axis_scale": 0.8820000290870667,
+						"length": 115.0,
+						"offset": [
+							-8.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.2967059910297394,
+							2.0594899654388429
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.463687002658844,
+								0.0
+							],
+							[
+								0.5762709975242615,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 3.141590118408203,
+						"x_axis_scale": 0.7870000004768372,
+						"length": 115.0,
+						"impact_x_rotation": [
+							-0.017453299835324289,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.2967059910297394,
+							-2.792530059814453
+						],
+						"impact_type": "Blunt",
+						"hand": "OffHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.48603400588035586,
+								0.0
+							],
+							[
+								0.558659017086029,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.10471999645233154,
+						"angle": 2.897249937057495,
+						"length": 138.72799682617188,
+						"impact_x_rotation": [
+							-0.08726649731397629,
+							-0.08726649731397629
+						],
+						"impact_z_rotation": [
+							0.43633198738098147,
+							1.309000015258789
+						],
+						"impact_type": "Slash"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.45251399278640749,
+								0.0
+							],
+							[
+								0.48603400588035586,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.4014259874820709,
+						"angle": 3.6651899814605715,
+						"length": 115.60700225830078,
+						"impact_x_rotation": [
+							0.17453299462795258,
+							-0.08726649731397629
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.9198600053787232
+						],
+						"impact_type": "Slash"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4301680028438568,
+								0.0
+							],
+							[
+								0.46927401423454287,
+								1.0
+							]
+						],
+						"rotation": 0.10471999645233154,
+						"width": 104.0459976196289,
+						"length": 156.06900024414063,
+						"impact_type": "Piercing"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_shield_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.48603400588035586,
+								0.0
+							],
+							[
+								0.558659017086029,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.10471999645233154,
+						"angle": 2.897249937057495,
+						"length": 138.72799682617188,
+						"impact_x_rotation": [
+							-0.08726649731397629,
+							-0.08726649731397629
+						],
+						"impact_z_rotation": [
+							0.43633198738098147,
+							1.309000015258789
+						],
+						"impact_type": "Slash"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_shield_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.45251399278640749,
+								0.0
+							],
+							[
+								0.48603400588035586,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.4014259874820709,
+						"angle": 3.6651899814605715,
+						"length": 115.60700225830078,
+						"impact_x_rotation": [
+							0.17453299462795258,
+							-0.08726649731397629
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.9198600053787232
+						],
+						"impact_type": "Slash"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_shield_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4301680028438568,
+								0.0
+							],
+							[
+								0.46927401423454287,
+								1.0
+							]
+						],
+						"rotation": 0.10471999645233154,
+						"width": 104.0459976196289,
+						"length": 156.06900024414063,
+						"impact_type": "Piercing"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/rig.ast"
+		socket = "Back"
+			parent = "aux_back_attachment"
+		socket = "aux_tip"
+			parent = "R_Weapon"
+			translation = "0 0 -35"
+		socket = "aux_lightning_hit"
+			parent = "R_Weapon"
+			translation = "-40 120 -500"
+		socket = "aux_meleeslash_control"
+			parent = "chest_jntBnd"
+			translation = "0 -25 0"
+		socket = "aux_axe_end"
+			parent = "R_Weapon"
+			translation = "0 0 -60"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/BasicSkeleton.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "back false aux_back_attachment"
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false L_elbow_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd neck_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd R_elbow_jntBnd"
+		bone_group = "meleeslash_control false chest_jntBnd aux_meleeslash_control"
+		bone_group = "melee_trail false R_Weapon aux_axe_end"
+		bone_group = "aux_weapon false aux_tip R_finger_1_jntBnd_3 R_wrist_jntBnd"
+		bone_group = "aux_lightning false aux_tip aux_lightning_hit"
+		bone_group = "hand_l false L_finger_1_jntBnd_1"
+		bone_group = "hand_r false R_finger_1_jntBnd_1"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_sword_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.75068598985672,
+						"end_time": 0.8084601759910584,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/BasicSkeleton/epk/weapon_swing.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.6773080229759216,
+						"end_time": 0.756368100643158,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/BasicSkeleton/epk/weapon_swing.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_shield_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.7293149828910828,
+						"end_time": 0.8127738833427429,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/BasicSkeleton/epk/weapon_swing.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_shield_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.6682549715042114,
+						"end_time": 0.7502476572990418,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/BasicSkeleton/epk/weapon_swing.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Skeletons/BoneRabble/Priest/BoneRabblePriestCape.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/attachments/BoneRabblePriest/BoneRabblePriestCape.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/attachments/BoneRabblePriest/BoneRabblePriestCape.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/BoneRabblePriest/BoneRabblePriestCape.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Skeletons/BoneRabble/Priest/BoneRabblePriestCrown.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/attachments/BoneRabblePriest/BoneRabblePriestCrown.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/attachments/BoneRabblePriest/BoneRabblePriestCrown.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		tangent_viscosity_multiplier = 0.100
+		enclosure_radius_additive = 0.050
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/BoneRabblePriest/BoneRabblePriestCrown.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Skeletons/BoneRabble/Priest/BoneRabblePriestRobe.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/attachments/BoneRabblePriest/BoneRabblePriestRobe.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/attachments/BoneRabblePriest/BoneRabblePriestRobe.ast"
+		linear_allowed_contraction = 0.400
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/BoneRabblePriest/BoneRabblePriestRobe.sm"
+	}
+}
+
+=== .ao Art/Models/Items/Weapons/OneHandWeapons/Scepters/Monsters/BoneRabbleSceptreAncient.fmt (depth 2)
+	   �ʟ��@ß��ß�@����ADOLm  8   �  �  �  2      �  �  �
+                         	    
+   	  
+                                                             !   " ! ! " # "   $ " % # & " $ % " & ' ( ) ' * ( * + ( * , + * - , - * . * / . 0 - . / 1 . 2 0 . 1 3 . 3 2 . 4 5 6 5 7 6 5 8 7 4 6 9 : 4 9 8 ; 7 8 < ; : 9 = > : = 9 6 ? > = @ A > @ = 9 B 9 ? B @ = C = B C A @ D E A D E D F G E F F D H D @ I D I H @ C I H I J K H J J I L I C L L C M C B M M B N B ? N N ? O ? P O 6 P ? O P Q 6 7 P P R Q 7 R P Q R S 7 ; R R T S ; T R S T U ; V T < V ; < W V T X U V X T U X Y W Z V V Z X W [ Z X \ Y Z \ X Y \ ] [ ^ Z Z ^ \ [ _ ^ \ ` ] ^ ` \ ] ` a _ b ^ ^ b ` _ c b c d b b e ` ` e a b d e a e f d g e e g f h i j i k j l i h j k m n l h k o m p l n m o q r p n s m q t p r s q u v t r w s u x t v w u y z x v { w y { y | } { | z ~ x ~  x ~ �  � �  � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � � �  �    		
+
+
+ ! "!#"!$#!%$!%&$'$&(&%'&)(*&)&*+,-,.-,/./0.01.2.123.21425324627526789:8;9;<9=8:=:>?;8@=>@>AB8=B?8C=@CB=D@AEBCFBEF?BECGH?FDAIHJ??J;KJHJL;;L<LM<KNJJNLONKLPMNPLPQMORNNRPSROPTQRTPTUQSVRRVTWVSTXUVXTXYUWZVVZX[ZWX\YZ\X\]Y\^]Z_\_^\[_Z_`^a_[a`_bIcbDIdbcdcefbdgDbfgbhgfhfijghgkDjkgk@DGkjkC@GCklmnnmolpmnoqrplqosrtpqsuvtruswvrxuwyzvxyw{zx|y{}~z|{}~|��~����{�������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������� ����  	
+
+	
+ 
+! 
+! !"
+!!#"#!"#$%#%$#	%&"$	'%%'(%($')(&$*(*$+&*(),(,*)-,-.,+*/,/*0+/0/1.2,,2/.32/4124/1454654265676872966983929:83;9;:9<=>=?>@=<>?AB@<?CAD@BACEFDBGAEHDFGEIJHFKGILHJKIMNLJOKMOMPQOPRLNSRNSTRTURVWXWYXVXZW[Y\VZ[]Y\Z^_][`\^a_[`^bc_ad`becadbfgcehdfigejgikjihflmhlmlnlonpqrqsrprtuptutvwuvwvxywxz{|{}|z|~z~~����������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������� � 		
+	
+			 !" "#$ #!%"%!&!'&"%(&')'*)%&+(%+&),+&,-(+.+,.-+/.,0(-0"(10-#"02012#0321423#245435647#4$#78$79876:474:6;:<97<7:=9<;>:<:>;?>?@>A<>A=<A>@B=ACA@CBADEFEGFDFHIDHFGJGKJJKLMJLFJNNJMHFNONMIHPQIP*QP)*PRNOHNRPHR)PRSRO,)RS/R/,RTUVUWVXUTVWYZXTW[Y\XZY[]^\Z_Y]`\^_]ab`^c_ad`bcaefdbgcegehighjdfkjfkljlmjnopoqpnprosqtnrsuqtrvwusxtvywsxvz{wy|xz}{y|z~{}�|~�}������~����������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������� ��������		
+
+����������� �    !"" #"#$"$ "%$#%&$$'  '!&'$'(!&)'')(*+,,+-*.+,-/0.*/-102./1342031540635784675986:79;<8:;9=<:>?<>?>@;=A=BA=CBDEFDGEHDFGIEHFJGKILHJIKMLJNIMOPLNOMQPNROQSTPRSQUTRVSUWWUXWXYZTVZV[\Z[\]Z^_`^a_b^`b`cdbcdcefdefeghijhkilhjljmnlmnmopnopoqrstsutrvswvrwrxywxz{|z}{|{~|~~���������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������� ��� 	
+	
+   !"""##"$$"#$%$&%' !$((()()*$+&+$(+,&(*-+(--*.+/,/+-/0,/10/-21/2-.21232.424356758695797:;85;<8=<;=;>?;5>;??59>?''?  ?9 9@@9: @@:A@@ABCDDCEBFCDEGHFBGEIHJFGIKLJHKIMLHNKMOPLNOMQPNROQSTPRSQUTRVWTVWVXSUYUZYU[Z\]^\_]`\^_a]`^b_cad`bacedbfaeghdfgeihfjgiklhjkimljnkmoompopqrlnrnstrstsuvwxyvxzvy{zy|{y}|y~|}}y~}��}�}���}������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������Ds�E&���� ֹ�,����.�LV�  `4}� �����b2�=�  `4"�!² �������(��,���3�O���J��踪5"���  `4�� ǀ��黔5�ʟ�  `4�D � ���8�Δ�  `4������黈9�;��6�����#�H�����v:�Q��e��u��O�����7�� �  J4�(��� S���黸;����ß���w©��Z���}��8(����ؿ{\����O�5�����[;1Ͽ]!M��o¨��X���A�	;Ds�I&�?�� *��,w��.�=�  `4"�!² �����(�LV�  `4}� ��}��b2��,���3@OI��Ih踪5"���  `4�� ǀ{�黔5�ʟ�  `4�D � �8�Δ�  `4����~黈9��8��@�G#�Hh���|:�� �  J4�(��� S�{黸;���n�\@^kO�Nd���7%����?�1���+O�5t��_;����ß�@�w©Z�ZY�}��81Ͽ_!M@�o¨X�X[�A�	;��@E&�����\ִ�Չ��.g&�?  `4�D!�H �������(�M@  `4���c ������b2��(@��3�C6�f�����踪5�d�@  `4�8�n ����黔5�@  `4{��  � �
+�8�˔@  `4��{����黈9�)@�)W�B��d�����8�W7�r,@T�)�e�"������k:���?ß����a�����}��8	2!@  L4LZ��b�P��黸;�?]!M�+� �b�����A�	;�@�)��V��^�I�̌�@�h;��@I&�?���\*���w���.�M@  `4���c ���}��b2g&�?  `4�D!�H �������(��(@��3@C6�hI���h�踪5�d�@  `4�8�n ���{�黔5�@  `4{��  � 
+��8�˔@  `4��{���}�黈9�>@�w@���fD"��j����{:4�@�J[@�j�eM��e��#��7	2!@  L4LZ��b�P��|�黸;g]�?ß�@��ZX��[��}��8��@���?B��\&N��u���Y;B�?_!M@'�[U��]��A�	;
+@Mܷ?���X<F���j�F��2"�"@��G>^��jE���j�H��3!�@S<�?%D
+�fG���}����2Q�:@wu>�Y
+�|
+��}����3��@�7�����`�F��j�H��4���?�6)@�3
+�5q���|���O1b�?f@���-_G��i�F�O1��)@�R���n
+�q���}����4+��?� ���<�F��4i�H�"5)�{�IY:@�-
+��|���|���04�Y�5O!@����hH��h�F�0�T�??*@��5q�}�"�O1�ֿ�o@�2
+¹f�
+�|����-�����@L���UI�0�h�F��-.�}�	7;@���}�}�"�0�Dֿ{M@�¹g��}�"��-��)�t��?�A
+5��|���]*����L�?r�¢+J�F�g�F�]*>�:�t����V
+���|����!kn"�dRo����J�Jg�F��!B�:�uu��*���}�"��!��)��R�?�5��}�"�]*l��x7�?Ƙ.���k���]*��"�,�G�>������j����!����@����Y���1l����-U@^���#@7���m���@m���0s�?u�@Ҍ�.c��>m���O1ܿ@Ǽ?��Y?��2+m����2(�@���?%�fH�}�"��2�c"@pRo>���k
+��Bl����3T�:@���>�-�|��}�"��3Rz@�N��'��aӻ�A�j����4�)@-����B�q���|�"��4� �?���Q��=���/�i���"5�.�?{M�~
+�G���}���"5Z�]>��#�c��	�G��Fi�H��5���?�o�R�G��
+�|�"�"5��X>/O!����	����i����5��|>	7;� �
+���}����5ꇊ�}�����ԡH�Eh�H�_6%?{>%Y:�W�
+����|�"��59��f���ӡ���h���_6�k��?*��|
+�ˏ�}���_6R��,Ǽ���«�I�80h�H��6����]6)��P�ˏ���|�"�_6x�Lܷ� �©Ź���i����6����ֿzl
+��}����6kn"�dRo����J�Hg�H��7>�:�t����V
+�� }����7��G>տl@����}�"��6��"�,�G�>������i����7B�:�uu��*����}�"��7�c"@pRo>���k
+��C�d����3xB@�[w>����z�ط�3ܿ@Ǽ?��Y?��Jg����2��?�Ԫ?t����[S �ط�24@��f�C����s��ط�4s�?u�@Ҍ�.c��;m���O1Rz@�N��'��aӻ�&�c����4p�x?�b@����3p!�طO1�J�?}���샀M��ط"5��/�J�@#��� ��{ �ط0� �?���Q��=����c���"5U@^���#@7���m���:g���0��R>�����郀��ط�5�꡿v��?�������i�ط�-��X>/O!����	����e����5����@����Y���e����-�p�}L�����샀ʐ�ط_6�� ���?�������:�ط]*9��f���ӡ����i���_6l��x7�?Ƙ.����d���]*������� ����ط�!��"�,�G�>������i����!x�Lܷ� �©Ź�۽e����6ܰ鿟[��T ��􃀒��ط�6��"�,�G�>������`����7������� �����ط�7"�"@��G>^��jE��#e�+��3
+@Mܷ?���X<F���j�*��2J@�D>m�� }������3%	�?���?D��}������2PM@Ql�B���}��-���4�kx?���?0��
+}�����O1��@�7�����`�F��Ec�+��4b�?f@���-_G�	�d�*�O1�
+�?s�俊���}��c��"5�X�<@]|��}����0+��?� ���<�F�Pb�+�"54�Y�5O!@����hH�4�a�*�0��d>��Q���}��|���5E������?���~�C����-Z�]>��#�c��	�G�%Gc�+��5�����@L���UI�M�a�*��-3Ld�3��������}�*v��_6����LRp?j���~�n���]*ꇊ�}�����ԡH�=0d�+�_6����L�?r�¢+J�P	b�*�]*�	���4�F����~�}����!kn"�dRo����J�Hg�*��!m����c����~�gH���6R��,Ǽ���«�I�=)h�+��6kn"�dRo����J�@4a�+��7�	���4�F����~�|���7�i�?9�?�F�AC6��k�6�F��2�=�?"ٙ�b�AD��k�D�H��3 2�>UȔ?��A?��}�����2 ��>z���j�A��}����3�	�?{_���6�AF̣�j@�H��4 �>i�@*o�Al}����O1�Ǐ?��?(��AD]ʀk��F�O1 >�>Iթ���A�}����4�S�?�5�����AH�ʀi:*�H�"5 ��>��@nf�A} �}����0�=�?�Y@CP�AEj �j���F�0 ��&@
+��A�l|�"�O1 ��>�@�X�Al>�}������-�i�?��?��AG[4�i�ӁF��- �پd@L|�A�|�|��"�0 �Ͼ�v@�n�A�l?�}�"��- �>��? ��A>l�}�쁴�]*���?�~~?J�AI4Y�g仁F�]* ^�>��Ƚ%>�A |�|�恴��!���?�%�����AK f�f��F��! ��f�ؽ�S�A��}�}�"��! Jžz�?���A�>m�}�"�]*�ː�9�x?���A�4^�k>���]*�������'ҳA��k�kD����!����F�?�5�A�\7�k7(����-�@��f�@ˍ�A�k�kD���0����	;�?��A�]ˀk?偏�O1����.|?6��A�6��k*ʁ���2 :⾌˓?�4�A�>��|
+�"��2�B���ƽ*�A� ��k
+�����3 j޾ൽ���A� ��|��"��3�u���-��xt�A�ʤ�j翁���4 "־�Ӫ�h"�A��}��"��4�*��>��hƙA��ˀj�ԁ��"5 ��>,m��O�A���}���"5��?����0�AJ���gJ�H��5 �˾f���e�A�}���"�"5� ��5P�jn�A���j������5 ��>�
+%�`B�A���|�����5���?�'���ܪAK�2�fE�H�_6 ����%�X�A� �}��"��5����������A��5�j����_6 z�>����9�A�>�|�_6�U�?8��l:�AL�X�f.ÁH��6 溾�w�aO�A�>�}��"�_6�*��ј�x�A��\�k�7����6 .�>Z���*��A�k�|
+灴��6���?�%�����AK f�f��H��7 ^�>��Ƚ%>�A |�|恴��7 6��ζ��쟳A��l�}��"��6�������'ҳA��k�k�D����7 ��f�ؽ�S�A��}�}�"��7�B���ƽ*�A� ��e������3�5��>����A�����ط�3����.|?6��A�6��f �����2��wa?8(�A��L��ط�2����!u��f�A���ȑ�ط�4����	;�?��A�]ˀk<����O1�u���-��xt�A�ʤ�d�ށ���4�������?VÚA��lāطO1�����#ݿQ��A������ط"5�R��&�?�f�A��{�ط0�*��>��hƙA��ˀe����"5�@��f�@ˍ�A�k�f@(���0����F���J�A�����ط�5�i�����?7�A��o7�ط�-� ��5P�jn�A���g�"����5����F�?�5�A�\7�e!F����-�g����ݿ<�A����?�ط_6�e����^?��A��Ch�ط]*����������A��5�k�#���_6�ː�9�x?���A�4^�e�M���]*�ϖ�Ƽ�����A���{�ط�!�������'ҳA��k�j�D����!�*��ј�x�A��\�g�)����6����焿M��A����r�ط�6�������'ҳA��k�b�>����7�ϖ�Ƽ�����A����{�ط�7�=�?"ٙ�b�AD��e+@�+��3�i�?9�?�F�AC6��l�;�*��2���?=�_�*�A}��|���3�G�?��_?B�A|��l���2���?gO|���A}��7p���4���?2��?���A}��K��O1�	�?{_���6�AF̣�bJ �+��4�Ǐ?��?(��AD]ʀe���*�O1���?��տ1~�A}��iD��"5�ٗ?oK�?�A}�����0�S�?�5�����AH�ʀ`R��+�"5�=�?�Y@CP�AEj �b�Ё*�0�\�?������A~���}���5���?m��?w�A}��Ɓ��-��?����0�AJ���aFՁ+��5�i�?��?��AG[4�aߴ�*��-���?|lֿ�_�A~��ś�_6���?I]?��A~�����]*���?�'���ܪAK�2�b-��+�_6���?�~~?J�AI4Y�a��*�]*�9�?����0ܰA~�ꄁ��!���?�%�����AK f�f��*��!��?!#�׮A~��@����6�U�?8��l:�AL�X�f'��+��6���?�%�����AK f�_1��+��7�9�?����0ܰA~�����7�=�  `4"�!�N d�����(�LV�  `4}��g J����b2Ds�E&�����`*G�,���.��,���3�O�gJ�J�踪5"���  `4���q 9���黔5�ʟ�  `4�D� �� ��8�Δ�  `4���{��黈9�;��6�����cG݀H����v:�Q��e��u�bO�O����7�� �  J4�(��` ���黸;����ß���w�WZ�Z��}��8(����ؿ{\��Z+��5����[;1Ͽ]!M��o�XX�X��A�	;�LV�  `4}��g J�}��b2�=�  `4"�!�N d�����(Ds�I&�?���`�G�,w���.��,���3@O�g��Ih�踪5"���  `4���q 9�{�黔5�ʟ�  `4�D� �� ��8�Δ�  `4���{�~�黈9��8��@��c�݀Hh����|:�� �  J4�(��` ��{�黸;���n�\@^k�c��Nd����7%����?�1��Zձ�5t���_;����ß�@�w�W��ZY��}��81Ͽ_!M@�o�X��X[��A�	;�M@  `4�� O�����b2g&�?  `4�D!¸ h�������(��@E&����¤*L�Չ���.��(@��3�C6K����踪5�d�@  `4�8 ?���黔5�@  `4{�  � �
+��8�˔@  `4�����黈9�)@�)W�B�M񀳛��8�W7�r,@T�)Fހ������k:	2!@  L4LZ�������黸;���?ß���O쀱���}��8�@�)��V���-��̌��@�h;�?]!M�+� M逳���A�	;g&�?  `4�D!¸ h�����(�M@  `4�� O��}��b2��@I&�?��¤�L��w��.��(@��3@C6���h踪5�d�@  `4�8 ?��{�黔5�@  `4{�  � 
+�8�˔@  `4���}黈9�>@�w@���ހ�j���{:4�@�J[@�j����e�#��7	2!@  L4LZ������|黸;g]�?ß�@�¦�[�}��8��@���?B���ڲ��u��Y;B�?_!M@'¥�逪]�A�	;!�@S<�?%D
+����}���2"�"@��G>^������jH��3
+@Mܷ?��¨ĺ���jF��2Q�:@wu>�Y
+���}���3��@�7���� .���jH��4���?�6)@�3
+�ˏ���|��O1b�?f@���ӡ���iF�O1(�@���?%��}"��2)�{�IY:@�-
+�
+����|��04�Y�5O!@���	����hF�0�T�??*@��ˏ�}"�O1.�}�	7;@����}"�0�ֿ�o@�2
+�G��
+�|���-s�?u�@Ҍ�ҝA�>m��O1ܿ@Ǽ?�§�B�2+m���2U@^���#@7��	�A��@m��0�c"@pRo>���C�Bl���3�����@L��<���0�hF��-T�:@���>�-���}"��3Rz@�N��'�-E�A�j���4��)@�R���n
+5��}���4+��?� ����W���4iH�"5�)@-����B5��|"��4� �?���Q���VG�/�i��"5�.�?{M�~
+¹g��}��"5Z�]>��#�c���i���FiH��5���?�o�R¹f�
+�|"�"5��X>/O!�����iH��i���5��|>	7;� �
+��}�}���5ꇊ�}�����,_��EhH�_6%?{>%Y:�W��|���|"��59��f���-_H��h��_6�k��?*��|
+�5q�}��_6R��,Ǽ����U<��80hH��6����]6)��P�5q���|"�_6x�Lܷ� ��W;G���i���6����ֿzl
+�fH�}���6kn"�dRo����g
+��HgH��7>�:�t����V
+�|� }���7��G>տl@�fG���}"��6B�:�uu��*�|
+���}"��7��"�,�G�>��jF���i���7��)�t��?�A
+�q���|��]*����L�?r��^ն�F�gF�]*>�:�t����V
+�|��|���!kn"�dRo����g
+��JgF��!B�:�uu��*�|
+��}"��!��)��R�?��q���}"�]*l��x7�?Ƙ�a�D��k��]*��"�,�G�>��jF���j���!����@���>�B��1l���-�Dֿ{M@��G���}"��-ܿ@Ǽ?�§�B�Jg���2xB@�[w>����|�zط�3�c"@pRo>���C�C�d���34@��f�C��
+|�s�ط�4��?�Ԫ?t����{�[S ط�2Rz@�N��'�-E�&�c���4s�?u�@Ҍ�ҝA�;m��O1�J�?}����}�M�ط"5p�x?�b@����{�3p!طO1� �?���Q���VG��c��"5��/�J�@#���{�{ ط0��R>������}��ط�5U@^���#@7��	�A��:g��0��X>/O!�����iH��e���5�꡿v��?����{��iط�-�p�}L����}�ʐط_6����@���>�B��e���-9��f���-_H���i��_6�� ���?����|��:ط]*x�Lܷ� ��W;G�۽e���6l��x7�?Ƙ�a�D���d��]*������ |��ط�!��"�,�G�>��jF���i���!ܰ鿟[��T �}���ط�6��"�,�G�>��jF���`���7������ |���ط�7J@�D>m��� ������3
+@Mܷ?��¨ĺ���j*��2"�"@��G>^�����#e+��3%	�?���?D����������2PM@Ql�B������-��4�kx?���?0���타���O1��@�7���� .���Ec+��4b�?f@���ӡ��	�d*�O1�
+�?s�俊������c�"5�X�<@]|�샀��0+��?� ����W��Pb+�"54�Y�5O!@���	���4�a*�0��d>��Q������|��5E������?���C���-Z�]>��#�c���i��%Gc+��5�����@L��<���M�a*��-3Ld�3��������*v�_6����LRp?j�����n��]*ꇊ�}�����,_��=0d+�_6����L�?r��^ն�P	b*�]*�	���4�F����}���!kn"�dRo����g
+��Hg*��!m����c����gH��6R��,Ǽ����U<��=)h+��6kn"�dRo����g
+��@4a+��7�	���4�F����|��7 2�>UȔ?��A��l�}����2�=�?"ٙ�b�A��k�k�DH��3�i�?9�?�F�A��]�k�6F��2 ��>z���j�A��}�}���3�	�?{_���6�A�4]�j@H��4 �>i�@*o�A�>�}���O1�Ǐ?��?(��A��6�k�F�O1 :⾌˓?�4�A�k�|
+�"��2 ��>��@nf�A� �}���0�=�?�Y@CP�A�� �j��F�0 ��&@
+��A�>�|�"�O1 �پd@L|�A���|�"�0 ��>�@�X�A�}�����-����	;�?��AD�5�k?���O1����.|?6��AD�]�k*����2�@��f�@ˍ�AD���kD��0�B���ƽ*�AE k�k
+����3�i�?��?��A��̀i��F��- j޾ൽ���A |�|��"��3�u���-��xt�AE6\�j����4 >�>Iթ���A�>m�}���4�S�?�5�����A�Z6�i:*H�"5 "־�Ӫ�h"�A>l�}��"��4�*��>��hƙAE]5�j����"5 ��>,m��O�A�l?�}��"5��?����0�A�g�gJH��5 �˾f���e�Al>�}��"�"5� ��5P�jn�AEk��j�����5 ��>�
+%�`B�A�|�|����5���?�'���ܪA�Y΀fE�H�_6 ����%�X�A} �}�"��5����������AE\ˀj���_6 z�>����9�A�l|���_6�U�?8��l:�A�3��f.�H��6 溾�w�aO�Al}�"�_6�*��ј�x�AE6��k�7���6 .�>Z���*��A�>��|
+����6���?�%�����A� ��f�H��7 ^�>��Ƚ%>�A� ��|����7 6��ζ��쟳A?��}�"��6 ��f�ؽ�S�A��}"��7�������'ҳAD��k�D���7 �>��? ��A��}����]*���?�~~?J�A�̧�g�F�]* ^�>��Ƚ%>�A� ��|�����!���?�%�����A� ��f�F��! ��f�ؽ�S�A��}"��! Jžz�?���A�}"�]*�ː�9�x?���AD̢�k>��]*�������'ҳAD��kD���!����F�?�5�AD�ɀk7(���- �Ͼ�v@�n�A���}"��-����.|?6��AD�]�f ����2�5��>����A|��ط�3�B���ƽ*�AE k�e�����3����!u��f�A|�ȑط�4��wa?8(�A|��L�ط�2�u���-��xt�AE6\�d�����4����	;�?��AD�5�k<���O1�����#ݿQ��A|���ط"5�������?VÚA|��l�طO1�*��>��hƙAE]5�e���"5�R��&�?�f�A|���{�ط0����F���J�A|����ط�5�@��f�@ˍ�AD���f@(��0� ��5P�jn�AEk��g�"���5�i�����?7�A|���o7ط�-�g����ݿ<�A|��?ط_6����F�?�5�AD�ɀe!F���-����������AE\ˀk�#��_6�e����^?��A|��Chط]*�*��ј�x�AE6��g�)���6�ː�9�x?���AD̢�e�M��]*�ϖ�Ƽ�����A|�{ط�!�������'ҳAD��j�D���!����焿M��A|��rط�6�������'ҳAD��b�>���7�ϖ�Ƽ�����A|��{ط�7���?=�_�*�A����|��3�i�?9�?�F�A��]�l�;*��2�=�?"ٙ�b�A��k�e+@+��3�G�?��_?B�A����l��2���?gO|���A�	�7p��4���?2��?���A����K�O1�	�?{_���6�A�4]�bJ +��4�Ǐ?��?(��A��6�e��*�O1���?��տ1~�A��iD�"5�ٗ?oK�?�A�����0�S�?�5�����A�Z6�`R�+�"5�=�?�Y@CP�A�� �b��*�0�\�?������A��}��5���?m��?w�A��������-��?����0�A�g�aF�+��5�i�?��?��A��̀aߴ*��-���?|lֿ�_�A���s��_6���?I]?��A������]*���?�'���ܪA�Y΀b-�+�_6���?�~~?J�A�̧�a�*�]*�9�?����0ܰA������!���?�%�����A� ��f�*��!��?!#�׮A��@���6�U�?8��l:�A�3��f'�+��6���?�%�����A� ��_1�+��7�9�?����0ܰA������7 ��?�aw?'	�A_D2���t�F��2���?�iO=��At
+2���u�H��3f3�?]�?���AeI���}����2D�u?���?�ţA3q���}���O1@�V?w�?]$�A0j2���t�F�O1��@;Ϫ=o��A|���}����3�A��@أA�|��}���0L�$��?+4�A�t2��u�F�0����η?K4�A�a3��t�F��-̩E��%@
+�A�}��}�"�0n᤿�r�?@أA�g��|����-n��W31?�$�A�33�+�t�F�]*_��D��?1�A�h��}�"��-���R?FƣA�6��|���]*�����"���	�A��3�4�t�F��!���Ӊ��
+��A��� }����!���e�T?G��A�7��}�"�]*2 �]f����A�����}�"��!�V��@s��Y�A��΀�t����!rZ俋t8?�t�A�4π�u���]*�h���m�?���A�bЀ�+v����-4�/�۱�?t��A�vр�/v���0�#T?=��?�t�A0lЀ.v���O1�t?��?�ߝA3r�}�"�O1�|�?��~?VY�A^F΀%!u����2���?ߥ�?���AeJ�}�"��2Ȝ�?���=�9�At̀3t����3k�@RZ�=l��A|� }�"��3��@����9}�Ap���|�"��4~�@@��/c�Ap���}����4|��?�a���Ah�̀+�t����4��?YNh��ΨAi�1��u�H��48�?��\Q�AE���}���"5��?\ӿAA�0��+v�H�"5���?�_�Tk�AE���|�"�"5���?9�Ͽ4�A@�̀�t���"54�B>��nQ�A
+���}����5�L->������A
+�/��/v�H��5��T����ΨAД0�.v�H�_6|?>>x��k�A
+���}�"��5p-">����M�A	�΀�u����5�W�N���AЖ΀��t���_6y�u�]w��c�A͎�}���_6��Ϳd>��8�A��2�%!u�H��6Q�v�����}�A͏���}�"�_6�6Ͽ����j:�A��΀��t����6^���SK����A�����}�"��6�V��@s��Y�A��΀��t����72 �]f����A�����}�"��7v���������A���}����6���Ӊ��
+��A��� }����7�����"���	�A��3�2t�H��7Ȝ�?���=�9�A��z�����3Ч�?'��=;җA��z�ط�3�|�?��~?VY�A��t*����2ʶ?H'd?��A��\Q �ط�2�g�?pPB�R��A���s��ط�4�#T?=��?�t�A��4o"���O1|��?�a���A���^�����4�t>?�ܸ?��A��5o"�طO1h�~?r �����A샀O��ط"5́�=�?��A�!��{!�ط0���?9�Ͽ4�A냀+����"54�/�۱�?t��A�!���s ���0�d>#9ڿ���A胀��ط�5��z�H�?�A����h �ط�-p-">����M�A胀�����5�h���m�?���A����K����-�?:���ƿ���A�냀ډ�ط_6FKǿUX&?:�A����8�ط]*�W�N���A�냀�����_6rZ俋t8?�t�A�������]*��ۿݭF�Q�A� ����ط�!�V��@s��Y�A����������!ҭ������җA�󃀜��ط�6�6Ͽ����j:�A�󃀜�����6�V��@s��Y�A����������7��ۿݭF�Q�A� �����ط�7���?�iO=��A }���+��3 ��?�aw?'	�A}����*��2$R�?,{E=�G�A }������3cn�?8�U?�b�A}������24��?�GF��0�A�}��,���4@�V?w�?]$�A
+}�ь�*�O1��?YNh��ΨA�}��R�+��40@?bد?Cz�A
+}�ь��O1��~?�崿6#�A�}��b��"5��޽���?݇�A�}����0��?\ӿA�}��v�+�"5L�$��?+4�A�}�0��*�0*3>81ٿI#�A�}��|���5Sn�-s�?���A�~�E����-�L->������A�}�{�+��5����η?K4�A�~�d��*��-�6/��Lƿ�0�A��}�+v��_6�!���b?�z�A�~�o���]*��T����ΨA��}�Nc�+�_6n��W31?�$�A�~�|��*�]*`�ҿ;�d�Fc�A��~�}����!�����"���	�A��~�}�*��!�����F��RH�A��~�hF���6��Ϳd>��8�A��~�hF�+��6�����"���	�A��~�v-�+��7`�ҿ;�d�Fc�A��~�}���7 ;���ʗ?�buA�(���сm��: ܿ  ̴�buA� ��!���ն,; �̿�3�?jzA�(���с��;���  ��lzA� ��!���V;  .���@lzA 9���ǁ���:  .�j��?�buA 9��	�ǁ���: ��?4�?izA((���ׁ��: Z�?�Ǘ?�buA((���ׁY�=:�$
+@   �izA9 ���������9 9�?  ���buA9 ��������: �̿�3�?jzA�Z �������!���  ��lzA�  � �����" �ʿ^d�?�ЗA�Z �������- L�  ���ЗA�  � ������-  .�֓@�ЗA  �� �����-  .���@lzA  �� �����! w�?���?m��AZZ ��Z��<��, ��?4�?izAZZ ��Z��8��!��@  ��m��A  � ����,�$
+@   �izA  � ��۵ ! w�?���?m��A  ��� /�V/ �ʿ^d�?�ЗA  ��� }�V/��@  ��m��A  ��  ��U   .�֓@�ЗA  ��� V�1 L�  ���ЗA  ��  #�U  �ʿ]dſ�ЗA  �� �}�V/ w�?��οm��A  �� �/�V/  .�ד��ЗA  �� �V�1�:���ʗ��buA�؏�wՁ��F: �̿�3ǿlzA�؏�wԁ׶(: ܿ  ̴�buA� ��}���:���  ��lzA� ��}�����9  .����lzA Ǐ��qǁ3��:  .�h�ֿ�buA Ǐ��qǁڶ�: ��?4ǿgzA(؏��tЁ��; Z�?�Ǘ��buA(؏��tЁ���:�$
+@   �izA9 ���y�5�[; 9�?  ���buA9 ���y��3; �̿�3ǿlzA�� �Z�����! �ʿ]dſ�ЗA�� �Z�����-���  ��lzA�  � ������! L�  ���ЗA�  � ������-  .�ד��ЗA � � �����-  .����lzA � � ����" w�?��οm��AZ� �ZZ��]�- ��?4ǿgzAZ� �ZZ �\�Q"��@  ��m��A  � ��-�$
+@   �izA  � ��#"  .�<+ؿ�YA ��  ��=;  .�h�ֿ�buA � �  ���;�K���ۘ��YA���Z��
+�=;�:���ʗ��buA�� �Z����;֚ݿ  ���YA� � ����>; ܿ  ̴�buA�  � �����; Z�?�Ǘ��buAZ� �ZZ�����;�j�?	٘��YAZ��ZZ����=; 9�?  ���buA  � ����;ֺ�?   ��YA � ����>;�j�?٘?�YAZZ��Z�	�=; Z�?�Ǘ?�buAZZ ��Z���;ֺ�?   ��YA � ���>; 9�?  ���buA  � ����;  .�j��?�buA  ��  ���;  .�>+�?�YA ��  ��=; ;���ʗ?�buA�Z ��������;�K���ۘ?�YA�Z�������=;֚ݿ  ���YA� � ���~�>; ܿ  ̴�buA�  � ���֡�;  .��&�?��3A ��  ���p;  .�>+�?�YA ��  ����;�є?4@�?��3AZZ��Z �\�p;�j�?٘?�YAZZ��Z �\��;�K���ۘ?�YA�Z��� ����;ֺ�?   ��YA �  ����;�����B�?��3A�Z��� ���p;@��?   ���3A �  ���p;�є?2@����3AZ��ZZ ���p;�j�?	٘��YAZ��ZZ ����;֚ݿ  ���YA� � � �/��;@�߿  ����3A� � � �/�p;�����B����3A���Z� ���p;�K���ۘ��YA���Z� ����;  .�<+ؿ�YA ��  ����;  .��&ڿ��3A ��  ���p;�є?2@����3AZ���� ��p;�j�?	٘��YAZ���� ���;  .��&ڿ��3A ���  ��p;  .�<+ؿ�YA ���  ���;!��?�F�?�U��>o ��>����0	F�?�F�?60�>o ��> ����4&�@0�p;�U��  �  ���0)[@Pq;60�  �  ���4!��?NN�U��>� �o> ���0	F�?EN�60�>� �o> ���4y����F�?60��o �������4'����F�?�U���o �������0a�Pq;60��  � ��Y��4&��0�p;�U���  � ��Z��0y���EN�60� �o��,��4'���NN�U�� �o��-��0	F�?EN�60�>� �o> ����4!��?NN�U��>� �o> ����0&�@0�p;�U��4 ���p�W�](���? �p;����4 ���p�8�%!��?�F�?�U��-���f�e�](��c?E�?M��-���f���%!��?�F�?�U��-���	�W�](��c?E�?M��-���	�9�%'����F�?�U���-�����e�](��c�E�?=���-�������%&��0�p;�U��� ��ɐ�e�]('����F�?�U���-�����W�](��� �p;����� ��ɐ���%��c�E�?=���-�����8�%&��0�p;�U��� ��7��W�](��� �p;����� ��7��8�%'���NN�U���Ҍ�H��e�](��c�eL��F����Ҍ�H�����$'���NN�U���Ҍ�|��W�](��c�eL��F����Ҍ�|��9�%!��?NN�U��Ҍ�|	�e�](��c?dL��W���Ҍ�|	���%&�@0�p;�U��4 ��7p�e�](!��?NN�U��Ҍ�Hf�W�](���? �p;����4 ��7p���%��c?dL��W���Ҍ�Hf�9��$)[@Pq;60�R a�(�߁e�](	F�?�F�?60�(Ha�R�!�W�](`t�?`q;.ݿR a�(�߁��
+%�]b?E�?I�ܿ(Ha�R�!�8��$)[@Pq;60�R a�،"�W�](`t�?`q;.ݿR a�،"�8�	%	F�?EN�60�(�a���߁e�](�6b?[L��	mݿ(�a���߁���$	F�?EN�60�(�a��� �W�](�6b?[L��	mݿ(�a��� �9�%y���EN�60�عa����e�](&�b�[L���kݿعa������%a�Pq;60�� a��tށe�](y���EN�60�عa��[!�W�](���`q;ݿ� a��tށ��	%&�b�[L���kݿعa��[!�8��$a�Pq;60�� a�(t!�W�](���`q;ݿ� a�(t!�8�	%y����F�?60��Ha�R[߁e�](D�b�E�?:�ܿ�Ha�R[߁���$y����F�?60��Ha�x �W�](D�b�E�?:�ܿ�Ha�x �9�%	F�?�F�?60�(Ha�x���e�](�]b?E�?I�ܿ(Ha�x�����%�|d?7�?�ӓ�7��p:򁓺.6k�<��d�n[� ��x
+؁�b2WK�<R56�J�	� ���~���(r�?P����[��XRف踪5��<4�y�|� � ��rɁ黔5��_<�2}�������>�~��8���;��>������O���黈9Kّ?;���+��d�3�K`ہ��v:�}@��Կ:� �i�+�Ci���7  .�E@ܿD<����U�}���黸;�$@    h���v�.�|�}��8 �?9q������X�F�R^���[;c�?    ����v�.�~��A�	;0�Y�Un?����Ȑ쀐:���.WK�<R56�J�	� ����	���(6k�<��d�n[� �ဉ��b2���|���¡�#��V�踪5��<4�y�|� � ��黔5��_<�2}�������>���8���;��>������O��黈9��6��������.��c���|:  .�E@ܿD<����U����黸;A���@I�pl�0��f���7 ᠿHq��������(��_��_;� �    J�����,��|�}��8 C�    ������+���A�	;��?皑?=�/@��v�&�F��2�Н?���=Ra�1��u1�H��3�r�>6�?9F�C��}�����2BL�>�y@�V�oƀ}����O1;P�?ɮ�?_��-iɀv��F�O1���>+Ē=�����}����3%��>����O����}	����4�ğ?�|��%�0�u&�H��4w�J�=ޮ�� ��|�"��34�>	��sg��ŀ}���"5�B�?w����/�ɀv-�H�"5�v�� ��?D�辖�|��"��4-�پ�Q��[��ƀ}��"�"5���"�e=#@�� ��t́���3뤠�����������u�ׁ���4�%�������їʀv�큏�"5֘��?�:��C��|	�"��2O����܎?���?��tׁ���2k����
+@�J��oƀ|�"�O1������?C���hˀu-큏�O1�o�2�@���}�}��"�0遡�v�
+@����v�v/����0&��_�?<��h7�v-����-���>� @���} �}�����0��?�M@��-w �w���F�0�C�?S��?Q]�/i6�v��F��-R�޾`t
+@����n;�}�"��-���|@�?|���>d�u&���]*y�>
+�
+@w��o:�}���-�£?���?���2?b�u�ׁF�]*Z!ӾZF�?<���Bj�}�"�]*�����W*=����u�u0����!sʾOB=�@���}�}�"��!��>�?�? ��Bj�|�聴�]*̸�?�=��4 t�t�́F��!���>nCa=LL� |�|灴��!��?<���3�b�tׁH��6̸�?�=��4 t�s́H��7�>��������i�|	聴��6���>nCa=LL� |�|灴��7�6�>�]�L���:�}�_6e8�?���k�1�5�u-�H�_6��ž.ڕ�����j�}��"��6sʾOB=�@���}�}�"��7�����W*=����u�u�0����7�˙�<\�������c�v�&����6�Ǿ5������:�}��"�_6\3��p��J�ӗ7�v����_6n��>��,����}�����5���?*O���/���v/��H��5�$Ͼ~~�{�� �}���"��5 ˛�9��y��Ӊ �w������5���"�e=#@��������3Y)��#w�=�7��
+��ط�3O����܎?�� �����2���Ɓ?�H��ط�2Lp����Z��!��̏�ط�4������?C�� j����O1뤠��������������4(�����?�� i��طO10=��rJſ�"�����ط"5e3��ɫ�?�� � z�ط0�%����������݁��"5遡�v�
+@�� � v#���0r*��ƿ志����ط�5���w6�?~��m:�ط�- ˛�9��y��������5&��_�?<�Q]����-�¢��ƿd����1�ط_6�줿�[�?���?j�ط]*\3��p��J���R���_6���|@�?|��y���]*�3��H�=����{�ط�!�����W*=����|����!8g����]�)����k�ط�6�˙�<\�������k����6�����W*=����v����7�3��H�=�����|�ط�7�Н?���=Ra�}�y�+��3��?皑?=�|��w�*��2�&�?1��=�5�}��|���3�b�?f �?s�|��a���2�զ?|P��&�}��3r���4;P�?ɮ�?_��|��:�*�O1�ğ?�|��%�}��XY�+��4���?�?r.�|��:��O1���?�轿;�}��gH��"5�?���?�,�|���	��0�B�?w����}��y�+�"5��?�M@��|���؁*�0� �?\�ݿ;�}���}	���5��?�J�?},	�}����-���?*O���}���y݁+��5�C�?S��?Q]�}	����*��-#^�?3���9	�~��qɁ�_6�C�?<??�@�~�����]*e8�?���k�~��Z��+�_6�£?���?���~�ㆁ*�]*�?T�=�1�~�섁��!̸�?�=��~���*��!ӷ�?AS�H�~��L����6��?<���~��+��+��6�?T�=�1�~�"����7̸�?�=��~���+��7�=g?7�?@ӓ�6q�q����.rѧ<R56@J�	� k��~����(��<��d@n[� {��x���b2���?P�@��[Q"�X��踪5î<4�y@|� � ~�s��黔5�G�<�2}@�����o>�~��8�<��>@���cO�}�黈9��?�1�?{���e95�J����v:  .�D@�?A<���[X�~黸;��
+@���?:� �g:.�G����7 �?9q�?����X<E�U����[;�$@    h���v�.���}��8c�?    ����v�.���A�	;#�[�Un?@����q뀐�����.��<��d@n[� {����ׁ�b2rѧ<R56@J�	� k�������(����|@��¤R!���؁踪5î<4�y@|� � ~�ȁ黔5�G�<�2}@�����o>�����8�<��>@���cO����黈9u;�����?u����:0���܁��|:6��@I�?pl;-������7  .�D@�?A<���[X����黸;� �    J�����,����}��8 ᠿHq�?�����C3�����_; C�    ������+�����A�	;�����B�?��3A�Z�������Z: ����?�Y��Z �����8�^.@�߿  ����3A� � ���
+�[: ��@���Y��  � ���^�f.  .�R��?�Y�  ��  ��[.  .��&�?��3A ��  ��Z: ��?��?�Y�ZZ ��Z�$�^.�є?4@�?��3AZZ��Z��[: ,�?�,%�Y�  � �ϲf.@��?   ���3A � ���[:@�߿  ����3A� � ����[: ��@���Y��  � ��ϲf.�����B����3A���Z���Z: ������Y��� �Z��$�^.  .��&ڿ��3A ��  ��Z:  .�R���Y� � �  ��[.�є?2@����3AZ��ZZ����[: ��?����Y�Z� �ZZ��8�^.@��?   ���3A � ���[: ,�?�,%�Y�  � ��^�f.|������q8���� �Z� �+�4 ������Y��� �Z� �1��;��~%q8���  � �����
+4 ��@���Y��  � � �ĵ�;  .�R���Y� � �  ����;  .��ݿq8�� � �  ���4 ��?����Y�Z� �ZZ �
+��;S5�?����q8��Z� �ZZ ��4 ,�?�,%�Y�  �  ���;�?   2j8��  � ��
+4S5�?���?j8��ZZ ��Z �*�4 ��?��?�Y�ZZ ��Z �1��;�?   2j8��  � ����
+4 ,�?�,%�Y�  �  �ĵ�;  .�R��?�Y�  ��  ����;  .���?j8��  ��  ���4 ����?�Y��Z ��� �
+��;|�����?j8���Z ��� ��4 ��@���Y��  � � ���;��~%q8���  � ���
+4�o����?B<���1�ʖ-����0��*�$������	�
+���1�p��@�?����`����1�Ր�2��>�2���s���l/>��>�0�?]Y�1t�27�b�Y0s�?t��?A<��/t逊0����0  .�I��?����}�����1萖?0�?���`Qa �*��1���?���B<��s��'qԁ���0�.�?   2���}��~�����1>��>�0�?]Y�1t�,݁�0���?Q?���t��R����j/~�&�����D<��ь�v�����0�p��@��������R� �+��1�o����?B<���1�ُԁ���0��*�$������������1  .�J�ܿ�����
+����1)+���P���a�ό�r�݁�0�Ր�2��>�2�订���j/萖?0�����Q��aR���1���?���B<��s��6j,����0�.�?   2���}��~
+���1)+���P���a�ό�h�5�]�O0���?Q?���t��!-r���k/  .�I��?����}�����p;  .���?j8��  ��  ����;萖?0�?���`Qa��Y�p;S5�?���?j8��ZZ ��Z �Y��;|�����?j8���Z ��� ����;�?   2j8��  �  ����;�p��@�?����`�����p;�.�?   2���}�����p;萖?0�����Q��`S����p;S5�?����q8��Z� �ZZ ����;��~%q8���  � � �/��;��*�$������
+��/�p;�p��@��������R�����p;|������q8���� �Z� ����;  .��ݿq8�� � �  ����;  .�J�ܿ�����~		���p;萖?0�����Q�����p;S5�?����q8��Z� ��� ���;  .�J�ܿ�������p;  .��ݿq8�� � ��  ���;f3�?]�?���A�����}���2���?�iO=��A��΀��uH��3 ��?�aw?'	�A��΀��tF��2D�u?���?�ţA͏���}��O1@�V?w�?]$�AЖ΀��tF�O1��@;Ϫ=o��A�����}���3�A��@أA
+���}��0L�$��?+4�A	�΀�uF�0����η?K4�A@�̀�tF��-~�@@��/c�A�7��}���4��?YNh��ΨA�4π�uH��4n᤿�r�?@أAE���|���-n��W31?�$�Ah�̀+�tF�]*̩E��%@
+�A
+���}"�0_��D��?1�AE���}"��-���R?FƣAp���|��]*�����"���	�At̀4�tF��!���Ӊ��
+��A|� }���!���e�T?G��Ap���}"�]*2 �]f����A|���}"��!�V��@s��Y�At
+2��t���!rZ俋t8?�t�Ai�1��u��]*�h���m�?���AA�0��+v���-4�/�۱�?t��A
+�/��/v��0�#T?=��?�t�AД0�.v��O1�t?��?�ߝA͎�}"�O1�|�?��~?VY�A��2�%!u���2���?ߥ�?���A���}"��2Ȝ�?���=�9�A��3�3t���3k�@RZ�=l��A��� }"��3��@����9}�A�6��|"��4|��?�a���A�33�+�t���48�?��\Q�A�h��}��"5��?\ӿA�bЀ�+vH�"5���?�_�Tk�A�g��|"�"5���?9�Ͽ4�A�a3��t��"54�B>��nQ�A�}��}���5�L->������A�vр�/vH��5��T����ΨA0lЀ.vH�_6|?>>x��k�A�|��}"��5p-">����M�A�t2��u���5�W�N���A0j2���t��_6y�u�]w��c�A3r�}��_6��Ϳd>��8�A^F΀%!uH��6Q�v�����}�A3q���}"�_6�6Ͽ����j:�A_D2���t���6^���SK����AeI���}"��6�V��@s��Y�At
+2���t���72 �]f����A|���}"��7v���������AeJ�}���6�����"���	�At̀2tH��7���Ӊ��
+��A|� }���7�|�?��~?VY�A��{�t*���2Ч�?'��=;җA��|�zط�3Ȝ�?���=�9�A��|�z����3�g�?pPB�R��A�
+|�s�ط�4ʶ?H'd?��A��{�\Q ط�2|��?�a���A�|�^����4�#T?=��?�t�A��z�4o"��O1h�~?r �����A�}�O�ط"5�t>?�ܸ?��A��z�5o"طO1���?9�Ͽ4�A�}�+���"5́�=�?��A�{�{!ط0�d>#9ڿ���A�}��ط�54�/�۱�?t��A�{��s ��0p-">����M�A�}�����5��z�H�?�A�{��h ط�-�?:���ƿ���A}�ډط_6�h���m�?���A�{��K���-�W�N���A}�����_6FKǿUX&?:�A�|��8ط]*ҭ������җA}���ط�6rZ俋t8?�t�A�|����]*��ۿݭF�Q�A |��ط�!�V��@s��Y�A|������!�6Ͽ����j:�A}������6�V��@s��Y�A|������7��ۿݭF�Q�A |���ط�7$R�?,{E=�G�A� ������3 ��?�aw?'	�A�􃀍�*��2���?�iO=��A� ���+��3cn�?8�U?�b�A�􃀧���24��?�GF��0�A����,��4@�V?w�?]$�A�샀ь*�O1��?YNh��ΨA����R+��40@?bد?Cz�A�샀ь�O1��~?�崿6#�A����b�"5��޽���?݇�A냀��0��?\ӿA����v+�"5L�$��?+4�A냀0�*�0*3>81ٿI#�A����|��5Sn�-s�?���A���E���-�L->������A���{+��5����η?K4�A�d�*��-�6/��Lƿ�0�A��+v�_6�!���b?�z�A���o��]*��T����ΨA��Nc+�_6n��W31?�$�A���|�*�]*`�ҿ;�d�Fc�A��}���!�����"���	�A��}*��!�����F��RH�A��hF��6��Ϳd>��8�A��hF+��6�����"���	�A��v-+��7`�ҿ;�d�Fc�A��}��7 �̿�3�?jzA(�q�����; ܿ  ̴�buA9 q�!��ն,; ;���ʗ?�buA(�q���m��:���  ��lzA9 q�!���V;  .���@lzA �q������:  .�j��?�buA �q�	�����: ��?4�?izA��q�����: Z�?�Ǘ?�buA��q���Y�=:�$
+@   �izA� q�������9 9�?  ���buA� q������: �ʿ^d�?�ЗAZ� ������-���  ��lzA  � ����" �̿�3�?jzAZ� ������! L�  ���ЗA  � �����-  .�֓@�ЗA � �� ����-  .���@lzA � �� ����! w�?���?m��A�� ��Z�<��, ��?4�?izA�� ��Z�8��!��@  ��m��A�  � ���,�$
+@   �izA�  � �۵ !��@  ��m��A  ���  ���U  �ʿ^d�?�ЗA  ���� �}�V/ w�?���?m��A  ���� �/�V/  .�֓@�ЗA  ���� �V�1 L�  ���ЗA  ���  �#�U  �ʿ]dſ�ЗA  ��� }�V/ w�?��οm��A  ��� /�V/  .�ד��ЗA  ��� V�1 ܿ  ̴�buA9 q�}��: �̿�3ǿlzA((q�w�׶(:�:���ʗ��buA((q�w���F:���  ��lzA9 q�}����9  .����lzA 9q��q�3��:  .�h�ֿ�buA 9q��q�ڶ�: ��?4ǿgzA�(q��t���; Z�?�Ǘ��buA�(q��t����:�$
+@   �izA� q��y�5�[; 9�?  ���buA� q��y��3;���  ��lzA  � �����! �ʿ]dſ�ЗAZZ �Z����- �̿�3ǿlzAZZ �Z����! L�  ���ЗA  � �����-  .�ד��ЗA  � ����-  .����lzA  � ���" w�?��οm��A�Z �ZZ�]�- ��?4ǿgzA�Z �ZZ \�Q"��@  ��m��A�  � �-�$
+@   �izA�  � �#"�K���ۘ��YAZZ��Z�
+�=;  .�h�ֿ�buA  �  ��;  .�<+ؿ�YA ��  �=; Z�?�Ǘ��buA�Z �ZZ����;�:���ʗ��buAZZ �Z���;֚ݿ  ���YA �� ���>; ܿ  ̴�buA  � ����;�j�?	٘��YA�Z��ZZ���=; 9�?  ���buA�  � ���;ֺ�?   ��YA� �� ���>;ֺ�?   ��YA� �� ��>; Z�?�Ǘ?�buA�� ��Z��;�j�?٘?�YA�����Z	�=; 9�?  ���buA�  � ���;  .�j��?�buA � ��  ��;  .�>+�?�YA ����  �=; ;���ʗ?�buAZ� �������;�K���ۘ?�YAZ��������=;֚ݿ  ���YA �� ��~�>; ܿ  ̴�buA  � ��֡�;�є?4@�?��3A�����Z \�p;  .�>+�?�YA ����  ���;  .��&�?��3A ����  ��p;�K���ۘ?�YAZ����� ���;�j�?٘?�YA�����Z \��;�����B�?��3AZ����� ��p;ֺ�?   ��YA� ��  ���;֚ݿ  ���YA �� � /��;@��?   ���3A� ��  ��p;�є?2@����3A�Z��ZZ ��p;�j�?	٘��YA�Z��ZZ ���;@�߿  ����3A �� � /�p;�����B����3AZZ��Z� ��p;�K���ۘ��YAZZ��Z� ���;  .�<+ؿ�YA ��  ���;  .��&ڿ��3A ��  ��p;  .��&ڿ��3A ���  ���p;�j�?	٘��YA�Z���� ����;�є?2@����3A�Z���� ���p;  .�<+ؿ�YA ���  ����;&�@0�p;�U���  �  ��0	F�?�F�?60� ��> ���4!��?�F�?�U�� ��>���0y����F�?60�>� ������4)[@Pq;60��  �  ��4!��?NN�U���o �o> ��0	F�?EN�60��o �o> ��4'����F�?�U��>� ������0a�Pq;60�  � �Y��4&��0�p;�U��  � �Z��0y���EN�60�>o �o�,��4'���NN�U��>o �o�-��0	F�?EN�60��o �o> ���4!��?NN�U���o �o> ���0!��?�F�?�U����t��fe�](���? �p;����� t��p�8�%&�@0�p;�U��� t��p�W�](��c?E�?M����t��f��%'����F�?�U���t���e�](��c?E�?M����t��	�9�%!��?�F�?�U����t��	�W�](��c�E�?=���t�����%��� �p;����4 t�ɐ��%'����F�?�U���t����W�](&��0�p;�U��4 t�ɐe�](��c�E�?=���t����8�%'���NN�U��.t�H�e�](��� �p;����4 t�7��8�%&��0�p;�U��4 t�7��W�](��c�eL��F���.t�H����$!��?NN�U���.t�|	e�](��c�eL��F���.t�|��9�%'���NN�U��.t�|��W�](��c?dL��W����.t�|	��%���? �p;����� t�7p��%!��?NN�U���.t�Hf�W�](&�@0�p;�U��� t�7pe�](��c?dL��W����.t�Hf�9��$`t�?`q;.ݿ� ��(����
+%	F�?�F�?60�ظ��R�!W�]()[@Pq;60�� ��(��e�](�]b?E�?I�ܿظ��R�!8��$	F�?EN�60��G�����e�](`t�?`q;.ݿ� ��،"8�	%)[@Pq;60�� ��،"W�](�6b?[L��	mݿ�G��������$y���EN�60�(G����e�](�6b?[L��	mݿ�G���� 9�%	F�?EN�60��G���� W�](&�b�[L���kݿ(G������%���`q;ݿR ���t���	%y���EN�60�(G���[!W�](a�Pq;60�R ���t�e�](&�b�[L���kݿ(G���[!8��$y����F�?60�(���R[�e�](���`q;ݿR ��(t!8�	%a�Pq;60�R ��(t!W�](D�b�E�?:�ܿ(���R[����$	F�?�F�?60�ظ��x��e�](D�b�E�?:�ܿ(���x 9�%y����F�?60�(���x W�](�]b?E�?I�ܿظ��x����%WK�<R56�J�	� kD�~���(6k�<��d�n[� {�x
+��b2�|d?7�?�ӓ��q�p:���.r�?P���¥T�XR�踪5��<4�y�|� � ~�r�黔5��_<�2}�����o~�8���;��>����c���黈9Kّ?;���+���;̀K`���v:�}@��Կ:� 9ՀCi���7  .�E@ܿD<��^��}��黸;�$@    h����Ҁ|�}��8 �?9q�������;��R^���[;c�?    �����Ҁ~�A�	;6k�<��d�n[� {��ց�b2WK�<R56�J�	� kD��	���(0�Y�Un?����8p��:����.���|����_L݀�Vց踪5��<4�y�|� � ~��ǁ黔5��_<�2}�����o���8���;��>����c����黈9��6������g:Ҁ�cہ��|:  .�E@ܿD<��^�����黸;A���@I�pl�g:Ѐ�f���7 ᠿHq������cE؀�_��_;� �    J���wԀ�|�}��8 C�    ����xՀ���A�	;�r�>6�?9F��j�}����2�Н?���=Ra���u�u1H��3��?皑?=���c�v�&F��2BL�>�y@�V��:�}���O1;P�?ɮ�?_��ӗ7�v�F�O1���>+Ē=�����}�}���3%��>����O��Bj�}	���4�ğ?�|��%��>d�u&H��4w�J�=ޮ� |�|�"��34�>	��sg��n;�}��"5�B�?w�����h7�v-H�"5�v�� ��?D�Bj�|��"��4-�پ�Q��[�o:�}��"�"5뤠�������2?b�u�����4���"�e=#@�4 t�t����3�%�������/i6�v����"5֘��?�:��i�|	�"��2O����܎?��3�b�t����2�$Ͼ~~�{�} �}��"��5 ˛�9��y��-w �w�����5k����
+@�J��:�|�"�O1������?C��1�5�u-���O1�o�2�@�����}�"�0遡�v�
+@���/���v/���0&��_�?<�/�ɀv-���-\3��p��J�-iɀv���_6���>� @���� �}����0��?�M@��Ӊ �w��F�0�C�?S��?Q]�їʀv��F��-R�޾`t
+@����ŀ}"��-���|@�?|��0�u&��]*y�>
+�
+@w���ƀ}�����-�£?���?�������u��F�]*Z!ӾZF�?<�����}"�]*�����W*=��1��u0���!sʾOB=�@���}"��!��>�?�? ��辖�|����]*���>nCa=LL�� ��|����!̸�?�=��� ��t��F��!�>��������C��|	����6̸�?�=��� ��s�H��7��?<����?��t�H��6���>nCa=LL�� ��|����7�6�>�]�L���oƀ}���_6e8�?���k��hˀu-�H�_6��ž.ڕ����C��}�"��6sʾOB=�@���}"��7�����W*=��1��u�0���7�˙�<\�����/@��v�&���6�Ǿ5�����oƀ}�"�_6n��>��,��}�}����5���?*O����v�v/�H��5O����܎?��{�� ����2Y)��#w�=�7�|�
+�ط�3���"�e=#@�|������3Lp����Z��!�|�̏ط�4���Ɓ?�{��H�ط�2뤠�������|������4������?C��{�� j���O10=��rJſ�"�|���ط"5(�����?��{�� i�طO1�%�������|�����"5e3��ɫ�?���{��� z�ط0r*��ƿ志�|����ط�5遡�v�
+@���{��� v#��0 ˛�9��y��|������5���w6�?~��{���m:ط�-�¢��ƿd��|��1ط_6&��_�?<�{��Q]���-\3��p��J�|��R��_6�줿�[�?���|��?jط]*8g����]�)��|��kط�6���|@�?|��|��y��]*�3��H�=���|�{ط�!�����W*=��|��|���!�˙�<\�����|��k���6�����W*=��|��v���7�3��H�=���|��|ط�7�&�?1��=�5���|��3��?皑?=���w*��2�Н?���=Ra��y+��3�b�?f �?s���a��2�զ?|P��&
+�3r��4;P�?ɮ�?_����:*�O1�ğ?�|��%�XY+��4���?�?r.���:�O1���?�轿;�gH�"5�?���?�,���	�0�B�?w����y+�"5��?�M@�����*�0� �?\�ݿ;�}	��5��?�J�?},	�������-���?*O���y�+��5�C�?S��?Q]�����*��-#^�?3���9	��q��_6�C�?<??�@�����]*e8�?���k��Z�+�_6�£?���?�����*�]*�?T�=�1�����!̸�?�=����*��!ӷ�?AS�H	�L���6��?<���+�+��6�?T�=�1��"���7̸�?�=����+��7��<��d@n[� � �x�ف�b2rѧ<R56@J�	� �D�~����(�=g?7�?@ӓ�ʏ�q�򁓺.���?P�@�¥�ހX�؁踪5î<4�y@|� � ��s�ʁ黔5�G�<�2}@�����~���8�<��>@�������}��黈9��?�1�?{�����ˀJ�ځ��v:  .�D@�?A<�����~�黸;��
+@���?:� �ҀG�߁��7 �?9q�?�����Ļ�U����[;�$@    h����Ҁ�܁}��8c�?    �����Ҁ��A�	;rѧ<R56@J�	� �D������(��<��d@n[� � �����b2#�[�Un?@���7�������.����|@���\�߀���踪5î<4�y@|� � �����黔5�G�<�2}@��������8�<��>@���������黈9u;�����?u���f�Ѐ�����|:6��@I�?pl�g�Ӏ�����7  .�D@�?A<��������黸;� �    J���wԀ���}��8 ᠿHq�?����_�̀����_; C�    ����xՀ���A�	;@�߿  ����3A �� ��
+�[: ����?�Y�Z� ����8�^.�����B�?��3AZ��������Z: ��@���Y�  � ��^�f.  .�R��?�Y� � ��  �[.  .��&�?��3A ����  �Z: ��?��?�Y��� ��Z$�^.�є?4@�?��3A�����Z�[: ,�?�,%�Y��  � ϲf.@��?   ���3A� �� ��[:�����B����3AZZ��Z��Z: ��@���Y�  � �ϲf.@�߿  ����3A �� ���[: ������Y�ZZ �Z�$�^.  .��&ڿ��3A ��  �Z:  .�R���Y�  �  �[.�є?2@����3A�Z��ZZ���[: ��?����Y��Z �ZZ�8�^.@��?   ���3A� �� ��[: ,�?�,%�Y��  � �^�f.��~%q8��  � ����
+4 ������Y�ZZ �Z� 1��;|������q8��ZZ �Z� +�4 ��@���Y�  � � ĵ�;  .�R���Y�  �  ���;  .��ݿq8��  �  ��4 ��?����Y��Z �ZZ 
+��;S5�?����q8���Z �ZZ �4 ,�?�,%�Y��  �  ��;�?   2j8���  � �
+4�?   2j8���  � ���
+4 ��?��?�Y��� ��Z 1��;S5�?���?j8���� ��Z *�4 ,�?�,%�Y��  �  ĵ�;  .�R��?�Y� � ��  ���;  .���?j8�� � ��  ��4 ����?�Y�Z� ��� 
+��;|�����?j8��Z� ��� �4 ��@���Y�  � � ��;��~%q8��  � ��
+4�p��@�?���Q������1��*�$���}�	�
+��1�o����?B<��s��ʖ-���0>��>�0�?]Y�ό��27b�Y0�Ր�2��>��t����s��l/s�?t��?A<��ь��0���0  .�I��?����������1萖?0�?�������a *��1���?���B<���1�'q����0�.�?   2�������~����1>��>�0�?]Y�ό��,��0���?Q?��2�R���j/�o����?B<��s��ُ����0�p��@�����`Q�R� +��1~�&�����D<��/t�v����0��*�$���}������1  .�J�ܿ����}�
+���1)+���P���a�1t�r���0�Ր�2��>��t��订��j/萖?0������`�aR��1���?���B<���1�6j,���0�.�?   2�������~
+��1)+���P���a�1t�h�5]�O0���?Q?��2�!-r��k/萖?0�?�������a�Y�p;  .���?j8�� � ��  ���;  .�I��?����������p;|�����?j8��Z� ��� ���;S5�?���?j8���� ��Z Y��;�p��@�?���Q�������p;�?   2j8���  �  ���;��~%q8��  � � /��;�.�?   2���������p;萖?0������`�`S���p;S5�?����q8���Z �ZZ ���;��*�$���}�
+�/�p;�p��@�����`Q�R����p;|������q8��ZZ �Z� ���;  .��ݿq8��  �  ���;  .�J�ܿ����}�~		��p;  .�J�ܿ����}������p;S5�?����q8���Z ��� ����;萖?0������`�������p;  .��ݿq8��  ��  ����;        �  � � * * � O & * O &  <  & � � � I � & � & O � � � � � � � � � � � � � � � C � C 	 � � � � � 	 t � � t � { � t { � { # | � # | # � F | � F n � l � � � n l O � � � l e l n e � e � e n 1 F � � n F � n � 1 b 
+ P 
+ b � � b 6 � 6 V V  ` V 6   � ^ ^ ( � ^ � ( � b ( Z 2 L Z L � L 2 \ � L � L \ � � L � � \ � � � 4 � � � � � 4 � � > 9 � � > � 9 > 9 / / 9  9 � y  9 y /  � �    y g  g �  � �  � g � K � � � � � � � � � � � � � b P � 
+ � � 
+ � P � � � P  � P �  � �  � � � K � � � K � � � � i - E i E ; i � - i ;  i A � i  � i � A  A �   � �  � � � S  � S � � s � s �  � � � � �  � � � � � � �  �    !  ! �   � U �  U  � � X � �  � v � � X � � v � $ � � $ � $ � � � � � � j � � j � j � � �  � � � � � �  � � � � � � � � � � � � � � � � � � p � � p � � � p � � � � � � � � � � � � � B � �  B � � � �  � � � � u z � u z u � " z � " � } � o G m o � � � m + � � =  ' N + ' � '  H � � � ' � � N ' N � + d m � � � N d o m � d � � " } � } G 0 o d � � G � G o 0 � o M 3 [ ] 3 M � M [ � ] M � M � � M � � ] � 5 � � � � � 5 � � ? � � � � 8 8 � ? . 8 ?  8 . x � 8 x 8  �  .   � f x  f   �  � �  � � � � � � � � � � � � � � c  7 c � W 7 � a  W  7 W _ �  � ) _ ) � _ ) c � Q  c � �  Q �  � Q c � � � � ~ Q ~ � Q � f  �  J ~ � � � � � � � J � J � � � � D , h : D h , � h  : h � @ h �  h @ � h � @  �   �  � R � � R �  r � � � �  � r � � �  � � � � � �  � �    �       �   T �  T  � � �  � � Y w �  Y � � w � � � % � � % � � � % � � � � k � � k � � � k �  � � � �  � � � � � � � � � � � � � � � � � � � � � � q � � q � q � g�1��g�g3gWg1W1W:z:z@::@��@6@�66�R6Rd�d�Zd�dZ�Z'Z'kio}kii=ok=i��������v\�v\v`\`<``<��B����BB:tB:t:���!�!l���l�,l��,�0,�(0���������3�
+3|��|�|&>>�>&��&'��O'�'O-'- ��� �L�# LJ�JL"L�"�#��#��M�MZM�ZM�������^�^���������^����s��s��s����p/pb/bx/bOxb�O�b�b�������������������������++���+/+�/�������������__�����K����K�����G�G������������������Q������Q���B(B�B�H��(�BB���B��B���H���H��������_���_������88��8�A8A�8�$$��V8$V$�$���Uj�YUY UY5 Y5Ycc�c9��c��%�%
+�h
+�
+h�h������	�		�����D��DD���f������n����nx�nF�x"Fx�p�6p4��4?4��?�{?�{�em/ue�er�e/r/�rr�,r,,��rX��E]E�]��ES�]�S]*���*���*��Q*�Q�v�v�Iv���I������T�(T!I�!!���!�������0$$0�ff��f�f20fV0VV;;{;A{�A;7A�7�A�77SeSe�e[�[e�[�[&j&|nhhj%h<jn<h%1������� ���  �U)�U�����H ���H�w�wH�w�P�+P��+���+���+\R�\�RD��\�D\D��Ys��--s-�ss�.s.d�sd�dt.ld�z �>z�>��5>5��5q7�q�yG#y�Go�yo����o���~���g���EE��E�����������w��w�]w]]a=a=aaC�����C�;C;Cu�;u�������i�i�i� �� ���m�m��m-�-��-1�1)�����}���2��2	��}}	?'?'?�'����&�&N,N&,&�
+��
+"�M�"
+��KM#MK#�M"��L��L�L[L[��������_��_���_�����������r�rr��~~��~�$�$��b��8b�bbX4X!4XT!XTX�kT���%�%W%9W��%%�9�@9@�9��99���������I���I.q.cq.ycyNcN�c�c���c�������������������������*����*�C��C�.*���C.�*������C�)�������I�C�C)C����^�^��P���������P���J��������^�^�J������������FF����������@  `4{��  � �
+�8�@  `4{�  � �
+��8 ��f�ؽ�S�A��}"��! ��f�ؽ�S�A��}�}�"��!(����ؿ{\��Z+��5����[;(����ؿ{\����O�5�����[;�?5�����G��
+�|�"�"5�?5����¹f�
+�|"�"5��?!#�׮AL�X�f.ÁH��6��?!#�׮A�3��f.�H��6�Go�Ņ0@���	�A��@m��0�Go�Ņ0@����m���@m���04�@�J[@�j�eM��e��#��74�@�J[@�j����e�#��7��(@��3�C6�f�����踪5��(@��3�C6K����踪5�@  `4{��  � 
+��8�@  `4{�  � 
+�8g&�?  `4�D!�H �������(g&�?  `4�D!¸ h�����(g&�?  `4�D!�H �������(g&�?  `4�D!¸ h�������(��)@`��*��q���|�"��4��)@`��*�5��|"��4	2!@  L4LZ��b�P��黸;	2!@  L4LZ�������黸;����ß�@�w�W��ZY��}��8����ß�@�w©Z�ZY�}��8B�:�uu��*�|
+��}"��!B�:�uu��*���}�"��!�d�@  `4�8�n ���{�黔5�d�@  `4�8 ?��{�黔5�d�@  `4�8�n ����黔5�d�@  `4�8 ?���黔5�(�?T~�!�AH�ʀi:*�H�"5�(�?T~�!�A�Z6�i:*H�"5�Δ�  `4���{�~�黈9�Δ�  `4����~黈9r�ɾ߸�?���AD̢�k>��]*r�ɾ߸�?���A�4^�k>���]*��_�~?���^ն�F�gF�]*��_�~?��¢+J�F�g�F�]*9LL���?�@�AD�ɀk7(���-9LL���?�@�A�\7�k7(����-��@���?B��\&N��u���Y;��@���?B���ڲ��u��Y;��U>�3����郀�����5��U>�3�����}�����5�i�?9�?�F�AC6��k�6�F��2�i�?9�?�F�A��]�k�6F��2B�:�uu��*�|
+���}"��7B�:�uu��*����}�"��7m����c��U<��80hH��6m����c�«�I�80h�H��6��)�T`�?���q���}��]*��)�T`�?��5��}���]*��E>��;����
+����|�"��5��E>��;�����|���|"��5g]�?ß�@��ZX��[��}��8g]�?ß�@�¦�[�}��8��������a�AD��kD���!��������a�A��k�kD����!E�����,��-_H��h��_6E�����,��ӡ���h���_6�˔@  `4��{���}�黈9�˔@  `4���}黈9�0�?�_���ӱAK f�f��H��7�0�?�_���ӱA� ��f�H��7B�?_!M@'�[U��]��A�	;B�?_!M@'¥�逪]�A�	;!����C��_o�AE k�k
+����3!����C��_o�A� ��k
+�����3�0�?�_���ӱAK f�f��F��!�0�?�_���ӱA� ��f�F��!��:@P}>Rp�|
+���}�"��3��:@P}>Rp����}"��3��G>տl@�fG���}"��6��G>տl@����}�"��6HN?�Q�?���AG[4�i�ӁF��-HN?�Q�?���A��̀i��F��-)�{�IY:@�-
+�
+����|��0)�{�IY:@�-
+��|���|���0��@I&�?���\*���w���.��@I&�?��¤�L��w��.��@E&�����\ִ�Չ��.��@E&����¤*L�Չ���.�1	��P�?���a�D��k��]*�1	��P�?��.���k���]*%����?�1��Zձ�5t���_;%����?�1���+O�5t��_;5��&����jF���i���75��&��������i����7>�:�t����V
+�|� }���7>�:�t����V
+�� }����7>�:�t����V
+�|��|���!>�:�t����V
+���|����!5��&����jF���j���!5��&��������j����!�οq�@׋
+�<���0�hF��-�οq�@׋
+��UI�0�h�F��-�I@?���?�q�AD]ʀk��F�O1�I@?���?�q�A��6�k�F�O1G3�?�q�����<�F��4i�H�"5G3�?�q������W���4iH�"5�>@�w@���fD"��j����{:�>@�w@���ހ�j���{:�LV�  `4}��g J�}��b2�LV�  `4}� ��}��b2[�U�M�?�?�AD�5�k?���O1[�U�M�?�?�A�]ˀk?偏�O1�����/�?�+�A�k�|
+�"��2�����/�?�+�A�>��|
+�"��2�LV�  `4}��g J����b2�LV�  `4}� �����b2�?]!M�+� �b�����A�	;�?]!M�+� M逳���A�	;����z6�j��A|�������5����z6�j��A����󁏷�5���n�\@^k�c��Nd����7���n�\@^kO�Nd���7�Bd>�X�����}��{�H��5�Bd>�X��������{H��5�y�?�����AJ���gJ�H��5�y�?�����A�g�gJH��5M����ܗ���AE6\�j����4M����ܗ���A�ʤ�j翁���4Z��?�@^��-_G��i�F�O1Z��?�@^��ӡ���iF�O1����焿M��AE6��k�7���6����焿M��A��\�k�7����6�;��6�����cG݀H����v:�;��6�����#�H�����v:�Q��e��u�bO�O����7�Q��e��u��O�����7UO�W�N����g
+��JgF��!UO�W�N����J�Jg�F��!Ds�I&�?���`�G�,w���.Ds�I&�?�� *��,w��.Ds�E&�����`*G�,���.Ds�E&���� ֹ�,����.��������a�AD��k�D���7��������a�A��k�k�D����7����ֿzl
+�fH�}���6����ֿzl
+��}����6UO�W�N����g
+��HgH��7UO�W�N����J�Hg�H��7���?�� ��@�AK�2�fE�H�_6���?�� ��@�A�Y΀fE�H�_6����]6)��P�5q���|"�_6����]6)��P�ˏ���|�"�_6�@�)��V��^�I�̌�@�h;�@�)��V���-��̌��@�h;�"@��s>Q��k
+��Bl����3�"@��s>Q��C�Bl���3 ^�>��Ƚ%>�A |�|�恴��! ^�>��Ƚ%>�A� ��|�����!�����ة���W;G���i���6�����ة��©Ź���i����6��(@��3@C6�hI���h�踪5��(@��3@C6���h踪5�ܝ�_�ۿ�f�AE\ˀj���_6�ܝ�_�ۿ�f�A��5�j����_6"���  `4���q 9�{�黔5"���  `4�� ǀ{�黔5�� �  J4�(��` ���黸;�� �  J4�(��� S���黸;��`��d��,_��EhH�_6��`��d��ԡH�Eh�H�_6�2��c@I��	����hF�0�2��c@I���hH��h�F�0����ß���w�WZ�Z��}��8����ß���w©��Z���}��8	2!@  L4LZ��b�P��|�黸;	2!@  L4LZ������|黸;�j	@OK�����`�F��j�H��4�j	@OK���� .���jH��4"���  `4���q 9���黔5"���  `4�� ǀ��黔5�Δ�  `4���{��黈9�Δ�  `4������黈9M
+@�;y�@��aӻ�A�j����4M
+@�;y�@�-E�A�j���4���?B�?`!�AEj �j���F�0���?B�?`!�A�� �j��F�0��,���3�O�gJ�J�踪5��,���3�O���J��踪5,�@{3�?�c�fH�}�"��2,�@{3�?�c��}"��2���?ß����a�����}��8���?ß���O쀱���}��8��:@P}>Rp�|��}�"��3��:@P}>Rp���}"��3�����#ݿQ��AE]5�j����"5�����#ݿQ��A��ˀj�ԁ��"5�ʟ�  `4�D� �� ��8�ʟ�  `4�D � �8�R��&�?�f�AD���kD��0�R��&�?�f�A�k�kD���0 ��f�ؽ�S�A��}"��7 ��f�ؽ�S�A��}�}�"��7��?�Ԫ?t��Y?��2+m����2��?�Ԫ?t�§�B�2+m���2�)@�)W�B��d�����8�W7�)@�)W�B�M񀳛��8�W7%?�?����4j�AF̣�j@�H��4%?�?����4j�A�4]�j@H��4��a=�_@`o�A} �}����0��a=�_@`o�A� �}���0�˔@  `4��{����黈9�˔@  `4�����黈9�ʟ�  `4�D� �� ��8�ʟ�  `4�D � ���8� �?���Q��=���/�i���"5� �?���Q���VG�/�i��"51Ͽ_!M@�o�X��X[��A�	;1Ͽ_!M@�o¨X�X[�A�	; ^�>��Ƚ%>�A |�|恴��7 ^�>��Ƚ%>�A� ��|����7���?0$}�	W�AD��k�D�H��3���?0$}�	W�A��k�k�DH��3��,���3@O�g��Ih�踪5��,���3@OI��Ih踪5E���d@���>�B��1l���-E���d@����Y���1l����-�M@  `4���c ���}��b2�M@  `4�� O��}��b2�M@  `4���c ������b2�M@  `4�� O�����b2��wa?8(�AD�]�k*����2��wa?8(�A�6��k*ʁ���2T�>�}���o�A�k�|
+灴��6T�>�}���o�A�>��|
+����6
+@Mܷ?���X<F���j�F��2
+@Mܷ?��¨ĺ���jF��2�=�  `4"�!�N d�����(�=�  `4"�!² �����(�=�  `4"�!�N d�����(�=�  `4"�!² �������(�� �  J4�(��` ��{�黸;�� �  J4�(��� S�{黸;��8��@��c�݀Hh����|:��8��@�G#�Hh���|:���?�6)@�3
+�5q���|���O1���?�6)@�3
+�ˏ���|��O11Ͽ]!M��o�XX�X��A�	;1Ͽ]!M��o¨��X���A�	;g@�F>���jE���j�H��3g@�F>�������jH��3�r�?��i?�ɯAI4Y�g仁F�]*�r�?��i?�ɯA�̧�g�F�]*��)�T`�?���q���|��]*��)�T`�?��5��|���]*י�?�0 @���.c��>m���O1י�?�0 @���ҝA�>m��O1�r,@T�)�e�"������k:�r,@T�)Fހ������k:��)@`��*��q���}�"��4��)@`��*�5��}"��4 L�  ���ЗA  ���  �#�U  L�  ���ЗA  ��  #�U  ܿ  ̴�buA�  � ���֡�;@�/��s�xA  � ����;@�/��s�xA�  � ���;@�/��s�xA  � ����; ܿ  ̴�buA  � ��֡�; ܿ  ̴�buA  � ����; ܿ  ̴�buA�  � �����;@�/��s�xA�  � ���;�j�?	٘��YAZ��ZZ����=;�j�?	٘��YA�Z��ZZ���=;�¢��ƿd��-iɀv���_6�¢��ƿd��ӗ7�v����_6���w6�?~��/�ɀv-���-���w6�?~���h7�v-����-Wu�[���E�A0j2���t��_6Wu�[���E�AЖ΀��t���_6WK�<R56�J�	� ���~���(WK�<R56�J�	� kD�~���(@�߿  ����3A �� ���[:@�߿  ����3A� � ����[:�o�[v�?ݪ�A	�΀�uF�0�o�[v�?ݪ�A�t2��u�F�0���?���B<��s��'qԁ���0���?���B<���1�'q����0�p��@�?���Q�������p;�p��@�?����`�����p; L�  ���ЗA  � �����- L�  ���ЗA�  � ������- ܿ  ̴�buA  � �����! ܿ  ̴�buA�  � ������!�����B�?��3AZ����� ��p;�����B�?��3A�Z��� ���p;@�߿  ����3A �� ��
+�[:@�߿  ����3A� � ���
+�[:�ɿ�Q�?[�yAZ� �������;�ɿ�Q�?[�yA�Z ��������;���>nCa=LL� |�|灴��7���>nCa=LL�� ��|����7萖?0�����Q��aR���1萖?0������`�aR��1֚ݿ  ���YA �� ��~�>;֚ݿ  ���YA� � ���~�>;6k�<��d�n[� {�x
+��b26k�<��d�n[� ��x
+؁�b2Sn�-s�?���A@�̀�tF��-Sn�-s�?���A�a3��t�F��-֚ݿ  ���YA �� ���>;֚ݿ  ���YA� � ����>;  .�R��?�Y�  ��  ����;  .�R��?�Y� � ��  ���; ,�?�,%�Y�  �  �ĵ�; ,�?�,%�Y��  �  ĵ�;������
+@+��g�Ӏ�����7������
+@+�;-������7\�t?8��?�̘A0lЀ.v���O1\�t?8��?�̘AД0�.v��O1����������At̀2tH��7����������A��3�2t�H��7 ����?�Y�Z� ��� 
+��; ����?�Y��Z ��� �
+��;#��?Șx?�G�A_D2���t�F��2#��?Șx?�G�A��΀��tF��2��@����m��A  ��  ��U ��@����m��A  ���  ���U �p��@�����`Q�R� +��1�p��@��������R� �+��1 ,�?�,%�Y�  �  ���; ,�?�,%�Y��  �  ��;|�����?j8��Z� ��� ���;|�����?j8���Z ��� ����;@��?   ���3A �  ���p;@��?   ���3A� ��  ��p;ֺ�?   ��YA �  ����;ֺ�?   ��YA� ��  ���;�K���ۘ?�YAZ��������=;�K���ۘ?�YA�Z�������=;sʾOB=�@���}"��!sʾOB=�@���}�}�"��!)+���P���a�1t�r���0)+���P���a�ό�r�݁�0��<��d@n[� � �����b2��<��d@n[� {����ׁ�b2oP���c�?)7�AA�0��+v���-oP���c�?)7�A�bЀ�+v����-������
+@+��\�߀�����7������
+@+�¤R!������7zS	>�1��ʢA
+�/��/v�H��5zS	>�1��ʢA�vр�/vH��5�o����?B<��s��ُ����0�o����?B<���1�ُԁ���0�U��l����/i6�v����"5�U��l����їʀv�큏�"5 (�?~w�?73xAZZ ��Z��8��! (�?~w�?73xA�� ��Z�8��!/ٙ����?r���f�Ѐ�����|:/ٙ����?r����:0���܁��|:�o����?B<��s��ʖ-���0�o����?B<���1�ʖ-����0�H��??��Ai�1��u��]*�H��??��A�4π�u���]*  .��&�?��3A ��  ��Z:  .��&�?��3A ����  �Z:9-�����+�A^F΀%!uH��69-�����+�A��2�%!u�H��6  .�ד��ЗA � � �����-  .�ד��ЗA  � ����-  .��ݿq8�� � �  ���4  .��ݿq8��  �  ��4�?   2j8��  � ����
+4�?   2j8���  � ���
+4{��5;<H�  � �Y��4{��5;<H��  � ��Y��4 w�?��οm��A  �� �/�V/ w�?��οm��A  ��� /�V/  .���?j8��  ��  ����;  .���?j8�� � ��  ���;S5�?����q8��Z� �ZZ ��4S5�?����q8���Z �ZZ �4 ��@���Y�  � � ��; ��@���Y��  � � ���;"��T���At
+2���t���7"��T���A��΀��t����7 ��@���Y�  � � ĵ�; ��@���Y��  � � �ĵ�;�є?2@����3AZ���� ��p;�є?2@����3A�Z���� ���p;�.�?   2���}�����p;�.�?   2���������p; C�    ����xՀ���A�	; C�    ������+���A�	;�j�?	٘��YAZ���� ���;�j�?	٘��YA�Z���� ����;�K���ۘ��YAZZ��Z�
+�=;�K���ۘ��YA���Z��
+�=;  .��&ڿ��3A ��  ���p;  .��&ڿ��3A ��  ��p;v<(��j׿���^�����黸;v<(��j׿�����U����黸;�f�?�c�=��1��u1�H��3�f�?�c�=����u�u1H��3  .�<+ؿ�YA ���  ���;  .�<+ؿ�YA ���  ����;�鸿g����xAZZ �Z���;�鸿g����xA�� �Z����;��*�$���}�
+�/�p;��*�$������
+��/�p;>��>�0�?]Y�1t�27�b�Y0>��>�0�?]Y�ό��27b�Y0|�����?j8��Z� ��� �4|�����?j8���Z ��� ��48g����]�)��/@��v�&���68g����]�)����c�v�&����6;V=E�@�~xA  ��  ���;;V=E�@�~xA � ��  ��;  .��&ڿ��3A ���  ��p;  .��&ڿ��3A ���  ���p; �ʿ^d�?�ЗA  ��� }�V/ �ʿ^d�?�ЗA  ���� �}�V/sʾOB=�@���}"��7sʾOB=�@���}�}�"��7|������q8��ZZ �Z� +�4|������q8���� �Z� �+�4�Ȍ?�G��J�>� �o> ���4�Ȍ?�G��J��o �o> ��4  .�R���Y� � �  ����;  .�R���Y�  �  ���;�e���˴�g:Ѐ�\с踪5�e���˴�0��\�踪5�j�?٘?�YAZZ��Z �\��;�j�?٘?�YA�����Z \��;ӷ�?AS�H�3�b�tׁH��6ӷ�?AS�H��?��t�H��6�W��g��^w�>o �o�,��4�W��g��^w� �o��,��4  .�I��?����������1  .�I��?����}�����1  .�R���Y� � �  ��[.  .�R���Y�  �  �[.���;��>����c����黈9���;��>������O��黈9���?���B<��s��6j,����0���?���B<���1�6j,���0萖?0�?���`Qa��Y�p;萖?0�?�������a�Y�p;<[��l�=���4 t�t����3<[��l�=���� ��t́���3P��=Β�N���:�}�_6P��=Β�N���oƀ}���_66k�<��d�n[� {��ց�b26k�<��d�n[� �ဉ��b2�
+�?����MtxAZ� �ZZ �\�Q"�
+�?����MtxA�Z �ZZ \�Q"�����B�?��3AZ��������Z:�����B�?��3A�Z�������Z:  .�<+ؿ�YA ��  ��=;  .�<+ؿ�YA ��  �=; C�    ����xՀ���A�	; C�    ������+�����A�	;�$@    h���v�.���}��8�$@    h����Ҁ�܁}��8w�?�M�=���4 t�t�́F��!w�?�M�=���� ��t��F��!  .�J�ܿ�����~		���p;  .�J�ܿ����}�~		��p;���;��>����c���黈9���;��>������O���黈9��<4�y�|� � ��黔5��<4�y�|� � ~��ǁ黔5�Ҏ�}$�?�_��>� ������0�Ҏ�}$�?�_���o �������0 ��?����Y�Z� �ZZ��8�^. ��?����Y��Z �ZZ�8�^.  .�J�ܿ�����
+����1  .�J�ܿ����}�
+���1  .��ݿq8�� � �  ����;  .��ݿq8��  �  ���;t;T=��ۤxA � �  ���;t;T=��ۤxA  �  ��;�j�?	٘��YAZ��ZZ ����;�j�?	٘��YA�Z��ZZ ���;
+�=�7�"����}�����5
+�=�7�"��}�}����5Y����?}�Ah�̀+�tF�]*Y����?}�A�33�+�t�F�]*�f�?M��^��d�3�K`ہ��v:�f�?M��^���;̀K`���v: L�  ���ЗA  � �����- L�  ���ЗA�  � ������- ܿ  ̴�buA  � ����" ܿ  ̴�buA�  � �����"  .�I��?����������p;  .�I��?����}�����p;�鸿g����xAZZ �Z����!�鸿g����xA�� �Z�����!>��>�0�?]Y�1t�,݁�0>��>�0�?]Y�ό��,��0�.�?   2���}��~�����1�.�?   2�������~����1�@=I��?fA�C��}�����2�@=I��?fA��j�}����2�p��@�����`Q�R����p;�p��@��������R�����p;�����j�-w �w�����5�����j�Ӊ �w������5L��?x��D-�/���v/��H��5L��?x��D-��v�v/�H��5��_<�2}�����o���8��_<�2}�������>���8ʶ?H'd?��A^F΀%!u����2ʶ?H'd?��A��2�%!u���2 ��?��?�Y�ZZ ��Z �1��; ��?��?�Y��� ��Z 1��;  .��&�?��3A ��  ���p;  .��&�?��3A ����  ��p;Y�`?{������0�u&�H��4Y�`?{�������>d�u&H��4S5�?����q8��Z� ��� ���;S5�?����q8���Z ��� ����; ������Y�ZZ �Z� 1��; ������Y��� �Z� �1��;�����B����3AZZ��Z��Z:�����B����3A���Z���Z:�K���ۘ?�YAZ����� ���;�K���ۘ?�YA�Z��� ����;w�?�M�=���4 t�s́H��7w�?�M�=���� ��s�H��7H��?��r�^#�Ap���}�H��4H��?��r�^#�A�7��}H��4 ������Y�ZZ �Z�$�^. ������Y��� �Z��$�^.,�D=2�@���} �}�����0,�D=2�@���� �}����0  .��ݿq8�� � ��  ���;  .��ݿq8��  ��  ����;  .�>+�?�YA ��  ����;  .�>+�?�YA ����  ���;�$@    h���v�.�|�}��8�$@    h����Ҁ|�}��82 �]f����A|���}"��!2 �]f����A�����}�"��!�C�?<??�@�2?b�u�ׁF�]*�C�?<??�@�����u��F�]* ��?��?�Y�ZZ ��Z�$�^. ��?��?�Y��� ��Z$�^.��~%q8��  � � /��;��~%q8���  � � �/��;�є?2@����3AZ��ZZ ���p;�є?2@����3A�Z��ZZ ��p;���?���?H���e95�J����v:���?���?H�����ˀJ�ځ��v:�j�?٘?�YAZZ��Z�	�=;�j�?٘?�YA�����Z	�=;S5�?����q8��Z� �ZZ ����;S5�?����q8���Z �ZZ ���;�Ö�a]��
+���g:Ҁ�cہ��|:�Ö�a]��
+�����.��c���|: w�?��οm��AZ� �ZZ��]�- w�?��οm��A�Z �ZZ�]�-�p��@�?���Q������1�p��@�?����`����1萖?0�����Q�����p;萖?0������`�������p;"��T���At
+2��t���!"��T���A��΀�t����!�G�<�2}@��������8�G�<�2}@�����o>�����8��?��=�At̀3t����3��?��=�A��3�3t���3���?P�@��[Q"�X��踪5���?P�@�¥�ހX�؁踪5 �ʿ]dſ�ЗA  �� �}�V/ �ʿ]dſ�ЗA  ��� }�V/��@����m��A  � ����,��@����m��A�  � ���, (�?~w�?73xAZZ ��Z���; (�?~w�?73xA�� ��Z��;�G�<�2}@�����~���8�G�<�2}@�����o>�~��8�>��������i�|	聴��6�>��������C��|	����6�є?2@����3AZ��ZZ����[:�є?2@����3A�Z��ZZ���[:b\��5�@���/���v/���0b\��5�@����v�v/����0#^�?3���9	�1�5�u-�H�_6#^�?3���9	��hˀu-�H�_6�������?�s�3�b�t����2�������?�s��?��tׁ���2�����B����3AZZ��Z� ��p;�����B����3A���Z� ���p;��_<�2}�����o~�8��_<�2}�������>�~��8)+���P���a�1t�h�5]�O0)+���P���a�ό�h�5�]�O0���?5>K�חAh�̀+�t����4���?5>K�חA�33�+�t���4萖?0�����Q��`S����p;萖?0������`�`S���p;��
+@���?:� �g:.�G����7��
+@���?:� �ҀG�߁��7���?Q?���t��R����j/���?Q?��2�R���j/  .�<+ؿ�YA ��  ����;  .�<+ؿ�YA ��  ���;;V=E�@�~xA  �� �����!;V=E�@�~xA � �� ����!���?)��?�t�>o ��> ����4���?)��?�t� ��> ���4@�/��s�xA  � ��۵ !@�/��s�xA�  � �۵ !r�?P����[��XRف踪5r�?P���¥T�XR�踪5���?m�ο<�A@�̀�t���"5���?m�ο<�A�a3��t��"5 ,�?�,%�Y�  � ��^�f. ,�?�,%�Y��  � �^�f.ҭ������җA_D2���t���6ҭ������җA��΀��t����6rѧ<R56@J�	� k�������(rѧ<R56@J�	� �D������(��*�$���}�	�
+��1��*�$������	�
+���12 �]f����A|���}"��72 �]f����A�����}�"��7�|d?7�?�ӓ�7��p:򁓺.�|d?7�?�ӓ��q�p:���.s�?t��?A<��/t逊0����0s�?t��?A<��ь��0���0�Ր�2��>��t����s��l/�Ր�2��>�2���s���l/  .�֓@�ЗA  �� �����-  .�֓@�ЗA � �� ����-��<4�y�|� � ��rɁ黔5��<4�y�|� � ~�r�黔5@�V?w�?]$�A0j2���t�F�O1@�V?w�?]$�AЖ΀��tF�O1�
+�?����MtxAZ� �ZZ�����;�
+�?����MtxA�Z �ZZ����;!ō��u�b��>o �o�-��0!ō��u�b�� �o��-��0c�?    ����v�.�~��A�	;c�?    �����Ҁ~�A�	; ,�?�,%�Y�  � �ϲf. ,�?�,%�Y��  � ϲf.��~%q8��  � ����
+4��~%q8���  � �����
+4R��?F�=��At
+2���u�H��3R��?F�=��A��΀��uH��3{��?�D�U^��>� �o> ���0{��?�D�U^���o �o> ��0�ɿ�Q�?[�yAZ� ������!�ɿ�Q�?[�yA�Z �������!y�>
+�
+@w��o:�}���-y�>
+�
+@w���ƀ}�����-�}@��Կ:� �i�+�Ci���7�}@��Կ:� 9ՀCi���7c�?    ����v�.���A�	;c�?    �����Ҁ��A�	;@��?   ���3A � ���[:@��?   ���3A� �� ��[:@��?   ���3A � ���[:@��?   ���3A� �� ��[:�줿�[�?���0�u&��]*�줿�[�?����>d�u&���]*î<4�y@|� � ~�s��黔5î<4�y@|� � ��s�ʁ黔5�F]��`�?�"��������黸;�F]��`�?�"���[X����黸;+@;����e��  �  ���0+@;����e���  �  ��0#�[�Un?@���7�������.#�[�Un?@����q뀐�����.t;T=��ۤxA � � ����"t;T=��ۤxA  � ���"�F]��`�?�"�����~�黸;�F]��`�?�"���[X�~黸;!���b�?wW�>� ������4!���b�?wW��o �������4@�߿  ����3A �� � /�p;@�߿  ����3A� � � �/�p;֚ݿ  ���YA �� � /��;֚ݿ  ���YA� � � �/��;  .��&ڿ��3A ��  ��Z:  .��&ڿ��3A ��  �Z:��<��d@n[� � �x�ف�b2��<��d@n[� {��x���b2�G@&�����  �  ���4�G@&������  �  ��4�<��>@���cO�}�黈9�<��>@�������}��黈9�h�?J��?���/@��v�&�F��2�h�?J��?�����c�v�&F��2~�&�����D<��/t�v����0~�&�����D<��ь�v�����0i��?HV�?�c��>o ��>����0i��?HV�?�c�� ��>���0�3T?L�@�-iɀv��F�O1�3T?L�@�ӗ7�v�F�O1�=g?7�?@ӓ�6q�q����.�=g?7�?@ӓ�ʏ�q�򁓺.|������q8��ZZ �Z� ���;|������q8���� �Z� ����;����������At̀4�tF��!����������A��3�4�t�F��!� �    J���wԀ���}��8� �    J�����,����}��8�e���˴�_L݀�Vց踪5�e���˴¡�#��V�踪5 ��@���Y�  � �ϲf. ��@���Y��  � ��ϲf.��*�$���}������1��*�$������������1v<(��j׿���^��}��黸;v<(��j׿�����U�}���黸;��?\ӿAA�0��+v�H�"5��?\ӿA�bЀ�+vH�"5 ��@���Y�  � ��^�f. ��@���Y��  � ���^�f.  .�>+�?�YA ��  ��=;  .�>+�?�YA ����  �=;  .���?j8��  ��  ���4  .���?j8�� � ��  ��40�Y�Un?����8p��:����.0�Y�Un?����Ȑ쀐:���.�є?4@�?��3AZZ��Z �\�p;�є?4@�?��3A�����Z \�p; w�?���?m��A  ��� /�V/ w�?���?m��A  ���� �/�V/��?�J�?},	�/i6�v��F��-��?�J�?},	�їʀv��F��-�є?4@�?��3AZZ��Z��[:�є?4@�?��3A�����Z�[:�.�?   2���}��~
+���1�.�?   2�������~
+��1  .�֓@�ЗA  ��� V�1  .�֓@�ЗA  ���� �V�1  .�ד��ЗA  �� �V�1  .�ד��ЗA  ��� V�1� �?���Q��/�ɀv-�H�"5� �?���Q���h7�v-H�"5I�>�W� ɗA	�΀�u����5I�>�W� ɗA�t2��u���5�?   2j8��  �  ����;�?   2j8���  �  ���;e�?�*@��-w �w���F�0e�?�*@��Ӊ �w��F�0�3��H�=���1��u�0���7�3��H�=�����u�u�0����7 ��?����Y�Z� �ZZ �
+��; ��?����Y��Z �ZZ 
+��; �ʿ^d�?�ЗAZ� ������- �ʿ^d�?�ЗA�Z �������-��>�?�? ��Bj�|�聴�]*��>�?�? ��辖�|����]*��A=��=����}����3��A=��=����}�}���3 �ʿ]dſ�ЗAZZ �Z����- �ʿ]dſ�ЗA�� �Z�����-rѧ<R56@J�	� k��~����(rѧ<R56@J�	� �D�~����(E���d@���1�5�u-���O1E���d@����hˀu-큏�O1�3��H�=���1��u0���!�3��H�=�����u�u0����!�Ȍ?�G��J�>� �o> ����4�Ȍ?�G��J��o �o> ���4�Ր�2��>��t��订��j/�Ր�2��>�2�订���j/��~%q8��  � ��
+4��~%q8���  � ���
+4S5�?���?j8��ZZ ��Z �Y��;S5�?���?j8���� ��Z Y��;���>nCa=LL� |�|灴��!���>nCa=LL�� ��|����!ֺ�?   ��YA � ���>;ֺ�?   ��YA� �� ��>;ֺ�?   ��YA � ����>;ֺ�?   ��YA� �� ���>;  .�R��?�Y�  ��  ��[.  .�R��?�Y� � ��  �[.{��?�D�U^��>� �o> ����0{��?�D�U^���o �o> ���0�<��>@���cO����黈9�<��>@���������黈9Բb�������2?b�u�����4Բb�����������u�ׁ���4S5�?���?j8��ZZ ��Z �*�4S5�?���?j8���� ��Z *�4 w�?���?m��AZZ ��Z��<��, w�?���?m��A�� ��Z�<��, ����?�Y�Z� ����8�^. ����?�Y��Z �����8�^.�K���ۘ��YAZZ��Z� ���;�K���ۘ��YA���Z� ����;WK�<R56�J�	� ����	���(WK�<R56�J�	� kD��	���(%���m�?�3�A
+�/��/v��0%���m�?�3�A�vр�/v���0R*��-��e��  � �Z��0R*��-��e���  � ��Z��0î<4�y@|� � ~�ȁ黔5î<4�y@|� � �����黔5�?   2j8��  � ��
+4�?   2j8���  � �
+4  .�J�ܿ�������p;  .�J�ܿ����}������p;�6/��Lƿ�0�A0lЀ.vH�_6�6/��Lƿ�0�AД0�.v�H�_6@�/��s�xA  � ��#"@�/��s�xA�  � �#"���?Q?���t��!-r���k/���?Q?��2�!-r��k/萖?0�?���`Qa �*��1萖?0�?�������a *��1� �    J���wԀ�|�}��8� �    J�����,��|�}��8��@����m��A  � ��-��@����m��A�  � �-    %   �   %   �   �   �    ����(�(�� �!���h����A  +cP�����  +�l��ɟA ��Q�E(	� �!�$�'��2A  +�(V����  +֚Ѩ�0��    E<=�    E<w��    E<���    E<ˡ��   B o n e R a b b l e S c e p t r e A n c i e n t _ d o u b l e S h a p e   A r t / M o d e l s / I t e m s / W e a p o n s / O n e H a n d W e a p o n s / S c e p t e r s / M o n s t e r s / T e x t u r e s / B o n e R a b b l e P r i e s t S c e p t r e A n c i e n t c . m a t   B o n e R a b b l e S c e p t r e A n c i e n t _ s i n g l e S h a p e   h a n d l e   b l a d e   m i d   
+
+=== .ao Metadata/Parent.ao (depth 3)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao nothing.ao (depth 4)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BasicSkeleton/BoneRabblePriestNoPhys.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BasicSkeleton/BoneRabblePriest_armour_788181e9.smd"
+Materials 2
+	"Art/Textures/Monsters/BasicSkeleton/BoneRabble/BoneRabblePriestc.mat" 4
+	"Art/Textures/Monsters/BasicSkeleton/BoneRabble/BoneRabblec.mat" 1
+BoundingBox -76.245 -15.2158 -218.529 77.8251 16.5479 0.491278
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_1_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_1_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/BasicSkeleton/BoneRabblePriest_armour_788181e9.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 5 in the header, 5 in the block · 16790 triangles over 13446 vertices
+  names: 712 bytes said, 712 read  [agree]
+
+=== shapes (5)
+0	armour_BoneRabblePriestNoPhys|BoneRabblePriestCape|BoneRabblePriestCapeShape	from 0	count 1170
+1	armour_BoneRabblePriestNoPhys|BoneRabblePriestCrown|BoneRabblePriestCrownShape	from 1170	count 720
+2	armour_BoneRabblePriestNoPhys|BoneRabblePriestRobe|BoneRabblePriestRobeShape	from 1890	count 2208
+3	armour_BoneRabblePriestNoPhys|BoneRabblePriest|BoneRabblePriestShape	from 4098	count 18120
+4	armour_BoneRabblePriestNoPhys|PriestSkele|PriestSkeleShape	from 22218	count 28152
+
+=== fitting
+the monster's rig: 49 bones
+mounts: aux_position, aux_back_attachment, aux_head_jntBnd, aux_L_foot_jntBnd, aux_R_foot_jntBnd
+  BoneRabblePriestCape.ao  socket chest_jntBnd [in its carrier's rig]  box (-15.1,9.4,-18.9)..(14.4,16.5,20.6)
+    (the geometry did not read)
+    rig 6 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_medal_jntBnd  [its own]  under 0  rests at (0,14.9,-7.7)
+      2 phys_skinned_L_cape_jntBnd_1  [its own]  under 0  rests at (7.1,11.7,-11.7)
+      3 phys_skinned_R_cape_jntBnd_1  [its own]  under 0  rests at (-7.1,11.7,-11.7)
+      4 phys_skinned_L_cape_jntBnd_2  [its own]  under 2  rests at (7.1,12,3.7)
+      5 phys_skinned_R_cape_jntBnd_2  [its own]  under 3  rests at (-7.1,12,3.7)
+  BoneRabblePriestCrown.ao  socket head_jntBnd [in its carrier's rig]  box (-15.1,-12,-46.1)..(14.8,14.7,-12)
+    (the geometry did not read)
+    rig 4 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_M_feathers_jntBnd  [its own]  under 0  rests at (0,-7.1,-29.5)
+      2 phys_skinned_L_feathers_jntBnd  [its own]  under 0  rests at (10.5,0.3,-26.8)
+      3 phys_skinned_R_feathers_jntBnd  [its own]  under 0  rests at (-10.5,0.3,-26.8)
+  BoneRabblePriestRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-18.5,-13.6,-7.2)..(20.4,8.8,28.5)
+    (the geometry did not read)
+    rig 6 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_front_robe_jntBnd_1  [its own]  under 0  rests at (0,-11.1,8.8)
+      2 phys_skinned_L_robe_jntBnd  [its own]  under 0  rests at (13.1,-5.6,8.8)
+      3 phys_skinned_R_robe_jntBnd  [its own]  under 0  rests at (-13.1,-5.6,8.8)
+      4 phys_skinned_back_robe_jntBnd  [its own]  under 0  rests at (0,7.9,1.5)
+      5 phys_skinned_front_robe_jntBnd_2  [its own]  under 1  rests at (0,-11.1,18.1)

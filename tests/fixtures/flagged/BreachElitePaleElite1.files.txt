@@ -1,0 +1,1709 @@
+monster: It That Controls [Metadata/Monsters/Breach/BreachElitePaleElite1]
+
+=== .ao Metadata/Monsters/Breach/Monsters/HellscapePaleElite1/HellscapePaleElite1.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8989683985710144,
+					"name": "contact",
+					"position": [
+						-27.55340003967285,
+						-77.94750213623047,
+						-179.8260040283203
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.91278475522995,
+					"name": "contact",
+					"position": [
+						24.715442657470704,
+						-76.06281280517578,
+						-178.78143310546876
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7920998930931091,
+					"name": "contact",
+					"position": [
+						0.0,
+						-100.32057189941406,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "beam_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.2830135822296143,
+					"name": "start_target_update",
+					"data": "200 -100 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3053581714630128,
+					"name": "contact",
+					"position": [
+						-2.9204699993133547,
+						-85.989501953125,
+						-143.54100036621095
+					]
+				}
+			]
+		},
+		{
+			"name": "teleport_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0,
+					"name": "start_face",
+					"data": "360 0 -1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "teleport_out"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.37727901339530947,
+					"name": "end_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.37727999687194826,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.37727999687194826,
+					"name": "teleport_in"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/Breach/Monsters/HellscapePaleElite1/attachments/MiniCapeHeld.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/Breach/Monsters/HellscapePaleElite1/attachments/HeadHeld.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/Breach/Monsters/HellscapePaleElite1/attachments/ChestHeld.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/rig.ast"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 -1.6974 -8.67004"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -12.2104 -8.67004"
+		socket = "aux_beam_01"
+			translation = "0 -100 0"
+		linear_stiffness = 10000.000
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_velocity_factor = 5.000
+		animation_force_factor = 5.000
+		gravity = 800.000
+		use_shock_propagation = false
+		enable_collisions = false
+		recreate_on_scale = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/BreachEliteMageDemon.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd aux_target_head_01"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_wrist_01 false L_upper_wrist_jntBnd L_upper_elbow_jntBnd"
+		bone_group = "grp_R_wrist_01 false R_upper_wrist_jntBnd R_upper_elbow_jntBnd"
+		bone_group = "grp_L_hand_01 false L_upper_finger_2_jntBnd_1 L_upper_wrist_jntBnd"
+		bone_group = "grp_R_hand_01 false R_upper_finger_2_jntBnd_1 R_upper_wrist_jntBnd"
+		bone_group = "grp_L_wrist_02 false L_mid_wrist_jntBnd L_mid_elbow_jntBnd"
+		bone_group = "grp_R_wrist_02 false R_mid_wrist_jntBnd R_mid_elbow_jntBnd"
+		bone_group = "grp_L_hand_02 false L_mid_finger_2_jntBnd_1 L_mid_wrist_jntBnd"
+		bone_group = "grp_R_hand_02 false R_mid_finger_2_jntBnd_1 R_mid_wrist_jntBnd"
+		bone_group = "grp_L_wrist_03 false L_lower_wrist_jntBnd L_lower_elbow_jntBnd"
+		bone_group = "grp_R_wrist_03 false R_lower_wrist_jntBnd R_lower_elbow_jntBnd"
+		bone_group = "grp_L_hand_03 false L_lower_finger_2_jntBnd_1 L_lower_wrist_jntBnd"
+		bone_group = "grp_R_hand_03 false R_lower_finger_2_jntBnd_1 R_lower_wrist_jntBnd"
+		bone_group = "grp_L_wing_01_01 false phys_tri_L_fleshcape_01_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_wing_01_01 false phys_tri_R_fleshcape_01_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_wing_01_02 false phys_tri_L_fleshcape_02_jntBnd phys_tri_L_fleshcape_01_jntBnd"
+		bone_group = "grp_R_wing_01_02 false phys_tri_R_fleshcape_02_jntBnd phys_tri_R_fleshcape_01_jntBnd"
+		bone_group = "grp_L_wing_01_03 false phys_tri_L_fleshcape_03_jntBnd phys_tri_L_fleshcape_02_jntBnd"
+		bone_group = "grp_R_wing_01_03 false phys_tri_R_fleshcape_03_jntBnd phys_tri_R_fleshcape_02_jntBnd"
+		bone_group = "grp_L_wing_01_04 false phys_tri_L_fleshcape_04_jntBnd phys_tri_L_fleshcape_03_jntBnd"
+		bone_group = "grp_R_wing_01_04 false phys_tri_R_fleshcape_04_jntBnd phys_tri_R_fleshcape_03_jntBnd"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_L_knee false L_knee_jntBnd L_thigh_jntBnd"
+		bone_group = "grp_R_knee false R_knee_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false phys_tri_R_fleshcape_01_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd phys_tri_L_fleshcape_01_jntBnd"
+		bone_group = "L_lightning_01 false L_upper_elbow_jntBnd chest_jntBnd"
+		bone_group = "L_lightning_02 false L_mid_elbow_jntBnd chest_jntBnd"
+		bone_group = "L_lightning_03 false L_lower_elbow_jntBnd chest_jntBnd"
+		bone_group = "R_lightning_01 false R_upper_elbow_jntBnd chest_jntBnd"
+		bone_group = "R_lightning_02 false R_mid_elbow_jntBnd chest_jntBnd"
+		bone_group = "R_lightning_03 false R_lower_elbow_jntBnd chest_jntBnd"
+		bone_group = "L_light_to_hand_01 false L_upper_wrist_jntBnd L_mid_wrist_jntBnd"
+		bone_group = "L_light_to_hand_02 false L_mid_wrist_jntBnd L_lower_wrist_jntBnd"
+		bone_group = "R_light_to_hand_01 false R_upper_wrist_jntBnd R_mid_wrist_jntBnd"
+		bone_group = "R_light_to_hand_02 false R_mid_wrist_jntBnd R_lower_wrist_jntBnd"
+		bone_group = "beam false aux_beam_01"
+		bone_group = "flame_attach_01 false R_upper_Weapon"
+		bone_group = "flame_attach_02 false R_mid_Weapon"
+		bone_group = "flame_attach_03 false R_lower_Weapon"
+		bone_group = "flame_attach_04 false L_upper_Weapon"
+		bone_group = "flame_attach_05 false L_mid_Weapon"
+		bone_group = "flame_attach_06 false L_lower_Weapon"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Attack",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.057128600776195529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5677109956741333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Swish",
+						"bone_name": "R_mid_finger_3_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6246057748794556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6674972772598267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Attack",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09741149842739105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5650129914283752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Swish",
+						"bone_name": "L_mid_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Attack",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15934692323207856,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17934100329875947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5839795470237732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_ArmMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6761190295219421,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Swish",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.95216304063797,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9551382064819336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.007020354270935,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "beam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Effects/FX_BeamSweetener",
+						"bone_name": "spine_2_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_BeamA",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23132294416427613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Beam",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2704438865184784,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Effects/FX_BeamChargeA",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34868550300598147,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_ArmMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6480447053909302,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7398934960365295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0953826904296876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Effects/FX_BeamChargeB",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1064103841781617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Swish",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4802864789962769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Effects/FX_Beam",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4950250387191773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.637860894203186,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9343101978302003,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Death",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21340399980545045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Falls",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4078409969806671,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "R_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.476267009973526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5846629738807678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "R_upper_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.661217987537384,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "L_upper_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Death",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8061224818229675,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9714285135269165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5650218725204468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Falls",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6516770124435425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_DeathFall",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7874575853347779,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "R_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9238591194152833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9602108001708985,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "R_upper_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0426833629608156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "L_upper_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Death",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1422693431377411,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Falls",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24816325306892396,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27189400792121889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "R_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31751134991645815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3897753357887268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "R_upper_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44081199169158938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "L_upper_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Death",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1422693431377411,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Falls",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27189400792121889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "R_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31751134991645815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3897753357887268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "R_upper_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44081199169158938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "L_upper_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Death",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1422693431377411,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Falls",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27189400792121889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "R_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31751134991645815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3897753357887268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "R_upper_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44081199169158938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "L_upper_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Death",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1422693431377411,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Falls",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27189400792121889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "R_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31751134991645815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "L_mid_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3897753357887268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "R_upper_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44081199169158938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Footsteps",
+						"bone_name": "L_upper_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23915265500545503,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25895512104034426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32750204205513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Flinch",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.026923099532723428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Flinch",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.017857100814580919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Flinch",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.020329700782895089,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Flinch",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.016483500599861146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15237070620059968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40400320291519167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2985320091247559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3031703233718873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.794008493423462,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_ArmMovement",
+						"bone_name": "neck_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15854956209659577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42038607597351076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.356015682220459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4373770952224732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.946324110031128,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_ArmMovement",
+						"bone_name": "neck_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2929669916629791,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1482632160186768,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Gore",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.577739953994751,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Flap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7417280673980713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Chase",
+						"bone_name": "aux_target_head_01"
+					}
+				]
+			},
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/VO/VO_Aggro",
+						"bone_name": "aux_target_head_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10769200325012207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Effects/FX_TeleportA",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11455264687538147,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_Bone",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33527135848999026,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Foley/F_ArmMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3665603995323181,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/BreachHellscapePaleElite1/Effects/FX_TeleportB",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	DecalEvents
+	{
+		animations = '[
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "DecalEventType",
+						"time": 0.05999999865889549,
+						"atlas": "Metadata/Decals/bloodnew.atlas",
+						"group": "bloodsplat",
+						"bone_name": "spine_2_jntBnd",
+						"size": 65.0,
+						"fade_in_time": 0.10000000149011612
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "DecalEventType",
+						"time": 0.15000000596046449,
+						"atlas": "Metadata/Decals/bloodnew.atlas",
+						"group": "bloodsplat",
+						"bone_name": "spine_2_jntBnd",
+						"size": 65.0,
+						"fade_in_time": 0.10000000149011612
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "DecalEventType",
+						"time": 0.10000000149011612,
+						"atlas": "Metadata/Decals/bloodnew.atlas",
+						"group": "bloodsplat",
+						"bone_name": "spine_2_jntBnd",
+						"size": 65.0,
+						"fade_in_time": 0.10000000149011612
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "DecalEventType",
+						"time": 0.10000000149011612,
+						"atlas": "Metadata/Decals/bloodnew.atlas",
+						"group": "bloodsplat",
+						"bone_name": "spine_2_jntBnd",
+						"size": 65.0,
+						"fade_in_time": 0.10000000149011612
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/fx/OnAct_FireHands.pet",
+						"bone_groups": [
+							"grp_R_wrist_01",
+							"grp_R_wrist_02",
+							"grp_R_wrist_03"
+						]
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/fx/OnAct_FireHands.pet",
+						"bone_groups": [
+							"grp_L_wrist_02",
+							"grp_L_wrist_03",
+							"grp_L_wrist_01"
+						]
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.15633191168308259,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/fx/OnAct_FireHands.pet",
+						"bone_groups": [
+							"grp_L_wrist_02",
+							"grp_L_wrist_03",
+							"grp_L_wrist_01",
+							"grp_R_wrist_01",
+							"grp_R_wrist_02",
+							"grp_R_wrist_03"
+						]
+					}
+				]
+			},
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/fx/OnAct_Teleport.pet",
+						"bone_groups": [
+							"grp_R_wrist_01",
+							"grp_head",
+							"grp_L_wing_01_01",
+							"grp_R_wing_01_01",
+							"grp_R_foot",
+							"grp_L_foot",
+							"grp_L_wing_01_04",
+							"grp_R_wing_01_03",
+							"grp_L_wrist_02"
+						]
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "EmissiveMulti",
+						"curve": "4 0 0 Smooth 0.611997 1 Linear 1.04725 0 Flat 1.333 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "EmissiveMulti",
+						"curve": "4 0 0 Smooth 0.611997 1 Linear 1.04725 0 Flat 1.333 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.600000023841858,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Smooth 0.73458 1 Linear 0.857238 1 Smooth 1.25701 0 Flat 1.6 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "beam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Smooth 1.07111 1 Linear 1.24996 1 Smooth 1.83288 0 Flat 2.333 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "surgeTime_R",
+						"curve": "7 0 1 Smooth 0.0854628 0.773649 Smooth 0.154174 0.138514 Smooth 0.252981 0 Flat 0.37728 0 Linear 0.634583 1 Linear 1 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "EmissiveMulti",
+						"curve": "6 0 0 Linear 0.0769449 0 Linear 0.121806 1 Linear 0.543725 1 Linear 0.710676 0 Linear 1 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "beam_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/ao/OnAct_fire_projectile_spawn.ao",
+						"animation": "animationPreSet_01",
+						"from": {
+							"parent_bone": "aux_beam_01"
+						},
+						"speed_type": "Inherit"
+					}
+				]
+			},
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/ao/teleport.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.5218338966369629,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/ao/teleport.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/epk/hand_glow_R.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/epk/hand_glow_L.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/epk/hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "beam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/epk/hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/epk/teleport_in.epk"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Breach/Monsters/HellscapePaleElite1/attachments/MiniCapeHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/attachments/BreachEliteMageDemon/cape/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/attachments/BreachEliteMageDemon/cape/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.600
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/attachments/BreachEliteMageDemon/cape/BreachEliteMageDemonMiniCape.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Breach/Monsters/HellscapePaleElite1/attachments/HeadHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/attachments/BreachEliteMageDemon/head/rig.amd"
+	view_of = "idle_01"
+		view_name = "teleport_01"
+		view_end = 1000
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/attachments/BreachEliteMageDemon/head/rig.ast"
+		enclosure_angle = 0.075
+		attachment_bones = "head_jntBnd neck_jntBnd chest_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd neck_jntBnd chest_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/attachments/BreachEliteMageDemon/head/BreachEliteMageDemonHead.sm"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/fx/OnAct_Teleport.pet",
+						"bone_group": "child_attach"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/epk/teleport_in.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "EmissiveMulti",
+						"curve": "6 0 0 Linear 0.0769449 0 Linear 0.121806 1 Linear 0.543725 1 Linear 0.710676 0 Linear 1 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "surgeTime_R",
+						"curve": "7 0 1 Smooth 0.0854628 0.773649 Smooth 0.154174 0.138514 Smooth 0.252981 0 Flat 0.37728 0 Linear 0.634583 1 Linear 1 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Breach/Monsters/HellscapePaleElite1/attachments/ChestHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/attachments/BreachEliteMageDemon/chest/rig.amd"
+	view_of = "idle_01"
+		view_name = "teleport_01"
+		view_end = 1000
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/attachments/BreachEliteMageDemon/chest/rig.ast"
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd neck_jntBnd head_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/attachments/BreachEliteMageDemon/chest/BreachEliteMageDemonChest.sm"
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapePaleElite1/epk/teleport_in.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "teleport_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "EmissiveMulti",
+						"curve": "6 0 0 Linear 0.0769449 0 Linear 0.121806 1 Linear 0.543725 1 Linear 0.710676 0 Linear 1 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "surgeTime_R",
+						"curve": "7 0 1 Smooth 0.0854628 0.773649 Smooth 0.154174 0.138514 Smooth 0.252981 0 Flat 0.37728 0 Linear 0.634583 1 Linear 1 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/BreachEliteMageDemon.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/BreachEliteMageDemon_armour_3e487027.smd"
+Materials 1
+	"Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/Textures/BreachEliteMageDemonc.mat" 7
+BoundingBox -81.0141 -20.8983 -163.994 81.0141 100.207 0.177
+BoneGroups 34
+	"grp_root" 1 "hip_jntBnd"
+	"grp_frameupper" 5 "phys_tri_R_fleshcape_01_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "phys_tri_L_fleshcape_01_jntBnd"
+	"grp_head" 2 "head_jntBnd" "face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "phys_tri_L_fleshcape_01_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "phys_tri_R_fleshcape_01_jntBnd"
+	"grp_l_fleshcape_01" 2 "phys_tri_L_fleshcape_01_jntBnd" "phys_tri_L_fleshcape_02_jntBnd"
+	"grp_l_fleshcape_02" 2 "phys_tri_L_fleshcape_02_jntBnd" "phys_tri_L_fleshcape_03_jntBnd"
+	"grp_l_fleshcape_03" 2 "phys_tri_L_fleshcape_03_jntBnd" "phys_tri_L_fleshcape_04_jntBnd"
+	"grp_r_fleshcape_01" 2 "phys_tri_R_fleshcape_01_jntBnd" "phys_tri_R_fleshcape_02_jntBnd"
+	"grp_r_fleshcape_02" 2 "phys_tri_R_fleshcape_02_jntBnd" "phys_tri_R_fleshcape_03_jntBnd"
+	"grp_r_fleshcape_03" 2 "phys_tri_R_fleshcape_03_jntBnd" "phys_tri_R_fleshcape_04_jntBnd"
+	"grp_l_upper_forearm" 2 "L_upper_elbow_jntBnd" "L_upper_wrist_jntBnd"
+	"grp_r_upper_forearm" 2 "R_upper_elbow_jntBnd" "R_upper_thumb_1_jntBnd_2"
+	"grp_l_upper_palm" 2 "L_upper_wrist_jntBnd" "L_upper_finger_2_jntBnd_1"
+	"grp_r_upper_palm" 2 "R_upper_wrist_jntBnd" "R_upper_finger_2_jntBnd_1"
+	"grp_l_mid_forearm" 2 "L_mid_elbow_jntBnd" "L_mid_wrist_jntBnd"
+	"grp_r_mid_forearm" 2 "R_mid_elbow_jntBnd" "R_mid_thumb_1_jntBnd_2"
+	"grp_l_mid_palm" 2 "L_mid_wrist_jntBnd" "L_mid_finger_2_jntBnd_1"
+	"grp_r_mid_palm" 2 "R_mid_wrist_jntBnd" "R_mid_finger_2_jntBnd_1"
+	"grp_l_lower_forearm" 2 "L_lower_elbow_jntBnd" "L_lower_wrist_jntBnd"
+	"grp_r_lower_forearm" 2 "R_lower_elbow_jntBnd" "R_lower_thumb_1_jntBnd_2"
+	"grp_l_lower_palm" 2 "L_lower_wrist_jntBnd" "L_lower_finger_2_jntBnd_1"
+	"grp_r_lower_palm" 2 "R_lower_wrist_jntBnd" "R_lower_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/MONSTERS/FleshPaleMysteriousSpellcasterDemon/BreachEliteMageDemon_armour_3e487027.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 7 in the header, 7 in the block · 16822 triangles over 12789 vertices
+  names: 1346 bytes said, 1346 read  [agree]
+
+=== shapes (12)
+0	armour_BreachEliteMageDemon|BreachEliteMageDemon_Body|BreachEliteMageDemon_BodyShape	from 0	count 31920
+1	armour_BreachEliteMageDemon|cape_GRP|BreachEliteMageDemon_Neck_Wrap|BreachEliteMageDemon_Neck_WrapShape	from 31920	count 3252
+2	armour_BreachEliteMageDemon|BreachEliteMageDemon_Opaque|BreachEliteMageDemon_OpaqueShape	from 35172	count 9990
+3	armour_BreachEliteMageDemon|cape_GRP|BreachEliteMageDemon_Split_Cape|BreachEliteMageDemon_Split_CapeShape	from 45162	count 3504
+4	armour_BreachEliteMageDemon|cape_GRP|BreachEliteMageDemon_Waist_Coins|BreachEliteMageDemon_Waist_CoinsShape	from 48666	count 552
+5	armour_BreachEliteMageDemon|BreachEliteMageDemon_Wraps|BreachEliteMageDemon_WrapsShape	from 49218	count 768
+6	armour_BreachEliteMageDemon|BreachEliteMageDemon_Wrist_Chains|BreachEliteMageDemon_Wrist_ChainsShape	from 49986	count 480
+7	BreachEliteMageDemon_Min_CapeShape	from 50466	count 960
+8	BreachEliteMageDemon_HeadShape	from 51426	count 3558
+9	BreachEliteMageDemon_HoodShape	from 54984	count 4326
+10	BreachEliteMageDemon_OpaqueShape	from 59310	count 1500
+11	BreachEliteMageDemon_chestShape	from 60810	count 6540
+
+=== fitting
+the monster's rig: 137 bones
+mounts: aux_position
+  MiniCapeHeld.ao  socket chest_jntBnd [in its carrier's rig]  box (-20.8,5,-24.2)..(20.4,32.9,22.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 320 triangles over 204 vertices
+    names: 68 bytes said, 68 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_cape_jntBnd  [its own]  under 0  rests at (-0,14.5,-4.3)
+  HeadHeld.ao  socket head_jntBnd [in its carrier's rig]  box (-11.2,-29,-28.7)..(11.3,12.9,19.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 3128 triangles over 1959 vertices
+    names: 184 bytes said, 184 read  [agree]
+    rig 25 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 24 of 25  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,0,0)  carrier has (0,0,0)
+      1 neck_jntBnd  [shared]  under 0  rests at (0,-2.8,16.1)  carrier has (-0,1.4,-150.9)
+      2 jaw_jntBnd  [its own]  under 0  rests at (0,-1,-1.5)
+      3 finger_4_jntBnd_1  [its own]  under 0  rests at (2.9,-11.2,-8.7)
+      4 finger_5_jntBnd_1  [its own]  under 0  rests at (4.2,-10.5,-6.2)
+      5 finger_3_jntBnd_1  [its own]  under 0  rests at (-0.2,-10.8,-9.2)
+      6 finger_2_jntBnd_1  [its own]  under 0  rests at (-2.8,-11,-8.4)
+      7 finger_1_jntBnd_1  [its own]  under 0  rests at (-4.5,-10.2,-6.2)
+      8 phys_tri_headdress_jntBnd_1  [its own]  under 0  rests at (-7.1,-6.2,-3.3)
+      9 phys_tri_headdress_jntBnd_4  [its own]  under 0  rests at (7.1,-6.2,-3.3)
+      10 chest_jntBnd  [shared]  under 1  rests at (-0,-13.7,28.2)  carrier has (-0,-4.9,-135.8)
+      11 finger_4_jntBnd_2  [its own]  under 3  rests at (5.1,-8.8,-12.9)
+      12 finger_5_jntBnd_2  [its own]  under 4  rests at (7.3,-8.1,-8.3)
+      13 finger_3_jntBnd_2  [its own]  under 5  rests at (-0.2,-9.2,-13.9)
+      14 finger_2_jntBnd_2  [its own]  under 6  rests at (-4.8,-8.8,-12.2)
+      15 finger_1_jntBnd_2  [its own]  under 7  rests at (-7.2,-8,-8.3)
+      16 phys_tri_headdress_jntBnd_2  [its own]  under 8  rests at (-6.3,-11,9.7)
+      17 phys_tri_headdress_jntBnd_5  [its own]  under 9  rests at (6.3,-11,9.7)
+      18 finger_4_jntBnd_3  [its own]  under 11  rests at (5.9,-6.1,-14.8)
+      19 finger_5_jntBnd_3  [its own]  under 12  rests at (8.8,-6.1,-9.7)
+      20 finger_3_jntBnd_3  [its own]  under 13  rests at (-0.2,-7.1,-17.1)
+      21 finger_2_jntBnd_3  [its own]  under 14  rests at (-5.9,-6.3,-14.6)
+      22 finger_1_jntBnd_3  [its own]  under 15  rests at (-8.6,-6,-9.6)
+      23 phys_tri_headdress_jntBnd_3  [its own]  under 16  rests at (-6.1,-19.6,20.4)
+      24 phys_tri_headdress_jntBnd_6  [its own]  under 17  rests at (6.1,-19.6,20.4)
+  ChestHeld.ao  socket chest_jntBnd [in its carrier's rig]  box (-30.4,-19.2,-23.3)..(30.4,14.9,15.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 2180 triangles over 1375 vertices
+    names: 62 bytes said, 62 read  [agree]
+    rig 25 bones, 8 of them names its carrier's rig also has
+    mesh weights reach bone 24 of 25  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (8.2,0.2,-10.3)  carrier has (8.2,-4.7,-146.1)
+      2 neck_jntBnd  [shared]  under 0  rests at (0,6.3,-15)  carrier has (-0,1.4,-150.9)
+      3 R_clavicle_jntBnd  [shared]  under 0  rests at (-8.2,0.2,-10.3)  carrier has (-8.2,-4.7,-146.1)
+      4 hip_jntBnd  [shared]  under 0  rests at (0,0,38.4)  carrier has (0,-4.9,-97.4)
+      5 phys_jntBnd  [its own]  under 0  rests at (0,0,0)
+      6 L_finger_Top_01_jntBnd  [its own]  under 0  rests at (9.8,12.1,-4.8)
+      7 L_finger_mid_01_jntBnd  [its own]  under 0  rests at (7.6,9.2,0.5)
+      8 R_finger_Top_01_jntBnd  [its own]  under 0  rests at (-9.8,12.1,-4.8)
+      9 R_finger_mid_01_jntBnd  [its own]  under 0  rests at (-7.6,9.2,0.5)
+      10 L_finger_low_02_jntBnd  [its own]  under 0  rests at (13.4,1.3,11.1)
+      11 R_finger_low_02_jntBnd  [its own]  under 0  rests at (-13.4,1.3,11.1)
+      12 head_jntBnd  [shared]  under 2  rests at (0,3.6,-31.1)  carrier has (-0,-1.3,-167)
+      13 spine_1_jntBnd  [shared]  under 4  rests at (0,0,25.6)  carrier has (0,-4.9,-110.2)
+      14 L_finger_Top_02_jntBnd  [its own]  under 6  rests at (16.3,10.9,-2)
+      15 L_finger_mid_02_jntBnd  [its own]  under 7  rests at (15,5,5)
+      16 R_finger_Top_02_jntBnd  [its own]  under 8  rests at (-16.3,10.9,-2)
+      17 R_finger_mid_02_jntBnd  [its own]  under 9  rests at (-15,5,5)
+      18 L_finger_low_03_jntBnd  [its own]  under 10  rests at (12.3,-8.7,12.2)
+      19 R_finger_low_03_jntBnd  [its own]  under 11  rests at (-12.3,-8.7,12.2)
+      20 spine_2_jntBnd  [shared]  under 13  rests at (0,0,12.8)  carrier has (-0,-4.9,-123)
+      21 L_finger_Top_03_jntBnd  [its own]  under 14  rests at (21.4,4.7,1.3)
+      22 L_finger_mid_03_jntBnd  [its own]  under 15  rests at (18.3,-3,7.2)
+      23 R_finger_Top_03_jntBnd  [its own]  under 16  rests at (-21.4,4.7,1.3)
+      24 R_finger_mid_03_jntBnd  [its own]  under 17  rests at (-18.3,-3,7.2)

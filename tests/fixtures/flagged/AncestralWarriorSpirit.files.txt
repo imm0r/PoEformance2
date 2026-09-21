@@ -1,0 +1,649 @@
+monster: Ancestral Warrior Spirit [Metadata/Monsters/Totems/ancestor_totem/AncestralWarriorSpirit]
+
+=== .ao Metadata/Monsters/Totems/ancestor_totem/AncestorFour.ao (depth 0)
+version 3
+extends "Metadata/Characters/Character"
+
+AttachedAnimatedObject
+{
+	clear_inherited_attached_objects = true
+	attached_object = "spine_1_jntBnd Metadata/Effects/Spells/warrior_totems/ancestor/Attachments/KaruiSkirt.ao"
+		attached_object_scale = "1.1 1.2 1"
+	attached_object = "head_jntBnd Metadata/Effects/Spells/warrior_totems/ancestor/Attachments/KaruiHair.ao"
+	attached_object = "spine_1_jntBnd Metadata/Effects/Spells/warrior_totems/ancestor/Attachments/KaruiAccessories.ao"
+		attached_object_translation = "0 0 -3"
+		attached_object_scale = "0.95 0.95 1"
+}
+
+AnimationController
+{
+}
+
+client
+{
+	ClientAnimationController
+	{
+	}
+	
+	SkinMesh
+	{
+		remove_skin = "Art/Models/CharactersFour/Templar.sm"
+		skin = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/AncestorTotem/AncestorTotem.sm"
+			FallenKaruiHeroesBodyShape = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiMale03.mat:0"
+			bodyArmour_01Shape = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiArmour03.mat:0"
+			hair_01Shape = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiMale03Hair.mat:0"
+			hair_02Shape = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiMale03Hair.mat:0"
+			bodyArmour_02Shape = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiArmour03.mat:0"
+	}
+	
+	AnimatedRender
+	{
+		RenderPasses = 
+		'{
+		    "passes": [
+		        {
+		            "is_main": false,
+		            "type": "StandAlone",
+		            "filename": "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/spectreSkin_01.mat"
+		        },
+		        {
+		            "is_main": false,
+		            "type": "StandAlone",
+		            "filename": "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/spectreShadows.mat"
+		        }
+		    ]
+		}'
+	}
+	
+	ParticleEffects
+	{
+		continuous_effect = "grp_* Metadata/Effects/Spells/warrior_totems/ancestor/FX/ghostRibbons.pet"
+	}
+}
+
+=== .ao Metadata/Characters/Character.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/CharactersFour/OneRig.amd"
+}
+
+Melee
+{
+}
+
+AttachedAnimatedObject
+{
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/CharactersFour/OneRig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "aux_L_shoulder_attachment"
+			parent = "L_shoulder_attachment_jntBnd"
+		socket = "aux_R_shoulder_attachment"
+			parent = "R_shoulder_attachment_jntBnd"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment_jntBnd"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment_jntBnd"
+		socket = "aux_NR_waist_attachment"
+			parent = "root_jntBnd"
+			translation = "0 0 -99.848"
+		socket = "aux_target_head_01"
+			parent = "neck_jntBnd"
+			translation = "0 3.25867 -22.0645"
+		socket = "aux_target_head_02"
+			parent = "neck_jntBnd"
+			translation = "0 -7.4446 -22.0645"
+		socket = "aux_melee_pivot"
+			parent = "chest_jntBnd"
+			ignore_parent_axis = "xy"
+		socket = "aux_melee_direction"
+			parent = "chest_jntBnd"
+			translation = "0 -25 0"
+			ignore_parent_axis = "xy"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "aux_chest_attachment"
+			parent = "chest_jntBnd"
+		socket = "R_Weapon2"
+			parent = "aux_Back_attachment"
+			rotation = "-0 -2.70526 0"
+			translation = "-10 5 0"
+		socket = "L_Weapon2"
+			parent = "aux_Back_attachment"
+			rotation = "-0 2.70526 0"
+			translation = "10 5 0"
+		socket = "sheath_2HMace"
+			parent = "aux_Back_attachment"
+			scale = "0.8 0.8 0.8"
+			rotation = "-0 -2.617 0"
+			translation = "-7.6632 5.852 4.4248"
+		socket = "sheath_Shield"
+			parent = "aux_Back_attachment"
+			rotation = "-0 0 3.14"
+			translation = "12.591 5.196 10"
+		socket = "sheath_2HSword"
+			parent = "aux_Back_attachment"
+			rotation = "-0 -2.671 0"
+			translation = "-23.451 7.315 -21.957"
+		socket = "sheath_Crossbow"
+			parent = "aux_Back_attachment"
+			rotation = "-0 -2.878 1.57"
+			translation = "-6.362 7.315 -12.702"
+		socket = "sheath_Staff"
+			parent = "aux_Back_attachment"
+			rotation = "-0 0.532 0"
+			translation = "23.564 7.315 62.935"
+		socket = "sheath_Spear"
+			parent = "aux_Back_attachment"
+			rotation = "-0 -2.617 0"
+			translation = "-7.025 7.315 4.056"
+		socket = "sheath_Bow"
+			parent = "aux_Back_attachment"
+			rotation = "-0 0.523 3.14"
+			translation = "7.802 7.315 0.313"
+		socket = "sheath_RWeapon"
+			parent = "hip_jntBnd"
+			rotation = "0.778 -3.053 1.515"
+			translation = "-25.65 -8.198 -6.846"
+		socket = "sheath_RClaw"
+			parent = "hip_jntBnd"
+			rotation = "-1.449 -1.498 2.975"
+			translation = "-23.617 -0.023 1.284"
+		socket = "sheath_LWeapon"
+			parent = "hip_jntBnd"
+			rotation = "0.778 3.03 1.52"
+			translation = "25.843 -8.199 -6.826"
+		socket = "sheath_LClaw"
+			parent = "hip_jntBnd"
+			rotation = "1.449 -1.642 2.975"
+			translation = "23.617 -0.023 1.284"
+		socket = "sheath_Flail"
+			parent = "hip_jntBnd"
+			rotation = "-0.204 -0.309 1.242"
+			translation = "-42.331 12.492 50.532"
+		socket = "sheath_LSceptre"
+			parent = "hip_jntBnd"
+			rotation = "0.778 3.03 1.52"
+			translation = "24.431 4.426 5.905"
+		socket = "sheath_RSceptre"
+			parent = "hip_jntBnd"
+			rotation = "0.778 -3.053 1.515"
+			translation = "-24.536 4.426 5.916"
+		socket = "sheath_Buckler"
+			parent = "hip_jntBnd"
+			rotation = "-0.042 0.124 1.897"
+			translation = "20.167 4.223 2.164"
+		socket = "sheath_Focus"
+			parent = "hip_jntBnd"
+			rotation = "-0.042 0.124 1.897"
+			translation = "20.167 4.223 2.164"
+		socket = "aux_STRIKE_POSITION"
+			translation = "0 -65 0"
+		socket = "L_hand_FX"
+			parent = "L_wrist_jntBnd"
+			translation = "7.5 0 0"
+		socket = "R_hand_FX"
+			parent = "R_wrist_jntBnd"
+			rotation = "-0 0 -3.14159"
+			translation = "-7.5 0 0"
+		socket = "sheath_2HOffhand"
+			parent = "aux_Back_attachment"
+			rotation = "-0.00159255 -0.521407 3.14159"
+			translation = "9.579 7.315 5.531"
+		socket = "flask_attachment_01"
+			parent = "spine_1_jntBnd"
+			translation = "-5.327 -15.86 1.464"
+		socket = "flask_attachment_02"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 -1.047"
+			translation = "-14.31 -11.204 1.035"
+		socket = "flask_attachment_03"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 -1.57"
+			translation = "-18.739 -3.342 0.309"
+		socket = "flask_attachment_04"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 -2.09619"
+			translation = "-17.207 5.197 -0.48"
+		socket = "flask_attachment_05"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 -2.62019"
+			translation = "-10.236 11.72 -1.082"
+		socket = "flask_attachment_06"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 3.14"
+			translation = "0 14.165 -1.308"
+		socket = "flask_attachment_07"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 2.617"
+			translation = "10.236 11.72 -1.082"
+		socket = "flask_attachment_08"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 2.093"
+			translation = "17.207 5.197 -0.48"
+		socket = "flask_attachment_09"
+			parent = "spine_1_jntBnd"
+			translation = "18.739 -3.342 0.309"
+		socket = "flask_attachment_10"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 0.523"
+			translation = "14.31 -11.204 1.035"
+		socket = "flask_attachment_11"
+			parent = "spine_1_jntBnd"
+			translation = "5.327 -15.86 1.464"
+		socket = "aux_waist_attachment"
+			parent = "spine_1_jntBnd"
+		socket = "amulet_attachment"
+			parent = "chest_jntBnd"
+			rotation = "0.572 0 0"
+			translation = "0 -10 -10"
+		socket = "left_ring_attachment"
+			parent = "L_finger_3_jntBnd_1"
+			rotation = "-0 0 1.57"
+			translation = "2 0 0"
+		socket = "right_ring_attachment"
+			parent = "R_finger_3_jntBnd_1"
+			rotation = "-0.00159255 3.14159 -1.57159"
+			translation = "-2 0 0"
+		socket = "bug_attachment_01"
+			parent = "head_jntBnd"
+		socket = "bug_attachment_02"
+			parent = "R_clavicle_jntBnd"
+		socket = "bug_attachment_03"
+			parent = "spine_2_jntBnd"
+		socket = "bug_attachment_04"
+			parent = "L_elbow_jntBnd"
+		socket = "bug_attachment_05"
+			parent = "L_clavicle_jntBnd"
+		socket = "arcane_mageblood_attachment"
+			parent = "neck_jntBnd"
+		socket = "R_shoulder_pet_01"
+			parent = "R_shoulder_attachment_jntBnd"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "back_orbsocket_1"
+			parent = "aux_Back_attachment"
+			translation = "0 12.2741 -11.9684"
+		socket = "back_orbsocket_2"
+			parent = "aux_Back_attachment"
+			translation = "0 12.2741 6.48659"
+		socket = "back_orbsocket_3"
+			parent = "aux_Back_attachment"
+			translation = "0 12.2741 23.4886"
+		socket = "back_orbsocket_4"
+			parent = "aux_Back_attachment"
+			translation = "0 12.2741 40.174"
+	    socket = "sheath_Talisman"
+	        parent = "hip_jntBnd"
+	        rotation = "-0.0 0.0 -0.677"
+	        translation = "-14.791 -11.025 -11.267"
+	    socket = "sheath_Talisman2"
+	        parent = "hip_jntBnd"
+	        rotation = "-0.0 0.0 0.677"
+	        translation = "14.791 -11.025 -11.267"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/CharactersFour/Templar.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_2_jntBnd"
+		bone_group = "grp_L_clavicle false L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_clavicle false R_clavicle_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_bicep false L_shoulder_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_bicep false R_shoulder_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_forearm false L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "grp_R_forearm false R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "grp_L_hand false L_wrist_jntBnd L_finger_2_jntBnd_1"
+		bone_group = "grp_R_hand false R_wrist_jntBnd R_finger_2_jntBnd_1"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd R_knee_jntBnd"
+		bone_group = "grp_L_shin false L_knee_jntBnd L_ankle_jntBnd"
+		bone_group = "grp_R_shin false R_knee_jntBnd R_ankle_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_foot_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_foot_jntBnd"
+		bone_group = "fx_melee false aux_melee_pivot aux_melee_direction"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "wand false R_elbow_jntBnd R_thumb_1_jntBnd_1"
+		bone_group = "frameupper false aux_R_shoulder_attachment neck_jntBnd aux_L_shoulder_attachment"
+		bone_group = "lwand false L_elbow_jntBnd L_thumb_1_jntBnd_1"
+		bone_group = "foot1 false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "foot2 false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "body false R_elbow_jntBnd R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd L_shoulder_cTwist_jntBnd_1 L_shoulder_jntBnd L_clavicle_jntBnd chest_jntBnd spine_2_jntBnd spine_1_jntBnd R_thigh_jntBnd R_knee_jntBnd R_ankle_jntBnd R_knee_jntBnd R_thigh_jntBnd L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd"
+		bone_group = "splashfoot1 false R_foot_jntBnd R_ankle_jntBnd"
+		bone_group = "splashfoot2 false L_foot_jntBnd L_ankle_jntBnd"
+		bone_group = "Larmfx false L_thumb_1_jntBnd_1 L_wrist_jntBnd L_elbow_Twist_jntBnd_3 L_elbow_Twist_jntBnd_2 L_elbow_Twist_jntBnd_1 L_elbow_jntBnd"
+		bone_group = "Rarmfx false R_thumb_1_jntBnd_1 R_wrist_jntBnd R_elbow_Twist_jntBnd_3 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_1 R_elbow_jntBnd"
+		bone_group = "bodyfx false R_clavicle_jntBnd L_clavicle_jntBnd chest_jntBnd spine_2_jntBnd spine_1_jntBnd R_thigh_jntBnd L_thigh_jntBnd spine_1_jntBnd"
+		bone_group = "lweaponbuff false L_wrist_jntBnd aux_L_Weapon_attachment_jntBnd"
+		bone_group = "rweaponbuff false R_wrist_jntBnd aux_R_Weapon_attachment_jntBnd"
+		bone_group = "sourcearcgroup false L_finger_2_jntBnd_1 L_finger_1_jntBnd_1"
+		bone_group = "waist_parent_attach false L_thigh_jntBnd R_thigh_jntBnd"
+		bone_group = "shoulder_parent_attach false aux_L_shoulder_attachment aux_R_shoulder_attachment"
+		bone_group = "full_L_arm false L_shoulder_jntBnd L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "full_R_arm false R_shoulder_jntBnd R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "full_L_leg false L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd"
+		bone_group = "full_R_leg false R_thigh_jntBnd R_knee_jntBnd R_ankle_jntBnd"
+		bone_group = "trailfoot_01 false R_foot_jntBnd R_ankle_jntBnd"
+		bone_group = "trailfoot_02 false L_foot_jntBnd L_ankle_jntBnd"
+		bone_group = "head_and_shoulders false aux_R_shoulder_attachment head_jntBnd aux_L_shoulder_attachment"
+		bone_group = "chest_fx false spine_1_jntBnd spine_2_jntBnd chest_jntBnd aux_Back_attachment"
+		bone_group = "wrist_FX_L false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "wrist_FX_R false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "L_upper_arm false L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd"
+		bone_group = "R_upper_arm false R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd"
+		bone_group = "waistfx false spine_1_jntBnd spine_2_jntBnd"
+		bone_group = "upper_body false aux_Back_attachment L_clavicle_jntBnd R_clavicle_jntBnd R_shoulder_attachment_jntBnd L_shoulder_attachment_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd L_elbow_Twist_jntBnd_1 L_elbow_Twist_jntBnd_2 L_elbow_Twist_jntBnd_3 L_wrist_jntBnd L_thumb_1_jntBnd_1 L_thumb_1_jntBnd_2 L_thumb_1_jntBnd_3 aux_L_Weapon_attachment_jntBnd L_finger_1_jntBnd_1 L_finger_1_jntBnd_2 L_finger_1_jntBnd_3 L_finger_2_jntBnd_3 L_finger_2_jntBnd_2 L_finger_2_jntBnd_1 L_finger_3_jntBnd_1 L_finger_3_jntBnd_2 L_finger_3_jntBnd_3 L_finger_4_jntBnd_3 L_finger_4_jntBnd_2 L_finger_4_jntBnd_1 R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 R_wrist_jntBnd R_thumb_1_jntBnd_1 R_thumb_1_jntBnd_2 R_thumb_1_jntBnd_3 aux_R_Weapon_attachment_jntBnd R_finger_1_jntBnd_1 R_finger_1_jntBnd_2 R_finger_1_jntBnd_3 R_finger_2_jntBnd_3 R_finger_2_jntBnd_2 R_finger_2_jntBnd_1 R_finger_3_jntBnd_1 R_finger_3_jntBnd_2 R_finger_3_jntBnd_3 R_finger_4_jntBnd_3 R_finger_4_jntBnd_2 R_finger_4_jntBnd_1 neck_jntBnd head_jntBnd"
+		bone_group = "lower_body false R_foot_jntBnd R_ankle_jntBnd R_knee_jntBnd R_thigh_jntBnd hip_jntBnd L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd L_foot_jntBnd"
+		bone_group = "floating_mask false R_foot_jntBnd aux_R_foot_attachment R_ankle_jntBnd R_knee_jntBnd R_thigh_jntBnd L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd aux_L_foot_attachment L_foot_jntBnd"
+		bone_group = "floating_mask_translation false R_foot_jntBnd aux_R_foot_attachment R_ankle_jntBnd R_knee_jntBnd R_thigh_jntBnd L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd aux_L_foot_attachment L_foot_jntBnd hip_jntBnd root_jntBnd"
+		bone_group = "run_floating_mask_translation false R_foot_jntBnd aux_R_foot_attachment R_ankle_jntBnd R_knee_jntBnd root_jntBnd R_thigh_jntBnd L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd aux_L_foot_attachment L_foot_jntBnd hip_jntBnd head_jntBnd neck_jntBnd chest_jntBnd spine_1_jntBnd spine_2_jntBnd"
+		bone_group = "weapon_swap_mask false aux_Back_attachment L_upperArm_attachment_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd L_elbow_attachment_jntBnd L_elbow_Twist_jntBnd_1 L_elbow_Twist_jntBnd_2 L_elbow_Twist_jntBnd_3 L_wrist_jntBnd L_thumb_1_jntBnd_1 L_thumb_1_jntBnd_2 L_thumb_1_jntBnd_3 L_finger_1_jntBnd_3 L_finger_2_jntBnd_3 L_finger_1_jntBnd_2 L_finger_1_jntBnd_1 L_finger_2_jntBnd_2 L_finger_2_jntBnd_1 aux_L_Weapon_attachment_jntBnd L_finger_3_jntBnd_2 spine_1_jntBnd phys_skinned_L_chest_jntBnd phys_skinned_R_chest_jntBnd L_chest_jntBnd R_chest_jntBnd L_finger_2_jntBnd_1 L_finger_3_jntBnd_2 L_finger_3_jntBnd_1 L_finger_4_jntBnd_1 L_finger_4_jntBnd_2 L_finger_4_jntBnd_2 R_clavicle_jntBnd R_shoulder_attachment_jntBnd R_shoulder_jntBnd R_upperArm_attachment_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd R_elbow_attachment_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 R_wrist_jntBnd R_thumb_1_jntBnd_2 R_thumb_1_jntBnd_3 R_finger_1_jntBnd_2 R_finger_1_jntBnd_3 R_finger_2_jntBnd_2 R_finger_2_jntBnd_3 R_finger_2_jntBnd_2 R_finger_3_jntBnd_2 R_finger_3_jntBnd_3 R_finger_3_jntBnd_2 R_finger_4_jntBnd_2 R_finger_4_jntBnd_3 R_finger_4_jntBnd_2 R_thumb_1_jntBnd_1 R_finger_1_jntBnd_1 R_thumb_1_jntBnd_1 R_finger_2_jntBnd_1 R_finger_3_jntBnd_1 R_finger_4_jntBnd_1 aux_R_Weapon_attachment_jntBnd spine_2_jntBnd chest_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd neck_jntBnd L_clavicle_jntBnd L_finger_4_jntBnd_3 L_shoulder_jntBnd L_shoulder_attachment_jntBnd"
+		bone_group = "weapon_swap_mask_moving false aux_Back_attachment L_upperArm_attachment_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd L_elbow_attachment_jntBnd L_elbow_Twist_jntBnd_1 L_elbow_Twist_jntBnd_2 L_elbow_Twist_jntBnd_3 L_wrist_jntBnd L_thumb_1_jntBnd_1 L_thumb_1_jntBnd_2 L_thumb_1_jntBnd_3 L_finger_1_jntBnd_3 L_finger_2_jntBnd_3 L_finger_1_jntBnd_2 L_finger_1_jntBnd_1 L_finger_2_jntBnd_2 L_finger_2_jntBnd_1 aux_L_Weapon_attachment_jntBnd L_finger_3_jntBnd_2 L_finger_2_jntBnd_1 L_finger_3_jntBnd_2 L_finger_3_jntBnd_1 L_finger_4_jntBnd_1 L_finger_4_jntBnd_2 L_finger_4_jntBnd_2 R_clavicle_jntBnd R_shoulder_attachment_jntBnd R_shoulder_jntBnd R_upperArm_attachment_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd R_elbow_attachment_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 R_wrist_jntBnd R_thumb_1_jntBnd_2 R_thumb_1_jntBnd_3 R_finger_1_jntBnd_2 R_finger_1_jntBnd_3 R_finger_2_jntBnd_2 R_finger_2_jntBnd_3 R_finger_2_jntBnd_2 R_finger_3_jntBnd_2 R_finger_3_jntBnd_3 R_finger_3_jntBnd_2 R_finger_4_jntBnd_2 R_finger_4_jntBnd_3 R_finger_4_jntBnd_2 R_thumb_1_jntBnd_1 R_finger_1_jntBnd_1 R_thumb_1_jntBnd_1 R_finger_2_jntBnd_1 R_finger_3_jntBnd_1 R_finger_4_jntBnd_1 aux_R_Weapon_attachment_jntBnd L_clavicle_jntBnd L_finger_4_jntBnd_3 L_shoulder_jntBnd L_shoulder_attachment_jntBnd"
+		bone_group = "body_and_arms false R_wrist_jntBnd R_elbow_Twist_jntBnd_3 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_1 R_elbow_jntBnd R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd R_thumb_1_jntBnd_3 R_thumb_1_jntBnd_2 R_thumb_1_jntBnd_1 R_finger_1_jntBnd_3 R_finger_1_jntBnd_2 R_finger_1_jntBnd_1 R_finger_2_jntBnd_3 R_finger_2_jntBnd_2 R_finger_2_jntBnd_1 R_finger_3_jntBnd_3 R_finger_3_jntBnd_2 R_finger_3_jntBnd_1 R_finger_4_jntBnd_3 R_finger_4_jntBnd_2 R_finger_4_jntBnd_1 chest_jntBnd L_clavicle_jntBnd head_jntBnd neck_jntBnd spine_2_jntBnd spine_1_jntBnd aux_R_Weapon_attachment_jntBnd hip_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd L_elbow_Twist_jntBnd_1 L_elbow_Twist_jntBnd_2 L_elbow_Twist_jntBnd_3 L_wrist_jntBnd L_thumb_1_jntBnd_3 L_thumb_1_jntBnd_2 L_thumb_1_jntBnd_1 L_finger_1_jntBnd_3 L_finger_1_jntBnd_2 L_finger_1_jntBnd_1 aux_L_Weapon_attachment_jntBnd L_finger_2_jntBnd_3 L_finger_2_jntBnd_2 L_finger_2_jntBnd_1 L_finger_4_jntBnd_3 L_finger_3_jntBnd_2 L_finger_3_jntBnd_1 L_finger_4_jntBnd_2 L_finger_4_jntBnd_1 aux_Back_attachment phys_skinned_R_chest_jntBnd phys_skinned_L_chest_jntBnd"
+		bone_group = "L_fingertips_01 false L_finger_4_jntBnd_2 L_finger_4_jntBnd_3"
+		bone_group = "L_fingertips_02 false L_finger_3_jntBnd_2 L_finger_3_jntBnd_3"
+		bone_group = "L_fingertips_03 false L_finger_2_jntBnd_2 L_finger_2_jntBnd_3"
+		bone_group = "L_fingertips_04 false L_finger_1_jntBnd_2 L_finger_1_jntBnd_3"
+		bone_group = "L_fingertips_05 false L_thumb_1_jntBnd_2 L_thumb_1_jntBnd_3"
+		bone_group = "R_fingertips_01 false R_finger_4_jntBnd_2 R_finger_4_jntBnd_3"
+		bone_group = "R_fingertips_02 false R_finger_3_jntBnd_2 R_finger_3_jntBnd_3"
+		bone_group = "R_fingertips_03 false R_finger_2_jntBnd_2 R_finger_2_jntBnd_3"
+		bone_group = "R_fingertips_04 false R_finger_1_jntBnd_2 R_finger_1_jntBnd_3"
+		bone_group = "R_fingertips_05 false R_thumb_1_jntBnd_2 R_thumb_1_jntBnd_3"
+		bone_group = "right_arm_mask false R_shoulder_attachment_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 R_elbow_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 R_wrist_jntBnd R_thumb_1_jntBnd_1 R_thumb_1_jntBnd_2 R_thumb_1_jntBnd_3 aux_R_Weapon_attachment_jntBnd R_hand_FX R_Weapon right_ring_attachment R_finger_1_jntBnd_1 R_finger_1_jntBnd_2 R_finger_1_jntBnd_3 R_finger_2_jntBnd_3 R_finger_2_jntBnd_2 R_finger_2_jntBnd_1 R_finger_3_jntBnd_1 R_finger_3_jntBnd_2 R_finger_3_jntBnd_3 R_finger_4_jntBnd_3 R_finger_4_jntBnd_2 R_finger_4_jntBnd_1"
+		bone_group = "back_orb_visuals false back_orbsocket_1 back_orbsocket_2 back_orbsocket_3 back_orbsocket_4"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+		continuous_effect = "this effect runs permanently"
+			shape = "Wake"
+			size = "250.000 100.000 100.000"
+			duration = 5.000
+			is_persistent = true
+			bone_name = "root"
+	}
+	
+	SoundEvents
+	{
+	}
+	
+	AttachedAnimatedObject
+	{
+	}
+	
+	ParticleEffects
+	{
+	}
+	
+	TimelineParameters
+	{
+	}
+	
+	EffectPack
+	{
+	}
+	
+	TrailsEffects
+	{
+	}
+	
+	ScreenShake
+	{
+	}
+	
+	SoundParams
+	{
+	}
+	
+	AnimationController
+	{
+		on_event_mount_start = { game_object.target.PlayAdditiveAnimation( mount_01_additive, 2, '', true ); }
+	}
+}
+
+=== .ao Metadata/Effects/Spells/warrior_totems/ancestor/Attachments/KaruiSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0201/FKM0201_Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0201/FKM0201_Robe/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.450
+		attachment_bones = "hip_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0201/FKM0201_Robe/FKM0201Robe.sm"
+			FKM0201_robe_01Shape = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiArmour02.mat:0"
+			FKM0201_robe_0Shape2 = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiArmour02.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false hip_jntBnd"
+	}
+}
+
+=== .ao Metadata/Effects/Spells/warrior_totems/ancestor/Attachments/KaruiHair.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0205/FKM0205_Hair/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0205/FKM0205_Hair/rig.ast"
+		linear_allowed_contraction = 0.250
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.350
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0205/FKM0205_Hair/FKM0205Hair.sm"
+			FKM0205_hair_03Shape = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiMale03Hair.mat:0"
+			FKM0205_hairAccessoriesShape = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiMale03Attachments.mat:0"
+	}
+}
+
+=== .ao Metadata/Effects/Spells/warrior_totems/ancestor/Attachments/KaruiAccessories.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0205/FKM0205_Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0205/FKM0205_Robe/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		attachment_bones = "hip_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0205/FKM0205_Robe/FKM0205Robe.sm"
+			FKM0205_robe_01Shape = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiMale03Attachments.mat:0"
+			FKM0205_robeAccssShape = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiMale03Attachments.mat:0"
+			FKM0205_robe_02Shape = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiMale03Attachments.mat:0"
+			FKM0205_robe_03Shape = "Metadata/Effects/Spells/warrior_totems/ancestor/MATs/ancestralSpirit_KaruiMale03Attachments.mat:0"
+			hide_segments = "FKM0205_robe_01Shape,FKM0205_robe_02Shape,FKM0205_robe_03Shape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false hip_jntBnd"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/AncestorTotem/AncestorTotem.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/AncestorTotem/AncestorTotem_armour_446ccbb7.smd"
+Materials 3
+	"Art/Models/MONSTERS/FallenKarui/Textures/FallenKaruiMale_03c.mat" 1
+	"Art/Models/MONSTERS/FallenKarui/Textures/FallenKaruiMale_attachment_03c.mat" 2
+	"Art/Models/MONSTERS/FallenKarui/Textures/FallenKaruiMale_hair_03c.mat" 2
+BoundingBox -74.6449 -16.2725 -191.796 74.6449 17.8763 0.127662
+BoneGroups 22
+	"root" 2 "root_jntBnd" "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "aux_Head_attachment"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "aux_L_foot_attachment" "L_foot_jntBnd"
+	"grp_r_toe" 2 "aux_R_foot_attachment" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/AncestorTotem/AncestorTotem_armour_446ccbb7.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 5 in the header, 5 in the block · 7251 triangles over 5115 vertices
+  names: 172 bytes said, 172 read  [agree]
+
+=== shapes (13)
+0	FallenKaruiHeroesBodyShape	from 0	count 9498
+1	bodyArmour_01Shape	from 9498	count 11529
+2	bodyArmour_02Shape	from 21027	count 324
+3	hair_01Shape	from 21351	count 282
+4	hair_02Shape	from 21633	count 120
+5	FKM0201_robe_01Shape	from 21753	count 3210
+6	FKM0201_robe_0Shape2	from 24963	count 1314
+7	FKM0205_hairAccessoriesShape	from 26277	count 1173
+8	FKM0205_hair_03Shape	from 27450	count 984
+9	FKM0205_robe_01Shape	from 28434	count 288
+10	FKM0205_robe_02Shape	from 28722	count 264
+11	FKM0205_robe_03Shape	from 28986	count 216
+12	FKM0205_robeAccssShape	from 29202	count 2376
+
+=== fitting
+the monster's rig: 87 bones
+mounts: aux_position, aux_camera_position, aux_L_Weapon_attachment_jntBnd_02, aux_R_Weapon_attachment_jntBnd_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_Head_attachment, aux_L_Weapon_attachment_jntBnd, aux_R_Weapon_attachment_jntBnd
+  KaruiSkirt.ao  socket spine_1_jntBnd [in its carrier's rig]  attached_object_scale = "1.1 1.2 1"  box (-28.1,-17.3,-2.3)..(22.9,16.6,72.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 1508 triangles over 1060 vertices
+    names: 80 bytes said, 80 read  [agree]
+    rig 7 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,0,12.8)  carrier has (0,0,-99.8)
+      2 phys_tri_front_01_jntBnd  [its own]  under 0  rests at (0,-14.6,42.8)
+      3 phys_tri_back_jntBnd  [its own]  under 0  rests at (0,12,40)
+      4 L_thigh_jntBnd  [shared]  under 1  rests at (11,0,12.8)  carrier has (10.9,0,-99.8)
+      5 R_thigh_jntBnd  [shared]  under 1  rests at (-11,0,12.8)  carrier has (-10.9,-0,-99.8)
+      6 phys_tri_front_02_jntBnd  [its own]  under 2  rests at (0,-14.6,57.8)
+  KaruiHair.ao  socket head_jntBnd [in its carrier's rig]  box (-13.3,-13.9,-21.4)..(11.7,16.4,28.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 719 triangles over 567 vertices
+    names: 96 bytes said, 96 read  [agree]
+    rig 8 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 5 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_hair_jntBnd  [its own]  under 0  rests at (0,13.5,-8.8)
+      2 chest_jntBnd  [shared]  under 0  rests at (0,1.3,38.2)  carrier has (0,0,-138.1)
+      3 L_clavicle_jntBnd  [shared]  under 2  rests at (8.5,1.3,20)  carrier has (5.6,-0.9,-154)
+      4 R_clavicle_jntBnd  [shared]  under 2  rests at (-8.5,1.3,20)  carrier has (-5.6,-0.9,-154)
+      5 neck_jntBnd  [shared]  under 2  rests at (0,4.1,13.5)  carrier has (-0,2.4,-159.3)
+      6 L_shoulder_jntBnd  [shared]  under 3  rests at (23.8,8.6,25.7)  carrier has (19,6.5,-150.2)
+      7 R_shoulder_jntBnd  [shared]  under 4  rests at (-23.8,8.6,25.7)  carrier has (-19,6.5,-150.2)
+  KaruiAccessories.ao  socket spine_1_jntBnd [in its carrier's rig]  attached_object_translation = "0 0 -3"  attached_object_scale = "0.95 0.95 1"  box (-25,-18.6,-2.5)..(24.7,15.3,76.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 1048 triangles over 856 vertices
+    names: 164 bytes said, 164 read  [agree]
+    rig 8 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,0,12.8)  carrier has (0,0,-99.8)
+      2 phys_tri_robe_jntBnd_3  [its own]  under 0  rests at (0,11.7,31.2)
+      3 phys_tri_robe_jntBnd_1  [its own]  under 0  rests at (0,-10.9,34.5)
+      4 L_thigh_jntBnd  [shared]  under 1  rests at (11,0,12.8)  carrier has (10.9,0,-99.8)
+      5 R_thigh_jntBnd  [shared]  under 1  rests at (-11,0,12.8)  carrier has (-10.9,-0,-99.8)
+      6 phys_tri_robe_jntBnd_4  [its own]  under 2  rests at (0,12.2,48.2)
+      7 phys_tri_robe_jntBnd_2  [its own]  under 3  rests at (-0,-10.9,55.1)

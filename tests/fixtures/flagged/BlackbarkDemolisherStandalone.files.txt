@@ -1,0 +1,1141 @@
+monster: Blackbark Demolisher [Metadata/Monsters/LeagueAncestral/StandaloneNgamahu/BlackbarkDemolisherStandalone]
+
+=== .ao Metadata/Monsters/LeagueAncestral/StandaloneNgamahu/Ngamahu01/Ngamahu01.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/FallenKaruiOlderMale/Ngamahu01/rig.amd"
+	animations = '[
+		{
+			"name": "buff_self_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7172120213508606,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "groundslam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5346542596817017,
+					"name": "contact",
+					"position": [
+						5.753600120544434,
+						-131.931396484375,
+						0.0
+					],
+					"contact_ref": [
+						5.647136688232422,
+						-104.94288635253906,
+						0.0
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "R_Weapon Metadata/Monsters/LeagueAncestral/StandaloneNgamahu/Ngamahu01/attachments/Weapon.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/LeagueAncestral/StandaloneNgamahu/Ngamahu01/attachments/Skirt.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.24803149700164796,
+								0.0
+							],
+							[
+								0.26377952098846438,
+								0.2667946219444275
+							],
+							[
+								0.27952754497528078,
+								0.7236084342002869
+							],
+							[
+								0.29133859276771548,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.5759590268135071,
+						"width": 17.340999603271486,
+						"angle": 1.9198600053787232,
+						"length": 127.16799926757813,
+						"local_offset": [
+							0.0,
+							-25.0
+						],
+						"impact_z_rotation": [
+							0.15707963705062867,
+							2.6005406379699709
+						],
+						"impact_type": "Slash"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.6472602486610413,
+								0.0
+							],
+							[
+								0.6541095972061157,
+								0.274472177028656
+							],
+							[
+								0.6712328791618347,
+								0.6660268306732178
+							],
+							[
+								0.681506872177124,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.4188790023326874,
+						"width": 33.55699920654297,
+						"angle": 1.8325999975204468,
+						"length": 147.64999389648438,
+						"impact_x_rotation": [
+							0.0,
+							-0.27925270795822146
+						],
+						"impact_z_rotation": [
+							-0.3490658700466156,
+							-2.094395160675049
+						],
+						"impact_type": "Slash"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/FallenKaruiOlderMale/Ngamahu01/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "R_Weapon_end_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -34.8825"
+		socket = "R_Weapon_end_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "7.99788 0 -104.118"
+		socket = "aux_chest_attachment"
+			parent = "chest_jntBnd"
+		enclosure_angle = 0.250
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/FallenKaruiOlderMale/Ngamahu01.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.024565933272242547,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.024565933272242547,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Attack",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15568625926971436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2589934170246124,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/JadeWeaponWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35527968406677248,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/StepSoft",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7017302513122559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7447260618209839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Attack",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7571077346801758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9357919096946716,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/JadeWeaponWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3761134147644044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/StepSoft",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "buff_self_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act4/KaruiNgamahu2HAxe/KaruiNgamahu_Buff_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/BuffSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "aux_face_jntBnd",
+						"chance": 0.5,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.086046501994133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16279074549674989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28139543533325198,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4767443537712097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5278273820877075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/MovementWhoosh",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9767442941665649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1709306240081788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.480233073234558,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04187977313995361,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07796109467744827,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/MovementWhoosh",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15870274603366853,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05055053532123566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18072359263896943,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/MovementWhoosh",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2857142686843872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.010738269425928593,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17262573540210725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/MovementWhoosh",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2588828206062317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05498579889535904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18900913000106812,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/MovementWhoosh",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3090643882751465,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05055053532123566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09410210698843003,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/MovementWhoosh",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19156046211719514,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05055053532123566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09410210698843003,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/MovementWhoosh",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3075579106807709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.005977078806608915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.005977078806608915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.005977078806608915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.005977078806608915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act4/KaruiNgamahu2HAxe/KaruiNgamahu_Skills_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/GroundSlamSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "aux_face_jntBnd",
+						"chance": 0.20000000298023225,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20927302539348603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/JadeWeaponWhoosh",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.6718400716781617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Idle",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Knockdown",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04806201905012131,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19582000374794007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.422176718711853,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7477582693099976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0097739696502686,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5782949924468995,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6155043840408326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7973712682724,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1051089763641359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Knockdown",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04337596893310547,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2770465910434723,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5279331207275391,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8595495223999023,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.013464331626892,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4244110584259034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4579925537109376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/ClothMove",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6221274137496949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7291550636291505,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.20068199932575227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.568356990814209,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8759739398956299,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1903011798858643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Vocals/Run",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2172800302505494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5512700080871583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.904289960861206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2192399501800539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.551759958267212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Ngamahu_Monsters/NgamahuAxe/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_upperArm_attachment_jntBnd"
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "melee_trail false R_Weapon_end_01 R_Weapon_end_02"
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Ngamahu/BlackbarkDemolisher/epk/weapon_buildup.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Ngamahu/BlackbarkDemolisher/epk/weapon_buildup.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.218509241938591,
+						"end_time": 0.5431514978408814,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Ngamahu/BlackbarkDemolisher/fx/axe_trail.pet",
+						"bone_group": "melee_trail"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.2139570713043213,
+						"end_time": 0.5425009727478027,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Ngamahu/BlackbarkDemolisher/fx/melee_swipe.trl",
+						"bone_group": "melee_trail"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.35892951488494875,
+						"end_time": 0.4974239468574524,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Ngamahu/BlackbarkDemolisher/melee_trail.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.45000457763672
+							],
+							"rotation": [
+								-0.7853999733924866,
+								0.0,
+								0.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.0785422325134278,
+						"end_time": 1.241544485092163,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Ngamahu/BlackbarkDemolisher/melee_trail.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-2.2165699005126955,
+								0.0,
+								0.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueAncestral/StandaloneNgamahu/Ngamahu01/attachments/Weapon.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/NgamahuTribe/Ngamahu2HAxeWeapon.fmt"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAncestral/StandaloneNgamahu/Ngamahu01/attachments/Skirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/FallenKaruiOlderMale/attachments/Ngamahu01/Skirt/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/FallenKaruiOlderMale/attachments/Ngamahu01/Skirt/rig.ast"
+		linear_allowed_contraction = 0.350
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.250
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "hip_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/FallenKaruiOlderMale/attachments/Ngamahu01/Skirt/skirt.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/FallenKaruiOlderMale/Ngamahu01.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/FallenKaruiOlderMale/Ngamahu01_armour_452340d3.smd"
+Materials 3
+	"Art/Models/MONSTERS/NgamahuTribe/Textures/Ngamahu01Armourc.mat" 7
+	"Art/Models/MONSTERS/NgamahuTribe/Textures/Ngamahu01Bodyc.mat" 1
+	"Art/Models/MONSTERS/NgamahuTribe/Textures/Ngamahu01Armourc.mat" 4
+BoundingBox -83.0542 -25.1903 -204.21 83.0542 26.5719 -0.1673
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/FallenKaruiOlderMale/Ngamahu01_armour_452340d3.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 12 in the header, 12 in the block · 9781 triangles over 6777 vertices
+  names: 1124 bytes said, 1124 read  [agree]
+
+=== shapes (14)
+0	armour_Ngamahu01|arm_armour_padding|arm_armour_paddingShape	from 0	count 927
+1	armour_Ngamahu01|arm_armour|arm_armourShape	from 927	count 3492
+2	armour_Ngamahu01|legs_armour_padding|legs_armour_paddingShape	from 4419	count 414
+3	armour_Ngamahu01|legs_armour|legs_armourShape	from 4833	count 3576
+4	armour_Ngamahu01|mask|maskShape	from 8409	count 1920
+5	armour_Ngamahu01|necklace|necklaceShape	from 10329	count 1320
+6	armour_Ngamahu01|shoulderpad_under|shoulderpad_underShape	from 11649	count 1488
+7	armour_Ngamahu01|base_body|base_bodyShape	from 13137	count 10182
+8	armour_Ngamahu01|body_flax|body_flaxShape	from 23319	count 1200
+9	armour_Ngamahu01|necklace_danglers|necklace_danglersShape	from 24519	count 540
+10	armour_Ngamahu01|shoulderpad_flax|shoulderpad_flaxShape	from 25059	count 588
+11	armour_Ngamahu01|skirt|skirtShape	from 25647	count 3696
+12	skirt_flaxShape	from 29343	count 1056
+13	skirt_frontbackShape	from 30399	count 648
+
+=== fitting
+the monster's rig: 86 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  Weapon.ao  socket R_Weapon [NOT in its carrier's rig]  fixed mesh Ngamahu2HAxeWeapon.fmt  1 shapes
+      Ngamahu2HAxeWeaponShape  ->  Art/Models/MONSTERS/NgamahuTribe/Textures/Ngamahu2HAxeWeaponc.mat
+  Skirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-34.8,-25.7,-3.4)..(34.7,25.4,75.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 568 triangles over 500 vertices
+    names: 70 bytes said, 70 read  [agree]
+    rig 12 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 11 of 12  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_thigh_jntBnd  [shared]  under 0  rests at (11,0,-0)  carrier has (11,2,-106.8)
+      2 R_thigh_jntBnd  [shared]  under 0  rests at (-11,-0,-0)  carrier has (-11,2,-106.8)
+      3 phys_tri_skirt_jntBnd_1  [its own]  under 0  rests at (-0,-20.2,29.2)
+      4 phys_tri_skirt_jntBnd_5  [its own]  under 0  rests at (-0,20,22.8)
+      5 phys_tri_skirt_jntBnd_3  [its own]  under 1  rests at (25.1,-6.6,23.7)
+      6 phys_tri_skirt_jntBnd_4  [its own]  under 1  rests at (25.2,5.6,23.8)
+      7 L_knee_jntBnd  [shared]  under 1  rests at (16.3,0,49.5)  carrier has (16.3,2,-57.2)
+      8 phys_tri_skirt_jntBnd_6  [its own]  under 2  rests at (-25.2,5.6,23.8)
+      9 phys_tri_skirt_jntBnd_7  [its own]  under 2  rests at (-25.1,-6.6,23.7)
+      10 R_knee_jntBnd  [shared]  under 2  rests at (-16.3,-0,49.5)  carrier has (-16.3,2,-57.2)
+      11 phys_tri_skirt_jntBnd_2  [its own]  under 3  rests at (-0,-19.4,53.1)

@@ -1,0 +1,1257 @@
+monster: ? [Metadata/Monsters/LeagueAncestral/AncestralSpiritCaster]
+
+=== .ao Metadata/Monsters/LeagueAncestral/KaruiSoulCaster/KaruiSoulCaster.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/KaruiSoulCaster/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.746973991394043,
+					"name": "spirit_barrage"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7469750046730042,
+					"name": "contact",
+					"position": [
+						-5.66648006439209,
+						-79.50523376464844,
+						-125.00848388671875
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6688870191574097,
+					"name": "contact",
+					"position": [
+						6.315939903259277,
+						-73.91374206542969,
+						-124.88790893554688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6725190281867981,
+					"name": "spirit_barrage",
+					"position": [
+						0.0,
+						-80.55699920654297,
+						-165.97500610351563
+					]
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.22119435667991639,
+					"name": "move",
+					"position": [
+						0.0,
+						0.0,
+						30.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.33330002427101138,
+					"name": "move",
+					"position": [
+						100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.33330002427101138,
+					"name": "move",
+					"position": [
+						-100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "spirit_cast_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.975180983543396,
+					"name": "spirit_lance"
+				}
+			]
+		},
+		{
+			"name": "summon_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8480629920959473,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8480629920959473,
+					"name": "spirit_lance"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/KaruiSoulCaster/attachments/KSCFeathers.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/KaruiSoulCaster/attachments/KSCHair.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/KaruiSoulCaster/attachments/KSCRobe.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/KaruiSoulCaster/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "root_spirit"
+			translation = "0 0 48.05"
+		socket = "grd_offset"
+			parent = "spine_1_jntBnd"
+			translation = "0 0 106.223"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/KaruiSoulCaster.sm"
+			hide_segments = "KaruiSoulCaster_FeatherShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1"
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "grd_offset false grd_offset"
+		bone_group = "R_weapon false R_Weapon"
+	}
+	
+	AnimatedRender
+	{
+		scale = 0.770000
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.14717000722885133,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiSoulCaster/pet/death/death_impact.pet",
+						"bone_group": "grp_neck"
+					}
+				]
+			},
+			{
+				"name": "spirit_cast_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiSoulCaster/pet/on_act/spirit_cast_01/charge_particles.pet",
+						"bone_group": "frameupper"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.021341461688280107,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiSoulCaster/pet/on_act/attack_01/hand_surge.pet",
+						"bone_groups": [
+							"grp_r_palm",
+							"grp_l_palm"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7300592660903931,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiSoulCaster/pet/on_act/spirit_cast_01/nova_burst.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.15755140781402589,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiSoulCaster/pet/on_act/attack_01/hand_surge.pet",
+						"bone_group": "grp_r_palm"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5998160243034363,
+						"end_time": 0.8505669832229614,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiSoulCaster/pet/on_act/summon_01/palm.trl",
+						"bone_group": "R_weapon"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiSoulCaster/epk/R_hand_Cast.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiSoulCaster/epk/L_hand_Cast.epk"
+					}
+				]
+			},
+			{
+				"name": "spirit_cast_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0006097560981288552,
+						"end_time": 0.9741760492324829,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiSoulCaster/epk/on_act_bu_spirit_cast_01.epk",
+						"remove_on_animation_end": false
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiSoulCaster/epk/R_hand_Cast.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2677883505821228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Effects/SpiritCast_Surge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5319162011146545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Cast",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6873136758804321,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21352475881576539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Effects/SpiritCast_Surge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45924174785614016,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Cast",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6666668057441711,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/DeathSweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Death",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05769230052828789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveRattle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12316831946372986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4428294897079468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7775904536247253,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/FallB",
+						"bone_name": "R_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/DeathSweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Death",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0435769185423851,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveRattle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1869838535785675,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/FallB",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33448389172554018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3499343991279602,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6122249960899353,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/FallB",
+						"bone_name": "R_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/DeathSweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Death",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0435769185423851,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveRattle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1869838535785675,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/FallB",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33448389172554018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3499343991279602,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6122249960899353,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/FallB",
+						"bone_name": "R_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/DeathSweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Death",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04230768606066704,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveRattle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1815377175807953,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/FallB",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3247416317462921,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33974212408065798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5723647475242615,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/FallB",
+						"bone_name": "R_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/DeathSweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Death",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0435769148170948,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveRattle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1869838386774063,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/FallB",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3344838619232178,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3499343693256378,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.589535653591156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/FallB",
+						"bone_name": "R_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/DeathSweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Death",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04230768606066704,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveRattle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1815377175807953,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/FallB",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3247416317462921,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33974212408065798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5723647475242615,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/FallB",
+						"bone_name": "R_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_taunt_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Aggro",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4767443537712097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9082690477371216,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3540056943893433,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3010990023612976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6591402292251587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Idle",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3045732975006105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_KnockdownA",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20616382360458375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6661206483840942,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/FallB",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.060853123664856,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.051421642303467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_KnockdownB",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.262274742126465,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2899835109710695,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_KnockdownA",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8456075191497803,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.175710916519165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.111757516860962,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_KnockdownB",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.32881236076355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3573360443115236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08527132868766785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2136099934577942,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Run",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7906975746154786,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spirit_cast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Effects/SpiritNova_ChantShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act4/KaruiSoulCaster/KaruiSoulCaster_Dialogue_Skill_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_NovaSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "head_jntBnd",
+						"chance": 0.4000000059604645,
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07252749800682068,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveRattle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2844424843788147,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Effects/Summon_Cast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.710016131401062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Effects/SpiritCast_Nova",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7549449801445007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveRattle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9667590260505676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05038755387067795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Vocals/SoulCaster_Summon",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21675799787044526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/MoveRattle",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2620163559913635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Effects/Summon_Cast",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6436820030212402,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/KaruiSoulCaster/Foley/Hover",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/KaruiSoulCaster/attachments/KSCFeathers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/attachments/KSC_Feather/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/attachments/KSC_Feather/rig.ast"
+		linear_allowed_contraction = 0.100 
+		bend_stiffness = 500.000 
+		bend_allowed_angle = 0.100 
+		normal_viscosity_multiplier = 0.200 
+		tangent_viscosity_multiplier = 0.025 
+		enclosure_angle = 0.200
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/attachments/KSC_Feather/KSCFeathers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiSoulCaster/attachments/KSCHair.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/attachments/KSC_Hair/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/attachments/KSC_Hair/rig.ast"
+		enclosure_angle = 0.350
+		attachment_bones = "chest_jntBnd neck_jntBnd head_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd neck_jntBnd head_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/attachments/KSC_Hair/KSCHair.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiSoulCaster/attachments/KSCRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/attachments/KSC_Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/attachments/KSC_Robe/rig.ast"
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.350
+		attachment_bones = "hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/attachments/KSC_Robe/KSCRobe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_thigh_jntBnd R_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/KaruiSoulCaster.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/KaruiSouldCaster_armour_e7f97b63.smd"
+Materials 3
+	"Art/Models/MONSTERS/KaruiWarriors/Textures/SoulCaster_Armourc.mat" 2
+	"Art/Models/MONSTERS/KaruiWarriors/Textures/SoulCaster_Bodyc.mat" 1
+	"Art/Models/MONSTERS/KaruiWarriors/Textures/SoulCaster_Hairc.mat" 3
+BoundingBox -68.8288 -15.5681 -186.289 68.8288 14.1494 -0.2139
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiSoulCaster/KaruiSouldCaster_armour_e7f97b63.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 6 in the header, 6 in the block · 6554 triangles over 4206 vertices
+  names: 352 bytes said, 352 read  [agree]
+
+=== shapes (10)
+0	KaruiSoulCaster01_RobeAccessoryTopShape	from 0	count 1584
+1	KaruiSoulCaster01_RobeTopShape	from 1584	count 1320
+2	KaruiSoulCaster_BodyShape	from 2904	count 11682
+3	KaruiSoulCaster_EarringsShape	from 14586	count 1512
+4	KaruiSoulCaster_FeatherShape	from 16098	count 84
+5	KaruiSoulCaster_HairShape	from 16182	count 3480
+6	KaruiSoulCaster_FeatherShape	from 19662	count 84
+7	PonyTailarmour_KSCHairShape	from 19746	count 4704
+8	KaruiSoulCaster_RobeAccessoryBottomShape	from 24450	count 2760
+9	KaruiSoulCaster_RobeBottom1Shape	from 27210	count 1944
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  KSCFeathers.ao  socket head_jntBnd [in its carrier's rig]  box (-11.1,5.3,-27.7)..(-0.3,9.3,-12.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 28 triangles over 40 vertices
+    names: 56 bytes said, 56 read  [agree]
+    rig 3 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_feathers_jntBnd  [its own]  under 0  rests at (-5.9,6.3,-18.7)
+      2 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  KSCHair.ao  socket chest_jntBnd [in its carrier's rig]  box (-6,5.6,-45.5)..(6.5,21.8,-6.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1568 triangles over 1104 vertices
+    names: 54 bytes said, 54 read  [agree]
+    rig 6 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 6  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 neck_jntBnd  [shared]  under 0  rests at (0,3.5,-19.1)  carrier has (0,3.2,-146.4)
+      2 head_jntBnd  [shared]  under 1  rests at (-0,0.5,-31.4)  carrier has (-0,0.2,-158.6)
+      3 phys_tri_hair_jntBnd_1  [its own]  under 2  rests at (0,9.7,-32.7)
+      4 phys_tri_hair_jntBnd_2  [its own]  under 3  rests at (0,14.8,-17)
+      5 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  KSCRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-23.9,-16,-23.6)..(23.9,13.8,47.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 1568 triangles over 1166 vertices
+    names: 144 bytes said, 144 read  [agree]
+    rig 14 bones, 6 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 14  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      3 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      4 phys_tri_skirt_jntBnd_1  [its own]  under 0  rests at (0,-8.5,0.2)
+      5 phys_tri_L_1_jntBnd  [its own]  under 0  rests at (18.8,-5.3,28.4)
+      6 phys_tri_L_2_jntBnd  [its own]  under 0  rests at (15.4,7,29.8)
+      7 phys_tri_back_jntBnd  [its own]  under 0  rests at (0,12.1,30.6)
+      8 phys_tri_R_1_jntBnd  [its own]  under 0  rests at (-18.8,-5.3,28.4)
+      9 phys_tri_R_2_jntBnd  [its own]  under 0  rests at (-15.4,7,29.8)
+      10 spine_2_jntBnd  [shared]  under 1  rests at (0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      11 phys_tri_skirt_jntBnd_2  [its own]  under 4  rests at (0,-8.5,15.6)
+      12 chest_jntBnd  [shared]  under 10  rests at (0,-3.5,-37.3)  carrier has (0,-0.3,-127.3)
+      13 phys_tri_skirt_jntBnd_3  [its own]  under 11  rests at (0,-8.5,30.9)

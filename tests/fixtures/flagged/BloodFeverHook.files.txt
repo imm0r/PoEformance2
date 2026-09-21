@@ -1,0 +1,1534 @@
+monster: Blood-fevered Hookman [Metadata/Monsters/BloodFeverKarui/BloodFeverHook]
+
+=== .ao Metadata/Monsters/BloodFeverKarui/BloodFeverHook/BloodFeverHook.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/KaruiWarriorHook/bloodfevered/rig.amd"
+	animations = '[
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.3329999446868898,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "AltPoseEventType",
+					"time": 0.37473800778388979,
+					"end_time": 1.6432641744613648,
+					"name": "alternate_pose"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.3329999446868898,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "AltPoseEventType",
+					"time": 0.24374598264694215,
+					"end_time": 1.7427539825439454,
+					"name": "alternate_pose"
+				},
+				{
+					"type": "AltPoseEventType",
+					"time": 0.37473800778388979,
+					"end_time": 1.6432641744613648,
+					"name": "alternate_pose"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/KaruiWarriorHook/attachments/TopFeathers.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/KaruiWarriorHook/attachments/KaruiRobe.ao"
+	attached_object = "Head_Attachment Metadata/Monsters/KaruiWarriorHook/attachments/KaruiHairFeathersao.ao"
+	attached_object = "R_Weapon Metadata/Monsters/BloodFeverKarui/BloodFeverHook/attachments/KaruiHookWeapon.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/KaruiWarriorHook/attachments/KaruiHookHair.ao"
+	attached_object = "<root> Metadata/Monsters/KaruiWarriorHook/attachments/KaruiHookBloodFever.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.31889763474464419,
+								0.0
+							],
+							[
+								0.33464565873146059,
+								0.3999997079372406
+							],
+							[
+								0.34645670652389529,
+								0.6737043857574463
+							],
+							[
+								0.35826772451400759,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 3,
+						"rotation": 0.36651918292045596,
+						"angle": 1.780236005783081,
+						"x_axis_scale": 0.6840000152587891,
+						"length": 174.81500244140626,
+						"offset": [
+							0.0,
+							-4.0
+						],
+						"local_offset": [
+							-6.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.6981319785118103,
+							2.076941967010498
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.7536231875419617,
+								0.0
+							],
+							[
+								0.7753623127937317,
+								0.4817658066749573
+							],
+							[
+								0.7971014380455017,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 3,
+						"rotation": -0.6457719802856445,
+						"angle": 3.141590118408203,
+						"x_axis_scale": 0.6740000247955322,
+						"length": 131.9739990234375,
+						"offset": [
+							5.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.9599310159683228,
+							-2.286381483078003
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4645669162273407,
+								0.0
+							],
+							[
+								0.4921259880065918,
+								0.4894433617591858
+							],
+							[
+								0.5314960479736328,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.41887903213500979,
+						"angle": 1.780236005783081,
+						"x_axis_scale": 0.5619999766349793,
+						"length": 174.0,
+						"offset": [
+							0.0,
+							-4.0
+						],
+						"local_offset": [
+							-13.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.26179900765419009
+						],
+						"impact_z_rotation": [
+							0.6981319785118103,
+							2.4085545539855959
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "throw_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.31102362275123598,
+								0.0
+							],
+							[
+								0.31889763474464419,
+								0.24760079383850099
+							],
+							[
+								0.33070865273475649,
+								0.3589251637458801
+							],
+							[
+								0.3779527544975281,
+								0.6967370510101318
+							],
+							[
+								0.4330708682537079,
+								0.9424184560775757
+							],
+							[
+								0.4763779640197754,
+								1.0
+							]
+						],
+						"damage_statset_index": 0,
+						"rotation": 0.05235987901687622,
+						"width": 47.87799835205078,
+						"length": 518.5260009765625,
+						"offset": [
+							-36.0,
+							-113.0
+						],
+						"impact_z_rotation": [
+							0.05235987901687622,
+							0.05235987901687622
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5,
+								0.0
+							],
+							[
+								0.5181159377098084,
+								0.10556620359420777
+							],
+							[
+								0.5507246255874634,
+								0.3652403950691223
+							],
+							[
+								0.5797101259231567,
+								0.5930901765823364
+							],
+							[
+								0.6014492511749268,
+								0.8656430244445801
+							],
+							[
+								0.6304348111152649,
+								1.0
+							]
+						],
+						"damage_statset_index": 0,
+						"rotation": 3.193952798843384,
+						"width": 47.87799835205078,
+						"length": 623.260009765625,
+						"offset": [
+							36.0,
+							632.0
+						],
+						"impact_z_rotation": [
+							3.2288591861724855,
+							3.2288591861724855
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/KaruiWarriorHook/bloodfevered/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_bloodfever_sideswell_L_1"
+			parent = "spine_1_jntBnd"
+			rotation = "-0 0 1.17147"
+			translation = "10.332 -0.880264 0"
+		socket = "aux_bloodfever_sideswell_L_2"
+			parent = "spine_1_jntBnd"
+			scale = "1 1 1"
+			rotation = "-0.798662 0.5325 0.5325"
+			translation = "2.41044 -13.2575 2.7858"
+		socket = "aux_bloodfever_sideswell_L_3"
+			parent = "spine_1_jntBnd"
+			rotation = "0.266163 -0.958534 0.266163"
+			translation = "9.62244 -17.9749 -6.4169"
+		socket = "aux_bloodfever_sideswell_L_4"
+			parent = "spine_1_jntBnd"
+			rotation = "0.585733 0 0.21293"
+			translation = "11.6468 -6.78504 -16.8222"
+		socket = "aux_bloodfever_leg_L_1"
+			parent = "L_thigh_jntBnd"
+			rotation = "1.2247 -0.21293 0"
+			translation = "1.01967 1.2572 -7.24072"
+		socket = "aux_bloodfever_leg_L_2"
+			parent = "L_thigh_jntBnd"
+			translation = "18.4559 1.2572 -2.05759"
+		socket = "aux_bloodfever_leg_L_3"
+			parent = "L_thigh_jntBnd"
+			rotation = "1.49086 0 0"
+			translation = "20.5942 1.2572 -11.8206"
+		socket = "aux_bloodfever_leg_L_4"
+			parent = "L_thigh_jntBnd"
+			rotation = "0.698132 3.14159 3.14159"
+			translation = "35.2322 5.7717 -5.19778"
+		socket = "aux_bloodfever_leg_L_5"
+			parent = "L_knee_jntBnd"
+			scale = "0.9 1 1"
+			rotation = "0.0534071 0.585732 -0.159698"
+			translation = "16.3876 -5.14058 3.02831"
+		socket = "aux_bloodfever_neck_1"
+			parent = "chest_jntBnd"
+			rotation = "1.14476 -0.905128 -0.798663"
+			translation = "1.83056 3.17842 -19.7015"
+		socket = "aux_bloodfever_neck_2"
+			parent = "chest_jntBnd"
+			rotation = "1.30446 -1.11806 1.97012"
+			translation = "12.856 -4.14061 -14.9358"
+		socket = "aux_bloodfever_leg_L_6"
+			parent = "L_knee_jntBnd"
+			rotation = "-1.5708 1.75719 0"
+			translation = "10.0624 0.80863 4.61408"
+		socket = "aux_bloodfever_leg_L_7"
+			parent = "L_thigh_jntBnd"
+			scale = "0.7 0.7 0.7"
+			rotation = "-1.5708 1.75719 0"
+			translation = "37.4709 -0.143277 1.80017"
+		socket = "aux_bloodfever_arm_L_1"
+			parent = "L_shoulder_jntBnd"
+			scale = "0.7 0.7 0.7"
+			rotation = "-1.5708 -2.2897 0"
+			translation = "11.9869 -2.82 -0.17"
+		socket = "aux_blade_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-11.6844 0 -22.0923"
+		socket = "aux_blade_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-25.6305 0 -49.9955"
+		socket = "aux_blade_03"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-25.6305 0 -68.8081"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/KaruiWarriorHook.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd neck_jntBnd chest_jntBnd L_clavicle_jntBnd L_upperArm_attachment_jntBnd L_shoulder_cTwist_jntBnd_1"
+		bone_group = "FX_blade false aux_blade_03 aux_blade_02 aux_blade_01"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1671132743358612,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Attack",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1864485889673233,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Foley/HookWhoosh",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7697821259498596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8493756651878357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Foley/HookWhoosh",
+						"bone_name": "R_finger_1_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Swish_Unarmed",
+						"bone_name": "R_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Attack2",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20957942306995393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35841104388237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Foley/HookWhoosh",
+						"bone_name": "R_thumb_1_jntBnd_1",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "attack_approach_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Foley/HookWhoosh",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Attack",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5621135830879211,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Foley/HookWhoosh",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.641118586063385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1448598951101303,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.360981285572052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4871494174003601,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8014014959335327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2636931538581848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34051722288131716,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6685758233070374,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06074821203947067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07593511044979096,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "aux_R_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18995314836502076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall"
+					}
+				]
+			},
+			{
+				"name": "death_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10378257185220719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30008456110954287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11698845028877258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2652217149734497,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "aux_R_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09471798688173294,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3191862404346466,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07710257917642594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1612149477005005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 2.7758829593658449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Idle",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Knockdown",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27072983980178835,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4197220802307129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7849333882331848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8521620035171509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2282780408859254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5843998193740845,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0677199363708498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Knockdown",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11992057412862778,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4197220802307129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.623223066329956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.623223066329956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2282780408859254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7479321956634522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09532710909843445,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2560746669769287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5205598473548889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6054367423057556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Run",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8775689005851746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1383161544799805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spray_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Swish_Unarmed",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.016443369910120965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Spray",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2920559048652649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Foley/HookWhoosh",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2920559048652649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Foley/NeckSlice",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6460280418395996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Vocals/Throw",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18142089247703553,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Foley/HookWhoosh",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18930843472480775,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2928379476070404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Foley/Whip",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48806077241897585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5708833336830139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5738415718078613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Foley/HookWhoosh",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5738415718078613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverHook/Foley/Whip",
+						"bone_name": "aux_R_Weapon_attachment"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.3429919183254242,
+						"end_time": 0.5492569804191589,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodFeverBloater/fx/melee_swipe.trl",
+						"bone_group": "FX_blade"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.9283849596977234,
+						"end_time": 1.20720374584198,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodFeverBloater/fx/melee_swipe.trl",
+						"bone_group": "FX_blade"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.47161340713500979,
+						"end_time": 0.808609127998352,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodFeverBloater/fx/melee_swipe.trl",
+						"bone_group": "FX_blade"
+					}
+				]
+			},
+			{
+				"name": "attack_approach_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.14832502603530885,
+						"end_time": 0.3805429935455322,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodFeverBloater/fx/melee_swipe.trl",
+						"bone_group": "FX_blade"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7210241556167603,
+						"end_time": 0.9738425016403198,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodFeverBloater/fx/melee_swipe.trl",
+						"bone_group": "FX_blade"
+					}
+				]
+			},
+			{
+				"name": "throw_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.339986115694046,
+						"end_time": 0.799390435218811,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodFeverBloater/fx/melee_swipe.trl",
+						"bone_group": "FX_blade"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "throw_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 0.7263239026069641,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodfeverHook/epk/weapon_glow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/KaruiWarriorHook/attachments/TopFeathers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/TopFeathers/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/TopFeathers/rig.ast"
+		linear_allowed_contraction = 0.300
+		enclosure_radius = 6.000
+		enclosure_angle = 0.000
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/TopFeathers/KaruiHookTopFeathers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiWarriorHook/attachments/KaruiRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/Robe/rig.ast"
+		linear_allowed_contraction = 0.400
+		enclosure_angle = 0.200
+		attachment_bones = "hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/Robe/KaruiHookRobe.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiWarriorHook/attachments/KaruiHairFeathersao.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/HairFeathers/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/HairFeathers/rig.ast"
+		linear_allowed_contraction = 0.300
+		bend_stiffness = 50.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.150
+		tangent_viscosity_multiplier = 0.075
+		enclosure_angle = 0.200
+	}
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/HairFeathers/KaruiHookHairFeathers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/BloodFeverKarui/BloodFeverHook/attachments/KaruiHookWeapon.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/Weapon/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/Weapon/rig.ast"
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 100.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/Weapon/WeaponHook.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiWarriorHook/attachments/KaruiHookHair.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/attachments/Hair/KaruiWarriorHookHair.fmt"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiWarriorHook/attachments/KaruiHookBloodFever.ao (depth 1)
+version 3
+extends "Metadata/SkinBodyArmour"
+
+BaseAnimationEvents
+{
+}
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHorn/attachments/BloodFeverAttachment/KaruiWarriorHornBloodFevered.sm"
+			HornBlistersBigShape = "Art/particles/monster_particles/Act4_FOUR/BloodFever/textures/BloodsuckerPoppedc.mat"
+		HornBlistersMedShape = "Art/particles/monster_particles/Act4_FOUR/BloodFever/textures/bloodfever_boil_GIB_1P.mat"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/SkinBodyArmour.ao (depth 2)
+version 3
+extends "Metadata/Skin"
+
+BaseAnimationEvents
+{
+	propagate_parent_effects = true
+}
+
+
+client
+{
+	ObjectHiding
+	{
+	    hide_parent_attachments = "Body_Attach"
+	    hide_parent_segments = "Body_Seg"
+		hide_sibling_segments = "AP_Body_Hides, AP_Helmet_Hides, AP_Gloves_Hides, AP_Boots_Hides, AP_BackAttachment_Hides"
+		hide_sibling_attachments = "AP_Helmet_Attach, AP_L_Glove_Attach, AP_R_Glove_Attach, AP_Gloves_Attach, AP_Boots_Attach,AP_Boots_Waist_Attach, AP_BackAttachment_Attach"
+	    show_sibling_segments = "AP_Helmet_Show, AP_Gloves_Show, AP_Boots_Show, AP_BackAttachment_Show"
+	}
+	
+	
+}
+
+=== .ao Metadata/Skin.ao (depth 3)
+version 3
+extends "nothing"
+
+BaseAnimationEvents { }
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	SkinMesh { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/KaruiWarriorHook.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/KaruiWarrior_armour_a7cf6bbf.smd"
+Materials 2
+	"Art/Models/MONSTERS/KaruiWarriors/Textures/WarriorHook_Bodyc.mat" 1
+	"Art/Models/MONSTERS/KaruiWarriors/Textures/WarriorHook_Armourc.mat" 1
+BoundingBox -82.9143 -16.2138 -201.831 82.9143 20.0098 0.405043
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHook/KaruiWarrior_armour_a7cf6bbf.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 2 in the header, 2 in the block · 4110 triangles over 2547 vertices
+  names: 76 bytes said, 76 read  [agree]
+
+=== shapes (10)
+0	body_meshShape	from 0	count 12246
+1	earring_attach_meshShape	from 12246	count 84
+2	chest_attach_meshShape	from 12330	count 3300
+3	top_feathers_meshShape	from 15630	count 5232
+4	hip_attach_meshShape	from 20862	count 3108
+5	hip_feathers_meshShape	from 23970	count 4314
+6	Warriorhook_hairShape	from 28284	count 903
+7	HornBlistersBigShape	from 29187	count 900
+8	HornBlistersMedShape	from 30087	count 9696
+9	HornBlistersSmallShape	from 39783	count 20442
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  TopFeathers.ao  socket chest_jntBnd [in its carrier's rig]  box (-43.1,-25.4,-71)..(43.1,30.7,-2.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 2844 triangles over 2295 vertices
+    names: 88 bytes said, 88 read  [agree]
+    rig 12 bones, 8 of them names its carrier's rig also has
+    mesh weights reach bone 11 of 12  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-12.8)  carrier has (0,2,-119.5)
+      2 phys_tri_shawl_jntBnd_1  [its own]  under 0  rests at (15.9,18.8,-30.9)
+      3 phys_tri_shawl_jntBnd_3  [its own]  under 0  rests at (-15.9,18.8,-30.9)
+      4 spine_2_jntBnd  [shared]  under 1  rests at (0,0,-25.6)  carrier has (0,2,-132.3)
+      5 phys_tri_shawl_jntBnd_2  [its own]  under 2  rests at (15.8,21.1,-13.1)
+      6 phys_tri_shawl_jntBnd_4  [its own]  under 3  rests at (-15.8,21.1,-13.1)
+      7 chest_jntBnd  [shared]  under 4  rests at (0,-0,-38.4)  carrier has (0,2,-145.1)
+      8 L_clavicle_jntBnd  [shared]  under 7  rests at (8.5,0,-56.5)  carrier has (8.5,2,-163.3)
+      9 R_clavicle_jntBnd  [shared]  under 7  rests at (-8.5,0,-56.5)  carrier has (-8.5,2,-163.3)
+      10 L_shoulder_jntBnd  [shared]  under 8  rests at (23.8,7.3,-50.9)  carrier has (23.8,9.3,-157.6)
+      11 R_shoulder_jntBnd  [shared]  under 9  rests at (-23.8,7.3,-50.9)  carrier has (-23.8,9.3,-157.6)
+  KaruiRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-29.6,-21.5,-12.8)..(29.4,21.8,43.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 2474 triangles over 1924 vertices
+    names: 84 bytes said, 84 read  [agree]
+    rig 8 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_thigh_jntBnd  [shared]  under 0  rests at (11,0,-0)  carrier has (11,2,-106.8)
+      2 R_thigh_jntBnd  [shared]  under 0  rests at (-11,-0,-0)  carrier has (-11,2,-106.8)
+      3 phys_tri_skirt_jntBnd_1  [its own]  under 0  rests at (-0,-12.1,18.3)
+      4 phys_tri_skirt_jntBnd_2  [its own]  under 0  rests at (-0,11.3,14.1)
+      5 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-12.8)  carrier has (0,2,-119.5)
+      6 phys_tri_skirt_jntBnd_3  [its own]  under 1  rests at (13.9,9.1,17.3)
+      7 phys_tri_skirt_jntBnd_4  [its own]  under 2  rests at (-14.2,9.1,17.4)
+  KaruiHairFeathersao.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-10.4,10.5,-34.3)..(10.4,18.2,7.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 110 triangles over 128 vertices
+    names: 88 bytes said, 88 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_topfeathers_jntBnd  [its own]  under 0  rests at (-0,14,-21.8)
+  KaruiHookWeapon.ao  socket R_Weapon [NOT in its carrier's rig]  box (-37,-6.5,-82)..(5,9.1,277.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 2686 triangles over 2021 vertices
+    names: 162 bytes said, 162 read  [agree]
+    rig 16 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 14 of 16  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 rope_1_jntBnd  [its own]  under 0  rests at (-4.2,-0.3,22.5)
+      2 rope_2_jntBnd  [its own]  under 1  rests at (-4.1,0.4,42.4)
+      3 rope_3_jntBnd  [its own]  under 2  rests at (-4,1,62.4)
+      4 rope_4_jntBnd  [its own]  under 3  rests at (-3.9,1.6,82.3)
+      5 rope_5_jntBnd  [its own]  under 4  rests at (-3.8,2.2,102.2)
+      6 rope_6_jntBnd  [its own]  under 5  rests at (-3.7,2.9,122.1)
+      7 rope_7_jntBnd  [its own]  under 6  rests at (-3.6,3.5,142.1)
+      8 rope_8_jntBnd  [its own]  under 7  rests at (-3.5,4.1,162)
+      9 rope_9_jntBnd  [its own]  under 8  rests at (-3.4,4.8,181.9)
+      10 rope_10_jntBnd  [its own]  under 9  rests at (-3.2,5.4,201.8)
+      11 rope_11_jntBnd  [its own]  under 10  rests at (-3.1,6,221.8)
+      12 rope_12_jntBnd  [its own]  under 11  rests at (-3,6.6,241.7)
+      13 rope_13_jntBnd  [its own]  under 12  rests at (-2.9,7.3,261.6)
+      14 rope_14_jntBnd  [its own]  under 13  rests at (-2.8,7.7,276.7)
+      15 aux_animation_control_ratio  [its own]  under 0  rests at (0,0,0)
+  KaruiHookHair.ao  socket head_jntBnd [in its carrier's rig]  fixed mesh KaruiWarriorHookHair.fmt  1 shapes
+      Warriorhook_hairShape  ->  Art/Models/MONSTERS/KaruiWarriors/Textures/WarriorHook_Hairc.mat
+  KaruiHookBloodFever.ao  socket <root> [NOT in its carrier's rig]  box (-62.5,-19,-203.8)..(27.9,31.1,-5.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 10346 triangles over 6070 vertices
+    names: 124 bytes said, 124 read  [agree]
+    (no rig of its own)

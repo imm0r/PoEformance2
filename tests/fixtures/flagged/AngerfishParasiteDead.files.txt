@@ -1,0 +1,386 @@
+monster: Infested Anglerfish [Metadata/Monsters/ParasiteMonsters/AngerfishParasiteDead]
+
+=== .ao Metadata/Monsters/ParasiteMonsters/AnglerFishParasite.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/ParasiteMonsters/ParasiteMonster01/Animations/AnglerFishParasite/rig.amd"
+	animations = '[
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						0.0,
+						125.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						0.0,
+						-125.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						162.5,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_move_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						0.0,
+						-175.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						-162.5,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3999999761581421,
+					"name": "move",
+					"position": [
+						0.0,
+						77.59500122070313,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3999999761581421,
+					"name": "move",
+					"position": [
+						0.0,
+						-127.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/ParasiteMonsters/attachments/AnglerFishParasiteAttachment.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.2681559920310974,
+								0.0
+							],
+							[
+								0.3407819867134094,
+								1.0
+							]
+						],
+						"width": 52.02299880981445,
+						"length": 109.8270034790039,
+						"offset": [
+							25.0,
+							0.0
+						]
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.480446994304657,
+								0.0
+							],
+							[
+								0.5642459988594055,
+								1.0
+							]
+						],
+						"width": 52.02299880981445,
+						"length": 127.16799926757813
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.40782099962234499,
+								0.0
+							],
+							[
+								0.4357540011405945,
+								1.0
+							]
+						],
+						"width": 57.803001403808597,
+						"length": 167.6300048828125
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/ParasiteMonsters/ParasiteMonster01/Animations/AnglerFishParasite/rig.ast"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/ParasiteMonsters/ParasiteMonster01/ParasiteMonster_01.sm"
+	}
+
+	AnimatedRender
+	{
+		scale = 0.500000
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false tail_1_jntBnd tail_base_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_claw_2_jntBnd R_claw_1_jntBnd neck_jntBnd hip_jntBnd neck_jntBnd L_claw_1_jntBnd L_claw_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/ParasiteMonsters/attachments/AnglerFishParasiteAttachment.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/AnglerFishParasite/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/AnglerFishParasite/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/AnglerFishParasite/AnglerFishParasite.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/ParasiteMonsters/ParasiteMonster01/ParasiteMonster_01.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/ParasiteMonsters/ParasiteMonster01/rig_9efb45fe.smd"
+Materials 1
+	"Art/Models/MONSTERS/ParasiteMonsters/Textures/ParasiteMonstersc.mat" 1
+BoundingBox -171.996 -248.58 -154.15 171.996 294.24 9.7147
+BoneGroups 45
+	"grp_root" 1 "hip_jntBnd"
+	"grp_frameupper" 3 "L_claw_1_jntBnd" "neck_jntBnd" "R_claw_1_jntBnd"
+	"grp_head" 2 "head_jntBnd" "top_tentacle_1_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "hip_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "neck_jntBnd"
+	"grp_l_clavicle" 2 "L_claw_1_jntBnd" "L_claw_2_jntBnd"
+	"grp_r_clavicle" 2 "R_claw_1_jntBnd" "R_claw_2_jntBnd"
+	"grp_l_bicep" 2 "L_claw_2_jntBnd" "L_claw_3_jntBnd"
+	"grp_r_bicep" 2 "R_claw_2_jntBnd" "R_claw_3_jntBnd"
+	"grp_l_forearm" 2 "L_claw_3_jntBnd" "L_claw_4_jntBnd"
+	"grp_r_forearm" 2 "R_claw_3_jntBnd" "R_claw_4_jntBnd"
+	"grp_l_thigh_01" 2 "L_leg_1_1_jntBnd" "L_leg_1_2_jntBnd"
+	"grp_l_shin_01" 2 "L_leg_1_2_jntBnd" "L_leg_1_3_jntBnd"
+	"grp_l_foot_01" 2 "L_leg_1_3_jntBnd" "L_leg_1_4_jntBnd"
+	"grp_l_toe_01" 2 "L_leg_1_4_jntBnd" "aux_L_leg_1_5_jntBnd"
+	"grp_r_thigh_01" 2 "R_leg_1_1_jntBnd" "R_leg_1_2_jntBnd"
+	"grp_r_shin_01" 2 "R_leg_1_2_jntBnd" "R_leg_1_3_jntBnd"
+	"grp_r_foot_01" 2 "R_leg_1_3_jntBnd" "R_leg_1_4_jntBnd"
+	"grp_r_toe_01" 2 "R_leg_1_4_jntBnd" "aux_R_leg_1_5_jntBnd"
+	"grp_l_thigh_02" 2 "L_leg_2_1_jntBnd" "L_leg_2_2_jntBnd"
+	"grp_l_shin_02" 2 "L_leg_2_2_jntBnd" "L_leg_2_3_jntBnd"
+	"grp_l_foot_02" 2 "L_leg_2_3_jntBnd" "L_leg_2_4_jntBnd"
+	"grp_l_toe_02" 2 "L_leg_2_4_jntBnd" "aux_L_leg_2_5_jntBnd"
+	"grp_r_thigh_02" 2 "R_leg_2_1_jntBnd" "R_leg_2_2_jntBnd"
+	"grp_r_shin_02" 2 "R_leg_2_2_jntBnd" "R_leg_2_3_jntBnd"
+	"grp_r_foot_02" 2 "R_leg_2_3_jntBnd" "R_leg_2_4_jntBnd"
+	"grp_r_toe_02" 2 "R_leg_2_4_jntBnd" "aux_R_leg_2_5_jntBnd"
+	"grp_l_thigh_03" 2 "L_leg_3_1_jntBnd" "L_leg_3_2_jntBnd"
+	"grp_l_shin_03" 2 "L_leg_3_2_jntBnd" "L_leg_3_3_jntBnd"
+	"grp_l_foot_03" 2 "L_leg_3_3_jntBnd" "L_leg_3_4_jntBnd"
+	"grp_l_toe_03" 2 "L_leg_3_4_jntBnd" "aux_L_leg_3_5_jntBnd"
+	"grp_r_thigh_03" 2 "R_leg_3_1_jntBnd" "R_leg_3_2_jntBnd"
+	"grp_r_shin_03" 2 "R_leg_3_2_jntBnd" "R_leg_3_3_jntBnd"
+	"grp_r_foot_03" 2 "R_leg_3_3_jntBnd" "R_leg_3_4_jntBnd"
+	"grp_r_toe_03" 2 "R_leg_3_4_jntBnd" "aux_R_leg_3_5_jntBnd"
+	"grp_tail_01" 2 "hip_jntBnd" "tail_base_jntBnd"
+	"grp_tail_02" 2 "tail_base_jntBnd" "tail_1_jntBnd"
+	"grp_tail_03" 2 "tail_1_jntBnd" "tail_2_jntBnd"
+	"grp_tail_04" 2 "tail_2_jntBnd" "tail_3_jntBnd"
+	"grp_tail_05" 2 "tail_3_jntBnd" "tail_4_jntBnd"
+	"grp_tail_06" 2 "tail_4_jntBnd" "tail_5_jntBnd"
+	"grp_tail_07" 2 "tail_5_jntBnd" "tail_6_jntBnd"
+	"grp_tail_08" 2 "tail_6_jntBnd" "tail_7_jntBnd"
+	"grp_tail_09" 2 "tail_7_jntBnd" "aux_tail_8_jntBnd"
+
+=== .smd Art/Models/MONSTERS/ParasiteMonsters/ParasiteMonster01/rig_9efb45fe.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 1 in the header, 1 in the block · 10746 triangles over 7079 vertices
+  names: 42 bytes said, 42 read  [agree]
+
+=== shapes (2)
+0	ParasiteMonstersShape	from 0	count 32238
+1	AnglerFishParasiteShape	from 32238	count 19971
+
+=== fitting
+the monster's rig: 107 bones
+mounts: aux_position, aux_L_leg_1_5_jntBnd, aux_L_leg_2_5_jntBnd, aux_L_leg_3_5_jntBnd, aux_R_leg_3_5_jntBnd, aux_R_leg_2_5_jntBnd, aux_R_leg_1_5_jntBnd, aux_tail_8_jntBnd, aux_L_leg_4_5_jntBnd, aux_R_leg_4_5_jntBnd, aux_L_leg_5_5_jntBnd, aux_L_leg_6_5_jntBnd, aux_R_leg_5_5_jntBnd, aux_R_leg_6_5_jntBnd
+  AnglerFishParasiteAttachment.ao  socket <root> [NOT in its carrier's rig]  box (-171.9,-342.8,-326.2)..(151,160.9,-38)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 6657 triangles over 4898 vertices
+    names: 46 bytes said, 46 read  [agree]
+    rig 34 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 33 of 34  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 para_hip_jntBnd  [its own]  under 0  rests at (0,-70.7,-83.2)
+      2 para_tail_base_jntBnd  [its own]  under 1  rests at (-0,-39.7,-78.2)
+      3 para_neck_jntBnd  [its own]  under 1  rests at (0,-117.5,-73.4)
+      4 body_jntBnd  [its own]  under 1  rests at (0,-92,-137.3)
+      5 para_tail_1_jntBnd  [its own]  under 2  rests at (0,-9,-69.2)
+      6 tail_jntBnd_1  [its own]  under 4  rests at (-0,-50.8,-122.5)
+      7 L_mandible_jntBnd_1  [its own]  under 4  rests at (35.4,-129.7,-185.4)
+      8 R_mandible_jntBnd_1  [its own]  under 4  rests at (-36.9,-129.8,-186.8)
+      9 L_mandible_jntBnd_2  [its own]  under 4  rests at (64.7,-123.7,-142.2)
+      10 R_mandible_jntBnd_2  [its own]  under 4  rests at (-60.9,-106.9,-113.8)
+      11 L_mandible_jntBnd_3  [its own]  under 4  rests at (34,-130.9,-95.9)
+      12 guts_jntBnd_1  [its own]  under 4  rests at (-0,-130.7,-134.7)
+      13 R_claw_jntBnd_1  [its own]  under 4  rests at (-64.8,-79.9,-147.2)
+      14 F_claw_jntBnd_1  [its own]  under 4  rests at (1.6,-134.5,-155.3)
+      15 L_claw_jntBnd_1  [its own]  under 4  rests at (54.3,-145.4,-135.7)
+      16 spike_jntBnd_1  [its own]  under 4  rests at (56.2,-114.9,-186.9)
+      17 spike_jntBnd_2  [its own]  under 4  rests at (1.7,-108,-211.9)
+      18 spike_jntBnd_3  [its own]  under 4  rests at (1.1,-72.8,-203.8)
+      19 para_tail_2_jntBnd  [its own]  under 5  rests at (-0,19.8,-57.8)
+      20 tail_jntBnd_2  [its own]  under 6  rests at (-0,-7.1,-98.3)
+      21 guts_jntBnd_2  [its own]  under 12  rests at (13.2,-168.1,-113.8)
+      22 R_claw_jntBnd_2  [its own]  under 13  rests at (-90.6,-80.8,-183.7)
+      23 F_claw_jntBnd_2  [its own]  under 14  rests at (2.3,-178.2,-187.1)
+      24 L_claw_jntBnd_2  [its own]  under 15  rests at (66.7,-181.2,-152.4)
+      25 para_tail_3_jntBnd  [its own]  under 19  rests at (0,49.3,-48.6)
+      26 tail_jntBnd_3  [its own]  under 20  rests at (-0,40.4,-82.7)
+      27 guts_jntBnd_3  [its own]  under 21  rests at (21.7,-185.1,-83.3)
+      28 R_claw_jntBnd_3  [its own]  under 22  rests at (-86.2,-80.4,-239.2)
+      29 F_claw_jntBnd_3  [its own]  under 23  rests at (2.1,-192.4,-279.9)
+      30 L_claw_jntBnd_3  [its own]  under 24  rests at (125.2,-190.9,-204.9)
+      31 tail_tip_jntBnd  [its own]  under 26  rests at (-0,81.2,-117.5)
+      32 L_tail_tip_jntBnd  [its own]  under 26  rests at (26.6,78.6,-78.8)
+      33 R_tail_tip_jntBnd  [its own]  under 26  rests at (-26.6,78.6,-78.8)

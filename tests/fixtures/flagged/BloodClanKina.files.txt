@@ -1,0 +1,184 @@
+monster: Sea-tribe Pouchbearer [Metadata/Monsters/BloodClan/BloodClanKina]
+
+=== .ao Metadata/Monsters/BloodClan/BloodClanBoyKina.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BloodClan/BloodClanDuo/TopClansman/Animations/kids/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.426813006401062,
+					"name": "contact",
+					"position": [
+						7.053830146789551,
+						-57.11309814453125,
+						-49.667598724365237
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6951599717140198,
+					"name": "reload"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "L_Weapon Metadata/Monsters/BloodClan/attachments/MortarWeapon_Pouch.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BloodClan/BloodClanDuo/TopClansman/Animations/kids/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BloodClan/BloodClanBoy.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd spine_1_jntBnd chest_jntBnd neck_jntBnd"
+		bone_group = "frameupper false R_wrist_jntBnd R_elbow_jntBnd R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_elbow_jntBnd L_wrist_jntBnd"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/BloodClan/attachments/MortarWeapon_Pouch.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BloodClan/attachments/Pouch/rig.amd"
+	default_animation = "idle_01"
+}
+
+BaseAnimationEvents
+{
+	attach_bone_override = "hip_jntBnd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BloodClan/attachments/Pouch/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 300.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.040
+		enclosure_angle = 0.300
+		use_shock_propagation = false
+	    attachment_bones = "hip_jntBnd spine_1_jntBnd chest_jntBnd R_clavicle_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BloodClan/attachments/Pouch/MortarWeaponPouch.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false hip_jntBnd spine_1_jntBnd chest_jntBnd R_clavicle_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BloodClan/BloodClanBoy.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BloodClan/armour_BloodClanBoy_f7e05759.smd"
+Materials 4
+	"Art/Textures/Monsters/BloodClan/Leaves2c.mat" 1
+	"Art/Textures/Monsters/BloodClan/BloodClanBoyc.mat" 1
+	"Art/Textures/Monsters/BloodClan/BloodKnifec.mat" 1
+	"Art/Textures/Monsters/BloodClan/Mask1Dirtcns.mat" 1
+BoundingBox -52.9614 -5.44188 -113.05 52.9614 21.225 0.38503
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/BloodClan/armour_BloodClanBoy_f7e05759.smd
+  version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 4 in the header, 4 in the block · 4046 triangles over 2816 vertices
+  names: 112 bytes said, 112 read  [agree]
+
+=== shapes (4)
+0	ArmLeavesShape	from 0	count 3024
+1	Body1Shape	from 3024	count 7602
+2	Knife_lowShape	from 10626	count 456
+3	Mask1Dirt_lowShape	from 11082	count 1056
+
+=== fitting
+the monster's rig: 51 bones
+mounts: aux_head_jntBnd, aux_L_foot_jntBnd, aux_R_foot_jntBnd
+  MortarWeapon_Pouch.ao  socket L_Weapon [NOT in its carrier's rig]  box (-9,-17.1,-36.3)..(28.9,12.4,16.2)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 6 in the header, 6 in the block · 34639 triangles over 25853 vertices
+    names: 142 bytes said, 142 read  [agree]
+    rig 8 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,-0,0)  carrier has (0,5.4,-51.3)
+      2 spine_1_jntBnd  [shared]  under 1  rests at (0,-0,-11.2)  carrier has (0,5.4,-62.5)
+      3 phys_pouch_jntBnd  [its own]  under 1  rests at (13.3,-1.3,14.2)
+      4 chest_jntBnd  [shared]  under 2  rests at (0,2.1,-21.9)  carrier has (0,7.4,-73.3)
+      5 phys_B_pouch_strap_jntBnd  [its own]  under 2  rests at (10.5,6.5,-11.7)
+      6 phys_F_pouch_strap_jntBnd  [its own]  under 2  rests at (9.6,-9.7,-8.3)
+      7 R_clavicle_jntBnd  [shared]  under 4  rests at (-2.7,3.8,-31.5)  carrier has (-2.7,9.2,-82.9)

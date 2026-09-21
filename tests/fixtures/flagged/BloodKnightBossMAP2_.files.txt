@@ -1,0 +1,4273 @@
+monster: Varloch, the Ashen Lord [Metadata/Monsters/HusbandMonster/BloodKnightBossMAP2_]
+
+=== .ao Metadata/Monsters/HusbandMonster/BloodKnightBossMAP.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/HusbandMonster/rig.amd"
+	view_of = "emerge_01"
+		view_name = "dormant_idle_01"
+		view_end = 100
+		view_looping = true
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	animations = '[
+		{
+			"name": "blood_orb_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.154680013656616,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "cleave_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.2000000476837159,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3700000047683716,
+					"name": "proj",
+					"position": [
+						33.54069900512695,
+						-67.30870056152344,
+						-101.94200134277344
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3899999856948853,
+					"name": "proj",
+					"position": [
+						17.41189956665039,
+						-88.84459686279297,
+						-112.69999694824219
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.409999966621399,
+					"name": "proj",
+					"position": [
+						-9.088330268859864,
+						-113.625,
+						-123.36900329589844
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4299999475479127,
+					"name": "proj",
+					"position": [
+						-55.727901458740237,
+						-125.36399841308594,
+						-136.4340057373047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.440000057220459,
+					"name": "proj",
+					"position": [
+						-99.45600128173828,
+						-115.18299865722656,
+						-137.8260040283203
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4500000476837159,
+					"name": "proj",
+					"position": [
+						-130.4239959716797,
+						-69.27120208740235,
+						-140.51300048828126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4600000381469727,
+					"name": "proj",
+					"position": [
+						-139.5489959716797,
+						-17.851999282836915,
+						-143.00799560546876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4700000286102296,
+					"name": "proj",
+					"position": [
+						-105.89900207519531,
+						73.37319946289063,
+						-138.65699768066407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4800000190734864,
+					"name": "proj",
+					"position": [
+						-63.037601470947269,
+						110.57099914550781,
+						-119.77200317382813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4900000095367432,
+					"name": "proj",
+					"position": [
+						-124.3219985961914,
+						43.19960021972656,
+						-143.82899475097657
+					]
+				}
+			]
+		},
+		{
+			"name": "cleave_02",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.2000000476837159,
+					"name": "start_target_update",
+					"data": "220 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3600000143051148,
+					"name": "proj",
+					"position": [
+						33.312400817871097,
+						-49.302101135253909,
+						-97.00910186767578
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3700000047683716,
+					"name": "proj",
+					"position": [
+						28.288799285888673,
+						-61.423099517822269,
+						-101.35900115966797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3799999952316285,
+					"name": "proj",
+					"position": [
+						21.504100799560548,
+						-73.03579711914063,
+						-105.54299926757813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3899999856948853,
+					"name": "proj",
+					"position": [
+						14.003199577331543,
+						-81.80229949951172,
+						-111.50900268554688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.399999976158142,
+					"name": "proj",
+					"position": [
+						5.095660209655762,
+						-88.6676025390625,
+						-119.39299774169922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.409999966621399,
+					"name": "proj",
+					"position": [
+						-7.934329986572266,
+						-105.91100311279297,
+						-121.95700073242188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4199999570846558,
+					"name": "proj",
+					"position": [
+						-26.594900131225587,
+						-117.10700225830078,
+						-126.85399627685547
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4299999475479127,
+					"name": "proj",
+					"position": [
+						-49.324798583984378,
+						-120.9749984741211,
+						-134.98399353027345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.440000057220459,
+					"name": "proj",
+					"position": [
+						-78.38249969482422,
+						-107.41200256347656,
+						-137.97999572753907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4500000476837159,
+					"name": "proj",
+					"position": [
+						-102.7750015258789,
+						-78.84030151367188,
+						-139.36300659179688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4600000381469727,
+					"name": "proj",
+					"position": [
+						-116.33399963378906,
+						-41.565799713134769,
+						-141.27000427246095
+					]
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.576640009880066,
+					"end_time": 1.8619900941848755,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8783799409866334,
+					"name": "reset_pierce_list"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0899999141693117,
+					"name": "proj",
+					"position": [
+						-89.3550033569336,
+						-60.954200744628909,
+						-136.7050018310547
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0999999046325685,
+					"name": "proj",
+					"position": [
+						-71.27629852294922,
+						-79.6511001586914,
+						-137.33099365234376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.109999895095825,
+					"name": "proj",
+					"position": [
+						-49.94089889526367,
+						-97.67400360107422,
+						-138.9720001220703
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.118069887161255,
+					"name": "proj",
+					"position": [
+						-26.1466007232666,
+						-106.0790023803711,
+						-142.73899841308595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.130000114440918,
+					"name": "proj",
+					"position": [
+						1.6496299505233765,
+						-106.5780029296875,
+						-146.45700073242188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.140000104904175,
+					"name": "proj",
+					"position": [
+						36.21699905395508,
+						-99.67659759521485,
+						-144.31500244140626
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.1500000953674318,
+					"name": "proj",
+					"position": [
+						65.44850158691406,
+						-84.09120178222656,
+						-140.03199768066407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.1619300842285158,
+					"name": "proj",
+					"position": [
+						87.1852035522461,
+						-61.12379837036133,
+						-136.65199279785157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.1700000762939455,
+					"name": "proj",
+					"position": [
+						99.9542007446289,
+						-34.40700149536133,
+						-133.6510009765625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.180000066757202,
+					"name": "proj",
+					"position": [
+						103.10800170898438,
+						-11.681599617004395,
+						-129.03700256347657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.190000057220459,
+					"name": "proj",
+					"position": [
+						100.62799835205078,
+						9.724720001220704,
+						-128.0850067138672
+					]
+				}
+			]
+		},
+		{
+			"name": "combo_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0021032700315117838,
+					"end_time": 3.6659998893737795,
+					"name": "move",
+					"data": "1 1 0 Everything 0 10 Away 1.000000"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 0.54230797290802,
+					"name": "start_face",
+					"data": "360 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.8745980262756348,
+					"name": "end_face"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 1.0884300470352173,
+					"name": "start_face",
+					"data": "260 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 1.3463399410247803,
+					"name": "end_face"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 1.7093600034713746,
+					"name": "start_face",
+					"data": "180 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 1.9021899700164796,
+					"name": "end_face"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 2.1756598949432375,
+					"name": "start_face",
+					"data": "180 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 2.387089967727661,
+					"name": "end_face"
+				}
+			]
+		},
+		{
+			"name": "cooldown_01",
+			"events": [
+				{
+					"type": "PoiseEventType",
+					"time": 0.0,
+					"end_time": 0.057953231036663058,
+					"name": "poise",
+					"data": "1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.04324698448181152,
+					"name": "unbuff"
+				}
+			]
+		},
+		{
+			"name": "dance_emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 6.240082740783691,
+					"name": "helmet"
+				}
+			],
+			"blend_in_time": 0,
+			"blend_out_time": 0
+		},
+		{
+			"name": "dance_emerge_idle_01",
+			"blend_in_time": 0,
+			"blend_out_time": 0
+		},
+		{
+			"name": "dash_slice_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7662709951400757,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8223699927330017,
+					"name": "bleh"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8423399925231934,
+					"name": "bleh"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8679059743881226,
+					"name": "bleh"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.89028400182724,
+					"name": "bleh"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9070670008659363,
+					"name": "bleh"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9224519729614258,
+					"name": "bleh"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9338150024414063,
+					"name": "hit_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9350389838218689,
+					"name": "bleh"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9675300121307373,
+					"name": "dash_cleave",
+					"position": [
+						-45.165199279785159,
+						26.34630012512207,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "death_bwd_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.5948901176452638,
+					"name": "empower"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5948901176452638,
+					"name": "dead_light"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5692100524902345,
+					"name": "dialogue"
+				}
+			]
+		},
+		{
+			"name": "emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "light_on"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6151299476623536,
+					"name": "dialogue"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 5.101809978485107,
+					"end_time": 9.965999603271485,
+					"name": "move",
+					"data": "1 0 0 Nothing 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.480000019073486,
+					"name": "light_two"
+				}
+			]
+		},
+		{
+			"name": "empower_01",
+			"events": [
+				{
+					"type": "PoiseEventType",
+					"time": 0.0,
+					"end_time": 1.280428171157837,
+					"name": "poise",
+					"data": "1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8309339880943298,
+					"name": "buff"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2892999649047852,
+					"name": "empower"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.353178858757019,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "overhead_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.6000000238418579,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8489760160446167,
+					"name": "contact",
+					"position": [
+						0.0,
+						-75.19879913330078,
+						-49.314701080322269
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.703389883041382,
+					"name": "contact",
+					"position": [
+						0.0,
+						-102.56700134277344,
+						-21.9685001373291
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "spine_1_jntBnd Metadata/Monsters/HusbandMonster/attachments/HusbandReskinSkirt.ao"
+	attached_object = "R_Weapon Metadata/Monsters/HusbandMonster/attachments/HusbandReskinWeapon.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.41242900490760805,
+								0.0
+							],
+							[
+								0.46327701210975649,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 3,
+						"rotation": -0.907571017742157,
+						"angle": 3.141590118408203,
+						"x_axis_scale": 0.8809999823570252,
+						"length": 196.4290008544922,
+						"offset": [
+							0.0,
+							-23.0
+						],
+						"impact_z_rotation": [
+							-0.8901180028915405,
+							-3.5953800678253176
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.36723199486732485,
+								0.0
+							],
+							[
+								0.45251399278640749,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 3,
+						"rotation": -0.22689299285411836,
+						"width": 53.57099914550781,
+						"angle": 0.785398006439209,
+						"length": 238.09500122070313,
+						"offset": [
+							42.0,
+							125.0
+						],
+						"impact_x_rotation": [
+							-0.7155849933624268,
+							0.3490658700466156
+						],
+						"impact_z_rotation": [
+							-0.19198623299598695,
+							-0.19198623299598695
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "cleave_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4180789887905121,
+								0.0
+							],
+							[
+								0.4960629940032959,
+								0.20537430047988892
+							],
+							[
+								0.5196850299835205,
+								0.5623800754547119
+							],
+							[
+								0.5354330539703369,
+								1.0
+							],
+							[
+								0.5354330539703369,
+								1.0
+							],
+							[
+								0.5354330539703369,
+								1.0
+							],
+							[
+								0.5354330539703369,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 3,
+						"rotation": 1.6406099796295167,
+						"angle": 2.949610471725464,
+						"x_axis_scale": 1.472000002861023,
+						"length": 127.9749984741211,
+						"offset": [
+							-33.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							2.687809705734253,
+							-0.5235990285873413
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5417299866676331,
+								0.0
+							],
+							[
+								0.5429553389549255,
+								0.24376201629638673
+							],
+							[
+								0.5567010045051575,
+								0.5815739035606384
+							],
+							[
+								0.5704467296600342,
+								0.8771592974662781
+							],
+							[
+								0.5819209814071655,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"previous_patterns_to_exclude_from": 1,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 3,
+						"rotation": -1.6057000160217286,
+						"angle": 3.4906599521636965,
+						"length": 220.20199584960938,
+						"impact_z_rotation": [
+							-0.8203049898147583,
+							-4.939280033111572
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "cleave_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4133858382701874,
+								0.0
+							],
+							[
+								0.4330708682537079,
+								0.18618041276931764
+							],
+							[
+								0.4527558982372284,
+								0.5239923000335693
+							],
+							[
+								0.4606299102306366,
+								0.8233345150947571
+							],
+							[
+								0.4652769863605499,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 3,
+						"rotation": 1.6406099796295167,
+						"angle": 2.949610471725464,
+						"x_axis_scale": 1.472000002861023,
+						"length": 127.9749984741211,
+						"offset": [
+							-33.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							2.687809705734253,
+							-0.5235990285873413
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4689269959926605,
+								0.0
+							],
+							[
+								0.47079038619995119,
+								0.18618041276931764
+							],
+							[
+								0.47766321897506716,
+								0.38579654693603518
+							],
+							[
+								0.49140894412994387,
+								0.7888675928115845
+							],
+							[
+								0.5084750056266785,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"previous_patterns_to_exclude_from": 1,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 3,
+						"rotation": -1.6057000160217286,
+						"angle": 3.4906599521636965,
+						"length": 220.20199584960938,
+						"impact_z_rotation": [
+							-0.8203049898147583,
+							-4.939280033111572
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6610170006752014,
+								0.0
+							],
+							[
+								0.7288140058517456,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 3,
+						"angle": 4.415679931640625,
+						"x_axis_scale": 0.9700000286102295,
+						"length": 220.0,
+						"impact_z_rotation": [
+							-0.4537860155105591,
+							3.4382998943328859
+						],
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "combo_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.15254199504852296,
+								0.0
+							],
+							[
+								0.1955309957265854,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 3,
+						"rotation": -1.0471999645233155,
+						"angle": 4.049160003662109,
+						"x_axis_scale": 1.4119999408721924,
+						"length": 120.0,
+						"offset": [
+							5.0,
+							-54.0
+						],
+						"impact_z_rotation": [
+							-1.0471999645233155,
+							2.094399929046631
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3016760051250458,
+								0.0
+							],
+							[
+								0.32099997997283938,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 3,
+						"rotation": 1.5707999467849732,
+						"angle": 3.141590118408203,
+						"x_axis_scale": 1.1100000143051148,
+						"length": 140.0,
+						"impact_z_rotation": [
+							1.7802400588989258,
+							-0.5934119820594788
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3210219740867615,
+								0.0
+							],
+							[
+								0.391061007976532,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"previous_patterns_to_exclude_from": 1,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 3,
+						"rotation": -2.0594899654388429,
+						"angle": 4.10152006149292,
+						"length": 217.64700317382813,
+						"impact_z_rotation": [
+							-1.326449990272522,
+							-5.51524019241333
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5247520208358765,
+								0.0
+							],
+							[
+								0.5445539951324463,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": 0.6283190250396729,
+						"angle": 2.548180103302002,
+						"x_axis_scale": 0.7950000166893005,
+						"length": 200.0,
+						"impact_z_rotation": [
+							1.0471999645233155,
+							2.7925302982330324
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6287130117416382,
+								0.0
+							],
+							[
+								0.6732670068740845,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": 0.5759590268135071,
+						"angle": 4.1887898445129398,
+						"x_axis_scale": 0.8970000147819519,
+						"length": 175.27000427246095,
+						"offset": [
+							-20.0,
+							-3.0
+						],
+						"impact_z_rotation": [
+							1.500980019569397,
+							-1.3090001344680787
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6732670068740845,
+								0.0
+							],
+							[
+								0.6930689811706543,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"previous_patterns_to_exclude_from": 1,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": -2.4085497856140138,
+						"width": 69.947998046875,
+						"angle": 2.0071299076080324,
+						"x_axis_scale": 0.8460000157356262,
+						"length": 200.0,
+						"impact_z_rotation": [
+							-2.5307300090789797,
+							-4.956739902496338
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "dash_slice_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4842519760131836,
+								0.0
+							],
+							[
+								0.4881889820098877,
+								0.17466408014297486
+							],
+							[
+								0.5039370059967041,
+								0.631477952003479
+							],
+							[
+								0.5157480239868164,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 3,
+						"angle": 3.141590118408203,
+						"x_axis_scale": 1.121000051498413,
+						"length": 175.0,
+						"offset": [
+							-5.0,
+							74.0
+						],
+						"impact_z_rotation": [
+							0.24434611201286317,
+							2.7052605152130129
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/HusbandMonster/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "proj_1"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-0.650764 0 -35.0339"
+		socket = "proj_2"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-0.650764 0 -61.2895"
+		socket = "proj_3"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-0.650764 0 -86.3032"
+		socket = "proj_4"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-2.6432 0 -111.73"
+		socket = "proj_5"
+			parent = "aux_R_Weapon_attachment"
+			translation = "3.94694 0 -137.155"
+		socket = "proj_6"
+			parent = "aux_R_Weapon_attachment"
+			translation = "1.07484 0 -158.179"
+		socket = "proj_1_ref"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-8.56014 0 -35.0923"
+		socket = "proj_2_ref"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-8.98774 0 -61.383"
+		socket = "proj_3_ref"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-10.4274 0 -86.3818"
+		socket = "proj_4_ref"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-10.6524 0 -111.926"
+		socket = "proj_5_ref"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-7.22487 0 -135.428"
+		socket = "head_skull_01"
+			parent = "head_jntBnd"
+			translation = "-4.06313 -5.99728 -23.7219"
+		socket = "head_skull_02"
+			parent = "head_jntBnd"
+			translation = "-6.62919 -10.3362 -17.5489"
+		socket = "head_skull_03"
+			parent = "head_jntBnd"
+			translation = "0.182411 -16.6622 -15.604"
+		socket = "head_skull_04"
+			parent = "head_jntBnd"
+			translation = "-8.11083 -15.9541 -10.9099"
+		socket = "head_skull_05"
+			parent = "head_jntBnd"
+			translation = "-14.4913 -12.0933 -6.36304"
+		socket = "head_skull_06"
+			parent = "head_jntBnd"
+			translation = "-15.5758 -4.50876 -8.31861"
+		socket = "head_skull_07"
+			parent = "head_jntBnd"
+			translation = "-13.093 -6.23299 -16.041"
+		socket = "head_skull_08"
+			parent = "head_jntBnd"
+			translation = "-11.5269 -1.29175 -19.9654"
+		socket = "head_skull_10"
+			parent = "head_jntBnd"
+			translation = "-13.4836 4.94694 -16.2228"
+		socket = "head_skull_11"
+			parent = "head_jntBnd"
+			translation = "4.82219 -7.18554 -23.3453"
+		socket = "head_skull_12"
+			parent = "head_jntBnd"
+			translation = "7.41932 -12.2525 -17.6761"
+		socket = "head_skull_13"
+			parent = "head_jntBnd"
+			translation = "7.24026 -13.6067 -9.59157"
+		socket = "head_skull_14"
+			parent = "head_jntBnd"
+			translation = "14.2269 -11.9743 -8.19928"
+		socket = "head_skull_15"
+			parent = "head_jntBnd"
+			translation = "14.2269 -6.33571 -15.3633"
+		socket = "head_skull_16"
+			parent = "head_jntBnd"
+			translation = "12.0223 -1.45882 -21.0136"
+		socket = "head_skull_17"
+			parent = "head_jntBnd"
+			translation = "13.825 4.79459 -14.199"
+		socket = "light"
+			parent = "root_jntBnd"
+			translation = "0 -1.19861 -269.843"
+		socket = "light_Copy1"
+			parent = "chest_jntBnd"
+			translation = "0 -1.19861 -92.6905"
+			ignore_parent_rotation = "yawpitchroll"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/HusbandReskin/HusbandReskin.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_upperArm_attachment_jntBnd L_shoulder_cTwist_jntBnd_1"
+		bone_group = "FX_weaponTrail false proj_1 proj_2 proj_3 proj_4 proj_5 proj_6"
+		bone_group = "FX_headSkulls false head_skull_01 head_skull_02 head_skull_03 head_skull_04 head_skull_05 head_skull_06 head_skull_07 head_skull_10 head_skull_08 head_skull_11 head_skull_12 head_skull_13 head_skull_14 head_skull_15 head_skull_16 head_skull_17"
+		bone_group = "FX_R_Weapon false R_Weapon proj_4"
+		bone_group = "FX_L_Weapon false L_Weapon"
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "blood_orb_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/EPKs/BloodOrb_OnAct.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/EPKs/BloodOrbSword_OnAct.epk"
+					}
+				]
+			},
+			{
+				"name": "cooldown_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.3137648105621338,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/EPKs/enrage_cooldown.epk"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/EPKs/death_Skin.epk"
+					}
+				]
+			},
+			{
+				"name": "empower_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/EPKs/enrage_blood.epk"
+					}
+				]
+			},
+			{
+				"name": "overhead_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4768359959125519,
+						"end_time": 0.7867449522018433,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/Trails/Sword_trail/SwordTrail_01.trl",
+						"bone_group": "FX_weaponTrail"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4519990086555481,
+						"end_time": 0.9024990200996399,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/Trails/Sword_trail/SwordTrail_01.trl",
+						"bone_group": "FX_weaponTrail"
+					}
+				]
+			},
+			{
+				"name": "cleave_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.2388999462127686,
+						"end_time": 1.613175868988037,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/Trails/Sword_trail/SwordTrail_01.trl",
+						"bone_group": "FX_weaponTrail"
+					}
+				]
+			},
+			{
+				"name": "cleave_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.2408499717712403,
+						"end_time": 1.5966651439666749,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/Trails/Sword_trail/SwordTrail_01.trl",
+						"bone_group": "FX_weaponTrail"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.794581651687622,
+						"end_time": 2.503750801086426,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/Trails/Sword_trail/SwordTrail_01.trl",
+						"bone_group": "FX_weaponTrail"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4018239974975586,
+						"end_time": 2.7585740089416506,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/Trails/Sword_trail/SwordTrail_01.trl",
+						"bone_group": "FX_weaponTrail"
+					}
+				]
+			},
+			{
+				"name": "dash_slice_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6357809901237488,
+						"end_time": 1.0489929914474488,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/Trails/Sword_trail/SwordTrail_01.trl",
+						"bone_group": "FX_weaponTrail"
+					}
+				]
+			},
+			{
+				"name": "overhead_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.3999099731445313,
+						"end_time": 2.8452999591827394,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/Trails/Sword_trail/SwordTrail_01.trl",
+						"bone_group": "FX_weaponTrail"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "sword_glow",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 0.422497 1 Custom 0.666667 -1.8433 1.5 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "sword_glow",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 0.375459 1 Custom 0.666667 -3.35369 1.333 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "blood_orb_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0025439125020056965,
+						"end_time": 4.199999809265137,
+						"name": "surgeTime_R",
+						"auto_reset": false,
+						"curve": "6 0.00254391 0 Linear 0.977741 0 Flat 2.13861 0.973934 Flat 3.04449 0.984573 Flat 3.58121 0 Flat 4.2 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0025439125020056965,
+						"end_time": 4.199999809265137,
+						"name": "Orb_Scale",
+						"auto_reset": false,
+						"curve": "7 0.00254391 0 Linear 0.614546 0 Flat 1.05815 0.128752 Smooth 2.2639 0.128752 Flat 2.35261 0 Flat 3.14439 0 Flat 4.2 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0025439125020056965,
+						"end_time": 4.199999809265137,
+						"name": "surgeTime_L",
+						"auto_reset": false,
+						"curve": "3 0.00254391 0 Linear 0.894167 0.958136 Smooth 4.2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "cleave_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "sword_glow",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 0.56333 1 Custom 0.666667 -1.8433 2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.6659998893737795,
+						"name": "sword_glow",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.210635 1 Flat 2.43869 1 Custom 0 -1.03711 3.666 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "dash_slice_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "sword_glow",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 0.563329 1 Custom 0.666667 -1.8433 2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0025439125020056965,
+						"end_time": 3.999999761581421,
+						"name": "surgeTime_L",
+						"auto_reset": false,
+						"curve": "5 0.00254391 0 Smooth 2.03683 0.973934 Flat 2.89955 0.984573 Flat 3.41069 0 Flat 4 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "empower_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "boneBlast_FADEIN_CTRLs",
+						"curve": "6 0 0 Smooth 0.164082 0 Flat 0.817896 1 Flat 1.22704 1 Linear 1.67299 0 Flat 3 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "Trigger_DisableGroundCollision_Alt",
+						"curve": "4 0 1 Linear 0.864296 1 Linear 0.864296 0 Linear 3 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "Trigger_Spike_States_Alt",
+						"curve": "4 0 1 Linear 1.43206 1.04739 Linear 1.43206 2 Linear 3 2 Linear"
+					}
+				]
+			},
+			{
+				"name": "overhead_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.7330000400543215,
+						"name": "sword_glow",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 1.62472 1 Flat 2.68711 1 Custom 0 -2.37148 3.733 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "light_Copy1"
+			style_speed = 35
+			state = ""
+				colour = "0.624884 0.0280581 0.0280581"
+				position = "0 -69 -62"
+				radius = 300
+				penumbra_dist = 0
+				penumbra_radius = 0.002
+			state = "on_death"
+				position = "0 0 -125"
+				radius = 0
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "dim"
+				colour = "0.0205515 0.457706 0.271742"
+				position = "0 -59 -18"
+				radius = 500
+				penumbra_dist = 0
+				penumbra_radius = 0.02
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 8.515339851379395,
+						"end_time": 9.965999603271485,
+						"state_name": "emerging"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Attack2",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3336839973926544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLarge",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3336839973926544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/WeaponTrail",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41789498925209048,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46421098709106448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_Short_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7557899951934815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.777895987033844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.188420057296753,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.023175766691565515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Attack2",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2347950041294098,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLarge",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2931300103664398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/WeaponTrail",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37136900424957278,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41252899169921877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_Short_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6716449856758118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.691290020942688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0561100244522095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_orb_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/BloodOrbA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32378196716308596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.760581910610199,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9621817469596863,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2866241931915284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/BloodOrbB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3439972400665284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/BloodOrb_Start",
+						"bone_name": "L_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7471990585327149,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.805235743522644,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4466888904571535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.642179250717163,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLargeQuick",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8101747035980226,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4027597904205324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6257433891296388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLarge",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.815124034881592,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cleave_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/EmpowerCharge",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12210500240325928,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1235089972615242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2916276454925537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Cleave",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5333330035209656,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Cloth",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5571929812431336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8855479955673218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_Short_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.111449956893921,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLarge",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.12663996219635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1593199968338013,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2255100011825562,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/WeaponTrail",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3246999979019166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3992999792099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4218699932098389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4764900207519532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8331799507141114,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.93464994430542,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0515100955963136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2367799282073976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "cleave_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14042499661445619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14203999936580659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5691215991973877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Cleave2",
+						"bone_name": "head_skull_02",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6133530139923096,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Cloth",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6407930254936218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0184099674224854,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_Short_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0888299942016602,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLarge",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1929700374603272,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/WeaponTrail",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.295680046081543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3332600593566895,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.523460030555725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6092499494552613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.635200023651123,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6980199813842774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7801899909973145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLarge",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8448200225830079,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/WeaponTrail",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8612099885940552,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0830800533294679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.108220100402832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3593099117279054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.498660087585449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7990400791168215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/ComboA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27784401178359988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32415100932121279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLarge",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4342989921569824,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/WeaponTrail",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7306280136108398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7357730269432068,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7383459806442261,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8978490233421326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLargeQuick",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.952709972858429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/WeaponTrail",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0419199466705323,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1782699823379517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2451499700546265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2760299444198609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5836600065231324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/WeaponTrail",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6490600109100342,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLargeQuick",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7571099996566773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7648299932479859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8291399478912354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.119849920272827,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLarge",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1249899864196779,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.253619909286499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2577199935913088,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/WeaponTrail",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.317929983139038,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3307900428771974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6369199752807619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6472299098968508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.994529962539673,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.159169912338257,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.210629940032959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cooldown_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Cooldown",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14736899733543397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_knee_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14736899733543397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23298299312591554,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6119300127029419,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1943800449371338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2407000064849854,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_knee_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2673699855804444,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3768399953842164,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "dance_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23325024545192719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Leather_",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5081521272659302,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Armour_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5747939944267273,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5747939944267273,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.140188217163086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Leather_",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.265146255493164,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Armour_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.526165962219238,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/WhooshLargeQuick",
+						"bone_name": "proj_5_ref"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.703876495361328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Armour_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.073190689086914,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Armour_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.150948524475098,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.467500686645508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Armour_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.6424384117126469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_5_ref"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.695199966430664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.014529705047607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.092286109924316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Armour_",
+						"bone_name": "head_skull_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.31443452835083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Armour_",
+						"bone_name": "head_skull_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.1585693359375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Armour_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.355733394622803,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Armour_",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.691710472106934,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Armour_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.78335428237915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Step_BigStomp",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.29983139038086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/HusbandBoss/Foley/Armour_"
+					}
+				]
+			},
+			{
+				"name": "dash_slice_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15225957334041596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Dash",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18713100254535676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5571929812431336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6189479827880859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_Short_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.813264012336731,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLarge",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8743849992752075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9255419969558716,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/WeaponTrail",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.97878497838974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0077199935913087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0371899604797364,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4600800275802613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5845600366592408,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6669000387191773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03649109974503517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WeaponDrop_Sword",
+						"bone_name": "proj_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25964900851249697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25964900851249697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4336850047111511,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5501760244369507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5501760244369507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9543870091438294,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.097540020942688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.097540020942688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Fall_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4638500213623047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5915700197219849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07298219949007034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WeaponDrop_Sword",
+						"bone_name": "proj_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2357890009880066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23859600722789765,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.578245997428894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5810530185699463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8673700094223023,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1059600114822388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3080699443817139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.52701997756958,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrackDeath",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8329800367355347,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.366309881210327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.416830062866211,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.425260066986084,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4392900466918947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/LimbSnap_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.871570110321045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Fall_",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/Emerge",
+						"bone_name": "light_Copy1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.684718132019043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Emerge",
+						"bone_name": "light_Copy1",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.330659866333008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrackDeath",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.4568400382995609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.000699996948242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.000699996948242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.000699996948242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.448249816894531,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.962240219116211,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.040599822998047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.203700065612793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.388599872589111,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.401700019836426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.656199932098389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.73900032043457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.00790023803711,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Fall_",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.068599700927735,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.077099800109864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.2253999710083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "empower_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Empower",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/Empower_Charge",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14526300132274629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22315800189971925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30947399139404299,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33894601464271548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4231579899787903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42947399616241457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6000000238418579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8484219908714294,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9705259799957275,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9810529947280884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9894750118255615,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0547399520874024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2252600193023682,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2660953998565674,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/Empower_Impact",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0042099952697756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0947299003601076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0968399047851564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.185260057449341,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.223140001296997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.412630081176758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_Short_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Movement_Metal",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_Short_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_Short_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_Short_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Movement_Metal",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.2305999994277955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Idle",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21284200251102448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39162999391555788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4129140079021454,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4469679892063141,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5619029998779297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WeaponDrop_Sword",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2131999731063843,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2462807893753052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.686069965362549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0904700756073,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrackDeath",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2011399269104006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.358649969100952,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_Short_",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.120619773864746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.31643009185791,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.878320217132568,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.333799839019775,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.397649765014648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.470019817352295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.479410171508789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/KnockdownD",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "overhead_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/OverheadA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14456099271774293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6189479827880859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_Short_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7272329926490784,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/HeavyStomp",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7578949928283691,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2659599781036378,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2822500467300416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.374899983406067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/WeaponTrail",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3768399953842164,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3780399560928345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLarge",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9845499992370606,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1439900398254396,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3801701068878176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLarge",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3838300704956056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/FX/HeavySwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4089701175689699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5316100120544435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5408999919891359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_BigStomp",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.548449993133545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.366990089416504,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Cloth",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13413499295711518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13974300026893617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21171799302101136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2523002624511719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Run.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4514780044555664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4594230055809021,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "summoned_cleave_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 3.5,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6221001148223879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7350900173187258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshSmall",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7423899173736574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Cleave",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.033329963684082,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Cloth",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.05718994140625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.385550022125244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_Short_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.6114501953125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/WhooshLarge",
+						"bone_name": "proj_6"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.6266398429870609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/BoneCrack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.659319877624512,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.824699878692627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.8993000984191898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.921870231628418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.976490020751953,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.333179950714111,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.43464994430542,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.536779880523682,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.551509857177734,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17430099844932557,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Leather_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38974499702453616,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4062019884586334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7067868113517761,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Vocals/Walk.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8490599989891052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Armour_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9612699747085571,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Step_Armour",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9822149872779846,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P1/P1_6/VampireHusbandBoss/Foley/Stomp_Step_",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "blood_orb_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/FX/BloodFall/OnAct/OnActOrb.pet",
+						"bone_group": "FX_L_Weapon"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/FX/BloodFall/OnAct/OnActSword.pet",
+						"bone_group": "FX_R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "cooldown_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.15162451565265656,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/FX/Enrage/cooldown.pet",
+						"bone_group": "frameupper"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/FX/Death/death_seq.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.05968976020813,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/FX/Death/death_burst.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "empower_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/FX/Enrage/Enrage_ground.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.2893040180206299,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/FX/Enrage/empower_01.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "blood_orb_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.005662441253662,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/OnAct/BloodFall/BloodFall_Lightning.ao",
+						"offset": [
+							6.2415056228637699,
+							22.03485107421875
+						],
+						"height": 296.7227478027344
+					}
+				]
+			},
+			{
+				"name": "overhead_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.7600415945053101,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/BlazingLance_stomp.ao",
+						"animation": "once",
+						"offset": [
+							6.008470058441162,
+							-69.23690032958985
+						],
+						"inherit_speed": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.5510098934173586,
+						"end_time": 2.6766879558563234,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/BlazingLance_overheadCleave.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"rotation": [
+								-1.5709999799728394,
+								0.0,
+								-0.7853999733924866
+							],
+							"scale": [
+								2.0,
+								2.0,
+								2.0
+							]
+						}
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.672731876373291,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/BlazingLance_overheadCleave_Projectile.ao",
+						"offset": [
+							0.0,
+							100.16400146484375
+						],
+						"inherit_height": true,
+						"inherit_speed": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.674560546875,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodKnightBoss/BlazingLance_GroundSlam.ao",
+						"offset": [
+							0.0,
+							-288.0799865722656
+						],
+						"height": 10.0,
+						"inherit_speed": true,
+						"inherit_orientation": true,
+						"orientation": 1.5707999467849732
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "overhead_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.8154240250587463,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 2.6744399070739748,
+						"amplitude": 8.0,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "cleave_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.4254136085510255,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "cleave_02",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.4202792644500733,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 2.135247230529785,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.6860345005989075,
+						"haptic_id": "Haptic_BasicBoss_Sunder_AoE3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.933121919631958,
+						"haptic_id": "Haptic_BasicBoss_Sunder_AoE3D"
+					}
+				]
+			},
+			{
+				"name": "dash_slice_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.9957979917526245,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "empower_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.2132360935211182,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "summoned_cleave_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 4.9955644607543949,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/HusbandMonster/attachments/HusbandReskinSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/HusbandReskin/attachments/Skirt/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/HusbandReskin/attachments/Skirt/rig.ast"
+		linear_allowed_contraction = 0.360
+		bend_stiffness = 300.000
+		bend_allowed_angle = 0.300
+		normal_viscosity_multiplier = 0.150
+		enable_heightmap_collisions = true
+		attachment_bones = "spine_1_jntBnd hip_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd hip_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/HusbandReskin/attachments/Skirt/HusbandReskinSkirt.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/HusbandMonster/attachments/HusbandReskinWeapon.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/HusbandReskin/attachments/Weapon/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/HusbandReskin/attachments/Weapon/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/HusbandReskin/attachments/Weapon/HusbandReskinWeapon.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/HusbandReskin/HusbandReskin.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/HusbandReskin/HusbandReskin_armour_eb7f29ae.smd"
+Materials 3
+	"Art/Models/MONSTERS/HusbandReskin/Textures/HusbandReskinc.mat" 7
+	"Art/Models/MONSTERS/HusbandReskin/Textures/HusbandReskinc.mat" 1
+	"Art/Models/MONSTERS/HusbandReskin/Textures/HusbandHeadc.mat" 1
+BoundingBox -83.794 -22.83 -203.948 83.794 22.4689 -0.413594
+BoneGroups 22
+	"root" 1 "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/HusbandReskin/HusbandReskin_armour_eb7f29ae.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 9 in the header, 9 in the block · 16702 triangles over 11842 vertices
+  names: 238 bytes said, 238 read  [agree]
+
+=== shapes (13)
+0	bodyShape	from 0	count 6126
+1	L_bandShape	from 6126	count 1368
+2	Lside_shoulderpadShape	from 7494	count 5778
+3	neck_meshShape	from 13272	count 240
+4	pantsShape	from 13512	count 5652
+5	R_bandShape	from 19164	count 1368
+6	Rside_shoulderpadShape	from 20532	count 5778
+7	glovesShape	from 26310	count 11940
+8	headShape	from 38250	count 11856
+9	beltShape	from 50106	count 2538
+10	chainShape	from 52644	count 7512
+11	sides_platesShape	from 60156	count 4896
+12	skirtShape	from 65052	count 7062
+
+=== fitting
+the monster's rig: 84 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_light_attachment, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  HusbandReskinSkirt.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-44.4,-23,-11.1)..(44.4,38.7,122.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 7336 triangles over 6474 vertices
+    names: 92 bytes said, 92 read  [agree]
+    rig 17 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 15 of 17  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,0,12.8)  carrier has (0,2,-106.8)
+      2 L_thigh_jntBnd  [shared]  under 1  rests at (11,0,12.8)  carrier has (11,2,-106.8)
+      3 R_thigh_jntBnd  [shared]  under 1  rests at (-11,0,12.8)  carrier has (-11,2,-106.8)
+      4 phys_tri_F_skirt_1_jntBnd  [its own]  under 1  rests at (-1.9,-15.9,37.3)
+      5 L_knee_jntBnd  [shared]  under 2  rests at (16.3,0,62.3)  carrier has (16.3,2,-57.2)
+      6 R_knee_jntBnd  [shared]  under 3  rests at (-16.3,-0,62.3)  carrier has (-16.3,2,-57.2)
+      7 phys_tri_F_skirt_2_jntBnd  [its own]  under 4  rests at (-2.6,-17.7,79.2)
+      8 phys_tri_L_skirt_1_jntBnd  [its own]  under 5  rests at (28.2,-7.4,89.2)
+      9 phys_tri_L_skirt_3_jntBnd  [its own]  under 5  rests at (23.1,19.3,86.4)
+      10 phys_tri_L_skirt_2_jntBnd  [its own]  under 5  rests at (31.6,5.1,87.1)
+      11 phys_tri_B_skirt_1_jntBnd  [its own]  under 5  rests at (8.7,29.5,86.7)
+      12 phys_tri_R_skirt_1_jntBnd  [its own]  under 6  rests at (-28.2,-7.4,89.2)
+      13 phys_tri_R_skirt_3_jntBnd  [its own]  under 6  rests at (-23.1,19.3,86.4)
+      14 phys_tri_R_skirt_2_jntBnd  [its own]  under 6  rests at (-31.6,5.1,87.1)
+      15 phys_tri_F_skirt_3_jntBnd  [its own]  under 7  rests at (-3,-18.6,100.1)
+      16 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  HusbandReskinWeapon.ao  socket R_Weapon [NOT in its carrier's rig]  box (-22.8,-4.4,-152.6)..(22.8,4.4,25.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 4192 triangles over 2836 vertices
+    names: 48 bytes said, 48 read  [agree]
+    rig 3 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 weapon_jntBnd  [its own]  under 0  rests at (0,0,0)
+      2 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)

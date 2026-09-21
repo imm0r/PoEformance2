@@ -1,0 +1,3319 @@
+monster: Bloodrite Guard [Metadata/Monsters/BloodBathers/BloodBatherShield/BloodBatherShieldStrongbox]
+
+=== .ao Metadata/Monsters/BloodBathers/BloodBatherShield/BloodBather04A.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Procession/sword_shield/rig.amd"
+	animations = '[
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000000298023225,
+					"name": "move",
+					"position": [
+						140.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.19903475046157838,
+					"name": "move",
+					"position": [
+						-140.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "Head_Attachment Metadata/Monsters/BloodBathers/BloodBatherShield/attachments/Earrings.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4938271641731262,
+								0.0
+							],
+							[
+								0.5144032835960388,
+								0.2410256266593933
+							],
+							[
+								0.5390946269035339,
+								0.5446153879165649
+							],
+							[
+								0.5679012537002564,
+								0.7866666316986084
+							],
+							[
+								0.604938268661499,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"angle": 3.0019664764404299,
+						"x_axis_scale": 0.9139999747276306,
+						"length": 121.73799896240235,
+						"local_offset": [
+							10.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.24434611201286317,
+							-0.19198623299598695
+						],
+						"impact_z_rotation": [
+							0.15707963705062867,
+							2.3212881088256838
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon",
+						"weapon_sound_type_override": "Axe1HMetal"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4403292238712311,
+								0.0
+							],
+							[
+								0.45679011940956118,
+								0.2820512652397156
+							],
+							[
+								0.47325101494789126,
+								0.5364102125167847
+							],
+							[
+								0.4897119402885437,
+								0.7989743947982788
+							],
+							[
+								0.5061728358268738,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.1745329350233078,
+						"angle": 3.577924966812134,
+						"length": 117.39099884033203,
+						"local_offset": [
+							-11.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.24434611201286317,
+							0.22689281404018403
+						],
+						"impact_z_rotation": [
+							-0.15707963705062867,
+							-2.7401671409606935
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon",
+						"weapon_sound_type_override": "Axe1HMetal"
+					}
+				]
+			}
+		},
+		{
+			"name": "enraged_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.22633744776248933,
+								0.0
+							],
+							[
+								0.2469135820865631,
+								0.3476923108100891
+							],
+							[
+								0.27572017908096316,
+								0.725128173828125
+							],
+							[
+								0.30452674627304079,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.4363323450088501,
+						"angle": 2.9496066570281984,
+						"x_axis_scale": 0.7850000262260437,
+						"length": 139.12899780273438,
+						"local_offset": [
+							15.0,
+							-12.0
+						],
+						"impact_x_rotation": [
+							-0.13962635397911073,
+							-0.33161258697509768
+						],
+						"impact_z_rotation": [
+							-0.15707963705062867,
+							2.3561947345733644
+						],
+						"impact_type": "Slash",
+						"weapon_sound_type_override": "Axe1HMetal"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.7075471878051758,
+								0.0
+							],
+							[
+								0.7358490824699402,
+								0.3025640845298767
+							],
+							[
+								0.7735849022865295,
+								0.5569230914115906
+							],
+							[
+								0.8160377144813538,
+								0.782564103603363
+							],
+							[
+								0.8584905862808228,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.5759586691856384,
+						"angle": 3.0892326831817629,
+						"x_axis_scale": 0.8999999761581421,
+						"length": 140.7030029296875,
+						"local_offset": [
+							7.0,
+							-4.0
+						],
+						"impact_z_rotation": [
+							-0.6981317400932312,
+							-2.8448867797851564
+						],
+						"impact_type": "Slash",
+						"weapon_sound_type_override": "Axe1HMetal"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Procession/sword_shield/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_Head_mid"
+			parent = "aux_Head_attachment"
+			translation = "0 0 -4.19612"
+		socket = "aux_Nose_pt"
+			parent = "aux_Head_attachment"
+			translation = "0 -10.3183 -4.19612"
+		socket = "aux_box_01"
+			parent = "root_jntBnd"
+			translation = "-20.6926 84.2351 0"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodBathers/BloodBather04.sm"
+			hide_segments = "BloodBather04B_LoinclothShape,BloodBather04C_LoinclothShape,EarringsShape"
+			hide_colliders = "collision_ellipsoid_L_thighShape,collision_ellipsoid_R_thighShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_Head_01_01 false aux_Head_mid aux_Nose_pt"
+		bone_group = "grp_L_bicep_01_01 false L_shoulder_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_L_clavicle_01_01 false L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_L_foot_01_01 false L_ankle_jntBnd L_foot_jntBnd"
+		bone_group = "grp_L_forearm_01_01 false L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "grp_L_palm_01_01 false L_wrist_jntBnd L_finger_2_jntBnd_1"
+		bone_group = "grp_L_shin_01_01 false L_knee_jntBnd L_ankle_jntBnd"
+		bone_group = "grp_L_thigh_01_01 false L_thigh_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_bicep_01_01 false R_shoulder_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_R_clavicle_01_01 false R_clavicle_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_R_foot_01_01 false R_ankle_jntBnd R_foot_jntBnd"
+		bone_group = "grp_R_forearm_01_01 false R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "grp_R_palm_01_01 false R_wrist_jntBnd R_finger_2_jntBnd_1"
+		bone_group = "grp_R_shin_01_01 false R_knee_jntBnd R_ankle_jntBnd"
+		bone_group = "grp_R_thigh_01_01 false R_thigh_jntBnd R_knee_jntBnd"
+		bone_group = "grp_chest_01_01 false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_neck_01_01 false neck_jntBnd head_jntBnd"
+		bone_group = "grp_waist_01_01 false hip_jntBnd chest_jntBnd"
+		bone_group = "body_box_01 false L_shoulder_jntBnd R_knee_jntBnd aux_box_01"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2468079924583435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Attack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5700640082359314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/AttackClothA_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5774949789047241,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5940619707107544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/AxeSwing",
+						"bone_name": "R_thumb_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.750531017780304,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18669871985912324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Attack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4575369954109192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/AttackClothB_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4893850088119507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5042459964752197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/AxeSwing",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.789808988571167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "block_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Attack1",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17789973318576814,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "L_finger_2_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_detonate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreMedium",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22651346027851106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedDetonate",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.209089994430542,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5984699726104737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.659409999847412,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/AttackClothB_",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7080600261688233,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_enrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1710910052061081,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/Enrage",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2440979927778244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2929460108280182,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.019464751705527307,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedFlinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.022334299981594087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedFlinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.021986352279782296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedFlinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.019452499225735666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedFlinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedIdle.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30445700883865359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Gore.loop.ogg",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreMedium",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedRun.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11966700106859207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36886799335479739,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4285140037536621,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09971970319747925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Fall_NoArmour_",
+						"bone_name": "Back"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18626399338245393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/WeaponDrop_Spear",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3110939860343933,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3412089943885803,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7041990160942078,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.789497971534729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19615399837493897,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2010989934206009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/WeaponDrop_Spear",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37297800183296206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Fall_NoArmour_",
+						"bone_name": "aux_Nose_pt"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4478360116481781,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6626480221748352,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7325040102005005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1520950049161911,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Fall_NoArmour_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20920799672603608,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20934100449085236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/WeaponDrop_Spear",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2982169985771179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5104950070381165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10240600258111954,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12035199999809265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Fall_NoArmour_",
+						"bone_name": "Back"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29938000440597536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/WeaponDrop_Spear",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3106729984283447,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4715299904346466,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11439699679613114,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12300699949264527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2517789900302887,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/WeaponDrop_Spear",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.276077002286911,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Fall_NoArmour_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5673320293426514,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6809279918670654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.014011000283062458,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10779500007629395,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Fall_NoArmour_",
+						"bone_name": "Back"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12527500092983247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/WeaponDrop_Spear",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20518900454044343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26642000675201418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3214290142059326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11274299770593643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedAttack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12241899967193604,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/AxeSwing",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14393900334835053,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3106060028076172,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5194889903068543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/AxeSwing",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5407480001449585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedAttack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6742420196533203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enraged_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.004292699974030256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2904820144176483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedIdle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6312299966812134,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3010900020599367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.27231502532959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedIdle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.940899848937988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enraged_run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1022849977016449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30847299098968508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedRun.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41739699244499209,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.016210399568080903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03901100158691406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.025576399639248849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.040384601801633838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.021613800898194314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03736260160803795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02593659982085228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0337911993265152,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.31334900856018069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17777660489082337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29629430174827578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2038007974624634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2444360256195069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/Enrage",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5999900102615357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9149096012115479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1422213315963745,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2038007974624634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2444360256195069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/Enrage",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5999900102615357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9149096012115479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "pray_knee_sway_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Prayer/PrayKneesSway",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4434499740600587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_knee_sway_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Stand",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1674569994211197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17027999460697175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23707400262355805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49578601121902468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4986079931259155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7018150091171265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_knee_triangle_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Stand",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1674569994211197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17027999460697175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23599599301815034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.698544979095459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6992110013961792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1946899890899659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_knee_triangle_loop_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Prayer/PrayerFloor",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_knee_wave_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Stand",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1674569994211197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17027999460697175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23707400262355805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49578601121902468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4986079931259155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7018150091171265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_knee_wave_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Prayer/PrayerKnees",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_stand_sway_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Prayer/PrayStandSway",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_stand_sway_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Stand",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11913800239562988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25543999671936037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2953200042247772,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4089049994945526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Run",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06329649686813355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21679699420928956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6163489818572998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8351640105247498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.028439998626709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3885799646377564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5859299898147584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8490500450134278,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.210969924926758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.352530002593994,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6607000827789308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.019040107727051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.672078013420105,
+						"end_time": 0.9531949758529663,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/melee_trail.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.637611985206604,
+						"end_time": 0.8010990023612976,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/melee_trail.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.18531499803066255,
+						"end_time": 0.31678399443626406,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/melee_trail.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.5489490032196045,
+						"end_time": 0.7878080010414124,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/melee_trail.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/BloodBathers/BloodBatherShield/BloodBather04C.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Procession/sword_shield/rig.amd"
+	animations = '[
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000000298023225,
+					"name": "move",
+					"position": [
+						140.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000001788139344,
+					"name": "move",
+					"position": [
+						-140.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4938271641731262,
+								0.0
+							],
+							[
+								0.5144032835960388,
+								0.2410256266593933
+							],
+							[
+								0.5390946269035339,
+								0.5446153879165649
+							],
+							[
+								0.5679012537002564,
+								0.7866666316986084
+							],
+							[
+								0.604938268661499,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"angle": 3.0019664764404299,
+						"x_axis_scale": 0.9139999747276306,
+						"length": 121.73799896240235,
+						"local_offset": [
+							10.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.24434611201286317,
+							-0.19198623299598695
+						],
+						"impact_z_rotation": [
+							0.15707963705062867,
+							2.3212881088256838
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon",
+						"weapon_sound_type_override": "Axe1HMetal"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4403292238712311,
+								0.0
+							],
+							[
+								0.45679011940956118,
+								0.2820512652397156
+							],
+							[
+								0.47325101494789126,
+								0.5364102125167847
+							],
+							[
+								0.4897119402885437,
+								0.7989743947982788
+							],
+							[
+								0.5061728358268738,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.1745329350233078,
+						"angle": 3.577924966812134,
+						"length": 117.39099884033203,
+						"local_offset": [
+							-11.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.24434611201286317,
+							0.22689281404018403
+						],
+						"impact_z_rotation": [
+							-0.15707963705062867,
+							-2.7401671409606935
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon",
+						"weapon_sound_type_override": "Axe1HMetal"
+					}
+				]
+			}
+		},
+		{
+			"name": "enraged_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.22633744776248933,
+								0.0
+							],
+							[
+								0.2469135820865631,
+								0.3476923108100891
+							],
+							[
+								0.27572017908096316,
+								0.725128173828125
+							],
+							[
+								0.30452674627304079,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.4363323450088501,
+						"angle": 2.9496066570281984,
+						"x_axis_scale": 0.7850000262260437,
+						"length": 139.12899780273438,
+						"local_offset": [
+							15.0,
+							-12.0
+						],
+						"impact_x_rotation": [
+							-0.13962635397911073,
+							-0.33161258697509768
+						],
+						"impact_z_rotation": [
+							-0.15707963705062867,
+							2.3561947345733644
+						],
+						"impact_type": "Slash",
+						"weapon_sound_type_override": "Axe1HMetal"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.7075471878051758,
+								0.0
+							],
+							[
+								0.7358490824699402,
+								0.3025640845298767
+							],
+							[
+								0.7735849022865295,
+								0.5569230914115906
+							],
+							[
+								0.8160377144813538,
+								0.782564103603363
+							],
+							[
+								0.8584905862808228,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.5759586691856384,
+						"angle": 3.0892326831817629,
+						"x_axis_scale": 0.8999999761581421,
+						"length": 140.7030029296875,
+						"local_offset": [
+							7.0,
+							-4.0
+						],
+						"impact_z_rotation": [
+							-0.6981317400932312,
+							-2.8448867797851564
+						],
+						"impact_type": "Slash",
+						"weapon_sound_type_override": "Axe1HMetal"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Procession/sword_shield/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_Head_mid"
+			parent = "aux_Head_attachment"
+			translation = "0 0 -4.19612"
+		socket = "aux_Nose_pt"
+			parent = "aux_Head_attachment"
+			translation = "0 -10.3183 -4.19612"
+		socket = "aux_box_01"
+			parent = "root_jntBnd"
+			translation = "-20.6926 84.2351 0"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodBathers/BloodBather04.sm"
+			hide_segments = "BloodBather04B_LoinclothShape,BloodBather04C_LoinclothShape,EarringsShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_Head_01_01 false aux_Head_mid aux_Nose_pt"
+		bone_group = "grp_L_bicep_01_01 false L_shoulder_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_L_clavicle_01_01 false L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_L_foot_01_01 false L_ankle_jntBnd L_foot_jntBnd"
+		bone_group = "grp_L_forearm_01_01 false L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "grp_L_palm_01_01 false L_wrist_jntBnd L_finger_2_jntBnd_1"
+		bone_group = "grp_L_shin_01_01 false L_knee_jntBnd L_ankle_jntBnd"
+		bone_group = "grp_L_thigh_01_01 false L_thigh_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_bicep_01_01 false R_shoulder_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_R_clavicle_01_01 false R_clavicle_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_R_foot_01_01 false R_ankle_jntBnd R_foot_jntBnd"
+		bone_group = "grp_R_forearm_01_01 false R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "grp_R_palm_01_01 false R_wrist_jntBnd R_finger_2_jntBnd_1"
+		bone_group = "grp_R_shin_01_01 false R_knee_jntBnd R_ankle_jntBnd"
+		bone_group = "grp_R_thigh_01_01 false R_thigh_jntBnd R_knee_jntBnd"
+		bone_group = "grp_chest_01_01 false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_neck_01_01 false neck_jntBnd head_jntBnd"
+		bone_group = "grp_waist_01_01 false hip_jntBnd chest_jntBnd"
+		bone_group = "body_box_01 false L_shoulder_jntBnd R_knee_jntBnd aux_box_01"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2468079924583435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Attack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5700640082359314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/AttackClothA_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5774949789047241,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5940619707107544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/AxeSwing",
+						"bone_name": "R_thumb_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.750531017780304,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18669871985912324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Attack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4575369954109192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/AttackClothB_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4893850088119507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5042459964752197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/AxeSwing",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.789808988571167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "block_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Attack1",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17789973318576814,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "L_finger_2_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_detonate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreMedium",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22651346027851106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedDetonate",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.209089994430542,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5984699726104737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.659409999847412,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/AttackClothB_",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7080600261688233,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_enrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1710910052061081,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/Enrage",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2440979927778244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2929460108280182,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.019464751705527307,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedFlinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.022334299981594087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedFlinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.021986352279782296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedFlinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.019452499225735666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedFlinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedIdle.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30445700883865359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Gore.loop.ogg",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blood_enraged_run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreMedium",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedRun.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11966700106859207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36886799335479739,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4285140037536621,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09971970319747925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Fall_NoArmour_",
+						"bone_name": "Back"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18626399338245393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/WeaponDrop_Spear",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3110939860343933,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3412089943885803,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7041990160942078,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.789497971534729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19615399837493897,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2010989934206009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/WeaponDrop_Spear",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37297800183296206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Fall_NoArmour_",
+						"bone_name": "aux_Nose_pt"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4478360116481781,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6626480221748352,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7325040102005005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1520950049161911,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Fall_NoArmour_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20920799672603608,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20934100449085236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/WeaponDrop_Spear",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2982169985771179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5104950070381165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10240600258111954,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12035199999809265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Fall_NoArmour_",
+						"bone_name": "Back"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29938000440597536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/WeaponDrop_Spear",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3106729984283447,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4715299904346466,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11439699679613114,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12300699949264527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2517789900302887,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/WeaponDrop_Spear",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.276077002286911,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Fall_NoArmour_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5673320293426514,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6809279918670654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.014011000283062458,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10779500007629395,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Fall_NoArmour_",
+						"bone_name": "Back"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12527500092983247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/WeaponDrop_Spear",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20518900454044343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26642000675201418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/ShieldDrop",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3214290142059326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11274299770593643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedAttack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12241899967193604,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/AxeSwing",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14393900334835053,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3106060028076172,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5194889903068543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Foley/AxeSwing",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5407480001449585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedAttack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6742420196533203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enraged_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.004292699974030256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2904820144176483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedIdle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6312299966812134,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3010900020599367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.27231502532959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedIdle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.940899848937988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enraged_run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1022849977016449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30847299098968508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/EnragedRun.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41739699244499209,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.016210399568080903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03901100158691406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.025576399639248849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.040384601801633838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.021613800898194314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03736260160803795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02593659982085228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0337911993265152,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.31334900856018069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17777660489082337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29629430174827578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2038007974624634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2444360256195069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/Enrage",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5999900102615357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9149096012115479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1422213315963745,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2038007974624634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2444360256195069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Enraged/Enrage",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5999900102615357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9149096012115479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "pray_knee_sway_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Prayer/PrayKneesSway",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4434499740600587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_knee_sway_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Stand",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1674569994211197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17027999460697175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23707400262355805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49578601121902468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4986079931259155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7018150091171265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_knee_triangle_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Stand",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1674569994211197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17027999460697175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23599599301815034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.698544979095459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6992110013961792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1946899890899659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_knee_triangle_loop_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Prayer/PrayerFloor",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_knee_wave_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Stand",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1674569994211197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17027999460697175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23707400262355805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49578601121902468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4986079931259155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7018150091171265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_knee_wave_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Prayer/PrayerKnees",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_stand_sway_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Prayer/PrayStandSway",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pray_stand_sway_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Stand",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11913800239562988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25543999671936037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2953200042247772,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4089049994945526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherShield/Vocals/Run",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06329649686813355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21679699420928956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6163489818572998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8351640105247498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.028439998626709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3885799646377564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5859299898147584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8490500450134278,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.210969924926758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.352530002593994,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6607000827789308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.019040107727051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFoley/Step_Bare_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.672078013420105,
+						"end_time": 0.9531949758529663,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/melee_trail.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.637611985206604,
+						"end_time": 0.8010990023612976,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/melee_trail.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.18531499803066255,
+						"end_time": 0.31678399443626406,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/melee_trail.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.5489490032196045,
+						"end_time": 0.7878080010414124,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/melee_trail.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/BloodBathers/BloodBatherShield/attachments/Earrings.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodBathers/attachments/BloodBather04B/Earrings/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodBathers/attachments/BloodBather04B/Earrings/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodBathers/attachments/BloodBather04B/Earrings/Earrings.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodBathers/BloodBather04.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodBathers/BloodBathers04_armour_10b480ab.smd"
+Materials 1
+	"Art/Models/MONSTERS/BloodBathers/Textures/BloodBather04c.mat" 4
+BoundingBox -68.5262 -19.6679 -174.848 68.5262 17.1901 0.552222
+BoneGroups 18
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/BloodBathers/BloodBathers04_armour_10b480ab.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 4 in the header, 4 in the block · 5774 triangles over 4928 vertices
+  names: 178 bytes said, 178 read  [agree]
+
+=== shapes (4)
+0	BloodBather04B_LoinclothShape	from 0	count 2070
+1	BloodBather04C_LoinclothShape	from 2070	count 2148
+2	BloodBather0Shape4	from 4218	count 12600
+3	EarringsShape	from 16818	count 504
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  Earrings.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-8.1,-2.6,-1.2)..(8.1,0.5,5.5)
+    version 3 · c0h 2 · 2 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 168 triangles over 184 vertices
+    names: 26 bytes said, 26 read  [agree]
+    rig 3 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_1_jntBnd  [its own]  under 0  rests at (-6.8,-1.1,5.9)
+      2 phys_skinned_2_jntBnd  [its own]  under 0  rests at (6.8,-1.1,5.9)

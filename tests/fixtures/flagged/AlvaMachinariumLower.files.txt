@@ -1,0 +1,2023 @@
+monster: Alva [Metadata/Monsters/NPC/AlvaMachinariumLower]
+
+=== .ao Metadata/NPC/League/Incursion/TreasureHunter.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Conquista/rig.amd"
+	view_of = "general_frontal_inspection_01"
+		view_name = "general_frontal_inspection_01_01_once"
+	view_of = "general_frontal_inspection_02"
+		view_name = "general_frontal_inspection_02_01_once"
+	view_of = "general_frontal_inspection_03"
+		view_name = "general_frontal_inspection_03_01_once"
+	view_of = "emerge_from_portal_walk"
+		view_name = "emerge_from_portal_sunken_city_01"
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	default_animation = "town_idle_01"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.49906599521636965,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5262879729270935,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "incursion_medallion_long_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 11.105947494506836,
+					"name": "pickup"
+				}
+			]
+		},
+		{
+			"name": "incursion_medallion_short_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 5.2754082679748539,
+					"name": "pickup"
+				}
+			]
+		},
+		{
+			"name": "leave_through_portal_run",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.6659998893737795,
+					"name": "leave"
+				}
+			]
+		},
+		{
+			"name": "portal_exit_vaal_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 21.533000946044923,
+					"name": "move",
+					"position": [
+						0.0,
+						-162.64199829101563,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "post_doryani_fight_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 13.166000366210938,
+					"name": "move",
+					"position": [
+						0.0,
+						-220.61000061035157,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "tome_open_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 4.954999923706055,
+					"name": "skip_convo_one"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.605000019073486,
+					"name": "skip_convo_two"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 11.052000045776368,
+					"name": "skip_convo_three"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 14.192999839782715,
+					"name": "skip_convo_four"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 18.701000213623048,
+					"name": "skip_convo_five"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 21.468000411987306,
+					"name": "skip_convo_six"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 24.929000854492189,
+					"name": "skip_convo_seven"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 28.44000244140625,
+					"name": "skip_convo_eight"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 34.176998138427737,
+					"name": "skip_convo_nine"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 38.09600067138672,
+					"name": "skip_convo_ten"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 42.191001892089847,
+					"name": "skip"
+				}
+			]
+		},
+		{
+			"name": "viper_napuatzi_emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 16.712860107421876,
+					"name": "past_guards"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 31.042619705200197,
+					"name": "delete"
+				}
+			]
+		},
+		{
+			"name": "viper_napuatzi_emerge_walk_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 16.600000381469728,
+					"name": "move",
+					"position": [
+						0.0,
+						-1304.3470458984376,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4067278206348419,
+								0.0
+							],
+							[
+								0.4984709620475769,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 0,
+						"angle": 2.1467549800872804,
+						"length": 152.51600646972657,
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon",
+						"weapon_sound_type_override": "Sword1H",
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4097859263420105,
+								0.0
+							],
+							[
+								0.4587155878543854,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 0,
+						"rotation": 0.1745329350233078,
+						"angle": 3.1415927410125734,
+						"length": 88.0510025024414,
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon",
+						"weapon_sound_type_override": "Sword1H",
+						"hand": "MainHand"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "Head_Attachment Metadata/NPC/Four_Act3/AlvaAttachments/Feathers.ao"
+	attached_object = "chest_jntBnd Metadata/NPC/Four_Act3/AlvaAttachments/Cravat.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Conquista/rig.ast"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		linear_allowed_contraction = 0.300
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Conquista/AlvaCazar.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "palmfx false L_finger_2_jntBnd_1 L_finger_3_jntBnd_1 L_finger_4_jntBnd_1"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "portal_open_cut",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.7298200130462647,
+						"filename": "Metadata/Particles/enviro_effects/League_Incursion/Alva_Cazar_Altar/bloodsacrifice/bloodDrip.pet",
+						"bone_group": "palmfx"
+					}
+				]
+			},
+			{
+				"name": "ziggurat_dialogue_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 16.533353805541993,
+						"end_time": 24.489349365234376,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/ZigguratArena/arena_transition/pet/blood_hand.pet",
+						"bone_group": "grp_l_palm"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "head_jntBnd"
+			state = ""
+				colour = "0.80653 0.700758 0.553712"
+				position = "0 0 -57"
+				radius = 124
+				distance_threshold = 221
+			state = "on_death"
+				position = "0 0 -224"
+				radius = 300
+		animations = '[
+			{
+				"name": "idle_activated_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on_death"
+					}
+				]
+			}
+		]'
+	}
+	
+	WindEvents
+	{
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "emerge_from_portal_walk",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 2.6659998893737795,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								65.0,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "incursion_medallion_long_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 1.5238456726074219,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								90.00000762939453,
+								0.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 10.968214988708496,
+						"end_time": 13.000000953674317,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								90.00000762939453,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "incursion_medallion_short_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 1.002925992012024,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								90.00000762939453,
+								0.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 5.434330940246582,
+						"end_time": 6.666001319885254,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								90.00000762939453,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "leave_through_portal_run",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 2.6659998893737795,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								90.00000762939453,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "portal_enter",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 2.6659998893737795,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								50.000003814697269,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "tome_portal_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 1.8329999446868897,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								50.000003814697269,
+								0.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "emerge_from_portal_walk",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.6659998893737795,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Alva_portal_fade.epk"
+					}
+				]
+			},
+			{
+				"name": "incursion_medallion_long_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 14.434867858886719,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Alva_portal_fade_incursion_medallion.epk"
+					}
+				]
+			},
+			{
+				"name": "incursion_medallion_short_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 16.677465438842775,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Alva_portal_fade_incursion_medallion.epk"
+					}
+				]
+			},
+			{
+				"name": "leave_through_portal_run",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.6659998893737795,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Alva_portal_fadeout.epk"
+					}
+				]
+			},
+			{
+				"name": "portal_enter",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.6659998893737795,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Alva_portal_fade_town_portal_01.epk"
+					}
+				]
+			},
+			{
+				"name": "tome_portal_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.6659998893737795,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Alva_portal_fade_town_portal_01.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_from_portal_sunken_city_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.73078989982605,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Alva_portal_fade.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "viper_napuatzi_emerge_01",
+				"events": [
+					{
+						"type": "GEALEventType",
+						"time": 0.0,
+						"geal": "SetLightState( on_death, 1.0 );"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2836029529571533,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourAttack",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3817991018295288,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/WeaponSwing1",
+						"bone_name": "R_thumb_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3934725821018219,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Vocal/Attack",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.19227352738380433,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Vocal/AttackLong",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29115650057792666,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourAttack",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4497815668582916,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/WeaponSwing2",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "deactivate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5123679637908936,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2685515880584717,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6996450424194337,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Vocal/Grunt",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4947001934051515,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7632598876953127,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourAttack",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.434635877609253,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.438166618347168,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Vocal/Grunt",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6254568099975588,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.2756500244140629,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.816305637359619,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.455885887145996,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_from_portal_walk",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5479589104652405,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8698252439498901,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0582324266433716,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5119916200637818,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8998163938522339,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fidget_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.541344165802002,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3167645931243898,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.012956414371728897,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Vocal/Flinch",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "general_frontal_inspection_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.41021278500556948,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49441349506378176,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6239530444145203,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/SwordTink",
+						"bone_name": "sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7765069007873537,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/SwordDrag",
+						"bone_name": "sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1694352626800539,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "general_frontal_inspection_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.40201547741889956,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/SwordTink",
+						"bone_name": "sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5967444181442261,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7380777597427368,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.585553169250488,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/SwordDrag",
+						"bone_name": "sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.843075752258301,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "general_frontal_inspection_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.6536931991577148,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7190613746643066,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/SwordTink",
+						"bone_name": "sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9878029227256775,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepRun",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.730321884155274,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/SwordDrag",
+						"bone_name": "sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.868257522583008,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "incursion_medallion_long_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8681008815765381,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0767922401428223,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovementSoft",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2920299768447877,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4346001148223879,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovement",
+						"bone_name": "L_finger_3_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.494379997253418,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovementSoft",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.028870105743408,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovement",
+						"bone_name": "L_finger_3_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.748851776123047,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/PaperRustle",
+						"bone_name": "R_thumb_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.539859771728516,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovement",
+						"bone_name": "L_finger_3_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.894632339477539,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovementSoft",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.949417591094971,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovement",
+						"bone_name": "L_finger_3_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 10.428205490112305,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovement",
+						"bone_name": "L_finger_3_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.225038528442383,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovementSoft",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.662113189697266,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 12.142333984375,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "incursion_medallion_short_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8907300233840942,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2598475217819214,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6128499507904053,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovement",
+						"bone_name": "L_finger_3_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4609999656677248,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/PaperRustle",
+						"bone_name": "R_thumb_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6523075103759767,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovement",
+						"bone_name": "L_finger_3_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.500912666320801,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovementSoft",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.948111534118652,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.213240146636963,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/ArmourMovement",
+						"bone_name": "L_finger_3_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.894489765167236,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.534860134124756,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "leave_through_portal_run",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.9216367602348328,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6517305374145508,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_enter",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09577496349811554,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44119274616241457,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0770745277404786,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3691140413284302,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/SwordDrag",
+						"bone_name": "R_thumb_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4994304180145264,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6093379259109498,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_exit",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.6866891980171204,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2202576398849488,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5901075601577759,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8598380088806153,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_open",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.31272077560424807,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourAttack",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33303895592689516,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Vocal/Grunt",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "portal_open_cut",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.42756205797195437,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourAttack",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7173148393630981,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8886929154396057,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/HandCut",
+						"bone_name": "L_finger_4_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6996502876281739,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/BloodDrip",
+						"bone_name": "L_finger_4_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.607783794403076,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12579511106014253,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "phys_tri_F_shawl_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2831569015979767,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5253241658210754,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.663371741771698,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_relaxed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12579511106014253,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "phys_tri_F_shawl_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2831569015979767,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5253241658210754,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.663371741771698,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "tome_open_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 43.32712173461914,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Vocals/RitualEffort",
+						"bone_name": "face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "tome_open_short_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 2.5240650177001955,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Alva/Vocals/RitualEffort",
+						"bone_name": "face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "town_past_portal_exit_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4102475345134735,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1623672246932984,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0005879402160646,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6666078567504885,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/SwordTink",
+						"bone_name": "sword_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6691412925720217,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6691436767578127,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.087281227111816,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "viper_napuatzi_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.47162848711013796,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6414145231246948,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.622255802154541,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.093884229660034,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.56551194190979,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.282236576080322,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.3011016845703129,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourAttack",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.451870441436768,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/HelmetHit",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.508462905883789,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourAttack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.508467674255371,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Vocal/Knockout",
+						"bone_name": "face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.602790355682373,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.696972846984863,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 13.130105018615723,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourAttack",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 14.69593334197998,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/DragLoop",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "viper_napuatzi_emerge_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3421671986579895,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.967843770980835,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5837475061416627,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6717320680618287,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2094247341156008,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.747114658355713,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.431443452835083,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7149593830108644,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.027789115905762,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.6436967849731449,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.259590148925781,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.904820919036865,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.462056636810303,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.9019975662231449,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.107296466827393,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.742744445800781,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.34887409210205,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.935471534729004,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.56117057800293,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 10.147735595703125,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 10.812532424926758,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.506638526916504,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 12.249650955200196,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 12.973039627075196,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/SwordSheathe",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 13.139260292053223,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/SwordTink",
+						"bone_name": "L_finger_3_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17645412683486939,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3325760066509247,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.759552001953125,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9142229557037354,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_relaxed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17645412683486939,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3325760066509247,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.759552001953125,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9142229557037354,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "ziggurat_dialogue_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.6874687075614929,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/SwordSheathe",
+						"bone_name": "L_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3344991207122803,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.38592267036438,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/StoneSweep",
+						"bone_name": "R_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5274605751037599,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0936145782470705,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.1964430809021,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovementSoft",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.42983341217041,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovementSoft",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.148530006408692,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourAttack",
+						"bone_name": "R_finger_3_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.846935272216797,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovementSoft",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 10.655731201171875,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovementSoft",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.242097854614258,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovementSoft",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.828463554382325,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovementSoft",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 12.41482925415039,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovementSoft",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 14.477261543273926,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourAttack"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 15.973481178283692,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/HandCut",
+						"bone_name": "L_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 16.15549087524414,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/BloodDrip",
+						"bone_name": "L_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 16.944068908691408,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 17.065359115600587,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/BloodStream",
+						"bone_name": "L_finger_3_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 24.12212562561035,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_from_portal_sunken_city_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09577496349811554,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44119274616241457,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0770745277404786,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3691140413284302,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/SwordDrag",
+						"bone_name": "R_thumb_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4994304180145264,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/ArmourMovement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6093379259109498,
+						"filename": "Audio/Sound Effects/NPC/4.0/Part1/Act3/G3_Town/AlvaValai/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "ziggurat_dialogue_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 22.74933624267578,
+						"frequency": 150.0,
+						"amplitude": 2.0,
+						"duration": 3.0
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 23.573165893554689,
+						"amplitude": 50.0,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 24.442102432250978,
+						"frequency": 150.0,
+						"duration": 20.0,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/NPC/Four_Act3/AlvaAttachments/Feathers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Conquista/attachments/Feathers/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Conquista/attachments/Feathers/rig.ast"
+		linear_allowed_contraction = 0.100
+		normal_viscosity_multiplier = 0.100
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Conquista/attachments/Feathers/Feathers.sm"
+	}
+}
+
+=== .ao Metadata/NPC/Four_Act3/AlvaAttachments/Cravat.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Conquista/attachments/Cravat/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Conquista/attachments/Cravat/rig.ast"
+		linear_allowed_contraction = 0.100
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Conquista/attachments/Cravat/Cravat.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/NPC/Conquista/AlvaCazar.sm
+version 6
+SkinnedMeshData "Art/Models/NPC/Conquista/rig_850e2f64.smd"
+Materials 6
+	"Art/Models/NPC/Conquista/Textures/Alva_metalc.mat" 6
+	"Art/Models/NPC/Conquista/Textures/Alvac.mat" 3
+	"Art/Models/NPC/Conquista/Textures/Alvac.mat" 1
+	"Art/Models/NPC/Conquista/Textures/Eyec.mat" 4
+	"Art/Models/NPC/Conquista/Textures/Alva_sssc.mat" 1
+	"Art/Textures/NPC/Conquista/Conquista_weaponcns.mat" 2
+BoundingBox -64.971 -90.183 -175.643 64.9769 67.0797 -0.932724
+BoneGroups 22
+	"root" 2 "root_jntBnd" "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/NPC/Conquista/rig_850e2f64.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 17 in the header, 17 in the block · 12904 triangles over 9605 vertices
+  names: 562 bytes said, 562 read  [agree]
+
+=== shapes (18)
+0	belt_meshShape	from 0	count 4248
+1	body_meshShape	from 4248	count 13884
+2	collar_meshShape	from 18132	count 690
+3	shawl_meshShape	from 18822	count 2556
+4	shoulderpad_meshShape	from 21378	count 612
+5	sleeves_meshShape	from 21990	count 3012
+6	boot_frills_meshShape	from 25002	count 186
+7	flyway_hairs_meshShape	from 25188	count 456
+8	hip_plate_meshShape	from 25644	count 660
+9	Conquista_sssShape	from 26304	count 1695
+10	eyes_meshShape	from 27999	count 1080
+11	mouth_bagShape	from 29079	count 300
+12	teeth_meshShape	from 29379	count 360
+13	tongue_meshShape	from 29739	count 192
+14	hair_fur_layer_meshShape	from 29931	count 3333
+15	sheathShape	from 33264	count 336
+16	swordShape	from 33600	count 5112
+17	cravat_meshShape	from 38712	count 546
+
+=== fitting
+the monster's rig: 113 bones
+mounts: aux_position, aux_Head_attachment
+  Feathers.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-0.6,6.2,-17.2)..(37.9,31.2,-5.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 424 triangles over 348 vertices
+    names: 36 bytes said, 36 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_feather_jntBnd  [its own]  under 0  rests at (14.8,15,-10.9)
+  Cravat.ao  socket chest_jntBnd [in its carrier's rig]  box (-4.5,-14.8,-20.2)..(5.3,-2.8,-10.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 182 triangles over 130 vertices
+    names: 32 bytes said, 32 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_cravat_jntBnd  [its own]  under 0  rests at (0,-6.9,-13.6)

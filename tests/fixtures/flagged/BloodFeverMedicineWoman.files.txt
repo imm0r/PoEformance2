@@ -1,0 +1,1257 @@
+monster: Blood-fevered Wisewoman [Metadata/Monsters/BloodFeverKarui/BloodFeverMedicineWoman]
+
+=== .ao Metadata/Monsters/BloodFeverKarui/BloodFeverMedicineWoman/BloodFeverMedicineWoman.ao (depth 0)
+version 3
+extends "Metadata/Monsters/KaruiMedicineWoman/KaruiMedicineWomanBloodFever"
+
+AnimationController
+{
+	animations = '[
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.033711552619934,
+					"name": "contact",
+					"position": [
+						-4.967930793762207,
+						-96.6094741821289,
+						-123.56144714355469
+					],
+					"contact_ref": [
+						-5.270567893981934,
+						-58.818084716796878,
+						-120.73944091796875
+					]
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23330000042915345,
+					"name": "move",
+					"position": [
+						120.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23330000042915345,
+					"name": "move",
+					"position": [
+						-120.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "healing_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.46246498823165896,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 3.0,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 3.0,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "projectile_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.187999963760376,
+					"name": "contact",
+					"position": [
+						15.07699966430664,
+						-49.44969940185547,
+						-123.0
+					],
+					"contact_ref": [
+						15.07699966430664,
+						-37.90700149536133,
+						-118.69599914550781
+					]
+				}
+			]
+		},
+		{
+			"name": "summon_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8161194324493408,
+					"name": "spawn",
+					"position": [
+						0.0,
+						-40.87269973754883,
+						-0.2026599943637848
+					]
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.40112999081611636,
+								0.0
+							],
+							[
+								0.4802260100841522,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"angle": 2.792530059814453,
+						"length": 100.0,
+						"impact_z_rotation": [
+							0.43633198738098147,
+							1.3962600231170655
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon",
+						"hand": "MainHand"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "L_Weapon Metadata/Monsters/BloodFeverKarui/BloodFeverMedicineWoman/attachments/KaruiMedicineWomanLivingBowl.ao"
+}
+
+Locators
+{
+	locator = "monster 12.5443 -61.6462 0 0 0 0"
+}
+
+client
+{
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11101900041103363,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11435410380363465,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/AttackShort1",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5681220293045044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Swish_Unarmed",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6133990287780762,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveFastGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02379104681313038,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/AttackLong",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1420082449913025,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.784619927406311,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveFastGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9079513549804688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Swish_Unarmed",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "blessing_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Blessing",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6389141082763672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4347994327545168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "climb_down_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0822055339813233,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1002895832061768,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_BareSoft",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1868620067834854,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/DeathFall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38189199566841128,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "aux_L_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Death_",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2838670015335083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3701939880847931,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/DeathFall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6330839991569519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "aux_L_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Death_",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11117099970579148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2048719972372055,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/DeathFall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.335099995136261,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "aux_L_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Death_",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2300879955291748,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/DeathFall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27637800574302676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "aux_L_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Death_",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2001360058784485,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2641249895095825,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3226679861545563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/DeathFall",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Death_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21375100314617158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35806700587272646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/WoodDropLight",
+						"bone_name": "aux_L_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Flinch1",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.053437698632478717,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/FlinchMove",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Flinch1",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.033015698194503787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/FlinchMove",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Flinch1",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.020762400701642038,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/FlinchMove",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.025895699858665468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Flinch1",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04123999923467636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/FlinchMove",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "healing_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Effects/HealingDrink.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10847699642181397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/HealingLoop",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "healing_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08335494995117188,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Aggro_",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2347709983587265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/HealingEnd",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "healing_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.005163149908185005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04333660006523132,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/HealingStart",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29283100366592409,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Swish_Unarmed",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.9089775681495667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Idle",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Knockdown",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11040006577968598,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2640000581741333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5232001543045044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2499200105667115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0275182723999025,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/Knockdown",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11040006577968598,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2640000581741333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35616040229797366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2499200105667115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9094359874725342,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "projectile_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/ProjectileAttack",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44559499621391299,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Effects/BowlMix",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.007970094680786,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Foley/MoveLongGrassSkirt",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.032910108566284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Swish_Unarmed",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.24025200307369233,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34669598937034609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveLongGrassSkirt",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6195979714393616,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9915040135383606,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.097830057144165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Swish_Unarmed",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.388700008392334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5116300582885743,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/RunLoop",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7469300031661988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7555099725723267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveLongGrassSkirt",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1891300678253176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.506649971008301,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.721859931945801,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveLongGrassSkirt",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.732059955596924,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Swish_Unarmed",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9071099758148195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.24479499459266663,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveLongGrassSkirt",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.341839998960495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverMedicineWoman/Vocal/SummonAttack",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5351259708404541,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.1955711543560028,
+						"end_time": 1.0389972925186158,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodfeveredMedicineWoman/fx/projectile/onAct_stir.pet",
+						"bone_group": "grp_r_palm"
+					}
+				]
+			},
+			{
+				"name": "projectile_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.35561299324035647,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodfeveredMedicineWoman/fx/projectile/onAct_stir.pet",
+						"bone_group": "grp_r_palm"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4088717997074127,
+						"end_time": 1.2857733964920045,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodfeveredDrunk/pet/liquid_pour.pet",
+						"bone_group": "FX_pour"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.1724177747964859,
+						"end_time": 1.038008689880371,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodfeveredMedicineWoman/fx/projectile/onAct_stir.trl",
+						"bone_group": "grp_r_palm"
+					}
+				]
+			},
+			{
+				"name": "projectile_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.3499999940395355,
+						"end_time": 2.3499999046325685,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodfeveredMedicineWoman/fx/projectile/onAct_stir.trl",
+						"bone_group": "grp_r_palm"
+					}
+				]
+			}
+		]'
+	}
+	
+	ClientAnimationController
+	{
+		socket = "L_Weapon_02"
+			parent = "aux_L_Weapon_attachment"
+			translation = "0 0 -15.6426"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_pour false L_Weapon L_Weapon_02"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiMedicineWoman/KaruiMedicineWomanBloodFever.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/KaruiMedicineWoman/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/KaruiMedicineWoman/attachments/KaruiMedicineWomanBloodFeverRobe.ao"
+	attached_object = "Head_Attachment Metadata/Monsters/KaruiMedicineWoman/attachments/KaruiMedicineWomanBloodFeverHair.ao"
+	attached_object = "<root> Metadata/Monsters/KaruiMedicineWoman/attachments/KaruiMedicineWomanBloodFeverBlisters.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/KaruiMedicineWoman/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/KaruiMedicineWomanBloodfever.sm"
+		hide_segments = "hairShape,robe_attachmentsShape,robeShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false R_shoulder_jntBnd head_jntBnd L_shoulder_jntBnd "
+		bone_group = "root false root_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/BloodFeverKarui/BloodFeverMedicineWoman/attachments/KaruiMedicineWomanLivingBowl.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/KaruiMedicineWomanLivingBowl.fmt"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/KaruiMedicineWoman/attachments/KaruiMedicineWomanBloodFeverRobe.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/BloodFeverRobe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/BloodFeverRobe/rig.ast"
+		enclosure_angle = 0.350
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/BloodFeverRobe/KaruiMedicineWomanBloodFeverRobe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false hip_jntBnd spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiMedicineWoman/attachments/KaruiMedicineWomanBloodFeverHair.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/BloodFeverHair/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/BloodFeverHair/rig.ast"
+		enclosure_angle = 0.300
+		attachment_bones = "head_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/BloodFeverHair/KaruiMedicineWomanBloodFeverHair.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiMedicineWoman/attachments/KaruiMedicineWomanBloodFeverBlisters.ao (depth 2)
+version 3
+extends "Metadata/SkinBodyArmour"
+
+BaseAnimationEvents
+{
+}
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/BloodFeverBlisters/KaruiMedicineWomanBloodfeverBlisters.sm"
+	}
+}
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .ao Metadata/SkinBodyArmour.ao (depth 3)
+version 3
+extends "Metadata/Skin"
+
+BaseAnimationEvents
+{
+	propagate_parent_effects = true
+}
+
+
+client
+{
+	ObjectHiding
+	{
+	    hide_parent_attachments = "Body_Attach"
+	    hide_parent_segments = "Body_Seg"
+		hide_sibling_segments = "AP_Body_Hides, AP_Helmet_Hides, AP_Gloves_Hides, AP_Boots_Hides, AP_BackAttachment_Hides"
+		hide_sibling_attachments = "AP_Helmet_Attach, AP_L_Glove_Attach, AP_R_Glove_Attach, AP_Gloves_Attach, AP_Boots_Attach,AP_Boots_Waist_Attach, AP_BackAttachment_Attach"
+	    show_sibling_segments = "AP_Helmet_Show, AP_Gloves_Show, AP_Boots_Show, AP_BackAttachment_Show"
+	}
+	
+	
+}
+
+=== .ao Metadata/Skin.ao (depth 4)
+version 3
+extends "nothing"
+
+BaseAnimationEvents { }
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	SkinMesh { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/KaruiMedicineWomanBloodfever.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/KaruiMedicineWomanBloodFever_armour_da85e714.smd"
+Materials 3
+	"Art/Models/MONSTERS/KaruiMedicineWomanBloodfever/Textures/KaruiMedicineWomanBloodfeverFurc.mat" 1
+	"Art/Models/MONSTERS/KaruiMedicineWomanBloodfever/Textures/KaruiMedicineWomanBloodfever01c.mat" 2
+	"Art/Models/MONSTERS/KaruiMedicineWomanBloodfever/Textures/KaruiMedicineWomanBloodfever02c.mat" 4
+BoundingBox -69.4609 -33.3981 -170.242 69.4609 29.903 0.81776
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/KaruiMedicineWomanBloodFever_armour_da85e714.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 7 in the header, 7 in the block · 12476 triangles over 10089 vertices
+  names: 168 bytes said, 168 read  [agree]
+
+=== shapes (27)
+0	FurShape	from 0	count 516
+1	bodyShape	from 516	count 12384
+2	hairShape	from 12900	count 14064
+3	earringsShape	from 26964	count 168
+4	robe_attachmentsShape	from 27132	count 4200
+5	robeShape	from 31332	count 5736
+6	wrist_bandShape	from 37068	count 360
+7	robe_attachmentsShape	from 37428	count 4200
+8	robeShape	from 41628	count 5220
+9	Blister05Shape	from 46848	count 1872
+10	Blister0Shape1	from 48720	count 228
+11	Blister0Shape10	from 48948	count 264
+12	Blister0Shape11	from 49212	count 222
+13	Blister0Shape12	from 49434	count 210
+14	Blister0Shape13	from 49644	count 222
+15	Blister0Shape14	from 49866	count 264
+16	Blister0Shape15	from 50130	count 222
+17	Blister0Shape16	from 50352	count 228
+18	Blister0Shape17	from 50580	count 210
+19	Blister0Shape18	from 50790	count 222
+20	Blister0Shape2	from 51012	count 252
+21	Blister0Shape3	from 51264	count 264
+22	Blister0Shape4	from 51528	count 210
+23	Blister0Shape6	from 51738	count 210
+24	Blister0Shape7	from 51948	count 264
+25	Blister0Shape8	from 52212	count 264
+26	Blister0Shape9	from 52476	count 228
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  KaruiMedicineWomanLivingBowl.ao  socket L_Weapon [NOT in its carrier's rig]  fixed mesh KaruiMedicineWomanLivingBowl.fmt  1 shapes
+      BowlShape  ->  Art/Models/MONSTERS/KaruiMedicineWomanLiving/Textures/KaruiMedicineWomanLivingUpdatec.mat
+  KaruiMedicineWomanBloodFeverRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-34.2,-35.9,-18.7)..(34,26.7,65.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 3140 triangles over 2491 vertices
+    names: 60 bytes said, 60 read  [agree]
+    rig 16 bones, 6 of them names its carrier's rig also has
+    mesh weights reach bone 15 of 16  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (0,3.2,-89.9)
+      2 spine_1_jntBnd  [shared]  under 1  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      3 L_thigh_jntBnd  [shared]  under 1  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      4 R_thigh_jntBnd  [shared]  under 1  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      5 phys_R_sphere_01_jntBnd  [its own]  under 1  rests at (-8.5,-20,-4.9)
+      6 phys_R_sphere_02_jntBnd  [its own]  under 1  rests at (-17.8,-14.1,-6.2)
+      7 phys_tri_L_jntBnd  [its own]  under 1  rests at (26,0.8,21.7)
+      8 phys_tri_R_jntBnd  [its own]  under 1  rests at (-26,0.8,21.7)
+      9 phys_tri_M_1_jntBnd  [its own]  under 1  rests at (-0,-21.1,19.8)
+      10 phys_tri_B_1_jntBnd  [its own]  under 1  rests at (0,15.7,18.8)
+      11 phys_L1_jntBnd  [its own]  under 1  rests at (15.8,-17.3,-6.8)
+      12 phys_L2_jntBnd  [its own]  under 1  rests at (16.1,10.1,-7.9)
+      13 spine_2_jntBnd  [shared]  under 2  rests at (0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      14 phys_tri_M_2_jntBnd  [its own]  under 9  rests at (-0,-21.1,49.8)
+      15 phys_tri_B_2_jntBnd  [its own]  under 10  rests at (0,20,48.4)
+  KaruiMedicineWomanBloodFeverHair.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-34.2,-12.5,-11.6)..(34.2,26.9,26.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 4688 triangles over 4630 vertices
+    names: 20 bytes said, 20 read  [agree]
+    rig 12 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 5 of 12  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_L_hair_1_jntBnd  [its own]  under 0  rests at (19.9,6.5,9.5)
+      2 phys_tri_L_hair_2_jntBnd  [its own]  under 0  rests at (13.6,17.2,11.1)
+      3 phys_tri_M_hair_1_jntBnd  [its own]  under 0  rests at (0,19.8,12)
+      4 phys_tri_R_hair_1_jntBnd  [its own]  under 0  rests at (-19.9,6.5,9.5)
+      5 phys_tri_R_hair_2_jntBnd  [its own]  under 0  rests at (-13.6,17.2,11.1)
+      6 chest_jntBnd  [shared]  under 0  rests at (0,-0.5,31.4)  carrier has (0,-0.3,-127.3)
+      7 L_clavicle_jntBnd  [shared]  under 6  rests at (4.7,0.5,17.3)  carrier has (4.7,0.7,-141.4)
+      8 R_clavicle_jntBnd  [shared]  under 6  rests at (-4.7,0.5,17.3)  carrier has (-4.7,0.7,-141.4)
+      9 neck_jntBnd  [shared]  under 6  rests at (0,3,12.3)  carrier has (0,3.2,-146.4)
+      10 L_shoulder_jntBnd  [shared]  under 7  rests at (15.8,5.8,20.3)  carrier has (15.8,6,-138.3)
+      11 R_shoulder_jntBnd  [shared]  under 8  rests at (-15.8,5.8,20.3)  carrier has (-15.8,6,-138.3)
+  KaruiMedicineWomanBloodFeverBlisters.ao  socket <root> [NOT in its carrier's rig]  box (-55.3,-20.7,-164.7)..(24.8,20.5,-35.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 18 in the header, 18 in the block · 1952 triangles over 1134 vertices
+    names: 522 bytes said, 522 read  [agree]
+    (no rig of its own)

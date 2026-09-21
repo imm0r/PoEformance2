@@ -1,0 +1,1888 @@
+monster: Blood-fevered Arsonist [Metadata/Monsters/BloodFeverKarui/BloodFeverPoi_]
+
+=== .ao Metadata/Monsters/BloodFeverKarui/BloodFeverPoi/KaruiWarriorPoi.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/KaruiWarriorsPoi/rig.amd"
+	animations = '[
+		{
+			"name": "attack_spin_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.0,
+					"name": "move",
+					"position": [
+						0.0,
+						-197.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8181647062301636,
+					"name": "fire",
+					"position": [
+						107.7738037109375,
+						-69.73772430419922,
+						-85.32902526855469
+					],
+					"contact_ref": [
+						94.5262451171875,
+						-87.99388885498047,
+						-85.2996826171875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.925000011920929,
+					"name": "fire",
+					"position": [
+						105.22599792480469,
+						62.55210876464844,
+						-154.20486450195313
+					],
+					"contact_ref": [
+						118.40630340576172,
+						40.594993591308597,
+						-154.36424255371095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.024999976158142,
+					"name": "fire",
+					"position": [
+						-3.6973037719726564,
+						55.060264587402347,
+						-181.35435485839845
+					],
+					"contact_ref": [
+						11.537835121154786,
+						69.47805786132813,
+						-181.3544158935547
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.125,
+					"name": "fire",
+					"position": [
+						13.646748542785645,
+						-49.91145706176758,
+						-185.0616912841797
+					],
+					"contact_ref": [
+						-2.401228904724121,
+						-41.21076583862305,
+						-185.06175231933595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.225000023841858,
+					"name": "fire",
+					"position": [
+						81.21977233886719,
+						25.355995178222658,
+						-185.2975616455078
+					],
+					"contact_ref": [
+						83.10575866699219,
+						7.004585266113281,
+						-185.29762268066407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3250000476837159,
+					"name": "fire",
+					"position": [
+						-2.3873767852783205,
+						80.98693084716797,
+						-185.2975616455078
+					],
+					"contact_ref": [
+						19.1141300201416,
+						79.03538513183594,
+						-185.29762268066407
+					]
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.132999897003174,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.132999897003174,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "walk_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.2865481972694397,
+					"name": "fire_fwd",
+					"position": [
+						-47.37319564819336,
+						-32.71497344970703,
+						-50.0
+					],
+					"contact_ref": [
+						-47.373046875,
+						-17.201433181762697,
+						-48.5
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5250863432884216,
+					"name": "fire_bck",
+					"position": [
+						41.742549896240237,
+						17.12779426574707,
+						-45.0
+					],
+					"contact_ref": [
+						41.74300003051758,
+						2.092524528503418,
+						-43.5
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8245176672935486,
+					"name": "fire_fwd",
+					"position": [
+						-43.51249313354492,
+						-32.71497344970703,
+						-50.0
+					],
+					"contact_ref": [
+						-43.51255416870117,
+						-17.201433181762697,
+						-48.5
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0587234497070313,
+					"name": "fire_bck",
+					"position": [
+						41.74300003051758,
+						17.12779426574707,
+						-46.0
+					],
+					"contact_ref": [
+						41.74300003051758,
+						2.092524528503418,
+						-44.5
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/KaruiWarriorPoi/attachments/KWPHair.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/KaruiWarriorPoi/attachments/KWPSkirt.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/KaruiWarriorPoi/attachments/KWPTop.ao"
+	attached_object = "<root> Metadata/Monsters/KaruiWarriorPoi/attachments/KWPOutfitTop.ao"
+	attached_object = "<root> Metadata/Monsters/KaruiWarriorPoi/attachments/KaruiPoiBloodFeverAttachment.ao"
+	attached_object = "L_Weapon Metadata/Monsters/BloodFeverKarui/BloodFeverPoi/attachments/KWPWeaponL.ao"
+	attached_object = "R_Weapon Metadata/Monsters/BloodFeverKarui/BloodFeverPoi/attachments/KWPWeaponR.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_spin_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.22950799763202668,
+								0.0
+							],
+							[
+								0.29234999418258669,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"rotation": -0.6108649969100952,
+						"angle": 0.6283190250396729,
+						"length": 100.0,
+						"impact_z_rotation": [
+							0.43633198738098147,
+							0.6108649969100952
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.29234999418258669,
+								0.0
+							],
+							[
+								0.3551909923553467,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"previous_patterns_to_exclude_from": 1,
+						"rotation": 0.017453499138355256,
+						"angle": 0.6283190250396729,
+						"length": 100.0,
+						"impact_z_rotation": [
+							0.9599310159683228,
+							1.1344599723815919
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.3551909923553467,
+								0.0
+							],
+							[
+								0.41803300380706789,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"previous_patterns_to_exclude_from": 2,
+						"rotation": 0.6457729935646057,
+						"angle": 0.6283190250396729,
+						"length": 100.0,
+						"impact_z_rotation": [
+							1.309000015258789,
+							1.6580599546432496
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.41803300380706789,
+								0.0
+							],
+							[
+								0.4808740019798279,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"previous_patterns_to_exclude_from": 3,
+						"rotation": 1.274090051651001,
+						"angle": 0.6283190250396729,
+						"length": 100.0,
+						"impact_x_rotation": [
+							0.0,
+							0.26179900765419009
+						],
+						"impact_z_rotation": [
+							1.8325999975204468,
+							2.0071299076080324
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4808740019798279,
+								0.0
+							],
+							[
+								0.5437160134315491,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"previous_patterns_to_exclude_from": 4,
+						"rotation": 1.9024100303649903,
+						"angle": 0.6283190250396729,
+						"length": 100.0,
+						"impact_x_rotation": [
+							0.26179900765419009,
+							0.43633198738098147
+						],
+						"impact_z_rotation": [
+							2.094399929046631,
+							2.5307300090789797
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.5437160134315491,
+								0.0
+							],
+							[
+								0.6065580248832703,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"previous_patterns_to_exclude_from": 5,
+						"rotation": 2.5307300090789797,
+						"angle": 0.6283190250396729,
+						"length": 100.0,
+						"impact_x_rotation": [
+							0.43633198738098147,
+							0.43633198738098147
+						],
+						"impact_z_rotation": [
+							2.5307300090789797,
+							2.8797900676727297
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.6065580248832703,
+								0.0
+							],
+							[
+								0.6693990230560303,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"previous_patterns_to_exclude_from": 6,
+						"rotation": 3.1590499877929689,
+						"angle": 0.6283190250396729,
+						"length": 100.0,
+						"impact_x_rotation": [
+							0.34906598925590517,
+							0.26179900765419009
+						],
+						"impact_z_rotation": [
+							3.4033899307250978,
+							3.8397200107574465
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.6693990230560303,
+								0.0
+							],
+							[
+								0.7322409749031067,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"previous_patterns_to_exclude_from": 7,
+						"rotation": 3.787369966506958,
+						"angle": 0.6283190250396729,
+						"length": 100.0,
+						"impact_x_rotation": [
+							0.26179900765419009,
+							0.26179900765419009
+						],
+						"impact_z_rotation": [
+							4.1887898445129398,
+							4.625120162963867
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.7322409749031067,
+								0.0
+							],
+							[
+								0.7950819730758667,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"previous_patterns_to_exclude_from": 8,
+						"rotation": 4.415689945220947,
+						"angle": 0.6283190250396729,
+						"length": 100.0,
+						"impact_x_rotation": [
+							0.26179900765419009,
+							0.17453299462795258
+						],
+						"impact_z_rotation": [
+							4.625120162963867,
+							4.886919975280762
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.7950819730758667,
+								0.0
+							],
+							[
+								0.8579239845275879,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"previous_patterns_to_exclude_from": 9,
+						"rotation": 5.044010162353516,
+						"angle": 0.6283190250396729,
+						"length": 100.0,
+						"impact_x_rotation": [
+							0.17453299462795258,
+							0.0
+						],
+						"impact_z_rotation": [
+							5.235990047454834,
+							5.934120178222656
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+Locators
+{
+	locator = "backward 30.4303 16.7214 -45.9839 -3.14159 0 0"
+	locator = "forward -46.9442 0 -48.352 0 0 0"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/KaruiWarriorsPoi/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/KaruiWarriorPoi.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd neck_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1"
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodFeverPoi/epk/weapon_glow_R.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodFeverPoi/epk/weapon_glow_L.epk",
+						"bone_name": "L_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_spin_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodFeverPoi/epk/weapon_glow_R.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodFeverPoi/epk/weapon_glow_L.epk",
+						"bone_name": "L_Weapon"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodFeverPoi/epk/weapon_glow_L.epk",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/BloodFeverPoi/epk/weapon_glow_R.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Attack2_",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0894065648317337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5043870806694031,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5887333154678345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9176800847053528,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0239582061767579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_L_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1487914323806763,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2415672540664673,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_FireMed",
+						"bone_name": "aux_R_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "attack_spin_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Attack3_",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14330221712589265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.557633101940155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5903428196907044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6090343594551086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.638629674911499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Throw",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2788159847259522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6386289596557618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14719651639461518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7967287302017212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dissolve_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23610596358776093,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4186338782310486,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13200944662094117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14719651639461518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveClothFast",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09112152457237244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/RunFall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveClothFast",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1995202600955963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/RunFall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14096742868423463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15259329974651338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17617151141166688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1907007396221161,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22663573920726777,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24532684683799745,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/DeathFallSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Flinch_",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Flinch_",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Flinch_",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Flinch_",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.4349279999732971,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Idle_",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveClothFast"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Knockdown_",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1312360316514969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27908435463905337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0664997100830079,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveClothFast"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Knockdown_",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1312360316514969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27908435463905337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0664997100830079,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth"
+					}
+				]
+			},
+			{
+				"name": "totem_channel_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_L_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18535833060741425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43146294355392458,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_L_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8286579847335815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_L_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2819314002990723,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7087185382843018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_L_Weapon_attachment_02"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18098753690719605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2244388610124588,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22477112710475923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_L_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4639231860637665,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Vocals/Walk_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7098358869552612,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverFoley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7790511846542358,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7800483107566834,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_11_2/KaruiBloodFeverPoi/Foley/Poi_Swish_Small",
+						"bone_name": "aux_L_Weapon_attachment_02"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/KaruiWarriorPoi/attachments/KWPHair.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_hair/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_hair/rig.ast"
+		linear_allowed_contraction = 0.300
+		tangent_viscosity_multiplier = 0.200
+		enclosure_angle = 0.400
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_hair/KWPHair.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiWarriorPoi/attachments/KWPSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_skirt/rig.ast"
+		linear_allowed_contraction = 0.350
+		enclosure_angle = 0.200
+		attachment_bones = "hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_thigh_jntBnd R_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_skirt/KWPSkirt.sm"
+	}
+	
+}
+
+=== .ao Metadata/Monsters/KaruiWarriorPoi/attachments/KWPTop.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_top/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_top/rig.ast"
+		linear_allowed_contraction = 0.300
+		tangent_viscosity_multiplier = 0.200
+		enclosure_angle = 0.300
+		attachment_bones = "chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_top/KWPtop.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiWarriorPoi/attachments/KWPOutfitTop.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWPOutfitTop.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/KaruiWarriorPoi/attachments/KaruiPoiBloodFeverAttachment.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/KaruiWarriorsPoi/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/KaruiWarriorsPoi/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/BloodFeverAttachment/KaruiWarriorPoiBloodFevered.sm"
+			PoiBilstersMedShape = "Art/particles/monster_particles/Act4_FOUR/BloodFever/textures/bloodfever_boil_GIB_1P.mat"
+	}
+}
+
+=== .ao Metadata/Monsters/BloodFeverKarui/BloodFeverPoi/attachments/KWPWeaponL.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_weapon/rig.amd"
+	animations = '[
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.48017504811286929,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_dot_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.35904043912887576,
+					"name": "move",
+					"position": [
+						0.0,
+						50.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3288715183734894,
+					"name": "move",
+					"position": [
+						0.0,
+						80.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23060084879398347,
+					"name": "move",
+					"position": [
+						-100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23060084879398347,
+					"name": "move",
+					"position": [
+						100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_weapon/rig.ast"
+		socket = "NewSocket_1"
+			parent = "weapon_06_jntBnd"
+			translation = "0 -9.15761 0"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_weapon/KWPWeapon.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "blade false weapon_06_jntBnd weapon_05_jntBnd weapon_04_jntBnd"
+		bone_group = "FX_trail_01 false NewSocket_1"
+	}
+	
+	ParticleEffects
+	{
+		continuous_effect = "FX_trail_01 Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/fx/morniongStar_drippyembers.pet"
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.30511000752449038,
+						"end_time": 2.613075017929077,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/fx/morniongStar_embers.pet",
+						"bone_group": "FX_trail_01"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.25776538252830508,
+						"end_time": 2.932201385498047,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/fx/fire_skull_mortar_trail.trl",
+						"bone_group": "FX_trail_01"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/BloodFeverKarui/BloodFeverPoi/attachments/KWPWeaponR.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_weapon/Animations/R_weapon/rig.amd"
+	animations = '[
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.48017504811286929,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_dot_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.35904043912887576,
+					"name": "move",
+					"position": [
+						0.0,
+						50.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3288715183734894,
+					"name": "move",
+					"position": [
+						0.0,
+						80.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23060084879398347,
+					"name": "move",
+					"position": [
+						-100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23060084879398347,
+					"name": "move",
+					"position": [
+						100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_weapon/Animations/R_weapon/rig.ast"
+		socket = "NewSocket_1"
+			parent = "weapon_06_jntBnd"
+			translation = "0 -9.15761 0"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/attachments/KWP_weapon/KWPWeapon.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "blade false weapon_06_jntBnd weapon_05_jntBnd weapon_04_jntBnd"
+		bone_group = "FX_trail_01 false NewSocket_1"
+	}
+	
+	ParticleEffects
+	{
+		continuous_effect = "FX_trail_01 Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/fx/morniongStar_drippyembers.pet"
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.30511000752449038,
+						"end_time": 2.613075017929077,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/fx/morniongStar_embers.pet",
+						"bone_group": "FX_trail_01"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.25776538252830508,
+						"end_time": 2.932201385498047,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/fx/fire_skull_mortar_trail.trl",
+						"bone_group": "FX_trail_01"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Skin.ao (depth 2)
+version 3
+extends "nothing"
+
+BaseAnimationEvents { }
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	SkinMesh { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/KaruiWarriorPoi.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/KaruiWarriorPoi_armour_d2155854.smd"
+Materials 2
+	"Art/Models/MONSTERS/KaruiWarriors/Textures/WarriorPoi_Bodyc.mat" 1
+	"Art/Models/MONSTERS/KaruiWarriors/Textures/BloodiedWarriorPoiFemale01c.mat" 1
+BoundingBox -68.8288 -14.1224 -174.558 68.8288 14.1494 -0.2139
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiWarriorsPoi/KaruiWarriorPoi_armour_d2155854.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 2 in the header, 2 in the block · 4994 triangles over 3352 vertices
+  names: 74 bytes said, 74 read  [agree]
+
+=== shapes (12)
+0	KWP_BodyShape	from 0	count 11670
+1	KWP_NoPhys_earringsShape	from 11670	count 3312
+2	KaruiWarriorPoi_PonytailShape	from 14982	count 7728
+3	KaruiWarriorPoi_robeAccessoriesShape	from 22710	count 4824
+4	KaruiWarriorPoi_skirtShape	from 27534	count 2940
+5	KaruiWarriorPoi_topAccessoriesShape	from 30474	count 12960
+6	KWP_hair_02Shape	from 43434	count 990
+7	KWP_hair_0Shape1	from 44424	count 1248
+8	KWP_topRopeShape	from 45672	count 1392
+9	KWP_topShape	from 47064	count 5472
+10	PoiBilstersMedShape	from 52536	count 4062
+11	PoiBilstersSmallShape	from 56598	count 9438
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  KWPHair.ao  socket head_jntBnd [in its carrier's rig]  box (-6.3,5.5,-27.2)..(6.3,19.7,-1.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 2576 triangles over 1842 vertices
+    names: 58 bytes said, 58 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 root_jntBnd|phys_tri_hair_Temp  [its own]  under 0  rests at (0,15.8,-9.7)
+  KWPSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-30.1,-18.2,-17)..(30.1,15.7,23.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 2588 triangles over 1910 vertices
+    names: 124 bytes said, 124 read  [agree]
+    rig 10 bones, 6 of them names its carrier's rig also has
+    mesh weights reach bone 8 of 10  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      4 phys_tri_skirt_jntBnd_1  [its own]  under 0  rests at (0,-12,3.3)
+      5 phys_tri_skirt_jntBnd_3  [its own]  under 0  rests at (0.1,6.6,-1.8)
+      6 spine_2_jntBnd  [shared]  under 1  rests at (0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      7 phys_tri_skirt_jntBnd_2  [its own]  under 2  rests at (13.8,4.5,5.8)
+      8 phys_tri_skirt_jntBnd_4  [its own]  under 3  rests at (-14.1,4.5,5.9)
+      9 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  KWPTop.ao  socket chest_jntBnd [in its carrier's rig]  box (-33.4,-22.2,-21.8)..(33.4,19.9,6.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 4320 triangles over 3106 vertices
+    names: 70 bytes said, 70 read  [agree]
+    rig 14 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 12 of 14  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (4.7,1,-14.1)  carrier has (4.7,0.7,-141.4)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-4.7,1,-14.1)  carrier has (-4.7,0.7,-141.4)
+      3 neck_jntBnd  [shared]  under 0  rests at (-0,3.5,-19.1)  carrier has (0,3.2,-146.4)
+      4 phys_tri_shawl_jntBnd_4  [its own]  under 0  rests at (-0,15.8,-9.8)
+      5 phys_tri_shawl_jntBnd_5  [its own]  under 1  rests at (13.4,15.2,-13.1)
+      6 phys_tri_shawl_jntBnd_6  [its own]  under 1  rests at (25.2,2.4,-12.4)
+      7 phys_tri_shawl_jntBnd_7  [its own]  under 1  rests at (17,-12.8,-2)
+      8 L_shoulder_jntBnd  [shared]  under 1  rests at (15.8,6.3,-11)  carrier has (15.8,6,-138.3)
+      9 phys_tri_shawl_jntBnd_2  [its own]  under 2  rests at (-25.2,2.4,-12.4)
+      10 phys_tri_shawl_jntBnd_3  [its own]  under 2  rests at (-13.4,15.2,-13.1)
+      11 phys_tri_shawl_jntBnd_1  [its own]  under 2  rests at (-17,-12.8,-2)
+      12 R_shoulder_jntBnd  [shared]  under 2  rests at (-15.8,6.3,-11)  carrier has (-15.8,6,-138.3)
+      13 aux_position  [shared]  under 0  rests at (-0,0,0)  carrier has (0,0,0)
+  KWPOutfitTop.ao  socket <root> [NOT in its carrier's rig]  box (-25.5,-16.8,-183.6)..(25.5,16,-116.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 3034 triangles over 2560 vertices
+    names: 120 bytes said, 120 read  [agree]
+    (no rig of its own)
+  KaruiPoiBloodFeverAttachment.ao  socket <root> [NOT in its carrier's rig]  box (-21.1,-15.6,-177)..(48.9,17.2,-16.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 4500 triangles over 2671 vertices
+    names: 80 bytes said, 80 read  [agree]
+    rig 83 bones, 83 of them names its carrier's rig also has
+    mesh weights reach bone 32 of 83  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,3.2,-89.9)  carrier has (0,3.2,-89.9)
+      2 spine_1_jntBnd  [shared]  under 1  rests at (0,0,-105.4)  carrier has (0,0,-105.4)
+      3 L_thigh_jntBnd  [shared]  under 1  rests at (10.1,3.2,-89.9)  carrier has (10.1,3.2,-89.9)
+      4 R_thigh_jntBnd  [shared]  under 1  rests at (-10.1,3.2,-89.9)  carrier has (-10.1,3.2,-89.9)
+      5 spine_2_jntBnd  [shared]  under 2  rests at (0,-0.7,-115.5)  carrier has (0,-0.7,-115.5)
+      6 L_knee_jntBnd  [shared]  under 3  rests at (13.5,3.2,-49.8)  carrier has (13.5,3.2,-49.8)
+      7 R_knee_jntBnd  [shared]  under 4  rests at (-13.5,3.2,-49.8)  carrier has (-13.5,3.2,-49.8)
+      8 chest_jntBnd  [shared]  under 5  rests at (0,-0.3,-127.3)  carrier has (0,-0.3,-127.3)
+      9 L_ankle_jntBnd  [shared]  under 6  rests at (16.7,8,-6.7)  carrier has (16.7,8,-6.7)
+      10 L_knee_attachment_jntBnd  [shared]  under 6  rests at (13.5,3.2,-49.8)  carrier has (13.5,3.2,-49.8)
+      11 R_ankle_jntBnd  [shared]  under 7  rests at (-16.7,8,-6.7)  carrier has (-16.7,8,-6.7)
+      12 R_knee_attachment_jntBnd  [shared]  under 7  rests at (-13.5,3.2,-49.8)  carrier has (-13.5,3.2,-49.8)
+      13 L_clavicle_jntBnd  [shared]  under 8  rests at (4.7,0.7,-141.4)  carrier has (4.7,0.7,-141.4)
+      14 R_clavicle_jntBnd  [shared]  under 8  rests at (-4.7,0.7,-141.4)  carrier has (-4.7,0.7,-141.4)
+      15 neck_jntBnd  [shared]  under 8  rests at (0,3.2,-146.4)  carrier has (0,3.2,-146.4)
+      16 L_foot_jntBnd  [shared]  under 9  rests at (17.7,-4,-1.8)  carrier has (17.7,-4,-1.8)
+      17 R_foot_jntBnd  [shared]  under 11  rests at (-17.7,-4,-1.8)  carrier has (-17.7,-4,-1.8)
+      18 L_shoulder_jntBnd  [shared]  under 13  rests at (15.8,6,-138.3)  carrier has (15.8,6,-138.3)
+      19 R_shoulder_jntBnd  [shared]  under 14  rests at (-15.8,6,-138.3)  carrier has (-15.8,6,-138.3)
+      20 head_jntBnd  [shared]  under 15  rests at (-0,0.2,-158.6)  carrier has (-0,0.2,-158.6)
+      21 L_toe_jntBnd  [shared]  under 16  rests at (18.7,-15.1,-1.8)  carrier has (18.7,-15.1,-1.8)
+      22 R_toe_jntBnd  [shared]  under 17  rests at (-18.7,-15.1,-1.8)  carrier has (-18.7,-15.1,-1.8)
+      23 L_elbow_jntBnd  [shared]  under 18  rests at (35.1,7.7,-123.2)  carrier has (35.1,7.7,-123.2)
+      24 L_shoulder_cTwist_jntBnd_1  [shared]  under 18  rests at (25.5,6.8,-130.7)  carrier has (25.5,6.8,-130.7)
+      25 L_upperArm_attachment_jntBnd  [shared]  under 18  rests at (15.8,6,-138.3)  carrier has (15.8,6,-138.3)
+      26 R_elbow_jntBnd  [shared]  under 19  rests at (-35.1,7.7,-123.2)  carrier has (-35.1,7.7,-123.2)
+      27 R_shoulder_cTwist_jntBnd_1  [shared]  under 19  rests at (-25.5,6.8,-130.7)  carrier has (-25.5,6.8,-130.7)
+      28 R_upperArm_attachment_jntBnd  [shared]  under 19  rests at (-15.8,6,-138.3)  carrier has (-15.8,6,-138.3)
+      29 L_wrist_jntBnd  [shared]  under 23  rests at (55.6,0.3,-107.1)  carrier has (55.6,0.3,-107.1)
+      30 L_elbow_Twist_jntBnd_1  [shared]  under 23  rests at (40.3,5.8,-119.2)  carrier has (40.3,5.8,-119.2)
+      31 L_elbow_Twist_jntBnd_2  [shared]  under 23  rests at (45.4,4,-115.1)  carrier has (45.4,4,-115.1)
+      32 L_elbow_Twist_jntBnd_3  [shared]  under 23  rests at (50.5,2.2,-111.1)  carrier has (50.5,2.2,-111.1)
+      33 L_elbow_attachment_jntBnd  [shared]  under 23  rests at (35.1,7.7,-123.2)  carrier has (35.1,7.7,-123.2)
+      34 R_wrist_jntBnd  [shared]  under 26  rests at (-55.6,0.3,-107.1)  carrier has (-55.6,0.3,-107.1)
+      35 R_elbow_Twist_jntBnd_1  [shared]  under 26  rests at (-40.3,5.8,-119.2)  carrier has (-40.3,5.8,-119.2)
+      36 R_elbow_Twist_jntBnd_2  [shared]  under 26  rests at (-45.4,4,-115.1)  carrier has (-45.4,4,-115.1)
+      37 R_elbow_Twist_jntBnd_3  [shared]  under 26  rests at (-50.5,2.2,-111.1)  carrier has (-50.5,2.2,-111.1)
+      38 R_elbow_attachment_jntBnd  [shared]  under 26  rests at (-35.1,7.7,-123.2)  carrier has (-35.1,7.7,-123.2)
+      39 L_finger_1_jntBnd_1  [shared]  under 29  rests at (61,-5.8,-102.4)  carrier has (61,-5.8,-102.4)
+      40 L_finger_2_jntBnd_1  [shared]  under 29  rests at (62.3,-3.5,-102)  carrier has (62.3,-3.5,-102)
+      41 L_finger_3_jntBnd_1  [shared]  under 29  rests at (62.4,-1,-101.6)  carrier has (62.4,-1,-101.6)
+      42 L_finger_4_jntBnd_1  [shared]  under 29  rests at (62,1.4,-101.5)  carrier has (62,1.4,-101.5)
+      43 L_thumb_1_jntBnd_1  [shared]  under 29  rests at (56.5,-3.3,-104.5)  carrier has (56.5,-3.3,-104.5)
+      44 R_finger_1_jntBnd_1  [shared]  under 34  rests at (-61,-5.8,-102.4)  carrier has (-61,-5.8,-102.4)
+      45 R_finger_2_jntBnd_1  [shared]  under 34  rests at (-62.3,-3.5,-102)  carrier has (-62.3,-3.5,-102)
+      46 R_finger_3_jntBnd_1  [shared]  under 34  rests at (-62.4,-1,-101.6)  carrier has (-62.4,-1,-101.6)
+      47 R_finger_4_jntBnd_1  [shared]  under 34  rests at (-62,1.4,-101.5)  carrier has (-62,1.4,-101.5)
+      48 R_thumb_1_jntBnd_1  [shared]  under 34  rests at (-56.5,-3.3,-104.5)  carrier has (-56.5,-3.3,-104.5)
+      49 L_finger_1_jntBnd_2  [shared]  under 39  rests at (62.7,-7.2,-100.6)  carrier has (62.7,-7.2,-100.6)
+      50 L_finger_2_jntBnd_2  [shared]  under 40  rests at (64.5,-4.2,-99.7)  carrier has (64.5,-4.2,-99.7)
+      51 L_finger_3_jntBnd_2  [shared]  under 41  rests at (64.5,-1,-99.7)  carrier has (64.5,-1,-99.7)
+      52 L_finger_4_jntBnd_2  [shared]  under 42  rests at (63.7,1.9,-99.9)  carrier has (63.7,1.9,-99.9)
+      53 L_thumb_1_jntBnd_2  [shared]  under 43  rests at (55.9,-5.8,-104.3)  carrier has (55.9,-5.8,-104.3)
+      54 R_finger_1_jntBnd_2  [shared]  under 44  rests at (-62.7,-7.2,-100.6)  carrier has (-62.7,-7.2,-100.6)
+      55 R_finger_2_jntBnd_2  [shared]  under 45  rests at (-64.5,-4.2,-99.7)  carrier has (-64.5,-4.2,-99.7)
+      56 R_finger_3_jntBnd_2  [shared]  under 46  rests at (-64.5,-1,-99.7)  carrier has (-64.5,-1,-99.7)
+      57 R_finger_4_jntBnd_2  [shared]  under 47  rests at (-63.7,1.9,-99.9)  carrier has (-63.7,1.9,-99.9)
+      58 R_thumb_1_jntBnd_2  [shared]  under 48  rests at (-55.9,-5.8,-104.3)  carrier has (-55.9,-5.8,-104.3)
+      59 L_finger_1_jntBnd_3  [shared]  under 49  rests at (64.1,-8.3,-99)  carrier has (64.1,-8.3,-99)
+      60 L_finger_2_jntBnd_3  [shared]  under 50  rests at (66.5,-4.9,-97.7)  carrier has (66.5,-4.9,-97.7)
+      61 L_finger_3_jntBnd_3  [shared]  under 51  rests at (66.4,-0.9,-97.9)  carrier has (66.4,-0.9,-97.9)
+      62 L_finger_4_jntBnd_3  [shared]  under 52  rests at (65,2.3,-98.7)  carrier has (65,2.3,-98.7)
+      63 L_thumb_1_jntBnd_3  [shared]  under 53  rests at (56.2,-8.4,-103.3)  carrier has (56.2,-8.4,-103.3)
+      64 R_finger_1_jntBnd_3  [shared]  under 54  rests at (-64.1,-8.3,-99)  carrier has (-64.1,-8.3,-99)
+      65 R_finger_2_jntBnd_3  [shared]  under 55  rests at (-66.5,-4.9,-97.7)  carrier has (-66.5,-4.9,-97.7)
+      66 R_finger_3_jntBnd_3  [shared]  under 56  rests at (-66.4,-0.9,-97.9)  carrier has (-66.4,-0.9,-97.9)
+      67 R_finger_4_jntBnd_3  [shared]  under 57  rests at (-65,2.3,-98.7)  carrier has (-65,2.3,-98.7)
+      68 R_thumb_1_jntBnd_3  [shared]  under 58  rests at (-56.2,-8.4,-103.3)  carrier has (-56.2,-8.4,-103.3)
+      69 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+      70 aux_L_Weapon_attachment_02  [shared]  under 0  rests at (59.7,-2,-102.1)  carrier has (59.7,-2,-102.1)
+      71 aux_R_Weapon_attachment_02  [shared]  under 0  rests at (-59.7,-2,-102.1)  carrier has (-59.7,-2,-102.1)
+      72 aux_Back_attachment  [shared]  under 8  rests at (0,10.9,-136.4)  carrier has (0,10.9,-136.4)
+      73 aux_L_foot_attachment  [shared]  under 9  rests at (17.6,0.6,-0.1)  carrier has (17.6,0.6,-0.1)
+      74 aux_R_foot_attachment  [shared]  under 11  rests at (-17.6,0.6,-0.1)  carrier has (-17.6,0.6,-0.1)
+      75 aux_L_shoulder_attachment  [shared]  under 13  rests at (13.3,4.4,-145.6)  carrier has (13.3,4.4,-145.6)
+      76 aux_R_shoulder_attachment  [shared]  under 14  rests at (-13.3,4.4,-145.6)  carrier has (-13.3,4.4,-145.6)
+      77 aux_L_upperArm_attachment  [shared]  under 18  rests at (15.8,6,-138.3)  carrier has (15.8,6,-138.3)
+      78 aux_R_upperArm_attachment  [shared]  under 19  rests at (-15.8,6,-138.3)  carrier has (-15.8,6,-138.3)
+      79 aux_Head_attachment  [shared]  under 20  rests at (-0,0.2,-158.6)  carrier has (-0,0.2,-158.6)
+      80 aux_face_jntBnd  [shared]  under 20  rests at (-0,-11.8,-159.9)  carrier has (-0,-11.8,-159.9)
+      81 aux_L_Weapon_attachment  [shared]  under 29  rests at (59.7,-2,-102.1)  carrier has (59.7,-2,-102.1)
+      82 aux_R_Weapon_attachment  [shared]  under 34  rests at (-59.7,-2,-102.1)  carrier has (-59.7,-2,-102.1)
+  KWPWeaponL.ao  socket L_Weapon [NOT in its carrier's rig]  box (-10.3,-7.5,-74.2)..(7.5,7.5,28.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 550 triangles over 406 vertices
+    names: 84 bytes said, 84 read  [agree]
+    rig 14 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 14  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 handle_jntBnd  [its own]  under 0  rests at (-0,0,8.2)
+      2 loop_jntBnd  [its own]  under 0  rests at (0,0,8.2)
+      3 weapon_01_jntBnd  [its own]  under 1  rests at (-0,0,-10.8)
+      4 loop_01_jntBnd  [its own]  under 2  rests at (-3.8,0.1,15)
+      5 loop_02_jntBnd  [its own]  under 2  rests at (-4.9,0.1,22.2)
+      6 loop_03_jntBnd  [its own]  under 2  rests at (0.1,0.1,27.5)
+      7 loop_04_jntBnd  [its own]  under 2  rests at (5,0.1,22.2)
+      8 loop_05_jntBnd  [its own]  under 2  rests at (3.9,0.1,15)
+      9 weapon_02_jntBnd  [its own]  under 3  rests at (-0,0,-20.3)
+      10 weapon_03_jntBnd  [its own]  under 9  rests at (-0,0,-29.9)
+      11 weapon_04_jntBnd  [its own]  under 10  rests at (-0,0,-39.5)
+      12 weapon_05_jntBnd  [its own]  under 11  rests at (-0,0,-48.7)
+      13 weapon_06_jntBnd  [its own]  under 12  rests at (-0,0,-58)
+  KWPWeaponR.ao  socket R_Weapon [NOT in its carrier's rig]  box (-10.3,-7.5,-74.2)..(7.5,7.5,28.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 550 triangles over 406 vertices
+    names: 84 bytes said, 84 read  [agree]
+    rig 14 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 14  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 handle_jntBnd  [its own]  under 0  rests at (-0,-0,8.2)
+      2 loop_jntBnd  [its own]  under 0  rests at (0,0,8.2)
+      3 weapon_01_jntBnd  [its own]  under 1  rests at (-0,-0,-10.8)
+      4 loop_01_jntBnd  [its own]  under 2  rests at (-3.8,0.1,15)
+      5 loop_02_jntBnd  [its own]  under 2  rests at (-4.9,0.1,22.2)
+      6 loop_03_jntBnd  [its own]  under 2  rests at (0.1,0.1,27.5)
+      7 loop_04_jntBnd  [its own]  under 2  rests at (5,0.1,22.2)
+      8 loop_05_jntBnd  [its own]  under 2  rests at (3.9,0.1,15)
+      9 weapon_02_jntBnd  [its own]  under 3  rests at (-0,-0,-20.3)
+      10 weapon_03_jntBnd  [its own]  under 9  rests at (-0,-0,-29.9)
+      11 weapon_04_jntBnd  [its own]  under 10  rests at (-0,-0,-39.5)
+      12 weapon_05_jntBnd  [its own]  under 11  rests at (-0,-0,-48.7)
+      13 weapon_06_jntBnd  [its own]  under 12  rests at (-0,-0,-58)

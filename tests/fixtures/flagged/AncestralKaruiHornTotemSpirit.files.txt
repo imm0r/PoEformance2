@@ -1,0 +1,940 @@
+monster: Ancestral Warhorn [Metadata/Monsters/LeagueAncestral/AncestralKaruiHornTotemSpirit]
+
+=== .ao Metadata/Monsters/Ascendancy/warbringer/Minions/minion_Battlehorn.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/LeagueAncestral/KaruiWarriorHorn/attachments/TukohamaBuffingBattlehorn/Skirt_Warbringer.ao"
+	attached_object = "R_Weapon Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/TukohamaBuffingBattlehornHorn_Warbringer.ao"
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/KaruiWarriorHorn/rig.amd"
+	view_of = "idle_01"
+		view_name = "death_idle_01"
+		view_end = 1202
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5362120270729065,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6467670202255249,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "cleave_slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5220069885253906,
+					"name": "cleave",
+					"position": [
+						0.0,
+						-17.0,
+						0.0
+					]
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.1699999570846558,
+					"end_time": 1.5299999713897706,
+					"name": "move",
+					"position": [
+						0.0,
+						-75.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7094000577926636,
+					"name": "slam",
+					"position": [
+						0.0,
+						-313.4410095214844,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "horn_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.659043788909912,
+					"name": "blow"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6789898872375489,
+					"name": "contact",
+					"position": [
+						0.0,
+						-189.55599975585938,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.247390031814575,
+					"name": "buff",
+					"position": [
+						0.0,
+						-189.55599975585938,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.247390031814575,
+					"name": "contact",
+					"position": [
+						0.0,
+						-190.81643676757813,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.743849992752075,
+					"name": "buff",
+					"position": [
+						0.0,
+						-189.55599975585938,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.743849992752075,
+					"name": "contact",
+					"position": [
+						0.0,
+						-182.25454711914063,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.1827502250671388,
+					"name": "buff",
+					"position": [
+						0.0,
+						-189.55599975585938,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.1827502250671388,
+					"name": "contact",
+					"position": [
+						0.0,
+						-183.66534423828126,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.643239974975586,
+					"name": "buff",
+					"position": [
+						0.0,
+						-189.55599975585938,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.643239974975586,
+					"name": "contact",
+					"position": [
+						0.0,
+						-187.4533233642578,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.651020050048828,
+					"name": "horn_stop",
+					"position": [
+						0.0,
+						-184.9527130126953,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "death_idle_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.06129184365272522,
+					"name": "remove_collidability"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "cleave_slam_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.17322835326194764,
+								0.0
+							],
+							[
+								0.18110236525535584,
+								0.3243762254714966
+							],
+							[
+								0.19685038924217225,
+								0.6890594959259033
+							],
+							[
+								0.22047244012355805,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.17453299462795258,
+						"angle": 2.967060089111328,
+						"length": 248.20700073242188,
+						"local_offset": [
+							35.0,
+							0.0
+						]
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.5762709975242615,
+								0.0
+							],
+							[
+								0.5924657583236694,
+								1.0
+							]
+						],
+						"width": 60.97600173950195,
+						"angle": 0.5585054159164429,
+						"x_axis_scale": 0.5450000166893005,
+						"length": 595.4959716796875,
+						"offset": [
+							0.0,
+							33.0
+						]
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/KaruiWarriorHorn/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_bloodfever_hunchback_1"
+			parent = "neck_jntBnd"
+			rotation = "1.5708 0.905128 0"
+			translation = "-2.32784 7.82997 -11.6438"
+		socket = "aux_bloodfever_hunchback_2"
+			parent = "neck_jntBnd"
+			rotation = "0.74543 0.21293 0"
+			translation = "-8.11322 -1.45441 -2.92224"
+		socket = "aux_bloodfever_hunchback_3"
+			parent = "neck_jntBnd"
+			rotation = "0.74543 0.21293 0"
+			translation = "-11.7378 10.0915 -1.85134"
+		socket = "aux_bloodfever_hunchback_4"
+			parent = "neck_jntBnd"
+			rotation = "1.5708 -0.426035 0"
+			translation = "0 11.699 3.57863"
+		socket = "aux_bloodfever_hunchback_5"
+			parent = "neck_jntBnd"
+			rotation = "1.5708 -0.426035 0"
+			translation = "8.87509 4.9066 -1.23153"
+		socket = "aux_bloodfever_hunchback_6"
+			parent = "neck_jntBnd"
+			rotation = "0.31957 0 0"
+			translation = "-20.5215 0 2.569"
+		socket = "aux_bloodfever_hunchback_7"
+			parent = "neck_jntBnd"
+			rotation = "1.09153 0.798662 -2.44939"
+			translation = "-5.2355 10.7963 -15.2614"
+		socket = "aux_bloodfever_hunchback_8"
+			parent = "neck_jntBnd"
+			rotation = "-0.479267 1.11823 2.39616"
+			translation = "-12.9735 5.8812 -17.5877"
+		socket = "aux_bloodfever_hunchback_9"
+			parent = "neck_jntBnd"
+			rotation = "1.19799 0 0"
+			translation = "-5.62103 11.3011 -10.3721"
+		socket = "aux_bloodfever_hunchback_10"
+			parent = "neck_jntBnd"
+			rotation = "1.19799 0 0"
+			translation = "-5.02281 7.11865 17.6187"
+		socket = "aux_bloodfever_hunchback_11"
+			parent = "neck_jntBnd"
+			rotation = "-1.4111 -2.6625 0"
+			translation = "11.7256 12.331 8.11623"
+		socket = "aux_bloodfever_hunchback_12"
+			parent = "neck_jntBnd"
+			rotation = "1.5708 2.44939 0"
+			translation = "8.9178 -11.2573 7.98905"
+		socket = "aux_bloodfever_stomach_1"
+			parent = "spine_1_jntBnd"
+			rotation = "-0.872665 -1.70396 -3.03513"
+			translation = "14.1305 -9.22714 0"
+		socket = "aux_bloodfever_stomach_2"
+			parent = "spine_1_jntBnd"
+			rotation = "-0.5325 1.7572 -0.106291"
+			translation = "7.2975 -9.7621 -8.3472"
+		socket = "aux_bloodfever_arm_R_1"
+			parent = "R_shoulder_jntBnd"
+			rotation = "-0.5236 1.97013 -1.81043"
+			translation = "-11.4593 2.91484 2.4258"
+		socket = "aux_bloodfever_leg_R_1"
+			parent = "R_knee_attachment_jntBnd"
+			rotation = "0.958534 -1.11823 -1.43763"
+			translation = "-0.889508 -46.4113 -3.48944"
+		socket = "aux_bloodfever_leg_R_2"
+			parent = "R_knee_attachment_jntBnd"
+			rotation = "1.5708 1.86366 0"
+			translation = "3.54654 -24.7987 -0.728931"
+		socket = "aux_bloodfever_leg_R_3"
+			parent = "R_knee_attachment_jntBnd"
+			rotation = "-0.665494 2.6625 1.4378"
+			translation = "-2.09345 -35.9808 -0.728931"
+		socket = "aux_bloodfever_head_1"
+			parent = "head_jntBnd"
+			rotation = "1.17146 0.106465 -1.38439"
+			translation = "-6.13533 0 -9.98836"
+		socket = "aux_bloodfever_hunchback_13"
+			parent = "neck_jntBnd"
+			rotation = "-0.159698 -2.34293 3.14159"
+			translation = "-9.09281 16.4635 7.33267"
+		socket = "aux_bloodfever_hunchback_14"
+			parent = "neck_jntBnd"
+			rotation = "-0.159698 -2.34293 3.14159"
+			translation = "8.86392 0.833231 24.2892"
+		socket = "aux_bloodfever_stomach_3"
+			parent = "spine_1_jntBnd"
+			rotation = "0.585732 3.03513 1.8106"
+			translation = "3.40522 -3.72291 -8.3472"
+		socket = "weapon_tip"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -150"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHorn/TukohamaBuffingBattlehorn.sm"
+			TukohamaBuffingBattlehornBodyShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornBody_Spectre.mat:0"
+			Body_FurShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornArmourBodyFur_Spectre.mat:0"
+			CloakAccessories_meshShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornArmour_Spectre.mat:0"
+			CloakDanglers_meshShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornArmour_Spectre.mat:0"
+			LegAccessories_meshShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornArmour_Spectre.mat:0"
+			LegBelt_meshShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornArmour_Spectre.mat:0"
+			Mask_meshShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornArmour_Spectre.mat:0"
+			SkirtAccessories_meshShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornArmour_Spectre.mat:0"
+			SkirtDanglers_meshShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornArmour_Spectre.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_upperArm_attachment_jntBnd"
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "weapon_trail false R_Weapon weapon_tip"
+	}
+	
+	AnimatedRender
+	{
+		RenderPasses = 
+		'{
+		    "passes": [
+		        {
+		            "is_main": false,
+		            "type": "StandAlone",
+		            "filename": "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/idle_spectre/spectreSkin_01.mat"
+		        },
+		        {
+		            "is_main": false,
+		            "type": "StandAlone",
+		            "filename": "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/idle_spectre/spectreShadows.mat"
+		        }
+		    ]
+		}'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "cleave_slam_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.550000011920929,
+						"filename": "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/horn_slam_buff.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								250.00001525878907,
+								0.0,
+								0.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.6000001430511475,
+						"filename": "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/horn_slam.ao",
+						"animation": "slam",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								-25.000001907348634,
+								0.0
+							],
+							"scale": [
+								2.0,
+								2.0,
+								1.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "horn_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.6499999165534973,
+						"filename": "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/horn_slam_buff.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								-200.00001525878907,
+								0.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "cleave_slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2587658762931824,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Vocals/AttackA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3976159393787384,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Whoosh",
+						"bone_name": "weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5091161727905273,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Clothing",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6122015714645386,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/WeaponImpact",
+						"bone_name": "weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9151465892791748,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Clothing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0413734912872315,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2685835361480713,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Vocals/AttackC",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3001387119293213,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Footsteps",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5210366249084473,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Whoosh",
+						"bone_name": "weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7082741260528565,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/WeaponImpact",
+						"bone_name": "weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7966325283050538,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Clothing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.922853946685791,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.499295949935913,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Clothing",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Vocals/Death",
+						"bone_name": "aux_bloodfever_head_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24193552136421204,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/DeathFallLarge",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3132225275039673,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/WeaponDrop",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7918343544006348,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/DeathFall",
+						"bone_name": "neck_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03440000116825104,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.096812404692173,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Clothing",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03440000116825104,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.096812404692173,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Clothing",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03440000116825104,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.096812404692173,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Clothing",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03440000116825104,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.096812404692173,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Clothing",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "horn_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Vocals/AttackB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41661322116851809,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Clothing",
+						"bone_name": "weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6086174845695496,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Whoosh",
+						"bone_name": "weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6919395327568054,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/WeaponImpact",
+						"bone_name": "weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5469025373458863,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Effects/Horn",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.010350704193115,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Clothing",
+						"bone_name": "weapon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.419715881347656,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Whoosh",
+						"bone_name": "weapon_tip"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.32568401098251345,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Vocals/Idle.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Vocals/RunA.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Footsteps",
+						"bone_name": "aux_L_foot_attachment",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6506083607673645,
+						"filename": "Audio/Sound Effects/Skills/4.0/Ascendancy/Warrior/Warbringer/TotemDefender/Horn/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		continuous_effect = "grp_* Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/fx/idle_spectre/ghostRibbons.pet"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueAncestral/KaruiWarriorHorn/attachments/TukohamaBuffingBattlehorn/Skirt_Warbringer.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHorn/attachments/TukohamaBuffingBattlehorn/Skirt/rig.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHorn/attachments/TukohamaBuffingBattlehorn/Skirt/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHorn/attachments/TukohamaBuffingBattlehorn/Skirt/Skirt.sm"
+			Skirt_Fur_meshShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornArmourBodyFur_Spectre.mat:0"
+			belt_meshShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornArmour_Spectre.mat:0"
+			danglers_meshShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornArmour_Spectre.mat:0"
+	}
+}
+
+=== .ao Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/TukohamaBuffingBattlehornHorn_Warbringer.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHorn/attachments/TukohamaBuffingBattlehorn/Horn/TukohamaBuffingBattlehornHorn.fmt"
+			TukohamaBuffingBattlehornWeaponShape = "Metadata/Effects/Spells/ascendancy_classes/warbringer/totem_defenders/mat/TukohamaBuffingBattlehorn/TukohamaBuffingBattlehornWeapon_Spectre.mat:0"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHorn/TukohamaBuffingBattlehorn.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHorn/TukohamaBuffingBattlehorn_armour_76f840e6.smd"
+Materials 3
+	"Art/Models/MONSTERS/TukohamaTribe/Textures/TukohamaBuffingBattlehornBodyc.mat" 1
+	"Art/Models/MONSTERS/TukohamaTribe/Textures/TukohamaBuffingBattlehornArmourBodyFurc.mat" 1
+	"Art/Models/MONSTERS/TukohamaTribe/Textures/TukohamaBuffingBattlehornArmourc.mat" 7
+BoundingBox -83.054 -19.8189 -205.681 83.0551 27.4409 0.44981
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiWarriorHorn/TukohamaBuffingBattlehorn_armour_76f840e6.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 9 in the header, 9 in the block · 14871 triangles over 11106 vertices
+  names: 400 bytes said, 400 read  [agree]
+
+=== shapes (12)
+0	TukohamaBuffingBattlehornBodyShape	from 0	count 9894
+1	Body_FurShape	from 9894	count 8460
+2	CloakAccessories_meshShape	from 18354	count 4278
+3	CloakDanglers_meshShape	from 22632	count 5868
+4	LegAccessories_meshShape	from 28500	count 4350
+5	LegBelt_meshShape	from 32850	count 366
+6	Mask_meshShape	from 33216	count 3969
+7	SkirtAccessories_meshShape	from 37185	count 4254
+8	SkirtDanglers_meshShape	from 41439	count 3174
+9	Skirt_Fur_meshShape	from 44613	count 2592
+10	belt_meshShape	from 47205	count 4254
+11	danglers_meshShape	from 51459	count 3174
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  Skirt_Warbringer.ao  socket hip_jntBnd [in its carrier's rig]  box (-29.9,-21.8,-13.9)..(29.9,18.3,71)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 3340 triangles over 2975 vertices
+    names: 102 bytes said, 102 read  [agree]
+    rig 35 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 34 of 35  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_C_1_jntBnd  [its own]  under 0  rests at (-0,-15.5,-4.6)
+      2 phys_skinned_L_1_jntBnd  [its own]  under 0  rests at (12.9,-11.8,-4.7)
+      3 phys_skinned_L_5_jntBnd  [its own]  under 0  rests at (18.2,-2.8,-4.7)
+      4 phys_skinned_L_9_jntBnd  [its own]  under 0  rests at (12.9,6.3,-4.7)
+      5 phys_skinned_L_13_jntBnd  [its own]  under 0  rests at (0,10,-4.6)
+      6 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (-12.9,-11.8,-4.7)
+      7 phys_skinned_R_5_jntBnd  [its own]  under 0  rests at (-18.2,-2.8,-4.7)
+      8 phys_skinned_R_9_jntBnd  [its own]  under 0  rests at (-12.9,6.3,-4.7)
+      9 phys_skinned_C_2_jntBnd  [its own]  under 1  rests at (-0,-14.8,7.4)
+      10 phys_skinned_L_2_jntBnd  [its own]  under 2  rests at (14.3,-10.8,7.4)
+      11 phys_skinned_L_6_jntBnd  [its own]  under 3  rests at (20.2,-1.3,7.3)
+      12 phys_skinned_L_10_jntBnd  [its own]  under 4  rests at (14.3,8.3,7.3)
+      13 phys_skinned_L_14_jntBnd  [its own]  under 5  rests at (0,12.3,7.4)
+      14 phys_skinned_R_2_jntBnd  [its own]  under 6  rests at (-14.3,-10.8,7.4)
+      15 phys_skinned_R_6_jntBnd  [its own]  under 7  rests at (-20.2,-1.3,7.3)
+      16 phys_skinned_R_10_jntBnd  [its own]  under 8  rests at (-14.3,8.3,7.3)
+      17 phys_skinned_C_3_jntBnd  [its own]  under 9  rests at (-0,-14.1,19.5)
+      18 phys_skinned_L_3_jntBnd  [its own]  under 10  rests at (15.7,-9.9,19.4)
+      19 phys_skinned_L_7_jntBnd  [its own]  under 11  rests at (22.2,0.2,19.3)
+      20 phys_skinned_L_11_jntBnd  [its own]  under 12  rests at (15.7,10.3,19.3)
+      21 phys_skinned_L_15_jntBnd  [its own]  under 13  rests at (0,14.6,19.5)
+      22 phys_skinned_R_3_jntBnd  [its own]  under 14  rests at (-15.7,-9.9,19.4)
+      23 phys_skinned_R_7_jntBnd  [its own]  under 15  rests at (-22.2,0.2,19.3)
+      24 phys_skinned_R_11_jntBnd  [its own]  under 16  rests at (-15.7,10.3,19.3)
+      25 phys_skinned_C_4_jntBnd  [its own]  under 17  rests at (-0,-13.4,31.5)
+      26 phys_skinned_L_4_jntBnd  [its own]  under 18  rests at (17.1,-9,31.5)
+      27 phys_skinned_L_8_jntBnd  [its own]  under 19  rests at (24.2,1.7,31.4)
+      28 phys_skinned_L_12_jntBnd  [its own]  under 20  rests at (17.1,12.4,31.4)
+      29 phys_skinned_L_16_jntBnd  [its own]  under 21  rests at (0,16.8,31.5)
+      30 phys_skinned_R_4_jntBnd  [its own]  under 22  rests at (-17.1,-9,31.5)
+      31 phys_skinned_R_8_jntBnd  [its own]  under 23  rests at (-24.2,1.7,31.4)
+      32 phys_skinned_R_12_jntBnd  [its own]  under 24  rests at (-17.1,12.4,31.4)
+      33 phys_skinned_C_5_jntBnd  [its own]  under 25  rests at (-0,-12.6,45.8)
+      34 phys_skinned_C_6_jntBnd  [its own]  under 33  rests at (-0,-11.6,62.7)
+  TukohamaBuffingBattlehornHorn_Warbringer.ao  socket R_Weapon [NOT in its carrier's rig]  fixed mesh TukohamaBuffingBattlehornHorn.fmt  1 shapes
+      TukohamaBuffingBattlehornWeaponShape  ->  Art/Models/MONSTERS/TukohamaTribe/Textures/TukohamaBuffingBattlehornWeaponc.mat
