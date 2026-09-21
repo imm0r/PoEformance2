@@ -165,7 +165,7 @@ public static class ModelDump
         }
 
         var bones = new HashSet<string>(rig.Bones.Select(one => one.Name), StringComparer.OrdinalIgnoreCase);
-        said.Append("parent rig: ").Append(Say(rig.Bones.Count)).AppendLine(" bones");
+        said.Append("the monster's rig: ").Append(Say(rig.Bones.Count)).AppendLine(" bones");
 
         // THE MOUNTS THE MONSTER OFFERS. The game's own name for an attachment point is aux_ -
         // Malgor's anchor hangs off aux_anchor_jntBnd and his cannon off aux_cannon_jntBnd - so
@@ -191,16 +191,47 @@ public static class ModelDump
 
         IReadOnlyList<System.Numerics.Matrix4x4> over_ = SkeletonPose.Of(rig)?.BindModel ?? [];
 
-        foreach (string one in walked)
+        // WHAT HANGS OFF A PIECE IS PRINTED UNDER THAT PIECE AND AGAINST ITS RIG - see Hanging.
+        // The flat list held Tycho's skirt layers up against the BODY, which is not the rig they
+        // are authored beside, and a dump that compares the wrong two rigs sends the next reader
+        // the way this one went. The list is still what starts the walk, and the pieces reached
+        // through their carrier are struck off it as they are printed.
+        Hanging(read, said, walked, bones, named_, over_, 1, new HashSet<string>(StringComparer.OrdinalIgnoreCase));
+    }
+
+    /// <summary>How deep the attachment tree is followed here. Doryani's belt hangs a dagger.</summary>
+    private const int MostDeep = 4;
+
+    /// <summary>
+    /// Every attachment line in one carrier's files, printed against THAT carrier's rig.
+    /// </summary>
+    /// <remarks>
+    /// A PIECE HANGS OFF WHATEVER CARRIES IT. Tycho's SkirtLayers.ao is an attached_object of his
+    /// Skirt.ao and rests its bones exactly where the SKIRT rests them; held up against the body
+    /// it looked like a piece sharing two names by accident, which is what this printed for as
+    /// long as it walked every file it had seen in one flat list.
+    /// </remarks>
+    private static void Hanging(
+        Func<string, byte[]?> read,
+        StringBuilder said,
+        IReadOnlyList<string> files,
+        HashSet<string> bones,
+        IReadOnlyDictionary<string, int> parent,
+        IReadOnlyList<System.Numerics.Matrix4x4> over_,
+        int depth,
+        HashSet<string> seen)
+    {
+        foreach (string one in files)
         {
-            (string _, byte[]? content) = Find(read, one);
-            if (content is not { Length: > 0 })
+            // KEYED ON THE PATH THE INSTALL ANSWERED WITH, not on the one that was asked for, so
+            // a piece reached through its carrier and again through the flat list is one piece.
+            (string at, byte[]? content) = Find(read, one);
+            if (content is not { Length: > 0 } || !seen.Add(at))
             {
                 continue;
             }
 
-            AnimatedObject ao = AnimatedObject.Read(content);
-            foreach (AoStruct block in ao.Structs)
+            foreach (AoStruct block in AnimatedObject.Read(content).Structs)
             {
                 foreach (AoEntry entry in block.Entries)
                 {
@@ -209,7 +240,7 @@ public static class ModelDump
                         continue;
                     }
 
-                    Hung(read, said, bones, named_, over_, entry);
+                    Hung(read, said, bones, parent, over_, entry, depth, seen);
                 }
             }
         }
@@ -222,7 +253,9 @@ public static class ModelDump
         HashSet<string> bones,
         IReadOnlyDictionary<string, int> parent,
         IReadOnlyList<System.Numerics.Matrix4x4> over_,
-        AoEntry entry)
+        AoEntry entry,
+        int depth,
+        HashSet<string> seen)
     {
         string value = entry.Value.Trim();
         int space = value.IndexOf(' ', StringComparison.Ordinal);
@@ -233,9 +266,10 @@ public static class ModelDump
             return;
         }
 
-        said.Append("  ").Append(path[(path.LastIndexOf('/') + 1)..])
+        string step = new(' ', depth * 2);
+        said.Append(step).Append(path[(path.LastIndexOf('/') + 1)..])
             .Append("  socket ").Append(socket.Length > 0 ? socket : "(none)")
-            .Append(socket.Length > 0 && bones.Contains(socket) ? " [in the parent rig]" : " [NOT in the parent rig]");
+            .Append(socket.Length > 0 && bones.Contains(socket) ? " [in its carrier's rig]" : " [NOT in its carrier's rig]");
 
         // THE CHILDREN OF THE ATTACHMENT LINE, which move the piece off its socket and which the
         // walk threw away until the Frostborn Fiend's block of ice turned up upside down on the
@@ -268,6 +302,7 @@ public static class ModelDump
             if (prop.Length == 0)
             {
                 said.AppendLine("  (no mesh - an effect or a sound)");
+                Under(read, said, path, bones, parent, over_, depth, seen);
                 return;
             }
 
@@ -279,10 +314,11 @@ public static class ModelDump
 
             foreach ((string shape, string material) in fixture.Named)
             {
-                said.Append("    ").Append(shape).Append("  ->  ")
+                said.Append(step).Append("    ").Append(shape).Append("  ->  ")
                     .AppendLine(material.Length > 0 ? material : "(no material)");
             }
 
+            Under(read, said, path, bones, parent, over_, depth, seen);
             return;
         }
 
@@ -290,12 +326,55 @@ public static class ModelDump
         said.Append("  box ").Append(Box(manifest.Least)).Append("..").AppendLine(Box(manifest.Most));
 
         SkinnedMesh geometry = SkinnedMesh.Read(read(manifest.Geometry.Replace('\\', '/').Trim()));
-        Facts(said, "    ", geometry.Facts);
-        Rigged(read, said, bones, parent, over_, SkeletonPose.Highest(geometry), chain);
+        Facts(said, step + "  ", geometry.Facts);
+        AnimationSkeleton? own = Rigged(
+            read, said, bones, parent, over_, SkeletonPose.Highest(geometry), chain, step);
+
+        // AND WHAT HANGS OFF THIS PIECE, against THIS piece's rig where it brought one.
+        if (own is { Ready: true } rig && SkeletonPose.Of(rig) is { } mine)
+        {
+            var theirs = new HashSet<string>(
+                rig.Bones.Select(one => one.Name), StringComparer.OrdinalIgnoreCase);
+            var named_ = new Dictionary<string, int>(rig.Bones.Count, StringComparer.OrdinalIgnoreCase);
+            for (var one = 0; one < rig.Bones.Count; one++)
+            {
+                named_.TryAdd(rig.Bones[one].Name, one);
+            }
+
+            Under(read, said, path, theirs, named_, mine.BindModel, depth, seen);
+            return;
+        }
+
+        Under(read, said, path, bones, parent, over_, depth, seen);
     }
 
-    /// <summary>How many of a piece's own bones are printed. Enough to see whose names they are.</summary>
-    private const int MostBones = 24;
+    /// <summary>Whatever a piece hangs off ITSELF, one step deeper and against its own rig.</summary>
+    private static void Under(
+        Func<string, byte[]?> read,
+        StringBuilder said,
+        string path,
+        HashSet<string> bones,
+        IReadOnlyDictionary<string, int> parent,
+        IReadOnlyList<System.Numerics.Matrix4x4> over_,
+        int depth,
+        HashSet<string> seen)
+    {
+        if (depth < MostDeep)
+        {
+            Hanging(read, said, [path], bones, parent, over_, depth + 1, seen);
+        }
+    }
+
+    /// <summary>
+    /// How many of a piece's own bones are printed.
+    /// </summary>
+    /// <remarks>
+    /// ENOUGH FOR THE WHOLE RIG, since Brughor's corpse armour turned up with eighty bones and
+    /// the answer to where his corpses go is in the ones this stopped before: whether a plain
+    /// name like <c>hip_jntBnd</c> is the monster's or a corpse's is settled by whether the same
+    /// rig ALSO carries a <c>…|hip_jntBnd</c>, and a list cut at twenty-four cannot say.
+    /// </remarks>
+    private const int MostBones = 128;
 
     /// <summary>
     /// A piece's OWN rig, beside the parent's: whose names its bones carry and where they rest.
@@ -314,14 +393,15 @@ public static class ModelDump
     /// and the answer is elsewhere. The two cases look identical in a picture and are told apart
     /// here, in one file, without another build.
     /// </remarks>
-    private static void Rigged(
+    private static AnimationSkeleton? Rigged(
         Func<string, byte[]?> read,
         StringBuilder said,
         HashSet<string> bones,
         IReadOnlyDictionary<string, int> parent,
         IReadOnlyList<System.Numerics.Matrix4x4> over_,
         int highest,
-        IReadOnlyList<AnimatedObject> chain)
+        IReadOnlyList<AnimatedObject> chain,
+        string step)
     {
         string path = string.Empty;
         foreach (AoStruct block in chain.SelectMany(one => one.Named("ClientAnimationController")))
@@ -337,28 +417,28 @@ public static class ModelDump
 
         if (path.Length == 0)
         {
-            said.AppendLine("    (no rig of its own)");
-            return;
+            said.Append(step).AppendLine("  (no rig of its own)");
+            return null;
         }
 
         AnimationSkeleton own = AnimationSkeleton.Read(read(path.Replace('\\', '/').Trim()));
         if (!own.Ready)
         {
-            said.Append("    rig ").Append(path).AppendLine(" (did not read)");
-            return;
+            said.Append(step).Append("  rig ").Append(path).AppendLine(" (did not read)");
+            return null;
         }
 
         var shared = 0;
         foreach (SkeletonBone one in own.Bones)
         {
-            if (bones.Contains(one.Name))
+            if (Meant(bones, one.Name))
             {
                 shared++;
             }
         }
 
-        said.Append("    rig ").Append(Say(own.Bones.Count)).Append(" bones, ")
-            .Append(Say(shared)).AppendLine(" of them names the parent rig also has");
+        said.Append(step).Append("  rig ").Append(Say(own.Bones.Count)).Append(" bones, ")
+            .Append(Say(shared)).AppendLine(" of them names its carrier's rig also has");
 
         // AND WHETHER THE PIECE'S MESH IS INDEXED BY THAT RIG AT ALL. A mesh whose highest
         // weighted bone is past the rig's count was rigged to something else - and the only
@@ -367,10 +447,10 @@ public static class ModelDump
         // a piece in the wrong place.
         if (highest >= 0)
         {
-            said.Append("    mesh weights reach bone ").Append(Say(highest))
+            said.Append(step).Append("  mesh weights reach bone ").Append(Say(highest))
                 .Append(" of ").Append(Say(own.Bones.Count))
                 .AppendLine(highest >= own.Bones.Count
-                    ? "  [PAST this rig - it is the parent's numbering]"
+                    ? "  [PAST this rig - it is the carrier's numbering]"
                     : "  [inside this rig]");
         }
 
@@ -380,8 +460,8 @@ public static class ModelDump
 
         for (var one = 0; one < own.Bones.Count && one < MostBones; one++)
         {
-            said.Append("      ").Append(Say(one)).Append(' ').Append(own.Bones[one].Name)
-                .Append(bones.Contains(own.Bones[one].Name) ? "  [shared]" : "  [its own]");
+            said.Append(step).Append("    ").Append(Say(one)).Append(' ').Append(own.Bones[one].Name)
+                .Append(Meant(bones, own.Bones[one].Name) ? "  [shared]" : "  [its own]");
 
             // THE PARENT'S NUMBER, because it is not always lower than the child's - a bone's
             // ancestors are walked to find one the parent rig has, and a walk that assumed the
@@ -397,16 +477,51 @@ public static class ModelDump
                 said.Append("  rests at ").Append(Box(rest[one].Translation));
             }
 
-            // AND WHERE THE PARENT RESTS THE SAME BONE, side by side. Whether the two rigs carry
+            // AND WHERE THE CARRIER RESTS THE SAME BONE, side by side. Whether the two rigs carry
             // the same rest pose is the question every theory about these pieces turned on, and
             // it was answered three times by guessing before it was ever printed.
-            if (parent.TryGetValue(own.Bones[one].Name, out int also) && also < over_.Count)
+            if (Meant(parent, own.Bones[one].Name, out int also) && also < over_.Count)
             {
-                said.Append("  parent has ").Append(Box(over_[also].Translation));
+                said.Append("  carrier has ").Append(Box(over_[also].Translation));
             }
 
             said.AppendLine();
         }
+
+        return own;
+    }
+
+    /// <summary>
+    /// Whether a carrier's rig carries a bone of this name, a MERGED rig's path included.
+    /// </summary>
+    /// <remarks>
+    /// THE SAME READING MonsterModels USES, and it belongs here for the same reason the chain
+    /// does: a dump that matches fewer names than the walk says a piece shares nothing when it
+    /// shares its whole spine. Brughor's corpse armour writes the monster's bones as their whole
+    /// path - <c>root_jntBnd|spine_2_jntBnd|chest_jntBnd</c> - because the corpses merged into it
+    /// carry a chest of their own.
+    /// </remarks>
+    private static bool Meant(HashSet<string> bones, string name)
+    {
+        if (bones.Contains(name))
+        {
+            return true;
+        }
+
+        int bar = name.LastIndexOf('|');
+        return bar >= 0 && bones.Contains(name[(bar + 1)..]);
+    }
+
+    /// <inheritdoc cref="Meant(HashSet{string}, string)"/>
+    private static bool Meant(IReadOnlyDictionary<string, int> where, string name, out int found)
+    {
+        if (where.TryGetValue(name, out found))
+        {
+            return true;
+        }
+
+        int bar = name.LastIndexOf('|');
+        return bar >= 0 && where.TryGetValue(name[(bar + 1)..], out found);
     }
 
     private static string Box(System.Numerics.Vector3 at)

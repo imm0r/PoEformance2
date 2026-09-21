@@ -464,8 +464,12 @@ public static class MonsterModels
             where.TryAdd(parent.Bones[one].Name, one);
         }
 
+        // THE MONSTER'S OWN RIG IS THE OUTERMOST FIT: every bone stands for itself and needs no
+        // transform to reach model space. Everything below is expressed against it - see Fit.
+        var body = new Fit(where, rest, Itself(parent.Bones.Count), []) { Plain = true };
+
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var queue = new Queue<(string Path, Matrix4x4 Place, int Bone, int Depth, bool Rooted)>();
+        var queue = new Queue<Hangs_>();
 
         // THE MONSTER ITSELF IS THE OUTERMOST CARRIER, at the identity: a piece socketed to
         // "<root>" at the top level is already in the monster's own space and wants no transform
@@ -474,45 +478,189 @@ public static class MonsterModels
         {
             foreach ((string socket, string path, Matrix4x4 local) in Hung(Object(read, one)))
             {
-                if (Socketed(socket, where, rest, Matrix4x4.Identity, 0, top: true, local) is { } put)
+                if (Socketed(socket, body, Matrix4x4.Identity, 0, Matrix4x4.Identity, top: true, local) is { } put)
                 {
-                    queue.Enqueue((path, put.Place, put.Bone, 1, Rooted(socket)));
+                    queue.Enqueue(new Hangs_(path, put.Place, put.Bone, put.Put, put.Socket, 1, Rooted(socket), body));
                 }
             }
         }
 
         while (queue.Count > 0 && parts.Count < MostParts)
         {
-            (string path, Matrix4x4 place, int bone, int depth, bool rooted) = queue.Dequeue();
-            if (path.Length == 0 || !seen.Add(path))
+            Hangs_ one_ = queue.Dequeue();
+            if (one_.Path.Length == 0 || !seen.Add(one_.Path))
             {
                 continue;
             }
 
-            AnimatedObject ao = Object(read, path);
+            AnimatedObject ao = Object(read, one_.Path);
             if (!ao.Ready)
             {
                 continue;
             }
 
-            if (depth < MostDeep)
+            // THE PIECE IS READ BEFORE ITS CHILDREN ARE QUEUED, because what it turns into IS the
+            // rig they are authored against - see Fit. The order parts come out in is the order
+            // they are dequeued, which this does not change.
+            (Part? part, Fit inner_) = Worn(read, ao, one_, paints, fallback, body);
+            if (part is { } worn)
             {
-                foreach ((string inner, string under, Matrix4x4 local) in Hung(ao))
-                {
-                    if (Socketed(inner, where, rest, place, bone, top: false, local) is { } put)
-                    {
-                        queue.Enqueue((under, put.Place, put.Bone, depth + 1, Rooted(inner)));
-                    }
-                }
+                parts.Add(worn);
             }
 
-            if (Worn(read, ao, place, bone, paints, fallback, where, rest, rooted) is { } part)
+            if (one_.Depth < MostDeep)
             {
-                parts.Add(part);
+                foreach ((string inner, string path_, Matrix4x4 local) in Hung(ao))
+                {
+                    if (Socketed(inner, inner_, one_.Place, one_.Bone, one_.Put, top: false, local) is { } where_)
+                    {
+                        queue.Enqueue(new Hangs_(
+                            path_,
+                            where_.Place,
+                            where_.Bone,
+                            where_.Put,
+                            where_.Socket,
+                            one_.Depth + 1,
+                            Rooted(inner),
+                            inner_));
+                    }
+                }
             }
         }
 
         return parts;
+    }
+
+    /// <summary>One piece waiting to be read: where its carrier puts it, and the rig it belongs to.</summary>
+    /// <param name="Place">Its transform into model space, for a piece that goes rigidly.</param>
+    /// <param name="Bone">The MONSTER's bone it follows, for the same.</param>
+    /// <param name="Put">Its socket's bind, in model space, without the attachment line's own turn.</param>
+    /// <param name="Socket">That socket's number in the CARRIER's rig, or -1 where it named none.</param>
+    /// <param name="Under">The rig the piece is authored against - see <see cref="Fit"/>.</param>
+    private readonly record struct Hangs_(
+        string Path,
+        Matrix4x4 Place,
+        int Bone,
+        Matrix4x4 Put,
+        int Socket,
+        int Depth,
+        bool Rooted,
+        Fit Under);
+
+    /// <summary>
+    /// The rig a piece is authored against, and what that rig's bones are in the MONSTER's.
+    /// </summary>
+    /// <remarks>
+    /// A PIECE HANGS OFF WHATEVER CARRIES IT, AND NOT OFF THE MONSTER. Reported from the live
+    /// client: Tycho's skirt sits on him and the layers under it lay on the floor - and the two
+    /// are not siblings. <c>SkirtLayers.ao</c> is an attached_object of <c>Skirt.ao</c>, its rig
+    /// lives in the skirt's own folder, and it rests <c>root_jntBnd</c> at (0,0,0) and
+    /// <c>spine_2_jntBnd</c> at (0,0,-12.8) - which is exactly where the SKIRT rests them. The
+    /// body rests its spine_2 at (0,2,-132.3).
+    ///
+    /// SO MATCHING A NESTED PIECE'S BONES AGAINST THE BODY IS MATCHING THE WRONG RIG. Its two
+    /// shared names found the body's bones, were corrected out of a bind pose they were never in,
+    /// and every bone the body does not have - the whole simulated cloth - fell to the body's
+    /// root, which is the floor between his feet.
+    ///
+    /// WHAT THIS CARRIES is the answer for one rig: <see cref="Where"/> and <see cref="Rest"/>
+    /// are that rig, <see cref="Onto"/> says which of the MONSTER's bones each of its bones ends
+    /// up following, and <see cref="Into"/> is the transform from that rig's bind pose into the
+    /// monster's. Composing the two is what lets a piece be fitted to its carrier and still come
+    /// out in model space, however deep it hangs.
+    ///
+    /// FOR THE BODY ITSELF both are the identity, so every case that was already right stays
+    /// bit-for-bit what it was.
+    /// </remarks>
+    private readonly record struct Fit(
+        IReadOnlyDictionary<string, int> Where,
+        SkeletonPose Rest,
+        byte[] Onto,
+        Matrix4x4[] Into)
+    {
+        /// <summary>
+        /// Whether this IS the monster's own rig, so every bone stands for itself.
+        /// </summary>
+        /// <remarks>
+        /// The common case by far, and worth knowing about rather than proving per bone: it
+        /// makes the composition below a no-op instead of a matrix multiply and a copy of the
+        /// geometry per piece.
+        /// </remarks>
+        public bool Plain { get; init; }
+    }
+
+    /// <summary>The bone table of a rig that stands for itself: nought is nought, one is one.</summary>
+    private static byte[] Itself(int bones)
+    {
+        var said = new byte[bones];
+        for (var one = 0; one < bones && one <= byte.MaxValue; one++)
+        {
+            said[one] = (byte)one;
+        }
+
+        return said;
+    }
+
+    /// <summary>A transform per bone, all of them the identity.</summary>
+    private static Matrix4x4[] Flat(int bones)
+    {
+        var said = new Matrix4x4[bones];
+        Array.Fill(said, Matrix4x4.Identity);
+        return said;
+    }
+
+    /// <summary>Which of the monster's bones a carrier's bone is, and the transform to get there.</summary>
+    private static (int Bone, Matrix4x4 Into) Through(Fit fit, int at)
+    {
+        if (fit.Plain)
+        {
+            return (at >= 0 ? at : 0, Matrix4x4.Identity);
+        }
+
+        return at >= 0 && at < fit.Onto.Length && at < fit.Into.Length
+            ? (fit.Onto[at], fit.Into[at])
+            : (0, Matrix4x4.Identity);
+    }
+
+    /// <summary>Vertex bones of a mesh already numbered by the carrier's rig, put into the monster's.</summary>
+    private static byte[] Passed(Fit fit, byte[] bones)
+    {
+        var said = new byte[bones.Length];
+        for (var one = 0; one < bones.Length; one++)
+        {
+            said[one] = (byte)Through(fit, bones[one]).Bone;
+        }
+
+        return said;
+    }
+
+    /// <summary>
+    /// The bone a name means in the rig it is being fitted to, a MERGED rig's path included.
+    /// </summary>
+    /// <remarks>
+    /// A RIG BUILT OUT OF SEVERAL WRITES THE PATH WHERE A NAME WOULD COLLIDE. Brughor's corpse
+    /// armour is a monster's skeleton with a heap of corpses merged into it, and its bones read
+    /// <c>root_jntBnd|spine_2_jntBnd</c>, <c>root_jntBnd|spine_2_jntBnd|chest_jntBnd</c>,
+    /// <c>…|neck_jntBnd</c> - the bone's whole path from the root, because the corpses carry a
+    /// spine and a chest of their own.
+    ///
+    /// THE PATH IS THE PROOF, not a guess at one: the piece rests <c>L_clavicle_jntBnd</c> at
+    /// exactly (27.7,-37.7,-464.2), which is where the BODY rests it, and that bone hangs off
+    /// <c>root_jntBnd|spine_2_jntBnd|chest_jntBnd</c> here and off <c>chest_jntBnd</c> there. Read
+    /// as a plain name none of the three matched anything, so his chest, spine and neck - and the
+    /// corpses hanging off them - fell to the rig root, which is the ground.
+    ///
+    /// THE FULL NAME IS TRIED FIRST, so a rig that really has a bone called that is unaffected.
+    /// </remarks>
+    private static bool Meant(IReadOnlyDictionary<string, int> where, string name, out int found)
+    {
+        if (where.TryGetValue(name, out found))
+        {
+            return true;
+        }
+
+        int bar = name.LastIndexOf('|');
+        return bar >= 0 && where.TryGetValue(name[(bar + 1)..], out found);
     }
 
     /// <summary>
@@ -534,31 +682,40 @@ public static class MonsterModels
     ///
     /// A NAME IT DOES NOT HAVE means different things inside and outside. On a piece hung off
     /// another piece it is a bone of the CARRIER's rig - Doryani's dagger and mirror name
-    /// phys_skinned_L_1_jntBnd and _2_, which belong to his belt - so the carrier's own place is
-    /// the nearest thing the body knows. At the TOP level there is no carrier to fall back to,
-    /// and bone 0 is not an answer, it is the floor: the piece is left out, on the same rule that
-    /// leaves a monster with no rig undressed.
+    /// phys_skinned_L_1_jntBnd and _2_, which belong to his belt - and THAT is the rig looked in,
+    /// so the strand is found rather than fallen back from. Where it is in neither, the carrier's
+    /// own place is the nearest thing the body knows. At the TOP level there is no carrier to
+    /// fall back to, and bone 0 is not an answer, it is the floor: the piece is left out, on the
+    /// same rule that leaves a monster with no rig undressed.
+    ///
+    /// THREE VALUES COME BACK AND THEY ARE NOT THE SAME THING. <c>Place</c> and <c>Bone</c> put a
+    /// rigid piece in model space. <c>Put</c> is the socket's bind alone, WITHOUT the attachment
+    /// line's own turn and shift, because that is what a skinned socketed piece has always been
+    /// corrected by - see <see cref="Correcting"/>. Folding the two together would move the
+    /// Frostborn Fiend's block of ice twice.
     /// </remarks>
-    private static (Matrix4x4 Place, int Bone)? Socketed(
+    private static (Matrix4x4 Place, int Bone, Matrix4x4 Put, int Socket)? Socketed(
         string socket,
-        IReadOnlyDictionary<string, int> where,
-        SkeletonPose rest,
+        Fit fit,
         Matrix4x4 carrier,
         int bone,
+        Matrix4x4 put,
         bool top,
         Matrix4x4 local)
     {
         if (socket.Length == 0 || socket.StartsWith('<'))
         {
-            return (local * carrier, bone);
+            return (local * carrier, bone, put, -1);
         }
 
-        if (where.TryGetValue(socket, out int at) && at < rest.BindModel.Count)
+        if (fit.Where.TryGetValue(socket, out int at) && at < fit.Rest.BindModel.Count)
         {
-            return (local * rest.BindModel[at], at);
+            (int onto, Matrix4x4 into) = Through(fit, at);
+            Matrix4x4 there = fit.Rest.BindModel[at] * into;
+            return (local * there, onto, there, at);
         }
 
-        return top ? null : (local * carrier, bone);
+        return top ? null : (local * carrier, bone, put, -1);
     }
 
     /// <summary>
@@ -653,7 +810,14 @@ public static class MonsterModels
     /// for a "&lt;root&gt;" piece is the monster's root.
     /// </remarks>
     private static Matrix4x4[] Correcting(
-        SkeletonPose mine, SkeletonPose rest, int bones, byte[] onto, int[] anchor, bool rooted, int socket)
+        SkeletonPose mine,
+        Fit fit,
+        int bones,
+        int[] onto,
+        int[] anchor,
+        bool rooted,
+        Matrix4x4 put,
+        int spare)
     {
         var into = new Matrix4x4[bones];
 
@@ -666,15 +830,22 @@ public static class MonsterModels
         // would leave his fist for that bone, which is the 0.1.13 regression in a new shape.
         if (!rooted)
         {
-            Matrix4x4 put = socket < rest.BindModel.Count ? rest.BindModel[socket] : Matrix4x4.Identity;
             Array.Fill(into, put);
             return into;
         }
 
         for (var one = 0; one < bones; one++)
         {
-            int at = onto[one] < rest.BindModel.Count ? onto[one] : 0;
-            Matrix4x4 there = at < rest.BindModel.Count ? rest.BindModel[at] : Matrix4x4.Identity;
+            // THE CARRIER'S BIND, AND THEN THE CARRIER'S OWN WAY INTO MODEL SPACE. For a piece on
+            // the monster himself the second half is the identity and this is what it always was;
+            // for one hung off another piece it is what carries Tycho's skirt layers up onto his
+            // skirt instead of leaving them where the body's rig happens to put the same names.
+            int said = onto[one] >= 0 ? onto[one] : spare;
+            int at = said >= 0 && said < fit.Rest.BindModel.Count ? said : 0;
+            (int _, Matrix4x4 over) = Through(fit, at);
+            Matrix4x4 there = at < fit.Rest.BindModel.Count
+                ? fit.Rest.BindModel[at] * over
+                : Matrix4x4.Identity;
 
             into[one] = anchor[one] >= 0
                 && anchor[one] < mine.BindModel.Count
@@ -799,17 +970,15 @@ public static class MonsterModels
     /// hanging it rigidly off the bone is the same answer with none of the work. What it gives
     /// up is cloth that swings while the monster moves, which a turning picture does not miss.
     /// </remarks>
-    private static Part? Worn(
+    private static (Part? Part, Fit Under) Worn(
         Func<string, byte[]?> read,
         AnimatedObject ao,
-        Matrix4x4 place,
-        int bone,
+        Hangs_ hung,
         Paints paints,
         Mipmaps? fallback,
-        IReadOnlyDictionary<string, int> where,
-        SkeletonPose rest,
-        bool rooted)
+        Fit body)
     {
+        (_, Matrix4x4 place, int bone, Matrix4x4 put, int socket, _, bool rooted, Fit fit) = hung;
         // THE PIECE AND EVERYTHING IT EXTENDS - see Whole. Gulzal's hammer is four lines and a
         // parent, and reading the four lines alone left it on the floor.
         List<AnimatedObject> chain = Whole(read, ao);
@@ -817,19 +986,19 @@ public static class MonsterModels
         string skin = Skin(chain);
         if (skin.Length == 0)
         {
-            return Propped(read, chain, place, bone, paints, fallback);
+            return (Propped(read, chain, place, bone, paints, fallback), body);
         }
 
         MeshManifest manifest = Read(read, skin, MeshManifest.Read);
         if (!manifest.Ready)
         {
-            return null;
+            return (null, body);
         }
 
         SkinnedMesh mesh = Read(read, manifest.Geometry, SkinnedMesh.Read);
         if (!mesh.Ready)
         {
-            return null;
+            return (null, body);
         }
 
         Dress dress = Dressed(read, mesh, [], manifest, fallback, string.Empty, paints);
@@ -838,15 +1007,17 @@ public static class MonsterModels
         // TO - see Retargeted. What the attachment line decides is where the piece SITS: a
         // "<root>" piece is already in the monster's space and wants no transform, a socketed
         // one is in its socket's space and wants that bone's rest transform on it.
-        if (Retargeted(read, chain, where, rest, mesh, rooted, bone) is { } map)
+        if (Retargeted(read, chain, fit, mesh, rooted, put, socket, bone) is { } map)
         {
             // NO PLACE: the correction already carries wherever the piece belongs, because a
             // socketed piece's own bind cancels down to exactly its socket's transform.
-            return new Part(Corrected(mesh, map.Into), map.Bones, mesh.Weights, null, dress.Skins);
+            return (
+                new Part(Corrected(mesh, map.Into), map.Bones, mesh.Weights, null, dress.Skins),
+                map.Under);
         }
 
         (byte[] bones, byte[] weights) = Bound(mesh.Positions.Length, bone);
-        return new Part(mesh, bones, weights, place, dress.Skins);
+        return (new Part(mesh, bones, weights, place, dress.Skins), body);
     }
 
     /// <summary>
@@ -896,16 +1067,17 @@ public static class MonsterModels
     /// nothing but the root has no bones to be moved onto and stays where it is. Malgor's ship's
     /// wheel is that piece, and it is the one thing here still not settled.
     /// </remarks>
-    private readonly record struct Retarget(byte[] Bones, Matrix4x4[] Into);
+    private readonly record struct Retarget(byte[] Bones, Matrix4x4[] Into, Fit Under);
 
     private static Retarget? Retargeted(
         Func<string, byte[]?> read,
         IReadOnlyList<AnimatedObject> chain,
-        IReadOnlyDictionary<string, int> where,
-        SkeletonPose rest,
+        Fit fit,
         SkinnedMesh mesh,
         bool rooted,
-        int socket)
+        Matrix4x4 put,
+        int socket,
+        int fall)
     {
         string path = Entryed(chain, RigBlock, RigEntry);
         if (path.Length == 0 || mesh.Bones.Length != mesh.Positions.Length * 4)
@@ -934,13 +1106,22 @@ public static class MonsterModels
             // can mean is the parent's - and then they are already right and want no correction.
             // A socketed piece is moved by its socket as well, so there the old rigid binding
             // stays: applying both would move it twice.
-            return rooted ? new Retarget(mesh.Bones, []) : null;
+            //
+            // "THE PARENT'S" IS THE CARRIER'S, which on the monster himself is the monster's and
+            // is where this stops: the numbers pass through fit.Onto, which is the identity there.
+            return rooted
+                ? new Retarget(fit.Plain ? mesh.Bones : Passed(fit, mesh.Bones), fit.Into, fit)
+                : null;
         }
 
         // THE FILE'S OWN PAIRING FIRST, where it wrote one down - see Attaching.
         Dictionary<string, string> named = Attaching(chain);
 
-        var onto = new byte[own.Bones.Count];
+        // NUMBERS OF THE CARRIER'S RIG, not the monster's: what this walk matches against is the
+        // rig the piece was authored beside, and the step into model space is Fit's - see there.
+        // Minus one means nothing up the chain matched, which is a different answer from "the
+        // root matched" and was told apart by neither array before.
+        var onto = new int[own.Bones.Count];
         var anchor = new int[own.Bones.Count];
         var shared = 0;
         for (var one = 0; one < own.Bones.Count; one++)
@@ -958,7 +1139,7 @@ public static class MonsterModels
             // and both rest at (0,0,0) - the piece's origin - while the parent rests its shoulder
             // at (22.3,7,-157.9). Matching that root by NAME would send every vertex weighted to
             // it across to the monster's own root, which is the far end of him.
-            onto[one] = (byte)(rooted ? 0 : socket);
+            onto[one] = -1;
             anchor[one] = -1;
 
             int at = one;
@@ -969,10 +1150,10 @@ public static class MonsterModels
                 bool paired = named.TryGetValue(own.Bones[at].Name, out string? theirs);
                 bool grown = paired || (at < mine.Parents.Count && mine.Parents[at] >= 0);
                 if (grown
-                    && where.TryGetValue(theirs ?? own.Bones[at].Name, out int found)
+                    && Meant(fit.Where, theirs ?? own.Bones[at].Name, out int found)
                     && found <= byte.MaxValue)
                 {
-                    onto[one] = (byte)found;
+                    onto[one] = found;
                     anchor[one] = at;
                     shared++;
                     break;
@@ -991,14 +1172,40 @@ public static class MonsterModels
             return null;
         }
 
+        // WHERE A BONE MATCHED NOTHING it keeps the answer it always had: the piece's socket on a
+        // socketed piece, and the carrier's own root on a "<root>" one. Both are then read as
+        // bones of the CARRIER's rig and stepped into the monster's, which on the monster himself
+        // leaves them exactly as they were.
+        int spare = rooted ? 0 : socket;
+        var over = new byte[own.Bones.Count];
+        for (var one = 0; one < over.Length; one++)
+        {
+            over[one] = onto[one] >= 0 || spare >= 0
+                ? (byte)Through(fit, onto[one] >= 0 ? onto[one] : spare).Bone
+                : (byte)fall;
+        }
+
         var bones = new byte[mesh.Bones.Length];
         for (var one = 0; one < bones.Length; one++)
         {
             byte said = mesh.Bones[one];
-            bones[one] = said < onto.Length ? onto[said] : (byte)0;
+            bones[one] = said < over.Length ? over[said] : (byte)0;
         }
 
-        return new Retarget(bones, Correcting(mine, rest, own.Bones.Count, onto, anchor, rooted, socket));
+        Matrix4x4[] into = Correcting(mine, fit, own.Bones.Count, onto, anchor, rooted, put, spare);
+        return new Retarget(bones, into, new Fit(Where(own), mine, over, into));
+    }
+
+    /// <summary>A rig's bones by name, first number wins - the table every fit is looked up in.</summary>
+    private static Dictionary<string, int> Where(AnimationSkeleton rig)
+    {
+        var said = new Dictionary<string, int>(rig.Bones.Count, StringComparer.OrdinalIgnoreCase);
+        for (var one = 0; one < rig.Bones.Count; one++)
+        {
+            said.TryAdd(rig.Bones[one].Name, one);
+        }
+
+        return said;
     }
 
     /// <summary>

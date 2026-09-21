@@ -1259,6 +1259,122 @@ public class MonsterModelTests
     }
 
     /// <summary>
+    /// A piece hung off another piece is fitted to THAT piece's rig, not to the monster's.
+    /// </summary>
+    /// <remarks>
+    /// REPORTED FROM THE LIVE CLIENT: Tycho's skirt sits on him and the layers under it lay on
+    /// the floor - and the two are not siblings. <c>SkirtLayers.ao</c> is an attached_object of
+    /// <c>Skirt.ao</c>, its rig lives in the skirt's own folder, and it rests root_jntBnd at
+    /// (0,0,0) and spine_2_jntBnd at (0,0,-12.8), which is exactly where the SKIRT rests them.
+    /// The body rests its own spine_2 at (0,2,-132.3), nowhere near.
+    ///
+    /// SO MATCHING IT AGAINST THE BODY MATCHES THE WRONG RIG. Its two shared names found the
+    /// body's bones and were corrected out of a bind pose they were never in, while every bone
+    /// the body does not have - the whole simulated cloth, which is most of the piece - fell back
+    /// to the body's root. That root is the floor between his feet.
+    ///
+    /// The numbers here are his, rounded: the skirt hangs off spine_1 two hundred up, and rests
+    /// its own spine_2 twelve further. A layer bone resting on the skirt's spine_2 belongs at the
+    /// two together; matched against the body it stops at the body's spine_2 instead, and a layer
+    /// bone the body has no name for does not leave the ground at all.
+    /// </remarks>
+    [Fact]
+    public void APieceHungOffAnotherPieceIsFittedToThatPiecesRigAndNotTheBodys()
+    {
+        var install = Install();
+        install.Files["art/rig.ast"] = Packed.Skeleton(
+            [
+                ("root_jntBnd", 255, 1, 0f),
+                ("spine_1_jntBnd", 2, 255, -200f),
+                ("spine_2_jntBnd", 255, 255, -130f),
+            ],
+            []);
+
+        // The skirt and its layers carry the SAME rest pose, because the layers were authored
+        // beside the skirt. Neither of them rests spine_2 where the body does.
+        byte[] skirt = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("spine_2_jntBnd", 255, 255, -12f)], []);
+
+        install.Files["art/skirt.ast"] = skirt;
+        install.Files["art/layers.ast"] = skirt;
+
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/skirt.ao", socket: "spine_1_jntBnd", skeleton: "art/rig.ast");
+        install.Files["art/skirt.ao"] = Ao(
+            skin: "art/skirt.sm", attach: "art/layers.ao", socket: "<root>", skeleton: "art/skirt.ast");
+        install.Files["art/layers.ao"] = Ao(skin: "art/layers.sm", skeleton: "art/layers.ast");
+
+        install.Files["art/skirt.sm"] = Sm("art/skirt.smd", "art/paint.mat");
+        install.Files["art/skirt.smd"] = Smd();
+        install.Files["art/layers.sm"] = Sm("art/layers.smd", "art/paint.mat");
+
+        // Two vertices on the layers' own root - the cloth the body has no name for - and two on
+        // the spine_2 both it and the skirt carry.
+        install.Files["art/layers.smd"] = Packed.Mesh(
+        [
+            new Packed.Vertex(new Vector3(0f, 0f, 0f), [0, 0, 0, 0], [255, 0, 0, 0]),
+            new Packed.Vertex(new Vector3(1f, 0f, 0f), [0, 0, 0, 0], [255, 0, 0, 0]),
+            new Packed.Vertex(new Vector3(2f, 0f, -12f), [1, 0, 0, 0], [255, 0, 0, 0]),
+            new Packed.Vertex(new Vector3(3f, 0f, -12f), [1, 0, 0, 0], [255, 0, 0, 0]),
+        ]);
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(2, said.Parts);
+
+        // The body's four vertices, then the skirt's four, then the layers'.
+        Assert.Equal(-200f, said.Mesh.Positions[8].Z, 3);
+        Assert.Equal(-212f, said.Mesh.Positions[10].Z, 3);
+
+        // And they follow the bones the SKIRT follows, which is how they move with him: the
+        // layers' own root is the skirt's, and the skirt's root is the spine_1 it hangs off.
+        Assert.Equal<byte>(1, said.Mesh.Bones[32]);
+        Assert.Equal<byte>(2, said.Mesh.Bones[40]);
+    }
+
+    /// <summary>
+    /// A merged rig writes a bone's whole path where its name would collide, and that is read.
+    /// </summary>
+    /// <remarks>
+    /// BRUGHOR'S CORPSE ARMOUR IS A MONSTER'S SKELETON WITH A HEAP OF CORPSES MERGED INTO IT, and
+    /// its bones read <c>root_jntBnd|spine_2_jntBnd</c>, <c>…|chest_jntBnd</c>, <c>…|neck_jntBnd</c>
+    /// - the bone's whole path from the root, because the corpses carry a spine and a chest of
+    /// their own and a name can only mean one thing.
+    ///
+    /// THE PATH IS THE PROOF AND NOT A GUESS AT ONE: the piece rests L_clavicle_jntBnd at exactly
+    /// (27.7,-37.7,-464.2), which is where the BODY rests it, and that bone hangs off
+    /// <c>root_jntBnd|spine_2_jntBnd|chest_jntBnd</c> here and off <c>chest_jntBnd</c> there.
+    /// Read as a plain name none of the three matched anything, so his chest, his spine and his
+    /// neck - and everything hanging off them - fell to the rig root, which is the ground.
+    /// </remarks>
+    [Fact]
+    public void ABoneNamedByItsWholePathInAMergedRigStillFindsTheParentsBone()
+    {
+        var install = Install();
+        install.Files["art/rig.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("spine_2_jntBnd", 255, 255, -300f)], []);
+
+        // The merged rig names the same bone by its path, and rests it somewhere of its own.
+        install.Files["art/corpses.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("root_jntBnd|spine_2_jntBnd", 255, 255, -100f)], []);
+
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/corpses.ao", socket: "<root>", skeleton: "art/rig.ast");
+        install.Files["art/corpses.ao"] = Ao(skin: "art/corpses.sm", skeleton: "art/corpses.ast");
+        install.Files["art/corpses.sm"] = Sm("art/corpses.smd", "art/paint.mat");
+        install.Files["art/corpses.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+
+        // Found by its last segment, so it follows the body's spine_2 and travels the two hundred
+        // between the piece's rest pose and the body's, instead of staying where it was authored.
+        Assert.Equal<byte>(1, said.Mesh.Bones[16]);
+        Assert.Equal(-200f, said.Mesh.Positions[4].Z - said.Mesh.Positions[0].Z, 3);
+    }
+
+    /// <summary>
     /// A piece that names no socket and shares no bone but the root stays where it is.
     /// </summary>
     /// <remarks>
