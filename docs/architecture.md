@@ -633,6 +633,37 @@ checked against real data on a machine with no install. `--aodump` surveys the `
 reports where its feet come out against the ground plane — the numbers behind a monster that stands
 in the model pane's floor or hovers above it.
 
+`--modeldump` is the same question asked of **every monster at once**, and it exists because of how
+the attachment bugs were being found: somebody played, saw a boot on the floor, and asked. That
+finds the monsters somebody happens to fight, and four fixes in a row each broke a monster the other
+had just fixed, because the case that would have caught it was on a monster nobody had looked at.
+The files are all on disk whether or not anybody is playing.
+
+It runs the **real** walk — `MonsterModels.Of`, which now reports what it did per piece through
+`MonsterModel.Fitted` — rather than a second walk beside it; a diagnostic that reads less than the
+walk does is how the model dump once reported "no rig, no pairing, no materials" for Gulzal's hammer
+while all three sat in the axe it extends. No `.dds` is decoded: the sweep hands the walk a reader
+that answers "not here" for a picture, which is the walk itself reading an install that happens to
+have none, and it is most of the running time.
+
+Two things come out, under `modeldump/` beside the exe. `monster-fits.jsonl` is **one line of JSON
+per monster, sorted by path** — its rig, its sections, and per piece the socket, how that socket was
+answered, how many of its bones found one of its carrier's, how many strayed, and the box it ended
+up with. Sorted, because the point is that two builds diff. And `flagged/`, the ordinary text dump
+for the monsters the sweep marked — over the whole table that would be hundreds of megabytes nobody
+reads, and over the flagged ones it is the file somebody opens.
+
+The flags are `dropped`, `unfitted`, `torn`, `apart`, `malformed`, `paths`, `deep`, `past`, `unread`
+and `capped`, and each one names a case that has already cost a day — see the remarks on
+`ModelSweep.Odd`. They decide **which monsters get a text dump and nothing else**; no flag here
+decides how anything is drawn, which is the only reason `apart` is allowed to be a rule of thumb at
+all. `torn` deliberately does not count a piece's own rig root, because that never matches by design
+— a socketed piece's root IS its socket — and counting it would fire on the whole table.
+
+A corpus produced this way belongs in `tests/fixtures/`, on the same rule as the recordings: it is
+real data from a real install, it is what the next question gets asked of, and it is the thing that
+says what a change to the walk did to the other 2732 monsters.
+
 ## Deployment
 
 Native AOT (`PublishAot=true` on App), AOT/trim analyzers on everywhere so
@@ -756,6 +787,8 @@ PoEformance.App --aodump "Skeletal Warrior"   # + one monster's files in full, s
 PoEformance.App --astdump                     # survey the skeletons those .ao files name: bones and animations
 PoEformance.App --astdump "Skeletal Warrior"  # + one monster's rig in full, every bone and every animation
 PoEformance.App --posedump "TitanBoss"        # where a monster's feet are: box, bind skeleton, and posed frame by frame
+PoEformance.App --modeldump                   # every monster's model and what became of each of its pieces
+PoEformance.App --modeldump "Pirates"         # + the same, limited to the monsters whose path or name matches
 
 # Look at one address somebody already found (Cheat Engine path, as written):
 PoEformance.App --peek "PathOfExileSteam.exe+468C3A8,235C"
