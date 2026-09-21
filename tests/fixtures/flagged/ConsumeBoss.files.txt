@@ -1,0 +1,2020 @@
+monster: Tasgul, Swallower of Light [Metadata/Monsters/LeagueAbyss/Lightless/ConsumeBoss]
+
+=== .ao Metadata/Monsters/LeagueAbyss/Lightless/ConsumeBoss/ConsumeBoss.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/AbyssConsumeBoss/rig.amd"
+	animations = '[
+		{
+			"name": "beam_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.7611777782440186,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9604154825210572,
+					"name": "contact",
+					"position": [
+						-13.924545288085938,
+						-157.54783630371095,
+						-220.40687561035157
+					]
+				}
+			]
+		},
+		{
+			"name": "dash_slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.2921082675457001,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2767935991287232,
+					"name": "hit_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.9399261474609377,
+					"name": "contact",
+					"position": [
+						0.0,
+						0.0,
+						-99.46940612792969
+					]
+				}
+			]
+		},
+		{
+			"name": "death_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.576930046081543,
+					"name": "audio"
+				}
+			]
+		},
+		{
+			"name": "emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.40908923745155337,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.47869136929512026,
+					"name": "retract"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 2.0,
+					"end_time": 3.0666000843048097,
+					"name": "move",
+					"position": [
+						0.0,
+						-80.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "entrance_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.07743082195520401,
+					"name": "destruction"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0149528980255129,
+					"name": "halo_emerge"
+				}
+			]
+		},
+		{
+			"name": "epic_slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.6389026641845705,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5333300232887268,
+					"name": "move",
+					"position": [
+						0.0,
+						148.83200073242188,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3650429248809815,
+					"name": "audio"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 3.5332999229431154,
+					"end_time": 4.599999904632568,
+					"name": "move",
+					"position": [
+						0.0,
+						-80.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "pizza_spin_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.2411084175109864,
+					"name": "destruction"
+				}
+			]
+		},
+		{
+			"name": "pizza_spin_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.4141347408294679,
+					"name": "darkness"
+				}
+			]
+		},
+		{
+			"name": "pizza_spin_start_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.4141347408294679,
+					"name": "darkness"
+				}
+			]
+		},
+		{
+			"name": "slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.920804023742676,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/LeagueAbyss/Lightless/ConsumeBoss/attachments/AbyssConsumeBossAttachments/ACBSkirtMetal.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/LeagueAbyss/Lightless/ConsumeBoss/attachments/AbyssConsumeBossAttachments/ACBCloak.ao"
+	attached_object = "L_shoulder_attachment_jntBnd Metadata/Monsters/LeagueAbyss/Lightless/ConsumeBoss/attachments/AbyssConsumeBossAttachments/ACBLShoulderPad.ao"
+	attached_object = "R_shoulder_attachment_jntBnd Metadata/Monsters/LeagueAbyss/Lightless/ConsumeBoss/attachments/AbyssConsumeBossAttachments/ACBRShoulderPad.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/LeagueAbyss/Lightless/ConsumeBoss/attachments/AbyssConsumeBossAttachments/ACBCloakHorn.ao"
+	attached_object = "halo_01 Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_lightless_01.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5354330539703369,
+								0.0
+							],
+							[
+								0.5551180839538574,
+								0.5239923000335693
+							],
+							[
+								0.5551180839538574,
+								1.0
+							]
+						],
+						"rotation": 2.8099801540374758,
+						"width": 164.89999389648438,
+						"angle": 3.1415927410125734,
+						"x_axis_scale": 0.15000000596046449,
+						"length": 353.5849914550781,
+						"offset": [
+							-61.0,
+							194.0
+						],
+						"impact_z_rotation": [
+							-0.4712389409542084,
+							2.5307276248931886
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon",
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5354330539703369,
+								0.0
+							],
+							[
+								0.5551180839538574,
+								0.5239923000335693
+							],
+							[
+								0.5551180839538574,
+								1.0
+							]
+						],
+						"rotation": 3.647738456726074,
+						"width": 130.3090057373047,
+						"angle": 3.1415927410125734,
+						"x_axis_scale": 0.15000000596046449,
+						"length": 312.7040100097656,
+						"offset": [
+							124.0,
+							216.0
+						],
+						"impact_z_rotation": [
+							-0.6632251739501953,
+							-2.9147000312805177
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon",
+						"hand": "MainHand"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/AbyssConsumeBoss/rig.ast"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 3.76361 -13.0496"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -13.5242 -13.0496"
+		socket = "aux_light_attach"
+			parent = "head_jntBnd"
+			translation = "0 -126.272 -135.937"
+		socket = "aux_orb_02"
+			parent = "head_jntBnd"
+			translation = "0 -373.878 -31.1176"
+		socket = "aux_orb_01"
+			parent = "head_jntBnd"
+			translation = "0 -25.6581 -31.1176"
+		socket = "aux_melee_01"
+			parent = "root_jntBnd"
+			translation = "-69.743 0 -233.011"
+		socket = "aux_melee_02"
+			parent = "root_jntBnd"
+			translation = "0 0 -182.949"
+		socket = "aux_light_01"
+			parent = "tail_01_jntBnd"
+			translation = "2.79426 6.35218 7.17834"
+		socket = "aux_light_02"
+			parent = "tail_01_jntBnd"
+			translation = "2.35948 -5.853 7.17834"
+		socket = "aux_light_03"
+			parent = "tail_02_jntBnd"
+			translation = "-5.17101 -0.740753 1.02338"
+		socket = "death_beam"
+			parent = "head_jntBnd"
+			translation = "-29.9026 34.1982 60.2489"
+			ignore_parent_rotation = "yawpitch"
+		socket = "aux_beam_01"
+			translation = "-13.9245 -157.548 -220.407"
+		socket = "halo_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -50"
+			ignore_parent_rotation = "yawpitch"
+		socket = "aux_root_dir"
+			parent = "root_jntBnd"
+			translation = "0 0 -94.6362"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+		gravity = 0.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/AbyssConsumeBoss/AbyssConsumeBoss.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly_01_01 false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_belly_01_02 false tail_base_jntBnd spine_1_jntBnd"
+		bone_group = "grp_belly_01_03 false tail_01_jntBnd tail_base_jntBnd"
+		bone_group = "grp_waist false legs_base_jntBnd tail_01_jntBnd"
+		bone_group = "grp_L_shoulder false L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder false R_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow false L_elbow_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_elbow false R_elbow_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_wrist false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_wrist false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_hand false L_finger_2_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "grp_R_hand false R_finger_2_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_L_thigh false phys_skinned_L_Leg_01_jntBnd legs_base_jntBnd"
+		bone_group = "grp_R_thigh false phys_skinned_R_Leg_01_jntBnd legs_base_jntBnd"
+		bone_group = "grp_tentacle_01 false phys_skinned_R_Leg_08_jntBnd phys_skinned_R_Leg_07_jntBnd phys_skinned_R_Leg_06_jntBnd phys_skinned_R_Leg_05_jntBnd phys_skinned_R_Leg_04_jntBnd"
+		bone_group = "grp_tentacle_02 false phys_skinned_L_Leg_08_jntBnd phys_skinned_L_Leg_07_jntBnd phys_skinned_L_Leg_06_jntBnd phys_skinned_L_Leg_05_jntBnd phys_skinned_L_Leg_04_jntBnd"
+		bone_group = "grp_L_knee false"
+		bone_group = "grp_R_knee false"
+		bone_group = "grp_L_foot false"
+		bone_group = "grp_R_foot false"
+		bone_group = "root false legs_base_jntBnd tail_02_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_Weapon false R_Weapon"
+		bone_group = "grp_L_Weapon false L_Weapon"
+		bone_group = "grp_orb false aux_orb_01 aux_orb_02"
+		bone_group = "grp_melee_01 false aux_melee_02 aux_melee_01"
+		bone_group = "grp_dash_mid false tail_base_jntBnd chest_jntBnd"
+		bone_group = "grp_hip false hip_jntBnd tail_base_jntBnd tail_01_jntBnd tail_02_jntBnd legs_base_jntBnd"
+		bone_group = "grp_body_line false tail_01_jntBnd tail_base_jntBnd hip_jntBnd spine_1_jntBnd chest_jntBnd"
+		bone_group = "FX_line_root false root_jntBnd aux_root_dir"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.042702920734882358,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3367856442928314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40530523657798769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Attack",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5688419938087463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.042702920734882358,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3453967571258545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4412910044193268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Attack",
+						"bone_name": "L_finger_2_metacarpal_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7354170083999634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "beam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/Beam",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19805799424648286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/BeamLayer",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5381087064743042,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/AbyssBeam/AbyssBeam_CastSurge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6876099109649659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/AbyssBeam/AbyssBeam_Shot",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "dash_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/DashAir",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5794000029563904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "legs_base_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "dash_slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/DashAir",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/DashBlast",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9318680167198181,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/SmallDash",
+						"bone_name": "aux_target_head_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.541925072669983,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/AbyssBeam/AbyssBeam_OrbSurge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6123027801513672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/BeamLayer",
+						"bone_name": "tail_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.767115592956543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/AbyssBeam/AbyssBeam_OrbExplode",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/DeathImpact",
+						"bone_name": "aux_orb_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/Death",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24018999934196473,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.328657865524292,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3667351007461548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1074297428131105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.924099922180176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Death",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/Emerge",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26052525639533999,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5287021398544312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "L_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0002310276031496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2800989151000978,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/SmallDash",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/FlyLoopIdle",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/IdleTentacles",
+						"bone_name": "phys_skinned_L_Leg_03_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22228999435901643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/IdleFloat",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "entrance_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/FlyLoop",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/DashAir",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/EmergeLong",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15646351873874665,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.748837411403656,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/BeamLayer",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8085273504257202,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/DashAir",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3357921838760377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5827699899673463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/SmallDash",
+						"bone_name": "tail_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8361300230026246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5084400177001955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "legs_base_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "epic_slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "jellybase_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/DonutSlam",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5402100086212158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/DonutSlam/DonutSlam_IntroSurge",
+						"bone_name": "spine_1_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5906093120574951,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/BeamLayer",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.700423002243042,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/DonutSlam/DonutSlam_PreNova",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.914140224456787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/DonutSlam/DonutSlam_SurgeSweetener"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9257786273956299,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6826634407043459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.408841848373413,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/DonutSlam/DonutSlam_Nova",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "legs_base_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.018087856471538545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.018087856471538545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.018087856471538545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.018087856471538545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/FlyLoopIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/IdleTentacles",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5428199768066406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/IdleFloat",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/DeathImpact",
+						"bone_name": "aux_orb_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25147292017936709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38035282492637637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5497021675109864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.672276258468628,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/SmallDash",
+						"bone_name": "tail_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7225896120071412,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.747342109680176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "L_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0333921909332277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4482710361480715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/SmallDash",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pizza_spin_loop_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/IdleTentacles",
+						"bone_name": "legs_base_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pizza_spin_loop_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/IdleTentacles",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/SummonAbyss/SummonAbyss_Loop",
+						"bone_name": "spine_1_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/SummonAbyss/SummonAbyss_EnvSweetener",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pizza_spin_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "aux_melee_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7769240140914917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "phys_skinned_R_Leg_02_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1799999475479127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "phys_skinned_R_Leg_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7492401599884034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "phys_skinned_R_Leg_02_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2876999378204347,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "phys_skinned_R_Leg_02_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pizza_spin_start_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "aux_melee_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/SummonDarkness",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7769240140914917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "phys_skinned_R_Leg_02_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1799999475479127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "phys_skinned_R_Leg_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7492401599884034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "phys_skinned_R_Leg_02_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2876999378204347,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/WetMovementSmall",
+						"bone_name": "phys_skinned_R_Leg_02_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.321150064468384,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/SummonAbyss/SummonAbyss_DarknessSurge",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/FlyLoop",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/RunTentacles",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9023380279541016,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/IdleChase",
+						"bone_name": "aux_target_head_01"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/Tentacles",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Foley/BeamLayer",
+						"bone_name": "legs_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5736436247825623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/DarknessSlam/DarknessSlam_Surge",
+						"bone_name": "tail_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9328168630599976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Vocals/Beam",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6326345205307007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/AbyssBeam/AbyssBeam_OrbSurge",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.853790044784546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/ConsumeBoss/Effects/DarknessSlam/DarknessSlam_Burst",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6901730895042419,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/attack_01.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7021755576133728,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/attack_02.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "dash_slam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.9274613857269289,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/dash_slam_release.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.9274613857269289,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/dash_slam_impact.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "epic_slam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7022973299026489,
+						"end_time": 3.6614813804626467,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/wrist_smoke.pet",
+						"bone_group": "grp_R_hand"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7022973299026489,
+						"end_time": 3.6614813804626467,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/wrist_smoke.pet",
+						"bone_group": "grp_L_hand"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7153024077415466,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/epic_slam_buildup.pet",
+						"bone_group": "grp_R_wrist"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7153024077415466,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/epic_slam_buildup.pet",
+						"bone_group": "grp_L_wrist"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.884372889995575,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/epic_slam_buildup_grd.pet",
+						"bone_group": "FX_line_root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.3171448707580568,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/epic_slam_marker.pet",
+						"bone_group": "FX_line_root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.4746339321136476,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/epic_slam_impact.pet",
+						"bone_group": "FX_line_root"
+					}
+				]
+			},
+			{
+				"name": "pizza_spin_end_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.2420274019241334,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/end_darkness.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8144075870513916,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/slam_buildup.pet",
+						"bone_group": "grp_L_wrist"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8144075870513916,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/slam_buildup.pet",
+						"bone_group": "grp_R_wrist"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.0315141677856447,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/fx/darkness_discharge.pet",
+						"bone_group": "FX_line_root"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/R_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/L_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "beam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/R_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/L_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "dash_slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/core_buildup.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.743269920349121,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/dash_ribbons.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/R_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/L_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_idle_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/onAct/emerge_pillar_idle_01/channeling_body_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "epic_slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/L_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/R_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/core_buildup.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/L_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/epk/R_hand_glow.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "epic_slam_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 3.576514720916748,
+						"amplitude": 10.0,
+						"duration": 0.75,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Linear 0.299718 0 Flat 0.566594 1 Linear 0.841767 1 Linear 1.23655 0 Flat 1.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "surgeTime_L",
+						"curve": "6 0 0 Linear 0.299718 0 Flat 0.566594 1 Linear 0.841767 1 Linear 1.23655 0 Flat 1.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "beam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.7330000400543215,
+						"name": "surgeTime_R",
+						"curve": "5 0 0 Linear 0.614501 0 Flat 1.16167 1 Linear 2.29994 1 Linear 2.733 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.7330000400543215,
+						"name": "surgeTime_L",
+						"curve": "5 0 0 Linear 0.614501 0 Flat 1.16167 1 Linear 2.29994 1 Linear 2.733 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "dash_slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.0,
+						"name": "surgeTime_R",
+						"curve": "5 0 0 Linear 1.5612 0 Flat 3.00519 1 Linear 3.70643 0 Flat 4 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.0,
+						"name": "surgeTime_L",
+						"curve": "5 0 0 Linear 1.5612 0 Flat 3.00519 1 Linear 3.70643 0 Flat 4 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "epic_slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.333000183105469,
+						"name": "surgeTime_L",
+						"curve": "6 0 0 Linear 1.2372 1 Flat 2.36315 1 Linear 3.53405 1 Linear 4.01949 0 Flat 4.333 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.333000183105469,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Linear 1.21697 1 Flat 2.36315 1 Linear 3.53405 1 Linear 4.01949 0 Flat 4.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.0,
+						"name": "surgeTime_R",
+						"curve": "5 0 0 Linear 1.5612 0 Flat 3.00519 1 Linear 3.70643 0 Flat 4 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.0,
+						"name": "surgeTime_L",
+						"curve": "5 0 0 Linear 1.5612 0 Flat 3.00519 1 Linear 3.70643 0 Flat 4 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "beam_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.84433114528656,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/ConsumeBoss/onact_beam_muzzle.ao",
+						"from": {
+							"parent_bone": "aux_beam_01"
+						},
+						"speed": 1.0
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.7357100248336792,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.7188799977302551,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "dash_slam_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 2.937588930130005,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "epic_slam_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 3.5853800773620607,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "pizza_spin_end_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.240116000175476,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 2.967060089111328,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Lightless/ConsumeBoss/attachments/AbyssConsumeBossAttachments/ACBSkirtMetal.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBSkirtMetal/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBSkirtMetal/rig.ast"
+		linear_allowed_contraction = 0.010
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.100
+		animation_velocity_factor = 1.000
+		animation_force_factor = 1.000
+		use_shock_propagation = false
+		attachment_bones = "tail_base_jntBnd tail_01_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBSkirtMetal/ACBSkirtMetal.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false tail_base_jntBnd tail_01_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Lightless/ConsumeBoss/attachments/AbyssConsumeBossAttachments/ACBCloak.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBCloak/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBCloak/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		attachment_bones = "spine_1_jntBnd hip_jntBnd tail_base_jntBnd tail_01_jntBnd tail_02_jntBnd legs_base_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBCloak/ACBCloak.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false spine_1_jntBnd hip_jntBnd tail_base_jntBnd tail_01_jntBnd tail_02_jntBnd legs_base_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Lightless/ConsumeBoss/attachments/AbyssConsumeBossAttachments/ACBLShoulderPad.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBLShoulderPad/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBLShoulderPad/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_radius_additive = 200.000
+		animation_velocity_factor = 5.000
+		animation_force_factor = 20.000
+		animation_max_velocity = 10000.000
+		gravity = 0.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBLShoulderPad/ACBLShoulderPad.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Lightless/ConsumeBoss/attachments/AbyssConsumeBossAttachments/ACBRShoulderPad.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBRShoulderPad/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBRShoulderPad/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_radius_additive = 200.000
+		animation_velocity_factor = 5.000
+		animation_force_factor = 20.000
+		animation_max_velocity = 10000.000
+		gravity = 0.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBRShoulderPad/ACBRShoulderPad.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Lightless/ConsumeBoss/attachments/AbyssConsumeBossAttachments/ACBCloakHorn.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBCloakHorn/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBCloakHorn/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_radius_additive = 200.000
+		animation_velocity_factor = 5.000
+		animation_force_factor = 20.000
+		animation_max_velocity = 10000.000
+		gravity = 0.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/AbyssConsumeBoss/attachments/ACBCloakHorn/ACBCloakHorn.sm"
+	}
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_lightless_01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "animate"
+		view_looping = true
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+		socket = "aux_line_01"
+			translation = "0 0 -100"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_line false root aux_line_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "animate",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/fx/halo_lightless_01.pet",
+						"bone_group": "FX_line"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/AbyssConsumeBoss/AbyssConsumeBoss.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/AbyssConsumeBoss/rig_a3be61bd.smd"
+Materials 2
+	"Art/Textures/Monsters/AbyssalMonsters/AbyssConsumeBossArmourc.mat" 10
+	"Art/Textures/Monsters/AbyssalMonsters/AbyssConsumeBossc.mat" 1
+BoundingBox -84.3721 -33.4673 -323.543 85.6387 79.719 161.826
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/AbyssConsumeBoss/rig_a3be61bd.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 11 in the header, 11 in the block · 18007 triangles over 13471 vertices
+  names: 300 bytes said, 300 read  [agree]
+
+=== shapes (17)
+0	Skirt|Back|BackShape	from 0	count 111
+1	Hip|Back|BackShape	from 111	count 1272
+2	BaseShape	from 1383	count 1374
+3	CloakHornShape	from 2757	count 3888
+4	Skirt|Front|FrontShape	from 6645	count 162
+5	GlovesShape	from 6807	count 5640
+6	HelmetShape	from 12447	count 5526
+7	MainShape	from 17973	count 2952
+8	ShoulderPadsShape	from 20925	count 6234
+9	TorsoShape	from 27159	count 10410
+10	BodyShape	from 37569	count 16452
+11	FrontShape	from 54021	count 3762
+12	SidesShape	from 57783	count 7680
+13	ClothShape	from 65463	count 3696
+14	L_ShoulderHornShape	from 69159	count 210
+15	R_ShoulderHornShape	from 69369	count 486
+16	CloakHornFloatsShape	from 69855	count 654
+
+=== fitting
+the monster's rig: 87 bones
+mounts: aux_animation_control_ratio
+  ACBSkirtMetal.ao  socket hip_jntBnd [in its carrier's rig]  box (-41.4,-25.6,-9.6)..(41.4,21.3,58.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 3814 triangles over 3058 vertices
+    names: 40 bytes said, 40 read  [agree]
+    rig 7 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 5 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 tail_base_jntBnd  [shared]  under 0  rests at (-0,2,9.8)  carrier has (-0,4.5,-180.4)
+      2 tail_01_jntBnd  [shared]  under 1  rests at (-0,2.1,28.7)  carrier has (0,4.7,-161.6)
+      3 phys_tri_skirt_F_jntBnd  [its own]  under 1  rests at (-0,-14,26.2)
+      4 phys_tri_skirt_L_jntBnd  [its own]  under 1  rests at (19.2,2.9,26.2)
+      5 phys_tri_skirt_R_jntBnd  [its own]  under 1  rests at (-19.2,2.9,26.2)
+      6 aux_position  [its own]  under 0  rests at (0,0,0)
+  ACBCloak.ao  socket chest_jntBnd [in its carrier's rig]  box (-77.4,16,-68.2)..(87.7,108.4,210.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1232 triangles over 880 vertices
+    names: 20 bytes said, 20 read  [agree]
+    rig 25 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 24 of 25  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0.7,11.3)  carrier has (0,2.6,-200.2)
+      2 phys_tri_cloth_L01_jntBnd  [its own]  under 0  rests at (65,27.2,-38.5)
+      3 phys_tri_cloth_MR01_jntBnd  [its own]  under 0  rests at (-21.6,54.4,-11)
+      4 phys_tri_cloth_R01_jntBnd  [its own]  under 0  rests at (-58.6,62.9,-17.5)
+      5 hip_jntBnd  [shared]  under 1  rests at (0,0.7,21.3)  carrier has (0,2.6,-190.2)
+      6 phys_tri_cloth_L02_jntBnd  [its own]  under 2  rests at (65,39.3,-11.5)
+      7 phys_tri_cloth_MR02_jntBnd  [its own]  under 3  rests at (-21.6,63,8.4)
+      8 phys_tri_cloth_R02_jntBnd  [its own]  under 4  rests at (-60.6,70.3,3.3)
+      9 tail_base_jntBnd  [shared]  under 5  rests at (0,2.7,31.1)  carrier has (-0,4.5,-180.4)
+      10 phys_tri_cloth_L03_jntBnd  [its own]  under 6  rests at (65,49.9,12.4)
+      11 phys_tri_cloth_MR03_jntBnd  [its own]  under 7  rests at (-21.6,71.7,28)
+      12 phys_tri_cloth_R03_jntBnd  [its own]  under 8  rests at (-63,79.4,29.1)
+      13 tail_01_jntBnd  [shared]  under 9  rests at (0,2.8,50)  carrier has (0,4.7,-161.6)
+      14 phys_tri_cloth_L04_jntBnd  [its own]  under 10  rests at (65,62.8,41.3)
+      15 phys_tri_cloth_MR04_jntBnd  [its own]  under 11  rests at (-21.6,80.4,47.5)
+      16 tail_02_jntBnd  [shared]  under 13  rests at (0,2.9,68.8)  carrier has (0,4.8,-142.7)
+      17 phys_tri_cloth_M01_jntBnd  [its own]  under 13  rests at (-0,28.4,36.7)
+      18 phys_tri_cloth_MR05_jntBnd  [its own]  under 15  rests at (-21.6,93.5,76.9)
+      19 legs_base_jntBnd  [shared]  under 16  rests at (0,3.1,87.7)  carrier has (0,5,-123.9)
+      20 phys_tri_cloth_M02_jntBnd  [its own]  under 16  rests at (-0,33.1,67.4)
+      21 phys_tri_cloth_M03_jntBnd  [its own]  under 19  rests at (-0,38,99.3)
+      22 phys_tri_cloth_M04_jntBnd  [its own]  under 21  rests at (-0,43,132.4)
+      23 phys_tri_cloth_M05_jntBnd  [its own]  under 22  rests at (-0,47.9,164.3)
+      24 phys_tri_cloth_M06_jntBnd  [its own]  under 23  rests at (-0,52.6,195)
+  ACBLShoulderPad.ao  socket L_shoulder_attachment_jntBnd [in its carrier's rig]  box (27.1,4.6,-15.6)..(46.9,13.6,-5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 70 triangles over 76 vertices
+    names: 38 bytes said, 38 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_LShoulderHorn_jntBnd  [its own]  under 0  rests at (33.7,8.5,-4)
+  ACBRShoulderPad.ao  socket R_shoulder_attachment_jntBnd [in its carrier's rig]  box (-47,3.9,-15.6)..(-19.9,13.6,9.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 162 triangles over 159 vertices
+    names: 38 bytes said, 38 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_RShoulderHorn_jntBnd  [its own]  under 0  rests at (-33.7,8.5,-4)
+  ACBCloakHorn.ao  socket chest_jntBnd [in its carrier's rig]  box (-101.3,25.2,-113.9)..(62.2,88.6,-46.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 218 triangles over 181 vertices
+    names: 40 bytes said, 40 read  [agree]
+    rig 3 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_Floatie_L_jntBnd  [its own]  under 0  rests at (33.4,34,-61.1)
+      2 phys_tri_Floatie_R_jntBnd  [its own]  under 0  rests at (-65.9,63.6,-89.2)
+  halo_lightless_01.ao  socket halo_01 [NOT in its carrier's rig]  (no mesh - an effect or a sound)

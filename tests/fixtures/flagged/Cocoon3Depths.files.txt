@@ -1,0 +1,1565 @@
+monster: Lightless Abomination [Metadata/Monsters/LeagueAbyss/Lightless/Cocoon3Depths]
+
+=== .ao Metadata/Monsters/LeagueAbyss/Lightless/Cocoon3Boss/Cocoon3.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AttachedAnimatedObject
+{
+	attached_object = "halo_01 Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_lightless_01.ao"
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Cocoon3/rig.amd"
+	animations = '[
+		{
+			"name": "electric_charge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.1691499948501588,
+					"name": "sphere_spawn"
+				}
+			]
+		},
+		{
+			"name": "emerge_pit_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8261681199073792,
+					"name": "halo_emerge"
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.129504680633545,
+					"name": "halo_move"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.185579776763916,
+					"name": "halo_move"
+				}
+			]
+		},
+		{
+			"name": "mortar_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "sphere_kill",
+					"contact_ref": [
+						2.0683200359344484,
+						-31.434799194335939,
+						-139.3249969482422
+					]
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.25,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3522050082683563,
+					"name": "contact",
+					"position": [
+						2.0683200359344484,
+						-84.02649688720703,
+						-147.90499877929688
+					],
+					"contact_ref": [
+						2.0683200359344484,
+						-31.434799194335939,
+						-139.3249969482422
+					]
+				}
+			]
+		},
+		{
+			"name": "mortar_02",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.40234488248825076,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6522787809371948,
+					"name": "contact",
+					"position": [
+						1.7097400426864625,
+						-66.30039978027344,
+						-143.8699951171875
+					],
+					"contact_ref": [
+						4.85253381729126,
+						-20.224599838256837,
+						-140.8648681640625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6522787809371948,
+					"name": "contact",
+					"position": [
+						2.300011157989502,
+						-66.30039978027344,
+						-143.8699951171875
+					],
+					"contact_ref": [
+						2.2702479362487795,
+						-20.224599838256837,
+						-136.65469360351563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6522787809371948,
+					"name": "contact",
+					"position": [
+						1.7097400426864625,
+						-66.30039978027344,
+						-143.8699951171875
+					],
+					"contact_ref": [
+						-1.543795108795166,
+						-20.224599838256837,
+						-127.37693786621094
+					]
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.24858799576759339,
+								0.0
+							],
+							[
+								0.3385826647281647,
+								1.0
+							]
+						],
+						"width": 87.4800033569336,
+						"length": 203.74000549316407,
+						"impact_type": "Blunt",
+						"impact_bone": "spine_mouth_jntBnd_3"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Cocoon3/rig.ast"
+		socket = "ball_socket"
+			parent = "neck_jntBnd_5"
+			translation = "0 61.5219 -37.5448"
+		socket = "NewSocket_1"
+			parent = "spine_mouth_jntBnd_3"
+			translation = "0 -30 10"
+		socket = "halo_01"
+			parent = "head_jntBnd"
+			translation = "0 20 -70"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "halo_knockdown_01"
+			parent = "head_jntBnd"
+			translation = "0 20 -120"
+			ignore_parent_rotation = "yawpitchroll"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Cocoon3/Cocoons3.sm"
+			base_body_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3A.mat:0"
+		bone_skirt_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3A.mat:0"
+		head_torso_spikes_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3A.mat:0"
+		horn_spikes_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3A.mat:0"
+		insect_legs_1_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3A.mat:0"
+		insect_legs_2_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3A.mat:0"
+		insect_legs_2_spikes_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3A.mat:0"
+		sack_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3A.mat:0"
+		tentacle_1_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3B.mat:0"
+		tentacle_1_spikes_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3B.mat:0"
+		tentacle_2_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3B.mat:0"
+		tentacle_3_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3B.mat:0"
+		tentacle_4_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3B.mat:0"
+		tentacle_5_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons3B.mat:0"
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd base_jntBnd_5"
+		bone_group = "frameupper false chest_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd R_elbow_jntBnd L_elbow_jntBnd jaw_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "mortar false NewSocket_1"
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "mortar_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/Cocoon3/FX/onact_mortar_01.pet",
+						"bone_group": "mortar"
+					}
+				]
+			},
+			{
+				"name": "mortar_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.20067386329174043,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/Cocoon3/FX/onact_mortar_02.pet",
+						"bone_group": "mortar"
+					}
+				]
+			}
+		]'
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "L_tentacle_1_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/Attack01_",
+						"bone_name": "spine_mouth_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1316390037536621,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1765879988670349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2504349946975708,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Swish",
+						"bone_name": "spine_mouth_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3931809961795807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/BiteSwish",
+						"bone_name": "spine_mouth_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3947870135307312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Attack02_Impact_",
+						"bone_name": "spine_mouth_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4966028034687042,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "L_tentacle_1_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9110360145568848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.97605299949646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02073574997484684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/Attack01_",
+						"bone_name": "spine_mouth_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05551832914352417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "L_tentacle_1_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10969916731119156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14648833870887757,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "R_tentacle_1_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14715665578842164,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20869582891464234,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Swish",
+						"bone_name": "spine_mouth_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3276508152484894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/BiteSwish",
+						"bone_name": "spine_mouth_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.328989177942276,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Attack02_Impact_",
+						"bone_name": "spine_mouth_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4795999825000763,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "L_tentacle_1_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7591966390609741,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8133774995803833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Flinch",
+						"bone_name": "neck_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Death_TentacleFoley_",
+						"bone_name": "neck_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/Death_",
+						"bone_name": "spine_mouth_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementLong",
+						"bone_name": "base_jntBnd_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2127089947462082,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30501699447631838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3946489989757538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45351099967956545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6622070074081421,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6622070074081421,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8749139904975891,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "L_tentacle_1_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0822800397872925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Fall",
+						"bone_name": "L_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2749099731445313,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/FallMain",
+						"bone_name": "R_body_spikes_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "electric_charge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/ElectricCharge_",
+						"bone_name": "spine_mouth_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "R_tentacle_1_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10252299904823303,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16213394701480866,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Effects/Abyss/AbyssSurge",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17384299635887147,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5195139050483704,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "L_tentacle_1_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8390378355979919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Effects/Abyss/FireballCast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.138890027999878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "L_tentacle_1_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4910399913787842,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5957900285720826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_pit_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/OnAggro_",
+						"bone_name": "neck_jntBnd_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13837210834026338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "L_tentacle_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36266157031059267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "L_tentacle_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4359174370765686,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6339795589447022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "L_tentacle_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8989667296409607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "L_tentacle_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9143414497375488,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementLong",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/Flinch_",
+						"bone_name": "spine_mouth_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04013539478182793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Flinch",
+						"bone_name": "neck_jntBnd_5"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/Flinch_",
+						"bone_name": "spine_mouth_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0403771735727787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Flinch",
+						"bone_name": "neck_jntBnd_5"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/Flinch_",
+						"bone_name": "spine_mouth_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05149903893470764,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Flinch",
+						"bone_name": "neck_jntBnd_5"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/Flinch_",
+						"bone_name": "spine_mouth_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.040860723704099658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Flinch",
+						"bone_name": "neck_jntBnd_5"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/Idle.loop.ogg",
+						"bone_name": "spine_mouth_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2372799962759018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Shake_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.578710675239563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "L_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.135010004043579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.922547698020935,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "L_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9571800231933594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0824577808380129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1929500102996828,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4665000438690187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15615543723106385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16191916167736054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2372799962759018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Shake_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2724105715751648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.578710675239563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "L_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8440756797790527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.135010004043579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.922547698020935,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "L_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.947818398475647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "mortar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/Mortar01_",
+						"bone_name": "spine_mouth_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03916792571544647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Effects/Abyss/MortarCast",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07409360259771347,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18465399742126466,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/BiteSwish",
+						"bone_name": "spine_mouth_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2940349876880646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "mortar_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/Mortar02_",
+						"bone_name": "spine_mouth_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.060797300189733508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13163688778877259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Effects/Abyss/AbyssSurge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15042099356651307,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/Shake_",
+						"bone_name": "spine_mouth_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27946799993515017,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5024570226669312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/BiteSwish",
+						"bone_name": "spine_mouth_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6756340265274048,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.772711992263794,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/Run.loop.ogg",
+						"bone_name": "spine_mouth_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementLong",
+						"bone_name": "L_torso_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15785899758338929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3036789894104004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36521801352500918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5391309857368469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6033440232276917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.758529007434845,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9043459892272949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9591969847679138,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0043556690216065,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementLong",
+						"bone_name": "L_torso_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1612000465393067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2026699781417847,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.340459942817688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5050100088119507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5705599784851075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7565100193023682,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.803339958190918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8648699522018433,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "L_tentacle_2_jntBnd_8"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.969230055809021,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Vocals/Run.loop.ogg",
+						"bone_name": "spine_mouth_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementLong",
+						"bone_name": "L_torso_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15785899758338929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3036789894104004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36521801352500918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5391309857368469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6033440232276917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.758529007434845,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8729971647262573,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "L_tentacle_1_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9043459892272949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9591969847679138,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1612000465393067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2026699781417847,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.340459942817688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5050100088119507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5705599784851075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.59552001953125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/MovementShort",
+						"bone_name": "L_tentacle_1_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7565100193023682,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "L_B_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.803339958190918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ShortWalk",
+						"bone_name": "R_F_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.969230055809021,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Lightless/Cocoon/Foley/ClawStept",
+						"bone_name": "R_B_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "mortar_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/Cocoon3/EPK/OnAct.epk"
+					}
+				]
+			},
+			{
+				"name": "mortar_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/Cocoon3/EPK/OnAct.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "EmissiveMulti",
+						"curve": "4 0 0 Linear 0.500648 0 Linear 1.2382 1 Linear 1.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "EmissiveMulti",
+						"curve": "4 0 0 Linear 0.667531 0 Linear 1.65093 1 Linear 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "EmissiveMulti",
+						"curve": "4 0 0 Linear 0.667532 0 Linear 1.65093 1 Linear 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "EmissiveMulti",
+						"curve": "4 0 0 Linear 0.333766 0 Linear 0.825465 1 Linear 1 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "EmissiveMulti",
+						"curve": "4 0 0 Linear 0.333766 0 Linear 0.825465 1 Linear 1 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "EmissiveMulti",
+						"curve": "4 0 0 Linear 0.333766 0 Linear 0.825465 1 Linear 1 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "mortar_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.1660000085830689,
+						"name": "surgeTime_R",
+						"curve": "5 0 0 Smooth 0.471354 0.523697 Smooth 0.609949 0 Flat 0.716462 0 Flat 1.166 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "mortar_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.1660000085830689,
+						"name": "surgeTime_R",
+						"curve": "4 0 0 Smooth 0.726722 0.64218 Smooth 0.94782 0 Flat 1.166 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_lightless_01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "animate"
+		view_looping = true
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+		socket = "aux_line_01"
+			translation = "0 0 -100"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_line false root aux_line_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "animate",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/fx/halo_lightless_01.pet",
+						"bone_group": "FX_line"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/Cocoon3/Cocoons3.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/Cocoon3/rig_be344d04.smd"
+Materials 2
+	"Art/Models/MONSTERS/Cocoon/Textures/Cocoon3A_matc.mat" 8
+	"Art/Models/MONSTERS/Cocoon/Textures/Cocoon3B_matc.mat" 6
+BoundingBox -111.638 -98.6134 -141.531 111.638 153.498 164.493
+BoneGroups 153
+	"grp_head" 2 "head_jntBnd" "jaw_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_neck_01" 2 "neck_base_jntBnd" "neck_jntBnd_5"
+	"grp_neck_02" 2 "neck_jntBnd_5" "neck_jntBnd_1"
+	"grp_neck_03" 2 "neck_jntBnd_1" "neck_jntBnd_2"
+	"grp_neck_04" 2 "neck_jntBnd_2" "neck_jntBnd_3"
+	"grp_neck_05" 2 "neck_jntBnd_3" "neck_jntBnd_4"
+	"grp_neck_06" 2 "neck_jntBnd_4" "spine_mouth_jntBnd_1"
+	"grp_neck_07" 2 "spine_mouth_jntBnd_1" "spine_mouth_jntBnd_2"
+	"grp_neck_08" 2 "spine_mouth_jntBnd_2" "spine_mouth_jntBnd_3"
+	"grp_l_horn_01" 2 "neck_jntBnd_5" "L_horn_jntBnd_1"
+	"grp_l_horn_02" 2 "L_horn_jntBnd_1" "L_horn_jntBnd_2"
+	"grp_l_horn_03" 2 "L_horn_jntBnd_2" "L_horn_jntBnd_3"
+	"grp_l_horn_04" 2 "L_horn_jntBnd_3" "L_horn_jntBnd_4"
+	"grp_l_horn_05" 2 "L_horn_jntBnd_4" "L_horn_jntBnd_5"
+	"grp_l_horn_06" 2 "L_horn_jntBnd_5" "L_horn_jntBnd_6"
+	"grp_l_horn_07" 2 "L_horn_jntBnd_6" "L_horn_jntBnd_7"
+	"grp_r_horn_01" 2 "neck_jntBnd_5" "R_horn_jntBnd_1"
+	"grp_r_horn_02" 2 "R_horn_jntBnd_1" "R_horn_jntBnd_2"
+	"grp_r_horn_03" 2 "R_horn_jntBnd_2" "R_horn_jntBnd_3"
+	"grp_r_horn_04" 2 "R_horn_jntBnd_3" "R_horn_jntBnd_4"
+	"grp_r_horn_05" 2 "R_horn_jntBnd_4" "R_horn_jntBnd_5"
+	"grp_r_horn_06" 2 "R_horn_jntBnd_5" "R_horn_jntBnd_6"
+	"grp_r_horn_07" 2 "R_horn_jntBnd_6" "R_horn_jntBnd_7"
+	"grp_l_mandible_01" 2 "spine_mouth_jntBnd_1" "L_torso_clavicle_jntBnd"
+	"grp_l_mandible_02" 2 "L_torso_clavicle_jntBnd" "L_torso_shoulder_jntBnd"
+	"grp_r_mandible_01" 2 "spine_mouth_jntBnd_1" "R_torso_clavicle_jntBnd"
+	"grp_r_mandible_02" 2 "R_torso_clavicle_jntBnd" "R_torso_shoulder_jntBnd"
+	"grp_r_mandible_03" 2 "R_torso_shoulder_jntBnd" "R_torso_elbow_jntBnd"
+	"grp_r_mandible_04" 2 "R_torso_elbow_jntBnd" "R_torso_wrist_jntBnd"
+	"grp_l_big_claw_01" 2 "base_jntBnd_1" "L_B_hip_jntBnd"
+	"grp_l_big_claw_02" 2 "L_B_hip_jntBnd" "L_B_thigh_jntBnd"
+	"grp_l_big_claw_03" 2 "L_B_thigh_jntBnd" "L_B_knee_jntBnd"
+	"grp_l_big_claw_04" 2 "L_B_knee_jntBnd" "L_B_foot_jntBnd"
+	"grp_r_big_claw_01" 2 "base_jntBnd_1" "R_B_hip_jntBnd"
+	"grp_r_big_claw_02" 2 "R_B_hip_jntBnd" "R_B_thigh_jntBnd"
+	"grp_r_big_claw_03" 2 "R_B_thigh_jntBnd" "R_B_knee_jntBnd"
+	"grp_r_big_claw_04" 2 "R_B_knee_jntBnd" "R_B_foot_jntBnd"
+	"grp_l_small_claw_01" 2 "base_jntBnd_1" "L_F_hip_jntBnd"
+	"grp_l_small_claw_02" 2 "L_F_hip_jntBnd" "L_F_thigh_jntBnd"
+	"grp_l_small_claw_03" 2 "L_F_thigh_jntBnd" "L_F_knee_jntBnd"
+	"grp_l_small_claw_04" 2 "L_F_knee_jntBnd" "L_F_foot_jntBnd"
+	"grp_r_small_claw_01" 2 "R_F_hip_jntBnd" "R_F_thigh_jntBnd"
+	"grp_r_small_claw_02" 2 "R_F_thigh_jntBnd" "R_F_knee_jntBnd"
+	"grp_r_small_claw_03" 2 "R_F_knee_jntBnd" "R_F_foot_jntBnd"
+	"grp_l_tentacle_01_01" 2 "L_tentacle_1_jntBnd_1" "L_tentacle_1_jntBnd_2"
+	"grp_l_tentacle_01_02" 2 "L_tentacle_1_jntBnd_2" "L_tentacle_1_jntBnd_3"
+	"grp_l_tentacle_01_03" 2 "L_tentacle_1_jntBnd_3" "L_tentacle_1_jntBnd_4"
+	"grp_l_tentacle_01_04" 2 "L_tentacle_1_jntBnd_4" "L_tentacle_1_jntBnd_5"
+	"grp_l_tentacle_01_05" 2 "L_tentacle_1_jntBnd_5" "L_tentacle_1_jntBnd_6"
+	"grp_l_tentacle_01_06" 2 "L_tentacle_1_jntBnd_6" "L_tentacle_1_jntBnd_7"
+	"grp_l_tentacle_01_07" 2 "L_tentacle_1_jntBnd_7" "L_tentacle_1_jntBnd_8"
+	"grp_l_tentacle_01_08" 2 "L_tentacle_1_jntBnd_8" "L_tentacle_1_jntBnd_9"
+	"grp_l_tentacle_01_09" 2 "L_tentacle_1_jntBnd_9" "L_tentacle_1_jntBnd_10"
+	"grp_l_tentacle_01_10" 2 "L_tentacle_1_jntBnd_10" "L_tentacle_1_jntBnd_11"
+	"grp_l_tentacle_01_11" 2 "L_tentacle_1_jntBnd_11" "L_tentacle_1_jntBnd_12"
+	"grp_l_tentacle_01_12" 2 "L_tentacle_1_jntBnd_12" "L_tentacle_1_jntBnd_13"
+	"grp_l_tentacle_01_13" 2 "L_tentacle_1_jntBnd_13" "L_tentacle_1_jntBnd_14"
+	"grp_l_tentacle_02_01" 2 "L_tentacle_2_jntBnd_1" "L_tentacle_2_jntBnd_2"
+	"grp_l_tentacle_02_02" 2 "L_tentacle_2_jntBnd_2" "L_tentacle_2_jntBnd_3"
+	"grp_l_tentacle_02_03" 2 "L_tentacle_2_jntBnd_3" "L_tentacle_2_jntBnd_4"
+	"grp_l_tentacle_02_04" 2 "L_tentacle_2_jntBnd_4" "L_tentacle_2_jntBnd_5"
+	"grp_l_tentacle_02_05" 2 "L_tentacle_2_jntBnd_5" "L_tentacle_2_jntBnd_6"
+	"grp_l_tentacle_02_06" 2 "L_tentacle_2_jntBnd_6" "L_tentacle_2_jntBnd_7"
+	"grp_l_tentacle_02_07" 2 "L_tentacle_2_jntBnd_7" "L_tentacle_2_jntBnd_8"
+	"grp_l_tentacle_02_08" 2 "L_tentacle_2_jntBnd_8" "L_tentacle_2_jntBnd_9"
+	"grp_l_tentacle_02_09" 2 "L_tentacle_2_jntBnd_9" "L_tentacle_2_jntBnd_10"
+	"grp_l_tentacle_02_10" 2 "L_tentacle_2_jntBnd_10" "L_tentacle_2_jntBnd_11"
+	"grp_l_tentacle_02_11" 2 "L_tentacle_2_jntBnd_11" "L_tentacle_2_jntBnd_12"
+	"grp_l_tentacle_03_01" 2 "L_tentacle_3_jntBnd_1" "L_tentacle_3_jntBnd_2"
+	"grp_l_tentacle_03_02" 2 "L_tentacle_3_jntBnd_2" "L_tentacle_3_jntBnd_3"
+	"grp_l_tentacle_03_03" 2 "L_tentacle_3_jntBnd_3" "L_tentacle_3_jntBnd_4"
+	"grp_l_tentacle_03_04" 2 "L_tentacle_3_jntBnd_4" "L_tentacle_3_jntBnd_5"
+	"grp_l_tentacle_03_05" 2 "L_tentacle_3_jntBnd_5" "L_tentacle_3_jntBnd_6"
+	"grp_l_tentacle_03_06" 2 "L_tentacle_3_jntBnd_6" "L_tentacle_3_jntBnd_7"
+	"grp_l_tentacle_03_07" 2 "L_tentacle_3_jntBnd_7" "L_tentacle_3_jntBnd_8"
+	"grp_l_tentacle_03_08" 2 "L_tentacle_3_jntBnd_8" "L_tentacle_3_jntBnd_9"
+	"grp_l_tentacle_03_09" 2 "L_tentacle_3_jntBnd_9" "L_tentacle_3_jntBnd_10"
+	"grp_l_tentacle_03_10" 2 "L_tentacle_3_jntBnd_10" "L_tentacle_3_jntBnd_11"
+	"grp_l_tentacle_04_01" 2 "L_tentacle_4_jntBnd_1" "L_tentacle_4_jntBnd_2"
+	"grp_l_tentacle_04_02" 2 "L_tentacle_4_jntBnd_2" "L_tentacle_4_jntBnd_3"
+	"grp_l_tentacle_04_03" 2 "L_tentacle_4_jntBnd_3" "L_tentacle_4_jntBnd_4"
+	"grp_l_tentacle_04_04" 2 "L_tentacle_4_jntBnd_4" "L_tentacle_4_jntBnd_5"
+	"grp_l_tentacle_04_05" 2 "L_tentacle_4_jntBnd_5" "L_tentacle_4_jntBnd_6"
+	"grp_l_tentacle_04_06" 2 "L_tentacle_4_jntBnd_6" "L_tentacle_4_jntBnd_7"
+	"grp_l_tentacle_04_07" 2 "L_tentacle_4_jntBnd_7" "L_tentacle_4_jntBnd_8"
+	"grp_l_tentacle_04_08" 2 "L_tentacle_4_jntBnd_8" "L_tentacle_4_jntBnd_9"
+	"grp_l_tentacle_05_01" 2 "L_tentacle_5_jntBnd_1" "L_tentacle_5_jntBnd_2"
+	"grp_l_tentacle_05_02" 2 "L_tentacle_5_jntBnd_2" "L_tentacle_5_jntBnd_3"
+	"grp_l_tentacle_05_03" 2 "L_tentacle_5_jntBnd_3" "L_tentacle_5_jntBnd_4"
+	"grp_l_tentacle_05_04" 2 "L_tentacle_5_jntBnd_4" "L_tentacle_5_jntBnd_5"
+	"grp_l_tentacle_05_05" 2 "L_tentacle_5_jntBnd_5" "L_tentacle_5_jntBnd_6"
+	"grp_l_tentacle_05_06" 2 "L_tentacle_5_jntBnd_6" "L_tentacle_5_jntBnd_7"
+	"grp_l_tentacle_05_07" 2 "L_tentacle_5_jntBnd_7" "L_tentacle_5_jntBnd_8"
+	"grp_l_tentacle_05_08" 2 "L_tentacle_5_jntBnd_8" "L_tentacle_5_jntBnd_9"
+	"grp_r_tentacle_01_01" 2 "R_tentacle_1_jntBnd_1" "R_tentacle_1_jntBnd_2"
+	"grp_r_tentacle_01_02" 2 "R_tentacle_1_jntBnd_2" "R_tentacle_1_jntBnd_3"
+	"grp_r_tentacle_01_03" 2 "R_tentacle_1_jntBnd_3" "R_tentacle_1_jntBnd_4"
+	"grp_r_tentacle_01_04" 2 "R_tentacle_1_jntBnd_4" "R_tentacle_1_jntBnd_5"
+	"grp_r_tentacle_01_05" 2 "R_tentacle_1_jntBnd_5" "R_tentacle_1_jntBnd_6"
+	"grp_r_tentacle_01_06" 2 "R_tentacle_1_jntBnd_6" "R_tentacle_1_jntBnd_7"
+	"grp_r_tentacle_01_07" 2 "R_tentacle_1_jntBnd_7" "R_tentacle_1_jntBnd_8"
+	"grp_r_tentacle_01_08" 2 "R_tentacle_1_jntBnd_8" "R_tentacle_1_jntBnd_9"
+	"grp_r_tentacle_01_09" 2 "R_tentacle_1_jntBnd_9" "R_tentacle_1_jntBnd_10"
+	"grp_r_tentacle_01_10" 2 "R_tentacle_1_jntBnd_10" "R_tentacle_1_jntBnd_11"
+	"grp_r_tentacle_01_11" 2 "R_tentacle_1_jntBnd_11" "R_tentacle_1_jntBnd_12"
+	"grp_r_tentacle_01_12" 2 "R_tentacle_1_jntBnd_12" "R_tentacle_1_jntBnd_13"
+	"grp_r_tentacle_01_13" 2 "R_tentacle_1_jntBnd_13" "R_tentacle_1_jntBnd_14"
+	"grp_r_tentacle_02_01" 2 "R_tentacle_2_jntBnd_1" "R_tentacle_2_jntBnd_2"
+	"grp_r_tentacle_02_02" 2 "R_tentacle_2_jntBnd_2" "R_tentacle_2_jntBnd_3"
+	"grp_r_tentacle_02_03" 2 "R_tentacle_2_jntBnd_3" "R_tentacle_2_jntBnd_4"
+	"grp_r_tentacle_02_04" 2 "R_tentacle_2_jntBnd_4" "R_tentacle_2_jntBnd_5"
+	"grp_r_tentacle_02_05" 2 "R_tentacle_2_jntBnd_5" "R_tentacle_2_jntBnd_6"
+	"grp_r_tentacle_02_06" 2 "R_tentacle_2_jntBnd_6" "R_tentacle_2_jntBnd_7"
+	"grp_r_tentacle_02_07" 2 "R_tentacle_2_jntBnd_7" "R_tentacle_2_jntBnd_8"
+	"grp_r_tentacle_02_08" 2 "R_tentacle_2_jntBnd_8" "R_tentacle_2_jntBnd_9"
+	"grp_r_tentacle_02_09" 2 "R_tentacle_2_jntBnd_9" "R_tentacle_2_jntBnd_10"
+	"grp_r_tentacle_02_10" 2 "R_tentacle_2_jntBnd_10" "R_tentacle_2_jntBnd_11"
+	"grp_r_tentacle_02_11" 2 "R_tentacle_2_jntBnd_11" "R_tentacle_2_jntBnd_12"
+	"grp_r_tentacle_03_01" 2 "R_tentacle_3_jntBnd_1" "R_tentacle_3_jntBnd_2"
+	"grp_r_tentacle_03_02" 2 "R_tentacle_3_jntBnd_2" "R_tentacle_3_jntBnd_3"
+	"grp_r_tentacle_03_03" 2 "R_tentacle_3_jntBnd_3" "R_tentacle_3_jntBnd_4"
+	"grp_r_tentacle_03_04" 2 "R_tentacle_3_jntBnd_4" "R_tentacle_3_jntBnd_5"
+	"grp_r_tentacle_03_05" 2 "R_tentacle_3_jntBnd_5" "R_tentacle_3_jntBnd_6"
+	"grp_r_tentacle_03_06" 2 "R_tentacle_3_jntBnd_6" "R_tentacle_3_jntBnd_7"
+	"grp_r_tentacle_03_07" 2 "R_tentacle_3_jntBnd_7" "R_tentacle_3_jntBnd_8"
+	"grp_r_tentacle_03_08" 2 "R_tentacle_3_jntBnd_8" "R_tentacle_3_jntBnd_9"
+	"grp_r_tentacle_03_09" 2 "R_tentacle_3_jntBnd_9" "R_tentacle_3_jntBnd_10"
+	"grp_r_tentacle_03_10" 2 "R_tentacle_3_jntBnd_10" "R_tentacle_3_jntBnd_11"
+	"grp_r_tentacle_04_01" 2 "R_tentacle_4_jntBnd_1" "R_tentacle_4_jntBnd_2"
+	"grp_r_tentacle_04_02" 2 "R_tentacle_4_jntBnd_2" "R_tentacle_4_jntBnd_3"
+	"grp_r_tentacle_04_03" 2 "R_tentacle_4_jntBnd_3" "R_tentacle_4_jntBnd_4"
+	"grp_r_tentacle_04_04" 2 "R_tentacle_4_jntBnd_4" "R_tentacle_4_jntBnd_5"
+	"grp_r_tentacle_04_05" 2 "R_tentacle_4_jntBnd_5" "R_tentacle_4_jntBnd_6"
+	"grp_r_tentacle_04_06" 2 "R_tentacle_4_jntBnd_6" "R_tentacle_4_jntBnd_7"
+	"grp_r_tentacle_04_07" 2 "R_tentacle_4_jntBnd_7" "R_tentacle_4_jntBnd_8"
+	"grp_r_tentacle_04_08" 2 "R_tentacle_4_jntBnd_8" "R_tentacle_4_jntBnd_9"
+	"grp_r_tentacle_05_01" 2 "R_tentacle_5_jntBnd_1" "R_tentacle_5_jntBnd_2"
+	"grp_r_tentacle_05_02" 2 "R_tentacle_5_jntBnd_2" "R_tentacle_5_jntBnd_3"
+	"grp_r_tentacle_05_03" 2 "R_tentacle_5_jntBnd_3" "R_tentacle_5_jntBnd_4"
+	"grp_r_tentacle_05_04" 2 "R_tentacle_5_jntBnd_4" "R_tentacle_5_jntBnd_5"
+	"grp_r_tentacle_05_05" 2 "R_tentacle_5_jntBnd_5" "R_tentacle_5_jntBnd_6"
+	"grp_r_tentacle_05_06" 2 "R_tentacle_5_jntBnd_6" "R_tentacle_5_jntBnd_7"
+	"grp_r_tentacle_05_07" 2 "R_tentacle_5_jntBnd_7" "R_tentacle_5_jntBnd_8"
+	"grp_r_tentacle_05_08" 2 "R_tentacle_5_jntBnd_8" "R_tentacle_5_jntBnd_9"
+
+=== .smd Art/Models/MONSTERS/Cocoon3/rig_be344d04.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 14 in the header, 14 in the block · 46966 triangles over 30806 vertices
+  names: 608 bytes said, 608 read  [agree]
+
+=== shapes (14)
+0	base_body_meshShape	from 0	count 22680
+1	bone_skirt_meshShape	from 22680	count 33612
+2	head_torso_spikes_meshShape	from 56292	count 10812
+3	horn_spikes_meshShape	from 67104	count 35052
+4	insect_legs_1_meshShape	from 102156	count 3024
+5	insect_legs_2_meshShape	from 105180	count 4188
+6	insect_legs_2_spikes_meshShape	from 109368	count 2040
+7	sack_meshShape	from 111408	count 1806
+8	tentacle_1_meshShape	from 113214	count 4920
+9	tentacle_1_spikes_meshShape	from 118134	count 828
+10	tentacle_2_meshShape	from 118962	count 5484
+11	tentacle_3_meshShape	from 124446	count 5484
+12	tentacle_4_meshShape	from 129930	count 5484
+13	tentacle_5_meshShape	from 135414	count 5484
+
+=== fitting
+the monster's rig: 248 bones
+mounts: aux_position
+  halo_lightless_01.ao  socket halo_01 [NOT in its carrier's rig]  (no mesh - an effect or a sound)

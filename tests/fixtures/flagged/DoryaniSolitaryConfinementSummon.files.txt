@@ -1,0 +1,1659 @@
+monster: Doryani [Metadata/NPC/Four_Act4/DoryaniSolitaryConfinementSummon]
+
+=== .ao Metadata/NPC/Four_Act4/DoryaniTown.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/TrueDoryani/rig.amd"
+	default_animation = "idle_town_01"
+	animations = '[
+		{
+			"name": "precursor_active_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 35.066001892089847,
+					"name": "move",
+					"position": [
+						0.0,
+						-538.8079833984375,
+						0.0
+					],
+					"data": "0 0 0 Nothing 0 0 NoOverride 1.000000"
+				}
+			]
+		}
+	]'
+
+	subdivide_animation = "precursor_active_01"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "plate_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/PlateDanglers.ao"
+	attached_object = "R_upperArm_attachment_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/R_ShoulderpadDanglers.ao"
+	attached_object = "L_upperArm_attachment_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/L_ShoulderpadDanglers.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/HeadChain.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/Feathers.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/BackDanglers.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/Belt.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/Skirt.ao"
+	attached_object = "neck_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/Necklace.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/TrueDoryani/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_thruster_ref"
+			parent = "chest_jntBnd"
+			translation = "0 0 155"
+			ignore_parent_axis = "x"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "ground"
+		socket = "beam_blast_split"
+			translation = "0 -304.687 -185"
+		socket = "beam_blast_source"
+			translation = "0 -45.5326 -185"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/TrueDoryani.sm"
+			hide_segments = "amuletShape,amulet_glassShape,amulet_necklaceShape"
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "cataclysm_cinematic_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 4.704531669616699,
+						"end_time": 10.065999984741211,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Doryani/cataclysm_barrier.ao",
+						"animation": "animate",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"rotation": [
+								0.0,
+								0.0,
+								1.5707999467849732
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "portal_arrive_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 3.365999937057495,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								77.0,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "portal_arrive_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 3.365999698638916,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								77.0,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "portal_arrive_03",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 3.365999698638916,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								77.0,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "portal_leave_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.40282002091407778,
+						"end_time": 4.0,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								-275.0,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "precursor_portal_arrive_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 3.3329999446868898,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								77.0,
+								0.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "arbiter_arena_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8053870797157288,
+						"filename": "Audio/Sound Effects/NPC/4.0/Endgame/Doryani/Foley/LeatherFlap"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.269874930381775,
+						"filename": "Audio/Sound Effects/NPC/4.0/Endgame/Doryani/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3848319053649904,
+						"filename": "Audio/Sound Effects/NPC/4.0/Endgame/Doryani/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0709593296051027,
+						"filename": "Audio/Sound Effects/NPC/4.0/Endgame/Doryani/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.266674995422363,
+						"filename": "Audio/Sound Effects/NPC/4.0/Endgame/Doryani/Foley/ClothMail",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.135976314544678,
+						"filename": "Audio/Sound Effects/NPC/4.0/Endgame/Doryani/Foley/ClothMail",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "arbiter_arena_leave_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 3.8272645473480226,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/ClothMail",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.020543098449707,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Levitate",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.270410537719727,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Levitate",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cataclysm_cinematic_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 4.048455715179443,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_17/DoryaniBoss/Human/Foley/Clothing/WhooshArm",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.194168567657471,
+						"filename": "Audio/Sound Effects/Environment/4.0/Part1/Act3/G3_Town/Cataclysm/Doryani_Shield/Cataclysm_Shield_Gauntlet_Foley",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.4265217781066898,
+						"filename": "Audio/Sound Effects/Environment/4.0/Part1/Act3/G3_Town/Cataclysm/Doryani_Shield/Cataclysm_Shield_OnAct",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "clense_corruption_elevator_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/ClothFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/LeatherFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4372321367263794,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.938220202922821,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Effects/MagicGloveHandA",
+						"bone_name": "L_bracer_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.398001194000244,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Murals/PlatformNova",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.966808319091797,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Effects/MagicGloveLong",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.296410083770752,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/ClothMail",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.841390609741211,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.384044647216797,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/LeatherFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.401554107666016,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/ClothFlap",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.611124038696289,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.033461570739746,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "incursion_activate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.4774775803089142,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/LeatherFlapBig",
+						"bone_name": "amulet_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7888299822807312,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/FootstepsBig",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2100962400436402,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/ChainmailFlapBig",
+						"bone_name": "R_finger_4_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4210230112075806,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/LeatherFlapBig",
+						"bone_name": "amulet_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6728289127349854,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/Mechanism_RotateClose",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6980500221252442,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/FootstepsBig",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7068947553634644,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/Mechanism_Click",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9991726875305176,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/Mechanism_Click",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5967764854431154,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/ChainmailFlapBig",
+						"bone_name": "R_finger_4_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.416668176651001,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/Mechanism_RotateOpen",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5485012531280519,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/ChainmailFlapBig",
+						"bone_name": "R_finger_4_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.910357713699341,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/Mechanism_EndFoley",
+						"bone_name": "L_bracer_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.690592288970947,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/ChainmailFlapBig",
+						"bone_name": "R_finger_4_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.756936073303223,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/Mechanism_Click",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.521820068359375,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/LeatherFlapBig",
+						"bone_name": "amulet_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.877600193023682,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/FootstepsBig",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.938700199127197,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/ChainmailFlapBig",
+						"bone_name": "R_finger_4_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.414251804351807,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/IncursionTwo/Doryani/Foley/FootstepsBig",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_arrive_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.1926000118255616,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6241174936294556,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/ClothMail",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.835401177406311,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "precursor_active_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.337422639131546,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9084458351135254,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5832912921905518,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6215155124664308,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/ClothMail",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8032045364379885,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.915600061416626,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/LeatherFlapRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2710683345794679,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/GloveStart",
+						"bone_name": "L_elbow_Twist_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.94097900390625,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Effects/MagicGloveShort",
+						"bone_name": "L_bracer_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.926292419433594,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/ClothFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.935678958892822,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Effects/JetBoosters",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.198929786682129,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Levitate",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.73475980758667,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.27982234954834,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.136345863342286,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.525609970092774,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Effects/MagicGloveHandA",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.773508071899414,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Effects/MagicGloveLong",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 16.573699951171876,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Effects/MagicGloveHandB",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 16.78221893310547,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Effects/MagicGloveShort",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 16.85862159729004,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/ClothMail",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 18.018930435180665,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Effects/MagicGloveLong",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 24.7958927154541,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Effects/MagicGloveHandC",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 25.658992767333986,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Effects/MagicGloveShort",
+						"bone_name": "R_bracer_3_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 25.968992233276368,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/ClothMail",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 27.03423309326172,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Effects/MagicGloveLong",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "precursor_portal_arrive_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8482940793037415,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/ClothMail"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1969681978225709,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8023947477340699,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Precursor/Fortress/MonolithMuralReveal/Doryani/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd chest_jntBnd"
+		bone_group = "frameupper false R_upperArm_attachment_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd aux_L_shoulder_attachment"
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "clense_corruption_elevator_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Doryani/epk/hand_vaalglow_l_01.epk"
+					}
+				]
+			},
+			{
+				"name": "portal_arrive_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 7.6328654289245609,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Doryani_portal_fade.epk"
+					}
+				]
+			},
+			{
+				"name": "portal_arrive_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 8.099276542663575,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Doryani_portal_fade.epk"
+					}
+				]
+			},
+			{
+				"name": "portal_arrive_03",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 8.68283748626709,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Doryani_portal_fade.epk"
+					}
+				]
+			},
+			{
+				"name": "portal_leave_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 4.4010910987854,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Doryani/epk/portal_dissolve.epk"
+					}
+				]
+			},
+			{
+				"name": "precursor_active_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 5.489019393920898,
+						"end_time": 8.053728103637696,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Doryani/epk/feet_lightning_deathfall.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 8.933211326599121,
+						"end_time": 15.070277214050293,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Doryani/epk/hand_vaalglow_r_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 14.8388090133667,
+						"end_time": 23.499818801879884,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Doryani/epk/hand_vaalglow_l_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 23.671363830566408,
+						"end_time": 29.675689697265626,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Doryani/epk/hand_vaalglow_r_01.epk"
+					}
+				]
+			},
+			{
+				"name": "precursor_portal_arrive_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 7.558033466339111,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Doryani_portal_fade.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "clense_corruption_elevator_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.7724350690841675,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Doryani/fx/clense_corruption_elevator_01/L_hand_line.pet",
+						"bone_group": "grp_l_palm"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.478623628616333,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Doryani/fx/clense_corruption_elevator_01/L_hand_activate_line.pet",
+						"bone_group": "grp_l_palm"
+					}
+				]
+			},
+			{
+				"name": "precursor_active_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 5.862298011779785,
+						"end_time": 7.784134387969971,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/Doryani/fx/hover/feet_jets_01.pet",
+						"bone_groups": [
+							"grp_l_foot",
+							"grp_r_foot"
+						]
+					}
+				]
+			}
+		]'
+	}
+
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "precursor_active_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 5.903245449066162,
+						"frequency": 1000.0,
+						"amplitude": 1.0,
+						"duration": 0.6000000238418579,
+						"damp": "LinearUp"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 6.5057759284973148,
+						"frequency": 1000.0,
+						"amplitude": 1.0,
+						"duration": 1.649999976158142
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "clense_corruption_elevator_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 12.199999809265137,
+						"name": "colFade",
+						"curve": "4 0 0 Linear 3.34203 1 Linear 7.79288 0 Linear 12.2 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "precursor_active_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 5.895187854766846,
+						"end_time": 7.931229591369629,
+						"name": "Albedo_Mult",
+						"curve": "5 5.89519 0 Smooth 6.38269 0.25272 Smooth 6.64256 1 Smooth 7.48715 0.628586 CustomSmooth -0.653977 7.93123 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 9.080245971679688,
+						"end_time": 14.751718521118164,
+						"name": "colFade",
+						"curve": "4 9.08025 0 Smooth 10.7946 1 CustomSmooth 0 12.7118 1 Flat 14.7517 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 15.377904891967774,
+						"end_time": 22.887203216552736,
+						"name": "colFade",
+						"curve": "4 15.3779 0 Smooth 18 1 Flat 19.3775 1 Flat 22.8872 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 24.65157127380371,
+						"end_time": 29.489906311035158,
+						"name": "colFade",
+						"curve": "4 24.6516 0 Smooth 26.879 1 Flat 28.1401 1 Flat 29.4899 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/PlateDanglers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/PlateDanglers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/PlateDanglers/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.250
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/PlateDanglers/PlateDangler.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/R_ShoulderpadDanglers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/ShoulderpadDanglers/Right/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/ShoulderpadDanglers/Right/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.200
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/ShoulderpadDanglers/Right/R_ShoulderpadDanglers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/L_ShoulderpadDanglers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/ShoulderpadDanglers/Left/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/ShoulderpadDanglers/Left/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.200
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/ShoulderpadDanglers/Left/L_ShoulderpadDanglers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/HeadChain.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/HeadChain/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/HeadChain/rig.ast"
+		linear_allowed_contraction = 0.300
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/HeadChain/HeadChain.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/Feathers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Feathers/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Feathers/rig.ast"
+		linear_allowed_contraction = 0.300
+		normal_viscosity_multiplier = 0.150
+		tangent_viscosity_multiplier = 0.075
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Feathers/Feathers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/BackDanglers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/BackDanglers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/BackDanglers/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/BackDanglers/BackDanglers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/Belt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Belt/rig.amd"
+	default_animation = "idle_01"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "phys_skinned_L_2_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/Belt_attachments/Dagger.ao"
+	attached_object = "root_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/Belt_attachments/Dangler1.ao"
+	attached_object = "phys_skinned_L_1_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/Belt_attachments/Mirror.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Belt/rig.ast"
+		bend_stiffness = 120.000
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "spine_1_jntBnd spine_2_jntBnd chest_jntBnd plate_jntBnd belt_L_1_jntBnd belt_L_2_jntBnd belt_L_3_jntBnd belt_L_4_jntBnd belt_L_5_jntBnd belt_R_1_jntBnd belt_R_2_jntBnd belt_R_3_jntBnd belt_R_4_jntBnd belt_R_5_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Belt/Belt.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_2_jntBnd chest_jntBnd plate_jntBnd phys_skinned_L_1_jntBnd phys_skinned_L_2_jntBnd phys_skinned_L_3_jntBnd phys_skinned_L_4_jntBnd phys_skinned_L_5_jntBnd phys_skinned_R_1_jntBnd phys_skinned_R_2_jntBnd phys_skinned_R_3_jntBnd phys_skinned_R_4_jntBnd phys_skinned_R_5_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/Skirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Doryani/TrueDoryani/attachments/Ropes.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/skirt.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/Necklace.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Necklace/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Necklace/rig.ast"
+		linear_allowed_contraction = 0.100
+		enclosure_angle = 0.250
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Necklace/Necklace.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/Belt_attachments/Dagger.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Dagger/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Dagger/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.200
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Dagger/Dagger.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/Belt_attachments/Dangler1.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Dangler_1/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Dangler_1/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Dangler_1/Dangler1.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/Belt_attachments/Mirror.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Dangler_2/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Dangler_2/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Dangler_2/Dangler2.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Doryani/TrueDoryani/attachments/Ropes.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Ropes/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Ropes/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.700
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/attachments/Skirt/attachments/Ropes/Ropes.sm"
+	}
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/TrueDoryani.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/TrueDoryani_armour_180e532b.smd"
+Materials 6
+	"Art/Models/MONSTERS/Doryani/Textures/DoryaniAmuletGlassc.mat" 1
+	"Art/Models/MONSTERS/Doryani/Textures/DoryaniAmuletc.mat" 2
+	"Art/Models/MONSTERS/Doryani/Textures/DoryaniBodyc.mat" 1
+	"Art/Models/MONSTERS/Doryani/Textures/DoryaniArmourGemsc.mat" 3
+	"Art/Models/MONSTERS/Doryani/Textures/DoryaniArmourc.mat" 24
+	"Art/Models/MONSTERS/Doryani/Textures/DoryaniGarmentc.mat" 2
+BoundingBox -86.0815 -23.5365 -217.528 84.1196 23.84 -0.0759809
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_attachment"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_attachment"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TrueDoryani/TrueDoryani_armour_180e532b.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 33 in the header, 33 in the block · 28642 triangles over 23322 vertices
+  names: 1354 bytes said, 1354 read  [agree]
+
+=== shapes (62)
+0	amulet_glassShape	from 0	count 1344
+1	amulet_necklaceShape	from 1344	count 13080
+2	amuletShape	from 14424	count 2952
+3	body_NEWShape	from 17376	count 24504
+4	crystalsShape	from 41880	count 1392
+5	R_shoulderpad|shoulderpad|shoulderpadShape	from 43272	count 1260
+6	L_shoulderpad|shoulderpad|shoulderpadShape	from 44532	count 1032
+7	accessoriesShape	from 45564	count 876
+8	armour_doubleShape	from 46440	count 9960
+9	armour_opaqueShape	from 56400	count 4548
+10	cuffsShape	from 60948	count 480
+11	danglersShape	from 61428	count 792
+12	front_plateShape	from 62220	count 1176
+13	headcover1Shape	from 63396	count 3270
+14	headcoverShape2	from 66666	count 4236
+15	L_bracer_1_attachShape	from 70902	count 768
+16	L_bracer_2_attachShape	from 71670	count 768
+17	L_bracer_3_attachShape	from 72438	count 768
+18	L_bracer_Shape1	from 73206	count 720
+19	L_bracer_Shape2	from 73926	count 720
+20	L_bracer_Shape3	from 74646	count 720
+21	maskShape	from 75366	count 882
+22	R_bracer_1_attachShape	from 76248	count 768
+23	R_bracer_2_attachShape	from 77016	count 768
+24	R_bracer_3_attachShape	from 77784	count 768
+25	R_bracer_Shape1	from 78552	count 720
+26	R_bracer_Shape2	from 79272	count 720
+27	R_bracer_Shape3	from 79992	count 720
+28	sandal_solesShape	from 80712	count 660
+29	L_shoulderpad|shoulderpad_attach|shoulderpad_attachShape	from 81372	count 144
+30	R_shoulderpad|shoulderpad_attach|shoulderpad_attachShape	from 81516	count 36
+31	torso_fabricShape	from 81552	count 1536
+32	upperbody_fabricShape	from 83088	count 2838
+33	beadsShape	from 85926	count 432
+34	tasslesShape	from 86358	count 180
+35	B_danglerShape	from 86538	count 804
+36	F_danglerShape	from 87342	count 804
+37	B_danglerShape	from 88146	count 804
+38	F_danglerShape	from 88950	count 804
+39	head_chainShape	from 89754	count 1956
+40	neck_feathersShape	from 91710	count 2952
+41	beadsShape	from 94662	count 720
+42	tasslesShape	from 95382	count 420
+43	beadsShape	from 95802	count 1200
+44	chainsShape	from 97002	count 3456
+45	jewelsShape	from 100458	count 1152
+46	skirt_fabricShape	from 101610	count 2478
+47	Amulet_lpShape	from 104088	count 3576
+48	NeckLoop_lpShape	from 107664	count 1812
+49	polySurfaceShape10	from 109476	count 576
+50	polySurfaceShape6	from 110052	count 576
+51	polySurfaceShape7	from 110628	count 576
+52	polySurfaceShape9	from 111204	count 576
+53	Prongs_lpShape	from 111780	count 936
+54	Core_lpShape	from 112716	count 540
+55	Glass_lpShape	from 113256	count 1344
+56	daggerShape	from 114600	count 660
+57	dangler1Shape	from 115260	count 84
+58	danglerShape2	from 115344	count 564
+59	beadsShape	from 115908	count 1728
+60	feathersShape	from 117636	count 96
+61	ropesShape	from 117732	count 3744
+
+=== fitting
+the monster's rig: 105 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  PlateDanglers.ao  socket plate_jntBnd [in its carrier's rig]  box (-9.5,-10.6,26.9)..(9.5,-6.8,66.9)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 204 triangles over 216 vertices
+    names: 44 bytes said, 44 read  [agree]
+    rig 7 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_5_jntBnd  [its own]  under 0  rests at (6.3,-8.5,44.8)
+      2 phys_skinned_3_jntBnd  [its own]  under 0  rests at (0,-8.5,44.8)
+      3 phys_skinned_1_jntBnd  [its own]  under 0  rests at (-6.2,-8.5,44.8)
+      4 phys_skinned_6_jntBnd  [its own]  under 1  rests at (6.3,-9.5,59.2)
+      5 phys_skinned_4_jntBnd  [its own]  under 2  rests at (0,-9.5,59.2)
+      6 phys_skinned_2_jntBnd  [its own]  under 3  rests at (-6.2,-9.5,59.2)
+  R_ShoulderpadDanglers.ao  socket R_upperArm_attachment_jntBnd [in its carrier's rig]  box (-0.7,-19.5,-0.4)..(10,15,16.3)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 536 triangles over 600 vertices
+    names: 56 bytes said, 56 read  [agree]
+    rig 9 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 8 of 9  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_F_1_jntBnd  [its own]  under 0  rests at (6.2,-14.8,4.4)
+      2 phys_skinned_B_1_jntBnd  [its own]  under 0  rests at (6.2,10.2,4.5)
+      3 phys_skinned_F_2_jntBnd  [its own]  under 1  rests at (6.9,-17.2,14.3)
+      4 phys_skinned_F_3_jntBnd  [its own]  under 1  rests at (4.6,-15.8,14.8)
+      5 phys_skinned_F_4_jntBnd  [its own]  under 1  rests at (2.5,-14.2,13.9)
+      6 phys_skinned_B_2_jntBnd  [its own]  under 2  rests at (6.9,12.6,14.3)
+      7 phys_skinned_B_3_jntBnd  [its own]  under 2  rests at (4.6,11.2,14.8)
+      8 phys_skinned_B_4_jntBnd  [its own]  under 2  rests at (2.5,9.7,13.9)
+  L_ShoulderpadDanglers.ao  socket L_upperArm_attachment_jntBnd [in its carrier's rig]  box (-10,-19.5,-0.4)..(0.7,15,16.3)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 536 triangles over 600 vertices
+    names: 56 bytes said, 56 read  [agree]
+    rig 9 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 8 of 9  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_F_1_jntBnd  [its own]  under 0  rests at (-6.2,-14.8,4.4)
+      2 phys_skinned_B_1_jntBnd  [its own]  under 0  rests at (-6.2,10.2,4.5)
+      3 phys_skinned_F_2_jntBnd  [its own]  under 1  rests at (-6.9,-17.2,14.3)
+      4 phys_skinned_F_3_jntBnd  [its own]  under 1  rests at (-4.6,-15.8,14.8)
+      5 phys_skinned_F_4_jntBnd  [its own]  under 1  rests at (-2.5,-14.2,13.9)
+      6 phys_skinned_B_2_jntBnd  [its own]  under 2  rests at (-6.9,12.6,14.3)
+      7 phys_skinned_B_3_jntBnd  [its own]  under 2  rests at (-4.6,11.2,14.8)
+      8 phys_skinned_B_4_jntBnd  [its own]  under 2  rests at (-2.5,9.7,13.9)
+  HeadChain.ao  socket head_jntBnd [in its carrier's rig]  box (-7.9,-3.7,-5.3)..(7.9,8.4,8.2)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 652 triangles over 588 vertices
+    names: 30 bytes said, 30 read  [agree]
+    rig 11 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 10 of 11  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_C_1_jntBnd  [its own]  under 0  rests at (0,6.4,-0.5)
+      2 phys_skinned_C_2_jntBnd  [its own]  under 1  rests at (0,6.4,2.3)
+      3 phys_skinned_R_1_jntBnd  [its own]  under 2  rests at (-3,5.4,3.3)
+      4 phys_skinned_L_1_jntBnd  [its own]  under 2  rests at (3,5.4,3.3)
+      5 phys_skinned_R_2_jntBnd  [its own]  under 3  rests at (-5,3.2,4.3)
+      6 phys_skinned_L_2_jntBnd  [its own]  under 4  rests at (5,3.2,4.3)
+      7 phys_skinned_R_3_jntBnd  [its own]  under 5  rests at (-6.2,0.6,4.1)
+      8 phys_skinned_L_3_jntBnd  [its own]  under 6  rests at (6.2,0.6,4.1)
+      9 phys_skinned_R_4_jntBnd  [its own]  under 7  rests at (-6.2,-1.6,2.6)
+      10 phys_skinned_L_4_jntBnd  [its own]  under 8  rests at (6.2,-1.6,2.6)
+  Feathers.ao  socket chest_jntBnd [in its carrier's rig]  box (-30.4,5.3,-76.7)..(30.4,36.7,-34.4)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 984 triangles over 1084 vertices
+    names: 36 bytes said, 36 read  [agree]
+    rig 17 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 16 of 17  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (-15.2,8.1,-42.9)
+      2 phys_skinned_R_4_jntBnd  [its own]  under 0  rests at (-10.6,14.7,-45.8)
+      3 phys_skinned_C_1_jntBnd  [its own]  under 0  rests at (-0,18.5,-49.6)
+      4 phys_skinned_L_4_jntBnd  [its own]  under 0  rests at (10.6,14.7,-45.8)
+      5 phys_skinned_L_1_jntBnd  [its own]  under 0  rests at (15.2,8.1,-42.9)
+      6 phys_skinned_R_2_jntBnd  [its own]  under 1  rests at (-19.9,10.4,-48.9)
+      7 phys_skinned_R_5_jntBnd  [its own]  under 2  rests at (-13.2,19.6,-51.5)
+      8 phys_skinned_C_2_jntBnd  [its own]  under 3  rests at (-0,22.5,-57.4)
+      9 phys_skinned_L_5_jntBnd  [its own]  under 4  rests at (13.2,19.6,-51.5)
+      10 phys_skinned_L_2_jntBnd  [its own]  under 5  rests at (19.9,10.4,-48.9)
+      11 phys_skinned_R_3_jntBnd  [its own]  under 6  rests at (-24.6,12.7,-54.9)
+      12 phys_skinned_R_6_jntBnd  [its own]  under 7  rests at (-15.8,24.4,-57.3)
+      13 phys_skinned_C_3_jntBnd  [its own]  under 8  rests at (-0,26.5,-65.3)
+      14 phys_skinned_L_6_jntBnd  [its own]  under 9  rests at (15.8,24.4,-57.3)
+      15 phys_skinned_L_3_jntBnd  [its own]  under 10  rests at (24.6,12.7,-54.9)
+      16 phys_skinned_C_4_jntBnd  [its own]  under 13  rests at (-0,30.6,-73.1)
+  BackDanglers.ao  socket chest_jntBnd [in its carrier's rig]  box (-15.2,14.3,-9.1)..(15.2,19.4,38.2)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 380 triangles over 390 vertices
+    names: 44 bytes said, 44 read  [agree]
+    rig 16 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 15 of 16  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L_1_jntBnd  [its own]  under 0  rests at (11.7,15.4,5.2)
+      2 phys_skinned_L_4_jntBnd  [its own]  under 0  rests at (6.1,17,6.9)
+      3 phys_skinned_C_1_jntBnd  [its own]  under 0  rests at (-0,17.4,6.6)
+      4 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (-11.7,15.4,5.2)
+      5 phys_skinned_C_1_jntBnd1  [its own]  under 0  rests at (-6.1,17,6.9)
+      6 phys_skinned_L_2_jntBnd  [its own]  under 1  rests at (12.6,16,15.8)
+      7 phys_skinned_L_5_jntBnd  [its own]  under 2  rests at (7,17.6,18.2)
+      8 phys_skinned_C_1_jntBnd|phys_skinned_C_2_jntBnd  [its own]  under 3  rests at (-0,18,19.2)
+      9 phys_skinned_R_2_jntBnd  [its own]  under 4  rests at (-12.6,16,15.8)
+      10 phys_skinned_C_1_jntBnd1|phys_skinned_C_2_jntBnd  [its own]  under 5  rests at (-7,17.6,18.2)
+      11 phys_skinned_L_3_jntBnd  [its own]  under 6  rests at (13.5,16.6,26.5)
+      12 phys_skinned_L_6_jntBnd  [its own]  under 7  rests at (7.9,18.2,29.5)
+      13 phys_skinned_C_1_jntBnd|phys_skinned_C_2_jntBnd|phys_skinned_C_3_jntBnd  [its own]  under 8  rests at (-0,18.6,31.8)
+      14 phys_skinned_R_3_jntBnd  [its own]  under 9  rests at (-13.5,16.6,26.5)
+      15 phys_skinned_C_1_jntBnd1|phys_skinned_C_2_jntBnd|phys_skinned_C_3_jntBnd  [its own]  under 10  rests at (-7.9,18.2,29.5)
+  Belt.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-26.8,-17.8,-8.5)..(26.8,17.5,19.8)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 1936 triangles over 2112 vertices
+    names: 64 bytes said, 64 read  [agree]
+    rig 14 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 14  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_2_jntBnd  [shared]  under 0  rests at (0,0,-12.8)  carrier has (-0,2,-132.3)
+      2 phys_skinned_L_1_jntBnd  [its own]  under 0  rests at (14.3,11.6,5.1)
+      3 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (-14.3,11.6,5.1)
+      4 chest_jntBnd  [shared]  under 1  rests at (0,0,-25.6)  carrier has (-0,2,-145.1)
+      5 phys_skinned_L_2_jntBnd  [its own]  under 2  rests at (16.5,6.7,10.5)
+      6 phys_skinned_R_2_jntBnd  [its own]  under 3  rests at (-16.5,6.7,10.5)
+      7 plate_jntBnd  [shared]  under 4  rests at (0,-11,-34.4)  carrier has (-0,-8.9,-154)
+      8 phys_skinned_L_3_jntBnd  [its own]  under 5  rests at (17.6,-0.6,12.5)
+      9 phys_skinned_R_3_jntBnd  [its own]  under 6  rests at (-17.6,-0.6,12.5)
+      10 phys_skinned_L_4_jntBnd  [its own]  under 8  rests at (16.5,-8,10.5)
+      11 phys_skinned_R_4_jntBnd  [its own]  under 9  rests at (-16.5,-8,10.5)
+      12 phys_skinned_L_5_jntBnd  [its own]  under 10  rests at (14.3,-12.9,5.1)
+      13 phys_skinned_R_5_jntBnd  [its own]  under 11  rests at (-14.3,-12.9,5.1)
+    Dagger.ao  socket phys_skinned_L_2_jntBnd [in its carrier's rig]  box (-2.7,-7.4,-6.3)..(6.1,27.5,-2)
+      version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+      shapes 1 in the header, 1 in the block · 220 triangles over 226 vertices
+      names: 22 bytes said, 22 read  [agree]
+      rig 2 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 1 of 2  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_skinned_1_jntBnd  [its own]  under 0  rests at (3,13.4,-2.6)
+    Dangler1.ao  socket root_jntBnd [in its carrier's rig]  box (7.4,13.9,0.3)..(12.4,17.6,15.4)
+      version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+      shapes 1 in the header, 1 in the block · 28 triangles over 44 vertices
+      names: 26 bytes said, 26 read  [agree]
+      rig 2 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 1 of 2  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_skinned_1_jntBnd  [its own]  under 0  rests at (10.3,14.1,10.2)
+    Mirror.ao  socket phys_skinned_L_1_jntBnd [in its carrier's rig]  box (-2.9,-0.7,-4.6)..(10.7,12.9,-0.2)
+      version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+      shapes 1 in the header, 1 in the block · 188 triangles over 196 vertices
+      names: 26 bytes said, 26 read  [agree]
+      rig 2 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 1 of 2  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_skinned_1_jntBnd  [its own]  under 0  rests at (4.8,7.4,-1.1)
+  Skirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-30.2,-17.6,-18.6)..(30.8,25.4,81.8)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 826 triangles over 496 vertices
+    names: 34 bytes said, 34 read  [agree]
+    rig 41 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 40 of 41  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-12.8)  carrier has (0,2,-119.5)
+      2 phys_skinned_C_1_jntBnd  [its own]  under 0  rests at (0,-11,-0.5)
+      3 phys_skinned_B_1_jntBnd  [its own]  under 0  rests at (-0,9.3,-0.5)
+      4 phys_skinned_L_1_jntBnd  [its own]  under 0  rests at (10.9,-8,-0.5)
+      5 phys_skinned_L_5_jntBnd  [its own]  under 0  rests at (15.4,-0.8,-0.5)
+      6 phys_skinned_L_10_jntBnd  [its own]  under 0  rests at (11,6.5,-0.5)
+      7 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (-10.9,-8,-0.5)
+      8 phys_skinned_R_5_jntBnd  [its own]  under 0  rests at (-15.4,-0.8,-0.5)
+      9 phys_skinned_R_10_jntBnd  [its own]  under 0  rests at (-11,6.5,-0.5)
+      10 spine_2_jntBnd  [shared]  under 1  rests at (0,0,-25.6)  carrier has (-0,2,-132.3)
+      11 phys_skinned_C_2_jntBnd  [its own]  under 2  rests at (0,-12.1,18.4)
+      12 phys_skinned_B_2_jntBnd  [its own]  under 3  rests at (-0,12,18.4)
+      13 phys_skinned_L_2_jntBnd  [its own]  under 4  rests at (12.9,-8.6,18.4)
+      14 phys_skinned_L_6_jntBnd  [its own]  under 5  rests at (18.3,-0.1,18.2)
+      15 phys_skinned_L_11_jntBnd  [its own]  under 6  rests at (13,8.5,18.3)
+      16 phys_skinned_R_2_jntBnd  [its own]  under 7  rests at (-12.9,-8.6,18.4)
+      17 phys_skinned_R_6_jntBnd  [its own]  under 8  rests at (-18.3,-0.1,18.2)
+      18 phys_skinned_R_11_jntBnd  [its own]  under 9  rests at (-13,8.5,18.3)
+      19 chest_jntBnd  [shared]  under 10  rests at (0,0,-38.4)  carrier has (-0,2,-145.1)
+      20 phys_skinned_C_3_jntBnd  [its own]  under 11  rests at (-0,-13.3,37)
+      21 phys_skinned_B_3_jntBnd  [its own]  under 12  rests at (0,14.7,37)
+      22 phys_skinned_L_3_jntBnd  [its own]  under 13  rests at (15,-9.2,36.8)
+      23 phys_skinned_L_7_jntBnd  [its own]  under 14  rests at (21.1,0.7,36.6)
+      24 phys_skinned_L_12_jntBnd  [its own]  under 15  rests at (15,10.6,36.6)
+      25 phys_skinned_R_3_jntBnd  [its own]  under 16  rests at (-15,-9.2,36.8)
+      26 phys_skinned_R_7_jntBnd  [its own]  under 17  rests at (-21.1,0.7,36.6)
+      27 phys_skinned_R_12_jntBnd  [its own]  under 18  rests at (-15,10.6,36.6)
+      28 phys_skinned_C_4_jntBnd  [its own]  under 20  rests at (-0,-14.4,55.6)
+      29 phys_skinned_B_4_jntBnd  [its own]  under 21  rests at (0,17.4,55.6)
+      30 phys_skinned_L_4_jntBnd  [its own]  under 22  rests at (17,-9.7,55.3)
+      31 phys_skinned_L_8_jntBnd  [its own]  under 23  rests at (24,1.4,55)
+      32 phys_skinned_L_13_jntBnd  [its own]  under 24  rests at (17,12.6,55)
+      33 phys_skinned_R_4_jntBnd  [its own]  under 25  rests at (-17,-9.7,55.3)
+      34 phys_skinned_R_8_jntBnd  [its own]  under 26  rests at (-24,1.4,55)
+      35 phys_skinned_R_13_jntBnd  [its own]  under 27  rests at (-17,12.6,55)
+      36 phys_skinned_B_5_jntBnd  [its own]  under 29  rests at (0,20.2,74.1)
+      37 phys_skinned_L_9_jntBnd  [its own]  under 31  rests at (27,2.3,74.1)
+      38 phys_skinned_L_14_jntBnd  [its own]  under 32  rests at (19,14.9,74.2)
+      39 phys_skinned_R_9_jntBnd  [its own]  under 34  rests at (-27,2.3,74.1)
+      40 phys_skinned_R_14_jntBnd  [its own]  under 35  rests at (-19,14.9,74.2)
+    Ropes.ao  socket <root> [NOT in its carrier's rig]  box (-34.7,-14.9,-0.3)..(34.7,12.2,66.6)
+      version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+      shapes 3 in the header, 3 in the block · 1856 triangles over 1856 vertices
+      names: 66 bytes said, 66 read  [agree]
+      rig 41 bones, 41 of them names its carrier's rig also has
+      mesh weights reach bone 34 of 41  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-12.8)  carrier has (0,0,-12.8)
+        2 phys_skinned_C_1_jntBnd  [shared]  under 0  rests at (0,-11,-0.5)  carrier has (0,-11,-0.5)
+        3 phys_skinned_B_1_jntBnd  [shared]  under 0  rests at (-0,9.3,-0.5)  carrier has (-0,9.3,-0.5)
+        4 phys_skinned_L_1_jntBnd  [shared]  under 0  rests at (10.9,-8,-0.5)  carrier has (10.9,-8,-0.5)
+        5 phys_skinned_L_5_jntBnd  [shared]  under 0  rests at (15.4,-0.8,-0.5)  carrier has (15.4,-0.8,-0.5)
+        6 phys_skinned_L_10_jntBnd  [shared]  under 0  rests at (11,6.5,-0.5)  carrier has (11,6.5,-0.5)
+        7 phys_skinned_R_1_jntBnd  [shared]  under 0  rests at (-10.9,-8,-0.5)  carrier has (-10.9,-8,-0.5)
+        8 phys_skinned_R_5_jntBnd  [shared]  under 0  rests at (-15.4,-0.8,-0.5)  carrier has (-15.4,-0.8,-0.5)
+        9 phys_skinned_R_10_jntBnd  [shared]  under 0  rests at (-11,6.5,-0.5)  carrier has (-11,6.5,-0.5)
+        10 spine_2_jntBnd  [shared]  under 1  rests at (0,0,-25.6)  carrier has (0,0,-25.6)
+        11 phys_skinned_C_2_jntBnd  [shared]  under 2  rests at (0,-12.1,18.4)  carrier has (0,-12.1,18.4)
+        12 phys_skinned_B_2_jntBnd  [shared]  under 3  rests at (-0,12,18.4)  carrier has (-0,12,18.4)
+        13 phys_skinned_L_2_jntBnd  [shared]  under 4  rests at (12.9,-8.6,18.4)  carrier has (12.9,-8.6,18.4)
+        14 phys_skinned_L_6_jntBnd  [shared]  under 5  rests at (18.3,-0.1,18.2)  carrier has (18.3,-0.1,18.2)
+        15 phys_skinned_L_11_jntBnd  [shared]  under 6  rests at (13,8.5,18.3)  carrier has (13,8.5,18.3)
+        16 phys_skinned_R_2_jntBnd  [shared]  under 7  rests at (-12.9,-8.6,18.4)  carrier has (-12.9,-8.6,18.4)
+        17 phys_skinned_R_6_jntBnd  [shared]  under 8  rests at (-18.3,-0.1,18.2)  carrier has (-18.3,-0.1,18.2)
+        18 phys_skinned_R_11_jntBnd  [shared]  under 9  rests at (-13,8.5,18.3)  carrier has (-13,8.5,18.3)
+        19 chest_jntBnd  [shared]  under 10  rests at (0,0,-38.4)  carrier has (0,0,-38.4)
+        20 phys_skinned_C_3_jntBnd  [shared]  under 11  rests at (-0,-13.3,37)  carrier has (-0,-13.3,37)
+        21 phys_skinned_B_3_jntBnd  [shared]  under 12  rests at (0,14.7,37)  carrier has (0,14.7,37)
+        22 phys_skinned_L_3_jntBnd  [shared]  under 13  rests at (15,-9.2,36.8)  carrier has (15,-9.2,36.8)
+        23 phys_skinned_L_7_jntBnd  [shared]  under 14  rests at (21.1,0.7,36.6)  carrier has (21.1,0.7,36.6)
+        24 phys_skinned_L_12_jntBnd  [shared]  under 15  rests at (15,10.6,36.6)  carrier has (15,10.6,36.6)
+        25 phys_skinned_R_3_jntBnd  [shared]  under 16  rests at (-15,-9.2,36.8)  carrier has (-15,-9.2,36.8)
+        26 phys_skinned_R_7_jntBnd  [shared]  under 17  rests at (-21.1,0.7,36.6)  carrier has (-21.1,0.7,36.6)
+        27 phys_skinned_R_12_jntBnd  [shared]  under 18  rests at (-15,10.6,36.6)  carrier has (-15,10.6,36.6)
+        28 phys_skinned_C_4_jntBnd  [shared]  under 20  rests at (-0,-14.4,55.6)  carrier has (-0,-14.4,55.6)
+        29 phys_skinned_B_4_jntBnd  [shared]  under 21  rests at (0,17.4,55.6)  carrier has (0,17.4,55.6)
+        30 phys_skinned_L_4_jntBnd  [shared]  under 22  rests at (17,-9.7,55.3)  carrier has (17,-9.7,55.3)
+        31 phys_skinned_L_8_jntBnd  [shared]  under 23  rests at (24,1.4,55)  carrier has (24,1.4,55)
+        32 phys_skinned_L_13_jntBnd  [shared]  under 24  rests at (17,12.6,55)  carrier has (17,12.6,55)
+        33 phys_skinned_R_4_jntBnd  [shared]  under 25  rests at (-17,-9.7,55.3)  carrier has (-17,-9.7,55.3)
+        34 phys_skinned_R_8_jntBnd  [shared]  under 26  rests at (-24,1.4,55)  carrier has (-24,1.4,55)
+        35 phys_skinned_R_13_jntBnd  [shared]  under 27  rests at (-17,12.6,55)  carrier has (-17,12.6,55)
+        36 phys_skinned_B_5_jntBnd  [shared]  under 29  rests at (0,20.2,74.1)  carrier has (0,20.2,74.1)
+        37 phys_skinned_L_9_jntBnd  [shared]  under 31  rests at (27,2.3,74.1)  carrier has (27,2.3,74.1)
+        38 phys_skinned_L_14_jntBnd  [shared]  under 32  rests at (19,14.9,74.2)  carrier has (19,14.9,74.2)
+        39 phys_skinned_R_9_jntBnd  [shared]  under 34  rests at (-27,2.3,74.1)  carrier has (-27,2.3,74.1)
+        40 phys_skinned_R_14_jntBnd  [shared]  under 35  rests at (-19,14.9,74.2)  carrier has (-19,14.9,74.2)
+  Necklace.ao  socket neck_jntBnd [in its carrier's rig]  box (-7.9,-32.7,-8.2)..(7.9,-7.4,11.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 9 in the header, 9 in the block · 3504 triangles over 2530 vertices
+    names: 276 bytes said, 276 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_1_jntBnd  [its own]  under 0  rests at (0,-12.2,-4.8)
+      2 phys_skinned_2_jntBnd  [its own]  under 1  rests at (-0,-16.1,-1.3)
+      3 phys_skinned_3_jntBnd  [its own]  under 2  rests at (-0,-24.8,6.5)

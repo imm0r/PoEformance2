@@ -1,0 +1,5674 @@
+monster: The Black Crow [Metadata/Monsters/CrowBell/CrowBellBossSTANDALONE]
+
+=== .ao Metadata/Monsters/CrowBell/CrowBellSTANDALONE.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BellCrow/rig.amd"
+	view_of = "calm_01"
+		view_name = "calm_01_grab_bell"
+	view_of = "calm_01"
+		view_name = "calm_01_smash_gate"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6782100200653076,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8130599856376648,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "attack_combo_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7774999737739563,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4837499856948853,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "bell_attack_01",
+			"events": [
+				{
+					"type": "PoiseEventType",
+					"time": 0.0,
+					"end_time": 4.0,
+					"name": "poise",
+					"data": "1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8501703143119812,
+					"name": "smash"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9004849791526794,
+					"name": "geotrigger",
+					"position": [
+						0.0,
+						-255.52000427246095,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "bell_attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.826682984828949,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "bell_charge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.10000000149011612,
+					"name": "trample"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.20000000298023225,
+					"name": "trample"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.30000001192092898,
+					"name": "trample"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4000000059604645,
+					"name": "trample"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5,
+					"name": "trample"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6000000238418579,
+					"name": "trample"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.699999988079071,
+					"name": "trample"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7950000166893005,
+					"name": "trample"
+				}
+			]
+		},
+		{
+			"name": "bell_charge_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.43799999356269839,
+					"name": "geotrigger",
+					"position": [
+						0.0,
+						-99.76229858398438,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "bell_combo_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.8040000200271607,
+					"name": "geotrigger",
+					"position": [
+						0.0,
+						-265.6300048828125,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "bell_ultimate_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.7129219770431519,
+					"end_time": 3.146199941635132,
+					"name": "move",
+					"position": [
+						0.0,
+						-248.73800659179688,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 5 Away"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6023399829864503,
+					"name": "contact",
+					"position": [
+						-100.0,
+						-100.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.601170063018799,
+					"name": "contact",
+					"position": [
+						-100.0,
+						-100.0,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.0178699493408205,
+					"name": "geotrigger",
+					"position": [
+						0.0,
+						-82.53050231933594,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "enrage_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7519999742507935,
+					"name": "add_enrage_EPK"
+				}
+			]
+		},
+		{
+			"name": "enraged_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7671099901199341,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "enraged_attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8395140171051025,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "enraged_groundslam_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.1574999988079071,
+					"name": "start_face",
+					"data": "30 0 -1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7342100143432618,
+					"name": "geotrigger1",
+					"position": [
+						-65.17520141601563,
+						-224.59500122070313,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.215790033340454,
+					"name": "geotrigger2",
+					"position": [
+						22.66950035095215,
+						-244.62899780273438,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.673680067062378,
+					"name": "geotrigger1",
+					"position": [
+						-72.185302734375,
+						-231.64300537109376,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.1210498809814455,
+					"name": "geotrigger2",
+					"position": [
+						-71.42469787597656,
+						-202.2740020751953,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5999999046325685,
+					"name": "geotrigger1",
+					"position": [
+						-53.53889846801758,
+						-230.2449951171875,
+						0.0
+					]
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 3.689470052719116,
+					"name": "end_face"
+				}
+			]
+		},
+		{
+			"name": "enraged_groundslam_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0093599557876588,
+					"name": "geotrigger",
+					"position": [
+						-1.7204899787902833,
+						-241.43600463867188,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "enraged_leapslam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7362499833106995,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1087499856948853,
+					"name": "leg_swipe"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1675000190734864,
+					"name": "hand_swipe"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.306249976158142,
+					"name": "hit_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.366960048675537,
+					"name": "impact",
+					"position": [
+						-2.539780616760254,
+						-70.16142272949219,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.235379934310913,
+					"name": "remove_hand_swipe"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2865500450134279,
+					"name": "remove_leg_swipe"
+				}
+			]
+		},
+		{
+			"name": "grabbing_bell_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.7000000476837159,
+					"name": "grab"
+				}
+			]
+		},
+		{
+			"name": "groundslam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8025519847869873,
+					"name": "geotrigger1",
+					"position": [
+						21.510400772094728,
+						-183.36300659179688,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.266819953918457,
+					"name": "geotrigger2",
+					"position": [
+						-45.56809997558594,
+						-156.76699829101563,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "leapslam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7362499833106995,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1087499856948853,
+					"name": "leg_swipe"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1675000190734864,
+					"name": "hand_swipe"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.306249976158142,
+					"name": "hit_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3677300214767457,
+					"name": "impact",
+					"position": [
+						-2.158071994781494,
+						-48.916297912597659,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.277780055999756,
+					"name": "remove_hand_swipe"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2792398929595949,
+					"name": "remove_leg_swipe"
+				}
+			]
+		},
+		{
+			"name": "leapslam_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7362499833106995,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.059999942779541,
+					"name": "leg_swipe"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.122499942779541,
+					"name": "hand_swipe"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.306249976158142,
+					"name": "hit_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3677300214767457,
+					"name": "impact",
+					"position": [
+						-2.187711715698242,
+						-111.17554473876953,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "calm_01_grab_bell",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0019999742507935,
+					"name": "grab"
+				}
+			]
+		},
+		{
+			"name": "calm_01_smash_gate",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0049999952316285,
+					"name": "smash"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4043720066547394,
+								0.0
+							],
+							[
+								0.4699450135231018,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.3316130042076111,
+						"angle": 2.8797900676727297,
+						"x_axis_scale": 0.9610000252723694,
+						"length": 235.2209930419922,
+						"offset": [
+							10.0,
+							-15.0
+						],
+						"impact_z_rotation": [
+							0.15707999467849732,
+							2.3212900161743166
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4207650125026703,
+								0.0
+							],
+							[
+								0.44808700680732729,
+								1.0
+							]
+						],
+						"rotation": -0.6108649969100952,
+						"width": 104.29399871826172,
+						"angle": 1.9373199939727784,
+						"x_axis_scale": 1.0609999895095826,
+						"length": 295.8890075683594,
+						"offset": [
+							21.0,
+							30.0
+						],
+						"local_offset": [
+							133.0,
+							-8.0
+						],
+						"impact_z_rotation": [
+							-0.541051983833313,
+							-0.541051983833313
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_combo_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.30601099133491518,
+								0.0
+							],
+							[
+								0.34972700476646426,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.3316130042076111,
+						"angle": 2.8797900676727297,
+						"x_axis_scale": 0.8999999761581421,
+						"length": 235.2209930419922,
+						"offset": [
+							16.0,
+							-16.0
+						],
+						"impact_z_rotation": [
+							0.15707999467849732,
+							2.3212900161743166
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5649719834327698,
+								0.0
+							],
+							[
+								0.5875710248947144,
+								1.0
+							]
+						],
+						"rotation": -0.6108649969100952,
+						"width": 104.29399871826172,
+						"angle": 1.9373199939727784,
+						"x_axis_scale": 1.0609999895095826,
+						"length": 257.6730041503906,
+						"offset": [
+							17.0,
+							25.0
+						],
+						"local_offset": [
+							115.0,
+							3.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							0.6457719802856445
+						],
+						"impact_z_rotation": [
+							-0.541051983833313,
+							-0.541051983833313
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "bell_attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4207650125026703,
+								0.0
+							],
+							[
+								0.44808700680732729,
+								1.0
+							]
+						],
+						"rotation": -0.6108649969100952,
+						"width": 104.29399871826172,
+						"angle": 1.9373199939727784,
+						"x_axis_scale": 1.0609999895095826,
+						"length": 295.8890075683594,
+						"offset": [
+							21.0,
+							30.0
+						],
+						"local_offset": [
+							133.0,
+							-8.0
+						],
+						"impact_z_rotation": [
+							-0.541051983833313,
+							-0.541051983833313
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "bell_charge_end_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.18032799661159516,
+								0.0
+							],
+							[
+								0.2622950077056885,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.034906599670648578,
+						"angle": 2.2863800525665285,
+						"x_axis_scale": 0.824999988079071,
+						"length": 439.3059997558594,
+						"offset": [
+							5.0,
+							-50.0
+						],
+						"impact_z_rotation": [
+							0.6981319785118103,
+							2.478369951248169
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "phys_bell_jntBnd"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.548022985458374,
+								0.0
+							],
+							[
+								0.6214690208435059,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.6981319785118103,
+						"angle": 2.3910999298095705,
+						"x_axis_scale": 0.6850000023841858,
+						"length": 285.0,
+						"offset": [
+							-29.0,
+							12.0
+						],
+						"local_offset": [
+							9.0,
+							-76.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							0.6457719802856445
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							-0.5235990285873413
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "phys_bell_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "bell_combo_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.19125699996948243,
+								0.0
+							],
+							[
+								0.20765000581741334,
+								1.0
+							]
+						],
+						"rotation": -0.6108649969100952,
+						"width": 104.29399871826172,
+						"angle": 1.9373199939727784,
+						"x_axis_scale": 1.0609999895095826,
+						"length": 295.8890075683594,
+						"offset": [
+							21.0,
+							30.0
+						],
+						"local_offset": [
+							133.0,
+							-8.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							0.19198599457740785
+						],
+						"impact_z_rotation": [
+							-0.541051983833313,
+							-0.541051983833313
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "bell_ultimate_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.38251399993896487,
+								0.0
+							],
+							[
+								0.45901599526405337,
+								0.7520220279693604
+							],
+							[
+								0.5573769807815552,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 6.28318977355957,
+						"x_axis_scale": 0.9750000238418579,
+						"length": 350.0,
+						"local_offset": [
+							-21.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							2.792530059814453,
+							-4.206240177154541
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6403939723968506,
+								0.0
+							],
+							[
+								0.6748769879341126,
+								0.43935298919677737
+							],
+							[
+								0.7783250212669373,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 6.28318977355957,
+						"x_axis_scale": 0.949999988079071,
+						"length": 350.0
+					}
+				]
+			}
+		},
+		{
+			"name": "enraged_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4043720066547394,
+								0.0
+							],
+							[
+								0.45901599526405337,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.3316130042076111,
+						"angle": 2.8797900676727297,
+						"x_axis_scale": 0.875,
+						"length": 302.70599365234377,
+						"offset": [
+							16.0,
+							-16.0
+						],
+						"impact_z_rotation": [
+							0.15707999467849732,
+							2.3212900161743166
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "enraged_attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4207650125026703,
+								0.0
+							],
+							[
+								0.44262298941612246,
+								1.0
+							]
+						],
+						"rotation": -0.6108649969100952,
+						"width": 104.29399871826172,
+						"angle": 1.9373199939727784,
+						"x_axis_scale": 1.0609999895095826,
+						"length": 344.968994140625,
+						"offset": [
+							49.0,
+							51.0
+						],
+						"local_offset": [
+							133.0,
+							-8.0
+						],
+						"impact_z_rotation": [
+							-0.541051983833313,
+							-0.541051983833313
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "enraged_attack_combo_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.30601099133491518,
+								0.0
+							],
+							[
+								0.34972700476646426,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.3316130042076111,
+						"angle": 2.8797900676727297,
+						"x_axis_scale": 0.8999999761581421,
+						"length": 235.2209930419922,
+						"offset": [
+							16.0,
+							-16.0
+						],
+						"impact_z_rotation": [
+							0.15707999467849732,
+							2.3212900161743166
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5649719834327698,
+								0.0
+							],
+							[
+								0.5875710248947144,
+								1.0
+							]
+						],
+						"rotation": -0.6108649969100952,
+						"width": 104.29399871826172,
+						"angle": 1.9373199939727784,
+						"x_axis_scale": 1.0609999895095826,
+						"length": 257.6730041503906,
+						"offset": [
+							17.0,
+							25.0
+						],
+						"local_offset": [
+							115.0,
+							3.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							0.6457719802856445
+						],
+						"impact_z_rotation": [
+							-0.541051983833313,
+							-0.541051983833313
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "bell_jntBnd Metadata/Monsters/CrowBell/Attachments/Bell.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BellCrow/rig.ast"
+		socket = "L_eye_FX"
+			parent = "head_jntBnd"
+			translation = "11 -22.5 -9.7"
+		socket = "R_eye_FX"
+			parent = "head_jntBnd"
+			translation = "-11 -22.5 -9.7"
+		socket = "bell"
+			parent = "R_Weapon"
+			translation = "0 0 124.666"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BellCrow/BellCrow.sm"
+			hide_segments = "Bell_ClapperShape,Bell_mainShape"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03430179879069328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0686035007238388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18865999579429627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.279774010181427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6067230105400086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6356539726257324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6420860290527344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.646373987197876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6817470192909241,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_L_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7599980235099793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7878680229187012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8500400185585022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2820299863815308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03430179879069328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10183300077915192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18865999579429627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.279774010181427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6356539726257324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.646373987197876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6817470192909241,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_L_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7342720031738281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7599980235099793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7750049829483032,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7878680229187012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8500400185585022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2820299863815308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "attack_combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03430179879069328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06871339678764343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18865999579429627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.279774010181427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5935670137405396,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5938829779624939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6356539726257324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.646373987197876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6817470192909241,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_L_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7599980235099793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7878680229187012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8500400185585022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2820299863815308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3301899433135987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3859599828720093,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_L_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4064300060272217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.434209942817688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.435670018196106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4429800510406495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.473680019378662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5175399780273438,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "banging_door_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.019864600151777269,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07274690270423889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18187099695205689,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Effects/ThumpDoor",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "banging_door_calm_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.27088600397109988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "R_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3398759961128235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3874270021915436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Effects/ThumpDoor",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9636309742927551,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "R_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0188499689102173,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0617200136184693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Effects/ThumpDoor",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "banging_door_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Breath",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "bell_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08888889849185944,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32514598965644839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5450289845466614,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7298250198364258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.753216028213501,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7649120092391968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Whoosh/AttackWhoosh",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.807017982006073,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8701750040054321,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9029240012168884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/LargeBellTone",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9029240012168884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Resonate",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9029240012168884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/BellThump",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9029240012168884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/BellSmash",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9614030122756958,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_L_skirt_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0666699409484864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Ragey",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1157900094985963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.473680019378662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Scrapes/BellScrapeBack",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7309900522232056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7801200151443482,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8549699783325196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_L_skirt_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9040900468826295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0070199966430666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2081899642944338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3345000743865969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5520501136779787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.293570041656494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.419879913330078,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_L_skirt_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.433919906616211,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.497080087661743,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "bell_attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11148100346326828,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15650199353694917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1778009980916977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21867400407791139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6506609916687012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.708545982837677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7364159822463989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7814369797706604,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Ragey",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7932279706001282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8007320165634155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8028749823570252,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8821979761123657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9014930129051209,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.010830044746399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "bell_charge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_Air.loop.ogg",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Scrapes/BellScrapeCharge",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03555560111999512,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Ragey",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03555560111999512,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05480000004172325,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20912300050258637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22502900660037995,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2488889992237091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2587999999523163,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Scrapes/BellScrapeCharge",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42713499069213869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5445610284805298,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Scrapes/BellScrapeCharge",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5716959834098816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6030409932136536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6371930241584778,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "bell_charge_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10526300221681595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Regular",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11100000143051148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1333329975605011,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16315799951553346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22105300426483155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Regular",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26315799355506899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Whoosh/ChargeWhoosh",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39298200607299807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4228070080280304,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5052629709243774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/NoFrontResonate",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5578950047492981,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5877190232276917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Regular",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8403509855270386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9649119973182678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6649099588394166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Whoosh/AfterChargeWhoosh",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7333300113677979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.84211003780365,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9807000160217286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1263198852539064,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1491200923919679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Regular",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2170000076293947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallerBigBellTone",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2170000076293947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.242110013961792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.287719964981079,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "bell_charge_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09246669709682465,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43446698784828188,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5003330111503601,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.538332998752594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6574000120162964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hip_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8410670161247253,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9373329877853394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Regular",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.955066978931427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.018399953842163,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0538699626922608,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/ChargeStartBig",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2742700576782227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hip_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3236700296401978,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hip_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3540699481964112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8746700286865235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9265999794006348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "bell_combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1450289934873581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2315790057182312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Pain",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2877190113067627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3836260139942169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5356720089912415,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6947370171546936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7080000042915344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7279999852180481,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8748540282249451,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9450290203094482,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4198800325393677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7146199941635132,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7613999843597413,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.805999994277954,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/LargeBellTone",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8081899881362916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Resonate",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8081899881362916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/BellThump",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8081899881362916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/BellSmash",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8175400495529175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.861989974975586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.913450002670288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.556730031967163,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Scrapes/BellScrapeCombo",
+						"bone_name": "bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7017500400543215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.94035005569458,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.97544002532959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2912299633026125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2960000038146974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2960000038146974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallerBigBellTone"
+					}
+				]
+			},
+			{
+				"name": "bell_enraged_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.34058499336242678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Breath",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2481900453567505,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Pain",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1071300506591799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Breath",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "bell_flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06959059834480286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "bell_flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06959059834480286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "bell_flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06959059834480286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "bell_flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06959059834480286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "bell_flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06959059834480286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "bell_heavy_stun_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/HeavyStunA",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2110230028629303,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3037729859352112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3922030031681061,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/BellThumpHeavyStun",
+						"bone_name": "phys_bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.394335001707077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/BellSmashHeavyStun",
+						"bone_name": "phys_bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5392799973487854,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6053569912910461,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Scrapes/BellScrapeHeavyStun",
+						"bone_name": "phys_bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7652230262756348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/HeavyStunB",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8483520150184631,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.541100025177002,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/BellThumpHeavyStunLight",
+						"bone_name": "phys_bell_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6850099563598633,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.875749945640564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9546200037002564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/HeavyStunC",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2253201007843019,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.56210994720459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallerBigBellTone",
+						"bone_name": "phys_bell_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "bell_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.42951300740242007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5426899790763855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Ragey",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9599999785423279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "bell_run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0005997000262141228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/BellRun.loop.ogg",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05480000004172325,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2488889992237091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4000000059604645,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40280699729919436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42713499069213869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6371930241584778,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "bell_ultimate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.22172200679779054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3922779858112335,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/ChargeStart"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0096900463104249,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.529229998588562,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6100399494171143,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6117000579833985,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Whoosh/AttackWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6444400548934937,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/NoFrontResonate",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.035979986190796,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0364298820495607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5127499103546144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.523979902267456,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5590600967407228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Whoosh/AttackWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.601170063018799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/NoFrontResonate",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9775099754333498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.424760103225708,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "calm_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02339180000126362,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Derage",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9812870025634766,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "L_wing_jntBnd_4"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Death",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1274850070476532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20935699343681336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3181290030479431,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42713499069213869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5040940046310425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.014989972114563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Death_Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1309900283813477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1660799980163575,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2011699676513672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2327500581741334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2350900173187256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.290060043334961,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_TakeOff",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2746270000934601,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Effects/ShoutSaliva",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4165700078010559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/ChargeStart",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6926530003547669,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8754389882087708,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6403499841690064,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6461800336837769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1936399936676027,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_TakeOff",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.305850028991699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "phys_L_skirt_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.648439884185791,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_Air",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9350099563598635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Effects/ImpactLand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0693299770355226,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_Land",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2684459984302521,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33918100595474245,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Ragey",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6000000238418579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12046799808740616,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Enrage",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29499998688697817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4808500111103058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Effects/ShoutSaliva",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49707600474357607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5450289845466614,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6187130212783814,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6865500211715698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.798829972743988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1543899774551392,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2210500240325928,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2830400466918946,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.474850058555603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.513450026512146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6058499813079835,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "enrage_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12046799808740616,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Enrage",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29499998688697817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49707600474357607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5115129947662354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Effects/ShoutSaliva",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5450289845466614,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6187130212783814,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6865500211715698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.798829972743988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1543899774551392,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2210500240325928,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2830400466918946,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.474850058555603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.513450026512146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_chain_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6058499813079835,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_chain_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "enrage_flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1450289934873581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03430179879069328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06538770347833634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06967540085315705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11362499743700028,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Pain",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18865999579429627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.279774010181427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6260070204734802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6356539726257324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6420860290527344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.646373987197876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6817470192909241,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_L_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.718192994594574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Whoosh/AttackWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.721409022808075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7599980235099793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7878680229187012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8500400185585022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2820299863815308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6218299865722657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03430179879069328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12112800031900406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1800840049982071,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Ragey",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18865999579429627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.279774010181427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6356539726257324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.646373987197876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6817470192909241,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_L_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7106890082359314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7139049768447876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7203369736671448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Whoosh/AttackWhoosh",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7599980235099793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7878680229187012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8500400185585022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2820299863815308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03430179879069328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07894740253686905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07894740253686905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18865999579429627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.279774010181427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40643298625946047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Ragey",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6356539726257324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6383699774742127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6432750225067139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.646373987197876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6817470192909241,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_L_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7599980235099793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7878680229187012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8500400185585022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2820299863815308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3363699913024903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3859599828720093,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_L_hip_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4064300060272217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.434209942817688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.440060019493103,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4429800510406495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.473680019378662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5175399780273438,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8216400146484376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Breath",
+						"bone_name": "tongue_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enraged_flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07105260342359543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "enraged_flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07105260342359543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "enraged_flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07105260342359543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "enraged_flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07105260342359543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "enraged_groundslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.33684200048446658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/BigBoyScreech",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.521049976348877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Ragey"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5547499656677247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5710500478744507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6110700368881226,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1217899322509767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.152630090713501,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.513159990310669,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5157899856567385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Ragey"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.58420991897583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6263198852539064,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.944740056991577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.049999952316284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0657899379730226,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4052600860595705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.507889986038208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.563159942626953,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.799999952316284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "enraged_groundslam_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09122809767723084,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/ChargeStartBig",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7672510147094727,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Whoosh/ChargeWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7789469957351685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/LargeBell/Whoosh/AttackWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0098400115966797,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0308300256729127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_Land",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enraged_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10479500144720078,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24233900010585786,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Breath",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4678359925746918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Pain",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5651460289955139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "enraged_leapslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1637430042028427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/Ragey",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20052500069141389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "R_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28654998540878298,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30994200706481936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4195910096168518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7260090112686157,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_TakeOff",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8684210181236267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.11257004737854,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2075999975204468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2529200315475464,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_EnragedHand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2624599933624268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_Land",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3355499505996705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_Land",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3479499816894532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3692799806594849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4035099744796754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4312900304794312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4429800510406495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4722199440002442,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4970799684524537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "enraged_run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/EnragePainRun.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.013567299582064152,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05480000004172325,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22502900660037995,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2488889992237091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.401870995759964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42713499069213869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5716959834098816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellMove",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6371930241584778,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/Enraged/EnragedSmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "enraged_stun_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24362799525260926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5397300124168396,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.678409993648529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7346339821815491,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.979009985923767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Enraged/BigBoyScreech",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.695650100708008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.490250110626221,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.835080146789551,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_toe_tip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07105260342359543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07105260342359543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07105260342359543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07105260342359543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07105260342359543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "grabbing_bell_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18126800656318665,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45024698972702029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Regular",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7133790254592896,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.426759958267212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6080299615859986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6976900100708008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Effects/BreakBell",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7053799629211427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09686720371246338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2141990065574646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29878801107406618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45159199833869936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7149080038070679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7312800288200378,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8035889863967896,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8417900204658508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8786270022392273,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8868129849433899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8990920186042786,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1896899938583375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2142499685287476,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2510900497436524,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.26882004737854,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2879300117492676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3356800079345704,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3629599809646607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4079899787902833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4189000129699708,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2900579869747162,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9012900590896607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "leapslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.057017501443624499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2388020008802414,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28654998540878298,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30994200706481936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34356701374053957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "R_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4195910096168518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7353799939155579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_Air",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.739766001701355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_TakeOff",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8684210181236267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.11257004737854,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2075999975204468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2529200315475464,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3055599927902222,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_Land",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3479499816894532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4035099744796754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4312900304794312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4429800510406495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4722199440002442,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4970799684524537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "leapslam_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06140350177884102,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13849900662899018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28654998540878298,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30994200706481936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33918100595474245,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4195910096168518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7514619827270508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_Air",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7573099732398987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_TakeOff",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7668799757957459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8684210181236267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2061400413513184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2982499599456788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Handg",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3026299476623536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_Land",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3479499816894532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4035099744796754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4312900304794312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4429800510406495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4722199440002442,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4970799684524537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Pain/PainRun.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03087720088660717,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Regular",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05480000004172325,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0874854028224945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22502900660037995,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2488889992237091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove2",
+						"bone_name": "phys_R_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40982499718666079,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Regular",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42713499069213869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5716959834098816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellMove",
+						"bone_name": "phys_L_hanging_bell_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6371930241584778,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Bells/SmallBellTone",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "stun_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Flinch",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24362799525260926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5397300124168396,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6109439730644226,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "phys_L_hanging_bell_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.655921995639801,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.678409993648529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7346339821815491,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.979009985923767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/ChargeStartBig",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5869600772857668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Swing_Hand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.695650100708008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_GroundSlam",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.490250110626221,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.835080146789551,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Steps_Enraged",
+						"bone_name": "L_toe_tip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "taunt_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.22219300270080567,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5168399810791016,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Breath",
+						"bone_name": "tongue_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "tauntleap_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2105260044336319,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/ChargeStart",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7346330285072327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_TakeOff",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2777800559997559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Vocals/Attack",
+						"bone_name": "tongue_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3713500499725342,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_11/Crowbell/Foley/Leap_Land",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false chest_jntBnd"
+		bone_group = "frameupper false R_knee_jntBnd R_thigh_jntBnd L_knee_jntBnd L_thigh_jntBnd hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd head_jntBnd jaw_jntBnd R_wing_jntBnd_1 R_wing_jntBnd_2 L_wing_jntBnd_1 L_wing_jntBnd_2 L_wing_jntBnd_3 L_wing_jntBnd_4"
+		bone_group = "frame_upper false chest_jntBnd"
+		bone_group = "L_arm_FX false L_shoulder_jntBnd L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "R_arm_FX false R_shoulder_jntBnd R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "L_wrist_FX false L_finger_1_jntBnd_1 L_wrist_jntBnd L_elbow_Twist_jntBnd_2 L_elbow_jntBnd"
+		bone_group = "R_wrist_FX false R_finger_1_jntBnd_1 R_wrist_jntBnd R_elbow_Twist_jntBnd_2 R_elbow_jntBnd"
+		bone_group = "L_foot_FX false L_toe_jntBnd L_foot_jntBnd"
+		bone_group = "R_foot_FX false R_toe_jntBnd R_foot_jntBnd"
+		bone_group = "L_hand_FX false L_finger_1_jntBnd_2 L_finger_1_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "R_hand_FX false R_finger_1_jntBnd_2 R_finger_1_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "L_wing_FX false L_wing_jntBnd_1 L_wing_jntBnd_2 L_wing_jntBnd_3 L_wing_jntBnd_4"
+		bone_group = "R_wing_FX false R_wing_jntBnd_1 R_wing_jntBnd_2 R_wing_jntBnd_3 R_wing_jntBnd_4"
+		bone_group = "L_eye_FX false L_eye_FX head_jntBnd"
+		bone_group = "R_eye_FX false R_eye_FX head_jntBnd"
+		bone_group = "L_eye_TRL false L_eye_FX"
+		bone_group = "R_eye_TRL false R_eye_FX"
+		bone_group = "body_FX false hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd"
+		bone_group = "L_leg_FX false L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd L_foot_jntBnd"
+		bone_group = "R_leg_FX false R_thigh_jntBnd R_knee_jntBnd R_ankle_jntBnd R_foot_jntBnd"
+		bone_group = "tongue false tongue_jntBnd jaw_jntBnd"
+		bone_group = "R_Melee_FX false R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "AL_Melee_FX false L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "L_Wing false L_wing_jntBnd_3 L_wing_jntBnd_4 phys_chain_jntBnd_3"
+		bone_group = "R_Wing false R_wing_jntBnd_3 R_wing_jntBnd_4"
+		bone_group = "FX_bell false bell"
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6902999877929688,
+						"end_time": 0.9063599705696106,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_01.trl",
+						"bone_group": "R_hand_FX"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7573800086975098,
+						"end_time": 0.8658000230789185,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_01.trl",
+						"bone_group": "L_hand_FX"
+					}
+				]
+			},
+			{
+				"name": "attack_combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7329789996147156,
+						"end_time": 0.9074469804763794,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_01.trl",
+						"bone_group": "R_Melee_FX"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.4117000102996827,
+						"end_time": 1.5276570320129395,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_01.trl",
+						"bone_group": "AL_Melee_FX"
+					}
+				]
+			},
+			{
+				"name": "banging_door_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.11349999904632569,
+						"end_time": 0.20255319774150849,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_01.trl",
+						"bone_group": "R_Melee_FX"
+					}
+				]
+			},
+			{
+				"name": "bell_attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7112039923667908,
+						"end_time": 0.9196199774742127,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_01.trl",
+						"bone_group": "AL_Melee_FX"
+					}
+				]
+			},
+			{
+				"name": "bell_combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.722000002861023,
+						"end_time": 1.234043002128601,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_01.trl",
+						"bone_group": "AL_Melee_FX"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7425600290298462,
+						"end_time": 0.9243000149726868,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged.trl",
+						"bone_group": "R_Melee_FX"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7534800171852112,
+						"end_time": 0.9679800271987915,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged.trl",
+						"bone_group": "AL_Melee_FX"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7674999833106995,
+						"end_time": 0.9510639905929565,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged.trl",
+						"bone_group": "R_Melee_FX"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.3882999420166016,
+						"end_time": 1.6925549507141114,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged.trl",
+						"bone_group": "AL_Melee_FX"
+					}
+				]
+			},
+			{
+				"name": "enraged_groundslam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.5885000228881837,
+						"end_time": 1.7846810817718506,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged.trl",
+						"bone_group": "AL_Melee_FX"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.119499921798706,
+						"end_time": 2.4146809577941896,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged.trl",
+						"bone_group": "R_Melee_FX"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.569499969482422,
+						"end_time": 2.845531940460205,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged.trl",
+						"bone_group": "AL_Melee_FX"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 3.039750099182129,
+						"end_time": 3.3376591205596926,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged.trl",
+						"bone_group": "R_Melee_FX"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 3.521250009536743,
+						"end_time": 4.032765865325928,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged.trl",
+						"bone_group": "AL_Melee_FX"
+					}
+				]
+			},
+			{
+				"name": "enraged_groundslam_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8336790204048157,
+						"end_time": 1.0314890146255494,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged.trl",
+						"bone_group": "R_Melee_FX"
+					}
+				]
+			},
+			{
+				"name": "enraged_leapslam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7362499833106995,
+						"end_time": 1.378722906112671,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged_wings.trl",
+						"bone_group": "L_Wing"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7362499833106995,
+						"end_time": 1.3882980346679688,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged_wings.trl",
+						"bone_group": "R_Wing"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7387499809265137,
+						"end_time": 1.3989360332489014,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged.trl",
+						"bone_group": "AL_Melee_FX"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7387499809265137,
+						"end_time": 1.3872339725494385,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_attack_enraged.trl",
+						"bone_group": "R_Melee_FX"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "aux_face_jntBnd"
+			state = "standalone"
+				colour = "0.177336 0.200137 0.222527"
+				position = "0 -34 -150"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "on_death"
+				position = "0 -172 -272"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "enrage_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.6357449889183044,
+						"amplitude": 8.0,
+						"duration": 1.4500000476837159,
+						"global": true,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "enraged_run_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.011234000325202942,
+						"duration": 0.11500000208616257,
+						"global": true,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.4040850102901459,
+						"duration": 0.11500000208616257,
+						"global": true,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+	
+	WindEvents
+	{
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.5665490031242371,
+						"end_time": 1.0637450218200684,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/LHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.6671270132064819,
+						"end_time": 1.0201730728149415,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/RHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_combo_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.6680989861488342,
+						"end_time": 1.1503239870071412,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/LHand_Swipe.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.1675699949264527,
+						"end_time": 1.5876400470733643,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/RHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "bell_attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.599839985370636,
+						"end_time": 1.5,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/LHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "bell_attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.6339309811592102,
+						"end_time": 1.0181009769439698,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/RHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "bell_charge_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.46702298521995547,
+						"end_time": 1.3630080223083497,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/LHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "bell_charge_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "bell_combo_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.3998749852180481,
+						"end_time": 1.1246819496154786,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/RHand_Swipe.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.653130054473877,
+						"end_time": 2.4097061157226564,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/LHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "bell_ultimate_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "calm_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/epk/calm.epk"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.5874760150909424,
+						"end_time": 1.178041934967041,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/LHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.610388994216919,
+						"end_time": 0.9863680005073547,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/RHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_combo_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.606249988079071,
+						"end_time": 1.251567006111145,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/LHand_Swipe.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.377500057220459,
+						"end_time": 1.7149070501327515,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/RHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "enraged_groundslam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.5512399673461915,
+						"end_time": 1.996778964996338,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/RHand_Swipe.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 2.0657899379730226,
+						"end_time": 2.453731060028076,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/LHand_Swipe.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 2.5315799713134767,
+						"end_time": 2.840390920639038,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/RHand_Swipe.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 3.0,
+						"end_time": 3.3155579566955568,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/LHand_Swipe.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 3.4376399517059328,
+						"end_time": 3.7987289428710939,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/RHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "enraged_groundslam_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.8900579810142517,
+						"end_time": 1.3713889122009278,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/LHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "enraged_leapslam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.6765699982643127,
+						"end_time": 1.0212759971618653,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/RHand_Swipe.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.1435199975967408,
+						"end_time": 1.3376779556274415,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/LHand_Swipe.epk"
+					}
+				]
+			},
+			{
+				"name": "leapslam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "leapslam_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "bell_combo_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.800197958946228,
+						"end_time": 4.0,
+						"filename": "Metadata/Particles/monster_effects/Act1_FOUR/CrowBell/onAct_bell_attack_01_bellend.pet",
+						"bone_group": "FX_bell"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3956040143966675,
+						"end_time": 1.6008000373840333,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/fx/shout.pet",
+						"bone_group": "grp_head"
+					}
+				]
+			},
+			{
+				"name": "enrage_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.559440016746521,
+						"end_time": 1.3718280792236329,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/fx/shout.pet",
+						"bone_group": "grp_head"
+					}
+				]
+			},
+			{
+				"name": "enrage_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5994009971618652,
+						"end_time": 1.4697309732437134,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/fx/shout.pet",
+						"bone_group": "grp_head"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "calm_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "FadeFloat",
+						"curve": "3 0 1 Linear 0.1723 1 Flat 2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enrage_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "FadeFloat",
+						"curve": "3 0 0 Smooth 1.28381 1 Flat 2 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enrage_flinch_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 0.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.8329999446868897,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 1.833 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.8329999446868897,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 1.833 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_attack_combo_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 2.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_flinch_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 0.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_flinch_fwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 0.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_flinch_left_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 0.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_flinch_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 0.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_groundslam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.5,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 4.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_groundslam_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 2 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.600000023841858,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 1.6 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_leapslam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 2.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_run_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.800000011920929,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 0.8 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "enraged_stun_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"name": "FadeFloat",
+						"curve": "2 0 1 Smooth 5 1 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "bell_charge_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.2041960060596466,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/ao/footsteps.ao",
+						"offset": [
+							-12.150300025939942,
+							4.179989814758301
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.610988974571228,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/ao/footsteps.ao",
+						"offset": [
+							12.336700439453125,
+							0.0
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "bell_run_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.06393609941005707,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/ao/footsteps.ao",
+						"offset": [
+							22.853200912475587,
+							-26.295299530029298
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.3928070068359375,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/ao/footsteps.ao",
+						"offset": [
+							-23.29990005493164,
+							-22.015399932861329
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "bell_ultimate_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.5284700393676758,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/bellultimate.ao",
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.5514400005340578,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/bellultimate.ao",
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.1668399572372437,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/ao/impactStone.ao",
+						"offset": [
+							-0.2200469970703125,
+							-128.70899963378907
+						]
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.3176798820495607,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/ao/footsteps.ao",
+						"offset": [
+							14.98840045928955,
+							345.8699951171875
+						],
+						"height": 254.35299682617188
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.012079954147339,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/ao/impactLanding.ao",
+						"animation": "once",
+						"offset": [
+							-1.7434699535369874,
+							-74.1144027709961
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "enraged_run_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.011988000012934208,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/ao/footsteps.ao",
+						"offset": [
+							28.34429931640625,
+							-43.16749954223633
+						],
+						"inherit_height": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.4059939980506897,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/ao/footsteps.ao",
+						"offset": [
+							-30.121400833129884,
+							-43.16749954223633
+						],
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.0,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/ao/footsteps.ao",
+						"offset": [
+							21.97610092163086,
+							-46.271400451660159
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.4059939980506897,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/CrowBell/ao/footsteps.ao",
+						"offset": [
+							-22.854799270629884,
+							-42.817501068115237
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "bell_attack_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.9129129648208618,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.5285283327102661,
+						"haptic_id": "Haptic_HugeBoss_Rumble_Loop3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.2332336902618409,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "enrage_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.8128128051757813,
+						"haptic_id": "Haptic_HugeBoss_Sunder_AoE3D"
+					}
+				]
+			},
+			{
+				"name": "enrage_02",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.7787788510322571,
+						"haptic_id": "Haptic_HugeBoss_Sunder_AoE3D"
+					}
+				]
+			},
+			{
+				"name": "grabbing_bell_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.5880955457687379,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/CrowBell/Attachments/Bell.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/Items/Weapons/TwoHandWeapons/TwoHandMaces/Monster/loop_BellMace.amd"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Items/Weapons/TwoHandWeapons/TwoHandMaces/Monster/loop_BellMace.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/Items/Weapons/TwoHandWeapons/TwoHandMaces/Monster/loop_BellMace.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BellCrow/BellCrow.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BellCrow/rig_9a322b01.smd"
+Materials 3
+	"Art/Textures/Monsters/BellCrow/bellSpecularc.mat" 2
+	"Art/Textures/Monsters/BellCrow/bellcrow_bodyc.mat" 1
+	"Art/Textures/Monsters/BellCrow/bellcrow_accessoriesc.mat" 1
+BoundingBox -157.181 -76.352 -306.11 157.181 124.414 69.4428
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_tip_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_tip_jntBnd"
+
+=== .smd Art/Models/MONSTERS/BellCrow/rig_9a322b01.smd
+  version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 4 in the header, 4 in the block · 57498 triangles over 75490 vertices
+  names: 102 bytes said, 102 read  [agree]
+
+=== shapes (4)
+0	Bell_ClapperShape	from 0	count 2832
+1	Bell_mainShape	from 2832	count 13164
+2	bodyShape	from 15996	count 59196
+3	extrasShape	from 75192	count 97302
+
+=== fitting
+the monster's rig: 86 bones
+mounts: aux_position, aux_face_jntBnd
+  Bell.ao  socket bell_jntBnd [in its carrier's rig]  box (-79.7,-76.4,-6.7)..(79.7,79.7,156.4)
+    (the geometry did not read)
+    rig 2 bones, 2 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_bell_jntBnd  [shared]  under 0  rests at (0,0,51.2)  carrier has (0,0,-35.8)

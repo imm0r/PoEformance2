@@ -1,0 +1,984 @@
+monster: Garkam, Ranbu's Maul [Metadata/Monsters/VaalSavage/CannibalTribeGiantLandmarkNamed]
+
+=== .ao Metadata/Monsters/VaalSavage/CannibalVaalSavageGiant.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/RamGiant/Animations/CarverBogGiant/rig.amd"
+	animations = '[
+		{
+			"name": "Wheel_death_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"position": [
+						0.0,
+						150.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"position": [
+						0.0,
+						150.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "groundslam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8962389826774597,
+					"name": "contact",
+					"position": [
+						31.135499954223634,
+						-102.35800170898438,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "ignite_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8378360271453857,
+					"name": "fire"
+				}
+			]
+		},
+		{
+			"name": "slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.5093599557876588,
+					"name": "contact",
+					"position": [
+						-12.12030029296875,
+						-201.5,
+						0.0
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "R_Weapon Metadata/Monsters/CarverTribeStalker/attachments/GiantMace.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/VaalSavage/attachments/VaalSavageGiant/CannibalVaalSavageGiantSkirt.ao"
+}
+
+Locators
+{
+	locator = "SlamCentre 33.0828 -103.212 0 0 0 0"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.29050299525260928,
+								0.0
+							],
+							[
+								0.3615820109844208,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"width": 225.0,
+						"angle": 1.274090051651001,
+						"length": 358.2409973144531,
+						"offset": [
+							-8.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							1.309000015258789,
+							1.8325999975204468
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.33519598841667178,
+								0.0
+							],
+							[
+								0.37853100895881655,
+								1.0
+							]
+						],
+						"angle": 6.28318977355957,
+						"length": 120.11399841308594,
+						"offset": [
+							0.0,
+							-240.0
+						],
+						"impact_x_rotation": [
+							-0.17453299462795258,
+							-0.6108649969100952
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/RamGiant/Animations/CarverBogGiant/rig.ast"
+		socket = "FX_trail_01"
+			parent = "R_Weapon"
+			translation = "0 0 -84.5842"
+		socket = "FX_trail_02"
+			parent = "R_Weapon"
+			translation = "0 0 -184.821"
+		linear_stiffness = 10000.000
+		linear_allowed_contraction = 0.255
+		bend_stiffness = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		animation_velocity_factor = 1.000
+		animation_force_factor = 5.000
+		use_shock_propagation = false
+		enable_collisions = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/RamGiant/CarverBogGiant.sm"
+			arm_brace_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+			arm_guard_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+			body_bones_mesh72Shape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+			body_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+			head_skull_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+			jaw_bone_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+			leg_garter_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+			necklace_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+			shawl_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+			shawl_strings_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+			shoulder_bones_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd head_jntBnd jaw_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd root_jntBnd"
+		bone_group = "blade false FX_trail_01 FX_trail_02"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Attack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18846699595451356,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Leather",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2827019989490509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.918241024017334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Charms",
+						"bone_name": "phys_skinned_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.057479977607727,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Attack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2082300186157227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Leather",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Attack2",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11603400111198425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Leather",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20147700607776643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4735249876976013,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6814349889755249,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Charms",
+						"bone_name": "phys_skinned_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0461599826812745,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Leather",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Charms",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30439600348472597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Fall2",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34942999482154848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Charms",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Charms",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Charms",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Charms",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Charms",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Idle",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "ignite_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/IgniteWeapon",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17680999636650086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Leather",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4898099899291992,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Charms",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1026699542999268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Leather",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04195404797792435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Flinch",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1376091092824936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.55715012550354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8340457081794739,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9733383059501648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/PostAttack",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8459768295288087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Effects/SlamSmall",
+						"bone_name": "FX_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.045679807662964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Attack2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.325942039489746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04195404797792435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Flinch",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2416549175977707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5487603545188904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.882712721824646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9733383059501648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/PostAttack",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8459768295288087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Effects/SlamSmall",
+						"bone_name": "FX_trail_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.045679807662964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Attack2",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2923800945281984,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.767301559448242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Chase",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/CharmLoop",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37398698925971987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8096500039100647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Slam",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30289900302886965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Leather",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5089700222015381,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Charms",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1372499465942383,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2106399536132813,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.454450011253357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.130229949951172,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Vocal/Attack",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2196099758148195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Leather",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.299060106277466,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Charms",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8568199872970581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.587499976158142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "zombie_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8412426114082336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3329999446868897,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_7/BogGiant/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimatedRender
+	{
+	}
+	
+	Lights
+	{
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.4979959726333618,
+						"end_time": 0.9200423955917358,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalSavage_Dagger/epk/melee_trail.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.0771541595458985,
+						"end_time": 1.5543086528778077,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalSavage_Dagger/epk/melee_trail.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.3712424337863922,
+						"end_time": 0.5893300771713257,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalSavage_Dagger/epk/melee_trail.epk"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.715758800506592,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/CarverSavageGiant/epk/weaponGlow.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.2544491291046143,
+						"end_time": 1.5835793018341065,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalSavage_Dagger/epk/melee_trail.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.5718556642532349,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/CarverSavageGiant/ao/attack_02.ao",
+						"offset": [
+							11.353256225585938,
+							-221.38916015625
+						]
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.3006012439727783,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/CarverSavageGiant/ao/death_slam.ao",
+						"offset": [
+							-22.98944091796875,
+							46.66729736328125
+						]
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/CarverTribeStalker/attachments/GiantMace.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/CarverTribeStalker/attachments/Mace/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/CarverTribeStalker/attachments/Mace/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/CarverTribeStalker/attachments/Mace/CarverMace.sm"
+	}
+	
+	AnimatedRender
+	{
+		scale = 1.0
+	}
+}
+
+=== .ao Metadata/Monsters/VaalSavage/attachments/VaalSavageGiant/CannibalVaalSavageGiantSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/RamGiant/attachments/CarverBogGiantSkirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/RamGiant/attachments/CarverBogGiantSkirt/rig.ast"
+		linear_allowed_contraction = 0.200
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.500
+		normal_viscosity_multiplier = 0.150
+		tangent_viscosity_multiplier = 0.075
+		attachment_bones = "L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/RamGiant/attachments/CarverBogGiantSkirt/CarverBogGiantRobe.sm"
+			inner_skirt_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+			skirt_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+			skull_skirt_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalCarverBogGiant.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false skirt_L_thigh_jntBnd skirt_R_thigh_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/RamGiant/CarverBogGiant.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/RamGiant/CarverBogGiant_armour_91afd538.smd"
+Materials 1
+	"Art/Models/MONSTERS/CarverTribe/Textures/CarverBogGiantc.mat" 11
+BoundingBox -132.338 -41.4927 -254.381 132.338 67.4768 0.821374
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/RamGiant/CarverBogGiant_armour_91afd538.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 11 in the header, 11 in the block · 6619 triangles over 4882 vertices
+  names: 424 bytes said, 424 read  [agree]
+
+=== shapes (18)
+0	arm_brace_meshShape	from 0	count 540
+1	arm_guard_meshShape	from 540	count 1353
+2	body_bones_mesh72Shape	from 1893	count 2262
+3	body_meshShape	from 4155	count 9684
+4	head_skull_meshShape	from 13839	count 444
+5	jaw_bone_meshShape	from 14283	count 1212
+6	leg_garter_meshShape	from 15495	count 540
+7	necklace_meshShape	from 16035	count 306
+8	shawl_meshShape	from 16341	count 1116
+9	shawl_strings_meshShape	from 17457	count 966
+10	shoulder_bones_meshShape	from 18423	count 1434
+11	CarverMace_Broken_DoubleShape	from 19857	count 474
+12	CarverMace_Broken_OpaqueShape	from 20331	count 9993
+13	CarverMace_DoubleShape	from 30324	count 570
+14	CarverMace_OpaqueShape	from 30894	count 18762
+15	inner_skirt_meshShape	from 49656	count 210
+16	skirt_meshShape	from 49866	count 1008
+17	skull_skirt_meshShape	from 50874	count 2718
+
+=== fitting
+the monster's rig: 58 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  GiantMace.ao  socket R_Weapon [in its carrier's rig]  box (-38.5,-37.5,-194.9)..(49.1,27.8,59.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23D · stride 36
+    shapes 4 in the header, 4 in the block · 9933 triangles over 7252 vertices
+    names: 204 bytes said, 204 read  [agree]
+    rig 15 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 15  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 aux_blade1  [its own]  under 0  rests at (0,0,-106.5)
+      2 aux_blade2  [its own]  under 0  rests at (0,0,-132.2)
+      3 aux_blade3  [its own]  under 0  rests at (0,8.5,-175.6)
+      4 aux_blade4  [its own]  under 0  rests at (-36.3,3.5,-154.1)
+      5 aux_blade5  [its own]  under 0  rests at (45.8,2.1,-152.4)
+      6 aux_blade_cyl  [its own]  under 0  rests at (0,17.9,-130.5)
+      7 aux_blade_cyl_2  [its own]  under 0  rests at (0,7.8,-152.6)
+      8 aux_handle1  [its own]  under 0  rests at (0,0,26)
+      9 aux_handle2  [its own]  under 0  rests at (0,0,-100)
+      10 aux_handle_cyl  [its own]  under 0  rests at (0,-10,58.3)
+      11 aux_mid_2  [its own]  under 0  rests at (0,-16.5,-145.1)
+      12 aux_mid  [its own]  under 0  rests at (0,-14.5,-145.1)
+      13 aux_fwd  [its own]  under 0  rests at (0,-38.8,-145.1)
+      14 aux_root_end  [its own]  under 0  rests at (0,-1,0)
+  CannibalVaalSavageGiantSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-43.8,-40,-24.6)..(43,37.2,87.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 1312 triangles over 968 vertices
+    names: 114 bytes said, 114 read  [agree]
+    rig 22 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 21 of 22  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_F_skulls_jntBnd  [its own]  under 0  rests at (0,-24.7,35.5)
+      2 phys_skinned_F_robe_jntBnd_1  [its own]  under 0  rests at (0,-23.9,35.4)
+      3 phys_skinned_L_robe_jntBnd_1  [its own]  under 0  rests at (28.4,21.4,8.5)
+      4 phys_skinned_L_robe_jntBnd_4  [its own]  under 0  rests at (9.7,29.6,7.2)
+      5 phys_skinned_R_robe_jntBnd_4  [its own]  under 0  rests at (-9.7,29.6,7.2)
+      6 phys_skinned_R_robe_jntBnd_1  [its own]  under 0  rests at (-28.4,21.4,8.5)
+      7 phys_B_bones_jntBnd  [its own]  under 0  rests at (-19.5,28.7,7.9)
+      8 skirt_L_thigh_jntBnd  [its own]  under 0  rests at (25.1,0,0)
+      9 skirt_R_thigh_jntBnd  [its own]  under 0  rests at (-25.1,0,0)
+      10 phys_skinned_F_robe_jntBnd_2  [its own]  under 2  rests at (0,-22.5,56.1)
+      11 phys_skinned_L_robe_jntBnd_2  [its own]  under 3  rests at (28.1,21.6,27.9)
+      12 phys_skinned_L_robe_jntBnd_5  [its own]  under 4  rests at (9.5,28.5,27.4)
+      13 phys_skinned_R_robe_jntBnd_5  [its own]  under 5  rests at (-9.5,28.5,27.4)
+      14 phys_skinned_R_robe_jntBnd_2  [its own]  under 6  rests at (-28.1,21.6,27.9)
+      15 phys_skinned_F_robe_jntBnd_3  [its own]  under 10  rests at (-0,-21,76.7)
+      16 phys_skinned_L_robe_jntBnd_3  [its own]  under 11  rests at (25.3,22.4,49.7)
+      17 phys_skinned_L_robe_jntBnd_6  [its own]  under 12  rests at (9.2,27.4,46.3)
+      18 phys_skinned_R_robe_jntBnd_6  [its own]  under 13  rests at (-9.2,27.4,46.3)
+      19 phys_skinned_R_robe_jntBnd_3  [its own]  under 14  rests at (-25.3,22.4,49.7)
+      20 phys_skinned_L_robe_jntBnd_7  [its own]  under 17  rests at (10.2,25.2,63.3)
+      21 phys_skinned_R_robe_jntBnd_7  [its own]  under 18  rests at (-10.2,25.2,63.3)

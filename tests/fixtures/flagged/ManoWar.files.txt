@@ -1,0 +1,1764 @@
+monster: Man o' War [Metadata/Monsters/ManOWar/ManoWar]
+
+=== .ao Metadata/Monsters/ManOWar/ManOWar02.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/Animation/ManOWar/rig.amd"
+	animations = '[
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.16599999368190766,
+					"name": "move",
+					"position": [
+						0.0,
+						100.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.2329999953508377,
+					"name": "move",
+					"position": [
+						140.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.2329999953508377,
+					"name": "move",
+					"position": [
+						-140.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "AltPoseEventType",
+					"time": 0.317440003156662,
+					"end_time": 1.319183349609375,
+					"name": "alternate_pose"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.33000001311302187,
+					"name": "move",
+					"position": [
+						0.0,
+						-205.28199768066407,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "AltPoseEventType",
+					"time": 0.15906299650669099,
+					"end_time": 1.0844964981079102,
+					"name": "alternate_pose"
+				}
+			]
+		},
+		{
+			"name": "tendril_left_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0,
+					"name": "start_face",
+					"data": "0 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.8587355017662048,
+					"name": "end_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9978879690170288,
+					"name": "handone",
+					"position": [
+						-1.67352294921875,
+						-86.28253173828125,
+						-162.01942443847657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.100000023841858,
+					"name": "handone",
+					"position": [
+						-1.67352294921875,
+						-86.28253173828125,
+						-162.01942443847657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2000000476837159,
+					"name": "handone",
+					"position": [
+						-7.602447509765625,
+						-86.85867309570313,
+						-157.39599609375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "handone",
+					"position": [
+						-8.791099548339844,
+						-86.75772094726563,
+						-155.60122680664063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.399999976158142,
+					"name": "handone",
+					"position": [
+						-8.657058715820313,
+						-86.76445007324219,
+						-155.45159912109376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5,
+					"name": "handone",
+					"position": [
+						-8.604118347167969,
+						-86.42167663574219,
+						-155.04006958007813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.600000023841858,
+					"name": "handone",
+					"position": [
+						-7.977714538574219,
+						-86.22108459472656,
+						-154.75656127929688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7000000476837159,
+					"name": "handone",
+					"position": [
+						-6.160713195800781,
+						-86.86343383789063,
+						-155.68287658691407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "handone",
+					"position": [
+						-4.0251007080078129,
+						-87.39874267578125,
+						-156.72042846679688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.899999976158142,
+					"name": "handone",
+					"position": [
+						-1.6718902587890626,
+						-87.16270446777344,
+						-156.892822265625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "handone",
+					"position": [
+						1.09490966796875,
+						-86.72270965576172,
+						-157.60873413085938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0999999046325685,
+					"name": "handone",
+					"position": [
+						4.191501617431641,
+						-86.3549575805664,
+						-160.3594970703125
+					]
+				}
+			]
+		},
+		{
+			"name": "tendril_loop_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0,
+					"name": "start_face",
+					"data": "100 0 -1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.10383699089288712,
+					"name": "handone",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.20000000298023225,
+					"name": "handone",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.30000001192092898,
+					"name": "handone",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4000000059604645,
+					"name": "handone",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5,
+					"name": "handone",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6000000238418579,
+					"name": "handone",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.699999988079071,
+					"name": "handone",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.800000011920929,
+					"name": "handone",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8999999761581421,
+					"name": "handone",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0,
+					"name": "handone",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2000000476837159,
+					"name": "handtwo",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "handtwo",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.399999976158142,
+					"name": "handtwo",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5,
+					"name": "handtwo",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.600000023841858,
+					"name": "handtwo",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7000000476837159,
+					"name": "handtwo",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "handtwo",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.899999976158142,
+					"name": "handtwo",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "handtwo",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0999999046325685,
+					"name": "handtwo",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.200000047683716,
+					"name": "handtwo",
+					"position": [
+						-55.0,
+						-55.0,
+						0.0
+					]
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 2.3329999446868898,
+					"name": "end_face"
+				}
+			]
+		},
+		{
+			"name": "tendril_right_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0,
+					"name": "start_face",
+					"data": "0 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.8494014143943787,
+					"name": "end_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0104280710220338,
+					"name": "handtwo",
+					"position": [
+						-0.21982574462890626,
+						-86.4539794921875,
+						-161.90341186523438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.100000023841858,
+					"name": "handtwo",
+					"position": [
+						-0.21982574462890626,
+						-86.4539794921875,
+						-161.90341186523438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2000000476837159,
+					"name": "handtwo",
+					"position": [
+						5.771953582763672,
+						-87.19017028808594,
+						-157.26251220703126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "handtwo",
+					"position": [
+						8.32696533203125,
+						-86.86289978027344,
+						-155.56256103515626
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.399999976158142,
+					"name": "handtwo",
+					"position": [
+						8.657066345214844,
+						-86.76429748535156,
+						-155.45144653320313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5,
+					"name": "handtwo",
+					"position": [
+						8.604133605957032,
+						-86.42149353027344,
+						-155.0399169921875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.600000023841858,
+					"name": "handtwo",
+					"position": [
+						7.953239440917969,
+						-86.22734069824219,
+						-154.7569580078125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7000000476837159,
+					"name": "handtwo",
+					"position": [
+						6.17315673828125,
+						-86.86001586914063,
+						-155.6807861328125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "handtwo",
+					"position": [
+						3.9208755493164064,
+						-87.41693878173828,
+						-156.7084503173828
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.899999976158142,
+					"name": "handtwo",
+					"position": [
+						1.5033035278320313,
+						-87.18721008300781,
+						-156.87905883789063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "handtwo",
+					"position": [
+						-1.0269584655761719,
+						-86.71421813964844,
+						-157.60992431640626
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0999999046325685,
+					"name": "handtwo",
+					"position": [
+						-4.468345642089844,
+						-86.37078094482422,
+						-160.30950927734376
+					]
+				}
+			]
+		},
+		{
+			"name": "tendril_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3666599988937378,
+					"name": "empire"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4666599929332733,
+					"name": "empire"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5666599869728088,
+					"name": "empire"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6660000085830689,
+					"name": "empire"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/ManOWar/attachments/Jelly.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/ManOWar/attachments/Danglers.ao"
+}
+
+Locators
+{
+	locator = "new 0 0 0 0.488692 0 0"
+	locator = "new2 0 0 0 -0.488692 0 0"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/Animation/ManOWar/rig.ast"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/ManOWar02.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd root_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd neck_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_bicep_01_01 false R_shoulder_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_bicep_01_01 false L_shoulder_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_forearm_01_01 false R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "grp_L_forearm_01_01 false L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "grp_neck_01_01 false neck_jntBnd head_jntBnd"
+		bone_group = "grp_waist_01_01 false hip_jntBnd spine_2_jntBnd"
+		bone_group = "grp_L_thigh_01_01 false L_thigh_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_thigh_01_01 false R_thigh_jntBnd R_knee_jntBnd"
+		bone_group = "grp_R_shin_01_01 false R_knee_jntBnd R_ankle_jntBnd"
+		bone_group = "grp_L_shin_01_01 false L_knee_jntBnd L_ankle_jntBnd"
+		bone_group = "grp_L_weapon false L_Weapon_02 L_finger_1_jntBnd_1"
+		bone_group = "grp_R_weapon false R_Weapon R_finger_1_jntBnd_1"
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.267892986536026,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.267892986536026,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38080132007598879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6932026743888855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0091079473495484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21221399307250977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23479199409484864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27765101194381716,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1032940000295639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12747299671173097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14275099337100984,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22948400676250459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2373030036687851,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3171449899673462,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24149399995803834,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27010801434516909,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31141701340675356,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2007340043783188,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23478099703788758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.277413010597229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21219100058078767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24182400107383729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3024429976940155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Idle.loop.ogg",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Idle.loop.ogg",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Idle.loop.ogg",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2563619911670685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.303974986076355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39440301060676577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7845029830932617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Tendril.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0391700267791749,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Tendril_End",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21089500188827516,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24174700677394868,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementShort",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37191900610923769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6849820017814636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Tendril.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.821977972984314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Tendril_End",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Movement.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0013377900468185545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Run.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0013377900468185545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Run.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0013377900468185545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Run.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "tendril_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Tendril_End",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Tendril_End",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Tendril_End",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "tendril_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0018501672893762589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Tendril_Start",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0018501674057915807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Tendril_Start",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14089787006378175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41749894618988039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Tendril_Start",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4490776062011719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Tendril_Charge",
+						"bone_name": "L_thumb_1_jntBnd_1",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5764300227165222,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Tendril_Charge",
+						"bone_name": "L_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8306198120117188,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Effects/Tendril_Start",
+						"bone_name": "L_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8755307197570801,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Effects/Tendril_Impact",
+						"bone_name": "L_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9396124482154846,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Tendril_Charge",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0992064476013184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Effects/Tendril_Impact",
+						"bone_name": "L_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2718061208724976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Effects/Tendril_Impact",
+						"bone_name": "L_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5914685726165772,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Effects/Tendril_Start",
+						"bone_name": "L_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7718210220336915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Tendril_End",
+						"bone_name": "L_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "tendril_loop_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Tendril.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Tendril.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Tendril.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "tendril_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0018501672893762589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Tendril_Start",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0018501674057915807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Tendril_Start",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14089787006378175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41749894618988039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Tendril_Start",
+						"bone_name": "R_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4490776062011719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Tendril_Charge",
+						"bone_name": "R_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5764300227165222,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Tendril_Charge",
+						"bone_name": "R_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8306198120117188,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Effects/Tendril_Start",
+						"bone_name": "R_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8755307197570801,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Effects/Tendril_Impact",
+						"bone_name": "L_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9396124482154846,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Tendril_Charge",
+						"bone_name": "R_thumb_1_jntBnd_1",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0992064476013184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Effects/Tendril_Impact",
+						"bone_name": "R_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2718061208724976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Effects/Tendril_Impact",
+						"bone_name": "R_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5914685726165772,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Effects/Tendril_Start",
+						"bone_name": "R_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7718210220336915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Tendril_End",
+						"bone_name": "R_thumb_1_jntBnd_1",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "tendril_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/MovementMedium",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0004454849986359477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/Levitation/Tendril_Start",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0004454849986359477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Foley/RecordingGore/Tendril_Start",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0004454849986359477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/ManOWar/Vocal/Tendril_Start",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "tendril_left_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/ManOWar/pet/surge/surge.pet",
+						"bone_group": "grp_L_weapon"
+					}
+				]
+			},
+			{
+				"name": "tendril_right_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/ManOWar/pet/surge/surge.pet",
+						"bone_group": "grp_R_weapon"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "tendril_left_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.8204705715179445,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/ManOWar/epks/surge/L_arm_surge.epk"
+					}
+				]
+			},
+			{
+				"name": "tendril_right_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.896611213684082,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/ManOWar/epks/surge/R_arm_surge.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/ManOWar/attachments/Jelly.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/attachments/ManOWar02/Jelly/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/attachments/ManOWar02/Jelly/rig.ast"
+		linear_stiffness = 10000.000
+		linear_allowed_contraction = 0.150
+		bend_allowed_angle = 0.500
+		normal_viscosity_multiplier = 0.150
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.300
+		attachment_bones = "chest_jntBnd spine_2_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/ManOWar02/Jelly/Jelly.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_2_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/ManOWar/attachments/Danglers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/attachments/ManOWar02/Danglers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/attachments/ManOWar02/Danglers/rig.ast"
+		linear_allowed_contraction = 0.600
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		enclosure_angle = 0.800
+		animation_force_factor = 7.000
+		use_shock_propagation = false
+		attachment_bones = "spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/ManOWar02/Danglers/Danglers.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false spine_2_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BasicSkeleton/ManOWar02.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BasicSkeleton/ManOWar02_armour_2fc09f03.smd"
+Materials 1
+	"Art/Models/MONSTERS/BasicSkeleton/Textures/ManoWar02c.mat" 1
+BoundingBox -76.289 -14.5107 -189.112 77.2582 14.56 -0.225736
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_1_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_1_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/BasicSkeleton/ManOWar02_armour_2fc09f03.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 1 in the header, 1 in the block · 4098 triangles over 2756 vertices
+  names: 20 bytes said, 20 read  [agree]
+
+=== shapes (3)
+0	SkeleShape	from 0	count 12294
+1	JellyFishShape	from 12294	count 1506
+2	TentaclesShape	from 13800	count 3726
+
+=== fitting
+the monster's rig: 49 bones
+mounts: aux_position, aux_back_attachment, aux_head_jntBnd, aux_L_foot_jntBnd, aux_R_foot_jntBnd
+  Jelly.ao  socket chest_jntBnd [in its carrier's rig]  box (-23.2,-23.3,-20.7)..(25,28.4,21.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 502 triangles over 302 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 8 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,-0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (5,0,-13.4)  carrier has (5,0,-153.1)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-5,0,-13.4)  carrier has (-5,0,-153.1)
+      3 neck_jntBnd  [shared]  under 0  rests at (0,4.1,-17.7)  carrier has (0,4.1,-157.4)
+      4 spine_2_jntBnd  [shared]  under 0  rests at (0,0,14)  carrier has (0,0,-125.6)
+      5 phys_tri_F_jntBnd  [its own]  under 0  rests at (0,-0,6)
+      6 L_shoulder_jntBnd  [shared]  under 1  rests at (16.7,6.2,-13.3)  carrier has (16.7,6.2,-153)
+      7 R_shoulder_jntBnd  [shared]  under 2  rests at (-16.7,6.2,-13.3)  carrier has (-16.7,6.2,-153)
+  Danglers.ao  socket chest_jntBnd [in its carrier's rig]  box (-18.8,-19.1,-3.4)..(20.3,18.6,114.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1242 triangles over 995 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 15 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 14 of 15  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,-0)  carrier has (0,0,0)
+      1 spine_2_jntBnd  [shared]  under 0  rests at (0,0,14)  carrier has (0,0,-125.6)
+      2 phys_tri_tenties_01_01_jntBnd  [its own]  under 0  rests at (3.1,-15.4,18.5)
+      3 phys_tri_tenties_02_01_jntBnd  [its own]  under 0  rests at (15.4,-0.5,16.8)
+      4 phys_tri_tenties_03_01_jntBnd  [its own]  under 0  rests at (1.4,15.4,26.1)
+      5 phys_tri_tenties_04_jntBnd  [its own]  under 0  rests at (-12.8,10.8,11.1)
+      6 phys_tri_tenties_05_01_jntBnd  [its own]  under 0  rests at (-12.4,-14.1,25.1)
+      7 phys_tri_tenties_01_02_jntBnd  [its own]  under 2  rests at (3.1,-15.4,62.4)
+      8 phys_tri_tenties_02_02_jntBnd  [its own]  under 3  rests at (15.4,-0.5,63.5)
+      9 phys_tri_tenties_03_02_jntBnd  [its own]  under 4  rests at (1.4,15.4,69)
+      10 phys_tri_tenties_05_02_jntBnd  [its own]  under 6  rests at (-12.4,-14.1,62.2)
+      11 phys_tri_tenties_01_03_jntBnd  [its own]  under 7  rests at (3.1,-15.4,98.6)
+      12 phys_tri_tenties_02_03_jntBnd  [its own]  under 8  rests at (15.4,-0.5,100.9)
+      13 phys_tri_tenties_03_03_jntBnd  [its own]  under 9  rests at (1.4,15.4,103.2)
+      14 phys_tri_tenties_05_03_jntBnd  [its own]  under 10  rests at (-12.4,-14.1,92.8)

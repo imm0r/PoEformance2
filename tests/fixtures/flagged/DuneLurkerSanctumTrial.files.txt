@@ -1,0 +1,1853 @@
+monster: Dune Lurker [Metadata/Monsters/BrainWorm/DuneLurkerSanctumTrial]
+
+=== .ao Metadata/Monsters/BrainWorm/BrainWorm.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BrainWorm/rig.amd"
+	animations = '[
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.6989715695381165,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6989706754684448,
+					"name": "target_get"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9247288703918457,
+					"name": "contact",
+					"position": [
+						0.0,
+						0.0,
+						1.1831299947832445e-32
+					]
+				}
+			]
+		},
+		{
+			"name": "death_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3275528848171234,
+					"name": "hole_bye"
+				}
+			]
+		},
+		{
+			"name": "death_fwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.23603078722953797,
+					"name": "hole_bye"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"position": [
+						100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3169557750225067,
+					"name": "hole_bye"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"position": [
+						-100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3969174921512604,
+					"name": "hole_bye"
+				}
+			]
+		},
+		{
+			"name": "emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "hole"
+				}
+			]
+		},
+		{
+			"name": "emerge_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "hole"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8247036337852478,
+					"name": "contact",
+					"position": [
+						0.0,
+						0.0,
+						-7.493840046453723e31
+					]
+				}
+			]
+		},
+		{
+			"name": "emerge_leap_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.12179200351238251,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8178300261497498,
+					"name": "impact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8178300261497498,
+					"name": "hit_ground"
+				}
+			]
+		},
+		{
+			"name": "leap_roll_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.23333300650119782,
+					"end_time": 0.699999988079071,
+					"name": "move",
+					"position": [
+						0.0,
+						-288.1719970703125,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "roll_end_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.19999012351036073,
+					"name": "move",
+					"position": [
+						0.0,
+						-120.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 5 Away"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.2140820175409317,
+					"name": "hole"
+				}
+			]
+		},
+		{
+			"name": "roll_start_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.30000001192092898,
+					"end_time": 0.43299999833106997,
+					"name": "move",
+					"position": [
+						0.0,
+						-80.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 5 Away"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.33857378363609316,
+					"name": "hole_bye"
+				}
+			]
+		},
+		{
+			"name": "sanctum_emerge_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.371437668800354,
+					"name": "contact",
+					"position": [
+						0.0,
+						0.0,
+						-7.493840046453723e31
+					]
+				}
+			]
+		},
+		{
+			"name": "submerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7771599888801575,
+					"name": "hole_bye"
+				}
+			]
+		},
+		{
+			"name": "submerse_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7926480174064636,
+					"name": "hole_bye"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/BrainWorm/BrainWormArms.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5879999995231628,
+								0.0
+							],
+							[
+								0.6119999885559082,
+								0.6278195381164551
+							],
+							[
+								0.628000020980835,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"increment_damage_stage": false,
+						"rotation": -0.645771861076355,
+						"angle": 1.3089970350265504,
+						"x_axis_scale": 0.7400000095367432,
+						"length": 190.0,
+						"local_offset": [
+							-1.0,
+							-15.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "arm_R_impact"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5884615182876587,
+								0.0
+							],
+							[
+								0.607692301273346,
+								0.5714285373687744
+							],
+							[
+								0.6346153616905212,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"increment_damage_stage": false,
+						"rotation": 0.645771861076355,
+						"angle": 1.3089970350265504,
+						"x_axis_scale": 0.7400000095367432,
+						"length": 190.0,
+						"local_offset": [
+							1.0,
+							-15.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "arm_L_impact"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3575420081615448,
+								0.0
+							],
+							[
+								0.6759780049324036,
+								1.0
+							]
+						],
+						"width": 146.19900512695313,
+						"length": 233.91799926757813,
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "mouth_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "emerge_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5440000295639038,
+								0.0
+							],
+							[
+								0.5720000267028809,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"increment_damage_stage": false,
+						"rotation": 0.645771861076355,
+						"angle": 1.3089970350265504,
+						"x_axis_scale": 0.7400000095367432,
+						"length": 190.0,
+						"local_offset": [
+							1.0,
+							-15.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "arm_L_impact"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5461538434028626,
+								0.0
+							],
+							[
+								0.5730769038200378,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"increment_damage_stage": false,
+						"rotation": -0.645771861076355,
+						"angle": 1.3089970350265504,
+						"x_axis_scale": 0.7400000095367432,
+						"length": 190.0,
+						"local_offset": [
+							-1.0,
+							-15.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "arm_R_impact"
+					}
+				]
+			}
+		},
+		{
+			"name": "sanctum_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6207951307296753,
+								0.0
+							],
+							[
+								0.6666666865348816,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"increment_damage_stage": false,
+						"rotation": -0.645771861076355,
+						"angle": 1.3089970350265504,
+						"x_axis_scale": 0.7400000095367432,
+						"length": 190.0,
+						"local_offset": [
+							-1.0,
+							-15.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "arm_R_impact"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.632311999797821,
+								0.0
+							],
+							[
+								0.6713091731071472,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"increment_damage_stage": false,
+						"rotation": 0.645771861076355,
+						"angle": 1.3089970350265504,
+						"x_axis_scale": 0.7400000095367432,
+						"length": 190.0,
+						"local_offset": [
+							1.0,
+							-15.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "arm_L_impact"
+					}
+				]
+			}
+		},
+		{
+			"name": "sanctum_emerge_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5871559381484985,
+								0.0
+							],
+							[
+								0.639143705368042,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"increment_damage_stage": false,
+						"rotation": 0.645771861076355,
+						"angle": 1.3089970350265504,
+						"x_axis_scale": 0.7400000095367432,
+						"length": 190.0,
+						"local_offset": [
+							1.0,
+							-15.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "arm_L_impact"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5905292630195618,
+								0.0
+							],
+							[
+								0.640668511390686,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"increment_damage_stage": false,
+						"rotation": -0.645771861076355,
+						"angle": 1.3089970350265504,
+						"x_axis_scale": 0.7400000095367432,
+						"length": 190.0,
+						"local_offset": [
+							-1.0,
+							-15.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "arm_R_impact"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BrainWorm/rig.ast"
+		socket = "arm_R_impact"
+			parent = "aux_R_arm_outer"
+			translation = "-59.1562 -95.6117 0"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "arm_L_impact"
+			parent = "aux_L_arm_outer"
+			translation = "44.3951 -94.2103 0"
+			ignore_parent_rotation = "yawpitchroll"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BrainWorm/BrainWorm.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false chest_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false phys_skinned_antenna_D_jntBnd_1 phys_skinned_antenna_A_jntBnd_1 phys_skinned_antenna_E_jntBnd_1"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortSoft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.032023899257183078,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhooshLite",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43651801347732546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43651801347732546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Attack",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4963499903678894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhoosh",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5536540150642395,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhoosh",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7693819999694824,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortMed",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortSoft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08532299846410752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhooshLite",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37289199233055117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhoosh",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39196300506591799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Attack",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4066010117530823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhoosh",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4160830080509186,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4603550136089325,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreRumble",
+						"bone_name": "tail_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4687510132789612,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhoosh",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5846220254898071,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9617279767990112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortMed",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreMed",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Death",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17169900238513947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/FallMain",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17169900238513947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreHard.loop.ogg",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/LeapRumble",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Emerge",
+						"bone_name": "mouth_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreHard.loop.ogg",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/Emerge",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/LeapRumble",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Emerge",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12745699286460877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhooshLite",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4021050035953522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Attack",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5319539904594421,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortSoft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5941010117530823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhoosh",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0512700080871583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortMed",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_leap_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortMed",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/LeapRumble",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/EmergeLeap",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03897469863295555,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5719810128211975,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortSoft",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6457170248031616,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreMed",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6615070104598999,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7246130108833313,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GroundImpact",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7642109990119934,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/LeapRumble",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/Flinch",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Flinch",
+						"bone_name": "mouth_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreSoft.loop.ogg",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3066699504852296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Idle",
+						"bone_name": "mouth_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "inert_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreRumble",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Submerged",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "inert_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreSoft.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.369119882583618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "inert_submerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0007022470235824585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreSoft.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.351826012134552,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreRumble",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.351826012134552,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Submerged",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/KnockdownA",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08889266103506088,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/Fall",
+						"bone_name": "phys_skinned_antenna_F_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2539407014846802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreRumble",
+						"bone_name": "tail_jntBnd_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6357200145721436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/KnockdownB",
+						"bone_name": "mouth_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/KnockdownA",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08889266103506088,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/Fall",
+						"bone_name": "phys_skinned_antenna_F_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2539407014846802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreRumble",
+						"bone_name": "tail_jntBnd_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6357200145721436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/KnockdownB",
+						"bone_name": "mouth_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "leap_roll_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreMed",
+						"bone_name": "tail_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortHard",
+						"bone_name": "tail_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09614039957523346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Attack",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18960699439048768,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreRumble",
+						"bone_name": "tail_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4353939890861511,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortHard",
+						"bone_name": "tail_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "roll_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreHard.loop.ogg",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2549389898777008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreRumble",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3458290100097656,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Run",
+						"bone_name": "mouth_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "roll_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortSoft",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "roll_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Emerge",
+						"bone_name": "mouth_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortSoft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13665039837360383,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhooshLite",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8827028274536133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Attack",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8920801281929016,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0350414514541627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhoosh",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1946139335632325,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortMed",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2004454135894776,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhoosh",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sanctum_emerge_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreHard.loop.ogg",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/Emerge",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/LeapRumble",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Emerge",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1840478777885437,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhooshLite",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7674211859703064,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Attack",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8975775241851807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortSoft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.121669054031372,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/TentacleVomitWhoosh",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4950953722000123,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreShortMed",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreSoft.loop.ogg",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Submerged",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5146999955177307,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/LeapRumble",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "submerse_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/GoreSoft.loop.ogg",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Vocals/Submerged",
+						"bone_name": "mouth_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44662898778915408,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_6/DuneLurker/Foley/LeapRumble",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/attack01.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.7298750281333923,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/attack02_gd.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Inherit",
+						"offset": {
+							"translation": [
+								0.0,
+								-100.00000762939453,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/emerge.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Inherit"
+					}
+				]
+			},
+			{
+				"name": "emerge_attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/emerge.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Inherit"
+					}
+				]
+			},
+			{
+				"name": "emerge_leap_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/emerge_leap.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "roll_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/roll_dust.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "sanctum_emerge_attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.2727794051170349,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/emerge.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Inherit"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.7771599888801575,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/submerge.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "submerse_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.7926480174064636,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/submerge.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/BrainWorm/BrainWormArms.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BrainWorm/BrainWormArms/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BrainWorm/BrainWormArms/rig.ast"
+		socket = "L_hook_01"
+			parent = "L_arm_jntBnd_12"
+			translation = "13.1847 0 0"
+		socket = "L_hook_02"
+			parent = "L_arm_jntBnd_12"
+			translation = "26.8283 -0.505247 4.96169"
+		socket = "L_hook_03"
+			parent = "L_arm_jntBnd_12"
+			translation = "34.9593 -1.19105 15.7632"
+		socket = "L_hook_04"
+			parent = "L_arm_jntBnd_12"
+			translation = "35.5348 -1.38414 25.8172"
+		socket = "L_hook_05"
+			parent = "L_arm_jntBnd_12"
+			translation = "32.7577 -1.38414 33.9679"
+		socket = "LL_hook_01"
+			parent = "LL_arm_jntBnd_12"
+			translation = "13.1847 0 0"
+		socket = "LL_hook_02"
+			parent = "LL_arm_jntBnd_12"
+			translation = "20.5061 -0.505247 7.24331"
+		socket = "LL_hook_03"
+			parent = "LL_arm_jntBnd_12"
+			translation = "26.3626 -1.19105 16.0261"
+		socket = "LL_hook_04"
+			parent = "LL_arm_jntBnd_12"
+			translation = "26.6482 -1.49423 25.8172"
+		socket = "LL_hook_05"
+			parent = "LL_arm_jntBnd_12"
+			translation = "23.1077 -1.38414 33.6538"
+		socket = "R_hook_01"
+			parent = "R_arm_jntBnd_12"
+			translation = "-15.7903 0 0"
+		socket = "R_hook_02"
+			parent = "R_arm_jntBnd_12"
+			translation = "-27.1061 0.633848 -4.25193"
+		socket = "R_hook_03"
+			parent = "R_arm_jntBnd_12"
+			translation = "-34.8347 1.22504 -13.3333"
+		socket = "R_hook_04"
+			parent = "R_arm_jntBnd_12"
+			translation = "-36.0225 1.22504 -22.8639"
+		socket = "R_hook_05"
+			parent = "R_arm_jntBnd_12"
+			translation = "-33.7845 1.22504 -32.245"
+		socket = "RR_hook_01"
+			parent = "RR_arm_jntBnd_12"
+			translation = "-11.343 2.26261 0.634814"
+		socket = "RR_hook_02"
+			parent = "RR_arm_jntBnd_12"
+			translation = "-19.7417 2.22741 -5.17961"
+		socket = "RR_hook_03"
+			parent = "RR_arm_jntBnd_12"
+			translation = "-25.2766 2.7716 -13.7238"
+		socket = "RR_hook_04"
+			parent = "RR_arm_jntBnd_12"
+			translation = "-26.8291 2.7716 -23.7628"
+		socket = "RR_hook_05"
+			parent = "RR_arm_jntBnd_12"
+			translation = "-24.1304 2.7716 -31.5372"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BrainWorm/BrainWormArms/BrainWormArms.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "line01 false L_arm_jntBnd_01 LL_arm_jntBnd_01"
+		bone_group = "line02 false RR_arm_jntBnd_01 R_arm_jntBnd_01"
+		bone_group = "trl_01 false L_arm_jntBnd_01 L_arm_jntBnd_03 L_arm_jntBnd_05 L_arm_jntBnd_07 L_arm_jntBnd_09 L_arm_jntBnd_11 L_arm_jntBnd_12"
+		bone_group = "trl_02 false LL_arm_jntBnd_01 LL_arm_jntBnd_03 LL_arm_jntBnd_05 LL_arm_jntBnd_07 LL_arm_jntBnd_09 LL_arm_jntBnd_11 LL_arm_jntBnd_12"
+		bone_group = "trl_03 false R_arm_jntBnd_01 R_arm_jntBnd_03 R_arm_jntBnd_05 R_arm_jntBnd_07 R_arm_jntBnd_09 R_arm_jntBnd_11 R_arm_jntBnd_12"
+		bone_group = "trl_04 false RR_arm_jntBnd_01 RR_arm_jntBnd_03 RR_arm_jntBnd_05 RR_arm_jntBnd_07 RR_arm_jntBnd_09 RR_arm_jntBnd_11 RR_arm_jntBnd_12"
+		bone_group = "hook_01 false L_hook_01 L_hook_02 L_hook_03 L_hook_04 L_hook_05"
+		bone_group = "hook_02 false LL_hook_01 LL_hook_02 LL_hook_03 LL_hook_04 LL_hook_05"
+		bone_group = "hook_03 false R_hook_01 R_hook_02 R_hook_03 R_hook_04 R_hook_05"
+		bone_group = "hook_04 false RR_hook_01 RR_hook_02 RR_hook_03 RR_hook_04 RR_hook_05"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_surge.pet",
+						"bone_group": "line01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_surge.pet",
+						"bone_group": "line02"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack02_surge.pet",
+						"bone_group": "line01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack02_surge.pet",
+						"bone_group": "line02"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6678599715232849,
+						"end_time": 0.8270079493522644,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_mblur.trl",
+						"bone_group": "trl_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6678599715232849,
+						"end_time": 0.8270079493522644,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_mblur.trl",
+						"bone_group": "trl_02"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6678599715232849,
+						"end_time": 0.8270079493522644,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_mblur.trl",
+						"bone_group": "trl_03"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6678599715232849,
+						"end_time": 0.8270079493522644,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_mblur.trl",
+						"bone_group": "trl_04"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6679189801216126,
+						"end_time": 0.8270679712295532,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_melee.trl",
+						"bone_group": "hook_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6679189801216126,
+						"end_time": 0.8270679712295532,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_melee.trl",
+						"bone_group": "hook_02"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6679189801216126,
+						"end_time": 0.8270679712295532,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_melee.trl",
+						"bone_group": "hook_03"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6679189801216126,
+						"end_time": 0.8270679712295532,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_melee.trl",
+						"bone_group": "hook_04"
+					}
+				]
+			},
+			{
+				"name": "emerge_attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6678599715232849,
+						"end_time": 0.8270079493522644,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_mblur.trl",
+						"bone_group": "trl_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6678599715232849,
+						"end_time": 0.8270079493522644,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_mblur.trl",
+						"bone_group": "trl_02"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6678599715232849,
+						"end_time": 0.8270079493522644,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_mblur.trl",
+						"bone_group": "trl_03"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6678599715232849,
+						"end_time": 0.8270079493522644,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_mblur.trl",
+						"bone_group": "trl_04"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6679189801216126,
+						"end_time": 0.8270679712295532,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_melee.trl",
+						"bone_group": "hook_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6679189801216126,
+						"end_time": 0.8270679712295532,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_melee.trl",
+						"bone_group": "hook_02"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6679189801216126,
+						"end_time": 0.8270679712295532,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_melee.trl",
+						"bone_group": "hook_03"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6679189801216126,
+						"end_time": 0.8270679712295532,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/attack01_melee.trl",
+						"bone_group": "hook_04"
+					}
+				]
+			},
+			{
+				"name": "sanctum_attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.063458800315857,
+						"end_time": 1.4869825839996338,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/melee_swipe.trl",
+						"bone_groups": [
+							"trl_01",
+							"hook_01"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.063458800315857,
+						"end_time": 1.4869824647903443,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/melee_swipe.trl",
+						"bone_groups": [
+							"trl_02",
+							"hook_02"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.063458800315857,
+						"end_time": 1.4869823455810547,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/melee_swipe.trl",
+						"bone_groups": [
+							"trl_03",
+							"hook_03"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.063458800315857,
+						"end_time": 1.4869823455810547,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/melee_swipe.trl",
+						"bone_groups": [
+							"trl_04",
+							"hook_04"
+						]
+					}
+				]
+			},
+			{
+				"name": "sanctum_emerge_attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.2350797653198243,
+						"end_time": 1.4496206045150757,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/melee_swipe.trl",
+						"bone_groups": [
+							"trl_04",
+							"hook_04"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.2350797653198243,
+						"end_time": 1.4496206045150757,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/melee_swipe.trl",
+						"bone_groups": [
+							"trl_03",
+							"hook_03"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.2350797653198243,
+						"end_time": 1.4496206045150757,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/melee_swipe.trl",
+						"bone_groups": [
+							"hook_02",
+							"trl_02"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.2350797653198243,
+						"end_time": 1.4496206045150757,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/BrainWorm/fx/melee_swipe.trl",
+						"bone_groups": [
+							"hook_01",
+							"trl_01"
+						]
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BrainWorm/BrainWorm.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BrainWorm/rig_a363faa5.smd"
+Materials 1
+	"Art/Textures/Monsters/BrainWorm/BrainWormc.mat" 6
+BoundingBox -50.6088 -34.5334 -299.06 58.0502 55.1819 95.2411
+BoneGroups 13
+	"grp_root" 2 "root_jntBnd" "tail_jntBnd_1"
+	"grp_frameupper" 3 "aux_L_arm_outer" "head_jntBnd" "aux_R_arm_outer"
+	"grp_head" 2 "head_jntBnd" "mouth_jntBnd"
+	"grp_neck" 2 "chest_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_1_jntBnd" "chest_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "chest_jntBnd" "aux_L_arm_outer"
+	"grp_r_clavicle" 2 "chest_jntBnd" "aux_R_arm_outer"
+	"grp_tail_01" 2 "tail_jntBnd_1" "tail_jntBnd_2"
+	"grp_tail_02" 2 "tail_jntBnd_2" "tail_jntBnd_3"
+	"grp_tail_03" 2 "tail_jntBnd_3" "tail_jntBnd_4"
+	"grp_tail_04" 2 "tail_jntBnd_4" "tail_jntBnd_5"
+	"grp_tail_05" 2 "tail_jntBnd_5" "tail_jntBnd_6"
+
+=== .smd Art/Models/MONSTERS/BrainWorm/rig_a363faa5.smd
+  version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 6 in the header, 6 in the block · 7114 triangles over 4800 vertices
+  names: 120 bytes said, 120 read  [agree]
+
+=== shapes (6)
+0	antennaShape	from 0	count 1986
+1	bodyShape	from 1986	count 10056
+2	hairShape	from 12042	count 1464
+3	legsShape	from 13506	count 5460
+4	teethShape	from 18966	count 480
+5	tissueShape	from 19446	count 1896
+
+=== fitting
+the monster's rig: 42 bones
+mounts: aux_position, aux_R_arm_inner, aux_R_arm_outer, aux_L_arm_inner, aux_L_arm_outer
+  BrainWormArms.ao  socket <root> [NOT in its carrier's rig]  box (-8.7,-35.6,-227.2)..(8.7,7,5.6)
+    (the geometry did not read)
+    rig 49 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 RR_arm_jntBnd_01  [its own]  under 0  rests at (-0,-0,0)
+      2 R_arm_jntBnd_01  [its own]  under 0  rests at (0,0,0)
+      3 LL_arm_jntBnd_01  [its own]  under 0  rests at (0,0,0)
+      4 L_arm_jntBnd_01  [its own]  under 0  rests at (0,0,0)
+      5 RR_arm_jntBnd_02  [its own]  under 1  rests at (0,-0,-18)
+      6 R_arm_jntBnd_02  [its own]  under 2  rests at (-0,0,-16)
+      7 LL_arm_jntBnd_02  [its own]  under 3  rests at (0,0,-18)
+      8 L_arm_jntBnd_02  [its own]  under 4  rests at (0,-0,-16)
+      9 RR_arm_jntBnd_03  [its own]  under 5  rests at (0,-0,-36)
+      10 R_arm_jntBnd_03  [its own]  under 6  rests at (-0,-0,-32)
+      11 LL_arm_jntBnd_03  [its own]  under 7  rests at (0,-0,-36)
+      12 L_arm_jntBnd_03  [its own]  under 8  rests at (0,-0,-32)
+      13 RR_arm_jntBnd_04  [its own]  under 9  rests at (-0,-0,-54)
+      14 R_arm_jntBnd_04  [its own]  under 10  rests at (-0,-0,-48)
+      15 LL_arm_jntBnd_04  [its own]  under 11  rests at (0,-0,-54)
+      16 L_arm_jntBnd_04  [its own]  under 12  rests at (0,-0,-48)
+      17 RR_arm_jntBnd_05  [its own]  under 13  rests at (-0,-0,-72)
+      18 R_arm_jntBnd_05  [its own]  under 14  rests at (-0,0,-64)
+      19 LL_arm_jntBnd_05  [its own]  under 15  rests at (0,-0,-72)
+      20 L_arm_jntBnd_05  [its own]  under 16  rests at (0,-0,-64)
+      21 RR_arm_jntBnd_06  [its own]  under 17  rests at (-0,-0,-90)
+      22 R_arm_jntBnd_06  [its own]  under 18  rests at (-0,0,-80)
+      23 LL_arm_jntBnd_06  [its own]  under 19  rests at (0,-0,-90)
+      24 L_arm_jntBnd_06  [its own]  under 20  rests at (0,-0,-80)
+      25 RR_arm_jntBnd_07  [its own]  under 21  rests at (-0,-0,-108)
+      26 R_arm_jntBnd_07  [its own]  under 22  rests at (0,-0,-96)
+      27 LL_arm_jntBnd_07  [its own]  under 23  rests at (0,-0,-108)
+      28 L_arm_jntBnd_07  [its own]  under 24  rests at (0,0,-96)
+      29 RR_arm_jntBnd_08  [its own]  under 25  rests at (0,-0,-126)
+      30 R_arm_jntBnd_08  [its own]  under 26  rests at (-0,0,-112)
+      31 LL_arm_jntBnd_08  [its own]  under 27  rests at (0,0,-126)
+      32 L_arm_jntBnd_08  [its own]  under 28  rests at (0,-0,-112)
+      33 RR_arm_jntBnd_09  [its own]  under 29  rests at (0,-0,-144)
+      34 R_arm_jntBnd_09  [its own]  under 30  rests at (-0,-0,-128)
+      35 LL_arm_jntBnd_09  [its own]  under 31  rests at (0,-0,-144)
+      36 L_arm_jntBnd_09  [its own]  under 32  rests at (0,-0,-128)
+      37 RR_arm_jntBnd_10  [its own]  under 33  rests at (-0,-0,-162)
+      38 R_arm_jntBnd_10  [its own]  under 34  rests at (-0,-0,-144)
+      39 LL_arm_jntBnd_10  [its own]  under 35  rests at (0,-0,-162)
+      40 L_arm_jntBnd_10  [its own]  under 36  rests at (0,-0,-144)
+      41 RR_arm_jntBnd_11  [its own]  under 37  rests at (-0,-0,-180)
+      42 R_arm_jntBnd_11  [its own]  under 38  rests at (-0,0,-160)
+      43 LL_arm_jntBnd_11  [its own]  under 39  rests at (0,-0,-180)
+      44 L_arm_jntBnd_11  [its own]  under 40  rests at (0,-0,-160)
+      45 RR_arm_jntBnd_12  [its own]  under 41  rests at (-0,-0,-198.1)
+      46 R_arm_jntBnd_12  [its own]  under 42  rests at (-0,0,-176)
+      47 LL_arm_jntBnd_12  [its own]  under 43  rests at (0,-0,-198.1)
+      48 L_arm_jntBnd_12  [its own]  under 44  rests at (0,-0,-176)

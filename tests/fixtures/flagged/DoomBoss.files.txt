@@ -1,0 +1,5299 @@
+monster: Vandroth, Blackblooded Enslaver [Metadata/Monsters/LeagueAbyss/Blackblood/DoomBoss]
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/DoomBoss/DoomBoss.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/AbyssDoomBoss/rig.amd"
+	view_of = "burrow_01"
+		view_name = "burrow_swim_loop"
+		view_looping = true
+	view_of = "burrow_01"
+		view_name = "burrow_swim_start"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0719674825668336,
+					"name": "contact",
+					"position": [
+						33.47826385498047,
+						-260.437255859375,
+						-135.0
+					],
+					"contact_ref": [
+						33.47800064086914,
+						0.0,
+						-135.0
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8583287000656128,
+					"name": "contact",
+					"position": [
+						-105.86177825927735,
+						-145.06919860839845,
+						-123.20951080322266
+					]
+				}
+			]
+		},
+		{
+			"name": "burrow_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4000000059604645,
+					"name": "contact",
+					"position": [
+						21.257095336914064,
+						-129.67262268066407,
+						-0.4593963623046875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1673437356948853,
+					"name": "followup",
+					"position": [
+						21.257095336914064,
+						-129.67262268066407,
+						-0.4593963623046875
+					]
+				}
+			]
+		},
+		{
+			"name": "burrow_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.1872785091400147,
+					"name": "minions"
+				}
+			]
+		},
+		{
+			"name": "emerge_pillar_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0,
+					"name": "interupt"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 2.8666000366210939,
+					"end_time": 3.733299970626831,
+					"name": "move",
+					"position": [
+						51.09700012207031,
+						-43.86199951171875,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "idle_01",
+			"blend_in_time": 200
+		},
+		{
+			"name": "slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.078423023223877,
+					"name": "indicator",
+					"position": [
+						0.0,
+						-147.4290008544922,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "summon",
+					"position": [
+						-13.305331230163575,
+						-142.61541748046876,
+						-417.8858947753906
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.074113368988037,
+					"name": "contact",
+					"position": [
+						0.0,
+						-147.4290771484375,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "sumo_aoe_slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.233501672744751,
+					"name": "contact",
+					"position": [
+						0.0,
+						-158.6444549560547,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "sumo_dash_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.12458821386098862,
+					"name": "icestep",
+					"position": [
+						-24.479084014892579,
+						-44.54874038696289,
+						-11.179021835327149
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.37201574444770815,
+					"name": "icestep",
+					"position": [
+						24.62439727783203,
+						-44.506587982177737,
+						-12.173320770263672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.629448413848877,
+					"name": "icestep",
+					"position": [
+						-24.431591033935548,
+						-39.096309661865237,
+						-11.844930648803711
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8766638040542603,
+					"name": "icestep",
+					"position": [
+						-24.431591033935548,
+						-39.096309661865237,
+						-11.844930648803711
+					]
+				}
+			]
+		},
+		{
+			"name": "sumo_dash_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.28577178716659548,
+					"name": "icesmash",
+					"position": [
+						-5.358469009399414,
+						-141.02317810058595,
+						-125.45608520507813
+					]
+				}
+			]
+		},
+		{
+			"name": "sumo_dash_start_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.2862768173217774,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				}
+			]
+		},
+		{
+			"name": "vomit_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "vomit",
+					"position": [
+						-7.722433090209961,
+						-88.51715087890625,
+						-161.58688354492188
+					]
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.899999976158142,
+					"name": "start_target_update",
+					"data": "45 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.02500000037252903,
+					"name": "vomit",
+					"position": [
+						-8.544609069824219,
+						-86.19863891601563,
+						-163.7996826171875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.05000000074505806,
+					"name": "vomit",
+					"position": [
+						-9.518786430358887,
+						-83.19953155517578,
+						-165.86709594726563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.07500000298023224,
+					"name": "vomit",
+					"position": [
+						-9.943906784057618,
+						-81.32029724121094,
+						-166.59832763671876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.10000000149011612,
+					"name": "vomit",
+					"position": [
+						-9.350496292114258,
+						-82.57487487792969,
+						-164.8391876220703
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.125,
+					"name": "vomit",
+					"position": [
+						-8.273127555847168,
+						-84.52548217773438,
+						-163.24404907226563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.15000000596046449,
+					"name": "vomit",
+					"position": [
+						-8.37746524810791,
+						-83.40713500976563,
+						-163.9842071533203
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.17499999701976777,
+					"name": "vomit",
+					"position": [
+						-9.116460800170899,
+						-80.44366455078125,
+						-165.98365783691407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.20000000298023225,
+					"name": "vomit",
+					"position": [
+						-9.987520217895508,
+						-76.81394958496094,
+						-167.6764678955078
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.22499999403953553,
+					"name": "vomit",
+					"position": [
+						-9.382488250732422,
+						-77.76893615722656,
+						-166.0229949951172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.25,
+					"name": "vomit",
+					"position": [
+						-8.433963775634766,
+						-79.16316986083985,
+						-164.43605041503907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.2750000059604645,
+					"name": "vomit",
+					"position": [
+						-7.896421909332275,
+						-79.27195739746094,
+						-163.8985137939453
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.30000001192092898,
+					"name": "vomit",
+					"position": [
+						-8.427735328674317,
+						-76.54823303222656,
+						-165.7526397705078
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.32499998807907107,
+					"name": "vomit",
+					"position": [
+						-9.320898056030274,
+						-73.02975463867188,
+						-167.23036193847657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3499999940395355,
+					"name": "vomit",
+					"position": [
+						-9.1597318649292,
+						-72.28346252441406,
+						-166.5692901611328
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.375,
+					"name": "vomit",
+					"position": [
+						-8.327155113220215,
+						-73.15776062011719,
+						-164.86318969726563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4000000059604645,
+					"name": "vomit",
+					"position": [
+						-7.173882007598877,
+						-74.40096282958985,
+						-163.23712158203126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.42500001192092898,
+					"name": "vomit",
+					"position": [
+						-7.720936298370361,
+						-71.91095733642578,
+						-164.87391662597657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.44999998807907107,
+					"name": "vomit",
+					"position": [
+						-8.494336128234864,
+						-68.90625,
+						-166.26748657226563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4749999940395355,
+					"name": "vomit",
+					"position": [
+						-8.840547561645508,
+						-66.89258575439453,
+						-166.47344970703126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5,
+					"name": "vomit",
+					"position": [
+						-8.140368461608887,
+						-67.36603546142578,
+						-164.62815856933595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5249999761581421,
+					"name": "vomit",
+					"position": [
+						-6.954773902893066,
+						-68.59640502929688,
+						-163.14964294433595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.550000011920929,
+					"name": "vomit",
+					"position": [
+						-6.948627471923828,
+						-67.55029296875,
+						-163.52565002441407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.574999988079071,
+					"name": "vomit",
+					"position": [
+						-7.636185646057129,
+						-65.20259857177735,
+						-164.94876098632813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6000000238418579,
+					"name": "vomit",
+					"position": [
+						-8.577766418457032,
+						-62.34711837768555,
+						-166.04014587402345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.625,
+					"name": "vomit",
+					"position": [
+						-7.87260627746582,
+						-62.886714935302737,
+						-164.2753143310547
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6499999761581421,
+					"name": "vomit",
+					"position": [
+						-6.782047271728516,
+						-63.89399337768555,
+						-162.67869567871095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.675000011920929,
+					"name": "vomit",
+					"position": [
+						-6.178035736083984,
+						-64.11502838134766,
+						-162.01153564453126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.699999988079071,
+					"name": "vomit",
+					"position": [
+						-6.793989181518555,
+						-62.50424575805664,
+						-163.52943420410157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7250000238418579,
+					"name": "vomit",
+					"position": [
+						-7.851075649261475,
+						-60.24092102050781,
+						-164.72927856445313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.75,
+					"name": "vomit",
+					"position": [
+						-7.707581043243408,
+						-59.97245407104492,
+						-163.9742431640625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7749999761581421,
+					"name": "vomit",
+					"position": [
+						-6.712690830230713,
+						-60.948543548583987,
+						-162.2529754638672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.800000011920929,
+					"name": "vomit",
+					"position": [
+						-5.403478622436523,
+						-62.39423751831055,
+						-160.5897674560547
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.824999988079071,
+					"name": "vomit",
+					"position": [
+						-6.142071723937988,
+						-61.46107864379883,
+						-162.17091369628907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8500000238418579,
+					"name": "vomit",
+					"position": [
+						-7.15254020690918,
+						-60.07653045654297,
+						-163.65138244628907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.875,
+					"name": "vomit",
+					"position": [
+						-7.672320365905762,
+						-59.37873458862305,
+						-163.9931640625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8999999761581421,
+					"name": "vomit",
+					"position": [
+						-6.787596702575684,
+						-60.56472396850586,
+						-162.16690063476563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.925000011920929,
+					"name": "vomit",
+					"position": [
+						-5.417905807495117,
+						-62.663265228271487,
+						-160.60523986816407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.949999988079071,
+					"name": "vomit",
+					"position": [
+						-5.555859565734863,
+						-63.189239501953128,
+						-161.10809326171876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9750000238418579,
+					"name": "vomit",
+					"position": [
+						-6.583899021148682,
+						-62.7266845703125,
+						-162.88400268554688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0,
+					"name": "vomit",
+					"position": [
+						-7.959173679351807,
+						-61.71033477783203,
+						-164.49725341796876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.024999976158142,
+					"name": "vomit",
+					"position": [
+						-7.171026229858398,
+						-63.570335388183597,
+						-162.74964904785157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0499999523162842,
+					"name": "vomit",
+					"position": [
+						-6.016809463500977,
+						-65.99139404296875,
+						-161.02772521972657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0750000476837159,
+					"name": "vomit",
+					"position": [
+						-5.528708457946777,
+						-67.81634521484375,
+						-160.349609375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.100000023841858,
+					"name": "vomit",
+					"position": [
+						-6.669376373291016,
+						-67.96996307373047,
+						-162.32522583007813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.125,
+					"name": "vomit",
+					"position": [
+						-8.267942428588868,
+						-67.32743835449219,
+						-164.2422332763672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.149999976158142,
+					"name": "vomit",
+					"position": [
+						-8.296379089355469,
+						-68.58914184570313,
+						-163.68960571289063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1749999523162842,
+					"name": "vomit",
+					"position": [
+						-7.303040027618408,
+						-71.13172149658203,
+						-161.76559448242188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2000000476837159,
+					"name": "vomit",
+					"position": [
+						-5.959453582763672,
+						-74.11936950683594,
+						-159.6621551513672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.225000023841858,
+					"name": "vomit",
+					"position": [
+						-7.268435001373291,
+						-74.3438720703125,
+						-161.75146484375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.25,
+					"name": "vomit",
+					"position": [
+						-8.793787002563477,
+						-73.91169738769531,
+						-163.9113311767578
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.274999976158142,
+					"name": "vomit",
+					"position": [
+						-9.602645874023438,
+						-74.13934326171875,
+						-164.68089294433595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "vomit",
+					"position": [
+						-8.708072662353516,
+						-76.58818817138672,
+						-162.58282470703126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3250000476837159,
+					"name": "vomit",
+					"position": [
+						-7.311734199523926,
+						-79.74453735351563,
+						-160.44699096679688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.350000023841858,
+					"name": "vomit",
+					"position": [
+						-7.685389041900635,
+						-80.71575927734375,
+						-161.0692901611328
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.375,
+					"name": "vomit",
+					"position": [
+						-9.006553649902344,
+						-80.22030639648438,
+						-163.33937072753907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.399999976158142,
+					"name": "vomit",
+					"position": [
+						-10.494821548461914,
+						-78.9678955078125,
+						-165.5276336669922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4249999523162842,
+					"name": "vomit",
+					"position": [
+						-9.520054817199707,
+						-81.36477661132813,
+						-163.44081115722657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4500000476837159,
+					"name": "vomit",
+					"position": [
+						-8.224054336547852,
+						-84.16139221191406,
+						-161.27085876464845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.475000023841858,
+					"name": "vomit",
+					"position": [
+						-7.650622367858887,
+						-85.8751220703125,
+						-160.4161834716797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5,
+					"name": "vomit",
+					"position": [
+						-8.76038932800293,
+						-85.02510070800781,
+						-162.71563720703126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.524999976158142,
+					"name": "vomit",
+					"position": [
+						-10.186147689819336,
+						-83.19221496582031,
+						-165.0060577392578
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5499999523162842,
+					"name": "vomit",
+					"position": [
+						-10.017158508300782,
+						-83.87094116210938,
+						-164.45095825195313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5750000476837159,
+					"name": "vomit",
+					"position": [
+						-8.968244552612305,
+						-86.1622314453125,
+						-162.37576293945313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.600000023841858,
+					"name": "vomit",
+					"position": [
+						-7.600937366485596,
+						-88.82856750488281,
+						-160.16549682617188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.625,
+					"name": "vomit",
+					"position": [
+						-8.643838882446289,
+						-87.42768096923828,
+						-162.46432495117188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.649999976158142,
+					"name": "vomit",
+					"position": [
+						-9.80997085571289,
+						-85.29176330566406,
+						-164.74220275878907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6749999523162842,
+					"name": "vomit",
+					"position": [
+						-10.290573120117188,
+						-84.1402587890625,
+						-165.55715942382813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7000000476837159,
+					"name": "vomit",
+					"position": [
+						-9.48579216003418,
+						-85.98360443115235,
+						-163.57342529296876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.725000023841858,
+					"name": "vomit",
+					"position": [
+						-8.229635238647461,
+						-88.55061340332031,
+						-161.6424560546875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.75,
+					"name": "vomit",
+					"position": [
+						-8.395203590393067,
+						-88.15943908691406,
+						-162.37969970703126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.774999976158142,
+					"name": "vomit",
+					"position": [
+						-9.291029930114746,
+						-85.90788269042969,
+						-164.58880615234376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "vomit",
+					"position": [
+						-10.286149978637696,
+						-82.92831420898438,
+						-166.59202575683595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8250000476837159,
+					"name": "vomit",
+					"position": [
+						-9.564496994018555,
+						-84.68128967285156,
+						-164.7796630859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.850000023841858,
+					"name": "vomit",
+					"position": [
+						-8.544568061828614,
+						-86.94192504882813,
+						-162.9088897705078
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.875,
+					"name": "vomit",
+					"position": [
+						-7.722433090209961,
+						-88.51715087890625,
+						-161.58685302734376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.899999976158142,
+					"name": "vomit",
+					"position": [
+						-7.722433090209961,
+						-88.51715087890625,
+						-161.58688354492188
+					]
+				}
+			]
+		},
+		{
+			"name": "vomit_complete_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 2.5,
+					"end_time": 12.0,
+					"name": "start_target_update",
+					"data": "60 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5,
+					"name": "contact",
+					"position": [
+						-1.4622955322265626,
+						-36.37635803222656,
+						-171.20526123046876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.700000047683716,
+					"name": "contact",
+					"position": [
+						-2.4739274978637697,
+						-48.84294891357422,
+						-160.45086669921876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.9000000953674318,
+					"name": "contact",
+					"position": [
+						-2.081332206726074,
+						-50.567466735839847,
+						-156.92214965820313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0999999046325685,
+					"name": "contact",
+					"position": [
+						-2.4316158294677736,
+						-46.53141784667969,
+						-157.45849609375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.299999952316284,
+					"name": "contact",
+					"position": [
+						-3.1872520446777345,
+						-43.5360107421875,
+						-162.0298614501953
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5,
+					"name": "contact",
+					"position": [
+						-3.3566036224365236,
+						-35.30164337158203,
+						-167.64820861816407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.700000047683716,
+					"name": "contact",
+					"position": [
+						-2.281871795654297,
+						-30.190214157104493,
+						-173.082275390625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.9000000953674318,
+					"name": "contact",
+					"position": [
+						-2.6905288696289064,
+						-27.06220817565918,
+						-175.299560546875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.099999904632568,
+					"name": "contact",
+					"position": [
+						-1.7033233642578126,
+						-30.584897994995118,
+						-174.07766723632813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.300000190734863,
+					"name": "contact",
+					"position": [
+						-1.1879310607910157,
+						-34.07887268066406,
+						-169.61065673828126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.5,
+					"name": "contact",
+					"position": [
+						0.0009765625,
+						-40.569252014160159,
+						-164.03709411621095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.699999809265137,
+					"name": "contact",
+					"position": [
+						-1.429344654083252,
+						-44.9127197265625,
+						-158.8933563232422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.900000095367432,
+					"name": "contact",
+					"position": [
+						-0.6816210746765137,
+						-46.750633239746097,
+						-158.10321044921876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.099999904632568,
+					"name": "contact",
+					"position": [
+						-0.8417320251464844,
+						-41.3935546875,
+						-161.1770782470703
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.300000190734863,
+					"name": "contact",
+					"position": [
+						-0.6760654449462891,
+						-35.555458068847659,
+						-166.9795379638672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.5,
+					"name": "contact",
+					"position": [
+						-1.7786502838134766,
+						-26.73539924621582,
+						-171.83120727539063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.699999809265137,
+					"name": "contact",
+					"position": [
+						-0.9959545135498047,
+						-22.697250366210939,
+						-175.49362182617188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.900000095367432,
+					"name": "contact",
+					"position": [
+						-1.3566932678222657,
+						-23.84756088256836,
+						-174.9747314453125
+					]
+				},
+				{
+					"type": "InterruptSkillEventType",
+					"time": 6.0,
+					"name": "interrupt_skill",
+					"data": "70 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.099999904632568,
+					"name": "contact",
+					"position": [
+						-1.8923873901367188,
+						-34.540435791015628,
+						-170.97230529785157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.300000190734863,
+					"name": "contact",
+					"position": [
+						-2.4190120697021486,
+						-42.39543533325195,
+						-164.87022399902345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.5,
+					"name": "contact",
+					"position": [
+						-2.0455589294433595,
+						-47.91543960571289,
+						-159.52674865722657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.699999809265137,
+					"name": "contact",
+					"position": [
+						-3.0176024436950685,
+						-47.44878387451172,
+						-156.5085906982422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.900000095367432,
+					"name": "contact",
+					"position": [
+						-2.8621890544891359,
+						-44.562339782714847,
+						-158.7247314453125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.099999904632568,
+					"name": "contact",
+					"position": [
+						-2.7003793716430666,
+						-35.301307678222659,
+						-163.77053833007813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.300000190734863,
+					"name": "contact",
+					"position": [
+						-1.349802017211914,
+						-29.643888473510743,
+						-169.913330078125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.5,
+					"name": "contact",
+					"position": [
+						-2.5517921447753908,
+						-27.09956169128418,
+						-173.79217529296876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.699999809265137,
+					"name": "contact",
+					"position": [
+						-1.1289939880371094,
+						-29.213298797607423,
+						-175.19248962402345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.900000095367432,
+					"name": "contact",
+					"position": [
+						-0.8872795104980469,
+						-32.90195846557617,
+						-172.31405639648438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 8.100000381469727,
+					"name": "contact",
+					"position": [
+						-0.3496742248535156,
+						-40.309078216552737,
+						-167.00343322753907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 8.300000190734864,
+					"name": "contact",
+					"position": [
+						-1.3924245834350587,
+						-44.0349006652832,
+						-160.82164001464845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 8.5,
+					"name": "contact",
+					"position": [
+						-1.0572338104248047,
+						-45.68473815917969,
+						-157.2946319580078
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 8.699999809265137,
+					"name": "contact",
+					"position": [
+						-1.7428646087646485,
+						-41.54967498779297,
+						-157.50970458984376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 8.899999618530274,
+					"name": "contact",
+					"position": [
+						-2.7817697525024416,
+						-38.620967864990237,
+						-162.09645080566407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 9.100000381469727,
+					"name": "contact",
+					"position": [
+						-3.235095977783203,
+						-31.75220489501953,
+						-167.640380859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 9.300000190734864,
+					"name": "contact",
+					"position": [
+						-2.464153289794922,
+						-29.255918502807618,
+						-172.96160888671876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 9.5,
+					"name": "contact",
+					"position": [
+						-3.164825439453125,
+						-28.920427322387697,
+						-175.05239868164063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 9.699999809265137,
+					"name": "contact",
+					"position": [
+						-2.4321842193603517,
+						-34.3122673034668,
+						-173.62745666503907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 9.899999618530274,
+					"name": "contact",
+					"position": [
+						-2.076375961303711,
+						-37.55355453491211,
+						-169.0352783203125
+					]
+				},
+				{
+					"type": "InterruptSkillEventType",
+					"time": 10.0,
+					"name": "interrupt_skill",
+					"data": "70 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 10.100000381469727,
+					"name": "contact",
+					"position": [
+						-0.9167308807373047,
+						-41.91358184814453,
+						-163.3406524658203
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 10.300000190734864,
+					"name": "contact",
+					"position": [
+						-2.205406665802002,
+						-43.93096923828125,
+						-158.26466369628907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 10.5,
+					"name": "contact",
+					"position": [
+						-1.2069292068481446,
+						-45.77865982055664,
+						-157.35755920410157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 10.699999809265137,
+					"name": "contact",
+					"position": [
+						-0.9956932067871094,
+						-41.51539611816406,
+						-160.54083251953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 10.899999618530274,
+					"name": "contact",
+					"position": [
+						-0.47476959228515627,
+						-37.8031005859375,
+						-166.42654418945313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 11.100000381469727,
+					"name": "contact",
+					"position": [
+						-1.3927001953125,
+						-31.58929443359375,
+						-171.48309326171876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 11.300000190734864,
+					"name": "contact",
+					"position": [
+						-0.5493659973144531,
+						-29.35921859741211,
+						-175.2239990234375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 11.5,
+					"name": "contact",
+					"position": [
+						-0.8640785217285156,
+						-29.431716918945314,
+						-174.77328491210938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 11.699999809265137,
+					"name": "contact",
+					"position": [
+						-1.2265682220458985,
+						-36.6632080078125,
+						-170.5082550048828
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 11.899999618530274,
+					"name": "contact",
+					"position": [
+						-1.6887321472167969,
+						-40.963722229003909,
+						-164.3961944580078
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 12.100000381469727,
+					"name": "contact",
+					"position": [
+						-1.2706680297851563,
+						-43.85309600830078,
+						-159.4781494140625
+					]
+				}
+			],
+			"blend_out_time": 500
+		},
+		{
+			"name": "vomit_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "vomit",
+					"position": [
+						-7.722433090209961,
+						-88.51715087890625,
+						-161.58688354492188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.02500000037252903,
+					"name": "vomit",
+					"position": [
+						-8.428921699523926,
+						-85.8468246459961,
+						-164.3594207763672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.05000000074505806,
+					"name": "vomit",
+					"position": [
+						-8.231184005737305,
+						-84.48851013183594,
+						-166.3141326904297
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.07500000298023224,
+					"name": "vomit",
+					"position": [
+						-7.621155738830566,
+						-83.92994689941406,
+						-168.0149383544922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.10000000149011612,
+					"name": "vomit",
+					"position": [
+						-6.967632293701172,
+						-83.59471130371094,
+						-169.95294189453126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.125,
+					"name": "vomit",
+					"position": [
+						-6.2570648193359379,
+						-83.66056823730469,
+						-172.08554077148438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.15000000596046449,
+					"name": "vomit",
+					"position": [
+						-5.436435222625732,
+						-83.75637817382813,
+						-174.39598083496095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.17499999701976777,
+					"name": "vomit",
+					"position": [
+						-4.5684099197387699,
+						-83.87406921386719,
+						-176.84864807128907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.20000000298023225,
+					"name": "vomit",
+					"position": [
+						-3.702962875366211,
+						-84.0079345703125,
+						-179.40870666503907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.22499999403953553,
+					"name": "vomit",
+					"position": [
+						-2.9028055667877199,
+						-84.13016510009766,
+						-182.06996154785157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.25,
+					"name": "vomit",
+					"position": [
+						-2.2644410133361818,
+						-84.24678039550781,
+						-184.73654174804688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.2750000059604645,
+					"name": "vomit",
+					"position": [
+						-1.8225891590118409,
+						-84.35614013671875,
+						-187.385498046875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.30000001192092898,
+					"name": "vomit",
+					"position": [
+						-1.5927358865737916,
+						-84.45531463623047,
+						-189.99356079101563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.35176992416381838,
+					"name": "start_amble"
+				}
+			]
+		},
+		{
+			"name": "vomit_start_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.8222336769104005,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.380530834197998,
+					"name": "stop_amble"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4000000953674318,
+					"name": "vomit",
+					"position": [
+						4.054623603820801,
+						-25.220062255859376,
+						-214.68429565429688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.424999952316284,
+					"name": "vomit",
+					"position": [
+						2.1798694133758547,
+						-36.37759017944336,
+						-209.64366149902345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.450000047683716,
+					"name": "vomit",
+					"position": [
+						0.48800015449523928,
+						-47.69488525390625,
+						-203.6074676513672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4749999046325685,
+					"name": "vomit",
+					"position": [
+						-1.0018839836120606,
+						-56.72777557373047,
+						-198.0139617919922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5,
+					"name": "vomit",
+					"position": [
+						-4.044262886047363,
+						-61.625755310058597,
+						-194.4493865966797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5250000953674318,
+					"name": "vomit",
+					"position": [
+						-6.741814136505127,
+						-62.904361724853519,
+						-192.42013549804688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.549999952316284,
+					"name": "vomit",
+					"position": [
+						-7.3069257736206059,
+						-66.8421630859375,
+						-188.7361297607422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.575000047683716,
+					"name": "vomit",
+					"position": [
+						-6.5964789390563969,
+						-72.20186614990235,
+						-184.1936492919922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5999999046325685,
+					"name": "vomit",
+					"position": [
+						-5.449347019195557,
+						-77.600341796875,
+						-179.51742553710938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.625,
+					"name": "vomit",
+					"position": [
+						-6.513606071472168,
+						-77.74207305908203,
+						-179.0697784423828
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6500000953674318,
+					"name": "vomit",
+					"position": [
+						-7.773329734802246,
+						-77.107666015625,
+						-178.81398010253907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.674999952316284,
+					"name": "vomit",
+					"position": [
+						-8.419828414916993,
+						-77.56568145751953,
+						-177.40896606445313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.700000047683716,
+					"name": "vomit",
+					"position": [
+						-7.822697639465332,
+						-81.12554168701172,
+						-173.4778289794922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7249999046325685,
+					"name": "vomit",
+					"position": [
+						-6.716413497924805,
+						-85.05464172363281,
+						-169.7513885498047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.75,
+					"name": "vomit",
+					"position": [
+						-7.0599894523620609,
+						-85.70833587646485,
+						-168.81356811523438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7750000953674318,
+					"name": "vomit",
+					"position": [
+						-8.191091537475586,
+						-84.36424255371094,
+						-169.5806884765625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "vomit",
+					"position": [
+						-9.443416595458985,
+						-82.23346710205078,
+						-170.39418029785157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.825000047683716,
+					"name": "vomit",
+					"position": [
+						-8.838603019714356,
+						-84.69084167480469,
+						-167.47372436523438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.8499999046325685,
+					"name": "vomit",
+					"position": [
+						-7.913439750671387,
+						-87.47000885009766,
+						-164.6245574951172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.875,
+					"name": "vomit",
+					"position": [
+						-7.506906509399414,
+						-88.80111694335938,
+						-163.1527099609375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.9000000953674318,
+					"name": "vomit",
+					"position": [
+						-8.421231269836426,
+						-86.99114990234375,
+						-164.74334716796876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.924999952316284,
+					"name": "vomit",
+					"position": [
+						-9.631143569946289,
+						-84.19416809082031,
+						-166.41595458984376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.950000047683716,
+					"name": "vomit",
+					"position": [
+						-9.579617500305176,
+						-84.33509826660156,
+						-165.60888671875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.9749999046325685,
+					"name": "vomit",
+					"position": [
+						-8.826269149780274,
+						-86.26325988769531,
+						-163.550537109375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0,
+					"name": "vomit",
+					"position": [
+						-7.7224440574646,
+						-88.51710510253906,
+						-161.58688354492188
+					]
+				}
+			]
+		},
+		{
+			"name": "burrow_swim_loop",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.31579166650772097,
+					"name": "pustule",
+					"position": [
+						0.0,
+						100.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8004104495048523,
+					"name": "pustule",
+					"position": [
+						0.0,
+						100.0,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "burrow_swim_start",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "addepk"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "weapon_jntBnd Metadata/Monsters/LeagueAbyss/Blackblood/DoomBoss/attachments/DoomPersonifiedWeaponHeld.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/LeagueAbyss/Blackblood/DoomBoss/attachments/AbyssDoomBoss/ADBSkirt.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/LeagueAbyss/Blackblood/DoomBoss/attachments/AbyssDoomBoss/ADBBeard.ao"
+	attached_object = "L_shoulder_cTwist_jntBnd_1 Metadata/Monsters/LeagueAbyss/Blackblood/DoomBoss/attachments/AbyssDoomBoss/ADBLSleeve.ao"
+	attached_object = "R_shoulder_cTwist_jntBnd_1 Metadata/Monsters/LeagueAbyss/Blackblood/DoomBoss/attachments/AbyssDoomBoss/ADBRSleeve.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4581010043621063,
+								0.0
+							],
+							[
+								0.4921259880065918,
+								0.274472177028656
+							],
+							[
+								0.5118110179901123,
+								0.5201535224914551
+							],
+							[
+								0.5551180839538574,
+								0.7543185949325562
+							],
+							[
+								0.5810059905052185,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.2967059910297394,
+						"angle": 2.792530059814453,
+						"x_axis_scale": 0.5540000200271606,
+						"length": 221.11599731445313
+					}
+				]
+			}
+		},
+		{
+			"name": "cleave_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.3854750096797943,
+								0.0
+							],
+							[
+								0.42458099126815798,
+								0.6693329811096191
+							],
+							[
+								0.45251399278640749,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"width": 46.24300003051758,
+						"angle": 2.164210081100464,
+						"length": 236.99400329589845
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/AbyssDoomBoss/rig.ast"
+		socket = "aux_light_attach"
+			parent = "hip_jntBnd"
+			translation = "0 -118.827 -183.494"
+		socket = "dash_debris"
+			translation = "-42.4236 -217.172 0"
+		socket = "aux_melee"
+			parent = "root_jntBnd"
+			translation = "0 0 -120.777"
+		socket = "aux_melee_01"
+			parent = "root_jntBnd"
+			translation = "88.7154 -70.4903 -169.805"
+		socket = "aux_vomit"
+			parent = "head_jntBnd"
+			translation = "0 -15.1611 -5.4502"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "aux_kickup_box"
+			parent = "root_jntBnd"
+			translation = "71.4824 -9.40729 0"
+		socket = "aux_kickup_box_01"
+			parent = "root_jntBnd"
+			translation = "-15.398 -95.5831 0"
+		socket = "aux_kickup_box_02"
+			parent = "root_jntBnd"
+			translation = "-58.2792 -111.567 -23.6381"
+		socket = "weapon_orb"
+			parent = "L_Weapon"
+			translation = "-15.363 -2.08675 -33.4579"
+		socket = "weapon_orb_01"
+			parent = "L_Weapon"
+			translation = "-29.3272 0 -29.4115"
+		socket = "vomit_hole_01"
+			parent = "head_jntBnd"
+			translation = "0 -10.1812 -7.32793"
+		socket = "aux_weapon_grd"
+			parent = "root_jntBnd"
+			translation = "74.3357 -51.6732 0"
+		socket = "aux_weapon_grd_01"
+			parent = "root_jntBnd"
+			translation = "74.3357 -136.044 0"
+		socket = "aux_weapon_grd_02"
+			parent = "root_jntBnd"
+			translation = "74.3357 -51.6732 -80.7651"
+		socket = "aux_weapon_grd_03"
+			parent = "root_jntBnd"
+			translation = "152.75 -52.1599 0"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 2.82588 -18.9824"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -13.2942 -20.4992"
+		socket = "staff_tip"
+			parent = "weapon_jntBnd"
+			translation = "16.4427 0 -145"
+		socket = "r_hand_surge"
+			parent = "R_Weapon"
+			translation = "-29.6608 -17.2742 0"
+		socket = "dash_grd_trl_01"
+			translation = "-70 -170 -70"
+		socket = "dash_grd_trl_02"
+			translation = "70 -170 -70"
+		linear_stiffness = 10000.000
+		linear_allowed_contraction = 0.150
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.200
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_radius = 5.000
+		enclosure_angle = 0.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/AbyssDoomBoss/AbyssDoomBoss.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_A",
+						"bone_name": "L_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/Attack1",
+						"bone_name": "vomit_hole_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11333999037742615,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15106886625289918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "L_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48537999391555788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Casting/CastingSurge",
+						"bone_name": "staff_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7844359874725342,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_B",
+						"bone_name": "L_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8290889859199524,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9448000192642212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0979399681091309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "L_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.667829990386963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.679900050163269,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7079099416732789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.16178999841213227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Casting/CastingSurgeShort",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.208206906914711,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/Attack2",
+						"bone_name": "vomit_hole_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24257199466228486,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5035499930381775,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.566744327545166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/HandSwing",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7196919918060303,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7908949851989746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.949769914150238,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0148799419403077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5898100137710572,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7124799489974976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "burrow_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Submerge/SubmergeLOOP_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "burrow_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/BurrowEnd",
+						"bone_name": "vomit_hole_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Burrow/SplashOut",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16877000033855439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17694999277591706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Burrow/OutSwish",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19801799952983857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2682130038738251,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "neck_02_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2983289957046509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_A",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3774619996547699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/HandSwing",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41883599758148196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/HandSwing",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47440698742866518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_B",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1216599941253663,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1377400159835816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/DashFootstepStart",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1538399457931519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Burrow/StaffStepBurrowEnd",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1538399457931519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Burrow/StaffStepBurrowEnd",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1888699531555176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/RockyLayer",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.28603994846344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7256300449371338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.85139000415802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0415000915527345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "burrow_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/BurrowStart",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Submerge/SubmergeStart",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.551531970500946,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7479090094566345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9915099740028381,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/DoomSlam/DoubleSlam_SmallImpact",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4039000272750855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4185199737548829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5993114709854127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Submerge/SubmergeBoom",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6013307571411133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/DoomSlam/DoubleSlam_BigImpact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6650400161743165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cleave_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.029186900705099107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/FootSwish",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21147407591342927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Casting/CastingSurge",
+						"bone_name": "staff_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28630998730659487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34468498826026919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.441974014043808,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/Attack2",
+						"bone_name": "vomit_hole_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5976369976997376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/HandSwing",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.653232991695404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6740790009498596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_B",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8317499756813049,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.577489972114563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9263399839401246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9346799850463868,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9750399589538575,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/DeadSwish",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/DashStart",
+						"bone_name": "vomit_hole_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Death/Death_BuildUp",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3969149887561798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/DeathStaff",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3969149887561798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47188800573349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5821409821510315,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5821409821510315,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5909619927406311,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3936100006103516,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7040899991989136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/DeathGoo",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9900133609771729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/DashEnd",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9977999925613404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8622000217437746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9417636394500734,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.211460113525391,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Death/Death_Explode",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Burrow/OutSwish",
+						"bone_name": "neck_02_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Burrow/SplashOut",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09506630152463913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1980540007352829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6501700282096863,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7853929996490479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/DashFootstepStart",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7957360148429871,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/RockyLayer",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8108429908752441,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/DashFootstepStart",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8384259939193726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/RockyLayer",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9796389937400818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0404399633407593,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4920099973678589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.785140037536621,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.606410026550293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_A",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.622260093688965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0264699459075929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Slam/EmergeEerie",
+						"bone_name": "weapon_orb_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0473999977111818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4005300998687746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/EmergeStaff",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4005300998687746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "aux_weapon_grd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4005300998687746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Slam/EmergeSlam",
+						"bone_name": "aux_weapon_grd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4005300998687746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "aux_weapon_grd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4119999408721926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5042099952697756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "weapon_orb"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5042099952697756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "weapon_orb"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5286099910736086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "weapon_orb"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.579430103302002,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "weapon_orb"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5977299213409426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "weapon_orb"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5977299213409426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "weapon_orb"
+					}
+				]
+			},
+			{
+				"name": "emerge_pillar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/VomitEnd",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1035200357437134,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.318959951400757,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5643999576568605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5958199501037599,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_B",
+						"bone_name": "staff_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0284454822540285,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_B"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5165369510650636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/EmergeStaff",
+						"bone_name": "aux_weapon_grd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5425808429718019,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/DoomSlam/DoubleSlam_SmallImpact",
+						"bone_name": "aux_weapon_grd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.555590867996216,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach"
+					}
+				]
+			},
+			{
+				"name": "emerge_pillar_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Casting/IdleChanneling",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7317452430725098,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/IdleChanneling",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0258959848433733,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0470535084605217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02561921253800392,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04836585745215416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.028886115178465844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05402234569191933,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.027542760595679284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0576728917658329,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "heavy_stun_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/DashStart",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27908000349998476,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4426400363445282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_R_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7100300192832947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7619600296020508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9423900246620178,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_R_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.447860836982727,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/VomitEnd",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4694000482559205,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9407554864883423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9808299541473389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/DoomSlam/DoubleSlam_SmallImpact",
+						"bone_name": "aux_weapon_grd_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9839037656784058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.032965898513794,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/EmergeStaff",
+						"bone_name": "aux_weapon_grd_01"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/Idle",
+						"bone_name": "head_jntBnd",
+						"chance": 0.800000011920929
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09984999895095825,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.179669976234436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3569600582122803,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/RunLoop",
+						"bone_name": "head_jntBnd",
+						"chance": 0.23999999463558198
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19329610466957093,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd",
+						"chance": 0.23999999463558198
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5321379899978638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0947400331497193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1680560111999512,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd",
+						"chance": 0.23999999463558198
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5855000019073487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8098599910736085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.084089994430542,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/FootSwish",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/SlamA",
+						"bone_name": "vomit_hole_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementLong",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5775244235992432,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/HandSwing",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7137230038642883,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9080349802970886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0266599655151368,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.095451831817627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8672016859054566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/SlamB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9848099946975709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_A",
+						"bone_name": "L_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1853690147399904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1865999698638918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_A",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4892799854278566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/FootSwish",
+						"bone_name": "L_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.664910078048706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/FootSwish",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8053781986236574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "L_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.615435838699341,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/SlamC",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.708630084991455,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/HandSwing",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.813260078430176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_B",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9291000366210939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Slam/SlamImpact",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9589900970458986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Burrow/StaffStepBurrowEnd",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9589900970458986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/DashFootstepStart",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.01878023147583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Slam/SumoWet",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.047567367553711,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.44851016998291,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.1996002197265629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.280059814453125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sumo_aoe_slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_A",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/SumoSlam",
+						"bone_name": "vomit_hole_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19179999828338624,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/FootSwish",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2522589862346649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.339819997549057,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/SmlSlam/FootRocks",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.984017014503479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_B",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1257799863815308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1445399522781373,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/RockyLayer",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1924899816513062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Burrow/StaffStepBurrowEnd",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.219599962234497,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/RockyLayer",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.732450008392334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/RockyStaff",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4788100719451906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8332300186157228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8561599254608156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/DashCharge",
+						"bone_name": "head_jntBnd",
+						"chance": 0.800000011920929
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08809655159711838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/DashFootstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3381989002227783,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/DashFootstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5654218196868897,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/DashFootstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8537312150001526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/DashFootstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/DashEnd",
+						"bone_name": "vomit_hole_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Casting/CastingSurge",
+						"bone_name": "weapon_orb"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07240939885377884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/HandSwing",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12551000714302064,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_B",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4559600055217743,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6468570232391357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7240949869155884,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0958000421524048,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3757799863815308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6421500444412232,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6642099618911744,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "L_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/DashStart",
+						"bone_name": "vomit_hole_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22280700504779817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffSwish_A",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40550801157951357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/FootSwish",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7342422008514404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/Casting/CastingSurge",
+						"bone_name": "weapon_orb"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.09621000289917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Dash/DashFootstepStart",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1080700159072877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/RockyLayer",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1948200464248658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7349200248718262,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "vomit_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vcoals/VomitLoop",
+						"bone_name": "vomit_hole_01"
+					}
+				]
+			},
+			{
+				"name": "vomit_complete_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/VomitStart",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20101593434810639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8224459886550903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9818531274795532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2489806413650513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4063074588775635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4396203756332398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/ColdVomit/ColdVomitSprayStart",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6441600322723389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.456249952316284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/VomitLoop",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.42642879486084,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Effects/ColdVomit/ColdVomitSprayEnd",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.85985279083252,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/VomitEnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 12.18142032623291,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 12.356443405151368,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 12.507590293884278,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "vomit_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/VomitEnd",
+						"bone_name": "vomit_hole_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2885879874229431,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7607319951057434,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "vomit_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/VomitStart",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7215099930763245,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0738199949264527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3001999855041505,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2082200050354006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.376110076904297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd",
+						"chance": 0.30000001192092898
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Vocals/WalkLoop",
+						"bone_name": "vomit_hole_01",
+						"chance": 0.30000001192092898
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23888400197029115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36618000268936159,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7562639713287354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3510600328445435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementShort",
+						"bone_name": "head_jntBnd",
+						"chance": 0.4000000059604645
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4021400213241578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6584399938583375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/MovementStomach",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.932669997215271,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.201240062713623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/DoomBoss/Foley/StaffStep",
+						"bone_name": "L_finger_4_jntBnd_2"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck_01_01 false neck_01_jntBnd neck_02_jntBnd"
+		bone_group = "grp_neck_01_02 false neck_02_jntBnd head_jntBnd"
+		bone_group = "grp_neck_01_03 false head_jntBnd aux_target_head_01"
+		bone_group = "grp_chest false chest_jntBnd neck_01_jntBnd"
+		bone_group = "grp_belly false phys_tri_belly_jntBnd spine_2_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder false L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder false R_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow false L_elbow_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_elbow false R_elbow_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_wrist false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_wrist false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_hand false L_finger_2_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "grp_R_hand false R_finger_2_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_L_knee false L_knee_jntBnd L_thigh_jntBnd"
+		bone_group = "grp_R_knee false R_knee_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "root false spine_1_jntBnd spine_2_jntBnd"
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd head_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1"
+		bone_group = "grp_melee false aux_melee aux_melee_01"
+		bone_group = "grp_vomit false head_jntBnd aux_vomit"
+		bone_group = "dust_kickuop false aux_kickup_box aux_kickup_box_01 aux_kickup_box_02"
+		bone_group = "orb_emit false weapon_orb weapon_orb_01"
+		bone_group = "grp_R_Arm false R_shoulder_jntBnd R_elbow_jntBnd R_elbow_Twist_jntBnd_3"
+		bone_group = "grp_L_Arm false L_shoulder_jntBnd L_elbow_jntBnd L_wrist_jntBnd"
+		bone_group = "grp_L_Leg false L_thigh_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_Leg false R_thigh_jntBnd R_knee_jntBnd"
+		bone_group = "grp_hip false L_thigh_jntBnd hip_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_line_body false hip_jntBnd spine_2_jntBnd chest_jntBnd neck_02_jntBnd head_jntBnd"
+		bone_group = "grp_emerge_slam false aux_weapon_grd aux_weapon_grd_02"
+		bone_group = "grd_circle false aux_weapon_grd_01 aux_weapon_grd aux_weapon_grd_03"
+		bone_group = "staff_tip false weapon_jntBnd staff_tip"
+		bone_group = "R_hand_surge false R_elbow_Twist_jntBnd_3 R_wrist_jntBnd r_hand_surge"
+		bone_group = "charge_trl false dash_grd_trl_02 dash_grd_trl_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2630400061607361,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/surge.pet",
+						"bone_group": "staff_tip"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.1645297110080719,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/surge.pet",
+						"bone_group": "R_hand_surge"
+					}
+				]
+			},
+			{
+				"name": "burrow_end_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.36878031492233279,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/surge_cleave.pet",
+						"bone_group": "staff_tip"
+					}
+				]
+			},
+			{
+				"name": "burrow_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0012195110321046,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/blackblood_spawning/dissolve_blood_pulse.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "cleave_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.23391999304294587,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/surge_cleave.pet",
+						"bone_group": "staff_tip"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0798054188489914,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/death/death_surge.pet",
+						"bone_group": "grp_belly"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0798054188489914,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/death/death_surge_bones.pet",
+						"bone_groups": [
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"grp_L_elbow",
+							"grp_R_elbow",
+							"grp_R_wrist",
+							"grp_L_wrist",
+							"grp_L_thigh",
+							"grp_R_thigh",
+							"grp_L_knee",
+							"grp_R_knee",
+							"grp_L_foot",
+							"grp_R_foot"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.157569885253906,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/death/death_burst_bones.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_chest",
+							"grp_belly",
+							"grp_waist",
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"grp_L_elbow",
+							"grp_R_elbow",
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_L_hand",
+							"grp_R_hand",
+							"grp_R_thigh",
+							"grp_L_thigh",
+							"grp_L_knee",
+							"grp_R_knee",
+							"grp_L_foot",
+							"grp_R_foot",
+							"grp_R_Arm",
+							"grp_L_Arm",
+							"grp_L_Leg",
+							"grp_R_Leg"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.194210052490234,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/death/death_burst.pet",
+						"bone_group": "grp_belly"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2757722735404968,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/surge_staff_slam.pet",
+						"bone_group": "staff_tip"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/beam_burst.pet",
+						"bone_group": "staff_tip"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.2409071922302248,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/surge_staff_flip.pet",
+						"bone_group": "staff_tip"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/sumo_charge/charge_debris.pet",
+						"bone_group": "charge_trl"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.11320505291223526,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/sumo_charge/step_onact.pet",
+						"bone_group": "grp_R_foot"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3189401626586914,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/sumo_charge/step_onact.pet",
+						"bone_group": "grp_L_foot"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6019273400306702,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/sumo_charge/step_onact.pet",
+						"bone_group": "grp_R_foot"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8777135014533997,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/sumo_charge/step_onact.pet",
+						"bone_group": "grp_L_foot"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_end_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/surge_fast.pet",
+						"bone_group": "staff_tip"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7854488492012024,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/surge.pet",
+						"bone_group": "staff_tip"
+					}
+				]
+			},
+			{
+				"name": "vomit_complete_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3799999952316284,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/vomit/vomit_start.pet",
+						"bone_group": "grp_head"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/vomit/vomit_start.pet",
+						"bone_group": "grp_head"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.7096999883651734,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/vomit/surge.pet",
+						"bone_group": "grp_head"
+					}
+				]
+			},
+			{
+				"name": "vomit_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3855322301387787,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/vomit/vomit_start.pet",
+						"bone_group": "grp_head"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.044068455696106,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/vomit/vomit_start.pet",
+						"bone_group": "grp_head"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.7121491432189942,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/vomit/surge.pet",
+						"bone_group": "grp_head"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "burrow_end_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.41883599758148196,
+						"end_time": 1.198344111442566,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/cleave.trl",
+						"bone_group": "staff_tip"
+					}
+				]
+			},
+			{
+				"name": "cleave_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8317499756813049,
+						"end_time": 1.0896732807159424,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/cleave.trl",
+						"bone_group": "staff_tip"
+					}
+				]
+			},
+			{
+				"name": "emerge_pillar_idle_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/emerge_pillar_idle_01/hand_cast_trl.trl",
+						"bone_groups": [
+							"grp_L_hand",
+							"grp_R_hand"
+						]
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.9479668736457825,
+						"end_time": 4.087559700012207,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/onact/emerge_pillar_idle_01/hand_cast_trl.trl",
+						"bone_groups": [
+							"grp_L_hand",
+							"grp_R_hand"
+						]
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/fx/sumo_charge/doom_charge_trls.trl",
+						"bone_group": "charge_trl"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.7330000400543213,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 0.993446 1 Linear 1.733 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.7330000400543213,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.74173 0.685811 Smooth 1.733 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "burrow_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.1660000085830689,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 1.166 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "burrow_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0999999046325685,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 -5.96046e-08 Linear 0.185036 0.647436 Flat 0.972645 1 Flat 2.1 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0999999046325685,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "4 0 1 Linear 0.210527 1 Flat 1.04121 0 Flat 2.1 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0999999046325685,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "4 0 -5.96046e-08 Linear 0.875952 0.668919 Smooth 1.58005 0 Smooth 2.1 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "burrow_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "4 0 1 Linear 0.629761 1 Flat 2.4594 0 Flat 3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.333000183105469,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "7 0 0 Linear 0.971555 0.655405 Custom 0 0 2.39244 0.5 Flat 3.38122 -4.00873 CustomSmooth -12.1727 4.29843 -25.9561 Linear 4.53967 1.52588e-05 Flat 6.333 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.333000183105469,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "7 0 0 Linear 0.5 0 Flat 2.18302 0.1 Flat 4.17384 0.1 Linear 4.55557 1 Linear 6.18853 1 Flat 6.333 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.333000183105469,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.184238 0.476351 Linear 3.93791 0.766892 Custom 0.224024 0.224024 4.25 1 Linear 4.25 0 Flat 6.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_pillar_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "releaseTime_R",
+						"curve": "2 0 1 Linear 2.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_pillar_idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "releaseTime_R",
+						"curve": "2 0 1 Linear 2.333 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.282764434814453,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 3.89274 0.89527 Smooth 5.28276 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.282764434814453,
+						"name": "releaseTime_R",
+						"curve": "4 0 0 Smooth 1.94914 1 Linear 3.98814 1 Linear 5.28276 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.282764434814453,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 3.98814 1 Linear 5.28276 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0329999923706055,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0.922297 Linear 1.033 0.922297 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0329999923706055,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "2 0 0.841216 Linear 1.033 0.841216 Linear"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.7330000400543213,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0.760135 Smooth 0.314464 1 Flat 1.46279 0 Flat 1.733 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.7330000400543213,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "3 0 0.841216 Linear 0.262235 1 Linear 1.733 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 1.58078 0.9 Flat 2.133 0.760135 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.7 0 Flat 1.43346 0.9 Flat 2.133 0.760135 Linear"
+					}
+				]
+			},
+			{
+				"name": "vomit_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.899999976158142,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0.665541 Linear 1.9 0.665541 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.899999976158142,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "2 0 0.692568 Linear 1.9 0.692568 Linear"
+					}
+				]
+			},
+			{
+				"name": "vomit_complete_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 1.65069 0.719595 Flat 3 0.665541 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 2.32503 0.89527 Flat 3 0.692568 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 3.0,
+						"end_time": 12.121679306030274,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "2 3 0.693 Linear 12.1217 0.692568 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 3.0,
+						"end_time": 12.121679306030274,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 3 0.666 Linear 12.1217 0.666 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 12.100000381469727,
+						"end_time": 13.100000381469727,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "3 12.1 0.665541 Smooth 12.7725 0 Flat 13.1 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 12.100000381469727,
+						"end_time": 13.100000381469727,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "3 12.1 0.692568 Smooth 13.0496 0 Linear 13.1 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "vomit_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "3 0 0.692568 Smooth 0.94956 0 Linear 1 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "3 0 0.665541 Smooth 0.672457 0 Flat 1 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "vomit_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 2.32503 0.89527 Flat 3 0.692568 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 1.65069 0.719595 Flat 3 0.665541 Linear"
+					}
+				]
+			},
+			{
+				"name": "burrow_swim_loop",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.1660000085830689,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 1.166 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "burrow_swim_start",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.1660000085830689,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 1.15697 1 Linear 1.166 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge_weapon.epk",
+						"bone_name": "weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge_weapon.epk",
+						"bone_name": "weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "burrow_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge_weapon.epk",
+						"bone_name": "weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/death_dissolve.epk",
+						"remove_on_animation_end": false
+					}
+				]
+			},
+			{
+				"name": "emerge_pillar_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/onAct/emerge_pillar_idle_01/channeling_body_glow_noparticles.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_pillar_idle_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/onAct/emerge_pillar_idle_01/channeling_body_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge_weapon.epk",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/onAct/emerge_pillar_idle_01/channeling_body_glow_noparticles.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge_weapon.epk",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge.epk"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge_weapon.epk",
+						"bone_name": "weapon_jntBnd"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge.epk"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge_weapon.epk",
+						"bone_name": "weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "vomit_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge.epk"
+					}
+				]
+			},
+			{
+				"name": "vomit_complete_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge.epk"
+					}
+				]
+			},
+			{
+				"name": "vomit_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge.epk"
+					}
+				]
+			},
+			{
+				"name": "vomit_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/epk/cold_surge.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "emerge_pillar_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.537517547607422,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/ao/onact_staff_crack.ao",
+						"offset": [
+							86.63874816894531,
+							-64.65973663330078
+						]
+					}
+				]
+			},
+			{
+				"name": "vomit_complete_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.5,
+						"end_time": 12.000000953674317,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/DoomBoss/ao/cold_vomit_line.ao",
+						"from": {
+							"parent_bone": "aux_vomit"
+						},
+						"speed": 1.0
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "sumo_dash_start_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.0997099876403809,
+						"frequency": 150.0,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.061790108680725,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.8820453882217407,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "burrow_end_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.1833100318908692,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "burrow_start_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.8236007690429688,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "cleave_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.9132900238037109,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 3.5039000511169435,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "emerge_pillar_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 3.5454635620117189,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 4.074790000915527,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "sumo_aoe_slam_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.3534177541732789,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "sumo_dash_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.12657319009304048,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.37599942088127139,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.6336606740951538,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.8772031664848328,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/DoomBoss/attachments/DoomPersonifiedWeaponHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/DoomPersonified/attachments/weapon/DoomPersonifiedWeapon.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/DoomPersonified/attachments/weapon/DoomPersonifiedWeapon.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_velocity_factor = 5.000
+		animation_force_factor = 10.000
+		gravity = 0.000
+		use_shock_propagation = false
+		enable_collisions = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/DoomPersonified/attachments/weapon/DoomPersonifiedWeapon.sm"
+			DoomPersonifiedWenponShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssDoomBossWeapon.mat:0"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/DoomBoss/attachments/AbyssDoomBoss/ADBSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/AbyssDoomBoss/attachments/ADBSkirt/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/AbyssDoomBoss/attachments/ADBSkirt/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		attachment_bones = "spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/AbyssDoomBoss/attachments/ADBSkirt/ADBSkirt.sm"
+	}
+	
+	BoneGroups
+	{
+	    bone_group = "child_attach false spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/DoomBoss/attachments/AbyssDoomBoss/ADBBeard.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/AbyssDoomBoss/attachments/ADBBeard/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/AbyssDoomBoss/attachments/ADBBeard/rig.ast"
+		linear_allowed_contraction = 0.150
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_force_factor = 5.000
+		use_shock_propagation = false
+		attachment_bones = "chest_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/AbyssDoomBoss/attachments/ADBBeard/ADBBeard.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false chest_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/DoomBoss/attachments/AbyssDoomBoss/ADBLSleeve.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/AbyssDoomBoss/attachments/ADBLSleeve/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/AbyssDoomBoss/attachments/ADBLSleeve/rig.ast"
+		linear_allowed_contraction = 0.400
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.800
+		attachment_bones = "L_clavicle_jntBnd L_shoulder_jntBnd L_elbow_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/AbyssDoomBoss/attachments/ADBLSleeve/ADBLSleeve.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_clavicle_jntBnd L_shoulder_jntBnd L_elbow_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/DoomBoss/attachments/AbyssDoomBoss/ADBRSleeve.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/AbyssDoomBoss/attachments/ADBRSleeve/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/AbyssDoomBoss/attachments/ADBRSleeve/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		attachment_bones = "R_clavicle_jntBnd R_shoulder_jntBnd R_elbow_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/AbyssDoomBoss/attachments/ADBRSleeve/ADBRSleeve.sm"
+	}
+	
+	BoneGroups
+	{
+	    bone_group = "child_attach false R_clavicle_jntBnd R_shoulder_jntBnd R_elbow_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/AbyssDoomBoss/AbyssDoomBoss.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/AbyssDoomBoss/rig_745440b2.smd"
+Materials 1
+	"Art/Textures/Monsters/AbyssalMonsters/AbyssDoomBossNewc.mat" 15
+BoundingBox -113.512 -72.7472 -232.636 113.512 53.1027 -0.060627
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/AbyssDoomBoss/rig_745440b2.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 15 in the header, 15 in the block · 13015 triangles over 16078 vertices
+  names: 356 bytes said, 356 read  [agree]
+
+=== shapes (20)
+0	ArmoursShape	from 0	count 18564
+1	BellyShape	from 18564	count 678
+2	BodyShape	from 19242	count 7464
+3	Burst_01Shape	from 26706	count 291
+4	Burst_02Shape	from 26997	count 375
+5	Burst_03Shape	from 27372	count 303
+6	Burst_04Shape	from 27675	count 477
+7	Burst_05Shape	from 28152	count 321
+8	Burst_06Shape	from 28473	count 348
+9	Burst_07Shape	from 28821	count 621
+10	ChainShape	from 29442	count 576
+11	DeflatedBurstShape	from 30018	count 2817
+12	FaceShape	from 32835	count 2388
+13	HoodShape	from 35223	count 1554
+14	ShawlShape	from 36777	count 2268
+15	DoomPersonifiedWenponShape	from 39045	count 7746
+16	SkirtShape	from 46791	count 1356
+17	TentacleBeardShape	from 48147	count 3420
+18	L_SleeveShape	from 51567	count 1122
+19	R_SleeveShape	from 52689	count 1122
+
+=== fitting
+the monster's rig: 71 bones
+mounts: aux_position
+  DoomPersonifiedWeaponHeld.ao  socket weapon_jntBnd [in its carrier's rig]  box (-35.8,-15.7,-144.9)..(31.1,19.1,148)
+    version 3 · c0h 2 · 2 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 2582 triangles over 1871 vertices
+    names: 52 bytes said, 52 read  [agree]
+    rig 39 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 38 of 39  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 mid_ten_01_jntBnd  [its own]  under 0  rests at (2.8,7.7,-79.4)
+      2 end_ten_01_jntBnd  [its own]  under 0  rests at (1.6,5.9,-57.4)
+      3 base_ten_01_jntBnd  [its own]  under 0  rests at (0.5,-0.4,-30.6)
+      4 phys_skinned_upper_ten_01_jntBnd  [its own]  under 0  rests at (19,7,-123.1)
+      5 phys_skinned_lower_ten_01_jntBnd  [its own]  under 0  rests at (-2.9,11.4,-72.9)
+      6 mid_ten_02_jntBnd  [its own]  under 1  rests at (0.9,7.3,-96.1)
+      7 end_ten_02_jntBnd  [its own]  under 2  rests at (-4.9,4.8,-69.9)
+      8 base_ten_02_jntBnd  [its own]  under 3  rests at (1.4,-0.4,-38.5)
+      9 phys_skinned_upper_ten_02_jntBnd  [its own]  under 4  rests at (22.2,9.6,-128.1)
+      10 phys_skinned_lower_ten_02_jntBnd  [its own]  under 5  rests at (-8.5,15.1,-82.2)
+      11 mid_ten_03_jntBnd  [its own]  under 6  rests at (-0.1,3.4,-108.3)
+      12 end_ten_03_jntBnd  [its own]  under 7  rests at (-6,0.3,-83.2)
+      13 base_ten_03_jntBnd  [its own]  under 8  rests at (2.3,-0.3,-45.8)
+      14 phys_skinned_upper_ten_03_jntBnd  [its own]  under 9  rests at (23.7,9.6,-133.6)
+      15 phys_skinned_lower_ten_03_jntBnd  [its own]  under 10  rests at (-9.4,16.2,-91.6)
+      16 mid_ten_04_jntBnd  [its own]  under 11  rests at (2.2,-2.9,-117.1)
+      17 end_ten_04_jntBnd  [its own]  under 12  rests at (-6.8,-2.7,-91.6)
+      18 phys_skinned_upper_ten_04_jntBnd  [its own]  under 14  rests at (23.4,7.6,-138.7)
+      19 phys_skinned_lower_ten_04_jntBnd  [its own]  under 15  rests at (-6.8,15.8,-99)
+      20 mid_ten_05_jntBnd  [its own]  under 16  rests at (9.7,-4.4,-120.4)
+      21 end_ten_05_jntBnd  [its own]  under 17  rests at (0.1,-10.2,-97.5)
+      22 phys_skinned_upper_ten_05_jntBnd  [its own]  under 18  rests at (23.9,6.3,-142.6)
+      23 phys_skinned_lower_ten_05_jntBnd  [its own]  under 19  rests at (-1.4,14.3,-104.6)
+      24 mid_ten_06_jntBnd  [its own]  under 20  rests at (15,0.5,-120.8)
+      25 end_ten_06_jntBnd  [its own]  under 21  rests at (11.3,-9.4,-106.2)
+      26 phys_skinned_upper_ten_06_jntBnd  [its own]  under 22  rests at (25.9,6.4,-145.7)
+      27 phys_skinned_lower_ten_06_jntBnd  [its own]  under 23  rests at (3.3,13.7,-109)
+      28 end_ten_07_jntBnd  [its own]  under 25  rests at (16.5,0.6,-114.8)
+      29 phys_skinned_lower_ten_07_jntBnd  [its own]  under 27  rests at (5,14.8,-114)
+      30 end_ten_08_jntBnd  [its own]  under 28  rests at (13.4,9.9,-122.9)
+      31 phys_skinned_lower_ten_08_jntBnd  [its own]  under 29  rests at (3.5,16.2,-118.4)
+      32 end_ten_09_jntBnd  [its own]  under 30  rests at (7.2,10.9,-132.4)
+      33 phys_skinned_lower_ten_09_jntBnd  [its own]  under 31  rests at (0.1,16.2,-121)
+      34 end_ten_10_jntBnd  [its own]  under 32  rests at (7.2,8.4,-138)
+      35 phys_skinned_lower_ten_10_jntBnd  [its own]  under 33  rests at (-3.1,15.3,-123.7)
+      36 end_ten_11_jntBnd  [its own]  under 34  rests at (10.6,10.3,-143.2)
+      37 phys_skinned_lower_ten_11_jntBnd  [its own]  under 35  rests at (-4.2,14.2,-127)
+      38 phys_skinned_lower_ten_12_jntBnd  [its own]  under 37  rests at (-4.4,13.1,-130.1)
+  ADBSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-37.3,-22,-27.1)..(37.3,35.6,47.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 452 triangles over 308 vertices
+    names: 20 bytes said, 20 read  [agree]
+    rig 10 bones, 6 of them names its carrier's rig also has
+    mesh weights reach bone 9 of 10  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,1.4,-20)  carrier has (0,-7.2,-97.5)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (19.1,-1.3,-9.7)  carrier has (19.1,-10,-87.3)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-19.1,-1.3,-9.7)  carrier has (-19.1,-10,-87.3)
+      4 phys_tri_skirt_F01_jntBnd  [its own]  under 0  rests at (-10.4,-14.5,29)
+      5 phys_tri_skirt_F02_jntBnd  [its own]  under 0  rests at (10.4,-14.5,29)
+      6 phys_tri_skirt_B01_jntBnd  [its own]  under 0  rests at (12.2,29.7,4.4)
+      7 phys_tri_skirt_B02_jntBnd  [its own]  under 0  rests at (-12.2,29.7,4.4)
+      8 spine_2_jntBnd  [shared]  under 1  rests at (0,4.2,-39.8)  carrier has (-0,-4.5,-117.3)
+      9 chest_jntBnd  [shared]  under 8  rests at (0,8,-59.4)  carrier has (-0,-0.6,-137)
+  ADBBeard.ao  socket head_jntBnd [in its carrier's rig]  box (-16.8,-33.1,-3.4)..(16.4,-7,66.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1140 triangles over 692 vertices
+    names: 36 bytes said, 36 read  [agree]
+    rig 4 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_beard_01_jntBnd  [its own]  under 0  rests at (0,-22.3,13.9)
+      2 chest_jntBnd  [shared]  under 0  rests at (0,2.7,65.1)  carrier has (-0,-0.6,-137)
+      3 phys_tri_beard_02_jntBnd  [its own]  under 1  rests at (-0,-16.3,47.7)
+  ADBLSleeve.ao  socket L_shoulder_cTwist_jntBnd_1 [in its carrier's rig]  box (-6.1,-17.4,-10.3)..(105,12.3,60.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 374 triangles over 262 vertices
+    names: 26 bytes said, 26 read  [agree]
+    rig 7 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (-42.7,-5.8,13.4)  carrier has (10.1,-1.5,-156.9)
+      2 L_shoulder_jntBnd  [shared]  under 0  rests at (-21.7,0,0)  carrier has (33.6,6.5,-150.8)
+      3 L_elbow_jntBnd  [shared]  under 0  rests at (21.7,-0,0)  carrier has (62.4,11.2,-118.7)
+      4 phys_tri_LSleeve_01_jntBnd  [its own]  under 0  rests at (48.3,5,9.8)
+      5 phys_tri_LSleeve_02_jntBnd  [its own]  under 4  rests at (66.1,5,24.8)
+      6 phys_tri_LSleeve_03_jntBnd  [its own]  under 5  rests at (84.5,5,40.3)
+  ADBRSleeve.ao  socket R_shoulder_cTwist_jntBnd_1 [in its carrier's rig]  box (-105,-12.3,-60.5)..(6.1,17.4,10.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 374 triangles over 262 vertices
+    names: 26 bytes said, 26 read  [agree]
+    rig 8 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_clavicle_jntBnd  [shared]  under 0  rests at (42.7,5.8,-13.4)  carrier has (-10.1,-1.5,-156.9)
+      2 R_shoulder_jntBnd  [shared]  under 0  rests at (21.7,-0,0)  carrier has (-33.6,6.5,-150.8)
+      3 R_elbow_jntBnd  [shared]  under 0  rests at (-21.7,0,-0)  carrier has (-62.4,11.2,-118.7)
+      4 phys_tri_RSleeve_01_jntBnd  [its own]  under 0  rests at (-48.3,-5,-9.8)
+      5 phys_tri_RSleeve_02_jntBnd  [its own]  under 4  rests at (-66.1,-5,-24.8)
+      6 phys_tri_RSleeve_03_jntBnd  [its own]  under 5  rests at (-84.5,-5,-40.3)
+      7 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)

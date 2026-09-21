@@ -1,0 +1,2172 @@
+monster: Iron Sharpshooter [Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/CorruptedEliteRanger_]
+
+=== .ao Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/TheCountsEliteGuardCorruptedRanged.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/TheCountsEliteGuardCorruptedRanged/rig.amd"
+	animations = '[
+		{
+			"name": "barrage_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.30513399839401247,
+					"end_time": 3.0719499588012697,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1215900182724,
+					"name": "contact",
+					"position": [
+						26.05739974975586,
+						-77.26820373535156,
+						-146.5540008544922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6129000186920167,
+					"name": "contact",
+					"position": [
+						-36.45830154418945,
+						-77.26820373535156,
+						-131.2100067138672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0744400024414064,
+					"name": "contact",
+					"position": [
+						29.66699981689453,
+						-70.43920135498047,
+						-131.54600524902345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.397020101547241,
+					"name": "contact",
+					"position": [
+						-32.71329879760742,
+						-57.21030044555664,
+						-143.28399658203126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.655090093612671,
+					"name": "contact",
+					"position": [
+						22.943300247192384,
+						-54.73619842529297,
+						-152.3260040283203
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.923069953918457,
+					"name": "contact",
+					"position": [
+						-44.53390121459961,
+						-32.91350173950195,
+						-117.58100128173828
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0719499588012697,
+					"name": "contact",
+					"position": [
+						36.94110107421875,
+						-48.27799987792969,
+						-109.8550033569336
+					]
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3999999761581421,
+					"name": "move",
+					"position": [
+						0.0,
+						151.43699645996095,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_dot_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.19999998807907105,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						0.0,
+						-65.41799926757813,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3999999761581421,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.44100189208985,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						130.52699279785157,
+						17.947999954223634,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_move_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.30000001192092898,
+					"name": "move",
+					"position": [
+						0.0,
+						-146.4429931640625,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.09999999403953552,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						-131.74400329589845,
+						-17.017000198364259,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "laser_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.9236299991607666,
+					"end_time": 2.597020149230957,
+					"name": "start_target_update",
+					"data": "100 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0184677839279175,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "Head_Attachment Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedHeadTentacles.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedHoodTentacles.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedLoincloth.ao"
+	attached_object = "Back Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedQuiver.ao"
+	attached_object = "R_elbow_Twist_jntBnd_3 Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedRags.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedRobeSides.ao"
+	// attached_object = "hip_jntBnd Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedRobeTail.ao"
+	attached_object = "L_shoulder_jntBnd Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedShoulderTentacles.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedTailTentacles.ao"
+	attached_object = "neck_jntBnd Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedTongueTentacle.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.2937850058078766,
+								0.0
+							],
+							[
+								0.3513513505458832,
+								1.0
+							]
+						],
+						"rotation": 0.0872664675116539,
+						"width": 39.85599899291992,
+						"length": 106.51799774169922,
+						"offset": [
+							-15.0,
+							-10.0
+						],
+						"impact_x_rotation": [
+							-0.0872664675116539,
+							-0.6981319785118103
+						],
+						"impact_z_rotation": [
+							0.3141592741012573,
+							0.3665192127227783
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3905723989009857,
+								0.0
+							],
+							[
+								0.4141414165496826,
+								1.0
+							]
+						],
+						"previous_patterns_to_exclude_from": 1,
+						"rotation": 0.22689281404018403,
+						"width": 25.270999908447267,
+						"length": 111.91400146484375,
+						"offset": [
+							-4.0,
+							-35.0
+						],
+						"local_offset": [
+							-28.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.27925270795822146
+						],
+						"impact_z_rotation": [
+							0.13962635397911073,
+							0.1745329350233078
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "aux_R_tail_03"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3543543517589569,
+								0.0
+							],
+							[
+								0.3933933973312378,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.5235990285873413,
+						"width": 15.0,
+						"angle": 1.3962600231170655,
+						"x_axis_scale": 0.6200000047683716,
+						"length": 98.88200378417969,
+						"offset": [
+							0.0,
+							-7.0
+						],
+						"local_offset": [
+							-8.0,
+							-13.0
+						],
+						"impact_z_rotation": [
+							-0.3141592741012573,
+							-1.7104227542877198
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4343434274196625,
+								0.0
+							],
+							[
+								0.46464645862579348,
+								1.0
+							]
+						],
+						"previous_patterns_to_exclude_from": 1,
+						"rotation": -0.7679449319839478,
+						"width": 39.71099853515625,
+						"length": 129.96400451660157,
+						"offset": [
+							65.0,
+							51.0
+						],
+						"impact_z_rotation": [
+							-0.7679449319839478,
+							-0.7679449319839478
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "aux_L_tail_03"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/TheCountsEliteGuardCorruptedRanged/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/TheCountsEliteGuardCorruptedRanged.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false R_shoulder_jntBnd head_jntBnd L_shoulder_jntBnd"
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "FX_stab_R false aux_R_tail_10 aux_R_tail_11"
+		bone_group = "FX_stab_L false aux_L_tail_10 aux_L_tail_11"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Move",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21947400271892548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Attack1",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3409300148487091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Swish_Unarmed",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.370257705450058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Whoosh",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4496009945869446,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "aux_L_robe_2_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5946351289749146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/ProjectileSwoosh.once.ogg",
+						"bone_name": "aux_R_tail_11"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Move",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.009127936325967312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Attack2",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37209299206733706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Swish_Unarmed",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4906969964504242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "aux_L_robe_2_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5058130025863648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Whoosh",
+						"bone_name": "aux_R_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6514102220535278,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/ProjectileSwoosh.once.ogg",
+						"bone_name": "aux_R_tail_11"
+					}
+				]
+			},
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1469859927892685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31330859661102297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/BarrageA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5771899819374085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7922919392585754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8568130135536194,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Barrage",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0038100481033326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Whoosh",
+						"bone_name": "aux_L_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0974453687667847,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/SpikeThrow",
+						"bone_name": "aux_L_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3157000541687012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4196699857711793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Whoosh",
+						"bone_name": "aux_R_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5803190469741822,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/SpikeThrow",
+						"bone_name": "aux_R_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.606458306312561,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/SpikeThrow",
+						"bone_name": "aux_R_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6540234088897706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/BarrageB",
+						"bone_name": "aux_head_tentacle_1_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8928799629211426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Whoosh",
+						"bone_name": "aux_L_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8928899765014649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0508439540863039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/SpikeThrow",
+						"bone_name": "aux_R_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0582833290100099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/SpikeThrow",
+						"bone_name": "aux_L_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.272900104522705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.287220001220703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Whoosh",
+						"bone_name": "aux_R_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3895177841186525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/SpikeThrow",
+						"bone_name": "aux_R_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4044077396392824,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/SpikeThrow",
+						"bone_name": "aux_R_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4664900302886965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.509500026702881,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Whoosh",
+						"bone_name": "aux_L_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6448476314544679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/SpikeThrow",
+						"bone_name": "aux_L_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6851699352264406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.695919990539551,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Whoosh",
+						"bone_name": "aux_R_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9037792682647707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/SpikeThrow",
+						"bone_name": "aux_R_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9468801021575929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.950469970703125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Whoosh",
+						"bone_name": "aux_L_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0149900913238527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Whoosh",
+						"bone_name": "aux_R_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.035892963409424,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/SpikeThrow",
+						"bone_name": "aux_L_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.239332437515259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/SpikeThrow",
+						"bone_name": "aux_R_tail_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.509730100631714,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6387999057769777,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.0582499504089359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.302030086517334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23637500405311585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2654379904270172,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7391560077667236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8050310015678406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20676200091838838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23218299448490144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6465539932250977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7041760087013245,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20676200091838838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23218299448490144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5745260119438171,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6601120233535767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20676200091838838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23218299448490144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6465539932250977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7041760087013245,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20676200091838838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23218299448490144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6465539932250977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7041760087013245,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20676200091838838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23218299448490144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6465539932250977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7041760087013245,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.267441987991333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2302300930023195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3883700370788576,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.516279935836792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Idle",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04627871513366699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/KnockdownA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3456149995326996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5880600214004517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6172919869422913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7084239721298218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8236250281333923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "aux_loincloth_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9339812397956848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/KnockdownB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9000200033187867,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9653600454330445,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.140749931335449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/KnockdownA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2775439918041229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4722369909286499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.495712012052536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5688949823379517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6614059805870056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "aux_loincloth_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7764863967895508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/KnockdownB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5257999897003174,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5782699584960938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7191100120544434,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "laser_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.026475176215171815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/LaserCharge",
+						"bone_name": "aux_head_tentacle_3_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05474862828850746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Lazer",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16751700639724732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "aux_loincloth_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7326560020446777,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9130570292472839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "aux_loincloth_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9621319770812988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/LaserSurge.once.ogg",
+						"bone_name": "aux_tongue_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1358000040054322,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Swish_Tongue",
+						"bone_name": "aux_tongue_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6604399681091309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9089499711990357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "aux_loincloth_1"
+					}
+				]
+			},
+			{
+				"name": "laser_fast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Lazer",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/LaserCharge",
+						"bone_name": "aux_head_tentacle_3_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.030679788440465928,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5370960235595703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "aux_loincloth_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0996233224868775,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Effects/LaserSurge.once.ogg",
+						"bone_name": "aux_tongue_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2589868307113648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/GoreMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.278825283050537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Swish_Tongue",
+						"bone_name": "aux_tongue_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2953041791915894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "aux_loincloth_1"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Move_Idle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30903100967407229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4465939998626709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6471250057220459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.976498007774353,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9968420267105103,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Ranged/Vocals/Run.loop.ogg",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1024399995803834,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2797199487686158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_15/TheCountsGuard_Foley/Foley/Step_Bare",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.5950639843940735,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/TheCountsEliteGuardCorruptedRanged/stab.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-31.450000762939454,
+								-62.85000228881836,
+								-120.45000457763672
+							],
+							"rotation": [
+								-2.687999963760376,
+								-0.9947999715805054,
+								-3.1410000324249269
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.7353690266609192,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/TheCountsEliteGuardCorruptedRanged/stab.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								53.80000305175781,
+								-41.95000076293945,
+								-66.5
+							],
+							"rotation": [
+								1.0469999313354493,
+								-0.9249999523162842,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.1063499450683594,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/TheCountsEliteGuardCorruptedRanged/stab.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								57.500003814697269,
+								10.65000057220459,
+								-133.0500030517578
+							],
+							"rotation": [
+								1.5529999732971192,
+								-1.2919999361038209,
+								1.6059999465942383
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.6213300228118897,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/TheCountsEliteGuardCorruptedRanged/stab.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.35000228881836,
+								34.0,
+								-133.0500030517578
+							],
+							"rotation": [
+								-2.7749998569488527,
+								-1.2739999294281006,
+								-2.3559999465942385
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.0648601055145265,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/TheCountsEliteGuardCorruptedRanged/stab.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								57.500003814697269,
+								10.65000057220459,
+								-133.0500030517578
+							],
+							"rotation": [
+								1.5529999732971192,
+								-1.2919999361038209,
+								1.6059999465942383
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.417210102081299,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/TheCountsEliteGuardCorruptedRanged/stab.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.35000228881836,
+								34.0,
+								-133.0500030517578
+							],
+							"rotation": [
+								-2.7749998569488527,
+								-1.2739999294281006,
+								-2.3559999465942385
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.6636099815368654,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/TheCountsEliteGuardCorruptedRanged/stab.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								57.500003814697269,
+								10.65000057220459,
+								-133.0500030517578
+							],
+							"rotation": [
+								1.5529999732971192,
+								-1.2919999361038209,
+								1.6059999465942383
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.9149301052093508,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/TheCountsEliteGuardCorruptedRanged/stab.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.35000228881836,
+								34.0,
+								-133.0500030517578
+							],
+							"rotation": [
+								-2.7749998569488527,
+								-1.2739999294281006,
+								-2.3559999465942385
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.043070077896118,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/TheCountsEliteGuardCorruptedRanged/stab.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								57.500003814697269,
+								10.65000057220459,
+								-133.0500030517578
+							],
+							"rotation": [
+								1.5529999732971192,
+								-1.2919999361038209,
+								1.6059999465942383
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.247570037841797,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/TheCountsEliteGuardCorruptedRanged/stab.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-50.35000228881836,
+								34.0,
+								-133.0500030517578
+							],
+							"rotation": [
+								-2.7749998569488527,
+								-1.2739999294281006,
+								-2.3559999465942385
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/TheCountsEliteGuardCorruptedRanged/epk/glow_buildup_L.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/TheCountsEliteGuardCorruptedRanged/epk/glow_buildup_R.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.933000087738037,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "6 0 0 Custom 0 0 1.0752 1 Custom 6.85648 -7.24145 2.0435 1 Custom 4.85892 -11.4132 2.66526 1 Custom 5.64674 -16.4733 3.10099 1 Custom 12.2364 -2.40415 4.933 0 Flat"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.933000087738037,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Custom 0 0 1.61796 1 Custom 3.89056 -7.24145 2.38496 1 Custom 4.85892 -11.4132 2.92007 1 Custom 5.64674 -16.4733 3.27172 1 Custom 12.2364 -2.40415 4.933 0 Flat"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedHeadTentacles.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/head_tentacles/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/head_tentacles/rig.ast"
+		linear_allowed_contraction = 0.110
+		bend_stiffness = 100.000
+		bend_allowed_angle = 2.462
+		normal_viscosity_multiplier = 0.114
+		tangent_viscosity_multiplier = 0.074
+		animation_velocity_factor = 10.000
+		animation_force_factor = 25.000
+		animation_max_velocity = 500.000
+		gravity = 500.000
+		use_shock_propagation = false
+		enable_collisions = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/head_tentacles/RangedHeadTentacles.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedHoodTentacles.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/hood_tentacles/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/hood_tentacles/rig.ast"
+		linear_allowed_contraction = 0.300
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_force_factor = 5.000
+		use_shock_propagation = false
+		enable_collisions = false
+		attachment_bones = "chest_jntBnd neck_jntBnd head_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/hood_tentacles/RangedHoodTentacles.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd neck_jntBnd head_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedLoincloth.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/loincloth/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/loincloth/rig.ast"
+		linear_allowed_contraction = 0.052
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		enclosure_angle = 0.250
+		animation_velocity_factor = 5.000
+		animation_force_factor = 15.000
+		use_shock_propagation = false
+		attachment_bones = "L_thigh_jntBnd R_thigh_jntBnd hip_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/loincloth/RangedLoincloth.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_thigh_jntBnd R_thigh_jntBnd root_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedQuiver.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/quiver/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/quiver/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.200
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/quiver/RangedQuiver.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedRags.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/rags/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/rags/rig.ast"
+		linear_allowed_contraction = 0.300
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.005
+		enclosure_angle = 1.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/rags/RangedRags.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedRobeSides.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/robe_sides/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/robe_sides/rig.ast"
+		linear_allowed_contraction = 0.300
+		normal_viscosity_multiplier = 0.150
+		tangent_viscosity_multiplier = 0.500
+		enclosure_angle = 0.400
+		attachment_bones = "L_thigh_jntBnd R_thigh_jntBnd hip_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/robe_sides/RangedRobeSides.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_thigh_jntBnd R_thigh_jntBnd root_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedShoulderTentacles.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/shoulder_tentacles/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/shoulder_tentacles/rig.ast"
+		linear_allowed_contraction = 0.046
+		bend_stiffness = 0.000
+		bend_allowed_angle = 4.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_velocity_factor = 5.000
+		animation_force_factor = 10.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/shoulder_tentacles/RangedShoulderTentacles.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedTailTentacles.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/tail_tentacles/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/tail_tentacles/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_velocity_factor = 10.000
+		animation_force_factor = 15.000
+		use_shock_propagation = false
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/tail_tentacles/RangedTailTentacles.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/TheCountsEliteGuardCorrupted/Ranged/attachments/RangedTongueTentacle.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/mouth_tentacle/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/mouth_tentacle/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_velocity_factor = 10.000
+		animation_force_factor = 15.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/attachments/mouth_tentacle/RangedTongueTentacle.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/TheCountsEliteGuardCorruptedRanged.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/rig_59e3e145.smd"
+Materials 1
+	"Art/Models/MONSTERS/TheCountsGuardEliteCorrupted/Textures/TheCountsEliteGuardCorruptedRangedc.mat" 5
+BoundingBox -70.2304 -17.054 -178.803 70.0768 21.9023 2.00153
+BoneGroups 22
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+	"grp_root" 2 "root_jntBnd" "hip_jntBnd"
+	"grp_frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TheCountsEliteGuardCorruptedRanged/rig_59e3e145.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 5 in the header, 5 in the block · 14697 triangles over 9831 vertices
+  names: 118 bytes said, 118 read  [agree]
+
+=== shapes (15)
+0	body_dsShape	from 0	count 11550
+1	body_miscShape	from 11550	count 12294
+2	body_ssShape	from 23844	count 13707
+3	bootsShape	from 37551	count 3150
+4	strapsShape	from 40701	count 3390
+5	tentacles_chestShape	from 44091	count 2130
+6	flesh_loinclothShape	from 46221	count 3156
+7	skirt_clothShape	from 49377	count 2232
+8	ragsShape	from 51609	count 96
+9	robe_dsShape	from 51705	count 3186
+10	robe_ssShape	from 54891	count 4560
+11	tailShape	from 59451	count 546
+12	tentacles_shoulderShape	from 59997	count 1800
+13	tentacles_tailsShape	from 61797	count 4452
+14	tentacles_tongueShape	from 66249	count 2436
+
+=== fitting
+the monster's rig: 186 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_robe_tail_1, aux_loincloth_1, aux_R_tail_01, aux_L_tail_01, aux_R_robe_2_01, aux_R_robe_3_1, aux_R_robe_1_1, aux_L_robe_3_1, aux_L_robe_2_1, aux_L_robe_1_1, aux_robe_tail_2, aux_loincloth_2, aux_R_tail_02, aux_L_tail_02, aux_R_robe_2_02, aux_R_robe_2_06, aux_R_robe_3_2, aux_R_robe_1_2, aux_L_robe_3_2, aux_L_robe_2_2, aux_L_robe_2_6, aux_L_robe_1_2, aux_robe_tail_3, aux_loincloth_3, aux_Back_attachment, aux_L_hood_tentacles_1, aux_R_hood_tentacles_1, aux_R_tail_03, aux_L_tail_03, aux_R_robe_2_03, aux_R_robe_2_07, aux_R_robe_3_3, aux_R_robe_1_3, aux_L_robe_3_3, aux_L_robe_2_3, aux_L_robe_2_7, aux_L_robe_1_3, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_robe_tail_4, aux_R_robe_tail_4, aux_loincloth_4, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_tongue_1, aux_quiver, aux_L_hood_tentacles_2, aux_R_hood_tentacles_2, aux_R_tail_04, aux_L_tail_04, aux_R_robe_2_04, aux_R_robe_2_08, aux_R_robe_3_4, aux_R_robe_1_4, aux_L_robe_3_4, aux_L_robe_2_4, aux_L_robe_2_8, aux_L_robe_1_4, aux_L_robe_tail_5, aux_R_robe_tail_5, aux_L_upperArm_attachment, aux_shoulder_tentacle_2_1, aux_shoulder_tentacle_1_1, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_tongue_2, aux_L_hood_tentacles_3, aux_R_hood_tentacles_3, aux_R_tail_05, aux_L_tail_05, aux_R_robe_2_05, aux_R_robe_2_09, aux_R_robe_3_5, aux_R_robe_1_5, aux_L_robe_3_5, aux_L_robe_2_5, aux_L_robe_2_9, aux_L_robe_1_5, aux_shoulder_tentacle_2_2, aux_shoulder_tentacle_1_2, aux_head_tentacle_3_1, aux_head_tentacle_2_1, aux_head_tentacle_1_1, aux_tongue_3, aux_R_tail_06, aux_L_tail_06, aux_R_robe_2_10, aux_R_robe_3_6, aux_R_robe_1_6, aux_L_robe_3_6, aux_L_robe_1_6, aux_L_Weapon_attachment, aux_shoulder_tentacle_2_3, aux_shoulder_tentacle_1_3, aux_R_Weapon_attachment, aux_head_tentacle_3_2, aux_head_tentacle_2_2, aux_head_tentacle_1_2, aux_tongue_4, aux_R_tail_07, aux_L_tail_07, aux_head_tentacle_3_3, aux_head_tentacle_2_3, aux_head_tentacle_1_3, aux_tongue_5, aux_R_tail_08, aux_L_tail_08, aux_R_tail_09, aux_L_tail_09, aux_R_tail_10, aux_L_tail_10, aux_R_tail_11, aux_L_tail_11
+  RangedHeadTentacles.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-19.7,-6.6,-47.4)..(17.4,21.8,-3.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 866 triangles over 546 vertices
+    names: 90 bytes said, 90 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_tentacle_1_jntBnd_1  [its own]  under 0  rests at (6.1,10,-10.6)
+      2 phys_tri_tentacle_2_jntBnd_1  [its own]  under 0  rests at (-8.3,-0.8,-13.3)
+      3 phys_tri_tentacle_3_jntBnd_1  [its own]  under 0  rests at (1.9,7.4,-16.4)
+  RangedHoodTentacles.ao  socket chest_jntBnd [in its carrier's rig]  box (-11.5,-19,-38.5)..(11.9,7.6,20.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 710 triangles over 415 vertices
+    names: 40 bytes said, 40 read  [agree]
+    rig 5 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 neck_jntBnd  [shared]  under 0  rests at (0,3.5,-19.1)  carrier has (0,3.2,-146.4)
+      2 phys_tri_tentacles_jntBnd_1  [its own]  under 0  rests at (0,-9.4,-7.2)
+      3 head_jntBnd  [shared]  under 1  rests at (-0,0.5,-31.4)  carrier has (0,0.2,-158.6)
+      4 phys_tri_tentacles_jntBnd_2  [its own]  under 2  rests at (0,-15,8.3)
+  RangedLoincloth.ao  socket hip_jntBnd [in its carrier's rig]  box (-23.3,-21.2,-22.2)..(21.3,14.5,29)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 1796 triangles over 1198 vertices
+    names: 72 bytes said, 72 read  [agree]
+    rig 6 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 5 of 6  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 phys_tri_loincloth_jntBnd_1  [its own]  under 0  rests at (-0,-15.7,0.1)
+      3 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      4 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      5 spine_2_jntBnd  [shared]  under 1  rests at (-0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+  RangedQuiver.ao  socket Back [NOT in its carrier's rig]  box (-32.7,4.4,-27.4)..(12.7,16.3,38.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 1696 triangles over 1696 vertices
+    names: 56 bytes said, 56 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_quiver_jntBnd  [its own]  under 0  rests at (-5.5,11,6.4)
+  RangedRags.ao  socket R_elbow_Twist_jntBnd_3 [in its carrier's rig]  box (-4.1,-0.6,-11.4)..(3.2,2.7,-2.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 32 triangles over 40 vertices
+    names: 18 bytes said, 18 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_rags_jntBnd_1  [its own]  under 0  rests at (-3.9,0.7,-11.7)
+  RangedRobeSides.ao  socket hip_jntBnd [in its carrier's rig]  box (-40.7,-22.2,-21.3)..(39,40,86.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 2764 triangles over 1886 vertices
+    names: 66 bytes said, 66 read  [agree]
+    rig 13 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 12 of 13  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      4 phys_tri_L_robe_jntBnd_1  [its own]  under 0  rests at (28.3,-0.9,24.3)
+      5 phys_tri_R_robe_jntBnd_1  [its own]  under 0  rests at (-28.3,-0.9,24.3)
+      6 phys_tri_tail_jntBnd_1  [its own]  under 0  rests at (0.7,22.6,15.8)
+      7 spine_2_jntBnd  [shared]  under 1  rests at (0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      8 phys_tri_L_robe_jntBnd_3  [its own]  under 4  rests at (27.4,16.9,42.9)
+      9 phys_tri_L_robe_jntBnd_2  [its own]  under 4  rests at (28.6,-12.2,45.4)
+      10 phys_tri_R_robe_jntBnd_3  [its own]  under 5  rests at (-28.9,11.3,45.3)
+      11 phys_tri_R_robe_jntBnd_2  [its own]  under 5  rests at (-28.6,-12.2,45.4)
+      12 phys_tri_tail_jntBnd_2  [its own]  under 6  rests at (1.3,33,71.7)
+  RangedShoulderTentacles.ao  socket L_shoulder_jntBnd [in its carrier's rig]  box (2.7,-12.7,-18.2)..(23.8,-2.1,4.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 600 triangles over 390 vertices
+    names: 46 bytes said, 46 read  [agree]
+    rig 3 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_tentacle_1_jntBnd_1  [its own]  under 0  rests at (13,-9.6,0.6)
+      2 phys_tri_tentacle_2_jntBnd_1  [its own]  under 0  rests at (9.7,-9.5,-2.1)
+  RangedTailTentacles.ao  socket hip_jntBnd [in its carrier's rig]  box (-53.5,-8.7,-38.3)..(53.5,159.8,91.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1484 triangles over 1146 vertices
+    names: 40 bytes said, 40 read  [agree]
+    rig 26 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 25 of 26  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 spine_2_jntBnd  [shared]  under 1  rests at (0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      3 L_tail_jntBnd_01  [its own]  under 1  rests at (9,6.6,-15.1)
+      4 R_tail_jntBnd_01  [its own]  under 1  rests at (-9,6.6,-15.1)
+      5 chest_jntBnd  [shared]  under 2  rests at (0,-3.5,-37.3)  carrier has (0,-0.3,-127.3)
+      6 L_tail_jntBnd_02  [its own]  under 3  rests at (11.3,16.8,-2.4)
+      7 R_tail_jntBnd_02  [its own]  under 4  rests at (-11.3,16.8,-2.4)
+      8 L_tail_jntBnd_03  [its own]  under 6  rests at (15.4,30.1,6.4)
+      9 R_tail_jntBnd_03  [its own]  under 7  rests at (-15.4,30.1,6.4)
+      10 L_tail_jntBnd_04  [its own]  under 8  rests at (19.4,43.4,15.2)
+      11 R_tail_jntBnd_04  [its own]  under 9  rests at (-19.4,43.4,15.2)
+      12 L_tail_jntBnd_05  [its own]  under 10  rests at (23.5,56.7,24)
+      13 R_tail_jntBnd_05  [its own]  under 11  rests at (-23.5,56.7,24)
+      14 L_tail_jntBnd_06  [its own]  under 12  rests at (27.5,70,32.8)
+      15 R_tail_jntBnd_06  [its own]  under 13  rests at (-27.5,70,32.8)
+      16 L_tail_jntBnd_07  [its own]  under 14  rests at (31.5,83.3,41.6)
+      17 R_tail_jntBnd_07  [its own]  under 15  rests at (-31.5,83.3,41.6)
+      18 L_tail_jntBnd_08  [its own]  under 16  rests at (35.6,96.6,50.4)
+      19 R_tail_jntBnd_08  [its own]  under 17  rests at (-35.6,96.6,50.4)
+      20 L_tail_jntBnd_09  [its own]  under 18  rests at (39.6,109.9,59.2)
+      21 R_tail_jntBnd_09  [its own]  under 19  rests at (-39.6,109.9,59.2)
+      22 L_tail_jntBnd_10  [its own]  under 20  rests at (43.7,123.1,68)
+      23 R_tail_jntBnd_10  [its own]  under 21  rests at (-43.7,123.1,68)
+      24 phys_tri_L_tail_jntBnd_11  [its own]  under 22  rests at (47.7,136.4,76.8)
+      25 phys_tri_R_tail_jntBnd_11  [its own]  under 23  rests at (-47.7,136.4,76.8)
+  RangedTongueTentacle.ao  socket neck_jntBnd [in its carrier's rig]  box (-4.5,-55.5,-24.8)..(4.7,-2.3,-4.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 812 triangles over 564 vertices
+    names: 42 bytes said, 42 read  [agree]
+    rig 6 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 5 of 6  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,-0,-0)  carrier has (0,0,0)
+      1 tongue_jntBnd_1  [its own]  under 0  rests at (-0,-7.9,-8.8)
+      2 tongue_jntBnd_2  [its own]  under 1  rests at (-0,-17.9,-11.3)
+      3 tongue_jntBnd_3  [its own]  under 2  rests at (-0,-27.9,-13.8)
+      4 tongue_jntBnd_4  [its own]  under 3  rests at (-0,-37.9,-16.3)
+      5 tongue_jntBnd_5  [its own]  under 4  rests at (-0,-47.8,-18.9)

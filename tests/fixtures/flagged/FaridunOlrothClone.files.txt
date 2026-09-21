@@ -1,0 +1,6137 @@
+monster: Azmadi, the Faridun Prince [Metadata/Monsters/FaridunOlroth/FaridunOlrothClone]
+
+=== .ao Metadata/Monsters/FaridunOlroth/FaridunBlackPrince.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/NPC/Jamanra/boss/rig.amd"
+	view_of = "triple_lacerate_01"
+		view_name = "empowered_triple_lacerate_01"
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+		view_exclude_event = "ActiveDodgeEvent"
+		view_exclude_event = "TriggerEffectEvent"
+	view_of = "dash_01"
+		view_name = "chrono_dash_01"
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+		view_exclude_event = "ActiveDodgeEvent"
+		view_exclude_event = "TriggerEffectEvent"
+	view_of = "dash_02"
+		view_name = "chrono_dash_02"
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+		view_exclude_event = "ActiveDodgeEvent"
+		view_exclude_event = "TriggerEffectEvent"
+	view_of = "emerge_01"
+		view_name = "emerge_clone_01"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	animations = '[
+		{
+			"name": "chrono_leap_slam_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3944779634475708,
+					"name": "chop",
+					"position": [
+						0.0,
+						-65.18344116210938,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "chrono_leap_slam_start_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.1884145438671112,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.19908705353736878,
+					"end_time": 1.100000023841858,
+					"name": "move",
+					"position": [
+						0.0,
+						-200.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 5 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "clone_strike_ultimate_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.0999999046325685,
+					"name": "be_sand"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.397135019302368,
+					"name": "sword_split"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.38070011138916,
+					"name": "im_back"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 4.527307033538818,
+					"end_time": 5.565999984741211,
+					"name": "start_target_update",
+					"data": "110 -80 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.966000080108643,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.165999889373779,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.366000175476074,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.565999984741211,
+					"name": "stop_tracking"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.565999984741211,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.688790798187256,
+					"name": "final_swing"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.200291156768799,
+					"name": "dont_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.489291191101074,
+					"name": "return"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.531720161437988,
+					"name": "return"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.573843002319336,
+					"name": "return"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.669301986694336,
+					"name": "return"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.73445463180542,
+					"name": "return"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.807994842529297,
+					"name": "returned"
+				}
+			]
+		},
+		{
+			"name": "dash_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0,
+					"name": "start_face",
+					"data": "120 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.7980269193649292,
+					"name": "end_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8328859806060791,
+					"name": "thrust",
+					"position": [
+						0.0,
+						-61.57360076904297,
+						-118.35299682617188
+					]
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.8330000042915344,
+					"end_time": 1.1295082569122315,
+					"name": "move",
+					"position": [
+						0.0,
+						-440.9419860839844,
+						-0.0000010843799600479543
+					],
+					"data": "1 0 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1392873525619507,
+					"name": "swing",
+					"position": [
+						27.31719970703125,
+						19.679399490356447,
+						-118.23300170898438
+					]
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.1519229412078858,
+					"end_time": 1.9507509469985963,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 20 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "dash_02",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0,
+					"name": "start_face",
+					"data": "120 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.7837028503417969,
+					"name": "end_face"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.7990000247955322,
+					"end_time": 0.9660000205039978,
+					"name": "move",
+					"position": [
+						0.0,
+						-379.4010009765625,
+						-0.0000010843799600479543
+					],
+					"data": "0 0 0 Everything 0 20 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8187857866287231,
+					"name": "thrust",
+					"position": [
+						0.0,
+						0.0,
+						-111.55899810791016
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1203413009643555,
+					"name": "thrust2",
+					"position": [
+						-21.089599609375,
+						-130.05137634277345,
+						-88.46540069580078
+					]
+				}
+			]
+		},
+		{
+			"name": "death_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.05653649941086769,
+					"name": "light_off"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6031919717788696,
+					"name": "energy_lost"
+				}
+			]
+		},
+		{
+			"name": "emerge_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 3.166666030883789,
+					"end_time": 4.232999801635742,
+					"name": "move",
+					"position": [
+						0.0,
+						53.98099899291992,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "fake_dead_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "light_off"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.699999988079071,
+					"name": "energy_lost"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3365154266357422,
+					"name": "knee"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.662230014801025,
+					"name": "light_on"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.0,
+					"name": "energy_gain"
+				}
+			]
+		},
+		{
+			"name": "fake_dead_02",
+			"events": [
+				{
+					"type": "PoiseEventType",
+					"time": 0.0,
+					"end_time": 10.265999794006348,
+					"name": "poise",
+					"data": "1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0223569869995119,
+					"name": "time_djinn"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5999999046325685,
+					"name": "time_stop"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 8.5,
+					"name": "reply"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 9.5,
+					"name": "empower"
+				}
+			]
+		},
+		{
+			"name": "groundslam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7893999814987183,
+					"name": "energy_lost"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.489720344543457,
+					"name": "contact",
+					"position": [
+						-1.863621711730957,
+						-212.3197784423828,
+						-0.0000010843799600479543
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.337600231170654,
+					"name": "energy_gain"
+				}
+			]
+		},
+		{
+			"name": "groundslam_dash_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.29437848925590517,
+					"name": "move",
+					"position": [
+						0.0,
+						-453.5,
+						-0.0000010843799600479543
+					],
+					"data": "1 0 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.052142899483442309,
+					"name": "thrust",
+					"position": [
+						0.0,
+						-52.21289825439453,
+						-91.25019836425781
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.25928598642349245,
+					"name": "swing",
+					"position": [
+						0.0,
+						18.997499465942384,
+						-106.8219985961914
+					]
+				}
+			]
+		},
+		{
+			"name": "intro_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 6.75,
+					"name": "energy_gain"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.2589898109436039,
+					"name": "swing"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.803589820861816,
+					"name": "light_on"
+				}
+			]
+		},
+		{
+			"name": "many_sides_strike_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 5.366000175476074,
+					"name": "move",
+					"data": "1 0 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3499999940395355,
+					"name": "domain"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.200000047683716,
+					"name": "domain2"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6149587631225588,
+					"name": "slash",
+					"position": [
+						0.0,
+						-100.68218994140625,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.9548397064208986,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.2271647453308107,
+					"name": "slash",
+					"position": [
+						0.0,
+						-82.7337646484375,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.4380009174346926,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.9755687713623049,
+					"name": "slash",
+					"position": [
+						0.0,
+						-112.53533935546875,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.1277055740356449,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.427724361419678,
+					"name": "slash",
+					"position": [
+						0.0,
+						-92.83914184570313,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "slam_rupture_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.5280061364173889,
+					"end_time": 1.0595208406448365,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1707041263580323,
+					"name": "contact",
+					"position": [
+						-3.2940521240234377,
+						-161.49798583984376,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "slam_rupture_03",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.5254642367362976,
+					"end_time": 3.6500000953674318,
+					"name": "start_target_update",
+					"data": "80 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6999999284744263,
+					"name": "clone"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "clone"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "clone"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.200000047683716,
+					"name": "clone"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5,
+					"name": "clone"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.700000047683716,
+					"name": "clone"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.799999952316284,
+					"name": "contact",
+					"position": [
+						0.0,
+						-99.35832214355469,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "sword_throw_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.3330000042915344,
+					"end_time": 1.2660000324249268,
+					"name": "move",
+					"position": [
+						0.0,
+						-251.68499755859376,
+						-0.0000010843799600479543
+					],
+					"data": "1 1 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 0.3330000042915344,
+					"name": "start_face",
+					"position": [
+						0.0,
+						0.0,
+						-0.0012062099995091558
+					],
+					"data": "180 0 -1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.864736795425415,
+					"name": "contact",
+					"position": [
+						0.0,
+						-60.14727783203125,
+						-120.82479858398438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.864736795425415,
+					"name": "throw",
+					"position": [
+						0.0,
+						-60.14727783203125,
+						-120.82479858398438
+					]
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.8661699891090393,
+					"name": "end_face",
+					"position": [
+						0.0,
+						0.0,
+						-0.0012062099995091558
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.3738393783569338,
+					"name": "recall_sword"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.686414957046509,
+					"name": "show_weapon"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 2.9079182147979738,
+					"end_time": 3.632999897003174,
+					"name": "start_target_update",
+					"data": "165 0 1"
+				}
+			]
+		},
+		{
+			"name": "sword_throw_catch_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4293549358844757,
+					"name": "catch"
+				}
+			]
+		},
+		{
+			"name": "sword_throw_catch_throw_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.43634799122810366,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9431580305099487,
+					"name": "throw",
+					"position": [
+						-9.349357604980469,
+						-75.71782684326172,
+						-95.51261901855469
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.97918301820755,
+					"name": "tele",
+					"position": [
+						-9.349357604980469,
+						-75.71782684326172,
+						-95.51261901855469
+					]
+				}
+			]
+		},
+		{
+			"name": "sword_throw_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8904302716255188,
+					"name": "throw",
+					"position": [
+						-8.015227317810059,
+						-70.22798919677735,
+						-84.7957763671875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9330000281333923,
+					"name": "tele"
+				}
+			]
+		},
+		{
+			"name": "triple_lacerate_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.5,
+					"end_time": 1.2899999618530274,
+					"name": "move",
+					"position": [
+						0.0,
+						-115.94599914550781,
+						-0.0000010843799600479543
+					],
+					"data": "1 1 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 0.5,
+					"name": "start_face",
+					"position": [
+						0.0,
+						0.0,
+						-0.0012062099995091558
+					],
+					"data": "85 0 -1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8615450859069824,
+					"name": "swing"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9122189879417419,
+					"name": "proj1",
+					"position": [
+						-48.05059814453125,
+						-160.44400024414063,
+						-58.51919937133789
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1419099569320679,
+					"name": "proj2",
+					"position": [
+						37.61050033569336,
+						-150.33200073242188,
+						-90.53450012207031
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2008299827575684,
+					"name": "swing"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.2999999523162842,
+					"end_time": 1.7903800010681153,
+					"name": "move",
+					"position": [
+						0.0,
+						-171.4759979248047,
+						-0.0000010843799600479543
+					],
+					"data": "1 1 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 1.2999999523162842,
+					"name": "end_face",
+					"position": [
+						0.0,
+						0.0,
+						-0.0012062099995091558
+					]
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 1.2999999523162842,
+					"name": "start_face",
+					"data": "100 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 1.7903800010681153,
+					"name": "end_face",
+					"position": [
+						0.0,
+						0.0,
+						-0.0012062099995091558
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.835170030593872,
+					"name": "swing"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8552699089050294,
+					"name": "proj3",
+					"position": [
+						0.0,
+						-157.1909942626953,
+						-81.88240051269531
+					]
+				}
+			]
+		},
+		{
+			"name": "empowered_triple_lacerate_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5,
+					"name": "temp"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.5,
+					"end_time": 1.2899999618530274,
+					"name": "move",
+					"position": [
+						0.0,
+						-115.94599914550781,
+						-0.0000010843799600479543
+					],
+					"data": "1 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 0.5,
+					"name": "start_face",
+					"position": [
+						0.0,
+						0.0,
+						-0.0012062099995091558
+					],
+					"data": "85 0 -1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8615450859069824,
+					"name": "swing"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9122189879417419,
+					"name": "proj1",
+					"position": [
+						-48.05059814453125,
+						-160.44400024414063,
+						-58.51919937133789
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1419099569320679,
+					"name": "proj2",
+					"position": [
+						37.61050033569336,
+						-150.33200073242188,
+						-90.53450012207031
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2008299827575684,
+					"name": "swing"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "temp"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.2999999523162842,
+					"end_time": 1.7903800010681153,
+					"name": "move",
+					"position": [
+						0.0,
+						-171.4759979248047,
+						-0.0000010843799600479543
+					],
+					"data": "1 1 0 Everything 0 5 NoOverride 1.000000"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 1.3067501783370972,
+					"name": "end_face",
+					"position": [
+						0.0,
+						0.0,
+						-0.0012062099995091558
+					]
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 1.3067501783370972,
+					"name": "start_face",
+					"data": "100 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 1.7903800010681153,
+					"name": "end_face",
+					"position": [
+						0.0,
+						0.0,
+						-0.0012062099995091558
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8329999446868897,
+					"name": "temp"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.835170030593872,
+					"name": "swing"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8552699089050294,
+					"name": "proj3",
+					"position": [
+						0.0,
+						-157.1909942626953,
+						-81.88240051269531
+					]
+				}
+			]
+		},
+		{
+			"name": "chrono_dash_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0,
+					"name": "start_face",
+					"data": "0 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.8125667572021484,
+					"name": "end_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8250854015350342,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.024118185043335,
+					"name": "hit_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0571000576019288,
+					"name": "swing",
+					"position": [
+						27.31719970703125,
+						19.679399490356447,
+						-118.23300170898438
+					]
+				}
+			]
+		},
+		{
+			"name": "chrono_dash_02",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0,
+					"name": "start_face",
+					"data": "0 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.8263007402420044,
+					"name": "end_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8323512673377991,
+					"name": "leave_ground",
+					"position": [
+						0.0,
+						-83.31664276123047,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0703916549682618,
+					"name": "hit_ground",
+					"position": [
+						0.0,
+						-83.31664276123047,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.090628981590271,
+					"name": "thrust2",
+					"position": [
+						-21.089599609375,
+						-73.85320281982422,
+						-88.46540069580078
+					]
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4527558982372284,
+								0.0
+							],
+							[
+								0.4803149700164795,
+								0.5243664979934692
+							],
+							[
+								0.4803149700164795,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"rotation": 0.03490658849477768,
+						"angle": 2.1118485927581789,
+						"x_axis_scale": 0.47699999809265139,
+						"length": 245.0,
+						"impact_z_rotation": [
+							0.3141592741012573,
+							-2.2514748573303224
+						]
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4881889820098877,
+								0.0
+							],
+							[
+								0.5078740119934082,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"previous_patterns_to_exclude_from": 1,
+						"rotation": -0.7155849933624268,
+						"angle": 1.3089970350265504,
+						"x_axis_scale": 1.0399999618530274,
+						"length": 219.51199340820313,
+						"local_offset": [
+							0.0,
+							-5.0
+						],
+						"impact_z_rotation": [
+							-1.6929694414138795,
+							-2.2514748573303224
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3779527544975281,
+								0.0
+							],
+							[
+								0.4251968562602997,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 1.0122909545898438,
+						"angle": 2.1118485927581789,
+						"x_axis_scale": 1.7239999771118165,
+						"length": 102.8479995727539,
+						"offset": [
+							-37.0,
+							11.0
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "triple_lacerate_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.32677164673805239,
+								0.0
+							],
+							[
+								0.35433071851730349,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -1.1693706512451172,
+						"angle": 2.58308744430542,
+						"x_axis_scale": 1.159999966621399,
+						"length": 138.21200561523438,
+						"offset": [
+							60.0,
+							1.0
+						]
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.42148759961128237,
+								0.0
+							],
+							[
+								0.4399999976158142,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 3.176499605178833,
+						"x_axis_scale": 0.2809999883174896,
+						"length": 188.03399658203126,
+						"offset": [
+							24.0,
+							0.0
+						]
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6909090876579285,
+								0.0
+							],
+							[
+								0.7054545283317566,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.9948377013206482,
+						"angle": 2.1293017864227297,
+						"x_axis_scale": 1.034999966621399,
+						"length": 157.1439971923828,
+						"offset": [
+							-18.0,
+							5.0
+						],
+						"hand": "MainHand"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.7090908885002136,
+								0.0
+							],
+							[
+								0.7309091091156006,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"previous_patterns_to_exclude_from": 1,
+						"rotation": -1.082104206085205,
+						"angle": 2.4260077476501467,
+						"x_axis_scale": 0.8859999775886536,
+						"length": 196.4290008544922,
+						"offset": [
+							-63.0,
+							-4.0
+						],
+						"local_offset": [
+							12.0,
+							-3.0
+						],
+						"hand": "MainHand"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceShawl.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceSkirt.ao"
+	attached_object = "aux_Back_attachment Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceBackAttachment/FaridunBlackPrinceBackAttachment.ao"
+		attached_object_translation = "0 -14.15 0"
+	attached_object = "R_Weapon Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceWeapon.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/NPC/Jamanra/boss/rig.ast"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -11.4483"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -10.3458 -10.1457"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_weapon_blade_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-0.995125 -0.993481 -14.5253"
+		socket = "aux_weapon_blade_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -120.385"
+		socket = "aux_weapon_blade_03"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -150.709"
+		socket = "aux_weapon_blade_04"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 21.5785"
+		socket = "aux_trail_fix_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-0.995125 0 -40"
+		socket = "aux_trail_fix_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-0.995125 0 -80"
+		socket = "aux_light_attach"
+			parent = "chest_jntBnd"
+			translation = "0 -47.655 15.4511"
+		socket = "aux_bak_attach_fx"
+			parent = "aux_Back_attachment"
+			translation = "0 47.749 4.74504"
+		socket = "aux_eyeR"
+			parent = "head_jntBnd"
+			translation = "-3.86423 -9.44268 -9.97743"
+		socket = "aux_eyeL"
+			parent = "head_jntBnd"
+			translation = "3.86 -9.44268 -9.97743"
+		socket = "aux_sholder_R_01"
+			parent = "aux_R_shoulder_attachment"
+			translation = "-12.9989 -13.5957 -3.75033"
+		socket = "aux_sholder_R_02"
+			parent = "aux_R_shoulder_attachment"
+			translation = "5.65468 -12.6954 -2.12607"
+		socket = "aux_sholder_L_01"
+			parent = "aux_L_shoulder_attachment"
+			translation = "13 -13.6 -3.75033"
+		socket = "aux_sholder_L_02"
+			parent = "aux_L_shoulder_attachment"
+			translation = "-5.65 -12.7 -6.25952"
+		socket = "aux_weapon_blade_side_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-11.158 0 -150.709"
+		socket = "aux_weapon_blade_side_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "11.676 0 -150.709"
+		socket = "aux_weapon_blade_center"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -69.53"
+		socket = "aux_weapon_blade_tip_accurate"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-7.5 0 -140"
+		socket = "aux_root_moving"
+			parent = "hip_jntBnd"
+			ignore_parent_axis = "z"
+			ignore_parent_rotation = "yawpitchroll"
+		linear_allowed_contraction = 0.034
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.001
+		enclosure_radius = 5.000
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+		enable_collisions = false
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/FaridunBlackPrince.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder false L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder false R_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow false L_elbow_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_elbow false R_elbow_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_wrist false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_wrist false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_hand false L_finger_2_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "grp_R_hand false R_finger_2_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_L_knee false L_knee_jntBnd L_thigh_jntBnd"
+		bone_group = "grp_R_knee false R_knee_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd"
+		bone_group = "frameupper false R_elbow_jntBnd R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_elbow_jntBnd"
+		bone_group = "L_sleeve_bone_group false L_shoulder_cTwist_jntBnd_1 L_elbow_attachment_jntBnd"
+		bone_group = "R_sleeve_bone_group false R_shoulder_cTwist_jntBnd_1 R_elbow_attachment_jntBnd"
+		bone_group = "hips_bone_group false hip_jntBnd R_thigh_jntBnd L_thigh_jntBnd"
+		bone_group = "sword_handle false aux_weapon_blade_01 aux_weapon_blade_04"
+		bone_group = "sword_blade false aux_weapon_blade_01 aux_trail_fix_01 aux_trail_fix_02 aux_weapon_blade_02 aux_weapon_blade_03"
+		bone_group = "sword_tip false aux_weapon_blade_02 aux_weapon_blade_03"
+		bone_group = "sword_down_trl false aux_trail_fix_01"
+		bone_group = "eye_R false aux_target_head_02 aux_eyeR"
+		bone_group = "eye_L false aux_target_head_02 aux_eyeL"
+		bone_group = "aux_R_shoulder false aux_sholder_R_01 aux_sholder_R_02"
+		bone_group = "aux_L_shoulder false aux_sholder_L_01 aux_sholder_L_02"
+		bone_group = "dash_blade false aux_weapon_blade_side_01 aux_weapon_blade_side_02"
+		bone_group = "full_sword false aux_weapon_blade_04 aux_weapon_blade_03"
+		bone_group = "sword_center false aux_weapon_blade_center"
+		bone_group = "R_weapon false R_Weapon aux_weapon_blade_center"
+		bone_group = "sword_blade_accurate false aux_weapon_blade_01 aux_weapon_blade_tip_accurate"
+		bone_group = "root_moving false aux_root_moving"
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "anti_projectile_swipe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.9737035036087036,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.004955768585205,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Long",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0713590383529664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1608107089996338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2710604667663575,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2160930037498474,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5060189962387085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherFast",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5532469749450684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5787979960441589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Short",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6033650040626526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2955619990825653,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherFast",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4603790044784546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4950149953365326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Short",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "chrono_leap_slam_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04398007318377495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Long",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14439979195594788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27207988500595095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30000001192092898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3278423845767975,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.627647340297699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7229189276695252,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "chrono_leap_slam_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1599999964237213,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Sand_Fade_Fast",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48923149704933169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5125959515571594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Leap",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5264254808425903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5895161032676697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6455063223838806,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "clone_strike_ultimate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.48793667554855349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5051175355911255,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5543692111968994,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Sand_Fade_Fast",
+						"bone_name": "aux_position"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6734904050827026,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.832059383392334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/GroundSlam_Flash",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9706485271453859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Sand_Fade_In",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.195568561553955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.199408054351807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.223059177398682,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.346758842468262,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.3682861328125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Split_Strike_OnAct"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.394418716430664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.702404022216797,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/CloneStike_Start",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.457802772521973,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordOut",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.516067981719971,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Long",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.625280857086182,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.633613586425781,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.024264812469482,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.18904972076416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "dash_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17139388620853425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20111492276191712,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7864450216293335,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordIn",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0422300100326539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1099330186843873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Short",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1216000318527222,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5855228900909424,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6155200004577637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8639500141143799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "dash_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03870903700590134,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10964791476726532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8036179542541504,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8243780136108398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordIn",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8993470072746277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9017159938812256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Long",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.015239953994751,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.248810052871704,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordOut",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4410898685455323,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.737483024597168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.064026117324829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Death",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7269260287284851,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/Clang",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0895500183105469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2125500440597535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/KneeFall",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3036600351333619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/KneeFall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0625758171081545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Fall",
+						"bone_name": "L_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fake_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7560830116271973,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/Clang",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1416399478912354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2753100395202637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/KneeFall",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3636399507522584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/KneeFall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.860040664672852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.290729999542236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.9893598556518559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.012919902801514,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8178641200065613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9931206703186035,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordGround_Intro"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6088871955871583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8692498207092286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.750269651412964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.020413637161255,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1025147438049318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "aux_trail_fix_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.272881269454956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3961873054504396,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "aux_trail_fix_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9233837127685549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7560830116271973,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/Clang",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1416399478912354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2753100395202637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/KneeFall",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3636399507522584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/KneeFall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.860040664672852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.290729999542236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.9893598556518559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.012919902801514,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7560830116271973,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/Clang",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1416399478912354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2753100395202637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/KneeFall",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3636399507522584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/KneeFall",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.999999523162842,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Empower_Azmadi_Surging",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.202627182006836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.554912567138672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.867258071899414,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.437782287597657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.446267127990723,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Empower_Azmadi_Burst",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 10.154651641845704,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 10.188880920410157,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0003321238327771425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.031033163890242578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22506777942180634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2603040039539337,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4251484274864197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/GroundSlam_Flash",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48105478286743166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.59043288230896,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6344900131225586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8837689757347107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordFly",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0752400159835816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1399174928665162,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/GroundSlam_SwordSpin",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.970400094985962,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.178400993347168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/GroundSlam_SwordDown",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2192065715789797,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Long",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2938599586486818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.391401767730713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordGround",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4197299480438234,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9110500812530519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "groundslam_dash_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.026239899918437005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.060159001499414447,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14461994171142579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Long",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20679600536823274,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24071499705314637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2613149881362915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27255699038505556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8290650248527527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.108240008354187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.7710149884223938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Intro/IntroFoley",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.849100112915039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.311560153961182,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordOut",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.5446600914001469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Intro/IntroSword",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.184179782867432,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.273829936981201,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherFast",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.279809951782227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.351530075073242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19981539249420167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25901979207992556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4341665506362915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6611160039901733,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8721638321876526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Idle",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9200132489204407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Idle",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9548128843307495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Idle",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9939624071121216,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Idle",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0287619829177857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Idle",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.770915985107422,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2150661945343019,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherFast",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.51089334487915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Idle",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.550041675567627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Idle",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.582667350769043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Idle",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.639214992523193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Idle",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.669665813446045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Idle",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.913975715637207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.473958492279053,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "many_sides_strike_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06191994249820709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07335708290338516,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11100000143051148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/GroundSlam_SwordSpin",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37320348620414736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7268586158752441,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8678271770477296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.033653974533081,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3687033653259279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.003340482711792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Short",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.009387731552124,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1148934364318849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4966280460357668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5291295051574709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.707521915435791,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Short",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8160059452056886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8196511268615724,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.230836868286133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Long",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.283758163452148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.2955780029296879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.300359725952148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.885733604431152,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.168787002563477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Breath",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2499299943447113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28219500184059145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherRun",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5692049860954285,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11108332127332688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17682652175426484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20063002407550813,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3343833088874817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4148622751235962,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8591955304145813,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9304099678993225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/ChargeRelease",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.000147819519043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0643224716186524,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1029988527297974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3927958011627198,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4950517416000367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.228468179702759,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.372143507003784,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.15000000596046449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6700695753097534,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/RuptureSlam_Empowered_Charge",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9949779510498047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Teleport_Burst",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5931847095489503,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Teleport_Burst",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0937249660491945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Teleport_Burst",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.496600389480591,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Teleport_Burst",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7936668395996095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Teleport_Burst",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.991032361984253,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Teleport_Burst",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5918612480163576,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/RuptureSlam_Empowered_Whoosh",
+						"bone_name": "aux_weapon_blade_03"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6500000953674318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.687451124191284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.547311782836914,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.940000057220459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "neck_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.057151783257722858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28889256715774538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44999998807907107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6134828925132752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6868110299110413,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6958960294723511,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7768589854240418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1662499904632569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8023899793624879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2200000286102297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.325000047683716,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordReturn",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.450063943862915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5002100467681886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_catch_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Sand_Fade_In",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06208493560552597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordReturn",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11000528186559677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18986012041568757,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35093873739242556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_catch_throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Sand_Fade_In",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4302125573158264,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Sand_Fade_Fast",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4685142934322357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Short",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5779201984405518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6495370864868164,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "aux_R_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.01467729639261961,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.262077659368515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Long",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28889256715774538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38061055541038515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5249999761581421,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Sand_Fade_Fast",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.587224006652832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7187716960906982,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "aux_R_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "triple_lacerate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1987670212984085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40557926893234255,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6402323246002197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7093560099601746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7341663241386414,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Short",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7591444253921509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8684300184249878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.021910309791565,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.086409568786621,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0967177152633668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Short",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2986500263214112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4461770057678223,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Long",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5378004312515259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6312600374221802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.643370509147644,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8059974908828736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8572200536727906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1880199909210207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.40003809332847597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9110698699951172,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "empowered_triple_lacerate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.22148093581199647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Empowered_Sword_Swing",
+						"bone_name": "aux_weapon_blade_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29400816559791567,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordBody",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6098440885543823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Empowered_Sword_Swing",
+						"bone_name": "aux_weapon_blade_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7093560099601746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7341663241386414,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Short",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7612699866294861,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7960710525512695,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8684300184249878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0352920293807984,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Empowered_Sword_Swing",
+						"bone_name": "aux_weapon_blade_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0967177152633668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Short",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1193599700927735,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2363865375518799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2986500263214112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4174740314483643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Empowered_Sword_Swing",
+						"bone_name": "aux_weapon_blade_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4461770057678223,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Long",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.486780047416687,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5544828176498414,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Empowered_Sword_Swing",
+						"bone_name": "aux_weapon_blade_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6312600374221802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7996200323104859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8572200536727906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1880199909210207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "chrono_dash_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Sand_Fade_Fast",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17139388620853425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Effort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20111492276191712,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3747398853302002,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/ChronoDash_OnAct",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7379083037376404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Sand_Fade_In",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7864450216293335,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordIn",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0165150165557862,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Empowered_Sword_Swing",
+						"bone_name": "aux_weapon_blade_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0422300100326539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1099330186843873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Vocal/Attack_Short",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1216000318527222,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5855228900909424,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6155200004577637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8639500141143799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "chrono_dash_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Sand_Fade_Fast",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18887899816036225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Leather/LeatherLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35932862758636477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/ChronoDash_OnAct",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.737257719039917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Sand_Fade_In",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7990136742591858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordIn",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8036180138587952,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordBody",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8294148445129395,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Empowered_Sword_Swing",
+						"bone_name": "aux_weapon_blade_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8993470072746277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.015239953994751,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.16679847240448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Sword/SwordOut",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2132622003555298,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Empowered_Sword_Swing",
+						"bone_name": "aux_weapon_blade_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8844599723815919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/OlrothBoss/Foley/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_clone_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.7031577825546265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Effects/Sand_Fade_Slow",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9362807869911194,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Leather/LeatherLong",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0594340562820435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Interlude/P2/P2_7/AzmadiTheFaridunPrince/Foley/Sword/SwordGround_Intro"
+					}
+				]
+			}
+		]'
+	}
+
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.37851792573928835,
+						"end_time": 0.8019938468933106,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.42089664936065676,
+						"end_time": 0.8583003282546997,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "dash_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.4371151626110077,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6873251795768738,
+						"end_time": 1.416612148284912,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "dash_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8291100859642029,
+						"end_time": 1.723652958869934,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade_accurate"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8291100859642029,
+						"end_time": 1.2188209295272828,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_dash.trl",
+						"bone_group": "dash_blade"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.6261424422264099,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7055637240409851,
+						"end_time": 1.196981430053711,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "groundslam_dash_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.2738099992275238,
+						"end_time": 0.6075153350830078,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 6.415989875793457,
+						"end_time": 7.385409355163574,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/sword_swing.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "many_sides_strike_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.383596658706665,
+						"end_time": 4.423051834106445,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/cloneabsorb_trail.trl",
+						"bone_groups": [
+							"grp_head",
+							"grp_waist",
+							"grp_L_foot"
+						]
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5108387470245361,
+						"end_time": 1.0123049020767213,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade_accurate"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.0852901935577393,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail_windup.trl",
+						"bone_group": "sword_blade_accurate"
+					}
+				]
+			},
+			{
+				"name": "triple_lacerate_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.500072181224823,
+						"end_time": 1.4411048889160157,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.7230783700942994,
+						"end_time": 2.012972831726074,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "empowered_triple_lacerate_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.500072181224823,
+						"end_time": 1.4411048889160157,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail_empowered.trl",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.7230783700942994,
+						"end_time": 1.9645966291427613,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail_empowered.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "chrono_dash_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.4371151626110077,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6873251795768738,
+						"end_time": 1.3103368282318116,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "chrono_dash_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8291100859642029,
+						"end_time": 1.515352725982666,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/trl/sword_trail.trl",
+						"bone_group": "sword_blade"
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "chrono_leap_slam_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.1383947879076004,
+						"end_time": 0.379500150680542,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_inertia.pet",
+						"bone_group": "sword_blade_accurate"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.27042460441589358,
+						"end_time": 0.9982993006706238,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_inertia.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_chest",
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_R_knee",
+							"grp_L_knee",
+							"grp_R_elbow",
+							"grp_L_elbow"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8377247452735901,
+						"end_time": 0.9180746078491211,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_Thick.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_L_shoulder",
+							"grp_R_shoulder"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9170623421669006,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_burst.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_chest",
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_R_knee",
+							"grp_L_knee",
+							"grp_R_elbow",
+							"grp_L_elbow",
+							"sword_blade_accurate"
+						]
+					}
+				]
+			},
+			{
+				"name": "clone_strike_ultimate_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7529975175857544,
+						"end_time": 1.7607479095458985,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_Thick.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_L_shoulder",
+							"grp_R_shoulder"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.248663306236267,
+						"end_time": 2.0545148849487306,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall.pet",
+						"bone_groups": [
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"grp_head"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.9551522731781008,
+						"end_time": 4.640573978424072,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall.pet",
+						"bone_groups": [
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"grp_head",
+							"grp_chest",
+							"grp_L_knee",
+							"grp_R_knee",
+							"sword_blade_accurate"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.9877207279205324,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/OnAct_SandCoverup_UP.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.6840691566467289,
+						"end_time": 5.749793529510498,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/OnAct_BlurDistortion_Locked.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_chest",
+							"grp_L_wrist",
+							"grp_R_wrist"
+						]
+					}
+				]
+			},
+			{
+				"name": "dash_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8945606350898743,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/sword_stab.pet",
+						"bone_group": "sword_tip"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/death_fake/burst_bones.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_neck",
+							"grp_chest",
+							"grp_belly",
+							"grp_L_elbow",
+							"grp_R_elbow",
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_L_hand",
+							"grp_R_hand",
+							"grp_R_thigh",
+							"grp_L_thigh",
+							"grp_L_knee",
+							"grp_R_knee"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/death_fake/burst.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 6.249929904937744,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/death_fake/burst_revive.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 9.5,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/revive_pulse.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0660884380340577,
+						"end_time": 3.3711466789245607,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/OnAct_BlurDistortion_Buildup.pet",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.100000023841858,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sword_float_flash.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/intro/intro_core.pet",
+						"bone_group": "grp_head"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/intro/intro_bones.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_neck",
+							"grp_chest",
+							"grp_belly",
+							"grp_waist",
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"grp_L_elbow",
+							"grp_R_elbow",
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_L_hand",
+							"grp_R_hand",
+							"grp_L_thigh",
+							"grp_R_thigh",
+							"grp_L_knee",
+							"grp_R_knee",
+							"grp_R_foot",
+							"grp_L_foot"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.769439935684204,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/intro/intro_sword.pet",
+						"bone_group": "sword_blade"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 6.5383992195129398,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/fx/onact/death_fake/burst_revive.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3180690109729767,
+						"end_time": 0.5477315187454224,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/OnAct_KickUp_Dust.pet",
+						"bone_group": "grp_R_foot"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3753179609775543,
+						"end_time": 0.918363094329834,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_swordflourish.pet",
+						"bone_group": "sword_blade_accurate"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.060322642326355,
+						"end_time": 1.1636288166046143,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_swordflourish.pet",
+						"bone_group": "sword_blade_accurate"
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_03",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sword_absorb.pet",
+						"bone_group": "R_weapon"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/clone_absorb_pulse.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.6000001430511475,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/clone_absorb_pulse.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.0999999046325685,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/clone_absorb_pulse.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.5,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/clone_absorb_pulse.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.799999713897705,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/clone_absorb_pulse.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.000000238418579,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/clone_absorb_pulse.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_catch_end_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/OnAct_SandCoverup_Fast_UP.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.4361376166343689,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_chest",
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_R_knee",
+							"grp_L_knee",
+							"grp_neck",
+							"frameupper"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.27839770913124087,
+						"end_time": 0.40485963225364687,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_Extra.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_L_shoulder",
+							"grp_R_shoulder"
+						]
+					}
+				]
+			},
+			{
+				"name": "sword_throw_catch_throw_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/OnAct_SandCoverup_Fast_UP.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.4361376166343689,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_chest",
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_R_knee",
+							"grp_L_knee",
+							"grp_neck",
+							"frameupper"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2395210862159729,
+						"end_time": 0.5542648434638977,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_Thick.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_L_shoulder",
+							"grp_R_shoulder"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6904293298721314,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_burstforward.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_chest",
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_R_knee",
+							"grp_L_knee",
+							"grp_neck",
+							"frameupper"
+						]
+					}
+				]
+			},
+			{
+				"name": "sword_throw_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.39036527276039126,
+						"end_time": 0.5542648434638977,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_Thick.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"sword_blade_accurate"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6719207167625427,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_burstforward.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_chest",
+							"grp_L_shoulder",
+							"grp_R_shoulder",
+							"grp_L_wrist",
+							"grp_R_wrist",
+							"grp_R_knee",
+							"grp_L_knee",
+							"grp_neck",
+							"frameupper"
+						]
+					}
+				]
+			},
+			{
+				"name": "empowered_triple_lacerate_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.41741979122161868,
+						"end_time": 1.4024522304534913,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_swordflourish.pet",
+						"bone_group": "sword_blade_accurate"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8148590922355652,
+						"end_time": 1.0494017601013184,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/OnAct_GenericFlash_Gold.pet",
+						"bone_group": "R_weapon"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1467455625534058,
+						"end_time": 1.4789018630981446,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/OnAct_GenericFlash_Gold.pet",
+						"bone_group": "R_weapon"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.799022912979126,
+						"end_time": 2.0315206050872804,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_swordflourish.pet",
+						"bone_group": "sword_blade_accurate"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8378517627716065,
+						"end_time": 2.1504855155944826,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/OnAct_GenericFlash_Gold.pet",
+						"bone_group": "R_weapon"
+					}
+				]
+			},
+			{
+				"name": "chrono_dash_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6000000238418579,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sword_flash.pet",
+						"bone_group": "sword_handle"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9683243632316589,
+						"end_time": 1.2073185443878174,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_swordflourish.pet",
+						"bone_group": "sword_blade_accurate"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.080032229423523,
+						"end_time": 1.2995636463165284,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sand_grains.pet",
+						"bone_group": "sword_blade"
+					}
+				]
+			},
+			{
+				"name": "chrono_dash_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6000000238418579,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sword_flash.pet",
+						"bone_group": "sword_handle"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.975943922996521,
+						"end_time": 1.4960880279541016,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_swordflourish.pet",
+						"bone_group": "sword_blade_accurate"
+					}
+				]
+			},
+			{
+				"name": "emerge_clone_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.3065382242202759,
+						"end_time": 1.9590808153152466,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/pet/sandfall_Extra.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_L_shoulder",
+							"grp_R_shoulder"
+						]
+					}
+				]
+			}
+		]'
+	}
+
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 3.496150016784668,
+						"frequency": 1200.0,
+						"amplitude": 20.0,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_03",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 3.799999952316284,
+						"amplitude": 16.0,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "2 0 1 Linear 1.333 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.332742 0 Flat 0.687328 1 Flat 0.873257 0 Flat 1.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.374398 0 Flat 0.541023 1 Flat 0.66396 1 Flat 1.01448 0 Flat 1.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "chrono_leap_slam_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.8329999446868897,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 1 Linear 0.458949 1 Linear 0.723001 0 Flat 1.833 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "chrono_leap_slam_loop_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "sandFade",
+						"apply_on_children": true,
+						"curve": "3 0 1 Linear 0.727273 1 Flat 1 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "chrono_leap_slam_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.100000023841858,
+						"name": "sandFade",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.246075 0 Linear 0.718102 0.287162 Linear 0.8992 0.672297 Smooth 1.1 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "clone_strike_ultimate_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 8.765999794006348,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "6 0 1 Linear 1.3071 1 Linear 1.69692 0 Linear 3.69473 0 Linear 4.51091 1 Linear 8.766 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 8.765999794006348,
+						"name": "sandFade",
+						"apply_on_children": true,
+						"curve": "6 0 0 Smooth 0.597986 0 Flat 2.04785 1 Flat 4 1 Linear 4.90081 0 Linear 8.766 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "dash_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.2330000400543215,
+						"name": "EmissiveMultiSword",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 1.27419 4.96622 Linear 1.6621 0 Flat 2.233 0 Flat"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "7 0 0 Linear 0.416988 0 Flat 0.577026 0.523649 Flat 0.980678 0.516892 Custom 0 1.95879 1.16205 1 Flat 1.77553 0 Flat 2.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "dash_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.1659998893737795,
+						"name": "EmissiveMultiSword",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 1.23596 4.96622 Linear 1.61223 0 Flat 2.166 0 Flat"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.2160000801086427,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "7 0 0 Linear 0.154546 0 Flat 0.490662 0.570946 Flat 0.919674 0.60473 Flat 1.17641 1 Custom 0 2.08592 1.90269 0 Flat 2.216 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "3 0 1 Linear 0.482036 1 Linear 3 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "death_fake_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 7.065999984741211,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "3 0 1 Linear 3.1757 0 Smooth 7.066 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 7.065999984741211,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "3 0 1 Linear 3.1757 0 Smooth 7.066 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 5.437568664550781,
+						"end_time": 9.427350044250489,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "3 5.43757 1 Linear 6.2641 1 Flat 9.42735 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 9.5,
+						"end_time": 10.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 9.5 0 Linear 10 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.5,
+						"name": "Glow_Sphere_Fade",
+						"curve": "7 0 0 Linear 0.749434 0 Flat 1.12292 1 Linear 2.75472 0 Flat 3.91031 0 Flat 4.32836 0.5 Smooth 4.5 0 Flat"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.5,
+						"name": "EmissiveMultiSword",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "7 0 0 Linear 0.728294 0 Flat 2.95944 1.18323 Linear 3.55922 1.18323 Linear 3.68945 0 Flat 4.17955 1.18323 Linear 4.5 0 Flat"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.5,
+						"name": "SwordPulse",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "7 0 0 Linear 1.30407 0 Linear 2.3631 1 Linear 2.3631 0 Flat 3.59349 0 Linear 4.25838 1 Flat 4.5 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.5,
+						"name": "VortexStrength",
+						"curve": "7 0 0 Linear 1.54741 0 Linear 2.29798 1 Flat 3.20621 1 Flat 3.42555 0 Linear 4.25838 0 Linear 4.5 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.5,
+						"name": "WindVelocity",
+						"auto_reset": false,
+						"curve": "7 0 1 Linear 0.827685 1 Flat 1.16013 0 Linear 1.54741 0 Linear 1.73248 1 Flat 3.65518 1 Flat 4.5 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.866000175476074,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.45341 0 Linear 3.2 1 Smooth 4.866 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.866000175476074,
+						"name": "sandFade",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 4.866 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.600000023841858,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "2 0 1 Linear 1.6 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 8.265999794006348,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "3 0 1.19209e-07 Linear 1.32817 1.19209e-07 Linear 8.266 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 8.265999794006348,
+						"name": "Stab",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "6 0 1.19209e-07 Linear 4.23295 0 Linear 5.07255 1 Flat 6.25197 1 Flat 6.87167 0 Flat 8.266 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "many_sides_strike_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.366000175476074,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.5 0 Linear 2 1 Linear 2.8 0 Linear 5.366 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.366000175476074,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 1.74562 0 Linear 2.22267 1 Linear 5.366 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.6659998893737795,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "5 0 0 Linear 0.988574 1 Linear 1.17349 1 Linear 1.60224 0 Flat 2.666 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 1.0,
+						"end_time": 1.5,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 1 0 Linear 1.5 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 1.6000001430511475,
+						"end_time": 2.0999999046325685,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 1.6 0 Linear 2.1 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 2.0999999046325685,
+						"end_time": 2.500000238418579,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 2.1 0 Linear 2.5 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 2.5,
+						"end_time": 2.799999713897705,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 2.5 0 Linear 2.8 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 2.799999713897705,
+						"end_time": 3.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 2.8 0 Linear 3 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 3.000000238418579,
+						"end_time": 3.3000001907348635,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 3 0 Linear 3.3 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.632999897003174,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.380745 0 Flat 1.23915 1 Flat 2.59599 1 Flat 3.21025 0 Flat 3.633 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_catch_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.4329999685287476,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 1 Linear 0.404502 1 Flat 1.17212 0 Flat 1.433 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.4329999685287476,
+						"name": "sandFade",
+						"apply_on_children": true,
+						"curve": "6 0 1 Linear 0.0710008 1 Linear 0.150522 0.746622 Linear 0.370422 0.530405 Smooth 0.740437 0 Linear 1.433 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_catch_throw_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "sandFade",
+						"apply_on_children": true,
+						"curve": "7 0 1 Linear 0.179785 0.760135 Linear 0.3406 0.597973 Smooth 0.516704 0 Linear 0.733579 0 Linear 0.927237 0.368243 Custom 3.47584 3.47584 1 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.9330000281333923,
+						"name": "sandFade",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.686542 0 Linear 0.724581 0.152027 Linear 0.865112 0.483108 Smooth 0.933 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.9330000281333923,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 0.619037 0 Linear 0.933 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "triple_lacerate_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.700000047683716,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.36734 0 Linear 1.0053 1 Linear 2.06719 1 Linear 2.4726 0 Linear 2.7 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "empowered_triple_lacerate_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.700000047683716,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.36734 0 Linear 1.0053 1 Linear 2.06719 1 Linear 2.4726 0 Linear 2.7 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "chrono_dash_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "sandFade",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.0631261 0 Flat 0.501344 0.280405 Smooth 0.826326 1 Smooth 0.90559 0 Linear 2.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "chrono_dash_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.2160000801086427,
+						"name": "sandFade",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.162991 0 Flat 0.54471 0.584459 Smooth 0.83 1 Linear 0.83 0 Linear 2.216 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_clone_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.232999801635742,
+						"name": "sandFade",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 1.01792 0 Linear 1.40581 0.125 Smooth 2.47964 1 Flat 4.233 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "chrono_leap_slam_end_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.29940322041511538,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/leap_slam_end.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Inherit"
+					}
+				]
+			},
+			{
+				"name": "clone_strike_ultimate_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 4.900000095367432,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/teleport_burst.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 5.116656303405762,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/teleport_burst.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 5.315126419067383,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/teleport_burst.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 5.4832892417907719,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/teleport_burst.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "fake_dead_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 5.521661758422852,
+						"filename": "Metadata/Monsters/FaridunOlroth/Objects/TimePhaseApparition.ao",
+						"animation": "death_touch_idle_01",
+						"from": {
+							"parent_bone": "root_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								-135.0,
+								18.150001525878908
+							],
+							"rotation": [
+								0.0,
+								0.0,
+								3.141589879989624
+							],
+							"scale": [
+								1.2000000476837159,
+								1.2000000476837159,
+								1.2000000476837159
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "fake_dead_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 10.265999794006348,
+						"filename": "Metadata/Monsters/FaridunOlroth/Objects/TimePhaseApparition.ao",
+						"animation": "phase_time_stop_01",
+						"from": {
+							"parent_bone": "root_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								-135.0,
+								18.150001525878908
+							],
+							"rotation": [
+								0.0,
+								0.0,
+								3.141589879989624
+							],
+							"scale": [
+								1.2000000476837159,
+								1.2000000476837159,
+								1.2000000476837159
+							]
+						}
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 5.599636554718018,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/revive_surge.ao",
+						"offset": [
+							0.0,
+							64.0
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.100000023841858,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/circle_slam_charge.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Inherit",
+						"offset": {
+							"translation": [
+								0.0,
+								-205.00001525878907,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "many_sides_strike_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.9000000953674318,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/teleport_burst.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.4000000953674318,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/teleport_burst.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.4000000953674318,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/teleport_burst.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_03",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.75,
+						"end_time": 3.950000047683716,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/giga_cleave.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"rotation": [
+								-1.5707999467849732,
+								0.0,
+								0.26179999113082888
+							],
+							"scale": [
+								2.25,
+								2.25,
+								2.25
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "chrono_dash_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.8250849843025208,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/teleport_AoE.ao"
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.8299999833106995,
+						"end_time": 0.8500000238418579,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/teleport_burst.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "chrono_dash_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.8299999833106995,
+						"end_time": 0.8500000238418579,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/teleport_burst.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.83235102891922,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/teleport_AoE.ao"
+					}
+				]
+			}
+		]'
+	}
+
+	Lights
+	{
+		light = "point_light"
+			bone_name = "aux_face_jntBnd"
+			state = "on"
+				colour = "0.766583 0.578657 0.349764"
+				position = "0 0 -125"
+				radius = 300
+			state = "off"
+				position = "0 0 -125"
+				radius = 300
+			state = "flash"
+				colour = "2.41999 2.04139 1.53862"
+				position = "0 0 -125"
+				radius = 300
+			state = "on_death"
+				position = "0 0 -125"
+				radius = 300
+			state = ""
+				default_state = true
+				colour = "1.35678 1.02417 0.61905"
+				position = "0 0 -125"
+				radius = 300
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.036213468760252,
+						"end_time": 1.787214994430542,
+						"state_name": "off"
+					}
+				]
+			},
+			{
+				"name": "death_fake_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.3277115225791931,
+						"end_time": 2.40242862701416,
+						"state_name": "off"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 4.480224132537842,
+						"end_time": 7.065999984741211,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.511210024356842,
+						"end_time": 2.5859270095825197,
+						"state_name": "off"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 4.7624831199646,
+						"end_time": 7.065999984741211,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 1.1550192832946778,
+						"end_time": 1.3984804153442383,
+						"state_name": "flash"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 1.4209024906158448,
+						"end_time": 1.8902214765548707,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "intro_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "off"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 3.796898126602173,
+						"end_time": 7.237516403198242,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "emerge_clone_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 1.5,
+						"end_time": 3.0,
+						"state_name": "off"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.0131371021270753,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_attackGlow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.4896334111690521,
+						"end_time": 1.0295196771621705,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_attackGlow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "chrono_leap_slam_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.0295196771621705,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_attackGlow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "chrono_leap_slam_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sandfall_passonly.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "clone_strike_ultimate_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.8295958042144775,
+						"end_time": 2.101414203643799,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sandfall_slow.epk"
+					}
+				]
+			},
+			{
+				"name": "dash_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.33906763792037966,
+						"end_time": 2.1780316829681398,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_attackGlow_Long.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "dash_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.245330572128296,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_attackGlow_Long.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 1.2970690727233887,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/death_disintegrate.epk",
+						"remove_on_animation_end": false
+					}
+				]
+			},
+			{
+				"name": "fake_dead_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 2.999683380126953,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/olroth_fxmat_FOUR/epk/revive_pulse.epk"
+					}
+				]
+			},
+			{
+				"name": "fake_dead_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 5.494411468505859,
+						"end_time": 9.449999809265137,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/revivetouch.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 9.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/clone_absorb.epk"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_glow_golden.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "many_sides_strike_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_glow_golden.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/DomainEmpowered.epk"
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.040597438812256,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_attackGlow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "slam_rupture_03",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/clone_absorb.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_attackGlow_Long.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_catch_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_attackGlow_Long.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_catch_throw_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_attackGlow_Long.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sandfall_passonly.epk"
+					}
+				]
+			},
+			{
+				"name": "sword_throw_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sandfall_passonly.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_attackGlow_Long.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "triple_lacerate_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_attackGlow_Long.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "empowered_triple_lacerate_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sword_attackGlow_Long.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "chrono_dash_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.27216374874115,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sandfall.epk"
+					}
+				]
+			},
+			{
+				"name": "chrono_dash_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.177920937538147,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sandfall.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_clone_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 1.1202287673950196,
+						"end_time": 2.142137050628662,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act_Interlude/FaridunOlroth/epk/sandfall_slow.epk"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceShawl.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/Shawl/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/Shawl/rig.ast"
+		linear_allowed_contraction = 0.300
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.800
+		enclosure_angle = 0.300
+		attachment_bones = "chest_jntBnd spine_2_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 R_clavicle_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 neck_jntBnd head_jntBnd hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_2_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 R_clavicle_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 neck_jntBnd head_jntBnd hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/Shawl/FaridunBlackPrinceShawl.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/Skirt/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/Skirt/rig.ast"
+		linear_allowed_contraction = 0.400
+		bend_stiffness = 250.000
+		bend_allowed_angle = 0.400
+		normal_viscosity_multiplier = 0.150
+		enclosure_angle = 0.400
+		animation_velocity_factor = 1.000
+		animation_force_factor = 1.000
+		attachment_bones = "spine_1_jntBnd hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd R_knee_jntBnd L_knee_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd R_knee_jntBnd L_knee_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/Skirt/FaridunBlackPrinceSkirt.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceBackAttachment/FaridunBlackPrinceBackAttachment.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/BackAttachment/rig.amd"
+	default_animation = "idle_01"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "aux_tri_1_jntBnd Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceBackAttachment/Ring1.ao"
+	attached_object = "aux_tri_2_jntBnd Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceBackAttachment/Ring2.ao"
+	attached_object = "aux_tri_3_jntBnd Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceBackAttachment/Ring3.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/BackAttachment/rig.ast"
+		linear_allowed_contraction = 0.000
+		animation_velocity_factor = 10.000
+		animation_force_factor = 30.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/BackAttachment/FaridunBlackPrinceBackAttach.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceWeapon.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/Weapon/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/Weapon/rig.ast"
+		socket = "aux_handle_01"
+			parent = "root_jntBnd"
+			translation = "0 0 10"
+		socket = "aux_handle_02"
+			parent = "root_jntBnd"
+			translation = "0 0 -15"
+		socket = "aux_blade_01"
+			parent = "root_jntBnd"
+			translation = "0 0 -65"
+		socket = "aux_blade_02"
+			parent = "root_jntBnd"
+			translation = "2 0 -80"
+		socket = "aux_blade_03"
+			parent = "root_jntBnd"
+			translation = "3 0 -112"
+		socket = "aux_blade_04"
+			parent = "root_jntBnd"
+			translation = "-10 0 -131"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 500.000
+		normal_viscosity_multiplier = 0.150
+		tangent_viscosity_multiplier = 0.050
+		enclosure_radius = 2.000
+		enclosure_angle = 1.200
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/Weapon/FaridunBlackPrinceWeapon.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "handle false aux_handle_01 aux_handle_02"
+		bone_group = "blade false aux_handle_02 aux_blade_01 aux_blade_02 aux_blade_03 aux_blade_04"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceBackAttachment/Ring1.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/BackAttachment_Attach/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "phys_tri_jntBnd Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceBackAttachment/FaridunBlackPrinceBackCloth.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/BackAttachment_Attach/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.000
+		animation_velocity_factor = 10.000
+		animation_force_factor = 40.000
+		animation_max_velocity = 2500.000
+		gravity = 0.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/BackAttachment_Attach/ring1.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceBackAttachment/Ring2.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/BackAttachment_Attach/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/BackAttachment_Attach/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.000
+		animation_velocity_factor = 10.000
+		animation_force_factor = 37.000
+		animation_max_velocity = 2500.000
+		gravity = 0.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/BackAttachment_Attach/ring2.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceBackAttachment/Ring3.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/BackAttachment_Attach/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/BackAttachment_Attach/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.000
+		animation_velocity_factor = 10.000
+		animation_force_factor = 34.000
+		animation_max_velocity = 2500.000
+		gravity = 0.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/BackAttachment_Attach/ring3.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/FaridunOlroth/Attachments/FaridunBlackPrinceBackAttachment/FaridunBlackPrinceBackCloth.ao (depth 3)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/ClothBack/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/ClothBack/rig.ast"
+		linear_allowed_contraction = 0.400
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.400
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Heist/Jamanra/attachments/FaridunBlackPrince/ClothBack/FaridunBlackPrinceBackCloth.sm"
+	}
+}
+
+=== .sm Art/Models/NPC/Heist/Jamanra/FaridunBlackPrince.sm
+version 6
+SkinnedMeshData "Art/Models/NPC/Heist/Jamanra/FaridunBlackPrince_armour_58f101ad.smd"
+Materials 1
+	"Art/Models/NPC/Heist/Jamanra/Textures/FaridunBlackPrinceBodyc.mat" 3
+BoundingBox -84.6504 -20.4045 -229.724 84.6504 20.2355 0.5898
+BoneGroups 0
+
+=== .smd Art/Models/NPC/Heist/Jamanra/FaridunBlackPrince_armour_58f101ad.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 3 in the header, 3 in the block · 12036 triangles over 7837 vertices
+  names: 82 bytes said, 82 read  [agree]
+
+=== shapes (31)
+0	Body_meshShape	from 0	count 21198
+1	PantsShape	from 21198	count 9360
+2	Wrap_ClothesShape	from 30558	count 5550
+3	bodyShape	from 36108	count 1854
+4	headShape	from 37962	count 1293
+5	neckShape	from 39255	count 2235
+6	underbodyShape	from 41490	count 264
+7	extractShape1	from 41754	count 936
+8	extractShape2	from 42690	count 936
+9	lowerlayerShape	from 43626	count 6861
+10	topplayerShape	from 50487	count 14850
+11	polySurfaceShape8	from 65337	count 120
+12	clothShape1	from 65457	count 318
+13	clothShape2	from 65775	count 288
+14	cloth_knotsShape	from 66063	count 588
+15	polySurfaceShape10	from 66651	count 15000
+16	polySurfaceShape16	from 81651	count 72
+17	polySurfaceShape17	from 81723	count 228
+18	polySurfaceShape20	from 81951	count 360
+19	polySurfaceShape22	from 82311	count 120
+20	polySurfaceShape23	from 82431	count 876
+21	polySurfaceShape24	from 83307	count 72
+22	polySurfaceShape8	from 83379	count 1896
+23	polySurfaceShape11	from 85275	count 648
+24	polySurfaceShape9	from 85923	count 696
+25	polySurfaceShape18	from 86619	count 96
+26	polySurfaceShape19	from 86715	count 96
+27	polySurfaceShape21	from 86811	count 120
+28	polySurfaceShape25	from 86931	count 144
+29	clothShape4	from 87075	count 348
+30	polySurfaceShape5	from 87423	count 1062
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  FaridunBlackPrinceShawl.ao  socket chest_jntBnd [in its carrier's rig]  box (-28.4,-24.1,-51.2)..(27.1,20.7,54.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 1882 triangles over 2111 vertices
+    names: 82 bytes said, 82 read  [agree]
+    rig 24 bones, 18 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 24  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (8.5,0,-18.1)  carrier has (8.5,2,-163.3)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-8.5,0,-18.1)  carrier has (-8.5,2,-163.3)
+      3 neck_jntBnd  [shared]  under 0  rests at (0,2.8,-24.7)  carrier has (-0,4.9,-169.8)
+      4 phys_tri_shawl_1_jntBnd  [its own]  under 0  rests at (-13.7,16.7,21.3)
+      5 phys_tri_shawl_5_jntBnd  [its own]  under 0  rests at (15.3,-13.3,12.2)
+      6 phys_tri_shawl_3_jntBnd  [its own]  under 0  rests at (-14.8,-15,11.7)
+      7 hip_jntBnd  [shared]  under 0  rests at (0,-0,38.4)  carrier has (0,2,-106.8)
+      8 L_shoulder_jntBnd  [shared]  under 1  rests at (23.8,7.3,-12.5)  carrier has (23.8,9.3,-157.6)
+      9 R_shoulder_jntBnd  [shared]  under 2  rests at (-23.8,7.3,-12.5)  carrier has (-23.8,9.3,-157.6)
+      10 head_jntBnd  [shared]  under 3  rests at (0,-1.3,-38.2)  carrier has (-0,0.7,-183.3)
+      11 phys_tri_shawl_2_jntBnd  [its own]  under 4  rests at (-13.7,16.5,35.5)
+      12 phys_tri_shawl_6_jntBnd  [its own]  under 5  rests at (15.4,-13.4,34.2)
+      13 phys_tri_shawl_4_jntBnd  [its own]  under 6  rests at (-15.6,-15,33.7)
+      14 spine_1_jntBnd  [shared]  under 7  rests at (0,-0,25.6)  carrier has (0,2,-119.5)
+      15 L_thigh_jntBnd  [shared]  under 7  rests at (11,-0,38.4)  carrier has (11,2,-106.8)
+      16 R_thigh_jntBnd  [shared]  under 7  rests at (-11,-0,38.4)  carrier has (-11,2,-106.8)
+      17 L_shoulder_cTwist_jntBnd_1  [shared]  under 8  rests at (34.2,7.3,-4)  carrier has (34.2,9.3,-149.1)
+      18 L_upperArm_attachment_jntBnd  [shared]  under 8  rests at (23.8,7.3,-12.5)  carrier has (23.8,9.3,-157.6)
+      19 R_shoulder_cTwist_jntBnd_1  [shared]  under 9  rests at (-34.2,7.3,-4)  carrier has (-34.2,9.3,-149.1)
+      20 R_upperArm_attachment_jntBnd  [shared]  under 9  rests at (-23.8,7.3,-12.5)  carrier has (-23.8,9.3,-157.6)
+      21 spine_2_jntBnd  [shared]  under 14  rests at (0,-0,12.8)  carrier has (-0,2,-132.3)
+      22 L_shoulder_jntBnd|aux_L_upperArm_attachment  [shared]  under 8  rests at (23.8,7.3,-12.5)  carrier has (23.8,9.3,-157.6)
+      23 R_shoulder_jntBnd|aux_R_upperArm_attachment  [shared]  under 9  rests at (-23.8,7.3,-12.5)  carrier has (-23.8,9.3,-157.6)
+  FaridunBlackPrinceSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-48.3,-25.7,1.6)..(50.1,35.9,110.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 7861 triangles over 5209 vertices
+    names: 110 bytes said, 110 read  [agree]
+    rig 16 bones, 6 of them names its carrier's rig also has
+    mesh weights reach bone 15 of 16  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,0,12.8)  carrier has (0,2,-106.8)
+      2 L_thigh_jntBnd  [shared]  under 1  rests at (11,0,12.8)  carrier has (11,2,-106.8)
+      3 R_thigh_jntBnd  [shared]  under 1  rests at (-11,0,12.8)  carrier has (-11,2,-106.8)
+      4 phys_tri_F_skirt_1_jntBnd  [its own]  under 1  rests at (0,-12,28.7)
+      5 phys_tri_B_skirt_1_jntBnd  [its own]  under 1  rests at (0.1,23.4,99.3)
+      6 L_knee_jntBnd  [shared]  under 2  rests at (16.3,0,62.3)  carrier has (16.3,2,-57.2)
+      7 R_knee_jntBnd  [shared]  under 3  rests at (-16.3,-0,62.3)  carrier has (-16.3,2,-57.2)
+      8 phys_tri_F_skirt_2_jntBnd  [its own]  under 4  rests at (-0,-14.6,56.7)
+      9 phys_tri_L_skirt_2_jntBnd  [its own]  under 6  rests at (37.4,5,98.2)
+      10 phys_tri_L_skirt_1_jntBnd  [its own]  under 6  rests at (29.4,-12.9,100.1)
+      11 phys_tri_L_skirt_3_jntBnd  [its own]  under 6  rests at (24,18.9,98.7)
+      12 phys_tri_R_skirt_1_jntBnd  [its own]  under 7  rests at (-29.4,-12.9,100.1)
+      13 phys_tri_R_skirt_2_jntBnd  [its own]  under 7  rests at (-37.4,5,98.2)
+      14 phys_tri_R_skirt_3_jntBnd  [its own]  under 7  rests at (-24,18.9,98.7)
+      15 phys_tri_F_skirt_3_jntBnd  [its own]  under 8  rests at (-0.1,-17.2,84.6)
+  FaridunBlackPrinceBackAttachment.ao  socket aux_Back_attachment [in its carrier's rig]  attached_object_translation = "0 -14.15 0"  box (-0.5,-10.7,-0.5)..(0.5,-10.2,0.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 40 triangles over 52 vertices
+    names: 34 bytes said, 34 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 aux_tri_1_jntBnd  [its own]  under 0  rests at (0,14.7,-10.1)
+      2 aux_tri_2_jntBnd  [its own]  under 0  rests at (0,21.8,-13.4)
+      3 aux_tri_3_jntBnd  [its own]  under 0  rests at (0,27.5,-14.2)
+    Ring1.ao  socket aux_tri_1_jntBnd [in its carrier's rig]  box (-40.6,-45.8,-5.3)..(58.8,45.3,5.7)
+      version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+      shapes 4 in the header, 4 in the block · 5398 triangles over 3788 vertices
+      names: 112 bytes said, 112 read  [agree]
+      rig 2 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 1 of 2  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_tri_jntBnd  [its own]  under 0  rests at (0,0,0)
+      FaridunBlackPrinceBackCloth.ao  socket phys_tri_jntBnd [in its carrier's rig]  box (-12.2,12.6,-7.2)..(12.4,136.6,2.5)
+        version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+        shapes 2 in the header, 2 in the block · 470 triangles over 322 vertices
+        names: 56 bytes said, 56 read  [agree]
+        rig 4 bones, 1 of them names its carrier's rig also has
+        mesh weights reach bone 3 of 4  [inside this rig]
+          0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+          1 phys_tri_cloth_1_jntBnd  [its own]  under 0  rests at (0,43.7,0)
+          2 phys_tri_cloth_2_jntBnd  [its own]  under 1  rests at (0,75,-0)
+          3 phys_tri_cloth_3_jntBnd  [its own]  under 2  rests at (-0,107.8,0)
+    Ring2.ao  socket aux_tri_2_jntBnd [in its carrier's rig]  box (-63.2,-49.1,-1.3)..(39.8,28.9,1.7)
+      version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+      shapes 7 in the header, 7 in the block · 1208 triangles over 1276 vertices
+      names: 250 bytes said, 250 read  [agree]
+      rig 2 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 1 of 2  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_tri_jntBnd  [its own]  under 0  rests at (0,0,0)
+    Ring3.ao  socket aux_tri_3_jntBnd [in its carrier's rig]  box (-46.5,-54.5,-0.5)..(15.1,21.6,0.7)
+      version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+      shapes 6 in the header, 6 in the block · 600 triangles over 688 vertices
+      names: 214 bytes said, 214 read  [agree]
+      rig 2 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 1 of 2  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_tri_jntBnd  [its own]  under 0  rests at (0,0,0)
+  FaridunBlackPrinceWeapon.ao  socket R_Weapon [NOT in its carrier's rig]  box (-13.7,-3.8,-134.7)..(16.3,3.8,43.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 2508 triangles over 1688 vertices
+    names: 72 bytes said, 72 read  [agree]
+    rig 3 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_cloth_1_jntBnd  [its own]  under 0  rests at (12,-0.5,31.9)
+      2 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)

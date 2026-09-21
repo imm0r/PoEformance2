@@ -1,0 +1,1024 @@
+monster: Zealous Pillarcrusher [Metadata/Monsters/TwilightOrder/TwilightOrderExcavators/Maul/ExcavatorMaulSpectre]
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderExcavators/Maul/TwilightOrderExcavatorMaleMaul.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/OneRig/Animations/TwilightOrderExcavators/maul/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.1714413166046143,
+					"name": "slam",
+					"position": [
+						0.0,
+						-210.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1714413166046143,
+					"name": "rock",
+					"position": [
+						0.0,
+						-210.0,
+						-50.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.188369035720825,
+					"name": "move_all_stationary"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/TwilightOrder/TwilightOrderExcavators/attachments/TOEMDress.ao"
+	attached_object = "neck_jntBnd Metadata/Monsters/TwilightOrder/TwilightOrderExcavators/attachments/TOEMHood.ao"
+	attached_object = "root_jntBnd Metadata/Monsters/PrecursorWeapons/PrecursorMaul.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4055117964744568,
+								0.0
+							],
+							[
+								0.4488188922405243,
+								0.21689057350158692
+							],
+							[
+								0.4685039222240448,
+								0.47408831119537356
+							],
+							[
+								0.4881889820098877,
+								0.7274472117424011
+							],
+							[
+								0.5354330539703369,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 3,
+						"push_distance_limit": 5,
+						"rotation": 1.4486232995986939,
+						"angle": 4.363323211669922,
+						"length": 245.02000427246095,
+						"impact_z_rotation": [
+							0.40142571926116946,
+							4.956735134124756
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/OneRig/Animations/TwilightOrderExcavators/maul/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment_jntBnd"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment_jntBnd"
+		socket = "aux_weapon_drag"
+			parent = "aux_R_Weapon_attachment_jntBnd"
+			translation = "2.19615 -4.20378 -178.309"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/TwilightOrderExcavators/TwilightOrderExcavatorMale.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false chest_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "FX_weapon_drag false aux_weapon_drag"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/Whoosh"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5491161942481995,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/MaulDown",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3424681425094605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7081749439239503,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8583627939224244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Grunt",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.740509510040283,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Swing",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.357128381729126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8570821285247804,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.204272270202637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.162517070770264,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.438814640045166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Grunt",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.500449180603027,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.92633581161499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Death",
+						"bone_name": "jaw_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26410481333732607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6046513319015503,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Death",
+						"bone_name": "jaw_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13522878289222718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3003876209259033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Death",
+						"bone_name": "jaw_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13522878289222718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3003876209259033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Death",
+						"bone_name": "jaw_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13522878289222718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3003876209259033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Death",
+						"bone_name": "jaw_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13522878289222718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3003876209259033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Death",
+						"bone_name": "jaw_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13522878289222718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/DeathFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3003876209259033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Flinch",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Flinch",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Flinch",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Flinch",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Idle",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8190069198608398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryMedium"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/KnockdownA"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22266000509262086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.257752001285553,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1286100149154664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryMedium"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1258108615875246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryMedium"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2220935821533205,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2228691577911379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7984507083892824,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/KnockdownA"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22266000509262086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.257752001285553,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1286100149154664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryMedium"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6971640586853028,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1258108615875246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryMedium"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2220935821533205,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2228691577911379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Vocals/Maul/Run",
+						"bone_name": "jaw_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24599486589431764,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/ClothJewellryShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45219653844833376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.142248511314392,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/FoleyGeneral/Footstep",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 4.246276378631592,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderExcavators/MaleRaptor/fx/weapon_lightning.pet",
+						"bone_group": "FX_weapon_drag"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5952587127685547,
+						"end_time": 4.246276378631592,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderExcavators/MaulRocks/fx/dust_box.pet",
+						"bone_group": "FX_weapon_drag"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8947629928588868,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderExcavators/MaulRocks/fx/weapon_oomph.pet",
+						"bone_group": "FX_weapon_drag"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.9152941703796388,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderExcavators/MaulRocks/fx/weapon_oomph.pet",
+						"bone_group": "FX_weapon_drag"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderExcavators/MaulRocks/fx/dust_box.pet",
+						"bone_group": "FX_weapon_drag"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderExcavators/attachments/TOEMDress.ao (depth 1)
+version 3
+extends "Metadata/Monsters/TwilightOrder/TwilightOrderExcavators/attachments/TOEDress"
+
+client
+{
+	SkinMesh
+	{
+			hide_segments = "TOEFem_Dress_Shape"
+	}
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderExcavators/attachments/TOEMHood.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/TwilightOrderExcavators/attachments/TOE_Hood/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/TwilightOrderExcavators/attachments/TOE_Hood/rig.ast"
+		linear_allowed_contraction = 0.250
+		enclosure_angle = 0.350
+		attachment_bones = "head_jntBnd chest_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/TwilightOrderExcavators/attachments/TOE_Hood/TOEMHood.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false head_jntBnd chest_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/PrecursorWeapons/PrecursorMaul.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/OneRig/attachments/PrecursorWeapons/PrecursorMaul/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/OneRig/attachments/PrecursorWeapons/PrecursorMaul/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/OneRig/attachments/PrecursorWeapons/PrecursorMaul/PrecursorMaul.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.0486400127410889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/MechClick",
+						"bone_name": "maul_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5386539697647095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/ScarabMech",
+						"bone_name": "maul_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.854041576385498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/DragShort",
+						"bone_name": "maul_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.289795398712158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/ScarabMech",
+						"bone_name": "maul_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7903671264648439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/DragWoosh",
+						"bone_name": "maul_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8157334327697756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/ScarabMech"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.940103530883789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/ScarabMech",
+						"bone_name": "maul_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.711140155792236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/MechClick",
+						"bone_name": "maul_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.044884204864502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/ScarabMech",
+						"bone_name": "maul_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.250624656677246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/WalkDrag",
+						"bone_name": "maul_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.753943920135498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/ScarabMech",
+						"bone_name": "maul_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.476596832275391,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/MechClick",
+						"bone_name": "maul_tip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1393367201089859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/WalkDrag",
+						"bone_name": "maul_tip_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8789684772491455,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderExcavator/Effects/Maul/WalkDrag",
+						"bone_name": "maul_tip_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderExcavators/attachments/TOEDress.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/TwilightOrderExcavators/attachments/TOE_Dress/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/TwilightOrderExcavators/attachments/TOE_Dress/rig.ast"
+		linear_allowed_contraction = 0.300
+		enclosure_angle = 0.300
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/TwilightOrderExcavators/attachments/TOE_Dress/TOEDress.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/TwilightOrderExcavators/TwilightOrderExcavatorMale.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/TwilightOrderExcavators/TwilightOrderExcavatorMale_armour_916f89b7.smd"
+Materials 2
+	"Art/Models/MONSTERS/TwilightOrderExcavators/Textures/TwilightOrderExcavators_accessoriesc.mat" 10
+	"Art/Models/MONSTERS/TwilightOrderExcavators/Textures/malec.mat" 1
+BoundingBox -75.1611 -17.4731 -189.882 75.1611 19.992 -0.0774751
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/GenericBiped/OneRig/ModelVariants/TwilightOrderExcavators/TwilightOrderExcavatorMale_armour_916f89b7.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 11 in the header, 11 in the block · 16178 triangles over 14764 vertices
+  names: 442 bytes said, 442 read  [agree]
+
+=== shapes (32)
+0	TOEM_BootsShape	from 0	count 3732
+1	TOEM_GlovesShape	from 3732	count 12528
+2	TOEM_NeckAccss_01Shape	from 16260	count 864
+3	TOEM_NeckAccss_02Shape	from 17124	count 252
+4	TOEM_NeckAccss_03Shape	from 17376	count 10332
+5	TOEM_NeckAccss_04Shape	from 27708	count 2268
+6	TOEM_NeckAccss_05Shape	from 29976	count 1692
+7	TOEM_NeckAccss_06Shape	from 31668	count 1506
+8	TOEM_NeckAccss_07Shape	from 33174	count 1692
+9	TOEM_NeckAccss_08Shape	from 34866	count 1290
+10	TOEM_BodyShape	from 36156	count 12378
+11	TOEFem_Dress_Shape	from 48534	count 2334
+12	TOEFem_dagglygBits_01_Shape	from 50868	count 690
+13	TOEFem_dagglygBits_02_Shape	from 51558	count 1284
+14	TOEFem_DressAccss_base_02_Shape	from 52842	count 1104
+15	TOEFem_DressAccss_base_03_Shape	from 53946	count 2466
+16	TOEFem_DressAccss_base_04_Shape	from 56412	count 6096
+17	TOEFem_DressAccss_base_05_Shape	from 62508	count 4884
+18	TOEFem_DressAccss_base_06_Shape	from 67392	count 6180
+19	TOEFem_DressAccss_chains_01_Shape	from 73572	count 720
+20	TOEFem_DressAccss_chains_02_Shape	from 74292	count 3879
+21	TOEFem_DressAccss_ropes_Shape	from 78171	count 1404
+22	TOEMal_DressShape	from 79575	count 4470
+23	FaceChainsMShape	from 84045	count 408
+24	HeadClothMShape	from 84453	count 5736
+25	MetalMShape	from 90189	count 960
+26	RibbonsM1Shape	from 91149	count 1284
+27	base_meshShape	from 92433	count 13032
+28	cannister_meshShape	from 105465	count 6648
+29	flaps_meshShape	from 112113	count 1440
+30	leg_ends_meshShape	from 113553	count 3672
+31	legs_meshShape	from 117225	count 4068
+
+=== fitting
+the monster's rig: 87 bones
+mounts: aux_position, aux_camera_position, aux_L_Weapon_attachment_jntBnd_02, aux_R_Weapon_attachment_jntBnd_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_Head_attachment, aux_L_Weapon_attachment_jntBnd, aux_R_Weapon_attachment_jntBnd
+  TOEMDress.ao  socket hip_jntBnd [in its carrier's rig]  box (-34.7,-30.1,-29.3)..(34.7,27.9,65)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 12 in the header, 12 in the block · 11837 triangles over 10998 vertices
+    names: 678 bytes said, 678 read  [agree]
+    rig 13 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 12 of 13  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-13.4)  carrier has (0,0,-113.2)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.9,0,0)  carrier has (10.9,-0,-99.8)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-10.9,-0,0)  carrier has (-10.9,-0,-99.8)
+      4 phys_tri_L_front_01_jntBnd  [its own]  under 0  rests at (19.3,-15.7,12.5)
+      5 phys_tri_R_front_01_jntBnd  [its own]  under 0  rests at (-19.3,-15.7,12.5)
+      6 phys_tri_L_front_02_jntBnd  [its own]  under 0  rests at (24.6,-5.2,23.2)
+      7 phys_tri_R_front_02_jntBnd  [its own]  under 0  rests at (-24.6,-5.2,23.2)
+      8 phys_tri_L_back_02_jntBnd  [its own]  under 0  rests at (12.4,18.1,28.3)
+      9 phys_tri_R_back_02_jntBnd  [its own]  under 0  rests at (-12.4,18.1,28.3)
+      10 phys_tri_front_flap_02_jntBnd  [its own]  under 0  rests at (0,-19.8,28.4)
+      11 spine_2_jntBnd  [shared]  under 1  rests at (0,0,-25.7)  carrier has (0,-0,-125.5)
+      12 phys_tri_front_flap_03_jntBnd  [its own]  under 10  rests at (0,-23.2,53.7)
+  TOEMHood.ao  socket neck_jntBnd [in its carrier's rig]  box (-14.3,-14,-31.8)..(14.7,22.3,18.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 2796 triangles over 2332 vertices
+    names: 112 bytes said, 112 read  [agree]
+    rig 6 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 5 of 6  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 head_jntBnd  [shared]  under 0  rests at (0,0,-13.5)  carrier has (-0,-1.4,-172.2)
+      2 chest_jntBnd  [shared]  under 0  rests at (0,-8.3,19.6)  carrier has (0,-0,-138.1)
+      3 L_clavicle_jntBnd  [shared]  under 0  rests at (5.6,-4.7,4.1)  carrier has (5.6,-0.9,-154)
+      4 R_clavicle_jntBnd  [shared]  under 0  rests at (-5.6,-4.7,4.1)  carrier has (-5.6,-0.9,-154)
+      5 phys_tri_M_ribbon_jntBnd  [its own]  under 0  rests at (-0,17.6,5.7)
+  PrecursorMaul.ao  socket root_jntBnd [in its carrier's rig]  box (-59,-67.7,-207.3)..(59,36.7,70.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 5 in the header, 5 in the block · 9620 triangles over 8000 vertices
+    names: 160 bytes said, 160 read  [agree]
+    rig 20 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 16 of 20  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 maul_tip_jntBnd  [its own]  under 0  rests at (0,-0,-177.8)
+      2 leg_01_jntBnd_1  [its own]  under 1  rests at (18,10.4,-177.8)
+      3 leg_02_jntBnd_1  [its own]  under 1  rests at (-18,10.4,-177.8)
+      4 leg_03_jntBnd_1  [its own]  under 1  rests at (0,-20.8,-177.8)
+      5 flaps_jntBnd_1  [its own]  under 1  rests at (27.3,-0,-154.4)
+      6 flaps_jntBnd_2  [its own]  under 1  rests at (13.7,23.7,-154.4)
+      7 flaps_jntBnd_3  [its own]  under 1  rests at (-13.6,23.7,-154.4)
+      8 flaps_jntBnd_4  [its own]  under 1  rests at (-27.3,0,-154.4)
+      9 flaps_jntBnd_5  [its own]  under 1  rests at (-13.7,-23.7,-154.4)
+      10 flaps_jntBnd_6  [its own]  under 1  rests at (13.6,-23.7,-154.4)
+      11 leg_01_jntBnd_2  [its own]  under 2  rests at (25.4,14.7,-180.6)
+      12 leg_02_jntBnd_2  [its own]  under 3  rests at (-25.4,14.7,-180.6)
+      13 leg_03_jntBnd_2  [its own]  under 4  rests at (0,-29.4,-180.6)
+      14 leg_01_jntBnd_3  [its own]  under 11  rests at (38.2,22.1,-168.2)
+      15 leg_02_jntBnd_3  [its own]  under 12  rests at (-38.2,22.1,-168.2)
+      16 leg_03_jntBnd_3  [its own]  under 13  rests at (0,-44.1,-168.2)
+      17 leg_01_jntBnd_4  [its own]  under 14  rests at (56.9,32.9,-207.3)
+      18 leg_02_jntBnd_4  [its own]  under 15  rests at (-57,32.9,-207.3)
+      19 leg_03_jntBnd_4  [its own]  under 16  rests at (0,-65.8,-207.3)

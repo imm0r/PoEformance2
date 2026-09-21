@@ -1,0 +1,1099 @@
+monster: Farrow [Metadata/Monsters/NPC/FarrowActIntro]
+
+=== .ao Metadata/Monsters/NPC/FarrowActIntro.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/OneRig/Animations/Farrow/rig.amd"
+	view_of = "fork_idle_01"
+		view_name = "fork_idle_01_01"
+		view_end = 1000
+	animations = '[
+		{
+			"name": "present_tome_and_chisel_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "chisel_away"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.9000000357627869,
+					"end_time": 1.465999960899353,
+					"name": "move",
+					"position": [
+						-153.33700561523438,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "present_tome_and_chisel_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "chisel"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/NPC/League/Expedition/Farrow/attachments/FarrowSkirt.ao"
+	attached_object = "<root> Metadata/Terrain/Leagues/Expedition/Objects/ExpeditionTomeOfKnowledgeFarrowAttachment.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/OneRig/Animations/Farrow/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Farrow/Farrow.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false chest_jntBnd"
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "portal_enter_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 2.0329999923706056,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								65.0,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "portal_exit_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 2.565999984741211,
+						"filename": "Metadata/Effects/Spells/portal/portalopenthenclose.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								90.00000762939453,
+								0.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "portal_enter_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 4.698999881744385,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Alva_portal_fade.epk"
+					}
+				]
+			},
+			{
+				"name": "portal_exit_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 4.719230651855469,
+						"filename": "Metadata/Effects/Environment/Act3_FOUR/Alva_Portal/epk/Alva_portal_fadeout.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	Lights
+	{
+		light = "point_light"
+			bone_name = "face_jntBnd"
+			state = ""
+				colour = "0.195796 0.155473 0.0987316"
+				position = "0 -24 0"
+				radius = 100
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "climb_down_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.20959696173667909,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25975677371025088,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/WoodStep",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3188740611076355,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/WoodCreekMove",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9476653933525086,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/SoftTouchWood",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1071027517318726,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/WoodCreekMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2325029373168946,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/HollowWoodKnock",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2916203737258912,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/LeatherFlap",
+						"bone_name": "face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5782487392425538,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/Fall",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6176601648330689,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.709023118019104,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/Steps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.434551954269409,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/Steps",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "exit_from_portal_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.024454738944768907,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1746765673160553,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0498067140579224,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.788689374923706,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fork_activate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.43198898434638979,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.698966383934021,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Fork/ForkImpact",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1802558898925782,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2756136655807496,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Fork/ForkMoveA",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.042187690734863,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.163219451904297,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Fork/ForkEnd",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.4818925857543949,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.678630828857422,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.326617240905762,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fork_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.004126615822315216,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39438676834106448,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "greeting_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11896663904190064,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "R_finger_3_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5718747973442078,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9329490065574646,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1270525455474854,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9222499132156373,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6590099334716799,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "hide_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22709335386753083,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5522125959396362,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6069432497024536,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshCloth",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "hiding_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.27174678444862368,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3125877380371094,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1855430603027345,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8495259284973146,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4878792762756349,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_to_fork_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07400636374950409,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "R_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18311789631843568,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2925224006175995,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "R_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35389307141304018,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Fork/ForkEnd",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48059889674186709,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "jog_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3681415915489197,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps"
+					}
+				]
+			},
+			{
+				"name": "pickup_tome_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07121788710355759,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3080587089061737,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7535842061042786,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.776771068572998,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1444541215896607,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2140144109725953,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/PaperSoft",
+						"bone_name": "aux_L_Weapon_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2570761442184449,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/PaperCrumple",
+						"bone_name": "aux_L_Weapon_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3431997299194337,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/PaperSoft",
+						"bone_name": "aux_L_Weapon_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4988867044448853,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0321927070617677,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.032193660736084,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pocket_tome_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "aux_R_Weapon_attachment_jntBnd_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.033032000064849856,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/PaperMovement",
+						"bone_name": "L_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08116771280765534,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/PaperCrumple",
+						"bone_name": "L_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12599687278270722,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/BookClose",
+						"bone_name": "L_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4553695619106293,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "aux_R_Weapon_attachment_jntBnd_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5060961246490479,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "aux_R_Weapon_attachment_jntBnd_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6040135025978088,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0994923114776612,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/MovementGear",
+						"bone_name": "aux_R_Weapon_attachment_jntBnd_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2528568506240845,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_enter_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.34183189272880556,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0504064559936524,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6150522232055665,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_exit_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06463044136762619,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20087814331054688,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4594006836414337,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0515536069869996,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7642347812652588,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_exit_tome_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/BookClose",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/PaperFoldQuick",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06463044136762619,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20087814331054688,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4593998193740845,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0515536069869996,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7642347812652588,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "present_tome_and_chisel_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08881814032793045,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "aux_L_Weapon_attachment_jntBnd_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16765686869621278,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3003855347633362,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/PaperRustle",
+						"bone_name": "aux_L_Weapon_attachment_jntBnd_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35826683044433596,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/PaperCrumple",
+						"bone_name": "aux_L_Weapon_attachment_jntBnd_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3672483563423157,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39954790472984316,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/BookClose",
+						"bone_name": "aux_L_Weapon_attachment_jntBnd_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5009746551513672,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/LeatherFlap",
+						"bone_name": "aux_L_Weapon_attachment_jntBnd_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5578583478927612,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "aux_L_Weapon_attachment_jntBnd_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7065526843070984,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.768427312374115,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "aux_L_Weapon_attachment_jntBnd_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2045350074768067,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Steps",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "present_tome_and_chisel_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/WhooshArmour",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.017095984891057016,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/BookOpen_",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.032423414289951327,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/PaperFoldQuick",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0754581093788147,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Rune/Farrow/Foley/Book/PaperRustle",
+						"bone_name": "L_finger_1_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "zombies_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5397926568984985,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/LogCreekSmall",
+						"bone_name": "hip_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1422392129898072,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/WoodCreekBig",
+						"bone_name": "hip_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.824275255203247,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/TreeLogs",
+						"bone_name": "hip_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5423920154571535,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/LogCreekSmall",
+						"bone_name": "hip_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.927960157394409,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/TreeLogs",
+						"bone_name": "hip_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.349735736846924,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/WoodCreekBig",
+						"bone_name": "hip_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.3882927894592289,
+						"filename": "Audio/Sound Effects/Sequences/Leagues/Rune/Farrow/Act1_Intro/LogCreekSmall",
+						"bone_name": "hip_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/NPC/League/Expedition/Farrow/attachments/FarrowSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Farrow/attachments/skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Farrow/attachments/skirt/rig.ast"
+		linear_allowed_contraction = 0.300
+		bend_stiffness = 250.000
+		bend_allowed_angle = 0.500
+		normal_viscosity_multiplier = 0.150
+		enclosure_angle = 0.400
+		attachment_bones = "L_thigh_jntBnd L_chest_jntBnd chest_jntBnd R_chest_jntBnd spine_2_jntBnd spine_1_jntBnd L_thigh_jntBnd hip_jntBnd R_thigh_jntBnd child_attach"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Farrow/attachments/skirt/FarrowSkirt.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "child_attach false L_thigh_jntBnd L_chest_jntBnd chest_jntBnd R_chest_jntBnd spine_2_jntBnd spine_1_jntBnd L_thigh_jntBnd hip_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Terrain/Leagues/Expedition/Objects/ExpeditionTomeOfKnowledgeFarrowAttachment.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Conquista/attachments/BloodMagicTome/Animations/Farrow/rig.amd"
+	view_of = "pickup_tome_01"
+		view_name = "tome_idle_debug"
+		view_begin = 3332
+		view_looping = true
+	view_of = "pickup_tome_01"
+		view_name = "pickup_tome_shorter_01"
+		view_begin = 889
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Conquista/attachments/BloodMagicTome/Animations/Farrow/rig.ast"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Conquista/attachments/BloodMagicTome/BookofBloodMagic.sm"
+			BookofBloodMagic_OpaqueShape = "Art/Models/Terrain/Leagues/Expedition/Textures/Kalguur/KalguuranTome/KGD_TomeofKnowledge01c.mat:0"
+		BookofBloodMagic_DoubleShape = "Art/Models/Terrain/Leagues/Expedition/Textures/Kalguur/KalguuranTome/KGD_TomeofKnowledge01c.mat:0"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/NPC/Farrow/Farrow.sm
+version 6
+SkinnedMeshData "Art/Models/NPC/Farrow/EzomyteRuneMasterNPC_armour_23476eab.smd"
+Materials 6
+	"Art/Models/NPC/EzomyteRuneMaster/Textures/EzomyteRuneMasterc.mat" 15
+	"Art/Models/NPC/EzomyteRuneMaster/Textures/EzomyteRuneMaster_sssc.mat" 1
+	"Art/Models/NPC/EzomyteRuneMaster/Textures/EzomyteRuneMaster_normalc.mat" 1
+	"Art/Models/NPC/EzomyteRuneMaster/Textures/EzomyteRuneMaster_metalc.mat" 1
+	"Art/Models/NPC/EzomyteRuneMaster/Textures/EzomyteRuneMaster_hairc.mat" 1
+	"Art/Models/NPC/EzomyteRuneMaster/Textures/EzomyteRuneMaster_strandsc.mat" 1
+BoundingBox -74.8062 -17.7182 -192.162 74.8064 18.0721 2.28751
+BoneGroups 0
+
+=== .smd Art/Models/NPC/Farrow/EzomyteRuneMasterNPC_armour_23476eab.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23E · stride 36
+  shapes 20 in the header, 20 in the block · 26294 triangles over 20489 vertices
+  names: 752 bytes said, 752 read  [agree]
+
+=== shapes (38)
+0	apron_clips_meshShape	from 0	count 456
+1	apron_strip_meshShape	from 456	count 744
+2	arm_bracers_meshShape	from 1200	count 6162
+3	collar_meshShape	from 7362	count 1350
+4	eyes_meshShape	from 8712	count 504
+5	glasses_frame_meshShape	from 9216	count 468
+6	leather_jacket_meshShape	from 9684	count 7896
+7	lower_jaw_meshShape	from 17580	count 402
+8	pants_meshShape	from 17982	count 5646
+9	rune_arms_meshShape	from 23628	count 1170
+10	rune_earings_meshShape	from 24798	count 114
+11	rune_neck_meshShape	from 24912	count 162
+12	rune_strings_meshShape	from 25074	count 72
+13	shirt_meshShape	from 25146	count 4008
+14	upper_jaw_meshShape	from 29154	count 174
+15	body_meshShape	from 29328	count 10434
+16	glasses_lense_meshShape	from 39762	count 312
+17	hair_fur_meshShape	from 40074	count 8448
+18	hair_meshShape	from 48522	count 18540
+19	strands_meshShape	from 67062	count 11820
+20	apron_meshShape	from 78882	count 1296
+21	apron_string_meshShape	from 80178	count 780
+22	apron_tie_meshShape	from 80958	count 846
+23	belt_buckles_meshShape	from 81804	count 756
+24	belt_loops_meshShape	from 82560	count 720
+25	belts_meshShape	from 83280	count 846
+26	buckle_meshShape	from 84126	count 18
+27	chisel_meshShape	from 84144	count 534
+28	hammer_meshShape	from 84678	count 132
+29	kilt_meshShape	from 84810	count 4902
+30	satchel_belt_meshShape	from 89712	count 519
+31	satchel_meshShape	from 90231	count 1428
+32	scroll_01_meshShape	from 91659	count 318
+33	scroll_02_meshShape	from 91977	count 318
+34	tool_belt_loops_meshShape	from 92295	count 1152
+35	tool_belt_meshShape	from 93447	count 396
+36	BookofBloodMagic_DoubleShape	from 93843	count 2478
+37	BookofBloodMagic_OpaqueShape	from 96321	count 918
+
+=== fitting
+the monster's rig: 87 bones
+mounts: aux_position, aux_camera_position, aux_L_Weapon_attachment_jntBnd_02, aux_R_Weapon_attachment_jntBnd_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_Head_attachment, aux_L_Weapon_attachment_jntBnd, aux_R_Weapon_attachment_jntBnd
+  FarrowSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-32.8,-23.7,-35.1)..(31.4,23.7,44.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23E · stride 36
+    shapes 16 in the header, 16 in the block · 4987 triangles over 3660 vertices
+    names: 592 bytes said, 592 read  [agree]
+    rig 25 bones, 9 of them names its carrier's rig also has
+    mesh weights reach bone 24 of 25  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,-99.8)
+      2 spine_1_jntBnd  [shared]  under 1  rests at (0,0,-13.4)  carrier has (0,0,-113.2)
+      3 L_thigh_jntBnd  [shared]  under 1  rests at (10.9,0,-0)  carrier has (10.9,0,-99.8)
+      4 R_thigh_jntBnd  [shared]  under 1  rests at (-10.9,-0,0)  carrier has (-10.9,-0,-99.8)
+      5 phys_R_skirt_jntBnd_4  [its own]  under 1  rests at (-19.9,-13.4,28.4)
+      6 phys_R_skirt_jntBnd_3  [its own]  under 1  rests at (-15.9,-11.9,3.3)
+      7 phys_L_skirt_jntBnd_2  [its own]  under 1  rests at (21,-1.4,-3.8)
+      8 phys_L_skirt_jntBnd_1  [its own]  under 1  rests at (15.9,-11.9,3.3)
+      9 phys_tri_M_skirt_jntBnd_7  [its own]  under 1  rests at (-0,16.8,2.3)
+      10 phys_tri_L_skirt_jntBnd_5  [its own]  under 1  rests at (18.2,9.2,2.1)
+      11 phys_tri_L_skirt_jntBnd_3  [its own]  under 1  rests at (15.8,-10.6,3.2)
+      12 phys_tri_M_skirt_jntBnd_1  [its own]  under 1  rests at (-0,-15.5,3.9)
+      13 phys_tri_R_skirt_jntBnd_5  [its own]  under 1  rests at (-18.2,9.2,2.1)
+      14 phys_tri_R_skirt_jntBnd_3  [its own]  under 1  rests at (-15.8,-10.6,3.2)
+      15 spine_2_jntBnd  [shared]  under 2  rests at (0,0,-25.7)  carrier has (0,0,-125.5)
+      16 phys_tri_M_skirt_jntBnd_8  [its own]  under 9  rests at (-0,20.1,25.3)
+      17 phys_tri_L_skirt_jntBnd_6  [its own]  under 10  rests at (21.9,11.2,24.8)
+      18 phys_tri_L_skirt_jntBnd_4  [its own]  under 11  rests at (19.7,-11.8,28.3)
+      19 phys_tri_M_skirt_jntBnd_2  [its own]  under 12  rests at (-0,-17.9,31.3)
+      20 phys_tri_R_skirt_jntBnd_6  [its own]  under 13  rests at (-21.9,11.2,24.8)
+      21 phys_tri_R_skirt_jntBnd_4  [its own]  under 14  rests at (-19.7,-11.8,28.3)
+      22 chest_jntBnd  [shared]  under 15  rests at (0,0,-38.2)  carrier has (0,0,-138.1)
+      23 L_chest_jntBnd  [shared]  under 22  rests at (8.1,-7.7,-42)  carrier has (8.1,-7.7,-141.8)
+      24 R_chest_jntBnd  [shared]  under 22  rests at (-8.1,-7.7,-42)  carrier has (-8.1,-7.7,-141.8)
+  ExpeditionTomeOfKnowledgeFarrowAttachment.ao  socket <root> [NOT in its carrier's rig]  box (-27.1,-16.8,-26.7)..(26.7,16.6,0.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 1132 triangles over 1171 vertices
+    names: 112 bytes said, 112 read  [agree]
+    rig 13 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 12 of 13  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,0,0)  carrier has (0,0,0)
+      1 R_cover_jntBnd  [its own]  under 0  rests at (-2.8,-0,-0.7)
+      2 page_02_jntBnd_1  [its own]  under 0  rests at (-1.4,-0,-0.8)
+      3 page_01_jntBnd_1  [its own]  under 0  rests at (-1.4,-0,-0.8)
+      4 L_cover_jntBnd  [its own]  under 0  rests at (2.8,-0,-0.7)
+      5 R_page_jntBnd  [its own]  under 1  rests at (-25,0.1,-4.4)
+      6 page_02_jntBnd_2  [its own]  under 2  rests at (-0.7,-0,-4.5)
+      7 page_01_jntBnd_2  [its own]  under 3  rests at (-2,-0,-4.5)
+      8 L_page_jntBnd  [its own]  under 4  rests at (22.8,0.1,-5.1)
+      9 page_02_jntBnd_3  [its own]  under 6  rests at (0.4,-0,-11)
+      10 page_01_jntBnd_3  [its own]  under 7  rests at (-3.2,-0,-11)
+      11 page_02_jntBnd_4  [its own]  under 9  rests at (1.9,-0,-19.5)
+      12 page_01_jntBnd_4  [its own]  under 10  rests at (-4.7,-0,-19.5)

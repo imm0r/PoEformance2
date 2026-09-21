@@ -1,0 +1,4706 @@
+monster: It That Was Tul [Metadata/Monsters/BreachBossFallenKnight/FallenKnight]
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/BreachBossFallenKnight.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/rig.amd"
+	view_of = "portal_in_charge_01"
+		view_name = "portal_in_charge_01_loopless"
+	view_of = "portal_in_charge_01"
+		view_name = "emerge_charge_01"
+		view_looping = true
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+	group = "paired_ultimate_emerge_01_grp"
+		group_play_in_sequence = true
+		group_entry = "paired_ultimate_emerge_01 1"
+		group_entry = "paired_ultimate_walk_01 1"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.3356208801269532,
+					"name": "start_target_update",
+					"data": "50 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8899999856948853,
+					"name": "contact",
+					"position": [
+						-18.850765228271486,
+						-135.2557830810547,
+						-132.79217529296876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9100000262260437,
+					"name": "contact",
+					"position": [
+						-65.0430908203125,
+						-126.90623474121094,
+						-138.16470336914063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9300000071525574,
+					"name": "contact",
+					"position": [
+						-99.75306701660156,
+						-103.74494171142578,
+						-140.90383911132813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.949999988079071,
+					"name": "contact",
+					"position": [
+						-126.4482192993164,
+						-73.10218048095703,
+						-141.79708862304688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9700000286102295,
+					"name": "contact",
+					"position": [
+						-144.0730438232422,
+						-34.145076751708987,
+						-141.9185028076172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9900000095367432,
+					"name": "contact",
+					"position": [
+						-151.691162109375,
+						21.18800163269043,
+						-141.74911499023438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0099999904632569,
+					"name": "contact",
+					"position": [
+						-138.0240020751953,
+						69.54974365234375,
+						-143.0970458984375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0299999713897706,
+					"name": "contact",
+					"position": [
+						-111.54051971435547,
+						105.36555480957031,
+						-144.93435668945313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0499999523162842,
+					"name": "contact",
+					"position": [
+						-76.09263610839844,
+						135.48805236816407,
+						-144.75340270996095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0700000524520875,
+					"name": "contact",
+					"position": [
+						-32.617027282714847,
+						153.360107421875,
+						-142.1488800048828
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.090000033378601,
+					"name": "contact",
+					"position": [
+						6.872747421264648,
+						155.43136596679688,
+						-139.29127502441407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1100000143051148,
+					"name": "contact",
+					"position": [
+						41.60331726074219,
+						145.12411499023438,
+						-134.7333526611328
+					]
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.4320000410079957,
+					"end_time": 1.6319999694824219,
+					"name": "move",
+					"position": [
+						0.0,
+						-185.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "barrage_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.23299971222877503,
+					"name": "move_80u"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.2329999953508377,
+					"end_time": 0.5659999847412109,
+					"name": "move",
+					"position": [
+						0.0,
+						-80.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5659999847412109,
+					"name": "move_stop"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.5659999847412109,
+					"end_time": 3.074645519256592,
+					"name": "start_target_update",
+					"data": "60 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6660000085830689,
+					"name": "contact",
+					"position": [
+						12.730920791625977,
+						-228.978515625,
+						-134.36888122558595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.765999972820282,
+					"name": "contact",
+					"position": [
+						10.997675895690918,
+						-230.1366729736328,
+						-132.7836456298828
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8659999966621399,
+					"name": "contact",
+					"position": [
+						11.028057098388672,
+						-230.49688720703126,
+						-131.61659240722657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9660000205039978,
+					"name": "contact",
+					"position": [
+						11.065584182739258,
+						-230.5591583251953,
+						-131.708251953125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.065999984741211,
+					"name": "contact",
+					"position": [
+						11.065951347351075,
+						-228.95138549804688,
+						-135.74118041992188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1660000085830689,
+					"name": "contact",
+					"position": [
+						11.065698623657227,
+						-223.6164093017578,
+						-141.281982421875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2660000324249268,
+					"name": "contact",
+					"position": [
+						11.065873146057129,
+						-219.9082489013672,
+						-145.07266235351563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3660000562667847,
+					"name": "contact",
+					"position": [
+						11.065775871276856,
+						-217.92465209960938,
+						-147.301025390625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.465999960899353,
+					"name": "contact",
+					"position": [
+						11.06576919555664,
+						-217.78533935546876,
+						-145.79396057128907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.565999984741211,
+					"name": "contact",
+					"position": [
+						11.065912246704102,
+						-219.51800537109376,
+						-139.60650634765626
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6660000085830689,
+					"name": "contact",
+					"position": [
+						11.065439224243164,
+						-222.705322265625,
+						-135.38873291015626
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7660000324249268,
+					"name": "contact",
+					"position": [
+						11.065791130065918,
+						-226.94192504882813,
+						-133.7178955078125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8660000562667847,
+					"name": "contact",
+					"position": [
+						11.065776824951172,
+						-229.34750366210938,
+						-133.54588317871095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.965999960899353,
+					"name": "contact",
+					"position": [
+						11.065462112426758,
+						-228.6103515625,
+						-136.61447143554688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.065999984741211,
+					"name": "contact",
+					"position": [
+						11.065890312194825,
+						-225.17861938476563,
+						-140.73025512695313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.1659998893737795,
+					"name": "contact",
+					"position": [
+						11.065698623657227,
+						-222.5224151611328,
+						-143.4630584716797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2660000324249269,
+					"name": "contact",
+					"position": [
+						11.065828323364258,
+						-219.77357482910157,
+						-145.45460510253907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.365999937057495,
+					"name": "contact",
+					"position": [
+						11.0659818649292,
+						-218.76254272460938,
+						-144.35403442382813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4660000801086427,
+					"name": "contact",
+					"position": [
+						11.065385818481446,
+						-220.16903686523438,
+						-138.6731414794922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.565999984741211,
+					"name": "contact",
+					"position": [
+						11.065784454345704,
+						-223.08822631835938,
+						-134.54672241210938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6659998893737795,
+					"name": "contact",
+					"position": [
+						11.065784454345704,
+						-226.1345977783203,
+						-132.44033813476563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7660000324249269,
+					"name": "contact",
+					"position": [
+						11.06579875946045,
+						-228.05368041992188,
+						-131.4655303955078
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.865999937057495,
+					"name": "contact",
+					"position": [
+						11.065776824951172,
+						-228.5763702392578,
+						-131.05319213867188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.9660000801086427,
+					"name": "contact",
+					"position": [
+						11.065791130065918,
+						-228.10052490234376,
+						-130.7903594970703
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.065999984741211,
+					"name": "contact",
+					"position": [
+						10.872326850891114,
+						-224.54588317871095,
+						-130.79039001464845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.2660000324249269,
+					"name": "move_80u"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 3.2660300731658937,
+					"end_time": 3.565999984741211,
+					"name": "move",
+					"position": [
+						0.0,
+						80.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.565999984741211,
+					"name": "move_stop"
+				}
+			]
+		},
+		{
+			"name": "death_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.465999960899353,
+					"name": "move",
+					"position": [
+						0.0,
+						210.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6678080558776857,
+					"name": "ailith_in"
+				}
+			]
+		},
+		{
+			"name": "emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 10.274253845214844,
+					"name": "emerge"
+				}
+			]
+		},
+		{
+			"name": "heavy_stun_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.43299999833106997,
+					"name": "move",
+					"position": [
+						0.0,
+						220.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 3.3329999446868898,
+					"end_time": 4.132999897003174,
+					"name": "move",
+					"position": [
+						0.0,
+						-220.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "ice_shower_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5769923329353333,
+					"name": "contact",
+					"position": [
+						-36.12793731689453,
+						-55.78852081298828,
+						-69.68795013427735
+					]
+				}
+			]
+		},
+		{
+			"name": "ice_shower_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.056156039237976,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8710542917251588,
+					"name": "barrier"
+				}
+			]
+		},
+		{
+			"name": "inject_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.295191764831543,
+					"name": "contact",
+					"position": [
+						-43.978668212890628,
+						-49.96515655517578,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "paired_ultimate_emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.06296297162771225,
+					"name": "ultimate"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.732800006866455,
+					"name": "iceshield_start"
+				}
+			]
+		},
+		{
+			"name": "portal_in_charge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.05925926938652992,
+					"name": "portalin"
+				}
+			]
+		},
+		{
+			"name": "portal_in_charge_end_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.43299999833106997,
+					"name": "move",
+					"position": [
+						0.0,
+						-519.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "portal_in_charge_end_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.06599999964237213,
+					"name": "move",
+					"position": [
+						0.0,
+						-70.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.6660000085830689,
+					"end_time": 1.065999984741211,
+					"name": "move",
+					"position": [
+						0.0,
+						81.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "portal_out_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.276029109954834,
+					"name": "portalout"
+				}
+			]
+		},
+		{
+			"name": "portal_sidelines_in_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.009037327952682972,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "portal_sidelines_out_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7770150303840637,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "shield_stab_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.4804527759552,
+					"name": "contact",
+					"position": [
+						-11.62765121459961,
+						-85.58476257324219,
+						-55.0392951965332
+					]
+				},
+				{
+					"type": "MoveEventType",
+					"time": 3.0989999771118166,
+					"end_time": 4.0320000648498539,
+					"name": "move",
+					"position": [
+						0.0,
+						-88.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "shield_throw_end_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.8989999890327454,
+					"name": "move",
+					"position": [
+						0.0,
+						-416.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.029999999329447748,
+					"name": "shieldin"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8905842304229736,
+					"name": "contact",
+					"position": [
+						0.0,
+						-40.0,
+						0.0
+					]
+				}
+			],
+			"blend_in_time": 0
+		},
+		{
+			"name": "shield_throw_start_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.16599999368190766,
+					"end_time": 0.9990000128746033,
+					"name": "move",
+					"position": [
+						0.0,
+						-450.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5591184496879578,
+					"name": "contact",
+					"position": [
+						64.6387939453125,
+						-117.15171813964844,
+						-131.18655395507813
+					],
+					"contact_ref": [
+						64.63899993896485,
+						0.0,
+						-121.11563110351563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5750586986541748,
+					"name": "shieldout"
+				}
+			]
+		},
+		{
+			"name": "slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.5575520992279053,
+					"name": "contact",
+					"position": [
+						0.40769195556640627,
+						-223.21734619140626,
+						-9.364133834838868
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKCape.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKSkirt.ao"
+	attached_object = "L_shoulder_jntBnd Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKLBicepFingers.ao"
+	attached_object = "L_thigh_jntBnd Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKThighFingers.ao"
+	attached_object = "L_elbow_Twist_jntBnd_1 Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKLForearmFingers.ao"
+	attached_object = "L_knee_jntBnd Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKShinFingers.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.14373089373111726,
+								0.0
+							],
+							[
+								0.20489296317100526,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.4363323450088501,
+						"angle": 2.9321534633636476,
+						"length": 220.12600708007813,
+						"impact_bone": "R_arm_01_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.43425077199935915,
+								0.0
+							],
+							[
+								0.4862385392189026,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.12217305600643158,
+						"angle": 3.5430185794830324,
+						"length": 220.12600708007813,
+						"impact_bone": "R_arm_01_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.7401574850082398,
+								0.0
+							],
+							[
+								0.8110235929489136,
+								0.7076023817062378
+							],
+							[
+								0.8110235929489136,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"width": 150.0,
+						"length": 150.0,
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/rig.ast"
+		socket = "Proj_Socket"
+			parent = "chest_jntBnd"
+			translation = "7.1804 -199.971 -23.2444"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "aux_horn_A_01"
+			parent = "head_jntBnd"
+			translation = "-16.6493 -2.97047 -10.7263"
+		socket = "aux_horn_A_02"
+			parent = "head_jntBnd"
+			translation = "-22.8552 12.8291 -13.4889"
+		socket = "aux_horn_A_03"
+			parent = "head_jntBnd"
+			translation = "-25.5626 19.2054 -20.2579"
+		socket = "aux_horn_B_01"
+			parent = "head_jntBnd"
+			translation = "16.65 -2.97047 -10.7263"
+		socket = "aux_horn_B_02"
+			parent = "head_jntBnd"
+			translation = "22.86 12.8291 -13.4889"
+		socket = "aux_horn_B_03"
+			parent = "head_jntBnd"
+			translation = "25.56 19.2054 -20.2579"
+		socket = "aux_horn_C_01"
+			parent = "head_jntBnd"
+			translation = "-4.94397 -6.7963 -17.5185"
+		socket = "aux_horn_C_02"
+			parent = "head_jntBnd"
+			translation = "-6.95749 5.2305 -17.8703"
+		socket = "aux_horn_C_03"
+			parent = "head_jntBnd"
+			translation = "-5.02402 8.90334 -26.4026"
+		socket = "aux_horn_D_01"
+			parent = "head_jntBnd"
+			translation = "4.94 -6.7963 -17.5185"
+		socket = "aux_horn_D_02"
+			parent = "head_jntBnd"
+			translation = "6.96 5.2305 -17.8703"
+		socket = "aux_horn_D_03"
+			parent = "head_jntBnd"
+			translation = "5.02 8.90334 -26.4026"
+		socket = "Shield_Socket"
+			parent = "L_Weapon_2"
+		socket = "aux_shield_ccenter"
+			translation = "-30.5108 18.3582 0"
+		socket = "aux_shield_eye"
+			parent = "L_Weapon"
+			translation = "21.5621 -13.5321 0.719326"
+		socket = "aux_shield_trail_01"
+			parent = "L_Weapon"
+			translation = "21.56 5.72 70.77"
+		socket = "aux_shield_trail_02"
+			parent = "L_Weapon"
+			translation = "21.56 5.72 -70.77"
+		socket = "aux_shield_tip"
+			parent = "L_Weapon"
+			translation = "-48.44 6.02 0.719326"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/BreachBossFallenKnight.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "frameupper false chest_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd"
+		bone_group = "FX_horn_A false aux_horn_A_01 aux_horn_A_02 aux_horn_A_03"
+		bone_group = "FX_horn_B false aux_horn_B_01 aux_horn_B_02 aux_horn_B_03"
+		bone_group = "FX_horn_C false aux_horn_C_01 aux_horn_C_02 aux_horn_C_03"
+		bone_group = "FX_horn_D false aux_horn_D_01 aux_horn_D_02 aux_horn_D_03"
+		bone_group = "FX_shield_grd false aux_shield_eye"
+		bone_group = "FX_ShieldTrails false aux_shield_trail_01 aux_shield_tip aux_shield_trail_02"
+		bone_group = "FX_ShieldCore false L_Weapon_2"
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "R_arm_05_05_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12427079677581787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16492873430252076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/Attack01A_",
+						"bone_name": "R_arm_04_02_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3396199941635132,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/Swings/MagicSwingShort",
+						"bone_name": "R_arm_08_06_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3741941750049591,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/WeaponSwishShort",
+						"bone_name": "R_arm_08_05_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7124139666557312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7660343647003174,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/WeaponSwish",
+						"bone_name": "R_arm_01_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8210759162902832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/Swings/MagicSwingLong",
+						"bone_name": "R_arm_06_05_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8564900159835815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/Attack01B_",
+						"bone_name": "R_arm_04_04_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9538400173187256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "R_arm_03_04_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1579186916351319,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/ShieldToneSwing",
+						"bone_name": "L_shoulder_attachment_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.314980149269104,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhooshShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4479631185531617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhooshShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5557101964950562,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/ShieldGroundImpact",
+						"bone_name": "L_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5567079782485963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/ShieldImpact",
+						"bone_name": "L_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.614359974861145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/ShieldGrunt",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6362799406051636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7134100198745728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7676600217819214,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreLong",
+						"bone_name": "R_arm_05_03_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrageStart",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/Barrage",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43477100133895876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/TentacleBarrage/TentacleBarrage_TonalSweetener",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6587299704551697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7716313004493713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_03_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8852900266647339,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.956309974193573,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_03_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0756800174713135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2140873670578004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_03_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2279900312423707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4202799797058106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4335999488830567,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_03_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6220899820327759,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6696799993515015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_03_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.80485999584198,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8886200189590455,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_03_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.956672191619873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreLong",
+						"bone_name": "R_arm_04_02_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9838199615478516,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1132800579071047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1247000694274904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_03_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.284630060195923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3284099102020265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_03_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.463589906692505,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5283100605010988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_03_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.610189914703369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.74153995513916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_03_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7453598976135256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8615000247955324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9395499229431154,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_03_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0252299308776857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.086496114730835,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/TentacleBarrage/TentacleRetract"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.124229907989502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_04_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1432600021362306,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/AttackBarrage",
+						"bone_name": "R_arm_03_08_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.704900026321411,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreLong",
+						"bone_name": "R_arm_08_04_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/Death",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2566269338130951,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4408315420150757,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5342156291007996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/ShieldGroundImpact",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5743600130081177,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/ShieldImpact",
+						"bone_name": "aux_shield_eye"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.204069972038269,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2161500453948975,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/Extra/DeathSquish",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2437299489974976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2139499187469484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.435931444168091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/Extra/ShieldImpactReverb",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.4897964000701905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.886810064315796,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.491201877593994,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/ShieldImpact",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8036131858825685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "aux_R_toe"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8678996562957765,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.474274158477783,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.883520126342773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "aux_R_toe"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.14088249206543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.071098327636719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/WeaponSwishShort",
+						"bone_name": "R_arm_08_06_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.154509544372559,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.60323429107666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreLong"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.923219680786133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 10.480690002441407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "aux_R_toe"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 11.603710174560547,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh"
+					}
+				]
+			},
+			{
+				"name": "emerge_start_charge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14229999482631684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4391399919986725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03185924515128136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03970517963171005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0492154061794281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03661435842514038,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "heavy_stun_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22201234102249146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4062354266643524,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49151837825775149,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5374839305877686,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/ShieldImpact",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6249399185180666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.829549789428711,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3864800930023195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.66729998588562,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.1418561935424809,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "ice_shower_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/IceShower/IceShowerRingEnd",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/Barrage",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09114000201225281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10300000011920929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6390299797058106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.668690025806427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.690090000629425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/SpecialShieldImpact",
+						"bone_name": "aux_shield_eye"
+					}
+				]
+			},
+			{
+				"name": "ice_shower_loop_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/IceShower/IceShowerRingLOOP_",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "ice_shower_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/ShieldThrowA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/IceShower/IceShowerRingStart",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09793999791145325,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6845399737358093,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7721700072288513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8907300233840942,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/Attack01B_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0332638025283814,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/Attack01B_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.11845064163208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/IceShower/IceShowerRingStart",
+						"bone_name": "root_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3525899648666382,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/Attack01B_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7948600053787232,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/ShieldImpact"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreLong",
+						"bone_name": "R_arm_06_04_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/Idle",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "inject_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/Inject",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/Extra/InjectionBuildUp",
+						"bone_name": "R_arm_01_09_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22436000406742097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25879740715026858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/CorruptingSlam/CorruptionSlam_Telegraph",
+						"bone_name": "R_arm_01_10_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9293362498283386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/Extra/Injection_Telegraph",
+						"bone_name": "R_arm_01_04_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3759701251983643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/CorruptingSlam/CorruptionSlamImpact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8256274461746216,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3511385917663576,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.797799825668335,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/TentacleBarrage/TentacleRetract",
+						"bone_name": "R_arm_07_01_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "paired_ultimate_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1531391441822052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17086543142795564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17507131397724152,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/UltimateEmerge",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4041300117969513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6565393209457398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.488307237625122,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5110145807266236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/SpecialShieldImpact",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.538159966468811,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "paired_ultimate_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreLong",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "paired_ultimate_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5287692546844482,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.079300045967102,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0936299562454224,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_in_charge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/ChargeSmall.once.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"skip_on_loop": true,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/ShieldThrow/ShieldThrowStart.once.ogg",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"skip_on_loop": true,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20896263420581819,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/Emerge/EmergeFootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3727630078792572,
+						"skip_on_loop": true,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/SlamA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45333999395370486,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/Emerge/EmergeFootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_in_charge_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/ChargeEnd",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09528999775648117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12880000472068788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "R_arm_01_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23454999923706056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3427213132381439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/Attack01A_",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4180228114128113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_in_charge_end_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/ChargeEnd",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/SpecialShieldImpact",
+						"bone_name": "L_chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/ShieldThrow/ShieldThrowGroundImpact",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.035670001059770587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/Extra/ShieldImpactReverb",
+						"bone_name": "aux_shield_eye"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1484600007534027,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17637999355793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "R_arm_01_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.942799985408783,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0075199604034424,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_out_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/PortalSide_Out",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "L_chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "R_chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_sidelines_in_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/Extra/TeleportEnergyShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20580999553203584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GroundImpact",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2554199993610382,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/ShieldGroundImpact",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3666273355484009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42803001403808596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4461199045181275,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "portal_sidelines_out_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.13257481157779694,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3636400103569031,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "shield_stab_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/ShieldStab",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.535981297492981,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/ShieldImpact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5909088253974915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/ShieldGroundImpact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6184200048446655,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/ShieldStab/ShieldStabWarning"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7877780795097351,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/ShieldStab/IceSpearAppear",
+						"bone_name": "R_chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.082669973373413,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8099900484085084,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "R_arm_01_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.161048173904419,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/Attack01A_",
+						"bone_name": "R_arm_04_04_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4899044036865236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/SpecialShieldImpact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5290000438690187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/Extra/ShieldImpactReverb",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5950400829315187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9918181896209719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "shield_throw_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/ShieldThrowB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/ShieldThrow/ShieldThrowEnergy",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/ShieldThrow/ShieldThrow_PortalB",
+						"bone_name": "L_Weapon_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05771704763174057,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33281174302101138,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/ShieldThrow/ShieldThrowEnergy",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8364882469177246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/SpecialShieldImpact",
+						"bone_name": "aux_shield_eye"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8709390163421631,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/ShieldThrow/ShieldThrowGroundImpact",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.876829981803894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8780784606933594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7327699661254883,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreShort",
+						"bone_name": "R_arm_02_04_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0296499729156496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3266730308532717,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0006699562072756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "shield_throw_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/ShieldThrowA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/ShieldThrow/ShieldThrowChargeUp",
+						"bone_name": "R_chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20239000022411347,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3445099890232086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5703799724578857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7289900183677673,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8374900221824646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/SlamA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/CorruptingSlam/CorruptionSlamBuildUp",
+						"bone_name": "R_arm_01_09_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4045220613479614,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/CorruptingSlam/CorruptionSlam_Telegraph",
+						"bone_name": "R_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.21889066696167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.443487524986267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/SlamB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5260934829711915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/ShieldThrow/ShieldThrowGroundImpact",
+						"bone_name": "R_arm_06_06_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6558799743652345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.20123198628425599,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/GoreLong",
+						"bone_name": "R_arm_06_02_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5299902558326721,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0293731689453126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0440200567245484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.658139944076538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7133678197860718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/Walk",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.158600091934204,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/FootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1667699813842775,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementArmour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_charge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Vocals/ChargeSmall.once.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"skip_on_loop": true,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Effects/ShieldThrow/ShieldThrowStart.once.ogg",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"skip_on_loop": true,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/MovementWhoosh",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20896263420581819,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/Emerge/EmergeFootstepsMetal",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45333999395370486,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/TulFallenKnightBoss/Foley/Emerge/EmergeFootstepsFlesh",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.62403404712677,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/onact_shield_stab.pet",
+						"bone_group": "FX_shield_grd"
+					}
+				]
+			},
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/onact_barrage_charge.pet",
+						"bone_groups": [
+							"root",
+							"grp_r_hand_01",
+							"grp_r_hand_02",
+							"grp_r_hand_03",
+							"grp_r_hand_04"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.656410276889801,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_03"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.764102578163147,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_06"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8769230842590332,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_04"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.964102566242218,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_05"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0461543798446656,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_03"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1692321300506592,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_02"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.266668677330017,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_07"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.3333357572555543,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_05"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.4000037908554078,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_03"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.4410299062728882,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5025691986083985,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_06"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5692362785339356,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_04"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.6359037160873414,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_07"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.6718018054962159,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_08"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.7076997756958008,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_05"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.7641104459762574,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_03"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8000082969665528,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8666757345199586,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_06"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.9025734663009644,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_02"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.0000102519989015,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_07"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.03590726852417,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_08"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.066676378250122,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_05"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.1333422660827638,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_03"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.1692392826080324,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.2307772636413576,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_06"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.2718026638031008,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_02"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.307699680328369,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_04"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.3692378997802736,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_07"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.4000070095062258,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_08"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.435904026031494,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_05"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.5025699138641359,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_03"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.5384669303894045,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.605133056640625,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_06"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.635901927947998,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_02"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.666670799255371,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_04"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.733336925506592,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_07"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.7692339420318605,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_08"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.8000028133392336,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_05"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.866668701171875,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_03"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.9025654792785646,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.969231367111206,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_06"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.0153846740722658,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_02"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.0358972549438478,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_04"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.0974349975585939,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_07"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.148716449737549,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_08"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.1743571758270265,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_05"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.2358949184417726,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/barrage_muzzle.pet",
+						"bone_group": "grp_r_hand_03"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 10.428378105163575,
+						"end_time": 11.784936904907227,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/onact_emerge_flames.pet",
+						"bone_groups": [
+							"grp_r_hand_08",
+							"grp_r_arm_07_05",
+							"grp_r_hand_06",
+							"grp_r_arm_05_06",
+							"grp_r_hand_04",
+							"grp_r_arm_03_07",
+							"grp_r_hand_02",
+							"grp_r_hand_01"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 10.526327133178711,
+						"end_time": 11.066497802734375,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/onact_emerge_init.pet",
+						"bone_group": "grp_r_hand_01"
+					}
+				]
+			},
+			{
+				"name": "inject_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.48422202467918398,
+						"end_time": 2.6085033416748049,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/onact_slam_buildup.pet",
+						"bone_groups": [
+							"grp_r_hand_08",
+							"grp_r_arm_07_05",
+							"grp_r_hand_06",
+							"grp_r_arm_05_06",
+							"grp_r_hand_04",
+							"grp_r_arm_03_07",
+							"grp_r_hand_02",
+							"grp_r_hand_01"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5232153534889221,
+						"end_time": 1.357285737991333,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/onact_slam_buildup_init.pet",
+						"bone_group": "grp_r_hand_01"
+					}
+				]
+			},
+			{
+				"name": "portal_in_charge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/shield_streaks.pet",
+						"bone_group": "FX_shield_grd"
+					}
+				]
+			},
+			{
+				"name": "portal_out_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.43324458599090578,
+						"end_time": 0.98365718126297,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/OnAct_FlameRIbbons.pet",
+						"bone_groups": [
+							"grp_r_hand_01",
+							"grp_r_hand_02",
+							"grp_r_hand_03",
+							"grp_r_hand_04",
+							"grp_r_hand_05",
+							"grp_r_hand_06",
+							"grp_r_hand_07",
+							"grp_r_hand_08"
+						]
+					}
+				]
+			},
+			{
+				"name": "shield_stab_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6618520021438599,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/shield_stab_warning_cone.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.481435537338257,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/onact_shield_stab.pet",
+						"bone_group": "FX_shield_grd"
+					}
+				]
+			},
+			{
+				"name": "shield_throw_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.46278226375579836,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/OnAct_FlameRIbbons.pet",
+						"bone_groups": [
+							"grp_r_hand_01",
+							"grp_r_arm_02_07",
+							"grp_r_arm_03_07",
+							"grp_r_hand_04",
+							"grp_r_arm_04_03",
+							"grp_r_arm_07_02",
+							"grp_r_shin",
+							"grp_l_shin",
+							"grp_l_forearm"
+						]
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.38178107142448428,
+						"end_time": 1.869773030281067,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/onact_slam_buildup.pet",
+						"bone_groups": [
+							"grp_r_hand_08",
+							"grp_r_arm_07_05",
+							"grp_r_hand_06",
+							"grp_r_arm_05_06",
+							"grp_r_hand_04",
+							"grp_r_arm_03_07"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.41648799180984499,
+						"end_time": 2.134809732437134,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/onact_slam_buildup_init.pet",
+						"bone_group": "grp_r_hand_02"
+					}
+				]
+			},
+			{
+				"name": "emerge_charge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/shield_streaks.pet",
+						"bone_group": "FX_shield_grd"
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.3896634876728058,
+						"end_time": 0.5206291079521179,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/melee_cleave.ao",
+						"animation": "attack_220",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-100.00000762939453
+							],
+							"rotation": [
+								-0.26179999113082888,
+								0.0,
+								-0.43632999062538149
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.8666592836380005,
+						"end_time": 1.075047254562378,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/melee_cleave.ao",
+						"animation": "attack_360",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-90.00000762939453
+							],
+							"rotation": [
+								-3.141589879989624,
+								0.0,
+								0.5585100054740906
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "ice_shower_start_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.0,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/spearIce_01.ao",
+						"offset": [
+							86.2000732421875,
+							111.0052490234375
+						],
+						"min_speed": 1.0,
+						"max_speed": 1.2000000476837159,
+						"min_scale": [
+							0.800000011920929,
+							0.800000011920929,
+							0.800000011920929
+						],
+						"max_scale": [
+							1.2000000476837159,
+							1.2000000476837159,
+							1.2000000476837159
+						],
+						"inherit_orientation": true,
+						"orientation": 1.5707963705062867
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.013708860613405705,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/spearIce_01.ao",
+						"offset": [
+							-71.41546630859375,
+							130.856689453125
+						],
+						"min_speed": 1.0,
+						"max_speed": 1.2000000476837159,
+						"min_scale": [
+							0.800000011920929,
+							0.800000011920929,
+							0.800000011920929
+						],
+						"max_scale": [
+							1.2000000476837159,
+							1.2000000476837159,
+							1.2000000476837159
+						],
+						"inherit_orientation": true,
+						"orientation": 1.5707963705062867
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.038384806364774707,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/spearIce_01.ao",
+						"offset": [
+							-14.497039794921875,
+							183.10670471191407
+						],
+						"min_speed": 1.0,
+						"max_speed": 1.2000000476837159,
+						"min_scale": [
+							0.800000011920929,
+							0.800000011920929,
+							0.800000011920929
+						],
+						"max_scale": [
+							1.2000000476837159,
+							1.2000000476837159,
+							1.2000000476837159
+						],
+						"inherit_orientation": true,
+						"orientation": 1.5707963705062867
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.05209365859627724,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/spearIce_01.ao",
+						"offset": [
+							-176.12774658203126,
+							51.1622314453125
+						],
+						"min_speed": 1.0,
+						"max_speed": 1.2000000476837159,
+						"min_scale": [
+							0.800000011920929,
+							0.800000011920929,
+							0.800000011920929
+						],
+						"max_scale": [
+							1.2000000476837159,
+							1.2000000476837159,
+							1.2000000476837159
+						],
+						"inherit_orientation": true,
+						"orientation": 1.5707963705062867
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.05757720023393631,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/spearIce_01.ao",
+						"offset": [
+							-176.12774658203126,
+							51.1622314453125
+						],
+						"min_speed": 1.0,
+						"max_speed": 1.2000000476837159,
+						"min_scale": [
+							0.800000011920929,
+							0.800000011920929,
+							0.800000011920929
+						],
+						"max_scale": [
+							1.2000000476837159,
+							1.2000000476837159,
+							1.2000000476837159
+						],
+						"inherit_orientation": true,
+						"orientation": 1.5707963705062867
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.06306073814630509,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/spearIce_01.ao",
+						"offset": [
+							53.554039001464847,
+							159.24879455566407
+						],
+						"min_speed": 1.0,
+						"max_speed": 1.2000000476837159,
+						"min_scale": [
+							0.800000011920929,
+							0.800000011920929,
+							0.800000011920929
+						],
+						"max_scale": [
+							1.2000000476837159,
+							1.2000000476837159,
+							1.2000000476837159
+						],
+						"inherit_orientation": true,
+						"orientation": 1.5707963705062867
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.08225315809249878,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/spearIce_01.ao",
+						"offset": [
+							161.60836791992188,
+							51.1622314453125
+						],
+						"min_speed": 1.0,
+						"max_speed": 1.2000000476837159,
+						"min_scale": [
+							0.800000011920929,
+							0.800000011920929,
+							0.800000011920929
+						],
+						"max_scale": [
+							1.2000000476837159,
+							1.2000000476837159,
+							1.2000000476837159
+						],
+						"inherit_orientation": true,
+						"orientation": 1.5707963705062867
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.10967089235782623,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/spearIce_01.ao",
+						"offset": [
+							-135.3099365234375,
+							102.7303466796875
+						],
+						"min_speed": 1.0,
+						"max_speed": 1.2000000476837159,
+						"min_scale": [
+							0.800000011920929,
+							0.800000011920929,
+							0.800000011920929
+						],
+						"max_scale": [
+							1.2000000476837159,
+							1.2000000476837159,
+							1.2000000476837159
+						],
+						"inherit_orientation": true,
+						"orientation": 1.5707963705062867
+					}
+				]
+			},
+			{
+				"name": "paired_ultimate_emerge_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.1710726022720337,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/portal_in_vertical_no_momentum.ao",
+						"offset": [
+							0.0,
+							148.35899353027345
+						],
+						"inherit_height": true,
+						"height": 60.0,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "paired_ultimate_idle_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/knight_breach_wave.ao",
+						"animation": "channel",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								-60.000003814697269,
+								-80.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "paired_ultimate_walk_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/knight_breach_wave.ao",
+						"animation": "channel",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								-60.000003814697269,
+								-80.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "portal_in_charge_end_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.252468466758728,
+						"end_time": 0.5683102011680603,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/melee_cleave.ao",
+						"animation": "attack_220",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-109.1500015258789
+							],
+							"rotation": [
+								0.0,
+								0.0,
+								1.7802399396896363
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "portal_out_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.7215085029602051,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/portal_in.ao",
+						"offset": [
+							-30.510799407958986,
+							18.358200073242189
+						],
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "portal_sidelines_out_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.1821882724761963,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/portal_in.ao",
+						"offset": [
+							-30.510799407958986,
+							-4.642000198364258
+						],
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "shield_stab_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.6466097831726074,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/onact_shield_stab_grd.ao",
+						"animation": "once",
+						"offset": [
+							-12.4312744140625,
+							-86.5469970703125
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "shield_throw_end_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.0,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/portal_in_fast.ao"
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.9081740379333496,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/shieldThrow_groundSlam_impact.ao",
+						"offset": [
+							0.0,
+							-35.504913330078128
+						],
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "shield_throw_start_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20215463638305665,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/portal_in_vertical.ao",
+						"offset": [
+							0.0,
+							-145.0
+						],
+						"inherit_height": true,
+						"height": 105.0,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/onact_shield_stab.epk",
+						"bone_name": "Shield_Socket"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/onact_ice_barrage.epk"
+					}
+				]
+			},
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/onact_ice_barrage.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_start_charge_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					}
+				]
+			},
+			{
+				"name": "ice_shower_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					}
+				]
+			},
+			{
+				"name": "ice_shower_loop_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					}
+				]
+			},
+			{
+				"name": "ice_shower_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "inject_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/onact_corrupted_ground.epk"
+					}
+				]
+			},
+			{
+				"name": "paired_ultimate_emerge_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/portal_mask.epk"
+					}
+				]
+			},
+			{
+				"name": "paired_ultimate_idle_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					}
+				]
+			},
+			{
+				"name": "paired_ultimate_walk_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					}
+				]
+			},
+			{
+				"name": "portal_in_charge_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/portal_out.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					}
+				]
+			},
+			{
+				"name": "portal_in_charge_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					}
+				]
+			},
+			{
+				"name": "portal_in_charge_end_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					}
+				]
+			},
+			{
+				"name": "portal_out_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.9848384261131287,
+						"end_time": 1.286903738975525,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/portal_out.epk"
+					}
+				]
+			},
+			{
+				"name": "portal_sidelines_in_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.5357673168182374,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/portal_out.epk"
+					}
+				]
+			},
+			{
+				"name": "portal_sidelines_out_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.0545300245285035,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/portal_out.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.0545300245285035,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/portal_out.epk",
+						"bone_name": "Shield_Socket"
+					}
+				]
+			},
+			{
+				"name": "shield_stab_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/onact_shield_stab.epk",
+						"bone_name": "Shield_Socket"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/onact_ice_barrage.epk"
+					}
+				]
+			},
+			{
+				"name": "shield_throw_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.03986005857586861,
+						"end_time": 1.821120023727417,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/onact_shield_throw_end_shield.epk",
+						"bone_name": "Shield_Socket"
+					}
+				]
+			},
+			{
+				"name": "shield_throw_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/portal_mask.epk"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/onact_corrupted_ground.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_charge_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/shield_glow.epk",
+						"bone_name": "Shield_Socket"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/epk/portal_out.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.065999984741211,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "6 0 0 Smooth 0.300274 0.320946 Linear 0.897949 0.293919 Linear 0.897949 1 Linear 1.57033 1 Linear 2.066 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.065999984741211,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 1.0876 0 Linear 1.49169 0.564189 Flat 1.70876 0.557432 Linear 1.81457 0 Flat 2.066 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.065999984741211,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.438199 1 Flat 1.49562 1 Linear 2.066 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.0,
+						"name": "surgeTime_L",
+						"curve": "4 0 0 Smooth 0.431154 1 Linear 3.2128 1 Linear 4 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "emerge_start_charge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.4659999907016754,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.466 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "ice_shower_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.1330000162124634,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "4 0 1 Smooth 0.529952 1 Flat 0.830284 0 Flat 1.133 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "ice_shower_loop_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.6660000085830689,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "3 0 1 Linear 1.0947 1 Linear 1.666 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "ice_shower_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.1659998893737795,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 1.42324 0 Linear 2.166 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "inject_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.7660000324249269,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 0.714964 1 Linear 2.93057 1 Linear 3.766 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "paired_ultimate_emerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.1659998893737795,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 1.56802 1 Flat 2.166 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.1659998893737795,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 0.781155 1 Linear 1.70641 1 Flat 2.166 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "paired_ultimate_idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.6660000085830689,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 1.666 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "paired_ultimate_walk_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.1330000162124634,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 1.133 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "portal_in_charge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5329999923706055,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 0.533 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "portal_in_charge_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.100000023841858,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "4 0 1 Linear 0.289271 1 Linear 0.76136 0 Flat 1.1 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "portal_in_charge_end_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "4 0 1 Linear 0.586109 1 Linear 0.974978 0 Flat 1.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "portal_sidelines_out_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 0.654963 1 Linear 1 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "hide_me",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.444298 0 Linear 0.493928 1 Linear 1 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "shield_stab_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.366000175476074,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "7 0 0 Custom 0 0 0.88634 0.347973 Custom 1.242 0.334632 2.10808 0.550676 CustomSmooth 0.151105 2.54376 0.597973 Flat 2.66824 0.64527 Flat 2.75987 0 Flat 4.366 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.366000175476074,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.883523 1 Flat 2.53519 1 Linear 2.95419 0 Flat 4.366 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "shield_throw_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.132999897003174,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "4 0 1 Linear 1.37755 1 Linear 2.29153 0 Flat 3.133 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.132999897003174,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "4 0 0.476351 Linear 1.11739 0.476351 Flat 2.23561 0.252659 Flat 3.133 0.252659 Linear"
+					}
+				]
+			},
+			{
+				"name": "shield_throw_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.586109 1 Linear 1.333 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "4 0 1 Smooth 0.374323 1 Linear 1.05016 0 Flat 1.333 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0999999046325685,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 0.588526 1 Linear 1.6621 1 Linear 3.1 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "emerge_charge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5329999923706055,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 0.533 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "portal_sidelines_in_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.43790876865386965,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/Tul_Movement_TRL.trl",
+						"bone_groups": [
+							"grp_chest",
+							"grp_r_arm_01_01",
+							"grp_r_arm_02_06",
+							"grp_r_arm_01_08",
+							"grp_r_arm_07_05",
+							"grp_r_shin",
+							"grp_r_toe",
+							"grp_l_palm",
+							"grp_r_hand_02",
+							"grp_r_hand_04",
+							"grp_head"
+						]
+					}
+				]
+			},
+			{
+				"name": "shield_throw_end_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 1.6808114051818848,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/TulAndAshBoss/fx/ShieldTrail_BreachFlames.trl",
+						"bone_group": "FX_ShieldTrails"
+					}
+				]
+			}
+		]'
+	}
+
+	Lights
+	{
+		light = "point_light"
+			state = ""
+				colour = "4.55011 0.321876 1.128"
+				position = "0 -53 -285"
+				radius = 300
+			state = "on_death"
+				position = "0 -200 -210"
+				radius = 500
+	}
+
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.659688115119934,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.6450099945068359,
+						"haptic_id": "Haptic_LargeBoss_Rumble_Loop3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 3.6148500442504885,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "shield_stab_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.6922000050544739,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 2.554574489593506,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "shield_throw_start_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.5815200209617615,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.6023703813552857,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "inject_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.4129205644130707,
+						"frequency": 350.0,
+						"duration": 1.0,
+						"damp": "LinearUp"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.5221855640411377,
+						"frequency": 350.0,
+						"duration": 1.0,
+						"damp": "LinearUp"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.5523617267608643,
+						"frequency": 100.0,
+						"amplitude": 12.0,
+						"duration": 0.3499999940395355,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKCape.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKCape/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKCape/rig.ast"
+		linear_allowed_contraction = 0.600
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.800
+		normal_viscosity_multiplier = 0.200
+		tangent_viscosity_multiplier = 0.020
+		enclosure_radius = 1.000
+		attachment_bones = "L_clavicle_jntBnd R_clavicle_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKCape/BBFKCape.sm"
+	}
+	
+	BoneGroups
+	{
+	    bone_group = "child_attach false L_clavicle_jntBnd R_clavicle_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKSkirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKSkirt/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_radius = 2.000
+		enclosure_angle = 0.000
+		animation_velocity_factor = 5.000
+		animation_force_factor = 5.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKSkirt/BBFKSkirt.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKLBicepFingers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLBicepFingers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLBicepFingers/rig.ast"
+		linear_allowed_contraction = 0.100 
+		bend_stiffness = 500.000 
+		bend_allowed_angle = 0.100 
+		normal_viscosity_multiplier = 0.200 
+		tangent_viscosity_multiplier = 0.025 
+		enclosure_angle = 0.200
+		gravity = 0.100
+		enable_collisions = false
+		attachment_bones = "L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_attachment_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLBicepFingers/LBicepFingers.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_attachment_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKThighFingers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLThighFingers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLThighFingers/rig.ast"
+		linear_allowed_contraction = 0.100 
+		bend_stiffness = 500.000 
+		bend_allowed_angle = 0.100 
+		normal_viscosity_multiplier = 0.200 
+		tangent_viscosity_multiplier = 0.025 
+		enclosure_angle = 0.200
+		gravity = 0.100
+		enable_collisions = false
+		attachment_bones = "L_thigh_jntBnd L_knee_jntBnd L_knee_attachment_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLThighFingers/ThighFingers.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_thigh_jntBnd L_knee_jntBnd L_knee_attachment_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKLForearmFingers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLForearmFingers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLForearmFingers/rig.ast"
+		linear_allowed_contraction = 0.100 
+		bend_stiffness = 500.000 
+		bend_allowed_angle = 0.100 
+		normal_viscosity_multiplier = 0.200 
+		tangent_viscosity_multiplier = 0.025 
+		enclosure_angle = 0.200
+		gravity = 0.100
+		enable_collisions = false
+		attachment_bones = "L_elbow_jntBnd L_elbow_Twist_jntBnd_1 child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLForearmFingers/LForearmFingers.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_elbow_jntBnd L_elbow_Twist_jntBnd_1"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKShinFingers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLShinFingers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLShinFingers/rig.ast"
+		linear_allowed_contraction = 0.100 
+		bend_stiffness = 500.000 
+		bend_allowed_angle = 0.100 
+		normal_viscosity_multiplier = 0.200 
+		tangent_viscosity_multiplier = 0.025 
+		enclosure_angle = 0.200
+		gravity = 0.100
+		enable_collisions = false
+		attachment_bones = "L_knee_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLShinFingers/ShinFingers.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_knee_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BreachBossFallen/BreachBossFallenKnight.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BreachBossFallen/rig_5b9f4528.smd"
+Materials 1
+	"Art/Models/MONSTERS/BreachBossFallen/Textures/BreachBossFallenKnightc.mat" 19
+BoundingBox -144.618 -33.6208 -214.858 83.8567 47.7051 1.15064
+BoneGroups 78
+	"grp_root" 2 "root_jntBnd" "hip_jntBnd"
+	"grp_frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "aux_face" "head_jntBnd"
+	"grp_neck" 2 "head_jntBnd" "neck_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_toe"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_toe"
+	"grp_r_arm_01_01" 2 "R_arm_01_01_jntBnd" "R_arm_01_02_jntBnd"
+	"grp_r_arm_01_02" 2 "R_arm_01_02_jntBnd" "R_arm_01_03_jntBnd"
+	"grp_r_arm_01_03" 2 "R_arm_01_03_jntBnd" "R_arm_01_04_jntBnd"
+	"grp_r_arm_01_04" 2 "R_arm_01_04_jntBnd" "R_arm_01_05_jntBnd"
+	"grp_r_arm_01_05" 2 "R_arm_01_05_jntBnd" "R_arm_01_06_jntBnd"
+	"grp_r_arm_01_06" 2 "R_arm_01_06_jntBnd" "R_arm_01_07_jntBnd"
+	"grp_r_arm_01_07" 2 "R_arm_01_07_jntBnd" "R_arm_01_08_jntBnd"
+	"grp_r_arm_01_08" 2 "R_arm_01_08_jntBnd" "R_arm_01_09_jntBnd"
+	"grp_r_arm_01_09" 2 "R_arm_01_09_jntBnd" "R_arm_01_10_jntBnd"
+	"grp_r_hand_01" 2 "R_arm_01_10_jntBnd" "R_arm_01_finger_2_jntBnd_1"
+	"grp_r_arm_02_01" 2 "R_arm_02_01_jntBnd" "R_arm_02_02_jntBnd"
+	"grp_r_arm_02_02" 2 "R_arm_02_02_jntBnd" "R_arm_02_03_jntBnd"
+	"grp_r_arm_02_03" 2 "R_arm_02_03_jntBnd" "R_arm_02_04_jntBnd"
+	"grp_r_arm_02_04" 2 "R_arm_02_04_jntBnd" "R_arm_02_05_jntBnd"
+	"grp_r_arm_02_05" 2 "R_arm_02_05_jntBnd" "R_arm_02_06_jntBnd"
+	"grp_r_arm_02_06" 2 "R_arm_02_06_jntBnd" "R_arm_02_07_jntBnd"
+	"grp_r_arm_02_07" 2 "R_arm_02_07_jntBnd" "R_arm_02_08_jntBnd"
+	"grp_r_hand_02" 2 "R_arm_02_08_jntBnd" "R_arm_02_finger_2_jntBnd_1"
+	"grp_r_arm_03_01" 2 "R_arm_03_01_jntBnd" "R_arm_03_02_jntBnd"
+	"grp_r_arm_03_02" 2 "R_arm_03_02_jntBnd" "R_arm_03_03_jntBnd"
+	"grp_r_arm_03_03" 2 "R_arm_03_03_jntBnd" "R_arm_03_04_jntBnd"
+	"grp_r_arm_03_04" 2 "R_arm_03_04_jntBnd" "R_arm_03_05_jntBnd"
+	"grp_r_arm_03_05" 2 "R_arm_03_05_jntBnd" "R_arm_03_06_jntBnd"
+	"grp_r_arm_03_06" 2 "R_arm_03_06_jntBnd" "R_arm_03_07_jntBnd"
+	"grp_r_arm_03_07" 2 "R_arm_03_07_jntBnd" "R_arm_03_08_jntBnd"
+	"grp_r_hand_03" 2 "R_arm_03_08_jntBnd" "R_arm_03_finger_2_jntBnd_1"
+	"grp_r_arm_04_01" 2 "R_arm_04_01_jntBnd" "R_arm_04_02_jntBnd"
+	"grp_r_arm_04_02" 2 "R_arm_04_02_jntBnd" "R_arm_04_03_jntBnd"
+	"grp_r_arm_04_03" 2 "R_arm_04_03_jntBnd" "R_arm_04_04_jntBnd"
+	"grp_r_arm_04_04" 2 "R_arm_04_04_jntBnd" "R_arm_04_05_jntBnd"
+	"grp_r_arm_04_05" 2 "R_arm_04_05_jntBnd" "R_arm_04_06_jntBnd"
+	"grp_r_arm_04_06" 2 "R_arm_04_06_jntBnd" "R_arm_04_07_jntBnd"
+	"grp_r_arm_04_07" 2 "R_arm_04_07_jntBnd" "R_arm_04_08_jntBnd"
+	"grp_r_hand_04" 2 "R_arm_04_08_jntBnd" "R_arm_04_finger_2_jntBnd_1"
+	"grp_r_arm_05_01" 2 "R_arm_05_01_jntBnd" "R_arm_05_02_jntBnd"
+	"grp_r_arm_05_02" 2 "R_arm_05_02_jntBnd" "R_arm_05_03_jntBnd"
+	"grp_r_arm_05_03" 2 "R_arm_05_03_jntBnd" "R_arm_05_04_jntBnd"
+	"grp_r_arm_05_04" 2 "R_arm_05_04_jntBnd" "R_arm_05_05_jntBnd"
+	"grp_r_arm_05_05" 2 "R_arm_05_05_jntBnd" "R_arm_05_06_jntBnd"
+	"grp_r_arm_05_06" 2 "R_arm_05_06_jntBnd" "R_arm_05_07_jntBnd"
+	"grp_r_hand_05" 2 "R_arm_05_07_jntBnd" "R_arm_05_finger_2_jntBnd_1"
+	"grp_r_arm_06_01" 2 "R_arm_06_01_jntBnd" "R_arm_06_02_jntBnd"
+	"grp_r_arm_06_02" 2 "R_arm_06_02_jntBnd" "R_arm_06_03_jntBnd"
+	"grp_r_arm_06_03" 2 "R_arm_06_03_jntBnd" "R_arm_06_04_jntBnd"
+	"grp_r_arm_06_04" 2 "R_arm_06_04_jntBnd" "R_arm_06_05_jntBnd"
+	"grp_r_arm_06_05" 2 "R_arm_06_05_jntBnd" "R_arm_06_06_jntBnd"
+	"grp_r_hand_06" 2 "R_arm_06_06_jntBnd" "R_arm_06_finger_2_jntBnd_1"
+	"grp_r_arm_07_01" 2 "R_arm_07_01_jntBnd" "R_arm_07_02_jntBnd"
+	"grp_r_arm_07_02" 2 "R_arm_07_02_jntBnd" "R_arm_07_03_jntBnd"
+	"grp_r_arm_07_03" 2 "R_arm_07_03_jntBnd" "R_arm_07_04_jntBnd"
+	"grp_r_arm_07_04" 2 "R_arm_07_04_jntBnd" "R_arm_07_05_jntBnd"
+	"grp_r_arm_07_05" 2 "R_arm_07_05_jntBnd" "R_arm_07_06_jntBnd"
+	"grp_r_hand_07" 2 "R_arm_07_06_jntBnd" "R_arm_07_finger_2_jntBnd_1"
+	"grp_r_arm_08_01" 2 "R_arm_08_01_jntBnd" "R_arm_08_02_jntBnd"
+	"grp_r_arm_08_02" 2 "R_arm_08_02_jntBnd" "R_arm_08_03_jntBnd"
+	"grp_r_arm_08_03" 2 "R_arm_08_03_jntBnd" "R_arm_08_04_jntBnd"
+	"grp_r_arm_08_04" 2 "R_arm_08_04_jntBnd" "R_arm_08_05_jntBnd"
+	"grp_r_arm_08_05" 2 "R_arm_08_05_jntBnd" "R_arm_08_06_jntBnd"
+	"grp_r_hand_08" 2 "R_arm_08_06_jntBnd" "R_arm_08_finger_2_jntBnd_1"
+
+=== .smd Art/Models/MONSTERS/BreachBossFallen/rig_5b9f4528.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 19 in the header, 19 in the block · 30634 triangles over 28054 vertices
+  names: 530 bytes said, 530 read  [agree]
+
+=== shapes (30)
+0	BaseBodyArmour_01Shape	from 0	count 2328
+1	BaseBodyArmour_02Shape	from 2328	count 28872
+2	HeadShape	from 31200	count 1314
+3	HelmetShape	from 32514	count 5766
+4	L_armChainShape	from 38280	count 8064
+5	L_armShape	from 46344	count 3903
+6	L_ChestHornShape	from 50247	count 864
+7	LegsShape	from 51111	count 5781
+8	NeckPieceShape	from 56892	count 1422
+9	R_arm_01Shape	from 58314	count 3000
+10	R_arm_02Shape	from 61314	count 3000
+11	R_arm_03Shape	from 64314	count 3000
+12	R_arm_04Shape	from 67314	count 2940
+13	R_arm_05Shape	from 70254	count 3000
+14	R_arm_06Shape	from 73254	count 2760
+15	R_arm_07Shape	from 76014	count 3000
+16	R_arm_08Shape	from 79014	count 2700
+17	R_ChestHornShape	from 81714	count 864
+18	ShoulderPadsShape	from 82578	count 9324
+19	CapeShape	from 91902	count 2316
+20	BackPlatesShape	from 94218	count 2160
+21	FrontPlatesShape	from 96378	count 2520
+22	SidePlates_01Shape	from 98898	count 3624
+23	SidePlates_02Shape	from 102522	count 1944
+24	SidePlates_03Shape	from 104466	count 2040
+25	WaistBandShape	from 106506	count 6216
+26	L_bicepFingersShape	from 112722	count 1863
+27	ThighFingersShape	from 114585	count 1875
+28	LForearmFingersShape	from 116460	count 789
+29	ShinFingersShape	from 117249	count 843
+
+=== fitting
+the monster's rig: 244 bones
+mounts: aux_position, aux_L_toe, aux_R_toe, aux_face
+  BBFKCape.ao  socket chest_jntBnd [in its carrier's rig]  box (-21.3,19.1,-14.4)..(22.6,33.5,135.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 772 triangles over 458 vertices
+    names: 18 bytes said, 18 read  [agree]
+    rig 22 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 21 of 22  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (6,-1,-15)  carrier has (6,-1,-165.5)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-6,-1,-15)  carrier has (-6,-1,-165.5)
+      3 phys_skinned_Cape_01_01_jntBnd  [its own]  under 0  rests at (14.7,19.7,-4.4)
+      4 phys_skinned_Cape_02_01_jntBnd  [its own]  under 0  rests at (0,20.7,-4.4)
+      5 phys_skinned_Cape_03_01_jntBnd  [its own]  under 0  rests at (-14.7,19.7,-4.4)
+      6 phys_skinned_Cape_01_02_jntBnd  [its own]  under 3  rests at (14.7,20.4,17.3)
+      7 phys_skinned_Cape_02_02_jntBnd  [its own]  under 4  rests at (0,21.4,17.2)
+      8 phys_skinned_Cape_03_02_jntBnd  [its own]  under 5  rests at (-14.7,20.4,17.3)
+      9 phys_skinned_Cape_01_03_jntBnd  [its own]  under 6  rests at (14.7,21.2,38.9)
+      10 phys_skinned_Cape_02_03_jntBnd  [its own]  under 7  rests at (0,22.2,38.8)
+      11 phys_skinned_Cape_03_03_jntBnd  [its own]  under 8  rests at (-14.7,21.2,38.9)
+      12 phys_skinned_Cape_01_04_jntBnd  [its own]  under 9  rests at (14.7,22,60.5)
+      13 phys_skinned_Cape_02_04_jntBnd  [its own]  under 10  rests at (0,22.9,60.4)
+      14 phys_skinned_Cape_03_04_jntBnd  [its own]  under 11  rests at (-14.7,22,60.5)
+      15 phys_skinned_Cape_01_05_jntBnd  [its own]  under 12  rests at (14.7,22.7,82.1)
+      16 phys_skinned_Cape_02_05_jntBnd  [its own]  under 13  rests at (0,23.7,82)
+      17 phys_skinned_Cape_03_05_jntBnd  [its own]  under 14  rests at (-14.7,22.7,82.1)
+      18 phys_skinned_Cape_01_06_jntBnd  [its own]  under 15  rests at (13.2,23.4,102.4)
+      19 phys_skinned_Cape_02_06_jntBnd  [its own]  under 16  rests at (0,24.4,103.6)
+      20 phys_skinned_Cape_03_06_jntBnd  [its own]  under 17  rests at (-13.2,23.4,102.4)
+      21 phys_skinned_Cape_02_07_jntBnd  [its own]  under 19  rests at (0,25.2,125.2)
+  BBFKSkirt.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-30.7,-22.8,-15.4)..(30.7,22.4,26.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 6 in the header, 6 in the block · 6168 triangles over 6170 vertices
+    names: 198 bytes said, 198 read  [agree]
+    rig 31 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 30 of 31  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_frontPlates_01_jntBnd  [its own]  under 0  rests at (0,-16.2,1.1)
+      2 phys_backPlates_01_jntBnd  [its own]  under 0  rests at (0,16.4,2.6)
+      3 phys_L_sidePlates_01_01_jntBnd  [its own]  under 0  rests at (10.3,-11.8,-6.4)
+      4 phys_L_sidePlates_02_01_jntBnd  [its own]  under 0  rests at (17.7,-2.1,-5.7)
+      5 phys_L_sidePlates_03_01_jntBnd  [its own]  under 0  rests at (15.1,7.3,-5.3)
+      6 phys_R_sidePlates_01_01_jntBnd  [its own]  under 0  rests at (-10.3,-11.8,-6.4)
+      7 phys_R_sidePlates_02_01_jntBnd  [its own]  under 0  rests at (-17.7,-2.1,-5.7)
+      8 phys_R_sidePlates_03_01_jntBnd  [its own]  under 0  rests at (-15.1,7.3,-5.3)
+      9 phys_frontPlates_02_jntBnd  [its own]  under 1  rests at (0,-17.5,8.3)
+      10 phys_backPlates_02_jntBnd  [its own]  under 2  rests at (0,18.4,7.8)
+      11 phys_L_sidePlates_01_02_jntBnd  [its own]  under 3  rests at (12.1,-12,1.2)
+      12 phys_L_sidePlates_02_02_jntBnd  [its own]  under 4  rests at (20,-2.3,0.6)
+      13 phys_L_sidePlates_03_02_jntBnd  [its own]  under 5  rests at (17.3,8.1,1.3)
+      14 phys_R_sidePlates_01_02_jntBnd  [its own]  under 6  rests at (-12.1,-12,1.2)
+      15 phys_R_sidePlates_02_02_jntBnd  [its own]  under 7  rests at (-20,-2.3,0.6)
+      16 phys_R_sidePlates_03_02_jntBnd  [its own]  under 8  rests at (-17.3,8.1,1.3)
+      17 phys_frontPlates_03_jntBnd  [its own]  under 9  rests at (0,-18.8,15.6)
+      18 phys_backPlates_03_jntBnd  [its own]  under 10  rests at (0,19.8,15.6)
+      19 phys_L_sidePlates_01_03_jntBnd  [its own]  under 11  rests at (14.3,-12.7,8)
+      20 phys_L_sidePlates_02_03_jntBnd  [its own]  under 12  rests at (22.3,-2.6,6.9)
+      21 phys_L_sidePlates_03_03_jntBnd  [its own]  under 13  rests at (19.5,8.6,7.2)
+      22 phys_R_sidePlates_01_03_jntBnd  [its own]  under 14  rests at (-14.3,-12.7,8)
+      23 phys_R_sidePlates_02_03_jntBnd  [its own]  under 15  rests at (-22.3,-2.6,6.9)
+      24 phys_R_sidePlates_03_03_jntBnd  [its own]  under 16  rests at (-19.5,8.6,7.2)
+      25 phys_L_sidePlates_01_04_jntBnd  [its own]  under 19  rests at (16.4,-13.4,14.6)
+      26 phys_L_sidePlates_02_04_jntBnd  [its own]  under 20  rests at (24.5,-2.8,13)
+      27 phys_L_sidePlates_03_04_jntBnd  [its own]  under 21  rests at (21.9,9.1,13.6)
+      28 phys_R_sidePlates_01_04_jntBnd  [its own]  under 22  rests at (-16.4,-13.4,14.6)
+      29 phys_R_sidePlates_02_04_jntBnd  [its own]  under 23  rests at (-24.5,-2.8,13)
+      30 phys_R_sidePlates_03_04_jntBnd  [its own]  under 24  rests at (-21.9,9.1,13.6)
+  BBFKLBicepFingers.ao  socket L_shoulder_jntBnd [in its carrier's rig]  box (9.5,-8.8,-2.2)..(31.1,5.2,28.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 621 triangles over 446 vertices
+    names: 38 bytes said, 38 read  [agree]
+    rig 8 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_shoulder_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (22.3,7,-157.9)
+      2 L_shoulder_cTwist_jntBnd_1  [shared]  under 1  rests at (13.4,0,8.7)  carrier has (35.7,7,-149.2)
+      3 L_elbow_attachment_jntBnd  [shared]  under 1  rests at (26.8,0,17.4)  carrier has (49.2,7,-140.5)
+      4 phys_LBicepFingers_01_jntBnd  [its own]  under 1  rests at (12.5,-1.7,-0.2)
+      5 phys_LBicepFingers_02_jntBnd  [its own]  under 2  rests at (23.8,-5.1,8.9)
+      6 phys_LBicepFingers_03_jntBnd  [its own]  under 2  rests at (25.5,1.8,9)
+      7 phys_LBicepFingers_04_jntBnd  [its own]  under 2  rests at (19,0.5,23.4)
+  BBFKThighFingers.ao  socket L_thigh_jntBnd [in its carrier's rig]  box (-6.6,-16.3,19.2)..(14.7,1.2,61.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 625 triangles over 450 vertices
+    names: 34 bytes said, 34 read  [agree]
+    rig 7 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_thigh_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (11.5,0,-110)
+      2 L_knee_jntBnd  [shared]  under 1  rests at (5.2,1.7,49.7)  carrier has (16.7,1.7,-60.3)
+      3 L_knee_attachment_jntBnd  [shared]  under 1  rests at (5.2,1.7,49.7)  carrier has (16.7,1.7,-60.3)
+      4 phys_LegFingers_01_jntBnd  [its own]  under 1  rests at (-1.9,-8.8,27.7)
+      5 phys_LegFingers_02_jntBnd  [its own]  under 3  rests at (6,-7.1,48.5)
+      6 phys_LegFingers_03_jntBnd  [its own]  under 3  rests at (11.6,-2.3,56.1)
+  BBFKLForearmFingers.ao  socket L_elbow_Twist_jntBnd_1 [in its carrier's rig]  box (3.2,-9.2,-2.8)..(11.8,1.7,5.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 263 triangles over 190 vertices
+    names: 40 bytes said, 40 read  [agree]
+    rig 5 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_elbow_Twist_jntBnd_1  [shared]  under 0  rests at (0,0,0)  carrier has (59.4,3.3,-131.7)
+      2 L_elbow_jntBnd  [shared]  under 1  rests at (-10.3,3.7,-8.8)  carrier has (49.2,7,-140.5)
+      3 phys_LForearmFingers_01_jntBnd  [its own]  under 1  rests at (6.6,-4,-0.1)
+      4 phys_LForearmFingers_02_jntBnd  [its own]  under 1  rests at (4.9,-6.7,4.7)
+  BBFKShinFingers.ao  socket L_knee_jntBnd [in its carrier's rig]  box (0.4,-3.7,33.4)..(12.2,5.4,45)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 281 triangles over 209 vertices
+    names: 32 bytes said, 32 read  [agree]
+    rig 4 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_knee_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (16.7,1.7,-60.3)
+      2 phys_ShinFingers_01_jntBnd  [its own]  under 1  rests at (2.1,0.5,35.6)
+      3 phys_ShinFingers_02_jntBnd  [its own]  under 1  rests at (8.4,0.1,38.2)

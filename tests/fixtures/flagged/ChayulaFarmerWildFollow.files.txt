@@ -1,0 +1,1703 @@
+monster: Ailith [Metadata/Monsters/Breach/NPC/ChayulaFarmerWildFollow]
+
+=== .ao Metadata/Monsters/Breach/NPC/ChayulaFarmer.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/OneRig/Animations/BreachProphet/rig.amd"
+	view_of = "channel_01"
+		view_name = "channel_02"
+		view_looping = true
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+	animations = '[
+		{
+			"name": "battle_to_relaxed_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.03333333507180214,
+					"end_time": 0.699999988079071,
+					"name": "move",
+					"position": [
+						0.0,
+						-21.573999404907228,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "channel_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.6420650482177735,
+					"name": "bomb_explode"
+				}
+			]
+		},
+		{
+			"name": "channel_end_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.2680299282073975,
+					"name": "release_energy"
+				}
+			]
+		},
+		{
+			"name": "channel_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.51579350233078,
+					"name": "gather_energy"
+				}
+			]
+		},
+		{
+			"name": "channel_start_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.51579350233078,
+					"name": "gather_energy"
+				}
+			]
+		},
+		{
+			"name": "gift_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.239453077316284,
+					"name": "gift"
+				}
+			]
+		},
+		{
+			"name": "relaxed_to_battle_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.03333333507180214,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						0.0,
+						21.573999404907228,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "xesht_dying_cine_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 15.328495979309082,
+					"name": "death"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 16.366806030273439,
+					"name": "delete"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "Head_Attachment Metadata/NPC/League/Chayula/Ailith/attachments/AilithHoodHeld.ao"
+	attached_object = "R_upperArm_attachment_jntBnd Metadata/NPC/League/Chayula/Ailith/attachments/AilithRShoulderpadHeld.ao"
+	attached_object = "hip_jntBnd Metadata/NPC/League/Chayula/Ailith/attachments/AilithSkirtHeld.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.22440944612026215,
+								0.0
+							],
+							[
+								0.24409449100494386,
+								0.36452239751815798
+							],
+							[
+								0.29921260476112368,
+								1.0
+							]
+						],
+						"width": 80.0,
+						"length": 300.0,
+						"hand": "MainHand"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.7031963467597961,
+								0.0
+							],
+							[
+								0.7351598143577576,
+								0.3411306142807007
+							],
+							[
+								0.7990867495536804,
+								1.0
+							]
+						],
+						"width": 80.0,
+						"length": 300.0,
+						"hand": "OffHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.27165353298187258,
+								0.0
+							],
+							[
+								0.31102362275123598,
+								0.33723199367523196
+							],
+							[
+								0.3700787425041199,
+								1.0
+							]
+						],
+						"width": 80.0,
+						"length": 300.0,
+						"hand": "MainHand"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.7625570893287659,
+								0.0
+							],
+							[
+								0.7990867495536804,
+								0.33723199367523196
+							],
+							[
+								0.844748854637146,
+								1.0
+							]
+						],
+						"width": 80.0,
+						"length": 300.0,
+						"hand": "OffHand"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/OneRig/Animations/BreachProphet/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "center_L_hand"
+			parent = "L_finger_2_jntBnd_1"
+			translation = "-5 0 8"
+		socket = "center_R_hand"
+			parent = "R_finger_2_jntBnd_1"
+			translation = "5 0 -8"
+		socket = "gift_R"
+			parent = "R_thumb_1_jntBnd_3"
+			translation = "-1.88313 -1.87561 -2.31191"
+		socket = "root"
+			translation = "0 0 -19.1517"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Ailith_BreachProphet/AilithBreachProphet.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "hand_R_fx false center_R_hand R_finger_2_jntBnd_1"
+		bone_group = "hand_L_fx false center_L_hand L_finger_2_jntBnd_1"
+		bone_group = "gitf_fx false gift_R R_thumb_1_jntBnd_3"
+		bone_group = "root_fx false root_jntBnd root"
+		bone_group = "upperbody_fx false L_wrist_jntBnd L_elbow_jntBnd L_shoulder_jntBnd chest_jntBnd R_shoulder_jntBnd R_elbow_jntBnd R_wrist_jntBnd"
+		bone_group = "lowerbody_fx false L_toe_jntBnd L_ankle_jntBnd L_knee_jntBnd L_thigh_jntBnd R_thigh_jntBnd R_knee_jntBnd R_ankle_jntBnd R_toe_jntBnd"
+		bone_group = "head_fx false neck_jntBnd head_jntBnd face_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3680812418460846,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/attack_01.pet",
+						"bone_group": "hand_R_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.115314245223999,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/attack_01.pet",
+						"bone_group": "hand_L_fx"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.36679524183273318,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/attack_01.pet",
+						"bone_group": "hand_R_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9358120560646057,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/attack_01.pet",
+						"bone_group": "hand_L_fx"
+					}
+				]
+			},
+			{
+				"name": "channel_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/beamburst.pet",
+						"bone_group": "hand_R_fx"
+					}
+				]
+			},
+			{
+				"name": "channel_end_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/endburst.pet",
+						"bone_group": "hand_R_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5997074842453004,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/endamber.pet",
+						"bone_groups": [
+							"upperbody_fx",
+							"lowerbody_fx",
+							"head_fx"
+						]
+					}
+				]
+			},
+			{
+				"name": "channel_end_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/fadeburst.pet",
+						"bone_group": "hand_R_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8887078762054443,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/fadeamber.pet",
+						"bone_groups": [
+							"upperbody_fx",
+							"lowerbody_fx",
+							"head_fx"
+						]
+					}
+				]
+			},
+			{
+				"name": "channel_flinch_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/beamburst.pet",
+						"bone_group": "hand_R_fx"
+					}
+				]
+			},
+			{
+				"name": "channel_flinch_fwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/beamburst.pet",
+						"bone_group": "hand_R_fx"
+					}
+				]
+			},
+			{
+				"name": "channel_flinch_left_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/beamburst.pet",
+						"bone_group": "hand_R_fx"
+					}
+				]
+			},
+			{
+				"name": "channel_flinch_right_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/beamburst.pet",
+						"bone_group": "hand_R_fx"
+					}
+				]
+			},
+			{
+				"name": "channel_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.51579350233078,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/spellflame.pet",
+						"bone_group": "hand_R_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.51579350233078,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/amberburst.pet",
+						"bone_group": "hand_R_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9793641567230225,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/spellflame.pet",
+						"bone_group": "hand_L_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8937647342681885,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/startburst.pet",
+						"bone_group": "hand_R_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.9050681591033936,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/beamburst.pet",
+						"bone_group": "hand_R_fx"
+					}
+				]
+			},
+			{
+				"name": "channel_start_03",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.51579350233078,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/spellflame.pet",
+						"bone_group": "hand_R_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.51579350233078,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/amberburst.pet",
+						"bone_group": "hand_R_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9793641567230225,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/spellflame.pet",
+						"bone_group": "hand_L_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8937647342681885,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/startburst.pet",
+						"bone_group": "hand_R_fx"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.9050681591033936,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/beamburst.pet",
+						"bone_group": "hand_R_fx"
+					}
+				]
+			},
+			{
+				"name": "emerge_portal_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/portalamber.pet",
+						"bone_group": "root_fx"
+					}
+				]
+			},
+			{
+				"name": "gift_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.157281756401062,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/giftflame.pet",
+						"bone_group": "gitf_fx"
+					}
+				]
+			},
+			{
+				"name": "xesht_dying_cine_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 5.119877815246582,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/xesht_dying_cine_01_start.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 5.241517543792725,
+						"end_time": 15.344533920288086,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/xesht_dying_cine_01_pressure.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 15.28350830078125,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/xesht_dying_cine_01_blastingoff.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "channel_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/fx/beamburst_xeshty.pet",
+						"bone_group": "hand_R_fx"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.05917886644601822,
+						"end_time": 0.6123185157775879,
+						"name": "surgeTime_R",
+						"curve": "2 0.0591789 0 Linear 0.612319 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.8331238031387329,
+						"end_time": 1.352656364440918,
+						"name": "surgeTime_L",
+						"curve": "2 0.833124 0 Linear 1.35266 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.10984059423208237,
+						"end_time": 0.5538967847824097,
+						"name": "surgeTime_R",
+						"curve": "2 0.109841 0 Linear 0.553897 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.6965948343276978,
+						"end_time": 1.0871398448944092,
+						"name": "surgeTime_L",
+						"curve": "2 0.696595 0 Linear 1.08714 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "channel_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "chayulaFarmer_FADE",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 1.57112 0 Linear 2.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "channel_end_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "chayulaFarmer_FADE",
+						"apply_on_children": true,
+						"curve": "2 0 0 Smooth 2.333 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "channel_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "FadeFloat",
+						"curve": "4 0 1 Linear 1.8433 1 Linear 2.31847 0 Flat 2.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "channel_start_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "FadeFloat",
+						"curve": "4 0 1 Linear 1.8433 1 Linear 2.31847 0 Flat 2.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "gift_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.333000183105469,
+						"name": "FadeFloat",
+						"curve": "6 0 0 Linear 0.900174 0 Linear 1.58854 1 Linear 3.14454 1 Linear 3.71948 0 Flat 4.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "xesht_dying_cine_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 5.11702823638916,
+						"end_time": 16.666000366210939,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "4 5.11703 1 Linear 15.1679 1 Linear 16.0393 0 Flat 16.666 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 5.117039680480957,
+						"end_time": 16.666000366210939,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 5.11704 1 Linear 5.47564 0.435811 Flat 15.3089 0.435811 Linear 15.5904 0 Flat 16.666 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 5.258481025695801,
+						"end_time": 16.666000366210939,
+						"name": "FadeFloat",
+						"curve": "5 5.25848 0.5 Linear 10.031 0.5 Linear 10.2207 2 Linear 10.9881 1.5 Flat 16.666 1.5 Linear"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/epk/attack_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.8248791694641113,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/epk/attack_glow_02.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.08449263870716095,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/epk/attack_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.6862683296203613,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/epk/attack_glow_02.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_portal_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/epk/portalfade.epk"
+					}
+				]
+			},
+			{
+				"name": "exit_portal_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/epk/portalfade.epk"
+					}
+				]
+			},
+			{
+				"name": "xesht_dying_cine_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 5.165172576904297,
+						"filename": "Metadata/Effects/Spells/NPC/League/Chayula/epk/Ailith_xeshtdying_cine_01.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	Lights
+	{
+		light = "point_light"
+			state = ""
+				colour = "1.04277 0.783977 1.17325"
+				position = "0 -74 -270"
+				radius = 500
+			state = "on_death"
+				position = "0 -74 -270"
+				radius = 500
+		animations = '[
+			{
+				"name": "xesht_dying_cine_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 15.434080123901368,
+						"end_time": 16.666000366210939,
+						"state_name": "on_death"
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "channel_end_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.5985007286071778,
+						"ao_type": "Metadata/Effects/Spells/NPC/League/Chayula/ao/explosion_end.ao",
+						"offset": [
+							-1.3669319152832032,
+							-20.26134490966797
+						],
+						"height": 72.2890853881836
+					}
+				]
+			}
+		]'
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1464185267686844,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Whoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2630789577960968,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Vocals/NormalAttacks",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3634118437767029,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/Attack/Attack",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4571634829044342,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/Attack/BreachFlame_A_",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9469851851463318,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Whoosh",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0902423858642579,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/Attack/Attack",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.188207745552063,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/Attack/BreachFlame_B_",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0638679713010788,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Whoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18328000605106355,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Vocals/ShortAttacks",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33407866954803469,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/Attack/Attack",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35536840558052065,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/Attack/BreachFlame_A_",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6697973012924194,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Whoosh",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6726899147033691,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Vocals/ShortAttacks",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9031625390052795,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/Attack/Attack",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9236334562301636,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/Attack/BreachFlame_B_",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "channel_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/ChannelLoop",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"skip_on_loop": true,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/ChannelStart_Cast",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "channel_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/ChannelEnd_Surge",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "channel_end_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/Emerge_Teleport",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/ChannelStart_Cast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14180494844913484,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Vocals/ChannelEnd_Flinch",
+						"bone_name": "jaw_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "channel_flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Vocals/LowPrio_Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05433005094528198,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "channel_flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Vocals/LowPrio_Flinch",
+						"bone_name": "jaw_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04723735898733139,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "channel_flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Vocals/LowPrio_Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0401446595788002,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "channel_flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Vocals/LowPrio_Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04723735898733139,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "channel_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08456654101610184,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/ChannelStart",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "channel_start_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08456654101610184,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/ChannelStart",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_portal_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/Emerge_Teleport",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5438128709793091,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1806639432907105,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.539717435836792,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "R_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "exit_portal_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20182019472122193,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0883885622024537,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7749407291412354,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.48671555519104,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "L_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05433005094528198,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04864044487476349,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04133707657456398,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.050511233508586887,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "gift_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1095421314239502,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.532496452331543,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0071789026260377,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/Gift/EnergyMove",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.003286838531494,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/Gift/Emerge",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.502305746078491,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pit_fall_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18573959171772004,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/JumpCliff/Steps",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3687065541744232,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/JumpCliff/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48236870765686037,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/JumpCliff/Steps",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6126633286476135,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/JumpCliff/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1404378414154054,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/JumpCliff/Debris",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1762046813964845,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/JumpCliff/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.364715337753296,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/JumpCliff/Whoosh",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4342944622039797,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/JumpCliff/JumpCliff_Air",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3186380863189699,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/JumpCliff/Debris",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.00338077545166,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/JumpCliff/FallFarImpact",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3687114119529724,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"skip_on_loop": true,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2569081783294678,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5752692222595215,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sprint_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"skip_on_loop": true,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19726699590682984,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4602738916873932,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"skip_on_loop": true,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5373319983482361,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.087559461593628,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"skip_on_loop": true,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39908191561698916,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8077414035797119,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "xesht_dying_cine_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 3.879456043243408,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/JumpCliff/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.9670634269714359,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/XeshtKill/DyingBeam_Start_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.9670634269714359,
+						"end_time": 15.15174674987793,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/XeshtKill/DyingBeam_Loop_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 15.02211856842041,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/XeshtKill/Kill_Gore_",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "channel_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"skip_on_loop": true,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/ChannelStart_Cast",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/Breach/AilithNPC/Effects/ChannelLoop",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/NPC/League/Chayula/Ailith/attachments/AilithHoodHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Ailith_BreachProphet/attachments/hood/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Ailith_BreachProphet/attachments/hood/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_force_factor = 7.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Ailith_BreachProphet/attachments/hood/AilithBreachProphetHood.sm"
+	}
+}
+
+=== .ao Metadata/NPC/League/Chayula/Ailith/attachments/AilithRShoulderpadHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Ailith_BreachProphet/attachments/shoulderpad/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Ailith_BreachProphet/attachments/shoulderpad/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_radius = 0.500
+		enclosure_angle = 1.000
+	    attachment_bones = "chest_jntBnd neck_jntBnd R_clavicle_jntBnd R_shoulder_attachment_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Ailith_BreachProphet/attachments/shoulderpad/AilithBreachProphetCape.sm"
+	}
+}
+
+=== .ao Metadata/NPC/League/Chayula/Ailith/attachments/AilithSkirtHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/Ailith_BreachProphet/attachments/skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/Ailith_BreachProphet/attachments/skirt/rig.ast"
+		linear_allowed_contraction = 0.187
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		enclosure_angle = 0.700
+		animation_force_factor = 7.000
+		use_shock_propagation = false
+		attachment_bones = "R_knee_jntBnd R_thigh_jntBnd hip_jntBnd L_thigh_jntBnd L_knee_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/Ailith_BreachProphet/attachments/skirt/AilithBreachProphetSkirt.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/NPC/Ailith_BreachProphet/AilithBreachProphet.sm
+version 6
+SkinnedMeshData "Art/Models/NPC/Ailith_BreachProphet/Ailith_BreachProphet_armour_0c071eb7.smd"
+Materials 8
+	"Art/Models/NPC/Ailith_BreachProphet/textures/Ailith_Bodyc.mat" 6
+	"Art/Models/NPC/Ailith_BreachProphet/textures/Ailith_Bottomc.mat" 4
+	"Art/Models/NPC/Ailith_BreachProphet/textures/Ailith_Hoodc.mat" 1
+	"Art/Models/NPC/Ailith_BreachProphet/textures/Body_INT_Eyesc.mat" 1
+	"Art/Models/NPC/Ailith_BreachProphet/textures/Ailith_Glovesc.mat" 1
+	"Art/Models/NPC/Ailith_BreachProphet/textures/hair/Hair_INT_A_Cardsc.mat" 1
+	"Art/Models/NPC/Ailith_BreachProphet/textures/Body_INT_Fc.mat" 3
+	"Art/Models/NPC/Ailith_BreachProphet/textures/Ailith_Hood_normalc.mat" 1
+BoundingBox -74.4929 -17.9582 -201.828 74.4298 17.9291 0.672542
+BoneGroups 22
+	"root" 1 "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/NPC/Ailith_BreachProphet/Ailith_BreachProphet_armour_0c071eb7.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23D · stride 36
+  shapes 18 in the header, 18 in the block · 21920 triangles over 15555 vertices
+  names: 658 bytes said, 658 read  [agree]
+
+=== shapes (29)
+0	armpit_plate_meshShape	from 0	count 2844
+1	chest_fabric_meshShape	from 2844	count 2799
+2	chest_plate_accessories_meshShape	from 5643	count 13002
+3	chest_plate_meshShape	from 18645	count 2010
+4	L_shoulderpad_meshShape	from 20655	count 5061
+5	shirt_meshShape	from 25716	count 3030
+6	boots_01_meshShape	from 28746	count 6060
+7	boots_02_meshShape	from 34806	count 3636
+8	pants_meshShape	from 38442	count 3366
+9	pants_plate_meshShape	from 41808	count 402
+10	crown_meshShape	from 42210	count 3642
+11	eyes_meshShape	from 45852	count 1080
+12	gloves_meshShape	from 46932	count 5034
+13	hair_meshShape	from 51966	count 2724
+14	hands_meshShape	from 54690	count 3096
+15	head_meshShape	from 57786	count 4170
+16	upperArms_meshShape	from 61956	count 354
+17	hood_meshShape	from 62310	count 3450
+18	cloth_meshShape	from 65760	count 1146
+19	shoulderpads_dangles_meshShape	from 66906	count 2088
+20	shoulderpads_meshShape	from 68994	count 3582
+21	front_cloth_hands_meshShape	from 72576	count 1068
+22	main_cloth_hands_meshShape	from 73644	count 15252
+23	waist_opaque_meshShape	from 88896	count 31434
+24	front_cloth_meshShape	from 120330	count 588
+25	main_cloth_layer_01_meshShape	from 120918	count 2328
+26	main_cloth_layer_02_meshShape	from 123246	count 2058
+27	main_cloth_layer_03_meshShape	from 125304	count 1290
+28	waist_doublemeshShape	from 126594	count 384
+
+=== fitting
+the monster's rig: 87 bones
+mounts: aux_position, aux_camera_position, aux_L_Weapon_attachment_jntBnd_02, aux_R_Weapon_attachment_jntBnd_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_Head_attachment, aux_L_Weapon_attachment_jntBnd, aux_R_Weapon_attachment_jntBnd
+  AilithHoodHeld.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-13.2,-9.4,-9.1)..(12.4,14.1,1.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 546 triangles over 518 vertices
+    names: 74 bytes said, 74 read  [agree]
+    rig 8 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_L_03_jntBnd  [its own]  under 0  rests at (9.4,10.1,-2.5)
+      2 phys_tri_R_01_jntBnd  [its own]  under 0  rests at (-9.2,-8.5,-0.5)
+      3 phys_tri_L_01_jntBnd  [its own]  under 0  rests at (9.5,-7.9,-0.7)
+      4 phys_tri_R_02_jntBnd  [its own]  under 0  rests at (-12.2,-0.3,-2.2)
+      5 phys_tri_M_01_jntBnd  [its own]  under 0  rests at (-0.1,13.5,-2.8)
+      6 phys_tri_L_02_jntBnd  [its own]  under 0  rests at (11.5,-0.3,-2.1)
+      7 phys_tri_R_03_jntBnd  [its own]  under 0  rests at (-8.6,9.5,-2.2)
+  AilithRShoulderpadHeld.ao  socket R_upperArm_attachment_jntBnd [in its carrier's rig]  box (-48.1,-15.7,-21.7)..(16.6,15.2,20.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 2272 triangles over 1618 vertices
+    names: 134 bytes said, 134 read  [agree]
+    rig 14 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 14  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,-0,0)  carrier has (0,0,0)
+      1 R_clavicle_jntBnd  [shared]  under 0  rests at (13,-6.9,5.4)  carrier has (-5.6,-0.9,-154)
+      2 phys_tri_cloth_01_jntBnd  [its own]  under 0  rests at (-8.5,9,5.2)
+      3 phys_shoulderpad_dangles_01_jntBnd  [its own]  under 0  rests at (-19.7,11.8,2.2)
+      4 phys_shoulderpad_dangles_02_jntBnd  [its own]  under 0  rests at (-20.8,8.8,-6.4)
+      5 phys_shoulderpad_dangles_03_jntBnd  [its own]  under 0  rests at (-20.4,4.3,-11.4)
+      6 phys_shoulderpad_dangles_04_jntBnd  [its own]  under 0  rests at (-20,-2.6,-11.6)
+      7 phys_shoulderpad_dangles_06_jntBnd  [its own]  under 0  rests at (-18,-11.2,-0.3)
+      8 phys_shoulderpad_dangles_05_jntBnd  [its own]  under 0  rests at (-20.3,-8.2,-7.2)
+      9 R_shoulder_attachment_jntBnd  [shared]  under 1  rests at (0.4,0,-0.9)  carrier has (-19.2,6.5,-151.1)
+      10 neck_jntBnd  [shared]  under 1  rests at (20.6,-3.3,4.9)  carrier has (-0,2.4,-159.3)
+      11 chest_jntBnd  [shared]  under 1  rests at (7.3,-6.3,21.3)  carrier has (0,0,-138.1)
+      12 phys_tri_cloth_02_jntBnd  [its own]  under 2  rests at (-23.4,7.6,5.2)
+      13 phys_tri_cloth_03_jntBnd  [its own]  under 12  rests at (-34,9.1,11.7)
+  AilithSkirtHeld.ao  socket hip_jntBnd [in its carrier's rig]  box (-38.7,-20,-28)..(21.4,27.9,67.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 8 in the header, 8 in the block · 18134 triangles over 13417 vertices
+    names: 408 bytes said, 408 read  [agree]
+    rig 25 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 24 of 25  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-13.4)  carrier has (0,0,-113.2)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.9,0,-0)  carrier has (10.9,0,-99.8)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-10.9,-0,0)  carrier has (-10.9,-0,-99.8)
+      4 phys_tri_F_R_skirt_1  [its own]  under 0  rests at (-3.3,-12.6,0.8)
+      5 phys_tri_B_L_skirt_1  [its own]  under 0  rests at (8.6,12.5,0.9)
+      6 phys_tri_B_R_skirt_1  [its own]  under 0  rests at (-0.7,14.2,0.9)
+      7 phys_tri_F_L_skirt_1  [its own]  under 0  rests at (3.9,-12.5,0.7)
+      8 spine_2_jntBnd  [shared]  under 1  rests at (0,0,-25.7)  carrier has (0,0,-125.5)
+      9 L_knee_jntBnd  [shared]  under 2  rests at (15.5,0.8,45.7)  carrier has (15.5,0.8,-54.1)
+      10 R_knee_jntBnd  [shared]  under 3  rests at (-15.5,0.8,45.7)  carrier has (-15.5,0.8,-54.1)
+      11 phys_tri_R_skirt_1  [its own]  under 3  rests at (-15.5,-7.7,0.9)
+      12 phys_tri_F_R_skirt_2  [its own]  under 4  rests at (-4.2,-13,24.8)
+      13 phys_tri_B_L_skirt_2  [its own]  under 5  rests at (9.4,15.3,24.8)
+      14 phys_tri_B_R_skirt_2  [its own]  under 6  rests at (-1.1,16.4,24.9)
+      15 phys_tri_F_L_skirt_2  [its own]  under 7  rests at (4.4,-13,24.8)
+      16 phys_tri_R_skirt_4  [its own]  under 10  rests at (-23.2,-2.8,48.5)
+      17 phys_tri_R_skirt_6  [its own]  under 10  rests at (-19.1,13.6,48.7)
+      18 phys_tri_R_skirt_5  [its own]  under 10  rests at (-23.3,8.7,48.8)
+      19 phys_tri_R_skirt_12  [its own]  under 10  rests at (-18.9,-7.7,48.5)
+      20 phys_tri_R_skirt_2  [its own]  under 11  rests at (-16.8,-8,25)
+      21 phys_tri_F_R_skirt_3  [its own]  under 12  rests at (-4.6,-13.5,48.9)
+      22 phys_tri_B_L_skirt_3  [its own]  under 13  rests at (9.8,18.1,48.9)
+      23 phys_tri_B_R_skirt_3  [its own]  under 14  rests at (-1.6,18.8,48.9)
+      24 phys_tri_F_L_skirt_3  [its own]  under 15  rests at (4.9,-13.4,48.9)

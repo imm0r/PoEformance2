@@ -1,0 +1,690 @@
+monster: Fungal Artillery [Metadata/Monsters/Zombies/Fungal/FungalArtillery1__]
+
+=== .ao Metadata/Monsters/Zombies/Fungal/FungalArtillery_Brown.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FungalArtillery/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5036433339118958,
+					"name": "contact",
+					"position": [
+						-1.9291892051696778,
+						12.707891464233399,
+						-78.66345977783203
+					],
+					"contact_ref": [
+						-1.9290000200271607,
+						49.8187255859375,
+						-63.43819808959961
+					]
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.5,
+					"name": "move",
+					"data": "0 0 0 Everything 0 0 Away 1.000000"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.5,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 Away 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "projectile_jntBnd Metadata/Monsters/Zombies/Fungal/Attachments/Spore3.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FungalArtillery/rig.ast"
+		socket = "aux_sac_offset_01"
+			parent = "projectile_jntBnd"
+			translation = "0 0 -21.6936"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FungalArtillery/FungalArtillery3.sm"
+			FungalArtillery3_mesh|FungalArtilleryFungus|FungalArtilleryFungusShape = "Art/Textures/Monsters/FungalArtillery/FungalArtilleryFungusBrownc.mat:0"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09744150191545487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34221500158309939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.041228100657463077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3640350103378296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/GenericNorm",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06871350109577179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6067249774932861,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/GenericNorm",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5827000141143799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/MoveSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_big_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0011695900466293097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/FlinchLarge",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/FlinchSmall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/MoveSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/FlinchSmall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/MoveSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/FlinchSmall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/MoveSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/FlinchSmall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/MoveSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/FlinchSmall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/MoveSmall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/Idle.loop.ogg",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.002923979889601469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/FlinchLarge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34615200757980349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35576900839805605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/GenericNorm",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40769100189208987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45576900243759158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.573074996471405,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8788430094718933,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0865299701690674,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2115399837493897,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6173100471496583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6942299604415894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1423099040985109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2307701110839845,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3577001094818117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.002923979889601469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/FlinchLarge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34615200757980349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35576900839805605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/GenericNorm",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40769100189208987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45576900243759158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.573074996471405,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8788430094718933,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0865299701690674,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2115399837493897,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Move",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6173100471496583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6942299604415894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1423099040985109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2307701110839845,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3577001094818117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Vocal/WalkingIdle.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Move.loop.ogg",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05368420109152794,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6884210109710693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3721100091934205,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0542099475860597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/MushroomMortar/Movement/Step",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false L_shoulder_jntBnd L_clavicle_jntBnd chest_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_sac false projectile_jntBnd aux_sac_offset_01"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.42493054270744326,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/FungalArtillery/pet/attack_01_onact.pet",
+						"bone_group": "grp_sac"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.3329999446868897,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.148047 0 Flat 0.503643 1 Custom 6.9779 -0 1.05592 0 Linear 1.333 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Zombies/Fungal/Attachments/Spore3.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+	on_game_object_set =
+	{
+		game_object.spore = this;
+	}
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FungalArtillery/attachments/FungalSpore/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FungalArtillery/attachments/FungalSpore/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FungalArtillery/attachments/FungalSpore/FungalArtillerySpore.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "midline false aux_mid aux_line"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "grow",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.034601300954818729,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/FungalArtillery/spore_grow_midline.pet",
+						"bone_group": "midline"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/FungalArtillery/FungalArtillery3.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/FungalArtillery/rig_7fe5f520.smd"
+Materials 2
+	"Art/Textures/Monsters/FungalArtillery/FungalArtilleryBodyc.mat" 2
+	"Art/Textures/Monsters/FungalArtillery/FungalArtilleryFungusc.mat" 1
+BoundingBox -72.048 -15.3011 -186.229 72.5581 40.1493 -0.2555
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_1_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_1_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/FungalArtillery/rig_7fe5f520.smd
+  version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 3 in the header, 3 in the block · 12768 triangles over 9889 vertices
+  names: 404 bytes said, 404 read  [agree]
+
+=== shapes (3)
+0	FungalArtillery3_mesh|FungalArtilleryBody|FungalArtilleryBodyShape	from 0	count 14976
+1	FungalArtillery3_mesh|FungalArtilleryHair|FungalArtilleryHairShape	from 14976	count 3396
+2	FungalArtillery3_mesh|FungalArtilleryFungus|FungalArtilleryFungusShape	from 18372	count 19932
+
+=== fitting
+the monster's rig: 43 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  Spore3.ao  socket projectile_jntBnd [in its carrier's rig]  box (-20.5,-20.5,-45)..(19.7,20,10.6)
+    (the geometry did not read)
+    rig 3 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 aux_mid  [its own]  under 0  rests at (-0,0,-4.7)
+      2 aux_line  [its own]  under 0  rests at (-0,0,-36.3)

@@ -1,0 +1,1444 @@
+monster: Treant Foulspawn [Metadata/Monsters/LeagueRitual/DryadFaction/FungalZombie/DruidicFungusZombieTree]
+
+=== .ao Metadata/Monsters/LeagueRitual/DryadFaction/FungalZombie/DruidicFungusZombieTree.ao (depth 0)
+version 3
+extends "Metadata/Monsters/FungusZombie/FungusZombie"
+
+AttachedAnimatedObject
+{
+	attached_object = "L_clavicle_jntBnd Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieTreeLeftClavicle.ao"
+	attached_object = "R_clavicle_jntBnd Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieTreeRightClavicle.ao"
+	attached_object = "R_shoulder_jntBnd Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieTreeRightShoulder.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FungusZombie/FungusZombieTree.sm"
+			FungusZombieTreeShape = "Art/Textures/Monsters/FungusZombie/DruidicFungusZombieTree.mat:0"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueRitual/DryadFaction/FungalZombie/DruidicFungusZombieHeadlessPhysics.ao (depth 0)
+version 3
+extends "Metadata/Monsters/FungusZombie/FungusZombie"
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieHeadlessHead.ao"
+	attached_object = "L_clavicle_jntBnd Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieHeadlessLeftClavicle.ao"
+	attached_object = "L_shoulder_jntBnd Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieHeadlessLeftShoulder.ao"
+	attached_object = "R_clavicle_jntBnd Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieHeadlessRightClavicle.ao"
+	attached_object = "R_shoulder_jntBnd Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieHeadlessRightShoulder.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless.sm"
+			FungusZombieHeadlessShape = "Art/Textures/Monsters/FungusZombie/DruidicFungusZombieHeadless.mat:0"
+	}
+}
+
+=== .ao Metadata/Monsters/FungusZombie/FungusZombie.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FungusZombie/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.7158210277557373,
+					"end_time": 0.8244600296020508,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.7111549973487854,
+					"end_time": 0.8057979941368103,
+					"name": "melee_trail",
+					"data": "Left 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "death_explosion_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.2478200197219849,
+					"name": "explosion",
+					"position": [
+						0.0,
+						105.72699737548828,
+						-67.68399810791016
+					]
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000000298023225,
+					"name": "move",
+					"position": [
+						90.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000000298023225,
+					"name": "move",
+					"position": [
+						-90.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "spellcast_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6299999952316284,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.513966977596283,
+								0.0
+							],
+							[
+								0.6145250201225281,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.47123900055885317,
+						"angle": 2.478369951248169,
+						"length": 127.16799926757813,
+						"impact_x_rotation": [
+							0.0,
+							-0.26179900765419009
+						],
+						"impact_z_rotation": [
+							0.5235990285873413,
+							1.309000015258789
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_wrist_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.536312997341156,
+								0.0
+							],
+							[
+								0.6201120018959045,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.47123900055885317,
+						"angle": 2.2165699005126955,
+						"length": 161.85000610351563,
+						"impact_x_rotation": [
+							0.0,
+							-0.26179900765419009
+						],
+						"impact_z_rotation": [
+							0.5235990285873413,
+							1.309000015258789
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_wrist_jntBnd"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FungusZombie/rig.ast"
+		socket = "Monster_Trail_R"
+			parent = "R_finger_1_jntBnd_3"
+			translation = "-10 0 0"
+		socket = "Monster_Trail_L"
+			parent = "L_finger_1_jntBnd_3"
+			translation = "10 0 0"
+		socket = "cyl"
+			parent = "root_jntBnd"
+			translation = "40 0 -1"
+	}
+	
+	SkinMesh
+	{
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6085140109062195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.678633987903595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Swish",
+						"bone_name": "Monster_Trail_R"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6545029878616333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6854100227355957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Swish",
+						"bone_name": "Monster_Trail_L"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14949999749660493,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40083977580070498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_explosion_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Explode",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0010071400320157409,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09893249720335007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/FungalBombs/FungalBuildUp",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24272100627422334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.286734014749527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/StepExplode",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36230799555778506,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/StepExplode",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6156790256500244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/StepExplode",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8026919960975647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9140729904174805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/StepExplode",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9950569868087769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1368399858474732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/StepExplode",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1368399858474732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/FungalBombs/FungalExplode",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1624799966812134,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2543799877166749,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17629823088645936,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14949999749660493,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2055637389421463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14949999749660493,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Effects/FungalEmerge",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2439740002155304,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/EmergeSlam",
+						"bone_name": "Monster_Trail_L"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3184809982776642,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.885316014289856,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Swish",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9306060075759888,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/EmergeSlam",
+						"bone_name": "Monster_Trail_R"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3615700006484986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFoot",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4536099433898926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Shake",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6143100261688233,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFoot",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8086199760437012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_big_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.027108799666166307,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03364630043506622,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.031690098345279697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.015258199535310269,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.010954599827528,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.026604099199175836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/IdleTwitch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Shake",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9955019950866699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10328599810600281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15023499727249146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21361500024795533,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/FallKnockdown",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7159619927406311,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.875590980052948,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4178400039672852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Step",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.518779993057251,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7018799781799317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.781690001487732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Step",
+						"bone_name": "L_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.072770118713379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFoot",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10328599810600281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15023499727249146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21361500024795533,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/FallKnockdown",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7159619927406311,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Step",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.875590980052948,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4178400039672852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Step",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.492959976196289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7018799781799317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8004599809646607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFoot",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Spellcast",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08319509774446488,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "Monster_Trail_R"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14450299739837647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFoot",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14450299739837647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32715800404548647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3314419984817505,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4962629973888397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFoot",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4962629973888397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spellcast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Spellcast",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40198400616645815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFast",
+						"bone_name": "Monster_Trail_R"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5711959004402161,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/EmergeSlam"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5711959004402161,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Effects/FungalEmerge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5711959004402161,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/QueenOfFilthBoss/FX/GoreImpact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6311099529266358,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5792049765586853,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFoot",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5792049765586853,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6615039706230164,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6633819937705994,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveSlow",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2243399620056153,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/MoveFoot",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2243399620056153,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_6/FungusZombie/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd"
+		bone_group = "frameupper false R_elbow_jntBnd R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd"
+		bone_group = "cyl false root_jntBnd cyl"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/FungusZombie/fx/emerge_dripping.pet",
+						"bone_group": "frameupper"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0018210000125691295,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/FungusZombie/fx/emerge_ground.pet",
+						"bone_group": "cyl"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieTreeLeftClavicle.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FungusZombie/FungusZombieTree/L_Clavicle/FZTreeLClavicleNoPhys.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FungusZombie/FungusZombieTree/L_Clavicle/FZTreeLClavicleNoPhys.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FungusZombie/FungusZombieTree/L_Clavicle/FZTreeLClavicleNoPhys.sm"
+			skinned_idle_FZTreeLClavicleNoPhys|FungusZombieTree_L_clavicle|FungusZombieTree_L_clavicleShape = "Art/Textures/Monsters/FungusZombie/DruidicFungusZombieTree.mat:0"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieTreeRightClavicle.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FungusZombie/FungusZombieTree/R_Clavicle/FZTreeRClavicleNoPhys.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FungusZombie/FungusZombieTree/R_Clavicle/FZTreeRClavicleNoPhys.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FungusZombie/FungusZombieTree/R_Clavicle/FZTreeRClavicleNoPhys.sm"
+			skinned_idle_FZTreeRClavicleNoPhys|FungusZombieTree_R_clavicle|FungusZombieTree_R_clavicleShape = "Art/Textures/Monsters/FungusZombie/DruidicFungusZombieTree.mat:0"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieTreeRightShoulder.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FungusZombie/FungusZombieTree/R_Shoulder/FZTreeRShoulderNoPhys.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FungusZombie/FungusZombieTree/R_Shoulder/FZTreeRShoulderNoPhys.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FungusZombie/FungusZombieTree/R_Shoulder/FZTreeRShoulderNoPhys.sm"
+			skinned_idle_FZTreeRShoulderNoPhys|FungusZombieTree_R_shoulder|FungusZombieTree_R_shoulderShape = "Art/Textures/Monsters/FungusZombie/DruidicFungusZombieTree.mat:0"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieHeadlessHead.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/Head/FZHeadlessHeadNoPhys.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/Head/FZHeadlessHeadNoPhys.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/Head/FZHeadlessHeadNoPhys.sm"
+			skinned_idle_FZHeadlessHeadNoPhys|FungusZombieHeadless_head|FungusZombieHeadless_headShape = "Art/Textures/Monsters/FungusZombie/DruidicFungusZombieHeadless.mat:0"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieHeadlessLeftClavicle.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/L_Clavicle/FZHeadlessLClavicleNoPhys.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/L_Clavicle/FZHeadlessLClavicleNoPhys.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/L_Clavicle/FZHeadlessLClavicleNoPhys.sm"
+			skinned_idle_FZHeadlessLClavicleNoPhys|FungusZombieHeadless_L_clavicle|FungusZombieHeadless_L_clavicleShape = "Art/Textures/Monsters/FungusZombie/DruidicFungusZombieHeadless.mat:0"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieHeadlessLeftShoulder.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/L_Shoulder/FZHeadlessLShoulderNoPhys.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/L_Shoulder/FZHeadlessLShoulderNoPhys.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/L_Shoulder/FZHeadlessLShoulderNoPhys.sm"
+			skinned_idle_FZHeadlessLShoulderNoPhys|FungusZombieHeadless_L_shoulder|FungusZombieHeadless_L_shoulderShape = "Art/Textures/Monsters/FungusZombie/DruidicFungusZombieHeadless.mat:0"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieHeadlessRightClavicle.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/R_Clavicle/FZHeadlessRClavicleNoPhys.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/R_Clavicle/FZHeadlessRClavicleNoPhys.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/R_Clavicle/FZHeadlessRClavicleNoPhys.sm"
+			skinned_idle_FZHeadlessRClavicleNoPhys|FungusZombieHeadless_R_clavicle|FungusZombieHeadless_R_clavicleShape = "Art/Textures/Monsters/FungusZombie/DruidicFungusZombieHeadless.mat:0"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/FungusZombie/Attachments/DruidicFungusZombieHeadlessRightShoulder.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/R_Shoulder/FZHeadlessRShoulderNoPhys.amd"
+	default_animation = "idle"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/R_Shoulder/FZHeadlessRShoulderNoPhys.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FungusZombie/FungusZombieHeadless/R_Shoulder/FZHeadlessRShoulderNoPhys.sm"
+			skinned_idle_FZHeadlessRShoulderNoPhys|FungusZombieHeadless_R_shoulder|FungusZombieHeadless_R_shoulderShape = "Art/Textures/Monsters/FungusZombie/DruidicFungusZombieHeadless.mat:0"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/FungusZombie/FungusZombieTree.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/FungusZombie/rig_9d143e61.smd"
+Materials 1
+	"Art/Textures/Monsters/FungusZombie/FungusZombieTreec.mat" 1
+BoundingBox -93.0084 -21.9349 -178.457 93.0084 25.0815 0.397
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_1_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_1_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/FungusZombie/rig_9d143e61.smd
+  version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 1 in the header, 1 in the block · 10600 triangles over 7628 vertices
+  names: 42 bytes said, 42 read  [agree]
+
+=== shapes (1)
+0	FungusZombieTreeShape	from 0	count 31800
+
+=== fitting
+the monster's rig: 48 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  DruidicFungusZombieTreeLeftClavicle.ao  socket L_clavicle_jntBnd [in its carrier's rig]  box (0.2,0.6,-64.1)..(63.3,68.1,1.4)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 skinned_idle_FZTreeLClavicleNoPhys|root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  DruidicFungusZombieTreeRightClavicle.ao  socket R_clavicle_jntBnd [in its carrier's rig]  box (-63.3,-58.5,-3.5)..(48.9,24.5,104.4)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 skinned_idle_FZTreeRClavicleNoPhys|root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  DruidicFungusZombieTreeRightShoulder.ao  socket R_shoulder_jntBnd [in its carrier's rig]  box (-45.2,-21,2.7)..(-13.7,1.3,22.7)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 skinned_idle_FZTreeRShoulderNoPhys|root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  DruidicFungusZombieHeadlessHead.ao  socket chest_jntBnd [in its carrier's rig]  box (-45.4,-12,-113.2)..(52.8,65.5,-23.7)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 skinned_idle_FZHeadlessHeadNoPhys|root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  DruidicFungusZombieHeadlessLeftClavicle.ao  socket L_clavicle_jntBnd [in its carrier's rig]  box (3.8,-6.4,-31.7)..(36.2,42.8,-1.8)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 skinned_idle_FZHeadlessLClavicleNoPhys|root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  DruidicFungusZombieHeadlessLeftShoulder.ao  socket L_shoulder_jntBnd [in its carrier's rig]  box (7.6,1.1,-33.3)..(35.3,10.7,-3.1)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 skinned_idle_FZHeadlessLShoulderNoPhys|root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  DruidicFungusZombieHeadlessRightClavicle.ao  socket R_clavicle_jntBnd [in its carrier's rig]  box (-8.4,-48.8,9.9)..(2.6,-8.2,45.9)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 skinned_idle_FZHeadlessRClavicleNoPhys|root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  DruidicFungusZombieHeadlessRightShoulder.ao  socket R_shoulder_jntBnd [in its carrier's rig]  box (-46.2,-10.7,3.4)..(1.5,23.3,45.7)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 skinned_idle_FZHeadlessRShoulderNoPhys|root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)

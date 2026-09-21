@@ -1,0 +1,1420 @@
+monster: Runed Knight [Metadata/Monsters/LeagueExpeditionNew/VaalArmour/ExpeditionArmourCaster]
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/VaalArmour/VaalArmour.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Cultist/staff/rig.amd"
+	animations = '[
+		{
+			"name": "carpet_bomb_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.49471399188041689,
+					"name": "contact",
+					"position": [
+						0.0,
+						0.0,
+						-5.681040219604302e-34
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7136199474334719,
+					"name": "wave",
+					"position": [
+						-11.177399635314942,
+						-31.150299072265626,
+						-65.20719909667969
+					]
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.19299635291099549,
+					"name": "move",
+					"position": [
+						0.0,
+						100.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.19900000095367433,
+					"name": "move",
+					"position": [
+						150.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.19900000095367433,
+					"name": "move",
+					"position": [
+						-150.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "lightning_bolts_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5100280046463013,
+					"name": "beam_start",
+					"position": [
+						0.0,
+						0.0,
+						-5.681040219604302e-34
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5254100561141968,
+					"name": "beam_end",
+					"position": [
+						0.0,
+						0.0,
+						-5.681040219604302e-34
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_aoe_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.50380539894104,
+					"name": "contact",
+					"position": [
+						-11.759664535522461,
+						-32.78007507324219,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_projectile_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.2750000059604645,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5119658708572388,
+					"name": "contact",
+					"position": [
+						10.269895553588868,
+						-77.29530334472656,
+						-110.88999938964844
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_projectile_02",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.2750000059604645,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5604544281959534,
+					"name": "contact",
+					"position": [
+						15.260444641113282,
+						-71.34716033935547,
+						-126.08599853515625
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/LeagueExpeditionNew/VaalArmour/attachments/VaalArmourMonsterSkirtHeld.ao"
+	attached_object = "R_Weapon Metadata/Monsters/LeagueExpeditionNew/VaalArmour/attachments/VaalArmourStaffHeld.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/Cultist/staff/rig.ast"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -5.9192"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -10.6918 -4.11053"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+			translation = "0 10.6568 0"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "aux_hand_flames"
+			parent = "aux_L_Weapon_attachment"
+			translation = "-1.99325 9.63789 -7.31006"
+		socket = "aux_staff_up"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -36.4978"
+		socket = "aux_staff_up_shards"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-2.55912 0 -70.5439"
+		socket = "aux_staff_up_blade_01"
+			parent = "aux_R_Weapon_attachment"
+			translation = "7.87454 0 -75.0183"
+		socket = "aux_staff_up_blade_02"
+			parent = "aux_R_Weapon_attachment"
+			translation = "14.0647 0 -91.3736"
+		socket = "aux_staff_up_blade_03"
+			parent = "aux_R_Weapon_attachment"
+			translation = "6.33242 0 -110.258"
+		socket = "aux_staff_up_blade_04"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-16.2765 0 -120.615"
+		socket = "aux_staff_up_lightning"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-4.46814 0 -112.749"
+		socket = "aux_staff_down"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 107.411"
+		socket = "aux_staff_core"
+			parent = "aux_R_Weapon_attachment"
+			translation = "-2 0 -95"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/VaalArmour/VaalArmourMonster.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder false L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder false R_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow false L_elbow_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_elbow false R_elbow_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_wrist false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_wrist false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_hand false L_finger_2_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "grp_R_hand false R_finger_2_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_L_knee false L_knee_jntBnd L_thigh_jntBnd"
+		bone_group = "grp_R_knee false R_knee_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "root false R_thigh_jntBnd hip_jntBnd L_thigh_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd neck_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "cast_hand_trail false aux_L_Weapon_attachment"
+		bone_group = "cast_hand_FX false aux_L_Weapon_attachment aux_hand_flames"
+		bone_group = "staff_handle false aux_staff_down R_Weapon aux_staff_up"
+		bone_group = "staff_blade false aux_staff_up_blade_01 aux_staff_up_blade_02 aux_staff_up_blade_03 aux_staff_up_blade_04"
+		bone_group = "staff_lightning_01 false aux_staff_up_shards aux_staff_up_blade_04"
+		bone_group = "staff_shards false aux_staff_up aux_staff_up_shards"
+		bone_group = "grp_hand_beam_01 false L_finger_4_jntBnd_3 L_Weapon"
+		bone_group = "grp_hand_beam_02 false L_finger_3_jntBnd_3 L_Weapon"
+		bone_group = "grp_hand_beam_03 false L_finger_2_jntBnd_3 L_Weapon"
+		bone_group = "grp_hand_beam_04 false L_finger_1_jntBnd_3 L_Weapon"
+		bone_group = "grp_hand_beam_05 false L_thumb_1_jntBnd_3 L_Weapon"
+		bone_group = "staff_lightning_02 false aux_staff_up_shards aux_staff_up_lightning"
+		bone_group = "staff_lightning_03 false aux_staff_up_shards aux_staff_up_blade_03"
+		bone_group = "fx_handtostaff false aux_L_Weapon_attachment_02 aux_staff_core"
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "carpet_bomb_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.9532002806663513,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalArmour/fx/liquid_drips.pet",
+						"bone_group": "grp_L_hand"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.350000023841858,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalArmour/fx/act_carpetbomb_handtostaff.pet",
+						"bone_group": "fx_handtostaff"
+					}
+				]
+			},
+			{
+				"name": "jog_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/general/armored_caster/fx/act/hand_flames_casting_01.pet",
+						"bone_group": "cast_hand_FX"
+					}
+				]
+			},
+			{
+				"name": "lightning_bolts_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalArmour/fx/act_beam.pet",
+						"bone_group": "grp_L_hand"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalArmour/fx/act_projectile.pet",
+						"bone_group": "grp_L_hand"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalArmour/fx/act_projectile.pet",
+						"bone_group": "grp_L_hand"
+					}
+				]
+			}
+		]'
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1632910668849945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1775393784046173,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/BasicCast",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3148020803928375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_AttackWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44061794877052309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7373417615890503,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11200829595327378,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/BasicCast",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16682402789592744,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1933036744594574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44415482878685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_ArmWhoosh",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8857265710830689,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "carpet_bomb_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10230746120214462,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Effects/EffectsRework/Staff_Slam",
+						"bone_name": "aux_staff_up"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11515035480260849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/CarpetBombA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13037900626659394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.376227468252182,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Effects/EffectsRework/Staff_VolatileSummon",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4140099883079529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5048750042915344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_ArmWhoosh",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.818871021270752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0203094482421876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Effects/EffectsRework/StaffCharge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.069420099258423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/CarpetBombB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.520659923553467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.621299982070923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_EmergeJump",
+						"bone_name": "aux_staff_down"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.632110118865967,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_AttackWhoosh",
+						"bone_name": "aux_staff_up"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6773507595062258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Effects/EffectsRework/Staff_GroundHit",
+						"bone_name": "aux_staff_up"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.681807518005371,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Effects/EffectsRework/CarpetBomb_Nova"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7882800102233888,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9872798919677736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15406981110572816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_FallLong",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46633315086364748,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4757753610610962,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_SpearDrop",
+						"bone_name": "aux_staff_down"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.793852686882019,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_FallShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14160728454589845,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_SpearDrop",
+						"bone_name": "aux_staff_down"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2097688615322113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_FallLong",
+						"bone_name": "L_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7187963128089905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10496799647808075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "L_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15643300116062165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20253799855709077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_FallShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28488385677337649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_SpearDrop",
+						"bone_name": "aux_staff_down"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15000000596046449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1522011011838913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2734225392341614,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_SpearDrop",
+						"bone_name": "aux_staff_down"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4126802682876587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_FallShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10496799647808075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "L_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15643300116062165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20253799855709077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_FallShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12212300300598145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18431000411510468,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_FallLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2636530101299286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_FallShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10316390544176102,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_EmergeJump",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6125339865684509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.619704008102417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6442869901657105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_EmergeLand",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6494089961051941,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7774459719657898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "L_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.258870005607605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.003960280679166317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12365999817848206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "aux_Back_attachment"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0026495177298784258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.003960280679166317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0026495177298784258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.003960280679166317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0026495177298784258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.003960280679166317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0026495177298784258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.003960280679166317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03617570549249649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Idle",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "jog_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08977840095758438,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17417000234127046,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28077200055122378,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4769119918346405,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6884920001029968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18107633292675019,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40695586800575259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6832387447357178,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7579084038734436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3620351552963257,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9358381032943726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9899636507034302,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15442831814289094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35276365280151369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4472246468067169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_SpearDrop",
+						"bone_name": "aux_staff_down"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4965935945510864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_FallShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5480726957321167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1046513319015504,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4549592733383179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.570022702217102,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8576714992523194,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "lightning_bolts_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05834367871284485,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Beam",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23759999871253968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Effects/EffectsRework/BeamCast_Surge",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3802720010280609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4488919973373413,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_AttackWhoosh",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7412400245666505,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9199399948120118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11056999117136002,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16532956063747407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47108200192451479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.521952211856842,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.022596901282668115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Effects/EffectsRework/BasicCast_Surge",
+						"bone_name": "L_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2286609709262848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/BasicCast",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3242129981517792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4350864887237549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Effects/EffectsRework/BasicCast_Shot",
+						"bone_name": "L_finger_3_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.725937008857727,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.028480052947998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.023895351216197015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Effects/EffectsRework/BasicCast_Surge",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24180014431476594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Vocals/BasicCast",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3367150127887726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_AttackWhoosh",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4008910059928894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4600871503353119,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Effects/EffectsRework/BasicCast_Shot",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8284519910812378,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Movement",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8434540033340454,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.100160002708435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Expedition/VaalArmour/Foley/Foley_Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "carpet_bomb_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4155096709728241,
+						"end_time": 0.7534313201904297,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalArmour/fx/liquid_trail.trl",
+						"bone_group": "grp_L_hand"
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "carpet_bomb_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalArmour/epks/verisiumskin.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.4023443460464478,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalArmour/epks/staffsurge.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "lightning_bolts_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/VaalArmour/epks/verisiumskin.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "carpet_bomb_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.200000047683716,
+						"name": "surgeTime_L",
+						"curve": "7 0 0 Linear 0.244584 1 Linear 0.792842 1 Linear 1.1949 0.752764 Smooth 1.49035 1 Smooth 2.82749 0 Flat 3.2 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 1.3994596004486085,
+						"end_time": 3.200000047683716,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 1.39946 0 Linear 1.84706 0.71327 Smooth 2.72262 1 Linear 3.2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "lightning_bolts_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "surgeTime_L",
+						"curve": "4 0 0 Linear 0.436512 1 Linear 1.39596 1 Linear 2 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/VaalArmour/attachments/VaalArmourMonsterSkirtHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/VaalArmour/attachments/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/VaalArmour/attachments/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.800
+		animation_velocity_factor = 10.000
+		animation_force_factor = 10.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/VaalArmour/attachments/VaalArmourMonsterSkirt.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueExpeditionNew/VaalArmour/attachments/VaalArmourStaffHeld.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/Items/Weapons/Microtransactions/NecroLordWeapons/NecrolordStaff_ForBiped.fmt"
+	}
+	
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/VaalArmour/VaalArmourMonster.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/VaalArmour/VaalArmour_armour_c0d771db.smd"
+Materials 1
+	"Art/Models/MONSTERS/GenericBiped/BipedMedium/Textures/ExpeditionMonster3c.mat" 1
+BoundingBox -68.9118 -16.4072 -181.747 68.9118 21.9973 0.332893
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/Expedition/VaalArmour/VaalArmour_armour_c0d771db.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 1 in the header, 1 in the block · 6278 triangles over 4955 vertices
+  names: 18 bytes said, 18 read  [agree]
+
+=== shapes (1)
+0	BodyShape	from 0	count 18834
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  VaalArmourMonsterSkirtHeld.ao  socket hip_jntBnd [in its carrier's rig]  box (-16.2,4.7,-6.9)..(16.2,18.7,70.7)
+    (the geometry did not read)
+    rig 4 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_cloth_01_jntBnd  [its own]  under 0  rests at (0,12.2,16.2)
+      2 phys_skinned_cloth_02_jntBnd  [its own]  under 1  rests at (0,12.2,48.7)
+      3 aux_animation_control_ratio  [its own]  under 0  rests at (0,0,0)
+  VaalArmourStaffHeld.ao  socket R_Weapon [NOT in its carrier's rig]  fixed mesh NecrolordStaff_ForBiped.fmt  (did not read: version 8 puts its geometry outside a DOLm block, which this does not read)

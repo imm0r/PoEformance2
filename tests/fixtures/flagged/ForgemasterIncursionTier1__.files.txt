@@ -1,0 +1,3534 @@
+monster: Cualli, Kamasan Smith [Metadata/Monsters/LeagueIncursionNew/Smithy/ForgemasterIncursionTier1__]
+
+=== .ao Metadata/Monsters/LeagueIncursionNew/Smithy/VaalForgeMaster/VaalForgeMaster.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/VaalForgeMasterMiniboss/rig.amd"
+	view_of = "leap_slam_01"
+		view_name = "leap_slam_lava_01"
+	view_of = "warcry_01"
+		view_name = "warcry_detonate_01"
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	animations = '[
+		{
+			"name": "axe_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "axe"
+				}
+			]
+		},
+		{
+			"name": "blade_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3444089889526367,
+					"name": "blade"
+				}
+			]
+		},
+		{
+			"name": "brand_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "start",
+					"position": [
+						2.8298499584198,
+						-100.125,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "contact",
+					"position": [
+						2.8298499584198,
+						-100.125,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "cooldown_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.22352635860443116,
+					"name": "audio"
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				}
+			]
+		},
+		{
+			"name": "emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "hammer"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.03763251006603241,
+					"name": "emerge"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.614208459854126,
+					"name": "start_fight"
+				}
+			]
+		},
+		{
+			"name": "enrage_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "stance"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23333331942558289,
+					"name": "move",
+					"position": [
+						0.0,
+						-30.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 3.066666603088379,
+					"end_time": 3.5999999046325685,
+					"name": "move",
+					"position": [
+						0.0,
+						30.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.723145008087158,
+					"name": "audio"
+				}
+			]
+		},
+		{
+			"name": "enrage_walk_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "form_daemon"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5992802381515503,
+					"name": "form_daemon"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7864066958427429,
+					"name": "step",
+					"position": [
+						31.29618263244629,
+						-51.147987365722659,
+						-1.432429552078247
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9319999814033508,
+					"name": "move_daemons"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.531000018119812,
+					"name": "move_daemons"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.3072080612182619,
+					"name": "step",
+					"position": [
+						-30.981781005859376,
+						-50.26374053955078,
+						-1.076052188873291
+					]
+				}
+			]
+		},
+		{
+			"name": "epic_brand_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3870640695095062,
+					"name": "brand_create",
+					"position": [
+						8.05836009979248,
+						-80.2072982788086,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.388929545879364,
+					"name": "contact",
+					"position": [
+						8.05836009979248,
+						-80.2072982788086,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "hammer_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.0177029371261597,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.2759700119495392,
+					"name": "hammer"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2087572813034058,
+					"name": "contact",
+					"position": [
+						34.254512786865237,
+						-159.21670532226563,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "idle_smithing_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "hammer"
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				}
+			]
+		},
+		{
+			"name": "leap_slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.20000000298023225,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5280299782752991,
+					"name": "hammer"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8330000638961792,
+					"name": "hit_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9003577828407288,
+					"name": "contact",
+					"position": [
+						27.48855209350586,
+						-160.83827209472657,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "pre_emerge_idle_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "hammer"
+				}
+			]
+		},
+		{
+			"name": "pre_emerge_idle_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "hammer"
+				}
+			]
+		},
+		{
+			"name": "pre_emerge_look_up_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.0559006929397584,
+					"name": "hammer"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6891701221466066,
+					"name": "audio"
+				}
+			]
+		},
+		{
+			"name": "smithing_end_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 1.600000023841858,
+					"end_time": 2.6666600704193117,
+					"name": "move",
+					"position": [
+						0.0,
+						189.23899841308595,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "underarm_waves_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.771133542060852,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.46246764063835146,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7711340188980103,
+					"name": "stomp",
+					"position": [
+						-47.401180267333987,
+						-35.31430435180664,
+						-3.1553266048431398
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7711340188980103,
+					"name": "do_thing"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.033139944076538,
+					"end_time": 1.4116944074630738,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.411694049835205,
+					"name": "do_thing2"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.411694049835205,
+					"name": "stomp",
+					"position": [
+						50.422760009765628,
+						8.627348899841309,
+						-2.4365181922912599
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7851907014846802,
+					"name": "axe"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.9513599872589112,
+					"end_time": 2.3414406776428224,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5851080417633058,
+					"name": "contact",
+					"position": [
+						35.979496002197269,
+						-81.73509979248047,
+						0.0
+					],
+					"contact_ref": [
+						35.979000091552737,
+						0.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5851080417633058,
+					"name": "move_daemons",
+					"position": [
+						29.226499557495118,
+						-81.73509979248047,
+						0.0
+					],
+					"contact_ref": [
+						30.217199325561525,
+						0.0,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "volcanic_fissure_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5255380272865295,
+					"name": "hammer"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2835538387298586,
+					"name": "contact",
+					"position": [
+						35.919898986816409,
+						-151.3780059814453,
+						0.0
+					],
+					"contact_ref": [
+						42.06480026245117,
+						-81.68389892578125,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.296780824661255,
+					"name": "fissure",
+					"position": [
+						38.8127555847168,
+						-167.8592529296875,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.743190050125122,
+					"name": "slam"
+				}
+			]
+		},
+		{
+			"name": "walk_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.32479798793792727,
+					"name": "step",
+					"position": [
+						27.238052368164064,
+						-51.645355224609378,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0869656801223755,
+					"name": "step",
+					"position": [
+						-24.79839324951172,
+						-45.7449951171875,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "warcry_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9922500252723694,
+					"name": "do_thing"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.139659881591797,
+					"name": "move_daemon"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.139659881591797,
+					"name": "move_daemons"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.200000047683716,
+					"name": "start_fight"
+				}
+			]
+		},
+		{
+			"name": "warcry_detonate_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4729093611240387,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0662001371383668,
+					"name": "contact",
+					"position": [
+						0.0,
+						-16.919933319091798,
+						-126.193359375
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "R_Weapon Metadata/Monsters/LeagueIncursionNew/Smithy/VaalForgeMaster/attachments/ForgeMasterSeal.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/LeagueIncursionNew/Smithy/VaalForgeMaster/attachments/ForgeMasterCrest.ao"
+	attached_object = "<root> Metadata/Monsters/LeagueIncursionNew/Smithy/VaalForgeMaster/attachments/ForgeMasterHammer.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "axe_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5195195078849793,
+								0.0
+							],
+							[
+								0.5915915966033936,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": 0.5235990285873413,
+						"angle": 2.7925302982330324,
+						"x_axis_scale": 0.699999988079071,
+						"length": 226.38999938964845,
+						"offset": [
+							15.0,
+							-2.0
+						],
+						"local_offset": [
+							-1.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.2443459928035736,
+							3.246309518814087
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_wrist_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "blade_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.24024024605751038,
+								0.0
+							],
+							[
+								0.3243243098258972,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 3,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": -0.0872664675116539,
+						"angle": 2.967059850692749,
+						"x_axis_scale": 0.7860000133514404,
+						"length": 216.94900512695313,
+						"local_offset": [
+							-20.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.15707997977733613,
+							-2.5481808185577394
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_wrist_jntBnd"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4674922525882721,
+								0.0
+							],
+							[
+								0.5356037020683289,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 3,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"angle": 3.455749988555908,
+						"x_axis_scale": 0.7599999904632568,
+						"length": 185.0,
+						"local_offset": [
+							12.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.6283190250396729,
+							3.141590118408203
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_wrist_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "hammer_attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4685039222240448,
+								0.0
+							],
+							[
+								0.4685039222240448,
+								1.0
+							]
+						],
+						"damage_statset_index": 4,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"angle": 6.28318977355957,
+						"length": 145.04100036621095,
+						"offset": [
+							38.0,
+							-168.0
+						],
+						"impact_x_rotation": [
+							-1.5707999467849732,
+							-1.5707999467849732
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_wrist_jntBnd"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/VaalForgeMasterMiniboss/rig.ast"
+		socket = "NewSocket_1"
+			parent = "head_jntBnd"
+			translation = "0 -41.9981 -146.509"
+			ignore_parent_axis = "xy"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "aux_trail_axe_01"
+			parent = "L_wrist_jntBnd"
+			translation = "73.8111 14.5511 0"
+		socket = "aux_trail_axe_02"
+			parent = "L_wrist_jntBnd"
+			translation = "48.9226 27.6694 0"
+		socket = "aux_trail_axe_03"
+			parent = "L_wrist_jntBnd"
+			translation = "20.11 31.3226 0"
+		socket = "aux_trail_axe_04"
+			parent = "L_wrist_jntBnd"
+			translation = "-9.34601 20.0556 0"
+		socket = "aux_trail_blade"
+			parent = "L_elbow_jntBnd"
+			translation = "93.9515 -7.933 5.41469"
+		socket = "aux_trail_hammer_01"
+			parent = "L_wrist_jntBnd"
+			translation = "77.889 10.835 0"
+		socket = "aux_trail_hammer_02"
+			parent = "L_wrist_jntBnd"
+			translation = "51.4626 17.8764 0"
+		socket = "aux_UpperDust_01"
+			translation = "-97.5461 280 -362.494"
+		socket = "aux_UpperDust_02"
+			translation = "51.7024 280 -362.494"
+		socket = "aux_smithing_contact"
+			parent = "root_jntBnd"
+			translation = "-0.133057 -137.197 -64.5677"
+		linear_allowed_contraction = 0.042
+		enclosure_angle = 0.350
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/VaalForgeMasterMiniboss/ArchitectsoftheForgeT3.sm"
+			hide_segments = "chains_weapon_meshShape,hammer_weapon_meshShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd spine_2_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "FX_trail_axe false aux_trail_axe_01 aux_trail_axe_02 aux_trail_axe_03 aux_trail_axe_04"
+		bone_group = "FX_trail_blade false L_elbow_jntBnd aux_trail_blade"
+		bone_group = "FX_trail_hammer false aux_trail_hammer_01 aux_trail_hammer_02"
+		bone_group = "FX_weaponMoltenDrips false L_wrist_jntBnd aux_trail_blade"
+		bone_group = "FX_hotBodyLava false neck_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd spine_2_jntBnd R_clavicle_jntBnd|phys_skinned_chain_1_1|phys_skinned_chain_1_2 R_clavicle_jntBnd|phys_skinned_chain_1_1|phys_skinned_chain_1_2|phys_skinned_chain_1_3 spine_1_jntBnd R_thigh_jntBnd R_knee_jntBnd R_ankle_jntBnd L_thigh_jntBnd L_knee_jntBnd L_ankle_jntBnd L_foot_jntBnd"
+		bone_group = "FX_damUpperDust false aux_UpperDust_01 aux_UpperDust_02"
+		bone_group = "FX_smithing_contact false aux_smithing_contact"
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "NewSocket_1"
+			state = ""
+				colour = "1.697 0.985178 0.317819"
+				radius = 500
+			state = "on_death"
+				radius = 500
+			state = "light"
+				colour = "2.12106 1.23116 0.39778"
+				radius = 650
+			state = "pre_fight_light"
+				colour = "1.27772 0.741653 0.239623"
+				position = "0 271 -27"
+				radius = 473
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "axe_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.060288336127996448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Attacks/Attack",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08507460355758667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.738089919090271,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Axe",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8791049718856812,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "blade_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Attacks/AttackBlade",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06647240370512009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38937392830848696,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Blade",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6190239787101746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8596162796020508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Blade",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9721606373786926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/SwordAttackB",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3411542177200318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "brand_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Brand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06085339933633804,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10938775539398194,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Attacks/AttackBrand",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4183659851551056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1980500221252442,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cooldown_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.16687242686748506,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4338681697845459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44091907143592837,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/CoolDown",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5473414063453674,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6174277663230896,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Hard",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.767612874507904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Death_Brand_Drop",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9323817491531373,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.903578996658325,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4008595943450929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.121747970581055,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.221870422363281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0018518571741878987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0018518571741878987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Death",
+						"bone_name": "aux_head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06637399643659592,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2583332359790802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Brand",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28735193610191347,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4555553197860718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Death_Brand_Drop",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5784029960632324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6823760271072388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9268640279769898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Death_Fall_A",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0018203258514405,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2795978784561158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4768199920654297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5990900993347169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Whoosh_Jump",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.742319941520691,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Death_Fall_B",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2957474887371063,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1870086193084717,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Hammer",
+						"bone_name": "aux_trail_hammer_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2434836626052857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3919095993041993,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/Hammer_ImpactDoor",
+						"bone_name": "aux_UpperDust_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.858503818511963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9137845039367677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2354025840759279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Hammer",
+						"bone_name": "aux_trail_hammer_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4790267944335939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/Hammer_ImpactDoor",
+						"bone_name": "aux_UpperDust_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4790267944335939,
+						"filename": "Audio/Sound Effects/Environment/4.0/Part1/Act3/G3_9/Arena/Dam/Shatter",
+						"bone_name": "aux_UpperDust_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.492976665496826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Warcry",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.524996280670166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.8394365310668949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Hard",
+						"bone_name": "aux_R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10416200011968613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12759800255298615,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3046720027923584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4075029492378235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Enrage",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.012969970703125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.213479995727539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7223613262176515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.112217426300049,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Hard",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1847846508026125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "enrage_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2229720652103424,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Enrage.walk.loop.ogg",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7386829853057861,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Hard",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3329901695251465,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2056965827941896,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Hard",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "epic_brand_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Brand",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2244153469800949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.274722695350647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Attacks/AttackBrandEpic",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33347034454345705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Death_Brand_Drop",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8718199729919434,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.045300006866455,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Flinch",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Flinch",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Flinch",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Flinch",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "hammer_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.003687439952045679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28786787390708926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Attacks/AttackHammer",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3263390064239502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6618959903717041,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0121546983718873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Hammer",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3581489324569703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.9084738492965699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Idle",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "idle_smithing_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8486005067825317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.08076810836792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2295801639556885,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Hammer",
+						"bone_name": "aux_trail_hammer_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3198162317276,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/FissureSplash",
+						"bone_name": "aux_smithing_contact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3708076477050782,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/Hammer_ImpactDoor",
+						"bone_name": "aux_smithing_contact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6217408180236817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7189877033233643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Brand",
+						"bone_name": "aux_trail_hammer_01"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/KnockdownA",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1483670026063919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5192840099334717,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5291749835014343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8654729723930359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8852559924125671,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.040636658668518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/KnockdownB",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0830800533294678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1622099876403809,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0919699668884279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.171099901199341,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9772400856018068,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2789199352264406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.1493401527404789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "leap_slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Whoosh_Jump",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Attacks/LeapSlam",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23077799379825593,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5729640126228333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Whoosh_Arm",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6624910235404968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/LeapSlam_Slam",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7838490009307861,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7957850098609924,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Hard",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8574590086936951,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Hard",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5915700197219849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.15725332498550416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/PreEmerge/PreEmergeHammer",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8680489659309387,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4544436931610108,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2618930339813234,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Hammer",
+						"bone_name": "aux_trail_hammer_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3017148971557619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.456170082092285,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/Hammer_ImpactDoor",
+						"bone_name": "aux_UpperDust_02"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/PreEmerge/PreEmergeHammer2Harder",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4984963834285736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8352465033531189,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1466728448867798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Hammer",
+						"bone_name": "aux_trail_hammer_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2986174821853638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/Hammer_ImpactDoor",
+						"bone_name": "aux_UpperDust_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3218107223510743,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_look_up_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2810852527618408,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/PreEmerge/PreEmergeLookUp",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3497941792011261,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4691351652145386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6007429361343384,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/WallHitFast",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5198588371276857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Hammer",
+						"bone_name": "aux_trail_hammer_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6677629947662355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.768585205078125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/Hammer_ImpactDoor",
+						"bone_name": "aux_UpperDust_02"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Run.loop.ogg",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06553109735250473,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29816699028015139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5152390003204346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7355870008468628,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "smithing_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6967960596084595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Hammer",
+						"bone_name": "aux_trail_hammer_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7237728238105774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.830754816532135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/Hammer_ImpactDoor",
+						"bone_name": "aux_smithing_contact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.830754816532135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/FissureSplash",
+						"bone_name": "aux_smithing_contact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9576137065887452,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.493194818496704,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7291791439056398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Hammer",
+						"bone_name": "aux_trail_hammer_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9032535552978517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/Hammer_ImpactDoor",
+						"bone_name": "aux_smithing_contact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.915135622024536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/FissureSplash",
+						"bone_name": "aux_smithing_contact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.741150379180908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.965486526489258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Brand",
+						"bone_name": "aux_trail_hammer_01"
+					}
+				]
+			},
+			{
+				"name": "smithing_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8139659762382507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3945144414901734,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/FissureSplash",
+						"bone_name": "R_clavicle_jntBnd|phys_skinned_chain_1_1|phys_skinned_chain_1_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.583042025566101,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6708225011825562,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Brand",
+						"bone_name": "aux_trail_hammer_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6817947626113892,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7027435302734376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Hammer",
+						"bone_name": "aux_trail_hammer_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4987494945526125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Hard",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.693264961242676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Swing_Brand",
+						"bone_name": "aux_trail_hammer_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8069827556610109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move"
+					}
+				]
+			},
+			{
+				"name": "underarm_waves_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.24528400599956513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5895398855209351,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Attacks/Underarm",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6949689984321594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Hard",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1409399509429932,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3602099418640137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Hard",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.285599946975708,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Whoosh_Arm",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.296750068664551,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3224799633026125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "volcanic_fissure_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Attacks/VolcanicFissure",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10954900085926056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.387619972229004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6614899635314942,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0189549922943117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Whoosh_Arm",
+						"bone_name": "aux_trail_axe_04"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.656559944152832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Walk.loop.ogg",
+						"bone_name": "aux_head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09130819886922836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24161499738693238,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8639150261878967,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0367000102996827,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Step_Soft",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "warcry_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.057945601642131808,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2334693968296051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Warcry",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30518001317977908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39209800958633425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7803339958190918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7267800569534302,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "warcry_detonate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.057945601642131808,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2820917069911957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Effects/WarCry_BuildUp",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30518001317977908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39209800958633425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4921768307685852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Vocals/Warcry",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7803339958190918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7267800569534302,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/SmithyForgemaster/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "axe_attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8911589980125427,
+						"end_time": 1.327908992767334,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/melee.trl",
+						"bone_group": "FX_trail_axe"
+					}
+				]
+			},
+			{
+				"name": "blade_attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.34863701462745669,
+						"end_time": 1.577957034111023,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/melee.trl",
+						"bone_group": "FX_trail_axe"
+					}
+				]
+			},
+			{
+				"name": "hammer_attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6272720098495483,
+						"end_time": 0.9012579917907715,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/melee.trl",
+						"bone_group": "FX_trail_hammer"
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.4733545780181885,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 3.640721559524536,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "enrage_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.3157942295074463,
+						"frequency": 1500.0,
+						"amplitude": 3.0,
+						"duration": 1.0,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "enrage_walk_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.7934988737106323,
+						"amplitude": 10.0,
+						"global": true,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 2.2574992179870607,
+						"amplitude": 10.0,
+						"global": true,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "epic_brand_attack_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.3848000764846802,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "hammer_attack_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.213690996170044,
+						"amplitude": 8.0,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "idle_smithing_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.4822324514389039,
+						"frequency": 125.0,
+						"amplitude": 24.0,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "leap_slam_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.8991339206695557,
+						"amplitude": 10.0,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 2.706263542175293,
+						"amplitude": 1.0,
+						"lateral": true,
+						"global": true,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_02",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.484544277191162,
+						"amplitude": 2.0,
+						"lateral": true,
+						"global": true,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "underarm_waves_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.7833012342453003,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.406996250152588,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "volcanic_fissure_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 2.2830703258514406,
+						"amplitude": 8.0,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "warcry_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.0405982732772828,
+						"frequency": 1500.0,
+						"amplitude": 3.0,
+						"duration": 1.0,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "warcry_detonate_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.0658986568450928,
+						"frequency": 1500.0,
+						"amplitude": 3.0,
+						"duration": 1.0,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.466871738433838,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/dustKickUp.ao",
+						"from": {
+							"parent_bone": "aux_trail_hammer_01"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-19.80000114440918,
+								0.0,
+								0.0
+							],
+							"rotation": [
+								1.1868199110031129,
+								-0.8202999830245972,
+								0.22688999772071839
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "enrage_walk_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.7844988107681274,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/dustKickUp.ao",
+						"offset": [
+							29.3116455078125,
+							-36.26397705078125
+						]
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.263500213623047,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/dustKickUp.ao",
+						"offset": [
+							-29.762939453125,
+							-40.23779296875
+						]
+					}
+				]
+			},
+			{
+				"name": "idle_smithing_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.4633501768112183,
+						"ao_type": "Metadata/Effects/Environment/League_Incursion/crafting_bench/Smithy/T1/onact_smithing_sparks.ao",
+						"offset": [
+							0.29058170318603518,
+							-137.88299560546876
+						],
+						"inherit_height": true,
+						"height": 64.96229553222656,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "leap_slam_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.19867227971553803,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/dustKickUp.ao",
+						"offset": [
+							-40.2027587890625,
+							-26.905059814453126
+						]
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.1998075693845749,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/dustKickUp.ao",
+						"offset": [
+							47.077392578125,
+							29.147842407226564
+						]
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.6524081230163576,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/dustKickUp.ao",
+						"from": {
+							"parent_bone": "aux_trail_hammer_01"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-19.80000114440918,
+								0.0,
+								0.0
+							],
+							"rotation": [
+								1.1868199110031129,
+								-0.8202999830245972,
+								0.22688999772071839
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.4758450984954835,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/dustKickUp.ao",
+						"from": {
+							"parent_bone": "aux_trail_hammer_01"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-19.80000114440918,
+								0.0,
+								0.0
+							],
+							"rotation": [
+								1.1868199110031129,
+								-0.8202999830245972,
+								0.22688999772071839
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "underarm_waves_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.7833001017570496,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/dustKickUp.ao",
+						"offset": [
+							49.10810470581055,
+							15.222320556640625
+						]
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.4070000648498536,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/dustKickUp.ao",
+						"offset": [
+							-44.03711700439453,
+							-29.7794189453125
+						]
+					}
+				]
+			},
+			{
+				"name": "volcanic_fissure_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.2229254245758058,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/volcanicFissure_hit.ao",
+						"offset": [
+							45.00201416015625,
+							-164.9456024169922
+						]
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "MeltMask",
+						"curve": "4 0 0 Linear 0.155538 1 Linear 0.869026 1 Linear 1 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "axe_attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.899999976158142,
+						"name": "MeltMask",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.920495 1 Flat 0.963769 1 Linear 1.24603 0.172426 Smooth 1.9 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "blade_attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.065999984741211,
+						"name": "MeltMask",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 1.05653 1 Flat 1.13031 1 Flat 2.066 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.700000047683716,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.899512 0 Flat 1.61639 1 Flat 2.7 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 7.099999904632568,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "4 0 1 Linear 4.12213 1 Flat 5.55614 0 Flat 7.1 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 7.099999904632568,
+						"name": "MeltMask",
+						"apply_on_children": true,
+						"curve": "4 0 1 Smooth 3.63803 1 Flat 5.81287 0 Flat 7.1 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "hammer_attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5999999046325685,
+						"name": "MeltMask",
+						"apply_on_children": true,
+						"curve": "4 0 0.0181678 Smooth 1.25559 1 Linear 1.66876 1 Linear 2.6 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "idle_smithing_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.065999984741211,
+						"name": "MeltMask",
+						"apply_on_children": true,
+						"curve": "2 0 0.5 Smooth 2.066 0.5 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.065999984741211,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.71089 0.9 Flat 0.9 0.9 Flat 1.45849 0 Linear 2.066 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "leap_slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"name": "MeltMask",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.224455 0.14455 Smooth 0.410378 1 Linear 1.06515 1 Linear 2.133 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.365999937057495,
+						"name": "MeltMask",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 2.0605 1 Smooth 3.366 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.365999937057495,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 3.366 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.9329999685287476,
+						"name": "MeltMask",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 1.18329 1 Smooth 1.933 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.9329999685287476,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 1.933 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_look_up_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.4000000953674318,
+						"name": "MeltMask",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 2.08132 1 Smooth 3.4 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.4000000953674318,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 3.4 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "smithing_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.200000047683716,
+						"name": "MeltMask",
+						"apply_on_children": true,
+						"curve": "4 0 0.442568 Smooth 1.25 0.442568 Flat 1.62785 0 Flat 3.2 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.200000047683716,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "4 0 1 Smooth 0.945613 1 Flat 1.62785 0 Linear 3.2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "underarm_waves_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.132999897003174,
+						"name": "MeltMask",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 2.20342 0 Flat 2.87732 1 Linear 3.42137 1 Linear 4.133 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "volcanic_fissure_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.700000047683716,
+						"name": "MeltMask",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.23978 0.342022 Smooth 0.380003 1 Linear 2.33377 1 Linear 3.7 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "axe_attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.38475900888442995,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.150851845741272,
+						"end_time": 1.899999976158142,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "blade_attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.1782546043395997,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5751805305480958,
+						"end_time": 2.2330002784729006,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "brand_attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.4677575826644898,
+						"end_time": 2.377289295196533,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/damDustOnHit.pet",
+						"bone_group": "FX_damUpperDust"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.6876533031463625,
+						"end_time": 4.899999618530273,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.627200126647949,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/damFinalHit.pet",
+						"bone_group": "FX_trail_hammer"
+					}
+				]
+			},
+			{
+				"name": "enrage_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "epic_brand_attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "hammer_attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.9499306082725525,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.9100090265274048,
+						"end_time": 2.6659998893737795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 5.632999897003174,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "leap_slam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.5292624831199646,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.647359848022461,
+						"end_time": 3.365999937057495,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/damDustOnHit.pet",
+						"bone_group": "FX_damUpperDust"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.4845434427261353,
+						"end_time": 1.9312595129013062,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/damDustOnHit.pet",
+						"bone_group": "FX_damUpperDust"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.9330000281333923,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "smithing_end_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.584551215171814,
+						"end_time": 2.1633076667785646,
+						"filename": "Metadata/Effects/Environment/League_Incursion/crafting_bench/Smithy/T1/FX/onact_smithing_end_01.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "underarm_waves_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 2.9163265228271486,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.9075117111206056,
+						"end_time": 4.199999809265137,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "volcanic_fissure_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.5913692116737366,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.6650919914245607,
+						"end_time": 3.732999801635742,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.600000023841858,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "warcry_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 2.200000047683716,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			},
+			{
+				"name": "warcry_detonate_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 2.200000047683716,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalForgeMaster/fx/weaponMoltenDrips.pet",
+						"bone_group": "FX_weaponMoltenDrips"
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "axe_attack_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.0456832647323609,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "blade_attack_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.6473299860954285,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "brand_attack_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.6139092445373535,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "cooldown_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.9116167426109314,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.5839440226554871,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.3076324462890626,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.9511477947235108,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.5051358938217164,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 3.7046620845794679,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 5.2772932052612309,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "enrage_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.5250505208969117,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "idle_smithing_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.620140552520752,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 2.8663806915283205,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_02",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.5158430337905884,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_look_up_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 2.9487950801849367,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "smithing_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 3.7374587059020998,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "warcry_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.0234099626541138,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueIncursionNew/Smithy/VaalForgeMaster/attachments/ForgeMasterSeal.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/VaalForgeMasterMiniboss/attachments/ArchitectsoftheForgeBeast/ArchitectsoftheForgeT3Seal.fmt"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueIncursionNew/Smithy/VaalForgeMaster/attachments/ForgeMasterCrest.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/VaalForgeMasterMiniboss/attachments/ArchitectsoftheForgeBeast/Crest/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/VaalForgeMasterMiniboss/attachments/ArchitectsoftheForgeBeast/Crest/rig.ast"
+		linear_allowed_contraction = 0.038
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.200
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.300
+		animation_velocity_factor = 5.000
+		animation_force_factor = 20.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/VaalForgeMasterMiniboss/attachments/ArchitectsoftheForgeBeast/Crest/ArchitectsoftheForgeBeastCrest.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueIncursionNew/Smithy/VaalForgeMaster/attachments/ForgeMasterHammer.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/VaalForgeMasterMiniboss/attachments/ArchitectsoftheForgeBeast/Weapons/rig.amd"
+}
+
+BaseAnimationEvents
+{
+	attach_bone_override = "L_wrist_jntBnd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/VaalForgeMasterMiniboss/attachments/ArchitectsoftheForgeBeast/Weapons/rig.ast"
+	    attachment_bones = "L_wrist_jntBnd L_elbow_Twist_jntBnd_1 child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/VaalForgeMasterMiniboss/attachments/ArchitectsoftheForgeBeast/Weapons/ArchitectsoftheForgeBeastHammer.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd phys_L_elbow_Twist_jntBnd "
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/VaalForgeMasterMiniboss/ArchitectsoftheForgeT3.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/VaalForgeMasterMiniboss/ArchitectsoftheForgeBeast_armour_5a6f3527.smd"
+Materials 5
+	"Art/Models/MONSTERS/VaalForgeMasterMiniboss/Textures/ArchitectsoftheForgeT3Outfitc.mat" 20
+	"Art/Models/MONSTERS/VaalForgeMasterMiniboss/Textures/ArchitectsoftheForgeT3Bodyc.mat" 1
+	"Art/Models/MONSTERS/VaalForgeMasterMiniboss/Textures/ArchitectsoftheForgeT3Outfitc.mat" 1
+	"Art/Models/MONSTERS/VaalForgeMasterMiniboss/Textures/ArchitectsoftheForgeT3Weaponc.mat" 1
+	"Art/Models/MONSTERS/VaalForgeMasterMiniboss/Textures/ArchitectsoftheForgeT3tBackOrnamentc.mat" 2
+BoundingBox -112.076 -43.0686 -234.89 145.645 60.719 0.9725
+BoneGroups 21
+	"root" 2 "root_jntBnd" "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/VaalForgeMasterMiniboss/ArchitectsoftheForgeBeast_armour_5a6f3527.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 25 in the header, 25 in the block · 28969 triangles over 31168 vertices
+  names: 1092 bytes said, 1092 read  [agree]
+
+=== shapes (29)
+0	arm_plate_meshShape	from 0	count 975
+1	belt_meshShape	from 975	count 16644
+2	body_chain_meshShape	from 17619	count 4347
+3	chest_plate_meshShape	from 21966	count 492
+4	greaves_meshShape	from 22458	count 5424
+5	hair_base_layer_01_meshShape	from 27882	count 366
+6	hair_base_layer_02_meshShape	from 28248	count 570
+7	hair_base_layer_03_meshShape	from 28818	count 180
+8	hair_strands_layer_01_meshShape	from 28998	count 300
+9	hair_strands_layer_02_meshShape	from 29298	count 2100
+10	hair_strands_layer_03_meshShape	from 31398	count 648
+11	hairband_meshShape	from 32046	count 3192
+12	head_feathers_meshShape	from 35238	count 624
+13	helmet_meshShape	from 35862	count 4014
+14	hip_plates_meshShape	from 39876	count 2736
+15	pauldron_layer_01_meshShape	from 42612	count 1389
+16	pauldron_layer_02_meshShape	from 44001	count 3630
+17	robe_meshShape	from 47631	count 1536
+18	side_robe_meshShape	from 49167	count 1476
+19	vambrace_meshShape	from 50643	count 4422
+20	body_meshShape	from 55065	count 14448
+21	chains_weapon_meshShape	from 69513	count 5688
+22	hammer_weapon_meshShape	from 75201	count 2286
+23	wheel_chain_meshShape	from 77487	count 8232
+24	wheel_meshShape	from 85719	count 1188
+25	ArchitectsoftheForgeT3Seal_meshShape	from 86907	count 2286
+26	crest_feathers_meshShape	from 89193	count 3216
+27	chains_weapon_meshShape	from 92409	count 5688
+28	hammer_weapon_meshShape	from 98097	count 2286
+
+=== fitting
+the monster's rig: 80 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  ForgeMasterSeal.ao  socket R_Weapon [in its carrier's rig]  fixed mesh ArchitectsoftheForgeT3Seal.fmt  1 shapes
+      ArchitectsoftheForgeT3Seal_meshShape  ->  Art/Models/MONSTERS/VaalForgeMasterMiniboss/Textures/ArchitectsoftheForgeT3Weaponc.mat
+  ForgeMasterCrest.ao  socket head_jntBnd [in its carrier's rig]  box (-53.1,-18.8,-62.8)..(60.8,49.7,10)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1072 triangles over 1260 vertices
+    names: 48 bytes said, 48 read  [agree]
+    rig 7 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_L_feathers_jntBnd_1  [its own]  under 0  rests at (23.5,23.5,10)
+      2 phys_tri_L_feathers_jntBnd_2  [its own]  under 0  rests at (29,26.7,-10.7)
+      3 phys_tri_L_feathers_jntBnd_3  [its own]  under 0  rests at (13.8,31.7,-32.2)
+      4 phys_tri_R_feathers_jntBnd_1  [its own]  under 0  rests at (-23.5,23.5,10)
+      5 phys_tri_R_feathers_jntBnd_2  [its own]  under 0  rests at (-29,26.7,-10.7)
+      6 phys_tri_R_feathers_jntBnd_3  [its own]  under 0  rests at (-13.8,31.7,-32.2)
+  ForgeMasterHammer.ao  socket <root> [NOT in its carrier's rig]  box (-15.9,-22.8,-22.6)..(85,20,19.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 2658 triangles over 4651 vertices
+    names: 92 bytes said, 92 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_L_elbow_Twist_jntBnd  [its own]  under 0  rests at (-16.9,-0,-0)

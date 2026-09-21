@@ -1,0 +1,658 @@
+monster: Daemon [Metadata/Monsters/Breach/BreachOverseerBoss/Corpses/EshCorpse]
+
+=== .ao Metadata/Monsters/Breach/BreachOverseerBoss/Corpses/EshCorpse.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossHandMage/rig.amd"
+	view_of = "summon_esh_01"
+		view_name = "underground_idle"
+		view_end = 796
+		view_looping = true
+	view_of = "summon_esh_01"
+		view_name = "underground_once"
+		view_end = 349
+	animations = '[
+		{
+			"name": "summon_esh_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.8109371662139893,
+					"name": "start_beams"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.3522119522094728,
+					"name": "start_telegraph"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.352211952209473,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 8.324203491210938,
+					"name": "snap_beams"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "L_shoulder_jntBnd Metadata/Monsters/BreachBossHandMage/attachments/L_shoulder_cloth.ao"
+	attached_object = "R_shoulder_jntBnd Metadata/Monsters/BreachBossHandMage/attachments/R_shoulder_cloth.ao"
+	attached_object = "R_elbow_jntBnd Metadata/Monsters/BreachBossHandMage/attachments/R_elbow_cloth.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/BreachBossHandMage/attachments/RobeBossHand.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/BreachBossHandMage/attachments/CrownBossHand.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossHandMage/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossHandMage/BreachBossHandMage.sm"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "summon_esh_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1494531631469727,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/BreachOverseerBoss/fx/breach_portal/portal_once.pet",
+						"bone_group": "root_fixed"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.874542236328125,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/BreachOverseerBoss/fx/breach_portal/portal_summon_surge.pet",
+						"bone_group": "root_fixed"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.6024436950683595,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/BreachOverseerBoss/fx/esh_nova/OnAct_Buildup.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.421977519989014,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/BreachOverseerBoss/fx/esh_nova/OnAct_Buildup_Hands.pet",
+						"bone_groups": [
+							"grp_l_palm",
+							"grp_r_palm"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 6.356603622436523,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/BreachOverseerBoss/fx/esh_nova/OnAct.pet",
+						"bone_group": "root_fixed"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/BreachOverseerBoss/epk/Esh_OnAct.epk"
+					}
+				]
+			},
+			{
+				"name": "summon_esh_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/BreachOverseerBoss/epk/Esh_OnAct.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "summon_esh_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 10.333000183105469,
+						"name": "EmissiveMulti",
+						"curve": "6 0 0 Linear 3.32405 0 Flat 5.82368 0.327703 Smooth 6.36938 1 Linear 6.77425 0 Flat 10.333 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 10.333000183105469,
+						"name": "surgeTime_R",
+						"curve": "4 0 0 Linear 3.29471 0.266892 Smooth 6.0936 1 Flat 10.333 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 10.333000183105469,
+						"name": "Glow_Sphere_Fade",
+						"curve": "6 0 0 Linear 2.40282 0 Flat 4.27461 0.422297 Linear 6.41632 1 Flat 6.55714 0 Flat 10.333 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 10.333000183105469,
+						"name": "Portal_Open",
+						"curve": "6 0 0 Linear 1.15 0 Linear 2.61992 1 Linear 8.5815 1 Linear 9.27388 0 Flat 10.333 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root_fixed false root_jntBnd"
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "summon_esh_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 4.196387767791748,
+						"amplitude": 8.0,
+						"duration": 2.200000047683716,
+						"damp": "LinearUp"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 6.367902755737305,
+						"amplitude": 15.0,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "summon_esh_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5719369649887085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/Xesht_Boss/Effects/Puppet/Portal"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4260247945785523,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/Xesht_Boss/Effects/Puppet/PuppetPortal"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7758073806762697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/Xesht_Boss/Effects/Puppet/Esh/LightningMarker"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.798685073852539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/Xesht_Boss/Effects/Puppet/Esh/LightningNova"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.419930458068848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/Xesht_Boss/Effects/Puppet/PuppetPortal"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/BreachBossHandMage/attachments/L_shoulder_cloth.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossHandMage/attachments/L_shoulder_cloth/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossHandMage/attachments/L_shoulder_cloth/rig.ast"
+		linear_allowed_contraction = 0.600
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.800
+		enclosure_radius = 1.000
+		enclosure_angle = 0.600
+		attachment_bones = "L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_shoulder_cTwist_jntBnd_1"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossHandMage/attachments/L_shoulder_cloth/LShoulderClothBossMage.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossHandMage/attachments/R_shoulder_cloth.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossHandMage/attachments/R_shoulder_cloth/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossHandMage/attachments/R_shoulder_cloth/rig.ast"
+	    linear_allowed_contraction = 0.600
+	    bend_stiffness = 200.000
+	    bend_allowed_angle = 0.800
+	    normal_viscosity_multiplier = 0.200
+	    tangent_viscosity_multiplier = 0.020
+	    enclosure_radius = 1.000	
+	    attachment_bones = "R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd R_shoulder_cTwist_jntBnd_1"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossHandMage/attachments/R_shoulder_cloth/RShoulderClothBossMage.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossHandMage/attachments/R_elbow_cloth.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossHandMage/attachments/R_elbow_cloth/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossHandMage/attachments/R_elbow_cloth/rig.ast"
+	    linear_allowed_contraction = 0.600
+	    bend_stiffness = 200.000
+	    bend_allowed_angle = 0.800
+	    normal_viscosity_multiplier = 0.200
+	    tangent_viscosity_multiplier = 0.020
+	    enclosure_radius = 1.000
+		attachment_bones = "R_elbow_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3 child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd R_elbow_Twist_jntBnd_1 R_elbow_Twist_jntBnd_2 R_elbow_Twist_jntBnd_3"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossHandMage/attachments/R_elbow_cloth/RElbowClothBossMage.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossHandMage/attachments/RobeBossHand.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossHandMage/attachments/Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossHandMage/attachments/Robe/rig.ast"
+	    linear_allowed_contraction = 0.600
+	    bend_stiffness = 200.000
+	    bend_allowed_angle = 0.800
+	    normal_viscosity_multiplier = 0.200
+	    tangent_viscosity_multiplier = 0.020
+	    enclosure_radius = 1.000
+	    animation_velocity_factor = 1.000
+	    animation_force_factor = 1.500
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd L_arm_8_wrist_1_jntBnd R_arm_7_wrist_1_jntBnd R_arm_6_wrist_1_jntBnd L_arm_7_wrist_1_jntBnd L_bottom_finger_1_1_jntBnd L_bottom_finger_1_2_jntBnd L_bottom_finger_1_3_jntBnd L_bottom_finger_1_4_jntBnd L_bottom_finger_2_1_jntBnd L_bottom_finger_2_2_jntBnd L_bottom_finger_2_3_jntBnd L_bottom_finger_2_4_jntBnd L_bottom_finger_3_1_jntBnd L_bottom_finger_3_2_jntBnd L_bottom_finger_3_3_jntBnd L_bottom_finger_3_4_jntBnd L_bottom_finger_4_1_jntBnd L_bottom_finger_4_2_jntBnd L_bottom_finger_4_3_jntBnd L_bottom_finger_4_4_jntBnd B_bottom_finger_1_1_jntBnd B_bottom_finger_1_2_jntBnd  B_bottom_finger_1_3_jntBnd B_bottom_finger_1_4_jntBnd R_bottom_finger_1_1_jntBnd R_bottom_finger_1_2_jntBnd  R_bottom_finger_1_3_jntBnd R_bottom_finger_1_4_jntBnd R_bottom_finger_2_1_jntBnd R_bottom_finger_2_2_jntBnd R_bottom_finger_2_3_jntBnd R_bottom_finger_3_1_jntBnd R_bottom_finger_3_2_jntBnd  R_bottom_finger_3_3_jntBnd R_bottom_finger_3_4_jntBnd R_bottom_finger_4_1_jntBnd R_bottom_finger_4_2_jntBnd R_bottom_finger_4_3_jntBnd R_bottom_finger_4_4_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd L_arm_8_wrist_1_jntBnd R_arm_7_wrist_1_jntBnd R_arm_6_wrist_1_jntBnd L_arm_7_wrist_1_jntBnd L_bottom_finger_1_1_jntBnd L_bottom_finger_1_2_jntBnd L_bottom_finger_1_3_jntBnd L_bottom_finger_1_4_jntBnd L_bottom_finger_2_1_jntBnd L_bottom_finger_2_2_jntBnd L_bottom_finger_2_3_jntBnd L_bottom_finger_2_4_jntBnd L_bottom_finger_3_1_jntBnd L_bottom_finger_3_2_jntBnd L_bottom_finger_3_3_jntBnd L_bottom_finger_3_4_jntBnd L_bottom_finger_4_1_jntBnd L_bottom_finger_4_2_jntBnd L_bottom_finger_4_3_jntBnd L_bottom_finger_4_4_jntBnd B_bottom_finger_1_1_jntBnd B_bottom_finger_1_2_jntBnd  B_bottom_finger_1_3_jntBnd B_bottom_finger_1_4_jntBnd R_bottom_finger_1_1_jntBnd R_bottom_finger_1_2_jntBnd  R_bottom_finger_1_3_jntBnd R_bottom_finger_1_4_jntBnd R_bottom_finger_2_1_jntBnd R_bottom_finger_2_2_jntBnd R_bottom_finger_2_3_jntBnd R_bottom_finger_3_1_jntBnd R_bottom_finger_3_2_jntBnd  R_bottom_finger_3_3_jntBnd R_bottom_finger_3_4_jntBnd R_bottom_finger_4_1_jntBnd R_bottom_finger_4_2_jntBnd R_bottom_finger_4_3_jntBnd R_bottom_finger_4_4_jntBnd"
+	}
+	
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossHandMage/attachments/Robe/BreachBossHandMageSkirt.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossHandMage/attachments/CrownBossHand.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossHandMage/attachments/Crown/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossHandMage/attachments/Crown/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_angle = 0.000
+		enclosure_radius_additive = 162.500
+		animation_velocity_factor = 10.000
+		animation_force_factor = 34.000
+		animation_max_velocity = 350.000
+		gravity = 20.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossHandMage/attachments/Crown/CrownBreachBoss.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BreachBossHandMage/BreachBossHandMage.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BreachBossHandMage/BreachBossHandMage_armour_f6d783a2.smd"
+Materials 1
+	"Art/Models/MONSTERS/BreachBossHandMage/Texture/CasterBreachLordc.mat" 5
+BoundingBox -78.0298 -23.758 -232.183 78.0298 50.2672 -0.726048
+BoneGroups 41
+	"root" 2 "root_jntBnd" "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "jaw_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_bottom_finger_1_01" 2 "L_bottom_finger_1_1_jntBnd" "L_bottom_finger_1_2_jntBnd"
+	"grp_l_bottom_finger_1_02" 2 "L_bottom_finger_1_2_jntBnd" "L_bottom_finger_1_3_jntBnd"
+	"grp_l_bottom_finger_1_03" 2 "L_bottom_finger_1_3_jntBnd" "L_bottom_finger_1_4_jntBnd"
+	"grp_l_bottom_finger_2_01" 2 "L_bottom_finger_2_1_jntBnd" "L_bottom_finger_2_2_jntBnd"
+	"grp_l_bottom_finger_2_02" 2 "L_bottom_finger_2_2_jntBnd" "L_bottom_finger_2_3_jntBnd"
+	"grp_l_bottom_finger_2_03" 2 "L_bottom_finger_2_3_jntBnd" "L_bottom_finger_2_4_jntBnd"
+	"grp_l_bottom_finger_3_01" 2 "L_bottom_finger_3_1_jntBnd" "L_bottom_finger_3_2_jntBnd"
+	"grp_l_bottom_finger_3_02" 2 "L_bottom_finger_3_2_jntBnd" "R_clavicle_jntBnd"
+	"grp_l_bottom_finger_3_03" 2 "R_clavicle_jntBnd" "L_bottom_finger_3_4_jntBnd"
+	"grp_l_bottom_finger_4_01" 2 "L_bottom_finger_4_1_jntBnd" "L_bottom_finger_4_2_jntBnd"
+	"grp_l_bottom_finger_4_02" 2 "L_bottom_finger_4_2_jntBnd" "L_bottom_finger_4_3_jntBnd"
+	"grp_l_bottom_finger_4_03" 2 "L_bottom_finger_4_3_jntBnd" "L_bottom_finger_4_4_jntBnd"
+	"grp_b_bottom_finger_1_01" 2 "B_bottom_finger_1_1_jntBnd" "B_bottom_finger_1_2_jntBnd"
+	"grp_b_bottom_finger_1_02" 2 "B_bottom_finger_1_2_jntBnd" "B_bottom_finger_1_3_jntBnd"
+	"grp_b_bottom_finger_1_03" 2 "B_bottom_finger_1_3_jntBnd" "B_bottom_finger_1_4_jntBnd"
+	"grp_r_bottom_finger_1_01" 2 "R_bottom_finger_1_1_jntBnd" "R_bottom_finger_1_2_jntBnd"
+	"grp_r_bottom_finger_1_02" 2 "R_bottom_finger_1_2_jntBnd" "R_bottom_finger_1_3_jntBnd"
+	"grp_r_bottom_finger_1_03" 2 "R_bottom_finger_1_3_jntBnd" "R_bottom_finger_1_4_jntBnd"
+	"grp_r_bottom_finger_2_01" 2 "R_bottom_finger_2_1_jntBnd" "R_bottom_finger_2_2_jntBnd"
+	"grp_r_bottom_finger_2_02" 2 "R_bottom_finger_2_2_jntBnd" "R_bottom_finger_2_3_jntBnd"
+	"grp_r_bottom_finger_2_03" 2 "R_bottom_finger_2_3_jntBnd" "R_bottom_finger_2_4_jntBnd"
+	"grp_r_bottom_finger_3_01" 2 "R_bottom_finger_3_1_jntBnd" "R_bottom_finger_3_2_jntBnd"
+	"grp_r_bottom_finger_3_02" 2 "R_bottom_finger_3_2_jntBnd" "R_bottom_finger_3_3_jntBnd"
+	"grp_r_bottom_finger_3_03" 2 "R_bottom_finger_3_3_jntBnd" "R_bottom_finger_3_4_jntBnd"
+	"grp_r_bottom_finger_4_01" 2 "R_bottom_finger_4_1_jntBnd" "R_bottom_finger_4_2_jntBnd"
+	"grp_r_bottom_finger_4_02" 2 "R_bottom_finger_4_1_jntBnd" "R_bottom_finger_4_3_jntBnd"
+	"grp_r_bottom_finger_4_03" 2 "R_bottom_finger_4_1_jntBnd" "R_bottom_finger_4_4_jntBnd"
+
+=== .smd Art/Models/MONSTERS/BreachBossHandMage/BreachBossHandMage_armour_f6d783a2.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 5 in the header, 5 in the block · 22822 triangles over 15746 vertices
+  names: 134 bytes said, 134 read  [agree]
+
+=== shapes (16)
+0	arm_bandShape	from 0	count 279
+1	BodyShape	from 279	count 11238
+2	FingersShape	from 11517	count 14724
+3	r_arm_bandShape	from 26241	count 744
+4	shoulderHandsShape	from 26985	count 41481
+5	clothShape1	from 68466	count 36
+6	clothShape2	from 68502	count 120
+7	rClothShape	from 68622	count 96
+8	clothShape	from 68718	count 48
+9	attachmentsShape	from 68766	count 4371
+10	bot_chainShape	from 73137	count 1752
+11	mid_robeShape	from 74889	count 1644
+12	skirtShape	from 76533	count 6270
+13	top_chainShape	from 82803	count 2448
+14	top_spine_robeShape	from 85251	count 1563
+15	crownMeshShape	from 86814	count 2322
+
+=== fitting
+the monster's rig: 254 bones
+mounts: aux_position
+  L_shoulder_cloth.ao  socket L_shoulder_jntBnd [in its carrier's rig]  box (8.3,3.3,0.7)..(53.7,9,49.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 52 triangles over 60 vertices
+    names: 44 bytes said, 44 read  [agree]
+    rig 8 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_cloth_1_jntBnd  [its own]  under 0  rests at (14.3,5.5,11.7)
+      2 L_shoulder_cTwist_jntBnd_1  [shared]  under 0  rests at (13.3,-0,0)  carrier has (30.4,8.4,-183.5)
+      3 phys_skinned_cloth_2_jntBnd  [its own]  under 1  rests at (25.9,5.5,22.9)
+      4 phys_skinned_cloth_5_jntBnd  [its own]  under 2  rests at (30.1,3.7,6.2)
+      5 phys_skinned_cloth_3_jntBnd  [its own]  under 3  rests at (37.4,5.5,34.1)
+      6 phys_skinned_cloth_6_jntBnd  [its own]  under 4  rests at (38.4,3.3,16.8)
+      7 phys_skinned_cloth_4_jntBnd  [its own]  under 5  rests at (49.1,5.6,45.3)
+  R_shoulder_cloth.ao  socket R_shoulder_jntBnd [in its carrier's rig]  box (-29,-6.8,-30.8)..(-8.1,-1.9,-3.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 32 triangles over 32 vertices
+    names: 22 bytes said, 22 read  [agree]
+    rig 6 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 6  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_shoulder_cTwist_jntBnd_1  [shared]  under 0  rests at (-13.3,0,0)  carrier has (-30.4,8.4,-183.5)
+      2 phys_skinned_cloth_1_jntBnd  [its own]  under 0  rests at (-11.5,-3.8,-8.3)
+      3 phys_skinned_cloth_2_jntBnd  [its own]  under 2  rests at (-18.9,-3.2,-17.3)
+      4 phys_skinned_cloth_3_jntBnd  [its own]  under 3  rests at (-26.6,-2.7,-25.9)
+      5 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  R_elbow_cloth.ao  socket R_elbow_jntBnd [in its carrier's rig]  box (-32.8,-9.8,-19.5)..(-17,-4.1,1.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 16 triangles over 20 vertices
+    names: 20 bytes said, 20 read  [agree]
+    rig 9 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 9  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_elbow_Twist_jntBnd_1  [shared]  under 0  rests at (-7.2,0,0)  carrier has (-45.7,6.5,-170.1)
+      2 R_elbow_Twist_jntBnd_2  [shared]  under 0  rests at (-14.5,-0,0)  carrier has (-51.2,4.6,-165.8)
+      3 R_elbow_Twist_jntBnd_3  [shared]  under 0  rests at (-21.7,0,-0)  carrier has (-56.6,2.6,-161.5)
+      4 phys_skinned_cloth_1_jntBnd  [its own]  under 2  rests at (-19.6,-4.3,-1.2)
+      5 phys_skinned_cloth_2_jntBnd  [its own]  under 4  rests at (-23.2,-5.8,-6.5)
+      6 phys_skinned_cloth_3_jntBnd  [its own]  under 5  rests at (-26.7,-7.3,-11.8)
+      7 phys_skinned_cloth_4_jntBnd  [its own]  under 6  rests at (-30.2,-8.8,-17.1)
+      8 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  RobeBossHand.ao  socket hip_jntBnd [in its carrier's rig]  box (-36.5,-36.6,-35.3)..(37,43.7,87.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 6 in the header, 6 in the block · 6016 triangles over 4594 vertices
+    names: 172 bytes said, 172 read  [agree]
+    rig 81 bones, 45 of them names its carrier's rig also has
+    mesh weights reach bone 78 of 81  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-13)  carrier has (0,1.4,-156.7)
+      2 phys_L_skirt_05_jntBnd  [its own]  under 0  rests at (13.4,-8.5,-5.7)
+      3 phys_L_skirt_10_jntBnd  [its own]  under 0  rests at (14.3,2,-6.5)
+      4 phys_L_skirt_15_jntBnd  [its own]  under 0  rests at (5.6,10,-6.8)
+      5 phys_R_skirt_01_jntBnd  [its own]  under 0  rests at (-4.8,-13.6,-5.8)
+      6 phys_R_skirt_05_jntBnd  [its own]  under 0  rests at (-12.7,-8.2,-5.8)
+      7 phys_R_skirt_10_jntBnd  [its own]  under 0  rests at (-14.8,1.1,-6.3)
+      8 phys_R_skirt_15_jntBnd  [its own]  under 0  rests at (-7.5,9.5,-6.5)
+      9 phys_L_skirt_01_jntBnd  [its own]  under 0  rests at (5.2,-13.9,-5.8)
+      10 R_bottom_finger_1_1_jntBnd  [shared]  under 0  rests at (1.7,3.4,3.3)  carrier has (1.7,4.8,-140.4)
+      11 R_bottom_finger_2_1_jntBnd  [shared]  under 0  rests at (-7.4,0.4,1.3)  carrier has (-7.4,1.8,-142.3)
+      12 R_bottom_finger_3_1_jntBnd  [shared]  under 0  rests at (0.7,0.6,7.6)  carrier has (0.7,2,-136)
+      13 R_bottom_finger_4_1_jntBnd  [shared]  under 0  rests at (-4.3,1.6,2.2)  carrier has (-4.3,3,-141.5)
+      14 L_bottom_finger_4_1_jntBnd  [shared]  under 0  rests at (5.3,0.4,1.9)  carrier has (5.3,1.8,-141.8)
+      15 L_bottom_finger_1_1_jntBnd  [shared]  under 0  rests at (4.2,-0.5,-1.1)  carrier has (4.2,0.8,-144.8)
+      16 L_bottom_finger_2_1_jntBnd  [shared]  under 0  rests at (7,0.4,1.3)  carrier has (7,1.8,-142.3)
+      17 L_bottom_finger_3_1_jntBnd  [shared]  under 0  rests at (6,4.2,11.8)  carrier has (6,5.6,-131.8)
+      18 B_bottom_finger_1_1_jntBnd  [shared]  under 0  rests at (-1.5,1.9,26)  carrier has (-1.5,3.3,-117.6)
+      19 spine_2_jntBnd  [shared]  under 1  rests at (0,0,-26)  carrier has (0,1.4,-169.7)
+      20 phys_L_skirt_06_jntBnd  [its own]  under 2  rests at (19.4,-9.5,14.3)
+      21 phys_L_skirt_11_jntBnd  [its own]  under 3  rests at (21,5.4,14.3)
+      22 phys_L_skirt_16_jntBnd  [its own]  under 4  rests at (7.9,17.1,13.5)
+      23 phys_R_skirt_02_jntBnd  [its own]  under 5  rests at (-5,-14.7,15.4)
+      24 phys_R_skirt_06_jntBnd  [its own]  under 6  rests at (-18.3,-11.7,14.9)
+      25 phys_R_skirt_11_jntBnd  [its own]  under 7  rests at (-21.7,2.5,14.8)
+      26 phys_R_skirt_16_jntBnd  [its own]  under 8  rests at (-10.8,16.7,13.9)
+      27 phys_L_skirt_02_jntBnd  [its own]  under 9  rests at (7.3,-15.8,15.5)
+      28 R_bottom_finger_1_2_jntBnd  [shared]  under 10  rests at (-5.6,-5.7,58.1)  carrier has (-5.6,-4.3,-85.6)
+      29 R_bottom_finger_2_2_jntBnd  [shared]  under 11  rests at (-26.5,-6.9,51.3)  carrier has (-26.5,-5.6,-92.4)
+      30 R_bottom_finger_3_2_jntBnd  [shared]  under 12  rests at (-20.9,6.8,51.2)  carrier has (-20.9,8.2,-92.5)
+      31 R_bottom_finger_4_2_jntBnd  [shared]  under 13  rests at (-14.6,21,48.2)  carrier has (-14.6,22.4,-95.4)
+      32 L_bottom_finger_4_2_jntBnd  [shared]  under 14  rests at (13.3,21.4,49.9)  carrier has (13.3,22.8,-93.8)
+      33 L_bottom_finger_1_2_jntBnd  [shared]  under 15  rests at (8.7,-13.7,51.1)  carrier has (8.7,-12.3,-92.5)
+      34 L_bottom_finger_2_2_jntBnd  [shared]  under 16  rests at (27.1,-3.6,51.3)  carrier has (27.1,-2.3,-92.4)
+      35 L_bottom_finger_3_2_jntBnd  [shared]  under 17  rests at (20.9,11.5,60.1)  carrier has (20.9,12.8,-83.6)
+      36 B_bottom_finger_1_2_jntBnd  [shared]  under 18  rests at (-1,24,73.1)  carrier has (-1,25.4,-70.6)
+      37 chest_jntBnd  [shared]  under 19  rests at (0,0,-39)  carrier has (0,1.4,-182.7)
+      38 phys_L_skirt_07_jntBnd  [its own]  under 20  rests at (23.7,-11.9,34.8)
+      39 phys_L_skirt_12_jntBnd  [its own]  under 21  rests at (26.4,9.9,32.5)
+      40 phys_L_skirt_17_jntBnd  [its own]  under 22  rests at (10,23.7,30.2)
+      41 phys_R_skirt_03_jntBnd  [its own]  under 23  rests at (-5.1,-14.3,34.5)
+      42 phys_R_skirt_07_jntBnd  [its own]  under 24  rests at (-18.8,-14.8,34.8)
+      43 phys_R_skirt_12_jntBnd  [its own]  under 25  rests at (-27.1,6.7,33)
+      44 phys_R_skirt_17_jntBnd  [its own]  under 26  rests at (-12.9,23.3,31.1)
+      45 phys_L_skirt_03_jntBnd  [its own]  under 27  rests at (9.3,-18.9,35.8)
+      46 R_bottom_finger_1_3_jntBnd  [shared]  under 28  rests at (-9.9,-10.5,102.6)  carrier has (-9.9,-9.1,-41.1)
+      47 R_bottom_finger_2_3_jntBnd  [shared]  under 29  rests at (-36,-11.9,93.2)  carrier has (-36,-10.6,-50.5)
+      48 R_bottom_finger_3_3_jntBnd  [shared]  under 30  rests at (-32.3,10,80.1)  carrier has (-32.3,11.4,-63.6)
+      49 R_bottom_finger_4_3_jntBnd  [shared]  under 31  rests at (-21,32,84)  carrier has (-21,33.4,-59.6)
+      50 L_bottom_finger_4_3_jntBnd  [shared]  under 32  rests at (18.3,31.1,82.1)  carrier has (18.3,32.5,-61.6)
+      51 L_bottom_finger_1_3_jntBnd  [shared]  under 33  rests at (10.3,-16.6,88.1)  carrier has (10.3,-15.2,-55.6)
+      52 L_bottom_finger_2_3_jntBnd  [shared]  under 34  rests at (35,-5.3,86.4)  carrier has (35,-3.9,-57.3)
+      53 L_bottom_finger_3_3_jntBnd  [shared]  under 35  rests at (28.4,15.9,95.8)  carrier has (28.4,17.2,-47.9)
+      54 B_bottom_finger_1_3_jntBnd  [shared]  under 36  rests at (-0.5,34,104.8)  carrier has (-0.5,35.4,-38.9)
+      55 L_arm_8_wrist_1_jntBnd  [shared]  under 37  rests at (17.3,-3,-30.9)  carrier has (17.3,-1.7,-174.6)
+      56 R_arm_7_wrist_1_jntBnd  [shared]  under 37  rests at (-17.5,-0.3,-29)  carrier has (-17.5,1,-172.7)
+      57 R_arm_6_wrist_1_jntBnd  [shared]  under 37  rests at (-11.8,-13,-32.9)  carrier has (-11.8,-11.6,-176.6)
+      58 L_arm_7_wrist_1_jntBnd  [shared]  under 37  rests at (11.3,-14,-35.6)  carrier has (11.3,-12.6,-179.2)
+      59 phys_L_skirt_08_jntBnd  [its own]  under 38  rests at (28,-14.6,59.6)
+      60 phys_L_skirt_13_jntBnd  [its own]  under 39  rests at (32.2,16.4,52.8)
+      61 phys_L_skirt_18_jntBnd  [its own]  under 40  rests at (12.5,31.5,49)
+      62 phys_R_skirt_08_jntBnd  [its own]  under 42  rests at (-18.5,-16,54.6)
+      63 phys_R_skirt_13_jntBnd  [its own]  under 43  rests at (-30.8,14,54.4)
+      64 phys_R_skirt_18_jntBnd  [its own]  under 44  rests at (-14.7,31.3,50.5)
+      65 phys_L_skirt_04_jntBnd  [its own]  under 45  rests at (11.9,-22.9,60.7)
+      66 R_bottom_finger_1_4_jntBnd  [shared]  under 46  rests at (-11,-10.8,130.2)  carrier has (-11,-9.5,-13.5)
+      67 R_bottom_finger_2_4_jntBnd  [shared]  under 47  rests at (-38.7,-14.7,123)  carrier has (-38.7,-13.4,-20.7)
+      68 R_bottom_finger_3_4_jntBnd  [shared]  under 48  rests at (-40.8,12.3,104.4)  carrier has (-40.8,13.7,-39.3)
+      69 R_bottom_finger_4_4_jntBnd  [shared]  under 49  rests at (-25,38.2,110.1)  carrier has (-25,39.6,-33.6)
+      70 L_bottom_finger_4_4_jntBnd  [shared]  under 50  rests at (21.6,36.7,109.9)  carrier has (21.6,38.1,-33.8)
+      71 L_bottom_finger_1_4_jntBnd  [shared]  under 51  rests at (12.1,-16.2,114.7)  carrier has (12.1,-14.8,-29)
+      72 L_bottom_finger_2_4_jntBnd  [shared]  under 52  rests at (37.4,-5.8,118.1)  carrier has (37.4,-4.4,-25.6)
+      73 L_bottom_finger_3_4_jntBnd  [shared]  under 53  rests at (31.7,18.6,123.2)  carrier has (31.7,20,-20.5)
+      74 B_bottom_finger_1_4_jntBnd  [shared]  under 54  rests at (0.1,43.7,135.5)  carrier has (0.1,45.1,-8.2)
+      75 phys_L_skirt_19_jntBnd  [its own]  under 61  rests at (14.7,38.2,71.3)
+      76 phys_R_skirt_09_jntBnd  [its own]  under 62  rests at (-17.8,-19.1,72.7)
+      77 phys_R_skirt_19_jntBnd  [its own]  under 64  rests at (-15.5,38.5,72.5)
+      78 phys_L_skirt_04_tip_jntBnd  [its own]  under 65  rests at (14.4,-25,86.7)
+      79 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+      80 aux_position1  [its own]  under 0  rests at (0,0,0)
+  CrownBossHand.ao  socket head_jntBnd [in its carrier's rig]  box (-11.4,-12.1,-34.8)..(11.9,10.5,-13.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 774 triangles over 631 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 3 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_crown_jntBnd  [its own]  under 0  rests at (0,-1.2,-24.8)
+      2 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)

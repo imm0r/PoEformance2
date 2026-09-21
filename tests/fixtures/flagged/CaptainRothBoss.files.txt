@@ -1,0 +1,5127 @@
+monster: Captain Hartlin [Metadata/Monsters/Pirates/CaptainRothBoss]
+
+=== .ao Metadata/Monsters/Pirates/CaptainRoth.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/PirateBoss/rig.amd"
+	view_of = "attack_01"
+		view_name = "attack_01_tmep"
+		view_end = 90
+		view_exclude_event = "StandardEvent"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.5,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				}
+			]
+		},
+		{
+			"name": "cannon_barrage_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9937670230865479,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "cannon_blast_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.625,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9582909941673279,
+					"name": "contact",
+					"position": [
+						-0.05896639823913574,
+						-218.8070068359375,
+						-70.7333984375
+					],
+					"contact_ref": [
+						-2.3964200019836427,
+						-159.84300231933595,
+						-70.79879760742188
+					]
+				}
+			]
+		},
+		{
+			"name": "cannon_slam_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.75,
+					"name": "start_target_update",
+					"data": "135 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0996099710464478,
+					"name": "contact",
+					"position": [
+						-0.9285550117492676,
+						-131.32899475097657,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "drop_anchor_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 2.4000000953674318,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4000000953674318,
+					"name": "anchor_marker"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.624039888381958,
+					"name": "bonk"
+				}
+			]
+		},
+		{
+			"name": "mortar_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 3.5,
+					"name": "start_target_update",
+					"data": "275 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.800000011920929,
+					"name": "skull5",
+					"position": [
+						76.05870056152344,
+						-119.44200134277344,
+						-204.6230010986328
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.800000011920929,
+					"name": "skull4",
+					"position": [
+						59.00379943847656,
+						-107.43499755859375,
+						-255.3040008544922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.800000011920929,
+					"name": "skull3",
+					"position": [
+						17.227399826049806,
+						-94.04499816894531,
+						-272.32000732421877
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.800000011920929,
+					"name": "skull2",
+					"position": [
+						-28.1914005279541,
+						-90.59200286865235,
+						-257.5799865722656
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.800000011920929,
+					"name": "skull1",
+					"position": [
+						-54.67390060424805,
+						-93.41320037841797,
+						-215.0749969482422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.800000011920929,
+					"name": "skull8",
+					"position": [
+						-41.52510070800781,
+						-110.07499694824219,
+						-165.92100524902345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.800000011920929,
+					"name": "skull7",
+					"position": [
+						1.9955699443817139,
+						-120.36100006103516,
+						-147.33700561523438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.800000011920929,
+					"name": "skull6",
+					"position": [
+						48.74509811401367,
+						-126.59100341796875,
+						-162.49899291992188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.925000011920929,
+					"name": "skull8",
+					"position": [
+						-45.144901275634769,
+						-105.15399932861328,
+						-164.69700622558595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.925000011920929,
+					"name": "skull7",
+					"position": [
+						0.19615599513053895,
+						-115.7490005493164,
+						-151.38800048828126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.925000011920929,
+					"name": "skull6",
+					"position": [
+						44.86650085449219,
+						-121.85700225830078,
+						-171.91799926757813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.925000011920929,
+					"name": "skull5",
+					"position": [
+						67.16339874267578,
+						-114.20800018310547,
+						-216.81700134277345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.925000011920929,
+					"name": "skull4",
+					"position": [
+						44.41630172729492,
+						-101.51799774169922,
+						-265.0360107421875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.925000011920929,
+					"name": "skull3",
+					"position": [
+						0.9981849789619446,
+						-87.84259796142578,
+						-276.95001220703127
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.925000011920929,
+					"name": "skull2",
+					"position": [
+						-42.40760040283203,
+						-84.50810241699219,
+						-257.02801513671877
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.925000011920929,
+					"name": "skull1",
+					"position": [
+						-63.82170104980469,
+						-87.83699798583985,
+						-211.79200744628907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0499999523162842,
+					"name": "skull5",
+					"position": [
+						68.19129943847656,
+						-112.11299896240235,
+						-216.56100463867188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0499999523162842,
+					"name": "skull4",
+					"position": [
+						45.60649871826172,
+						-98.0427017211914,
+						-264.47198486328127
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0499999523162842,
+					"name": "skull3",
+					"position": [
+						2.2362101078033449,
+						-83.99960327148438,
+						-276.1300048828125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0499999523162842,
+					"name": "skull2",
+					"position": [
+						-41.230098724365237,
+						-81.19629669189453,
+						-256.2590026855469
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0499999523162842,
+					"name": "skull1",
+					"position": [
+						-62.790199279785159,
+						-85.78959655761719,
+						-211.2030029296875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0499999523162842,
+					"name": "skull8",
+					"position": [
+						-44.2755012512207,
+						-104.45099639892578,
+						-164.55999755859376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0499999523162842,
+					"name": "skull7",
+					"position": [
+						1.0155400037765504,
+						-115.45600128173828,
+						-151.41299438476563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0499999523162842,
+					"name": "skull6",
+					"position": [
+						45.74639892578125,
+						-121.01499938964844,
+						-171.96800231933595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1749999523162842,
+					"name": "skull8",
+					"position": [
+						-44.461700439453128,
+						-103.52999877929688,
+						-165.6739959716797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1749999523162842,
+					"name": "skull7",
+					"position": [
+						0.8206319808959961,
+						-114.79199981689453,
+						-152.7169952392578
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1749999523162842,
+					"name": "skull6",
+					"position": [
+						45.569400787353519,
+						-119.9260025024414,
+						-173.3419952392578
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1749999523162842,
+					"name": "skull5",
+					"position": [
+						68.04900360107422,
+						-110.11799621582031,
+						-217.7270050048828
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1749999523162842,
+					"name": "skull4",
+					"position": [
+						45.50080108642578,
+						-95.08370208740235,
+						-265.3630065917969
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1749999523162842,
+					"name": "skull3",
+					"position": [
+						2.1374499797821047,
+						-80.81490325927735,
+						-276.7690124511719
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1749999523162842,
+					"name": "skull2",
+					"position": [
+						-41.345699310302737,
+						-78.42240142822266,
+						-256.8810119628906
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1749999523162842,
+					"name": "skull1",
+					"position": [
+						-62.94169998168945,
+						-83.931396484375,
+						-211.9459991455078
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "skull1",
+					"position": [
+						-63.008399963378909,
+						-82.71399688720703,
+						-212.47900390625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "skull6",
+					"position": [
+						45.612701416015628,
+						-118.93499755859375,
+						-174.4010009765625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "skull7",
+					"position": [
+						0.8522509932518005,
+						-114.2239990234375,
+						-153.6999969482422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "skull2",
+					"position": [
+						-41.43510055541992,
+						-76.5062026977539,
+						-257.3340148925781
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "skull5",
+					"position": [
+						68.05719757080078,
+						-108.43499755859375,
+						-218.64500427246095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "skull3",
+					"position": [
+						2.0518798828125,
+						-78.49009704589844,
+						-277.2590026855469
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "skull8",
+					"position": [
+						-44.464599609375,
+						-102.91300201416016,
+						-166.49200439453126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2999999523162842,
+					"name": "skull4",
+					"position": [
+						45.45830154418945,
+						-92.7926025390625,
+						-266.0610046386719
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4249999523162842,
+					"name": "skull8",
+					"position": [
+						-44.21229934692383,
+						-102.66200256347656,
+						-167.46299743652345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4249999523162842,
+					"name": "skull2",
+					"position": [
+						-41.049800872802737,
+						-75.01309967041016,
+						-257.92999267578127
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4249999523162842,
+					"name": "skull3",
+					"position": [
+						2.5144200325012209,
+						-76.45490264892578,
+						-277.73199462890627
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4249999523162842,
+					"name": "skull7",
+					"position": [
+						1.132599949836731,
+						-113.86100006103516,
+						-154.67100524902345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4249999523162842,
+					"name": "skull4",
+					"position": [
+						45.97309875488281,
+						-90.63490295410156,
+						-266.5799865722656
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4249999523162842,
+					"name": "skull6",
+					"position": [
+						45.9900016784668,
+						-118.01100158691406,
+						-175.28199768066407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4249999523162842,
+					"name": "skull5",
+					"position": [
+						68.51370239257813,
+						-106.77400207519531,
+						-219.3040008544922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4249999523162842,
+					"name": "skull1",
+					"position": [
+						-62.73139953613281,
+						-81.96109771728516,
+						-213.23599243164063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5499999523162842,
+					"name": "skull7",
+					"position": [
+						1.7877399921417237,
+						-113.61599731445313,
+						-155.33299255371095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5499999523162842,
+					"name": "skull3",
+					"position": [
+						3.113830089569092,
+						-75.09480285644531,
+						-278.04998779296877
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5499999523162842,
+					"name": "skull5",
+					"position": [
+						69.27310180664063,
+						-105.21199798583985,
+						-219.69900512695313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5499999523162842,
+					"name": "skull4",
+					"position": [
+						46.693199157714847,
+						-88.89769744873047,
+						-266.89599609375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5499999523162842,
+					"name": "skull6",
+					"position": [
+						46.74720001220703,
+						-117.08999633789063,
+						-175.8470001220703
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5499999523162842,
+					"name": "skull2",
+					"position": [
+						-40.52050018310547,
+						-74.30760192871094,
+						-258.3659973144531
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5499999523162842,
+					"name": "skull1",
+					"position": [
+						-62.25339889526367,
+						-81.89309692382813,
+						-213.80099487304688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5499999523162842,
+					"name": "skull8",
+					"position": [
+						-43.640201568603519,
+						-102.80000305175781,
+						-168.15899658203126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6749999523162842,
+					"name": "skull7",
+					"position": [
+						2.8794000148773195,
+						-113.46299743652344,
+						-155.65199279785157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6749999523162842,
+					"name": "skull4",
+					"position": [
+						47.56610107421875,
+						-87.54029846191406,
+						-267.0299987792969
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6749999523162842,
+					"name": "skull2",
+					"position": [
+						-39.89289855957031,
+						-74.43589782714844,
+						-258.6000061035156
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6749999523162842,
+					"name": "skull8",
+					"position": [
+						-42.699100494384769,
+						-103.3499984741211,
+						-168.51800537109376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6749999523162842,
+					"name": "skull5",
+					"position": [
+						70.33000183105469,
+						-103.6729965209961,
+						-219.85899353027345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6749999523162842,
+					"name": "skull1",
+					"position": [
+						-61.57590103149414,
+						-82.56610107421875,
+						-214.10699462890626
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6749999523162842,
+					"name": "skull6",
+					"position": [
+						47.92679977416992,
+						-116.1050033569336,
+						-176.0970001220703
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6749999523162842,
+					"name": "skull3",
+					"position": [
+						3.7833099365234377,
+						-74.41680145263672,
+						-278.2070007324219
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "skull8",
+					"position": [
+						-41.33729934692383,
+						-104.3219985961914,
+						-168.51699829101563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "skull4",
+					"position": [
+						48.53459930419922,
+						-86.51210021972656,
+						-267.0480041503906
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "skull2",
+					"position": [
+						-39.204200744628909,
+						-75.42939758300781,
+						-258.625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "skull5",
+					"position": [
+						71.6675033569336,
+						-102.0719985961914,
+						-219.86399841308595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "skull1",
+					"position": [
+						-60.69169998168945,
+						-84.02040100097656,
+						-214.12399291992188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "skull7",
+					"position": [
+						4.463630199432373,
+						-113.36499786376953,
+						-155.64500427246095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "skull6",
+					"position": [
+						49.55950164794922,
+						-114.98100280761719,
+						-176.08999633789063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7999999523162842,
+					"name": "skull3",
+					"position": [
+						4.459310054779053,
+						-74.41590118408203,
+						-278.2349853515625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9249999523162842,
+					"name": "skull2",
+					"position": [
+						-39.135398864746097,
+						-77.53939819335938,
+						-257.98699951171877
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9249999523162842,
+					"name": "skull5",
+					"position": [
+						72.69920349121094,
+						-100.9219970703125,
+						-219.89300537109376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9249999523162842,
+					"name": "skull7",
+					"position": [
+						6.345779895782471,
+						-113.1780014038086,
+						-154.9709930419922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9249999523162842,
+					"name": "skull1",
+					"position": [
+						-60.023101806640628,
+						-86.1624984741211,
+						-213.20700073242188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9249999523162842,
+					"name": "skull3",
+					"position": [
+						4.3220601081848148,
+						-75.6449966430664,
+						-277.9849853515625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9249999523162842,
+					"name": "skull4",
+					"position": [
+						48.782901763916019,
+						-86.49259948730469,
+						-267.0459899902344
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9249999523162842,
+					"name": "skull6",
+					"position": [
+						51.294898986816409,
+						-113.88500213623047,
+						-175.78700256347657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9249999523162842,
+					"name": "skull8",
+					"position": [
+						-39.77669906616211,
+						-105.44499969482422,
+						-167.54600524902345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.049999952316284,
+					"name": "skull4",
+					"position": [
+						48.95840072631836,
+						-86.71890258789063,
+						-267.02899169921877
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.049999952316284,
+					"name": "skull8",
+					"position": [
+						-38.33570098876953,
+						-106.46099853515625,
+						-166.5679931640625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.049999952316284,
+					"name": "skull7",
+					"position": [
+						8.050780296325684,
+						-113.00299835205078,
+						-154.29200744628907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.049999952316284,
+					"name": "skull1",
+					"position": [
+						-59.384700775146487,
+						-88.19090270996094,
+						-212.2830047607422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.049999952316284,
+					"name": "skull3",
+					"position": [
+						4.175909996032715,
+						-77.00740051269531,
+						-277.7200012207031
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.049999952316284,
+					"name": "skull2",
+					"position": [
+						-39.0630989074707,
+						-79.63909912109375,
+						-257.33599853515627
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.049999952316284,
+					"name": "skull6",
+					"position": [
+						52.833099365234378,
+						-112.947998046875,
+						-175.4759979248047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.049999952316284,
+					"name": "skull5",
+					"position": [
+						73.57859802246094,
+						-100.03700256347656,
+						-219.91099548339845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.174999952316284,
+					"name": "skull7",
+					"position": [
+						9.403409957885743,
+						-112.8290023803711,
+						-153.58799743652345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.174999952316284,
+					"name": "skull6",
+					"position": [
+						54.00740051269531,
+						-112.27200317382813,
+						-175.13800048828126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.174999952316284,
+					"name": "skull8",
+					"position": [
+						-37.186100006103519,
+						-107.24500274658203,
+						-165.56399536132813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.174999952316284,
+					"name": "skull5",
+					"position": [
+						74.17030334472656,
+						-99.57250213623047,
+						-219.9010009765625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.174999952316284,
+					"name": "skull4",
+					"position": [
+						48.94729995727539,
+						-87.28070068359375,
+						-266.97900390625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.174999952316284,
+					"name": "skull3",
+					"position": [
+						3.9191999435424806,
+						-78.47899627685547,
+						-277.4230041503906
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.174999952316284,
+					"name": "skull2",
+					"position": [
+						-39.10340118408203,
+						-81.595703125,
+						-256.65301513671877
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.174999952316284,
+					"name": "skull1",
+					"position": [
+						-58.91320037841797,
+						-89.92259979248047,
+						-211.33099365234376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.299999952316284,
+					"name": "skull8",
+					"position": [
+						-36.500999450683597,
+						-107.6729965209961,
+						-164.5030059814453
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.299999952316284,
+					"name": "skull7",
+					"position": [
+						10.233499526977539,
+						-112.65299987792969,
+						-152.82899475097657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.299999952316284,
+					"name": "skull6",
+					"position": [
+						54.657501220703128,
+						-111.96700286865235,
+						-174.74400329589845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.299999952316284,
+					"name": "skull4",
+					"position": [
+						48.628700256347659,
+						-88.27850341796875,
+						-266.8710021972656
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.299999952316284,
+					"name": "skull3",
+					"position": [
+						3.436800003051758,
+						-80.04669952392578,
+						-277.07000732421877
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.299999952316284,
+					"name": "skull2",
+					"position": [
+						-39.38759994506836,
+						-83.28730010986328,
+						-255.91299438476563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.299999952316284,
+					"name": "skull1",
+					"position": [
+						-58.75590133666992,
+						-91.18299865722656,
+						-210.322998046875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.299999952316284,
+					"name": "skull5",
+					"position": [
+						74.34149932861328,
+						-99.68830108642578,
+						-219.83599853515626
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.424999952316284,
+					"name": "skull4",
+					"position": [
+						46.93109893798828,
+						-90.75749969482422,
+						-266.6470031738281
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.424999952316284,
+					"name": "skull5",
+					"position": [
+						73.45659637451172,
+						-101.0469970703125,
+						-219.80599975585938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.424999952316284,
+					"name": "skull8",
+					"position": [
+						-36.40290069580078,
+						-107.52200317382813,
+						-162.35499572753907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.424999952316284,
+					"name": "skull2",
+					"position": [
+						-40.874000549316409,
+						-85.37770080566406,
+						-254.27000427246095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.424999952316284,
+					"name": "skull6",
+					"position": [
+						54.55730056762695,
+						-112.19100189208985,
+						-174.08700561523438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.424999952316284,
+					"name": "skull3",
+					"position": [
+						1.5746099948883057,
+						-82.71549987792969,
+						-276.2489929199219
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.424999952316284,
+					"name": "skull7",
+					"position": [
+						10.525099754333496,
+						-112.27799987792969,
+						-151.38499450683595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.424999952316284,
+					"name": "skull1",
+					"position": [
+						-59.444801330566409,
+						-92.12760162353516,
+						-208.16700744628907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.549999952316284,
+					"name": "skull7",
+					"position": [
+						9.915630340576172,
+						-111.83799743652344,
+						-149.8090057373047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.549999952316284,
+					"name": "skull5",
+					"position": [
+						71.85030364990235,
+						-103.31400299072266,
+						-219.51800537109376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.549999952316284,
+					"name": "skull3",
+					"position": [
+						-0.6943759918212891,
+						-85.3936996459961,
+						-275.24200439453127
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.549999952316284,
+					"name": "skull8",
+					"position": [
+						-37.1161003112793,
+						-106.677001953125,
+						-160.13299560546876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.549999952316284,
+					"name": "skull4",
+					"position": [
+						44.6963996887207,
+						-93.85169982910156,
+						-266.1730041503906
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.549999952316284,
+					"name": "skull1",
+					"position": [
+						-60.696998596191409,
+						-92.13770294189453,
+						-205.9499969482422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.549999952316284,
+					"name": "skull2",
+					"position": [
+						-42.80390167236328,
+						-86.8593978881836,
+						-252.51100158691407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.549999952316284,
+					"name": "skull6",
+					"position": [
+						53.55939865112305,
+						-112.98899841308594,
+						-173.2209930419922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.674999952316284,
+					"name": "skull6",
+					"position": [
+						50.938499450683597,
+						-114.63300323486328,
+						-171.01199340820313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.674999952316284,
+					"name": "skull2",
+					"position": [
+						-43.677799224853519,
+						-87.23179626464844,
+						-251.95899963378907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.674999952316284,
+					"name": "skull3",
+					"position": [
+						-1.3260300159454346,
+						-87.83260345458985,
+						-274.2749938964844
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.674999952316284,
+					"name": "skull5",
+					"position": [
+						70.00330352783203,
+						-106.81500244140625,
+						-217.34800720214845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.674999952316284,
+					"name": "skull7",
+					"position": [
+						7.139120101928711,
+						-111.34700012207031,
+						-148.09800720214845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.674999952316284,
+					"name": "skull1",
+					"position": [
+						-62.19279861450195,
+						-90.66390228271485,
+						-205.46800231933595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.674999952316284,
+					"name": "skull4",
+					"position": [
+						43.64950180053711,
+						-97.63179779052735,
+						-264.5150146484375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.674999952316284,
+					"name": "skull8",
+					"position": [
+						-39.5802001953125,
+						-104.81700134277344,
+						-159.04600524902345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "skull3",
+					"position": [
+						0.8879550099372864,
+						-89.63629913330078,
+						-273.697998046875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "skull8",
+					"position": [
+						-42.945098876953128,
+						-102.52100372314453,
+						-159.9340057373047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "skull7",
+					"position": [
+						2.936690092086792,
+						-110.80400085449219,
+						-146.83999633789063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "skull1",
+					"position": [
+						-62.921199798583987,
+						-88.40589904785156,
+						-207.56199645996095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "skull5",
+					"position": [
+						68.8324966430664,
+						-110.43000030517578,
+						-213.36399841308595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "skull4",
+					"position": [
+						44.937400817871097,
+						-101.13500213623047,
+						-261.802001953125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "skull2",
+					"position": [
+						-42.310001373291019,
+						-86.75550079345703,
+						-253.25999450683595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.799999952316284,
+					"name": "skull6",
+					"position": [
+						47.48820114135742,
+						-116.44100189208985,
+						-167.75900268554688
+					]
+				}
+			]
+		},
+		{
+			"name": "slam_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.7757163643836975,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0791133642196656,
+					"name": "impact",
+					"position": [
+						-83.86710357666016,
+						-335.20098876953127,
+						0.0
+					],
+					"contact_ref": [
+						-83.86710357666016,
+						-204.24000549316407,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0810799598693848,
+					"name": "contact",
+					"position": [
+						-79.4093017578125,
+						-335.20098876953127,
+						0.0
+					],
+					"contact_ref": [
+						-83.86710357666016,
+						-204.24000549316407,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "slam_fast_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.800000011920929,
+					"name": "start_target_update",
+					"data": "100 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1185200214385987,
+					"name": "contact",
+					"position": [
+						18.797800064086915,
+						-167.4810028076172,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "stun_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 1.0,
+					"name": "move",
+					"position": [
+						0.0,
+						240.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 4.232999801635742,
+					"end_time": 5.0,
+					"name": "move",
+					"position": [
+						0.0,
+						-240.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "summon_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8999999761581421,
+					"name": "contact",
+					"position": [
+						-45.69160079956055,
+						-17.594600677490236,
+						-238.91299438476563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9624999761581421,
+					"name": "contact",
+					"position": [
+						84.96620178222656,
+						-45.29790115356445,
+						-233.87100219726563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.023300051689148,
+					"name": "contact",
+					"position": [
+						-14.461799621582032,
+						21.090999603271486,
+						-253.63900756835938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.087499976158142,
+					"name": "contact",
+					"position": [
+						53.431400299072269,
+						-82.16310119628906,
+						-223.08999633789063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.149999976158142,
+					"name": "contact",
+					"position": [
+						33.26110076904297,
+						30.015100479125978,
+						-255.42599487304688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.212499976158142,
+					"name": "contact",
+					"position": [
+						6.392970085144043,
+						-90.54440307617188,
+						-217.9709930419922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.274999976158142,
+					"name": "contact",
+					"position": [
+						75.5531997680664,
+						5.836219787597656,
+						-248.7760009765625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.337499976158142,
+					"name": "contact",
+					"position": [
+						-32.71080017089844,
+						-71.81510162353516,
+						-227.91700744628907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.399999976158142,
+					"name": "contact",
+					"position": [
+						89.54419708251953,
+						-45.10490036010742,
+						-225.61199951171876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.462499976158142,
+					"name": "contact",
+					"position": [
+						-40.57419967651367,
+						-27.986900329589845,
+						-245.8699951171875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.524999976158142,
+					"name": "contact",
+					"position": [
+						61.56850051879883,
+						-86.69969940185547,
+						-211.64199829101563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.587499976158142,
+					"name": "contact",
+					"position": [
+						-10.320899963378907,
+						1.1929600238800049,
+						-264.08599853515627
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.649999976158142,
+					"name": "contact",
+					"position": [
+						15.891200065612793,
+						-102.10299682617188,
+						-207.03900146484376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.712499976158142,
+					"name": "contact",
+					"position": [
+						34.849300384521487,
+						5.892469882965088,
+						-267.02801513671877
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.774999976158142,
+					"name": "contact",
+					"position": [
+						-23.85420036315918,
+						-93.7885971069336,
+						-221.16099548339845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.837499976158142,
+					"name": "contact",
+					"position": [
+						75.98200225830078,
+						-15.996999740600586,
+						-254.98899841308595
+					]
+				}
+			]
+		},
+		{
+			"name": "tidal_wave_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "contact",
+					"position": [
+						196.53700256347657,
+						-198.62399291992188,
+						-29.82029914855957
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9159839749336243,
+					"name": "move_all_stationary"
+				}
+			]
+		},
+		{
+			"name": "wheel_spin_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "speen"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "aux_anchor_jntBnd Metadata/Monsters/Pirates/attachments/PirateBossAnchor.ao"
+	attached_object = "aux_cannon_jntBnd Metadata/Monsters/Pirates/attachments/PirateBossCannon.ao"
+	attached_object = "<root> Metadata/Monsters/Pirates/attachments/PirateBossHelm.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/Pirates/attachments/PirateBossBeard.ao"
+	attached_object = "<root> Metadata/Monsters/Pirates/attachments/PirateBossSeaweed.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.28342199325561526,
+								0.0
+							],
+							[
+								0.28740158677101138,
+								0.1209213137626648
+							],
+							[
+								0.31102362275123598,
+								0.274472177028656
+							],
+							[
+								0.33464565873146059,
+								0.5124759674072266
+							],
+							[
+								0.34645670652389529,
+								0.7082533836364746
+							],
+							[
+								0.35826772451400759,
+								0.9078694581985474
+							],
+							[
+								0.37967899441719057,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"damage_statset_index": 3,
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 5,
+						"rotation": -0.8726649880409241,
+						"angle": 4.10152006149292,
+						"x_axis_scale": 0.875,
+						"length": 380.0,
+						"impact_z_rotation": [
+							-0.5235990285873413,
+							1.5707999467849732
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5589123964309692,
+								0.0
+							],
+							[
+								0.574018120765686,
+								0.21689057350158692
+							],
+							[
+								0.5861027240753174,
+								0.4894433617591858
+							],
+							[
+								0.5981873273849487,
+								0.7696737051010132
+							],
+							[
+								0.6102719306945801,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 3,
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 5,
+						"rotation": -0.9599310159683228,
+						"width": 98.44599914550781,
+						"angle": 2.9845099449157717,
+						"x_axis_scale": 0.8999999761581421,
+						"length": 367.8919982910156,
+						"offset": [
+							-81.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.8325999975204468
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_arm_tentacle_jntBnd_22"
+					}
+				]
+			}
+		},
+		{
+			"name": "cannon_slam_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5251399874687195,
+								0.0
+							],
+							[
+								0.5865920186042786,
+								1.0
+							]
+						],
+						"angle": 6.28318977355957,
+						"length": 120.0,
+						"offset": [
+							0.0,
+							-133.0
+						],
+						"impact_x_rotation": [
+							-1.0471999645233155,
+							-1.3962600231170655
+						],
+						"impact_z_rotation": [
+							-0.10471998155117035,
+							0.0
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "cannon_stock"
+					}
+				]
+			}
+		},
+		{
+			"name": "slam_fast_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5251399874687195,
+								0.0
+							],
+							[
+								0.5698320269584656,
+								1.0
+							]
+						],
+						"angle": 6.28318977355957,
+						"length": 120.0,
+						"offset": [
+							13.0,
+							-163.0
+						],
+						"impact_x_rotation": [
+							-1.0471999645233155,
+							-1.5707999467849732
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "aux_anchor_line_01"
+					}
+				]
+			}
+		},
+		{
+			"name": "tidal_wave_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.26203200221061709,
+								0.0
+							],
+							[
+								0.40641701221466067,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 6.2482805252075199,
+						"length": 339.1820068359375,
+						"impact_x_rotation": [
+							0.0,
+							0.43633195757865908
+						],
+						"impact_z_rotation": [
+							5.585050106048584,
+							0.785398006439209
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_arm_tentacle_jntBnd_22"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/PirateBoss/rig.ast"
+		socket = "skull_1"
+			parent = "neck_jntBnd"
+			translation = "-66.8539 0.306846 -21.2921"
+		socket = "skull_2"
+			parent = "neck_jntBnd"
+			translation = "-44.8325 45.32 -23.4821"
+		socket = "skull_3"
+			parent = "neck_jntBnd"
+			translation = "-0.90436 64.3141 -22.2181"
+		socket = "skull_4"
+			parent = "neck_jntBnd"
+			translation = "43.8792 49.9883 -24.0328"
+		socket = "skull_5"
+			parent = "neck_jntBnd"
+			translation = "66.8539 0.306846 -21.2921"
+		socket = "skull_6"
+			parent = "neck_jntBnd"
+			translation = "44.8325 -45.32 -23.4821"
+		socket = "skull_7"
+			parent = "neck_jntBnd"
+			translation = "-0.90436 -64.3141 -22.2181"
+		socket = "skull_8"
+			parent = "neck_jntBnd"
+			translation = "-46.9117 -49.3063 -24.0328"
+		socket = "anchor_emerge_impact"
+			translation = "-218.636 0 0"
+		socket = "cannon_tip"
+			parent = "L_Weapon"
+			translation = "0 0 -85.0979"
+		socket = "anchor_drag_01"
+			parent = "aux_anchor_jntBnd"
+			translation = "25 0 54.2335"
+		socket = "anchor_drag_02"
+			parent = "aux_anchor_jntBnd"
+			translation = "25 0 159.789"
+		socket = "aux_anchor_line_01"
+			parent = "aux_anchor_jntBnd"
+			translation = "0 0 159.789"
+		socket = "cannon_stock"
+			parent = "L_Weapon"
+			translation = "0 0 72.9192"
+		socket = "cannon_muzzle"
+			parent = "L_Weapon"
+			translation = "0 0 -75"
+		linear_allowed_contraction = 0.200
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.500
+		normal_viscosity_multiplier = 0.150
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.600
+		animation_velocity_factor = 1.000
+		animation_force_factor = 10.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/PirateBoss/PirateBoss.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "parent_attach false tail_jntBnd_4 tail_jntBnd_5 phys_tri_L_coat_jntBnd_1 phys_tri_L_coat_jntBnd_2 phys_tri_L_coat_jntBnd_3 phys_tri_L_coat_jntBnd_4 phys_tri_L_coat_jntBnd_5 phys_tri_L_coat_jntBnd_6 phys_tri_L_coat_jntBnd_7 phys_tri_L_coat_jntBnd_8 phys_tri_L_coat_jntBnd_9 phys_tri_L_coat_jntBnd_10 phys_tri_L_coat_jntBnd_11 phys_tri_L_coat_jntBnd_12 phys_tri_L_coat_jntBnd_13 phys_tri_L_coat_jntBnd_14 phys_tri_L_coat_jntBnd_15 phys_tri_L_coat_jntBnd_16 phys_tri_L_coat_jntBnd_17 phys_tri_L_coat_jntBnd_18 phys_tri_R_coat_jntBnd_16 phys_tri_R_coat_jntBnd_17 phys_tri_R_coat_jntBnd_18 phys_tri_R_coat_jntBnd_13 phys_tri_R_coat_jntBnd_14 phys_tri_R_coat_jntBnd_15 phys_tri_R_coat_jntBnd_10 phys_tri_R_coat_jntBnd_11 phys_tri_R_coat_jntBnd_12 phys_tri_R_coat_jntBnd_7 phys_tri_R_coat_jntBnd_8 phys_tri_R_coat_jntBnd_9 phys_tri_R_coat_jntBnd_4 phys_tri_R_coat_jntBnd_5 phys_tri_R_coat_jntBnd_6 phys_tri_R_coat_jntBnd_1 phys_tri_R_coat_jntBnd_2 phys_tri_R_coat_jntBnd_3"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_arm_tentacle_jntBnd_1 R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_back_shoulder_jntBnd L_back_shoulder_cTwist_jntBnd_1"
+		bone_group = "anchor_drag false anchor_drag_01 anchor_drag_02"
+		bone_group = "coat_tail false phys_tri_L_coat_jntBnd_4 phys_tri_L_coat_jntBnd_7 phys_tri_L_coat_jntBnd_10 phys_tri_L_coat_jntBnd_13 phys_tri_L_coat_jntBnd_16 phys_tri_R_coat_jntBnd_16 phys_tri_R_coat_jntBnd_13 phys_tri_R_coat_jntBnd_10 phys_tri_R_coat_jntBnd_7 phys_tri_R_coat_jntBnd_4"
+		bone_group = "anchor_line false aux_anchor_line_01 aux_anchor_jntBnd"
+		bone_group = "cannon_line false cannon_stock cannon_tip"
+		bone_group = "fx_muzzleline false cannon_muzzle cannon_tip"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2215380072593689,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3534800112247467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Attack01A",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5037779808044434,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Attack01A",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5046150088310242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_DropAnchor",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5886679887771606,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01A",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7090050578117371,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Whoosh_",
+						"bone_name": "R_arm_tentacle_jntBnd_22",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2079499959945679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Attack01B",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2121200561523438,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Attack01B",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2580499649047852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3497400283813477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_DropAnchor",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3554500341415406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Whoosh_",
+						"bone_name": "R_arm_tentacle_jntBnd_22",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9323101043701172,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cannon_barrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "spine_1_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0737379863858223,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Effects/CastSurge/CastSurge",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2410530149936676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBarrageA",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4840089976787567,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Barrage",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7834650278091431,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBarrageB",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.066230058670044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4782400131225587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_TidalWave",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9455499649047852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/GruntAlways",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0569000244140627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Attack01A",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3558599948883058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBarrageC",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4449501037597658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cannon/Foley_Cannon_Reload",
+						"bone_name": "L_back_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.466510057449341,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Swish",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4887800216674806,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_DropAnchor",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5722100734710695,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cannon/Foley_Cannon_Reload",
+						"bone_name": "L_back_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0260798931121828,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cannon_blast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13483500480651856,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16211000084877015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Attack01B",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17311100661754609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastA",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38607698678970339,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Attack01B",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5255759954452515,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Anchor/Foley_Anchor_Run",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.611965000629425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Footsteps",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6778259873390198,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cannon/CannonFuse_",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9742569923400879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastB",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9961919784545898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cannon/Cannon_",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2948499917984009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4802700281143189,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastA",
+						"bone_name": "L_back_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5967899560928345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01A",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.760349988937378,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "skull_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9592499732971192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cannon/Foley_Cannon_Reload",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.034480094909668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.088900089263916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_DropAnchorB",
+						"bone_name": "L_back_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.164170026779175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Footsteps",
+						"bone_name": "L_back_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cannon_slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12592099606990815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Slam",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14786699414253236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Attack01A",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6783779859542847,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7216569781303406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Swish",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0529299974441529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Effects/Cannon/Cannon_Slam_",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0529299974441529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Anchor/Foley_Anchor_Layer",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0657299757003785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01A",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.317389965057373,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "cannon_tip"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Death",
+						"bone_name": "skull_7"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_DropAnchor",
+						"bone_name": "R_arm_tentacle_jntBnd_15"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Death",
+						"bone_name": "skull_7",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Effects/Death/GhostlyDeathSurge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19780200719833375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/WeaponFall",
+						"bone_name": "aux_anchor_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3772900104522706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_TidalWave",
+						"bone_name": "R_arm_tentacle_jntBnd_15"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4615399837493898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01A",
+						"bone_name": "R_arm_tentacle_jntBnd_15"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7032999992370607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Effects/Cannon/Cannon_Slam_",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8498198986053469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/WeaponFall",
+						"bone_name": "cannon_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.250469923019409,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Death",
+						"bone_name": "skull_7"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.444659948348999,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/FallA",
+						"bone_name": "skull_7"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6168198585510256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/FallB",
+						"bone_name": "skull_7"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6168198585510256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/FatMovementShort",
+						"bone_name": "skull_7"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7376999855041506,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/FatMovementShort",
+						"bone_name": "skull_7"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.891540050506592,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/FatMovementShort",
+						"bone_name": "skull_7"
+					}
+				]
+			},
+			{
+				"name": "drop_anchor_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45208799839019778,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47103479504585268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Effects/CastSurge/CastSurge",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7977120280265808,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/DropAnchorA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.90208500623703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_DropAnchorA",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1396199464797974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Mortar",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2254899740219117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01A",
+						"bone_name": "R_arm_tentacle_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2541500329971314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01A",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5169199705123902,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.098180055618286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/DropAnchorB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.338900089263916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_TidalWave",
+						"bone_name": "R_arm_tentacle_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4294400215148927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_DropAnchor",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.508240222930908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Whoosh_",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6431703567504885,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_DropAnchorB",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7984299659729006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Effects/Cannon/Cannon_Slam_",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8593602180480959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Anchor/Foley_Anchor_DropAnchor",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8745100498199465,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.169670104980469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_PopUp_",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5340660214424133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8736259937286377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0693999528884888,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_Tentacle_B_",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0693999528884888,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_TidalWave",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2217299938201905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_Tentacle_A_",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7914700508117676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.873729944229126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_DropAnchorB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.23934006690979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01A",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7094500064849855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Run.loop.ogg",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.921800136566162,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9929699897766115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Walk.loop.ogg",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0711100101470949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Run.loop.ogg",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.269129991531372,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Swish",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.342250347137451,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Slam",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.357490062713623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01A",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.637779951095581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Anchor/Foley_Anchor_Run",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					}
+				]
+			},
+			{
+				"name": "emerge_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Idle.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5616059899330139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_Tentacle_A_",
+						"bone_name": "R_arm_tentacle_jntBnd_20"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3954399824142457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_Tentacle_B_",
+						"bone_name": "R_arm_tentacle_jntBnd_20"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0878100395202638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_Tentacle_A_",
+						"bone_name": "R_arm_tentacle_jntBnd_20"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.943079948425293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_Tentacle_B_",
+						"bone_name": "R_arm_tentacle_jntBnd_20"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_Tentacle_B_",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_Tentacle_B_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_Tentacle_B_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_Tentacle_B_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_Tentacle_B_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.000281849002931267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Idle.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_TidalWave",
+						"bone_name": "tail_jntBnd_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2281899452209473,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "mortar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Slam",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Run.loop.ogg",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_DropAnchor",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07179489731788635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/DropAnchorA",
+						"bone_name": "L_back_wrist_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1217690110206604,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Mortar",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.324070006608963,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Effects/SoulMortar/CastFast",
+						"bone_name": "neck_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4014990031719208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastA",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.684619903564453,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Grunt",
+						"bone_name": "L_back_wrist_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7846200466156008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8512799739837648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1333301067352297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Run.loop.ogg",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Run.loop.ogg",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0007952289888635278,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Run.loop.ogg",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48667898774147036,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Anchor/Foley_Anchor_Run",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12116076052188873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/GruntAlways",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19972637295722962,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01A",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32361888885498049,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Swish",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37152498960494997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Slam",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7095999717712402,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01A",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7686429023742676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Whoosh_",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8110565543174744,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Attack01B",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8132990002632141,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Swish",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.073171854019165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Effects/Impacts/AnchorSlam",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0884699821472169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Anchor/Foley_Anchor_Slam",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0884699821472169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Effects/Cannon/Cannon_Slam_",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.47406005859375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6647800207138062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_fast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Attack01A",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12657399475574494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3015890121459961,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6163169741630554,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/GruntAlways",
+						"bone_name": "skull_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6672459840774536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_DropAnchor",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8545039892196655,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Swish",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.886014997959137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Attack01B",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1117100715637208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Anchor/Foley_Anchor_Layer",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1154930591583253,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Anchor/Foley_Anchor_Slam",
+						"bone_name": "aux_anchor_line_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.13510000705719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01A",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1750999689102173,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_TidalWave",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5532599687576295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7985999584197999,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "stun_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_TidalWave",
+						"bone_name": "R_arm_tentacle_jntBnd_8"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_DropAnchor",
+						"bone_name": "R_arm_tentacle_jntBnd_8"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Stun",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23443199694156648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Wheel/Foley_Wheel_Summon.loop.ogg"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25274699926376345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Anchor/Foley_Anchor_Layer",
+						"bone_name": "aux_anchor_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.293040007352829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/WeaponFall",
+						"bone_name": "aux_anchor_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41391903162002566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Anchor/Foley_Anchor_Layer",
+						"bone_name": "aux_anchor_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47252801060676577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Effects/Cannon/Cannon_Slam_",
+						"bone_name": "aux_anchor_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.531140089035034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastA",
+						"bone_name": "L_back_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1098899841308595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastC",
+						"bone_name": "R_arm_tentacle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.446890115737915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_TidalWave",
+						"bone_name": "R_arm_tentacle_jntBnd_8"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.732599973678589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/DropAnchorA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8901100158691408,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Walk.loop.ogg",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Slam",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Run.loop.ogg",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Effects/CastSurge/CastSurge",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06153849512338638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Grunt",
+						"bone_name": "L_back_wrist_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10988999903202057,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Grunt",
+						"bone_name": "L_back_wrist_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13626399636268617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Grunt",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16483500599861146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_DropAnchor",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4692089557647705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Mortar",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5331529974937439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastA",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9054901599884034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Grunt",
+						"bone_name": "L_back_wrist_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1120901107788088,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Grunt",
+						"bone_name": "L_back_wrist_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2351698875427248,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.386810064315796,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6857099533081056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "tidal_wave_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_TidalWave",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16489599645137788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Wave",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2252880036830902,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_TidalWave",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26471400260925295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_TidalWave",
+						"bone_name": "tail_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3008610010147095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Wave",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41544800996780398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_DropAnchor",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5153520107269287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Swish",
+						"bone_name": "R_arm_tentacle_jntBnd_22"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7143440246582031,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Whoosh_",
+						"bone_name": "R_arm_tentacle_jntBnd_13"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.300860047340393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5433601140975953,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9663299322128297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9663299322128297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Emerge_Tentacle_B_",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Walk.loop.ogg",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Walk.loop.ogg",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1406559944152832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Vocal/Grunt",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "wheel_spin_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Run.loop.ogg",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.045010801404714587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_Mortar",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11189500242471695,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_TidalWave",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18665699660778047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_DropAnchor",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27832499146461489,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Cloth/Foley_Cloth_CannonBlastA",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0044599771499634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2636300325393677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "L_back_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3750900030136109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Tentacle/Foley_Tentacle_Attack01B",
+						"bone_name": "L_back_wrist_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "head_jntBnd"
+			state = ""
+				colour = "0.26022 0.249924 0.239855"
+				position = "0 -45 -100"
+				radius = 550
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "begin_death"
+				colour = "0.0447259 1.04045 0.714823"
+				position = "0 -45 -100"
+				radius = 600
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "on_death"
+				position = "0 -45 -100"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": ""
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.59300297498703,
+						"end_time": 2.6924829483032228,
+						"state_name": "begin_death"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 2.6918399333953859,
+						"end_time": 3.4528889656066896,
+						"state_name": "on_death"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.7521398067474365,
+						"end_time": 1.0391004085540772,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/ao/meleerig.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								0.0,
+								-100.00000762939453,
+								-150.0
+							],
+							"rotation": [
+								-0.08726999908685684,
+								-0.3490699827671051,
+								-1.553339958190918
+							],
+							"scale": [
+								1.5000001192092896,
+								1.5000001192092896,
+								1.5000001192092896
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.505826473236084,
+						"end_time": 1.7122679948806763,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/ao/meleerig.ao",
+						"animation": "attack_270",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								-25.000001907348634,
+								0.0,
+								-150.0
+							],
+							"rotation": [
+								3.036870002746582,
+								0.27924999594688418,
+								0.1919899880886078
+							],
+							"scale": [
+								1.5000001192092896,
+								1.5000001192092896,
+								1.5000001192092896
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.4200000762939455,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/MutantBird/ao/on_act/oA_deathdust.ao",
+						"animation": "death_kickup",
+						"offset": [
+							-120.4520034790039,
+							64.18949890136719
+						],
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.7249999046325685,
+						"end_time": 4.5,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/ao/onAct_AchorImpact.ao",
+						"from": {
+							"parent_bone": "anchor_emerge_impact"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.8633826375007629,
+						"end_time": 1.0408788919448853,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/ao/slam_meleerig.ao",
+						"animation": "attack_220",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch",
+						"offset": {
+							"translation": [
+								-96.6500015258789,
+								0.0,
+								-150.0
+							],
+							"rotation": [
+								-1.6406099796295167,
+								0.08726999908685684,
+								-1.5184400081634522
+							],
+							"scale": [
+								1.350000023841858,
+								1.350000023841858,
+								1.350000023841858
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "cannon_blast_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.051207184791565,
+						"amplitude": 2.5,
+						"duration": 0.25,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 3.4797799587249758,
+						"amplitude": 1.0,
+						"duration": 0.6000000238418579,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 3.7249999046325685,
+						"amplitude": 2.0,
+						"duration": 0.25,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "cannon_barrage_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 2.9004437923431398,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/GhostCannons/barrage_rothgather.pet",
+						"bone_group": "cannon_line"
+					}
+				]
+			},
+			{
+				"name": "cannon_blast_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0185898542404175,
+						"end_time": 1.300236701965332,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/onAct/cannon_muzzleflash.pet",
+						"bone_group": "fx_muzzleline"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.30000001192092898,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/onAct/oA_footsteps_drag.pet",
+						"bone_group": "anchor_line"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.367995262145996,
+						"end_time": 2.7401833534240724,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/onAct/death_ribbons.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.7719690799713136,
+						"end_time": 2.98256516456604,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/onAct/oA_footsteps_drag.pet",
+						"bone_group": "cannon_line"
+					}
+				]
+			},
+			{
+				"name": "drop_anchor_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 3.8927011489868166,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/GhostCannons/barrage_rothgather.pet",
+						"bone_group": "anchor_line"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.0166730880737309,
+						"end_time": 4.9472832679748539,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/onAct/oA_footsteps_drag.pet",
+						"bone_group": "anchor_drag"
+					}
+				]
+			},
+			{
+				"name": "mortar_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.382005900144577,
+						"end_time": 2.668879270553589,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/GhostCannons/barrage_rothgather.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6984660029411316,
+						"end_time": 1.4761509895324708,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/onAct/oA_footsteps_drag.pet",
+						"bone_group": "anchor_drag"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.4981440305709839,
+						"end_time": 1.98061203956604,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/onAct/oA_footsteps_drag.pet",
+						"bone_group": "anchor_drag"
+					}
+				]
+			},
+			{
+				"name": "slam_fast_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5588459968566895,
+						"end_time": 1.9527690410614014,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/onAct/oA_footsteps_drag.pet",
+						"bone_group": "anchor_drag"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.32743364572525027,
+						"end_time": 2.2876107692718508,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/GhostCannons/barrage_rothgather.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "tidal_wave_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1309009790420533,
+						"end_time": 1.3789269924163819,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/onAct/oA_footsteps_drag.pet",
+						"bone_group": "anchor_drag"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.653406023979187,
+						"end_time": 2.253943920135498,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/pet/onAct/oA_footsteps_drag.pet",
+						"bone_group": "anchor_drag"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "cannon_barrage_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.799999952316284,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/epk/cannon_barrage_01_skin.epk"
+					}
+				]
+			},
+			{
+				"name": "cannon_blast_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.132999897003174,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/epk/cannonglow.epk",
+						"bone_name": "aux_cannon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cannon_slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.965999960899353,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/epk/slam_01_skin.epk",
+						"bone_name": "aux_cannon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/epk/death_soul.epk"
+					}
+				]
+			},
+			{
+				"name": "drop_anchor_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 5.099999904632568,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/epk/cannon_barrage_01_skin.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0033052493818104269,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "mortar_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.5,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/epk/cannon_barrage_01_skin.epk"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.433000087738037,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/epk/slam_01_skin.epk",
+						"bone_name": "aux_anchor_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "slam_fast_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/epk/slam_01_skin.epk",
+						"bone_name": "aux_anchor_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/CaptainRoth/epk/cannon_barrage_01_skin.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "cannon_barrage_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.799999952316284,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "7 0 0 Linear 0.219639 0.114243 Smooth 2.41105 0.401088 Smooth 2.7921 0.628586 Smooth 3.04502 0.203264 Smooth 3.49273 0 Flat 3.8 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "cannon_blast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.7445350885391235,
+						"end_time": 2.7659997940063478,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 0.744535 0 Linear 0.950699 0 Flat 1.04041 1 Flat 1.34832 0.321958 Smooth 2.766 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "cannon_slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.965999960899353,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.872765 0.28598 Flat 1.10138 0.642062 Smooth 1.4598 0.193373 Smooth 1.966 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "drop_anchor_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.099999904632568,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "7 0 0 Linear 0.294779 0.114243 Smooth 3.23588 0.401088 Smooth 3.74729 0.628586 Smooth 4.08674 0.203264 Smooth 4.68761 0 Flat 5.1 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "mortar_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.5,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "7 0 0 Linear 0.555753 0.18954 Smooth 0.818166 0.382418 Smooth 2.50243 0.41951 Smooth 2.80463 0.152448 Smooth 3.21699 0 Flat 3.5 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.433000087738037,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.83678 0.381306 Flat 1.11971 0.856083 Smooth 2.06529 0 Flat 2.433 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "slam_fast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.946901 0.28598 Flat 1.19494 0.642062 Smooth 2.133 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "7 0 0 Linear 0.47636 0.18954 Smooth 0.701285 0.382418 Smooth 2.14494 0.41951 Smooth 2.40397 0.152448 Smooth 2.75742 0 Flat 3 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "cannon_blast_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.0180639028549195,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.3416856527328491,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 2.6879281997680666,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 3.5364394187927248,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 1.3796800374984742,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 2.4201102256774904,
+						"haptic_id": "Haptic_LargeBoss_Rumble_Loop3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 3.8770573139190676,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 4.5,
+						"haptic_id": "Haptic_HugeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.8236908316612244,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "wheel_spin_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.5847700238227844,
+						"haptic_id": "Haptic_BasicBoss_Rumble_Loop3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.555545449256897,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Pirates/attachments/PirateBossAnchor.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/PirateBoss/attachments/Anchor/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/PirateBoss/attachments/Anchor/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_radius = 3.500
+		enclosure_angle = 0.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/PirateBoss/attachments/Anchor/PirateBossAnchor.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Pirates/attachments/PirateBossCannon.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/PirateBoss/attachments/Cannon/PirateBossCannon.fmt"
+	}
+}
+
+=== .ao Metadata/Monsters/Pirates/attachments/PirateBossHelm.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/PirateBoss/attachments/Helm/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/PirateBoss/attachments/Helm/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/PirateBoss/attachments/Helm/PirateBossHelm.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "mortar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2331009954214096,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Wheel/Foley_Wheel_Mortar.loop.ogg",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3190859854221344,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Wheel/Foley_Wheel_Summon.loop.ogg",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "wheel_spin_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.34072598814964297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_2_2/CaptainRoth/Foley/Wheel/Foley_Wheel_Spin.loop.ogg",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.799999952316284,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 2.8 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.799999952316284,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 2.8 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "cannon_barrage_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.799999952316284,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 3.8 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.799999952316284,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 3.8 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "cannon_blast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.7660000324249269,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 2.766 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.7660000324249269,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 2.766 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "cannon_slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.965999960899353,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 1.966 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.965999960899353,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 1.966 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 5 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "drop_anchor_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.099999904632568,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 5.1 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.099999904632568,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 5.1 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.5,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 4.5 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.5,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 4.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "emerge_idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.132999897003174,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 3.133 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.132999897003174,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 3.133 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 0.5 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 0.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 0.5 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 0.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "flinch_large_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 0.5 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 0.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 0.5 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 0.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 0.5 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 0.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 0.5 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 0.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "hit_reaction",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 0.5 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 0.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 2.133 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 2.133 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "mortar_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.5,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 3.5 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.5,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 3.5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.600000023841858,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 1.6 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.600000023841858,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 1.6 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.433000087738037,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 2.433 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.433000087738037,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 2.433 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "slam_fast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 2.133 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.132999897003174,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 2.133 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "stun_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 5 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 5 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 3 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 3 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "tidal_wave_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.565999984741211,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 2.566 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.565999984741211,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 2.566 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "CaptainRoth_SpinGlow",
+						"curve": "2 0 1 Smooth 1 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"curve": "2 0 1 Linear 1 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "wheel_spin_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.8329999446868897,
+						"name": "CaptainRoth_SpinGlow",
+						"apply_on_children": true,
+						"curve": "4 0 1 Smooth 0.3 0 Flat 1.02906 0.276616 Smooth 1.833 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.8329999446868897,
+						"name": "CaptainRoth_SpinMaskCTRL",
+						"apply_on_children": true,
+						"curve": "6 0 1 Smooth 0.219955 1 Flat 0.29893 0 Flat 1.29258 0 Flat 1.7415 1 Flat 1.833 1 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_north_trail false jaw_jntBnd_1"
+	}
+	
+	AttachedAnimatedObject
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/Pirates/attachments/PirateBossBeard.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/PirateBoss/attachments/Beard/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/PirateBoss/attachments/Beard/rig.ast"
+		linear_allowed_contraction = 0.766
+		normal_viscosity_multiplier = 0.150
+		tangent_viscosity_multiplier = 0.075
+		enclosure_radius = 5.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/PirateBoss/attachments/Beard/PirateBossBeard.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Pirates/attachments/PirateBossSeaweed.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/PirateBoss/attachments/Seaweed/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/PirateBoss/attachments/Seaweed/rig.ast"
+		linear_allowed_contraction = 0.700
+		animation_velocity_factor = 1.000
+		animation_force_factor = 1.000
+	    attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd cannon_bucket_jntBnd L_back_shoulder_cTwist_jntBnd_1 L_back_shoulder_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd R_arm_tentacle_jntBnd_1 child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/PirateBoss/attachments/Seaweed/PirateBossSeaweed.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd cannon_bucket_jntBnd L_back_shoulder_cTwist_jntBnd_1 L_back_shoulder_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd R_arm_tentacle_jntBnd_1"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/PirateBoss/PirateBoss.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/PirateBoss/rig_19fa539f.smd"
+Materials 1
+	"Art/Models/MONSTERS/PirateBoss/Textures/PirateBossc.mat" 17
+BoundingBox -287.03 -130.437 -286.962 230.158 242.346 209.736
+BoneGroups 54
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_arm_tentacle_jntBnd_1"
+	"grp_l_bicep_01" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_l_forearm_01" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_l_palm_01" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_l_bicep_02" 2 "L_back_shoulder_jntBnd" "L_back_elbow_jntBnd"
+	"grp_l_forearm_02" 2 "L_back_elbow_jntBnd" "L_back_wrist_jntBnd"
+	"grp_l_palm_02" 2 "L_back_wrist_jntBnd" "L_back_finger_2_jntBnd_1"
+	"grp_r_arm_tentacle_01" 2 "R_arm_tentacle_jntBnd_1" "R_arm_tentacle_jntBnd_2"
+	"grp_r_arm_tentacle_02" 2 "R_arm_tentacle_jntBnd_2" "R_arm_tentacle_jntBnd_3"
+	"grp_r_arm_tentacle_03" 2 "R_arm_tentacle_jntBnd_3" "R_arm_tentacle_jntBnd_4"
+	"grp_r_arm_tentacle_04" 2 "R_arm_tentacle_jntBnd_4" "R_arm_tentacle_jntBnd_5"
+	"grp_r_arm_tentacle_05" 2 "R_arm_tentacle_jntBnd_5" "R_arm_tentacle_jntBnd_6"
+	"grp_r_arm_tentacle_06" 2 "R_arm_tentacle_jntBnd_6" "R_arm_tentacle_jntBnd_7"
+	"grp_r_arm_tentacle_07" 2 "R_arm_tentacle_jntBnd_7" "R_arm_tentacle_jntBnd_8"
+	"grp_r_arm_tentacle_08" 2 "R_arm_tentacle_jntBnd_8" "R_arm_tentacle_jntBnd_9"
+	"grp_r_arm_tentacle_09" 2 "R_arm_tentacle_jntBnd_9" "R_arm_tentacle_jntBnd_10"
+	"grp_r_arm_tentacle_10" 2 "R_arm_tentacle_jntBnd_10" "R_arm_tentacle_jntBnd_11"
+	"grp_r_arm_tentacle_11" 2 "R_arm_tentacle_jntBnd_11" "R_arm_tentacle_jntBnd_12"
+	"grp_r_arm_tentacle_12" 2 "R_arm_tentacle_jntBnd_12" "R_arm_tentacle_jntBnd_13"
+	"grp_r_arm_tentacle_13" 2 "R_arm_tentacle_jntBnd_13" "R_arm_tentacle_jntBnd_14"
+	"grp_r_arm_tentacle_14" 2 "R_arm_tentacle_jntBnd_14" "R_arm_tentacle_jntBnd_15"
+	"grp_r_arm_tentacle_15" 2 "R_arm_tentacle_jntBnd_15" "R_arm_tentacle_jntBnd_16"
+	"grp_r_arm_tentacle_16" 2 "R_arm_tentacle_jntBnd_16" "R_arm_tentacle_jntBnd_17"
+	"grp_r_arm_tentacle_17" 2 "R_arm_tentacle_jntBnd_17" "R_arm_tentacle_jntBnd_18"
+	"grp_r_arm_tentacle_18" 2 "R_arm_tentacle_jntBnd_18" "R_arm_tentacle_jntBnd_19"
+	"grp_r_arm_tentacle_19" 2 "R_arm_tentacle_jntBnd_19" "R_arm_tentacle_jntBnd_20"
+	"grp_tail_01" 2 "tail_jntBnd_1" "tail_jntBnd_2"
+	"grp_tail_02" 2 "tail_jntBnd_2" "tail_jntBnd_3"
+	"grp_tail_03" 2 "tail_jntBnd_3" "tail_jntBnd_4"
+	"grp_tail_04" 2 "tail_jntBnd_4" "tail_jntBnd_5"
+	"grp_l_tentacle_01" 2 "L_tentacle_jntBnd_01" "L_tentacle_jntBnd_02"
+	"grp_l_tentacle_02" 2 "L_tentacle_jntBnd_02" "L_tentacle_jntBnd_03"
+	"grp_l_tentacle_03" 2 "L_tentacle_jntBnd_03" "L_tentacle_jntBnd_04"
+	"grp_l_tentacle_04" 2 "L_tentacle_jntBnd_04" "L_tentacle_jntBnd_05"
+	"grp_l_tentacle_05" 2 "L_tentacle_jntBnd_05" "L_tentacle_jntBnd_06"
+	"grp_l_tentacle_06" 2 "L_tentacle_jntBnd_06" "L_tentacle_jntBnd_07"
+	"grp_l_tentacle_07" 2 "L_tentacle_jntBnd_07" "L_tentacle_jntBnd_08"
+	"grp_l_tentacle_08" 2 "L_tentacle_jntBnd_08" "L_tentacle_jntBnd_09"
+	"grp_l_tentacle_09" 2 "L_tentacle_jntBnd_09" "L_tentacle_jntBnd_10"
+	"grp_l_tentacle_10" 2 "L_tentacle_jntBnd_10" "L_tentacle_jntBnd_11"
+	"grp_l_tentacle_11" 2 "L_tentacle_jntBnd_11" "L_tentacle_jntBnd_12"
+	"grp_l_tentacle_12" 2 "L_tentacle_jntBnd_12" "L_tentacle_jntBnd_13"
+	"grp_l_tentacle_13" 2 "L_tentacle_jntBnd_13" "L_tentacle_jntBnd_14"
+	"grp_l_tentacle_14" 2 "L_tentacle_jntBnd_14" "L_tentacle_jntBnd_15"
+	"grp_l_tentacle_15" 2 "L_tentacle_jntBnd_15" "L_tentacle_jntBnd_16"
+	"grp_l_tentacle_16" 2 "L_tentacle_jntBnd_16" "L_tentacle_jntBnd_17"
+	"grp_l_tentacle_17" 2 "L_tentacle_jntBnd_17" "L_tentacle_jntBnd_18"
+	"grp_l_tentacle_18" 2 "L_tentacle_jntBnd_18" "L_tentacle_jntBnd_19"
+	"grp_l_tentacle_19" 2 "L_tentacle_jntBnd_19" "L_tentacle_jntBnd_20"
+
+=== .smd Art/Models/MONSTERS/PirateBoss/rig_19fa539f.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 17 in the header, 17 in the block · 30584 triangles over 25377 vertices
+  names: 696 bytes said, 696 read  [agree]
+
+=== shapes (32)
+0	barnacles_meshShape	from 0	count 3408
+1	body_chain_links_meshShape	from 3408	count 20799
+2	body_meshShape	from 24207	count 4449
+3	cannonball_bucket_meshShape	from 28656	count 3840
+4	cannonball_bucket_meshShape1	from 32496	count 3780
+5	coat_meshShape	from 36276	count 38034
+6	eye_patch_meshShape	from 74310	count 672
+7	L_arm_meshShape	from 74982	count 3276
+8	R_tentacle_meshShape	from 78258	count 1032
+9	ribs_meshShape	from 79290	count 2736
+10	seashells_meshShape	from 82026	count 750
+11	seaweed_arms_meshShape	from 82776	count 948
+12	seaweed_ropes_meshShape	from 83724	count 3114
+13	shoulderpad_meshesShape	from 86838	count 1356
+14	shoulderpad_tassles_meshShape	from 88194	count 1296
+15	starfish_meshShape	from 89490	count 240
+16	tricorne_meshShape	from 89730	count 2022
+17	PirateAnchorShape	from 91752	count 4278
+18	helm_meshShape	from 96030	count 5748
+19	skull_jaw_meshShape	from 101778	count 3456
+20	skull_top_meshShape	from 105234	count 10800
+21	wheel_chains_meshShape	from 116034	count 17160
+22	bandana_meshShape	from 133194	count 534
+23	beard_ties_meshShape	from 133728	count 1176
+24	beard_fur_meshShape	from 134904	count 3000
+25	beard_meshShape	from 137904	count 7080
+26	arm_chain_dangle_meshShape	from 144984	count 360
+27	seaweed_arms_meshShape	from 145344	count 252
+28	seaweed_clumps_big_meshShape	from 145596	count 312
+29	seaweed_clumps_mesh_1Shape	from 145908	count 648
+30	seaweed_clumps_mesh_2Shape	from 146556	count 360
+31	seaweed_clumps_mesh_3Shape	from 146916	count 1074
+
+=== fitting
+the monster's rig: 146 bones
+mounts: aux_cannon_jntBnd, aux_anchor_jntBnd, aux_position, aux_helm_jntBnd, aux_head_jntBnd
+  PirateBossAnchor.ao  socket aux_anchor_jntBnd [in its carrier's rig]  box (-68.7,-17.8,-67.8)..(68.7,17.9,188.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1426 triangles over 1228 vertices
+    names: 34 bytes said, 34 read  [agree]
+    rig 12 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 11 of 12  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_top_chain_jntBnd_1  [its own]  under 0  rests at (0,5,-51.8)
+      2 phys_tri_side_chain_jntBnd_1  [its own]  under 0  rests at (10.1,0,52.3)
+      3 phys_tri_top_chain_jntBnd_2  [its own]  under 1  rests at (0,10,-41.5)
+      4 phys_tri_side_chain_jntBnd_2  [its own]  under 2  rests at (10.1,0,59.3)
+      5 phys_tri_top_chain_jntBnd_3  [its own]  under 3  rests at (0,10,-35.3)
+      6 phys_tri_side_chain_jntBnd_3  [its own]  under 4  rests at (10.1,0,66.3)
+      7 phys_tri_top_chain_jntBnd_4  [its own]  under 5  rests at (0,10,-29.1)
+      8 phys_tri_side_chain_jntBnd_4  [its own]  under 6  rests at (10.1,0,73.4)
+      9 phys_tri_top_chain_jntBnd_5  [its own]  under 7  rests at (0,10,-23)
+      10 phys_tri_side_chain_jntBnd_5  [its own]  under 8  rests at (10.1,0,80.4)
+      11 phys_tri_side_chain_jntBnd_6  [its own]  under 10  rests at (10.1,0,87.5)
+  PirateBossCannon.ao  socket aux_cannon_jntBnd [in its carrier's rig]  fixed mesh PirateBossCannon.fmt  (did not read: version 8 puts its geometry outside a DOLm block, which this does not read)
+  PirateBossHelm.ao  socket <root> [NOT in its carrier's rig]  box (-86.8,-15.2,-80.9)..(81.2,21.3,81.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 12388 triangles over 12500 vertices
+    names: 148 bytes said, 148 read  [agree]
+    rig 10 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 9 of 10  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 helm_jntBnd  [its own]  under 0  rests at (0,-0,-0)
+      2 jaw_jntBnd_1  [its own]  under 1  rests at (0.2,-3.4,-61.7)
+      3 jaw_jntBnd_2  [its own]  under 1  rests at (-43.5,-3.1,-43.7)
+      4 jaw_jntBnd_3  [its own]  under 1  rests at (-61.7,-2.4,-0.2)
+      5 jaw_jntBnd_4  [its own]  under 1  rests at (-43.8,-1.7,43.5)
+      6 jaw_jntBnd_5  [its own]  under 1  rests at (-0.2,-1.4,61.7)
+      7 jaw_jntBnd_6  [its own]  under 1  rests at (43.5,-1.7,43.8)
+      8 jaw_jntBnd_7  [its own]  under 1  rests at (61.7,-2.4,0.2)
+      9 jaw_jntBnd_8  [its own]  under 1  rests at (43.8,-3.1,-43.4)
+  PirateBossBeard.ao  socket head_jntBnd [in its carrier's rig]  box (-12.9,-21.5,-13.7)..(15.1,3,62.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 3930 triangles over 3063 vertices
+    names: 142 bytes said, 142 read  [agree]
+    rig 8 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_beard_jntBnd_1  [its own]  under 0  rests at (0,-7.6,15.5)
+      2 phys_tri_bandana_jntBnd_1  [its own]  under 0  rests at (12.7,-10.2,-2.7)
+      3 phys_tri_beard_jntBnd_2  [its own]  under 1  rests at (0,-8.3,32.5)
+      4 phys_tri_bandana_jntBnd_2  [its own]  under 2  rests at (13.6,-10.5,15.5)
+      5 phys_tri_beard_jntBnd_3  [its own]  under 3  rests at (0,-9,49.5)
+      6 phys_tri_bandana_jntBnd_3  [its own]  under 4  rests at (14.4,-10.8,33.7)
+      7 phys_tri_bandana_jntBnd_4  [its own]  under 6  rests at (15.3,-11.2,51.9)
+  PirateBossSeaweed.ao  socket <root> [NOT in its carrier's rig]  box (-107.4,40.4,-227.4)..(105.8,130.7,-48.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 6 in the header, 6 in the block · 1002 triangles over 1304 vertices
+    names: 308 bytes said, 308 read  [agree]
+    rig 23 bones, 12 of them names its carrier's rig also has
+    mesh weights reach bone 22 of 23  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,18.7,-97.6)  carrier has (0,18.7,-97.6)
+      2 spine_1_jntBnd  [shared]  under 1  rests at (0,23,-122)  carrier has (0,23,-122)
+      3 spine_2_jntBnd  [shared]  under 2  rests at (0,25.5,-146.8)  carrier has (0,25.5,-146.8)
+      4 phys_tri_B_seaweed_belt_Temp_5  [its own]  under 2  rests at (45.1,78.3,-74.5)
+      5 phys_tri_B_seaweed_belt_Temp_4  [its own]  under 2  rests at (14.2,91.2,-82.1)
+      6 phys_tri_B_seaweed_belt_Temp_3  [its own]  under 2  rests at (-13.3,95,-96.6)
+      7 phys_tri_B_seaweed_belt_Temp_2  [its own]  under 2  rests at (-37.4,91.5,-116.4)
+      8 phys_tri_B_seaweed_belt_Temp_1  [its own]  under 2  rests at (-60.6,78.8,-137.1)
+      9 chest_jntBnd  [shared]  under 3  rests at (0,26.3,-171.6)  carrier has (0,26.3,-171.6)
+      10 R_clavicle_jntBnd  [shared]  under 9  rests at (-28.7,24.1,-197.7)  carrier has (-28.7,24.1,-197.7)
+      11 L_clavicle_jntBnd  [shared]  under 9  rests at (28.7,24.1,-197.7)  carrier has (28.7,24.1,-197.7)
+      12 cannon_bucket_jntBnd  [shared]  under 9  rests at (58.7,79.9,-165.8)  carrier has (58.7,79.9,-165.8)
+      13 phys_tri_B_seaweed_belt_Temp_6  [its own]  under 9  rests at (77.3,60.8,-139.1)
+      14 R_arm_tentacle_jntBnd_1  [shared]  under 10  rests at (-67,35.1,-185.3)  carrier has (-67,35.1,-185.3)
+      15 L_shoulder_jntBnd  [shared]  under 11  rests at (65.6,27.4,-184.7)  carrier has (65.6,27.4,-184.7)
+      16 L_back_shoulder_jntBnd  [shared]  under 11  rests at (62.6,61.5,-208.6)  carrier has (62.6,61.5,-208.6)
+      17 phys_tri_B_seaweed_Temp_2  [its own]  under 12  rests at (64.4,119.8,-94.5)
+      18 phys_tri_B_seaweed_belt_Temp_7  [its own]  under 13  rests at (81,70.3,-103.6)
+      19 phys_tri_B_seaweed_Temp_3  [its own]  under 14  rests at (-85.5,48.5,-154.9)
+      20 L_back_shoulder_cTwist_jntBnd_1  [shared]  under 16  rests at (88.8,61.2,-223.5)  carrier has (88.8,61.2,-223.5)
+      21 phys_chain_Temp_1  [its own]  under 20  rests at (102.7,63.2,-203.2)
+      22 phys_tri_B_seaweed_Temp_1  [its own]  under 20  rests at (92.8,70.8,-198.7)

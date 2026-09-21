@@ -1,0 +1,1407 @@
+monster: It That Creeps [Metadata/Monsters/Breach/BreachFodderDemonicSpikeThrower]
+
+=== .ao Metadata/Monsters/Breach/Monsters/DemonFemaleRangeRemake/DemonFemaleRangeRemake.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/ConstrictorCorpse/DemonFemaleRangeRemake/Animations/rig.amd"
+	animations = '[
+		{
+			"name": "barrage_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.0,
+					"name": "start_target_update",
+					"data": "100 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.10404700040817261,
+					"name": "shoot_l",
+					"position": [
+						22.451900482177736,
+						-101.99600219726563,
+						-168.95899963378907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6191189885139465,
+					"name": "shoot_r",
+					"position": [
+						-23.581300735473634,
+						-96.08670043945313,
+						-156.25
+					]
+				}
+			]
+		},
+		{
+			"name": "barrage_end_01",
+			"events": [
+				{
+					"type": "EndFaceEventType",
+					"time": 0.05327007547020912,
+					"name": "end_face"
+				}
+			]
+		},
+		{
+			"name": "barrage_start_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.5767768621444702,
+					"name": "start_face",
+					"data": "30 0 -1"
+				}
+			]
+		},
+		{
+			"name": "mortar_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5511000156402588,
+					"name": "contact",
+					"position": [
+						30.95800018310547,
+						-88.44390106201172,
+						-155.92599487304688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7803419828414917,
+					"name": "contact",
+					"position": [
+						-46.34280014038086,
+						-79.69200134277344,
+						-148.61599731445313
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/Breach/Monsters/DemonFemaleRangeRemake/attachments/BreachTorchHeadedSkirt.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3841809928417206,
+								0.0
+							],
+							[
+								0.42692306637763979,
+								1.0
+							]
+						],
+						"damage_statset_index": 2,
+						"rotation": -0.2967059910297394,
+						"width": 43.0,
+						"length": 205.80999755859376,
+						"offset": [
+							24.0,
+							-8.0
+						],
+						"impact_z_rotation": [
+							-0.3490658700466156,
+							-0.3490658700466156
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "aux_L_pincer_tip"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.49077489972114565,
+								0.0
+							],
+							[
+								0.5166051387786865,
+								1.0
+							]
+						],
+						"damage_statset_index": 2,
+						"width": 43.0,
+						"length": 175.0,
+						"offset": [
+							-26.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.05235987901687622,
+							0.0872664675116539
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "aux_R_pincer_tip"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4038461446762085,
+								0.0
+							],
+							[
+								0.4346153736114502,
+								1.0
+							]
+						],
+						"rotation": 0.24434611201286317,
+						"width": 65.52300262451172,
+						"length": 160.71400451660157,
+						"offset": [
+							23.0,
+							0.0
+						],
+						"local_offset": [
+							-31.0,
+							-8.0
+						],
+						"impact_z_rotation": [
+							0.15707963705062867,
+							0.15707963705062867
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "aux_R_pincer_tip"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/ConstrictorCorpse/DemonFemaleRangeRemake/Animations/rig.ast"
+		socket = "aux_L_pincer_tip"
+			parent = "L_snake_joint_5_jntBnd"
+			translation = "60 0 15"
+		socket = "aux_L_pincer_start"
+			parent = "L_snake_joint_5_jntBnd"
+			translation = "25 0 0"
+		socket = "aux_R_pincer_tip"
+			parent = "R_snake_joint_5_jntBnd"
+			translation = "60 0 15"
+		socket = "aux_R_pincer_start"
+			parent = "R_snake_joint_5_jntBnd"
+			translation = "25 0 0"
+		socket = "aux_flame_attach"
+			parent = "head_jntBnd"
+			translation = "0 0 -8"
+		socket = "aux_flame_attach_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -18"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/ConstrictorCorpse/DemonFemaleRangeRemake/BreachTorchHeadedREDUCED.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_snake_joint_2_jntBnd R_snake_joint_1_jntBnd spine_1_jntBnd L_snake_joint_1_jntBnd L_snake_joint_2_jntBnd"
+		bone_group = "R_line false R_snake_joint_5_jntBnd aux_R_pincer_start aux_R_pincer_tip"
+		bone_group = "L_line false L_snake_joint_5_jntBnd aux_L_pincer_start aux_L_pincer_tip"
+		bone_group = "FlameAttach false aux_flame_attach aux_flame_attach_01"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Attack1",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07506459951400757,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4306980073451996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Swing_Arms_",
+						"bone_name": "L_snake_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6068519949913025,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Swing_Arms_",
+						"bone_name": "R_snake_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6828168034553528,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreMedium",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Attack",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41974499821662905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Swing_Arms_",
+						"bone_name": "L_snake_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4329180121421814,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Swing_Arms_",
+						"bone_name": "R_snake_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6949167251586914,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Swing_Arms_",
+						"bone_name": "L_snake_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Barrage",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16995418071746827,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42952775955200198,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Barrage",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48616600036621096,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Swing_Arms_",
+						"bone_name": "R_snake_jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "barrage_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/BarrageEnd",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.054330628365278247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "barrage_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/BarrageStart",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6474475860595703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Fall",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.790786623954773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2723300457000733,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2483540028333664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25949612259864809,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40214094519615176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Fall",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25813961029052737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5513799786567688,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7019447684288025,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Fall",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8312230110168457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13575619459152223,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5210078954696655,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7686190605163574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Fall",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7860869765281677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9261599779129028,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1700799465179444,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2209330052137375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2516977787017822,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3265250027179718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.523301899433136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Fall",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5507069826126099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8289747834205627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08345204591751099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35168027877807619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreMedium",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7203180193901062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Fall",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9575570225715637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1676599979400635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.023299407213926317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07661745697259903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.016336366534233094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07661745697259903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_large_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09577181935310364,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.017675412818789483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07661745697259903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.047670070081949237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07661745697259903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05256740376353264,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Move_Tentacle_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.659886121749878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Idle",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6891229152679445,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Move_Tentacle_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.393343925476074,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Move_Tentacle_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.464733123779297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Move_Tentacle_"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1716465950012207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17615804076194764,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37476176023483279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43807631731033327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6019757390022278,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Move_Tentacle_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6058464050292969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Move_Tentacle_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8835656642913819,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0321011543273927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/KnockdownB"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.133183717727661,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12301337718963623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Move_Tentacle_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16783219575881959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2953570783138275,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Flinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37857601046562197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6331843137741089,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Move_Tentacle_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5697678327560425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6058464050292969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Move_Tentacle_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8208606243133546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/KnockdownB"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9500939846038819,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "mortar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Mortar",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36639100313186648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Swing_Arms_",
+						"bone_name": "L_snake_jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6263800263404846,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/GoreShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6721019744873047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Swing_Arms_",
+						"bone_name": "R_snake_jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.14519403874874116,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Run",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21428367495536805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6827924251556397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.147704839706421,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5007554292678834,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.296694278717041,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Move_Tentacle_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3925617039203644,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7666072249412537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3011664152145386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Vocal/Run",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.423343300819397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Move_Tentacle_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5335606336593629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9490469694137574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/DemonicSpikeThrowerBreach/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5379899144172669,
+						"end_time": 0.6298329830169678,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Lightning/DemonicSpikeThrower/fx/OnAct_Stab.pet",
+						"bone_group": "L_line"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6549126505851746,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Lightning/DemonicSpikeThrower/fx/OnAct_Stab.pet",
+						"bone_group": "R_line"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5331176519393921,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Lightning/DemonicSpikeThrower/fx/OnAct_Stab.pet",
+						"bone_groups": [
+							"L_line",
+							"R_line"
+						]
+					}
+				]
+			},
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.16276374459266663,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Lightning/DemonicSpikeThrower/fx/OnAct_Charge.pet",
+						"bone_group": "L_line"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.11299128085374832,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Lightning/DemonicSpikeThrower/fx/OnAct_Stab.pet",
+						"bone_group": "L_line"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5671400427818298,
+						"end_time": 0.6540319323539734,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Lightning/DemonicSpikeThrower/fx/OnAct_Charge.pet",
+						"bone_group": "R_line"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6320978403091431,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Lightning/DemonicSpikeThrower/fx/OnAct_Stab.pet",
+						"bone_group": "R_line"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Lightning/DemonicSpikeThrower/epk/OnAct_Barrage.epk"
+					}
+				]
+			},
+			{
+				"name": "barrage_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Lightning/DemonicSpikeThrower/epk/OnAct_Barrage.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "surgeTime_R",
+						"curve": "7 0 0 Linear 0.262067 0 Flat 0.470471 0.334566 Smooth 0.620954 1 Smooth 0.801533 0.787162 CustomSmooth -4.91428 0.902044 0 Flat 1 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "surgeTime_L",
+						"auto_reset": false,
+						"curve": "5 0 0.881757 Linear 0.20812 0.881757 Flat 0.293299 0 Flat 0.757808 0 Flat 1 0.881757 Smooth"
+					}
+				]
+			},
+			{
+				"name": "barrage_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.6660000085830689,
+						"name": "Glow_Fade_L",
+						"auto_reset": false,
+						"curve": "4 0 0 Linear 0.143525 0.206081 Smooth 0.587147 1 Flat 0.666 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "aux_flame_attach"
+			state = "On"
+				colour = "1.41363 0.17274 1.41363"
+				position = "0 0 -125"
+				radius = 170
+			state = "Off"
+				position = "0 0 -125"
+				radius = 170
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "On"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.022598234936594964,
+						"end_time": 0.6751796007156372,
+						"state_name": "Off"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "On"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.022598234936594964,
+						"end_time": 0.6751796007156372,
+						"state_name": "Off"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "On"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.022598234936594964,
+						"end_time": 0.6751796007156372,
+						"state_name": "Off"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "On"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.022598234936594964,
+						"end_time": 0.6751796007156372,
+						"state_name": "Off"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "On"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.022598234936594964,
+						"end_time": 0.6751796007156372,
+						"state_name": "Off"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Breach/Monsters/DemonFemaleRangeRemake/attachments/BreachTorchHeadedSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/ConstrictorCorpse/DemonFemaleRangeRemake/attachments/SkirtBreachTorchHeaded/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/ConstrictorCorpse/DemonFemaleRangeRemake/attachments/SkirtBreachTorchHeaded/rig.ast"
+		enclosure_radius = 1.000
+		enclosure_angle = 0.200
+		attachment_bones = "L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_thigh_jntBnd R_thigh_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/ConstrictorCorpse/DemonFemaleRangeRemake/attachments/SkirtBreachTorchHeaded/BreachTorchHeadedSkirt.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/ConstrictorCorpse/DemonFemaleRangeRemake/BreachTorchHeadedREDUCED.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/ConstrictorCorpse/DemonFemaleRangeRemake/BreachTorchHeadedREDUCED_armour_6da53185.smd"
+Materials 1
+	"Art/Models/MONSTERS/BreachTorchHeaded/Textures/BreachTorchHeadedc.mat" 23
+BoundingBox -159.664 -21.1784 -194.548 165.083 28.2152 0.52589
+BoneGroups 22
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+	"grp_f_skirt" 2 "phys_mesh_skirtfront_1_jntBnd" "phys_mesh_skirtfront_2_jntBnd"
+	"grp_b_skirt" 2 "phys_mesh_skirtback_1_jntBnd" "phys_mesh_skirtback_2_jntBnd"
+	"grp_l_bicep_01" 2 "L_snake_joint_1_jntBnd" "L_snake_joint_2_jntBnd"
+	"grp_l_bicep_02" 2 "L_snake_joint_2_jntBnd" "L_snake_joint_3_jntBnd"
+	"grp_l_forearm_01" 2 "L_snake_joint_3_jntBnd" "L_snake_joint_4_jntBnd"
+	"grp_l_forearm_02" 2 "L_snake_joint_4_jntBnd" "L_snake_joint_5_jntBnd"
+	"grp_r_bicep_01" 2 "R_snake_joint_1_jntBnd" "R_snake_joint_2_jntBnd"
+	"grp_r_bicep_02" 2 "R_snake_joint_2_jntBnd" "R_snake_joint_3_jntBnd"
+	"grp_r_forearm_01" 2 "R_snake_joint_3_jntBnd" "R_snake_joint_4_jntBnd"
+	"grp_r_forearm_02" 2 "R_snake_joint_4_jntBnd" "R_snake_joint_5_jntBnd"
+
+=== .smd Art/Models/MONSTERS/ConstrictorCorpse/DemonFemaleRangeRemake/BreachTorchHeadedREDUCED_armour_6da53185.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 23 in the header, 23 in the block · 15752 triangles over 12180 vertices
+  names: 612 bytes said, 612 read  [agree]
+
+=== shapes (26)
+0	arm_LShape	from 0	count 4362
+1	arm_midfinger_LShape	from 4362	count 639
+2	arm_midfinger_RShape	from 5001	count 639
+3	arm_RShape	from 5640	count 4356
+4	bodyShape	from 9996	count 11778
+5	boot_LShape	from 21774	count 3684
+6	boot_RShape	from 25458	count 3684
+7	cloth_arm_LShape	from 29142	count 3204
+8	cloth_arm_RShape	from 32346	count 3018
+9	cloth_waistShape	from 35364	count 6084
+10	fing_L_backShape	from 41448	count 252
+11	fing_LShape1	from 41700	count 276
+12	fing_LShape2	from 41976	count 285
+13	fing_LShape3	from 42261	count 564
+14	fing_LShape4	from 42825	count 588
+15	fing_LShape5	from 43413	count 588
+16	fing_R_backShape	from 44001	count 252
+17	fing_RShape1	from 44253	count 276
+18	fing_RShape2	from 44529	count 285
+19	fing_RShape3	from 44814	count 564
+20	fing_RShape4	from 45378	count 588
+21	fing_RShape5	from 45966	count 588
+22	metal_beltShape	from 46554	count 702
+23	metal_backShape	from 47256	count 996
+24	metal_frontShape	from 48252	count 2238
+25	skirtShape	from 50490	count 7404
+
+=== fitting
+the monster's rig: 44 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  BreachTorchHeadedSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-27.3,-20.7,-14.2)..(30.2,18.8,53.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 3546 triangles over 2930 vertices
+    names: 82 bytes said, 82 read  [agree]
+    rig 15 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 14 of 15  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 L_thigh_jntBnd  [shared]  under 0  rests at (7.8,-0,0)  carrier has (7.8,-0,-94.2)
+      2 R_thigh_jntBnd  [shared]  under 0  rests at (-7.8,-0,-0)  carrier has (-7.8,-0,-94.2)
+      3 phys_tri_F_skirt_2_jntBnd  [its own]  under 0  rests at (-0,-12.1,9.8)
+      4 phys_tri_R_skirt_10_jntBnd  [its own]  under 0  rests at (-0,11.8,8.9)
+      5 phys_tri_L_skirt_06_jntBnd  [its own]  under 1  rests at (14.5,-0.1,9.3)
+      6 phys_tri_R_skirt_06_jntBnd  [its own]  under 2  rests at (-14.5,-0.1,9.3)
+      7 phys_tri_F_skirt_3_jntBnd  [its own]  under 3  rests at (-0,-14,29.1)
+      8 phys_tri_R_skirt_11_jntBnd  [its own]  under 4  rests at (-0,13,29.3)
+      9 phys_tri_L_skirt_07_jntBnd  [its own]  under 5  rests at (17.3,0,29.4)
+      10 phys_tri_R_skirt_07_jntBnd  [its own]  under 6  rests at (-17.3,0,29.4)
+      11 phys_tri_F_skirt_4_jntBnd  [its own]  under 7  rests at (0,-14.1,40.6)
+      12 phys_tri_R_skirt_12_jntBnd  [its own]  under 8  rests at (-0,13,41.2)
+      13 phys_tri_L_skirt_08_jntBnd  [its own]  under 9  rests at (17.9,-0,41.3)
+      14 phys_tri_R_skirt_08_jntBnd  [its own]  under 10  rests at (-17.9,-0,41.2)

@@ -1,0 +1,1473 @@
+monster: Shepherd of the Pit [Metadata/Monsters/LeagueAbyss/Pit/Cocoons2Abyss]
+
+=== .ao Metadata/Monsters/LeagueAbyss/Pit/Cocoons2/Cocoons2.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/RootedMonsters/Cocoons2/rig.amd"
+	view_of = "lightning_tendrils_01"
+		view_name = "lightning_tendrils__loop_test"
+		view_begin = 559
+		view_end = 1672
+		view_looping = true
+	animations = '[
+		{
+			"name": "abyss_emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.303070545196533,
+					"name": "halo_emerge"
+				}
+			]
+		},
+		{
+			"name": "lightning_tendrils_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.309999942779541,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.600000023841858,
+					"name": "contact",
+					"position": [
+						-29.05459976196289,
+						-65.87870025634766,
+						-177.6649932861328
+					]
+				}
+			]
+		},
+		{
+			"name": "release_spore_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 2.2660000324249269,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1428500413894654,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3016760051250458,
+								0.0
+							],
+							[
+								0.48603400588035586,
+								1.0
+							]
+						],
+						"width": 40.46200180053711,
+						"length": 109.82599639892578,
+						"impact_type": "Piercing",
+						"impact_bone": "R_clawArm_4_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.3407819867134094,
+								0.0
+							],
+							[
+								0.446927011013031,
+								1.0
+							]
+						],
+						"width": 121.38700103759766,
+						"angle": 1.36135995388031,
+						"length": 98.26599884033203,
+						"impact_type": "Piercing",
+						"impact_bone": "R_clawArm_4_jntBnd"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "spore_r_1 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "-3.141 1.501 -2.286"
+	attached_object = "spore_r_2 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 -1.484 -1.885"
+	attached_object = "spore_r_3 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "-0.8727 -0 -1.972"
+	attached_object = "spore_r_4 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 -0.8029 -2.269"
+	attached_object = "spore_r_5 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 -0.5934 -1.955"
+	attached_object = "spore_r_6 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 -0.2967 -1.92"
+	attached_object = "spore_r_7 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 -0.384 -2.007"
+	attached_object = "spore_r_8 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 0.7854 -2.007"
+	attached_object = "spore_r_9 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "-3.141 1.536 1.047"
+	attached_object = "spore_r_10 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 0.384 -2.339"
+		attached_object_scale = "0.01 0.01 0.01"
+	attached_object = "spore_r_11 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 0.3665 -2.566"
+	attached_object = "spore_r_12 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.1 -2.583"
+	attached_object = "spore_r_13 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 0.9774 -2.897"
+	attached_object = "spore_l_1 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.501 0.8552"
+	attached_object = "spore_l_2 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.501 0.8552"
+	attached_object = "spore_l_3 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.501 0.8552"
+	attached_object = "spore_l_4 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.501 0.8552"
+	attached_object = "spore_l_5 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.501 0.8552"
+	attached_object = "spore_l_6 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.501 0.8552"
+	attached_object = "spore_l_7 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.501 1.012"
+	attached_object = "spore_l_8 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.501 1.187"
+	attached_object = "spore_l_9 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.501 1.466"
+	attached_object = "spore_l_10 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.222 1.798"
+	attached_object = "spore_l_11 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.222 2.286"
+	attached_object = "spore_l_12 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.082 2.548"
+	attached_object = "spore_l_13 Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao"
+		attached_object_rotation = "0 1.065 2.862"
+	attached_object = "halo_01 Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_pit_01.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/RootedMonsters/Cocoons2/rig.ast"
+		socket = "spore_r_1"
+			parent = "chest_jntBnd"
+			rotation = "-0 1.75109 0"
+			translation = "-11.6164 12.7758 -22.3646"
+		socket = "spore_r_2"
+			parent = "chest_jntBnd"
+			translation = "-16.8707 17.8017 -18.8909"
+		socket = "spore_r_3"
+			parent = "chest_jntBnd"
+			translation = "-19.5272 17.6147 -14.8509"
+		socket = "spore_r_4"
+			parent = "chest_jntBnd"
+			translation = "-21.4622 19.9405 -11.8057"
+		socket = "spore_r_5"
+			parent = "chest_jntBnd"
+			translation = "-23.0583 20.0433 -8.10074"
+		socket = "spore_r_6"
+			parent = "chest_jntBnd"
+			translation = "-25.1411 20.9437 -5.07387"
+		socket = "spore_r_7"
+			parent = "chest_jntBnd"
+			translation = "-25.1411 20.0186 -1.94809"
+		socket = "spore_r_8"
+			parent = "chest_jntBnd"
+			translation = "-25.1411 18.844 2.14201"
+		socket = "spore_r_9"
+			parent = "chest_jntBnd"
+			translation = "-24.7747 17.4297 6.19404"
+		socket = "spore_r_10"
+			parent = "chest_jntBnd"
+			translation = "-24.0908 15.6478 10.1442"
+		socket = "spore_r_11"
+			parent = "chest_jntBnd"
+			translation = "-23.3793 15.6162 14.5388"
+		socket = "spore_r_12"
+			parent = "chest_jntBnd"
+			translation = "-18.4618 12.7487 19.3196"
+		socket = "spore_r_13"
+			parent = "chest_jntBnd"
+			translation = "-16.3197 11.1956 22.9798"
+		socket = "spore_l_1"
+			parent = "chest_jntBnd"
+			translation = "11.9869 15.8891 -23.3388"
+		socket = "spore_l_2"
+			parent = "chest_jntBnd"
+			translation = "16.2364 16.0252 -17.7885"
+		socket = "spore_l_3"
+			parent = "chest_jntBnd"
+			translation = "19.6035 18.5792 -15.2766"
+		socket = "spore_l_4"
+			parent = "chest_jntBnd"
+			translation = "21.8786 19.6016 -11.6247"
+		socket = "spore_l_5"
+			parent = "chest_jntBnd"
+			translation = "21.5058 19.0445 -7.27456"
+		socket = "spore_l_6"
+			parent = "chest_jntBnd"
+			translation = "24.5306 20.1492 -5.17227"
+		socket = "spore_l_7"
+			parent = "chest_jntBnd"
+			translation = "25.4482 19.4258 -2.09829"
+		socket = "spore_l_8"
+			parent = "chest_jntBnd"
+			translation = "24.9284 17.7296 2.13831"
+		socket = "spore_l_9"
+			parent = "chest_jntBnd"
+			translation = "24.2498 17.6442 5.81329"
+		socket = "spore_l_10"
+			parent = "chest_jntBnd"
+			translation = "23.204 15.0278 10.0669"
+		socket = "spore_l_11"
+			parent = "chest_jntBnd"
+			translation = "22.3341 15.1737 14.4551"
+		socket = "spore_l_12"
+			parent = "chest_jntBnd"
+			translation = "18.8546 12.3812 18.9752"
+		socket = "spore_l_13"
+			parent = "chest_jntBnd"
+			translation = "16.2874 11.7766 22.6218"
+		socket = "halo_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -50"
+			ignore_parent_rotation = "yawpitch"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/RootedMonsters/Cocoons2/Cocoons2.sm"
+			Cocoons2Shape = "Art/Textures/Monsters/AbyssalMonsters/AbyssCocoons2.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd Tail_5_jntBnd"
+		bone_group = "frameupper false R_Wing_3_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_Wing_3_jntBnd"
+		bone_group = "FX_back_dir_L_01 false chest_jntBnd spore_l_1"
+		bone_group = "FX_back_dir_L_02 false chest_jntBnd spore_l_2"
+		bone_group = "FX_back_dir_L_03 false chest_jntBnd spore_l_3"
+		bone_group = "FX_back_dir_L_04 false chest_jntBnd spore_l_4"
+		bone_group = "FX_back_dir_L_05 false chest_jntBnd spore_l_5"
+		bone_group = "FX_back_dir_L_06 false chest_jntBnd spore_l_6"
+		bone_group = "FX_back_dir_L_07 false chest_jntBnd spore_l_7"
+		bone_group = "FX_back_dir_L_08 false chest_jntBnd spore_l_8"
+		bone_group = "FX_back_dir_L_09 false chest_jntBnd spore_l_9"
+		bone_group = "FX_back_dir_L_10 false chest_jntBnd spore_l_10"
+		bone_group = "FX_back_dir_L_11 false chest_jntBnd spore_l_11"
+		bone_group = "FX_back_dir_L_12 false chest_jntBnd spore_l_12"
+		bone_group = "FX_back_dir_L_13 false chest_jntBnd spore_l_13"
+		bone_group = "FX_back_dir_R_01 false chest_jntBnd spore_r_1"
+		bone_group = "FX_back_dir_R_02 false chest_jntBnd spore_r_2"
+		bone_group = "FX_back_dir_R_03 false chest_jntBnd spore_r_3"
+		bone_group = "FX_back_dir_R_04 false chest_jntBnd spore_r_4"
+		bone_group = "FX_back_dir_R_05 false chest_jntBnd spore_r_5"
+		bone_group = "FX_back_dir_R_06 false chest_jntBnd spore_r_6"
+		bone_group = "FX_back_dir_R_07 false chest_jntBnd spore_r_7"
+		bone_group = "FX_back_dir_R_08 false chest_jntBnd spore_r_8"
+		bone_group = "FX_back_dir_R_09 false chest_jntBnd spore_r_9"
+		bone_group = "FX_back_dir_R_10 false chest_jntBnd spore_r_10"
+		bone_group = "FX_back_dir_R_11 false chest_jntBnd spore_r_11"
+		bone_group = "FX_back_dir_R_12 false chest_jntBnd spore_r_12"
+		bone_group = "FX_back_dir_R_13 false chest_jntBnd spore_r_13"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "abyss_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.14569450914859773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Shake_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4970799684524536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7061399817466736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementTendrils",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1745034456253052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/OnAggro_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7821600437164307,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementTendrils",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8464901447296143,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0321600437164308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Fall",
+						"bone_name": "Tail_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Attack01_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22012099623680116,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Swish_A_",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2705160081386566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Swish_A_",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5132269859313965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Attack02_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17725500464439393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Swish_B_",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1911579966545105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Swish_A_",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33713299036026,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Attack02_Impact_",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47036200761795046,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5761181116104126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1028599739074708,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Shake_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.291890025138855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4024499654769898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6415200233459473,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/ShortWlak_",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9855799674987794,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1888699531555177,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.279819965362549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Flinch_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.048839449882507327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Flinch_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04158606380224228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Flinch_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.058994218707084659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Flinch_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.035541582852602008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Idle.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementLong",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17934000492095948,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementTendrils"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9304744005203247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0994199514389039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementTendrils"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8280439376831055,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.992210030555725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementTendrils"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.629012107849121,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.834320068359375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementTendrils"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.280250072479248,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7037200927734377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementTendrils"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/KnockdownA",
+						"bone_name": "aux_head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22794786095619203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0528850555419922,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.187980055809021,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Shake_",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.693442463874817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/KnockdownB",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/KnockdownA",
+						"bone_name": "aux_head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22794786095619203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0528850555419922,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.187980055809021,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Shake_",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.693442463874817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/KnockdownB",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "lightning_tendrils_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/LightningTendrils_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Effects/Abyss/LightningSurge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.013641499914228917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5305020213127136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7063239812850952,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8445169925689697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Flinch",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.887185275554657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Effects/Abyss/LightningSurge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0887199640274048,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1305700540542603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Flinch",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6249499320983887,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Effects/Abyss/AbyssSurge",
+						"bone_name": "Tail_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6848706007003785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "release_spore_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Spors_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.013641499914228917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5305020213127136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8594110012054443,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1028599739074708,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Shake_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3775826692581177,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Effects/Abyss/AbyssSurge",
+						"bone_name": "Tail_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7379399538040162,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06769230216741562,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Revive_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7978717088699341,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementLong",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1028599739074708,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/Shake_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.697279453277588,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Run.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18519000709056855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementTendrils",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1442500352859498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementTendrils",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8538000583648682,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8785293102264405,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementTendrils",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.61576247215271,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementTendrils",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.368419885635376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.502919912338257,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementTendrils",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Run.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43344399333000185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.249500036239624,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.218050003051758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.22406005859375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Run.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43344399333000185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.249500036239624,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.218050003051758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.22406005859375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Run.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43344399333000185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.249500036239624,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.218050003051758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.22406005859375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Vocals/Run.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43344399333000185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "R_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.249500036239624,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.218050003051758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.22406005859375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/Cocoon2/Foley/MovementShort",
+						"bone_name": "L_clawArm_4_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "lightning_tendrils_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/Cocoons2/epk/onact_lightning_tendrils.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/Cocoons2/epk/R_hand_glow.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/Cocoons2/epk/L_hand_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "release_spore_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/Cocoons2/epk/core_buildup.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "lightning_tendrils_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.9660000801086427,
+						"name": "surgeTime_R",
+						"curve": "4 0 0 Smooth 1.7176 1 Linear 2.45295 1 Linear 2.966 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.9660000801086427,
+						"name": "surgeTime_L",
+						"curve": "4 0 0 Smooth 1.7176 1 Linear 2.45295 1 Linear 2.966 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "release_spore_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.2660000324249269,
+						"name": "surgeTime_R",
+						"curve": "4 0 0 Smooth 0.905577 0 Flat 1.87403 1 Linear 2.266 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/Degen_cloud_emit.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/monster_particles/Act5_FOUR/Cocoons2/mb/Degen_cloud/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/monster_particles/Act5_FOUR/Cocoons2/mb/Degen_cloud/rig.ast"
+		socket = "aux_mid"
+		socket = "aux_fwd"
+			translation = "0 -180 0"
+		socket = "aux_up"
+			translation = "0 0 -100"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/particles/monster_particles/Act5_FOUR/Cocoons2/mb/Degen_cloud/degencloud.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "fwdline false aux_mid aux_fwd"
+		bone_group = "midup false aux_mid aux_up"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "fade_in",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/fx/Degen_cloud_emit/loop/loop_fwdline.pet",
+						"bone_group": "fwdline"
+					}
+				]
+			},
+			{
+				"name": "loop",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/Cocoons2/fx/Degen_cloud_emit/loop/loop_fwdline.pet",
+						"bone_group": "fwdline"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "fade_in",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act5/G5_8_1/Cocoon02/Effects/Spores/GasLayer",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act5/G5_8_1/Cocoon02/Effects/Spores/GasSpray",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "loop",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act5/G5_8_1/Cocoon02/Effects/Spores/Spores.loop.ogg"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_pit_01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "animate"
+		view_looping = true
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+		socket = "aux_line_01"
+			translation = "0 0 -100"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_line false root aux_line_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "animate",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/fx/halo_pit_01.pet",
+						"bone_group": "FX_line"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/RootedMonsters/Cocoons2/Cocoons2.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/RootedMonsters/Cocoons2/rig_d7993b53.smd"
+Materials 1
+	"Art/Models/MONSTERS/Cocoon/Textures/Cocoons2c.mat" 1
+BoundingBox -61.2597 -58.823 -187.701 61.2597 49.116 -17.9467
+BoneGroups 24
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger2_1_jntBnd"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger2_1_jntBnd"
+	"grp_belly" 2 "spine_1_jntBnd" "chest_jntBnd"
+	"grp_segment_01" 2 "hip_jntBnd" "Tail_1_jntBnd"
+	"grp_segment_02" 2 "Tail_1_jntBnd" "Tail_2_jntBnd"
+	"grp_segment_03" 2 "Tail_2_jntBnd" "Tail_3_jntBnd"
+	"grp_segment_04" 2 "Tail_3_jntBnd" "Tail_4_jntBnd"
+	"grp_segment_05" 2 "Tail_4_jntBnd" "Tail_5_jntBnd"
+	"grp_l_claw_01" 2 "L_clawArm_1_jntBnd" "L_clawArm_2_jntBnd"
+	"grp_l_claw_02" 2 "L_clawArm_2_jntBnd" "L_clawArm_3_jntBnd"
+	"grp_l_claw_03" 2 "L_clawArm_3_jntBnd" "L_clawArm_4_jntBnd"
+	"grp_r_claw_01" 2 "R_clawArm_1_jntBnd" "R_clawArm_2_jntBnd"
+	"grp_r_claw_02" 2 "R_clawArm_2_jntBnd" "R_clawArm_3_jntBnd"
+	"grp_r_claw_03" 2 "R_clawArm_3_jntBnd" "R_clawArm_4_jntBnd"
+
+=== .smd Art/Models/MONSTERS/RootedMonsters/Cocoons2/rig_d7993b53.smd
+  version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 1 in the header, 1 in the block · 14234 triangles over 10141 vertices
+  names: 26 bytes said, 26 read  [agree]
+
+=== shapes (1)
+0	Cocoons2Shape	from 0	count 42702
+
+=== fitting
+the monster's rig: 67 bones
+mounts: aux_position, aux_head_jntBnd
+  Degen_cloud_emit.ao  socket spore_r_1 [NOT in its carrier's rig]  attached_object_rotation = "-3.141 1.501 -2.286"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_r_2 [NOT in its carrier's rig]  attached_object_rotation = "0 -1.484 -1.885"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_r_3 [NOT in its carrier's rig]  attached_object_rotation = "-0.8727 -0 -1.972"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_r_4 [NOT in its carrier's rig]  attached_object_rotation = "0 -0.8029 -2.269"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_r_5 [NOT in its carrier's rig]  attached_object_rotation = "0 -0.5934 -1.955"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_r_6 [NOT in its carrier's rig]  attached_object_rotation = "0 -0.2967 -1.92"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_r_7 [NOT in its carrier's rig]  attached_object_rotation = "0 -0.384 -2.007"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_r_8 [NOT in its carrier's rig]  attached_object_rotation = "0 0.7854 -2.007"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_r_9 [NOT in its carrier's rig]  attached_object_rotation = "-3.141 1.536 1.047"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_r_10 [NOT in its carrier's rig]  attached_object_rotation = "0 0.384 -2.339"  attached_object_scale = "0.01 0.01 0.01"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_r_11 [NOT in its carrier's rig]  attached_object_rotation = "0 0.3665 -2.566"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_r_12 [NOT in its carrier's rig]  attached_object_rotation = "0 1.1 -2.583"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_r_13 [NOT in its carrier's rig]  attached_object_rotation = "0 0.9774 -2.897"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_1 [NOT in its carrier's rig]  attached_object_rotation = "0 1.501 0.8552"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_2 [NOT in its carrier's rig]  attached_object_rotation = "0 1.501 0.8552"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_3 [NOT in its carrier's rig]  attached_object_rotation = "0 1.501 0.8552"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_4 [NOT in its carrier's rig]  attached_object_rotation = "0 1.501 0.8552"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_5 [NOT in its carrier's rig]  attached_object_rotation = "0 1.501 0.8552"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_6 [NOT in its carrier's rig]  attached_object_rotation = "0 1.501 0.8552"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_7 [NOT in its carrier's rig]  attached_object_rotation = "0 1.501 1.012"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_8 [NOT in its carrier's rig]  attached_object_rotation = "0 1.501 1.187"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_9 [NOT in its carrier's rig]  attached_object_rotation = "0 1.501 1.466"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_10 [NOT in its carrier's rig]  attached_object_rotation = "0 1.222 1.798"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_11 [NOT in its carrier's rig]  attached_object_rotation = "0 1.222 2.286"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_12 [NOT in its carrier's rig]  attached_object_rotation = "0 1.082 2.548"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  Degen_cloud_emit.ao  socket spore_l_13 [NOT in its carrier's rig]  attached_object_rotation = "0 1.065 2.862"  box (-200.5,-200.5,-50)..(200.5,200.5,0)
+    (the geometry did not read)
+    rig 1 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+  halo_pit_01.ao  socket halo_01 [NOT in its carrier's rig]  (no mesh - an effect or a sound)

@@ -1,0 +1,1361 @@
+monster: Ancestral Headtaker [Metadata/Monsters/FallenKarui/FallenKaruiOneHandMaceHalls]
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/FallenKaruiMace/FallenKaruiMace01.ao (depth 0)
+version 3
+extends "Metadata/Monsters/FallenKarui/FallenKaruiMale/FallenKaruiMace/FallenKaruiMaceBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0101Feathers.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0101Robe.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0101RobeAccessories.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/FallenKaruiMale01.sm"
+			FKM01_01_Body_RemodelShape = "Art/Models/MONSTERS/FallenKarui/Textures/FallenKaruiMale_01Cc.mat"
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/FallenKaruiMale0101.sm"
+			hide_segments = "FKM0101_NoPhys_robeAccessories_01Shape,FKM0101_NoPhys_robeAccessories_02Shape,FKM0101_NoPhys_feathersShape,FKM0101_NoPhys_robe01Shape,FKM0101_NoPhys_robe02Shape"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/FallenKaruiMace/FallenKaruiMace02.ao (depth 0)
+version 3
+extends "Metadata/Monsters/FallenKarui/FallenKaruiMale/FallenKaruiMace/FallenKaruiMaceBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0101Feathers.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0102Robe.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0102RobeAccessories.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/FallenKaruiMale01.sm"
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/FallenKaruiMale0102.sm"
+			hide_segments = "FKM0102_NoPhys_feathersShape,FKM0102_NoPhys_robe0Shape2,FKM0102_NoPhys_robeAccss_0Shape1,FKM0102_NoPhys_robeAccss_0Shape2"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/FallenKaruiMace/FallenKaruiMace03.ao (depth 0)
+version 3
+extends "Metadata/Monsters/FallenKarui/FallenKaruiMale/FallenKaruiMace/FallenKaruiMaceBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0103Feathers.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0103Robe.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/FallenKaruiMale01.sm"
+			FKM01_01_Body_RemodelShape = "Art/Models/MONSTERS/FallenKarui/Textures/FallenKaruiMale_01Bc.mat"
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/FallenKaruiMale0103.sm"
+			hide_segments = "FKM0103_NoPhys_feathersShape, FKM0103_NoPhys_robe_02Shape"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/FallenKaruiMace/FallenKaruiMace04.ao (depth 0)
+version 3
+extends "Metadata/Monsters/FallenKarui/FallenKaruiMale/FallenKaruiMace/FallenKaruiMaceBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0201Feathers.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0201Necklace.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0201Robe.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/FallenKaruiMale02.sm"
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/FallenKaruiMale0201.sm"
+			hide_segments = "FKM0201_NoPhys_feathersShape,FKM0201_NoPhys_necklace_02Shape,FKM0201_NoPhys_necklace_03Shape,FKM0201_NoPhys_robe_01Shape,FKM0201_NoPhys_robe_0Shape2"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/FallenKaruiMace/FallenKaruiMaceBase.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/FallenKaruiMales/Mace/rig.amd"
+	animations = '[
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"position": [
+						0.0,
+						115.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						115.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5000000596046448,
+					"name": "move",
+					"position": [
+						-115.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.31843599677085879,
+								0.0
+							],
+							[
+								0.33519598841667178,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.2792530059814453,
+						"angle": 0.8901180028915405,
+						"length": 140.3520050048828,
+						"offset": [
+							7.0,
+							-1.0
+						],
+						"impact_z_rotation": [
+							0.785398006439209,
+							1.3962600231170655
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.6648039817810059,
+								0.0
+							],
+							[
+								0.6648039817810059,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.8028510212898254,
+						"angle": 1.762779951095581,
+						"length": 134.5030059814453,
+						"impact_z_rotation": [
+							-0.785398006439209,
+							-1.483530044555664
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/FallenKaruiMales/Mace/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_upperArm_attachment_jntBnd"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Attack",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.027149999514222146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/BeadsMove",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1631898283958435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/JadeWeaponWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6784226298332214,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7570701241493225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/BeadsMove",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8136248588562012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/JadeWeaponWhoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8261978626251221,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_AttackB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0904168114066124,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12202327698469162,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20780982077121736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11511629819869995,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19604699313640595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1859661340713501,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22664056718349458,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23492610454559327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_taunt_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Taunt",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23380999267101289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7084264755249023,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.736139714717865,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0214906930923463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/MovementWhoosh",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1109356880187989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/BeadsMove",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Flinch",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/BeadsMove",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Flinch",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/BeadsMove",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Flinch",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/BeadsMove",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Flinch",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Idle",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.116666793823242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Idle",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_KnockdownA",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0872093141078949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3468993306159973,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48643428087234499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/StepSoft",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7093026041984558,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5426359176635743,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_KnockdownB",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5794579982757569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.474807024002075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.78682279586792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_KnockdownA",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13417832553386689,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42195555567741396,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6903122663497925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7415120005607605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/ClothMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0645992755889893,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/StepSoft",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.405341386795044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_KnockdownB",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.808412790298462,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/BeadsMove",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.321638345718384,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5387957096099855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.035305559635162356,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Vocals/FallenMace_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27813899517059328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6019168496131897,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9222503304481506,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2830560207366944,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_1/FallenKarui/FallenMace/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.40619999170303347,
+						"end_time": 0.5810821056365967,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiWarriors/epk/melee_swing.epk",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 1.065999984741211,
+						"end_time": 1.236655354499817,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiWarriors/epk/melee_swing.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0101Feathers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0101/FKM0101_Feathers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0101/FKM0101_Feathers/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.100
+		animation_velocity_factor = 10.000
+		animation_force_factor = 5.000
+		gravity = 0.100
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0101/FKM0101_Feathers/FKM0101Feathers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0101Robe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0101/FKM0101_Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0101/FKM0101_Robe/rig.ast"
+		linear_allowed_contraction = 0.250
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.400
+		attachment_bones = "spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0101/FKM0101_Robe/FKM0101Robe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0101RobeAccessories.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0101/FKM0101_RobeAccessories/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0101/FKM0101_RobeAccessories/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.220
+		use_shock_propagation = false
+		attachment_bones = "spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0101/FKM0101_RobeAccessories/FKM0101RobeAccss.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0102Robe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0102/FKM0102_Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0102/FKM0102_Robe/rig.ast"
+		linear_allowed_contraction = 0.250
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.400
+		attachment_bones = "spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0102/FKM0102_Robe/FKM0102Robe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0102RobeAccessories.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0102/FKM0102_RobeAccss/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0102/FKM0102_RobeAccss/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.258
+		use_shock_propagation = false
+		attachment_bones = "L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0102/FKM0102_RobeAccss/FKM0102RobeAccss.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0103Feathers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0103/FKM0103_Feathers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0103/FKM0103_Feathers/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.100
+		animation_velocity_factor = 10.000
+		animation_force_factor = 5.000
+		gravity = 0.100
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0103/FKM0103_Feathers/FKM0103Feathers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0103Robe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0103/FKM0103_Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0103/FKM0103_Robe/rig.ast"
+		linear_allowed_contraction = 0.250
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.400
+		attachment_bones = "spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM01/attachments/FKM0103/FKM0103_Robe/FKM0103.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false spine_1_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0201Feathers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0201/FKM0201_Feathers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0201/FKM0201_Feathers/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.100
+		animation_velocity_factor = 10.000
+		animation_force_factor = 5.000
+		gravity = 0.100
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0201/FKM0201_Feathers/FKM0201Feathers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0201Necklace.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0201/FKM0201_Necklace/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0201/FKM0201_Necklace/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.250
+		enclosure_angle = 0.600
+		attachment_bones = "neck_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0201/FKM0201_Necklace/FKM0201Necklace.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false neck_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenKarui/FallenKaruiMale/attachments/FKM0201Robe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0201/FKM0201_Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0201/FKM0201_Robe/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.450
+		attachment_bones = "hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/attachments/FKM02/attachments/FKM0201/FKM0201_Robe/FKM0201Robe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/FallenKaruiMale01.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/FallenKaruiMale01_armour_ab332152.smd"
+Materials 1
+	"Art/Models/MONSTERS/FallenKarui/Textures/FallenKaruiMale_01c.mat" 1
+BoundingBox -83.3538 -18.655 -202.009 83.3538 22.8457 0.0594
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/KaruiFallenMale/FallenKaruiMale01_armour_ab332152.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 1 in the header, 1 in the block · 5556 triangles over 3588 vertices
+  names: 52 bytes said, 52 read  [agree]
+
+=== shapes (26)
+0	FKM01_01_Body_RemodelShape	from 0	count 16668
+1	FKM0101_bodyArmourShape	from 16668	count 16254
+2	FKM0101_necklaceShape	from 32922	count 1056
+3	FKM0101_NoPhys_robeAccessories_01Shape	from 33978	count 2400
+4	FKM0101_NoPhys_robeAccessories_02Shape	from 36378	count 1536
+5	FKM0101_hair01Shape	from 37914	count 312
+6	FKM0101_hair0Shape2	from 38226	count 1020
+7	FKM0101_NoPhys_feathersShape	from 39246	count 288
+8	FKM0101_NoPhys_robe01Shape	from 39534	count 414
+9	FKM0101_NoPhys_robe02Shape	from 39948	count 2340
+10	FKM0101_feathersShape	from 42288	count 288
+11	FKM01_01_robe01Shape	from 42576	count 438
+12	FKM01_01_robe02Shape	from 43014	count 2340
+13	FKM01_01_robeAccessories_01Shape	from 45354	count 2400
+14	FKM01_01_robeAccessories_02Shape	from 47754	count 1536
+15	FKM01_01_robe0Shape2	from 49290	count 2286
+16	FKM0102_robeAccss_0Shape1	from 51576	count 4998
+17	FKM0102_robeAccss_0Shape2	from 56574	count 960
+18	FKM0103_feathersShape	from 57534	count 288
+19	FKM0103_robe_sidesShape	from 57822	count 1974
+20	FKM0103_robeShape	from 59796	count 600
+21	FKM0201_feathersShape	from 60396	count 72
+22	FKM0201_necklace_02Shape	from 60468	count 204
+23	FKM0201_necklace_03Shape	from 60672	count 1062
+24	FKM0201_robe_01Shape	from 61734	count 3210
+25	FKM0201_robe_0Shape2	from 64944	count 1314
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  FKM0101Feathers.ao  socket head_jntBnd [in its carrier's rig]  box (-12.1,-1.9,-38.3)..(11.9,15.8,-10)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 96 triangles over 84 vertices
+    names: 42 bytes said, 42 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_feather_01_jntBnd  [its own]  under 0  rests at (9.9,1.5,-17.2)
+      2 phys_tri_feather_02_jntBnd  [its own]  under 0  rests at (0.2,12.2,-27.7)
+      3 phys_tri_feather_03_jntBnd  [its own]  under 0  rests at (-9.7,1,-17.2)
+  FKM0101Robe.ao  socket hip_jntBnd [in its carrier's rig]  box (-26.4,-23.8,-15.3)..(26.3,22.3,60.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 926 triangles over 638 vertices
+    names: 80 bytes said, 80 read  [agree]
+    rig 8 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-12.8)  carrier has (0,2,-119.5)
+      2 R_thigh_jntBnd  [shared]  under 0  rests at (-11,0,0)  carrier has (-11,2,-106.8)
+      3 L_thigh_jntBnd  [shared]  under 0  rests at (11,0,0)  carrier has (11,2,-106.8)
+      4 phys_tri_robe_front_02_02_jntBnd  [its own]  under 0  rests at (0,-17.6,17.1)
+      5 phys_tri_robe_back_02_02_jntBnd  [its own]  under 0  rests at (0,14.6,20.1)
+      6 phys_tri_robe_front_02_03_jntBnd  [its own]  under 4  rests at (0,-17.6,34.7)
+      7 phys_tri_robe_back_02_03_jntBnd  [its own]  under 5  rests at (-0,15.4,39.6)
+  FKM0101RobeAccessories.ao  socket hip_jntBnd [in its carrier's rig]  box (-30.9,-23.7,-13.8)..(30.9,20.6,28.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 1312 triangles over 1002 vertices
+    names: 128 bytes said, 128 read  [agree]
+    rig 8 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_L_robeAccss_01_jntBnd  [its own]  under 0  rests at (24,11.2,-1.2)
+      2 phys_tri_L_robeAccss_02_jntBnd  [its own]  under 0  rests at (15.9,16.5,-2.1)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-11,-0,-0)  carrier has (-11,2,-106.8)
+      4 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-12.8)  carrier has (0,2,-119.5)
+      5 L_thigh_jntBnd  [shared]  under 0  rests at (11,0,-0)  carrier has (11,2,-106.8)
+      6 phys_tri_R_robeAccss_01_jntBnd  [its own]  under 0  rests at (-24,11.2,-1.2)
+      7 phys_tri_R_robeAccss_02_jntBnd  [its own]  under 0  rests at (-15.9,16.5,-2.1)
+  FKM0101Feathers.ao  socket head_jntBnd [in its carrier's rig]  box (-12.1,-1.9,-38.3)..(11.9,15.8,-10)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 96 triangles over 84 vertices
+    names: 42 bytes said, 42 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_feather_01_jntBnd  [its own]  under 0  rests at (9.9,1.5,-17.2)
+      2 phys_tri_feather_02_jntBnd  [its own]  under 0  rests at (0.2,12.2,-27.7)
+      3 phys_tri_feather_03_jntBnd  [its own]  under 0  rests at (-9.7,1,-17.2)
+  FKM0102Robe.ao  socket hip_jntBnd [in its carrier's rig]  box (-42.9,-22.8,-12.6)..(42.9,20.9,60.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 762 triangles over 862 vertices
+    names: 40 bytes said, 40 read  [agree]
+    rig 10 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 9 of 10  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-12.8)  carrier has (0,2,-119.5)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (11,0,-0)  carrier has (11,2,-106.8)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-11,-0,-0)  carrier has (-11,2,-106.8)
+      4 phys_tri_L_grass_01_jntBnd  [its own]  under 0  rests at (23.1,3.7,5.8)
+      5 phys_tri_L_front_01_jntBnd  [its own]  under 0  rests at (0,-16,20.6)
+      6 phys_tri_L_back_01_jntBnd  [its own]  under 0  rests at (0,15.3,24.1)
+      7 phys_tri_R_grass_01_jntBnd  [its own]  under 0  rests at (-23,3.7,5.8)
+      8 phys_tri_L_front_02_jntBnd  [its own]  under 5  rests at (-0,-16.2,36)
+      9 phys_tri_L_back_02_jntBnd  [its own]  under 6  rests at (0,15.7,41.9)
+  FKM0102RobeAccessories.ao  socket hip_jntBnd [in its carrier's rig]  box (-33.4,-29.9,-20.6)..(25.4,16.5,20.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 1986 triangles over 1536 vertices
+    names: 100 bytes said, 100 read  [agree]
+    rig 5 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_thigh_jntBnd  [shared]  under 0  rests at (11,0,-0)  carrier has (11,2,-106.8)
+      2 R_thigh_jntBnd  [shared]  under 0  rests at (-11,0,-0)  carrier has (-11,2,-106.8)
+      3 phys_tri_assecories_jntBnd_1  [its own]  under 0  rests at (0,-20.4,-5.8)
+      4 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  FKM0103Feathers.ao  socket head_jntBnd [in its carrier's rig]  box (-7.1,9.6,-38.3)..(6.8,17.7,-20.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 96 triangles over 84 vertices
+    names: 42 bytes said, 42 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_feather_01_jntBnd  [its own]  under 0  rests at (-0,13.7,-29.5)
+  FKM0103Robe.ao  socket hip_jntBnd [in its carrier's rig]  box (-45.1,-29.8,-14.9)..(30.1,19.9,60.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 858 triangles over 972 vertices
+    names: 80 bytes said, 80 read  [agree]
+    rig 12 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 10 of 12  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-12.8)  carrier has (0,2,-119.5)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (11,0,-0)  carrier has (11,2,-106.8)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-11,-0,-0)  carrier has (-11,2,-106.8)
+      4 phys_tri_robe_jntBnd_3  [its own]  under 0  rests at (0,-18.5,21.9)
+      5 phys_tri_robe_jntBnd_1  [its own]  under 0  rests at (0,15.9,24.7)
+      6 phys_tri_robe_02_jntBnd_1  [its own]  under 0  rests at (21.1,8.7,6)
+      7 phys_tri_robe_02_jntBnd_2  [its own]  under 0  rests at (-21.1,8.7,6)
+      8 phys_tri_robe_02_jntBnd_3  [its own]  under 0  rests at (-23,-2.8,8.1)
+      9 phys_tri_robe_jntBnd_4  [its own]  under 4  rests at (-0,-18.2,37.8)
+      10 phys_tri_robe_jntBnd_2  [its own]  under 5  rests at (0,15.9,42.3)
+      11 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  FKM0201Feathers.ao  socket head_jntBnd [in its carrier's rig]  box (-16.1,1.2,-26.8)..(-4.8,14.3,-14.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 24 triangles over 32 vertices
+    names: 42 bytes said, 42 read  [agree]
+    rig 4 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_feather_01_jntBnd  [its own]  under 0  rests at (-11.5,2.1,-18.2)
+      2 phys_tri_feather_02_jntBnd  [its own]  under 0  rests at (-6.8,9.7,-21.8)
+      3 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  FKM0201Necklace.ao  socket chest_jntBnd [in its carrier's rig]  box (-7.2,-15.4,-21.5)..(6.9,-4.8,-1.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 422 triangles over 368 vertices
+    names: 96 bytes said, 96 read  [agree]
+    rig 6 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 6  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (8.5,0,-18.1)  carrier has (8.5,2,-163.3)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-8.5,0,-18.1)  carrier has (-8.5,2,-163.3)
+      3 neck_jntBnd  [shared]  under 0  rests at (0,2.8,-24.7)  carrier has (-0,4.9,-169.8)
+      4 phys_tri_necklace_jntBnd  [its own]  under 0  rests at (0,-9.5,-11.2)
+      5 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  FKM0201Robe.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-28.1,-17.3,-2.3)..(22.9,16.6,72.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 1508 triangles over 1060 vertices
+    names: 80 bytes said, 80 read  [agree]
+    rig 7 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,0,12.8)  carrier has (0,2,-106.8)
+      2 phys_tri_front_01_jntBnd  [its own]  under 0  rests at (0,-14.6,42.8)
+      3 phys_tri_back_jntBnd  [its own]  under 0  rests at (0,12,40)
+      4 L_thigh_jntBnd  [shared]  under 1  rests at (11,0,12.8)  carrier has (11,2,-106.8)
+      5 R_thigh_jntBnd  [shared]  under 1  rests at (-11,0,12.8)  carrier has (-11,2,-106.8)
+      6 phys_tri_front_02_jntBnd  [its own]  under 2  rests at (0,-14.6,57.8)

@@ -1,0 +1,3928 @@
+monster: Risen Farmhand [Metadata/Monsters/Zombies/Farmer/FarmerZombieMediumHoe]
+
+=== .ao Metadata/Monsters/Zombies/Farmer/FarmerZombiesMedium.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Zombies/Farmer/FarmerZombiesBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Beard.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Boots.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Pants.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Beard.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_BodyStraps.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Pants.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Shirt.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_LeatherHood_Phys.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_ClothsPhys.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesAverage.sm"
+		skin = "Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesMedium.sm"
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_axe_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.5556920170783997,
+						"end_time": 0.6520482301712036,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/ZombieFarmer/epk/weapon_trails.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_axe_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.5729429721832275,
+						"end_time": 0.7062639594078064,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/ZombieFarmer/epk/weapon_trails.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/FarmerZombiesMedium_noPhys.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Zombies/Farmer/FarmerZombiesBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Beard.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Boots.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Cloths.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Pants.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Beard.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_BodyStraps.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_LeatherHood.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Pants.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Shirt.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesAverage.sm"
+		skin = "Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesMedium.sm"
+			hide_colliders = "collision_ellipsoid_L_thighShape,collision_ellipsoid_R_thighShape"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/FarmerZombiesMedium_01.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Zombies/Farmer/FarmerZombiesBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Beard.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Boots.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Pants.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_ClothsPhys.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesAverage.sm"
+		skin = "Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesMedium.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/FarmerZombiesMedium_01_noPhys.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Zombies/Farmer/FarmerZombiesBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Beard.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Boots.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Cloths.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Pants.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesAverage.sm"
+		skin = "Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesMedium.sm"
+			hide_colliders = "collision_ellipsoid_L_thighShape,collision_ellipsoid_R_thighShape"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/FarmerZombiesMedium_02.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Zombies/Farmer/FarmerZombiesBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Beard.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_BodyStraps.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Pants.ao"
+	attached_object = "<root> Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Shirt.ao"
+	attached_object = "head_jntBnd Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_LeatherHood_Phys.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesAverage.sm"
+		skin = "Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesMedium.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/FarmerZombiesBase.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AttachedAnimatedObject
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/LumberjackZombies/rig.amd"
+	view_of = "farmer_idle_scythe_01"
+		view_name = "farmer_idle_scythe_01_01"
+		view_looping = true
+	animations = '[
+		{
+			"name": "attack_2haxe_01",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.45375001430511477,
+					"end_time": 0.527999997138977,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.45375001430511477,
+					"end_time": 0.527999997138977,
+					"name": "melee_trail",
+					"data": "Left 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_2haxe_02",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.48524999618530276,
+					"end_time": 0.5347499847412109,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.48524999618530276,
+					"end_time": 0.5347499847412109,
+					"name": "melee_trail",
+					"data": "Left 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_axe_01",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.5205000042915344,
+					"end_time": 0.6112499833106995,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_axe_02",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.5827500224113464,
+					"end_time": 0.6997500061988831,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_unarmed_01",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.445499986410141,
+					"end_time": 0.5857499837875366,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_unarmed_02",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.4972499907016754,
+					"end_time": 0.621749997138977,
+					"name": "melee_trail",
+					"data": "Left 0 0 0 0"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_2haxe_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.2569830119609833,
+								0.0
+							],
+							[
+								0.27932998538017275,
+								1.0
+							]
+						],
+						"width": 46.040000915527347,
+						"length": 144.7790069580078,
+						"local_offset": [
+							-6.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.17453299462795258,
+							-0.6108649969100952
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_2haxe_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.25683099031448367,
+								0.0
+							],
+							[
+								0.27374300360679629,
+								1.0
+							]
+						],
+						"rotation": 0.19198599457740785,
+						"width": 69.43199920654297,
+						"length": 139.13400268554688,
+						"offset": [
+							8.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.17453299462795258,
+							-0.5235990285873413
+						],
+						"impact_z_rotation": [
+							0.26179900765419009,
+							0.26179900765419009
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_axe_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.2185789942741394,
+								0.0
+							],
+							[
+								0.2349729984998703,
+								0.5471699833869934
+							],
+							[
+								0.2677600085735321,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.17453299462795258,
+						"width": 34.68199920654297,
+						"angle": 2.862339973449707,
+						"x_axis_scale": 0.7710000276565552,
+						"length": 98.26599884033203,
+						"local_offset": [
+							13.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.8500499725341797
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_axe_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.22950799763202668,
+								0.0
+							],
+							[
+								0.2677600085735321,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.26179900765419009,
+						"angle": 3.036870002746582,
+						"x_axis_scale": 0.8700000047683716,
+						"length": 92.0,
+						"local_offset": [
+							-14.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.6108649969100952,
+							-1.483530044555664
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.2185789942741394,
+								0.0
+							],
+							[
+								0.23463700711727143,
+								0.43801701068878176
+							],
+							[
+								0.26256999373435976,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.17453299462795258,
+						"angle": 2.862339973449707,
+						"x_axis_scale": 0.8289999961853027,
+						"length": 115.80999755859375,
+						"local_offset": [
+							23.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.8500499725341797
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.23463700711727143,
+								0.0
+							],
+							[
+								0.27374300360679629,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.034906599670648578,
+						"angle": 3.2986700534820558,
+						"x_axis_scale": 0.9419999718666077,
+						"length": 80.9260025024414,
+						"local_offset": [
+							-14.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.6108649969100952,
+							-1.483530044555664
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_unarmed_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.19672100245952607,
+								0.0
+							],
+							[
+								0.24590200185775758,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.13962599635124207,
+						"angle": 2.2165699005126955,
+						"x_axis_scale": 0.527999997138977,
+						"length": 90.0,
+						"offset": [
+							-9.0,
+							3.0
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							2.268929958343506
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_unarmed_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.21311500668525697,
+								0.0
+							],
+							[
+								0.22404399514198304,
+								0.5040429830551148
+							],
+							[
+								0.24590200185775758,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.3665190041065216,
+						"angle": 2.5656299591064455,
+						"x_axis_scale": 0.6389999985694885,
+						"length": 104.60099792480469,
+						"offset": [
+							-11.0,
+							0.0
+						],
+						"local_offset": [
+							0.0,
+							8.0
+						],
+						"impact_z_rotation": [
+							-0.34906598925590517,
+							-1.3962600231170655
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "farmer_attack_2h_rake_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.2622950077056885,
+								0.0
+							],
+							[
+								0.28961700201034548,
+								1.0
+							]
+						],
+						"width": 47.90399932861328,
+						"length": 179.64100646972657,
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "farmer_attack_2h_scythe",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.30054599046707156,
+								0.0
+							],
+							[
+								0.4098359942436218,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.541051983833313,
+						"angle": 4.3633198738098148,
+						"x_axis_scale": 0.8169999718666077,
+						"length": 175.0,
+						"offset": [
+							-21.0,
+							3.0
+						],
+						"impact_z_rotation": [
+							0.22689299285411836,
+							3.473210096359253
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6181820034980774,
+								0.0
+							],
+							[
+								0.7090910077095032,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.17453299462795258,
+						"angle": 3.6651899814605715,
+						"x_axis_scale": 1.0299999713897706,
+						"length": 150.0,
+						"offset": [
+							-32.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.26179900765419009,
+							-2.6005399227142336
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesAverage.sm"
+	}
+	
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/LumberjackZombies/rig.ast"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 -2.86952 -9.69315"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -10.1983 -7.80614"
+		socket = "FX_ground_hit_01"
+			parent = "root_jntBnd"
+			translation = "4.12119 -106.098 0"
+		socket = "FX_ground_hit_02"
+			parent = "root_jntBnd"
+			translation = "43.2862 -101.188 0"
+		socket = "FX_ground_hit_01_aux"
+			parent = "root_jntBnd"
+			translation = "4.12119 -130.31 0"
+		socket = "FX_ground_hit_02_aux"
+			parent = "root_jntBnd"
+			translation = "43.2862 -124.96 0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_ground_hit_01 false FX_ground_hit_01 FX_ground_hit_01_aux"
+		bone_group = "FX_ground_hit_02 false FX_ground_hit_02 FX_ground_hit_02_aux"
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder false L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder false R_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow false L_elbow_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_elbow false R_elbow_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_wrist false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_wrist false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_hand false L_finger_1_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "grp_R_hand false R_finger_1_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_L_thigh false L_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_R_thigh false R_thigh_jntBnd hip_jntBnd"
+		bone_group = "grp_L_knee false L_knee_jntBnd L_thigh_jntBnd"
+		bone_group = "grp_R_knee false R_knee_jntBnd R_thigh_jntBnd"
+		bone_group = "grp_L_foot false L_ankle_jntBnd L_knee_jntBnd"
+		bone_group = "grp_R_foot false R_ankle_jntBnd R_knee_jntBnd"
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false L_shoulder_jntBnd L_clavicle_jntBnd chest_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "2haxe_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10722264647483826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/KnockdownA",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15966999530792237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41829097270965578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3313299417495728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0262300968170168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0299203395843508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/KnockdownB",
+						"bone_name": "aux_L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "2haxe_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10438215732574463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/KnockdownA",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15966999530792237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41829097270965578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3313299417495728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8780224323272706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/KnockdownB",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0262300968170168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "alert_transition_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12743599712848664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19640199840068818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.602698028087616,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6611689925193787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_2haxe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.296997994184494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41260001063346865,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/RakeSwing",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5353869795799255,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/RakeImpact",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7365000247955322,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0538300275802613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/RakeSlide",
+						"bone_name": "L_finger_1_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "attack_2haxe_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18744300305843354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.405493825674057,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/RakeSwing",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5491060018539429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/RakeImpact"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7919999957084656,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4476509988307953,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/AxeSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.462116003036499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8550000190734863,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_axe_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39563998579978945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4612500071525574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5451769828796387,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/AxeSwing",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4010010063648224,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4465149939060211,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/HoeSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6922500133514404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4010010063648224,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4805130064487457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/HoeSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6922500133514404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4010010063648224,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4465149939060211,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Swing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6922500133514404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_unarmed_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3877499997615814,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4589039981365204,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Swing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8429999947547913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10722264647483826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/KnockdownA",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15966999530792237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41829097270965578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3313299417495728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0262300968170168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0299203395843508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/KnockdownB",
+						"bone_name": "aux_L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10438215732574463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/KnockdownA",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15966999530792237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41829097270965578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3313299417495728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8780224323272706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/KnockdownB",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0262300968170168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_2haxe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17497099936008454,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7814040184020996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_2haxe_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17497099936008454,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7814040184020996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_2haxe_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0699925422668457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2442292720079422,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0159738063812256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_2haxe_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13398699462413789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36173200607299807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_2haxe_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11209999769926071,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2630620002746582,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_2haxe_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07446014881134033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24125084280967713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.117240071296692,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_2haxe_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17131100594997407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2715210020542145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17894700169563294,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7893570065498352,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_axe_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17894700169563294,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7893570065498352,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_axe_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06824272125959397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2757005989551544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7769120335578919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_axe_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13398699462413789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36173200607299807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_axe_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11209999769926071,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2630620002746582,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_axe_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06824272125959397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2211063951253891,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7578042149543762,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_axe_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11209999769926071,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2630620002746582,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18193000555038453,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7913450002670288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_unarmed_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06329112499952316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2559831142425537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8708862662315369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_unarmed_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.036147307604551318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.058302294462919238,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8747989535331726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_unarmed_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11340399831533432,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2787899971008301,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreMed",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_unarmed_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10847199708223343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27678000926971438,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreMed",
+						"bone_name": "R_shoulder_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_unarmed_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.058302294462919238,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1154385432600975,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8199952840805054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_unarmed_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1108509972691536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26720601320266726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreMed",
+						"bone_name": "L_clavicle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_unarmed_submerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18193000555038453,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7913450002670288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_unarmed_submerge_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18193000555038453,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7913450002670288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Aggro",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.7099649906158447,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Aggro",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_02b",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.0849699974060059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Aggro",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8985490202903748,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Aggro",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_prison_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06775353848934174,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5549331903457642,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.209883689880371,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.761590600013733,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.406863212585449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4326698780059816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.991567611694336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4005775451660158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Aggro",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_swamp_2haxe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.9195718169212341,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Aggro",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_swamp_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5898624062538147,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Aggro",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_swamp_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5898624062538147,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Aggro",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_violent_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.07635440677404404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Aggro",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fallen_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3864879012107849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fallen_unarmed_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3864879012107849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fallen_unarmed_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3864879012107849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallA",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "farmer_attack_2h_rake_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.296997994184494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36582300066947939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/RakeSwing",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5353869795799255,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/RakeImpact",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7365000247955322,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.467020034790039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/RakeSlide",
+						"bone_name": "L_finger_1_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "farmer_attack_2h_scythe",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.373075008392334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.839011013507843,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/ScytheSwing",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9251570105552673,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9701100587844849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/ScytheSwingBack",
+						"bone_name": "L_finger_1_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "farmer_idle_hoe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.25976601243019106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8296679854393005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.897940993309021,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/HoeSwing",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0503000020980836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/RakeImpact",
+						"bone_name": "R_finger_1_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "farmer_idle_hoe_in_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.25976601243019106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6561700105667114,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8866999745368958,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/HoeSwing",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1052500009536744,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/RakeImpact",
+						"bone_name": "R_finger_1_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "farmer_idle_hoe_out_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.058021001517772678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33263999223709109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "farmer_idle_rake_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0932701975107193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4668929874897003,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/RakeSlide",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49940401315689089,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5339200496673585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5941499471664429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/RakeSlide",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "farmer_idle_rake_in_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09220380336046219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6143159866333008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7954699993133545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "farmer_idle_rake_out_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11002799868583679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2723880112171173,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5879309773445129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "farmer_idle_scythe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3874860107898712,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5716099739074707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8024529814720154,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_13_1/FarmhandZombie/ScytheSwing",
+						"bone_name": "L_thumb_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3713099956512452,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.193000078201294,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.234220027923584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4687299728393556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.198820114135742,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_2haxe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3409999907016754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3409999907016754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3409999907016754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_drop_left_arm_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21260200440883637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/FallB",
+						"bone_name": "R_thigh_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3409999907016754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_2haxe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3409999907016754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3409999907016754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3409999907016754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_large_2haxe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3409999907016754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_large_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26499998569488528,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_large_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2955000102519989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_2haxe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2955000102519989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2955000102519989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2955000102519989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_2haxe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2955000102519989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2955000102519989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2955000102519989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_2haxe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1587499976158142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14374999701976777,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14124999940395356,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "getup_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5461142659187317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Aggro",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_flinch_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/GoreShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2955000102519989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "guarding_idle_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9919999837875367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "hit_reactions_01_hit_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04131999984383583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "hit_reactions_01_hit_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04131999984383583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "hit_reactions_01_hit_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08995500206947327,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "hit_reactions_01_hit_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04131999984383583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_2haxe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.33583199977874758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9919999837875367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1349329948425293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9980000257492066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9919999837875367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_2haxe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5599120259284973,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5602379441261292,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0654300451278687,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1758736371994019,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.014296353794634343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5383359789848328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7166041135787964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0625900030136109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04288904741406441,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5508549809455872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5682801604270935,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0516300201416016,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "unarmed_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10722264647483826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/KnockdownA",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15966999530792237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41829097270965578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3313299417495728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0262300968170168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0299203395843508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/KnockdownB",
+						"bone_name": "aux_L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "unarmed_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10438215732574463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/KnockdownA",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15966999530792237,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41829097270965578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3313299417495728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8780224323272706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/KnockdownB",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0262300968170168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/KnockdownSteps",
+						"bone_name": "aux_L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_2haxe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.019100520759820939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26579999923706057,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5393805503845215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6029999852180481,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_axe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5396875143051148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0578900575637818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1508557796478272,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_unarmed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30395200848579409,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5408028960227966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Steps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0657199621200562,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/Zombie/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_2haxe_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7265639901161194,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/ZombieFarmer/fx/ground_hit.pet",
+						"bone_group": "FX_ground_hit_01"
+					}
+				]
+			},
+			{
+				"name": "attack_2haxe_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6721019744873047,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/ZombieFarmer/fx/ground_hit.pet",
+						"bone_group": "FX_ground_hit_02"
+					}
+				]
+			},
+			{
+				"name": "emerge_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/LumberjackZombie/pet/onact/emerge_02_02b/fwdline.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "emerge_02b",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/LumberjackZombie/pet/onact/emerge_02_02b/fwdline.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "emerge_axe_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/LumberjackZombie/pet/onact/emerge_02_02b/fwdline.pet",
+						"bone_group": "root"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_2haxe_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.5433220267295837,
+						"end_time": 0.714011013507843,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/ZombieFarmer/epk/weapon_trails.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_2haxe_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.5529969930648804,
+						"end_time": 0.6677780151367188,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/ZombieFarmer/epk/weapon_trails.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_axe_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.5310500264167786,
+						"end_time": 0.6680670380592346,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/ZombieFarmer/epk/weapon_trails.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "attack_axe_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.5667819976806641,
+						"end_time": 0.7259759902954102,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/ZombieFarmer/epk/weapon_trails.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "emerge_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 4.329999923706055,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/LumberjackZombie/epk/mud_fadeout.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_02b",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.6659998893737795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/LumberjackZombie/epk/mud_fadeout.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_axe_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.6659998893737795,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/LumberjackZombie/epk/mud_fadeout.epk"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Beard.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Beard.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Boots.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Boots.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Pants.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Pants.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Beard.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Beard.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_BodyStraps.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_BodyStraps.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Pants.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Pants.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Shirt.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_Shirt.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_LeatherHood_Phys.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_LeatherHood/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_LeatherHood/rig.ast"
+		linear_allowed_contraction = 0.200
+		bend_stiffness = 300.000
+		bend_allowed_angle = 0.200
+		normal_viscosity_multiplier = 0.150
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_LeatherHood/FarmerZombiesMedium02_LeatherHood.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_ClothsPhys.ao (depth 1)
+version 3
+extends "Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Cloths"
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Cloths_Hangings_F.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		hide_segments = "FarmerZombiesMedium01_Cloths_Hangings_FShape"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Cloths.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Cloths.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_LeatherHood.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium02_LeatherHood.sm"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Skin.ao (depth 2)
+version 3
+extends "nothing"
+
+BaseAnimationEvents { }
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	SkinMesh { }
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Cloths.ao (depth 2)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Cloths.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Zombies/Farmer/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Cloths_Hangings_F.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Cloths_Hangings_F/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Cloths_Hangings_F/rig.ast"
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/LumberjackZombies/attachments/FarmerZombiesMediumOutfits/FarmerZombiesMedium01_Cloths_Hangings_F/FarmerZombiesMedium01_Cloths_Hangings_F.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesMedium.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesMedium_armour_69db922e.smd"
+Materials 1
+	"Art/Models/MONSTERS/LumberjackZombies/Textures/FarmerZombieMediumBodyc.mat" 1
+BoundingBox -72.2449 -22.8829 -178.054 72.2449 15.9361 -0.526937
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_1_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_1_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/LumberjackZombies/FarmerZombiesMedium_armour_69db922e.smd
+  version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 1 in the header, 1 in the block · 4194 triangles over 2607 vertices
+  names: 58 bytes said, 58 read  [agree]
+
+=== shapes (29)
+0	FarmerZombiesMedium_BodyShape	from 0	count 12582
+1	FarmerZombiesMedium01_BeardShape	from 12582	count 570
+2	FarmerZombiesMedium01_Boots_LacesShape	from 13152	count 192
+3	FarmerZombiesMedium01_BootsShape	from 13344	count 4566
+4	FarmerZombiesMedium01_Pants_BeltShape	from 17910	count 756
+5	FarmerZombiesMedium01_PantsShape	from 18666	count 2571
+6	FarmerZombiesMedium02_BeardShape	from 21237	count 852
+7	FarmerZombiesMedium02_BodyStrapsShape	from 22089	count 3084
+8	FarmerZombiesMedium02_PantsShape	from 25173	count 2631
+9	FarmerZombiesMedium02_Shirt_HangingsShape	from 27804	count 1818
+10	FarmerZombiesMedium02_Shirt_SleaveRShape	from 29622	count 1806
+11	FarmerZombiesMedium02_ShirtShape	from 31428	count 2556
+12	FarmerZombiesMedium02_LeatherHoodShape	from 33984	count 1320
+13	FarmerZombiesMedium01_Cloths_BeltShape	from 35304	count 1104
+14	FarmerZombiesMedium01_Cloths_BodyShape	from 36408	count 1674
+15	FarmerZombiesMedium01_Cloths_Hangings_ChestShape	from 38082	count 30
+16	FarmerZombiesMedium01_Cloths_Hangings_FShape	from 38112	count 1080
+17	FarmerZombiesMedium01_Cloths_Hangings_LShape	from 39192	count 156
+18	FarmerZombiesMedium01_Cloths_Hangings_NeckShape	from 39348	count 1488
+19	FarmerZombiesMedium01_Cloths_Hangings_RShape	from 40836	count 138
+20	FarmerZombiesMedium01_Cloths_BeltShape	from 40974	count 1104
+21	FarmerZombiesMedium01_Cloths_BodyShape	from 42078	count 1674
+22	FarmerZombiesMedium01_Cloths_Hangings_ChestShape	from 43752	count 30
+23	FarmerZombiesMedium01_Cloths_Hangings_FShape	from 43782	count 1080
+24	FarmerZombiesMedium01_Cloths_Hangings_LShape	from 44862	count 156
+25	FarmerZombiesMedium01_Cloths_Hangings_NeckShape	from 45018	count 1488
+26	FarmerZombiesMedium01_Cloths_Hangings_RShape	from 46506	count 138
+27	FarmerZombiesMedium02_LeatherHoodShape	from 46644	count 1242
+28	FarmerZombiesMedium01_Cloths_Hangings_FShape	from 47886	count 1080
+
+=== fitting
+the monster's rig: 55 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_face_jntBnd
+  FarmerZombiesMedium01_Beard.ao  socket <root> [NOT in its carrier's rig]  box (-6.8,-11.4,-162.2)..(5.9,-0.6,-148.6)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 190 triangles over 127 vertices
+    names: 64 bytes said, 64 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_Boots.ao  socket <root> [NOT in its carrier's rig]  box (-20.6,-16.1,-37.1)..(19.5,15.3,0.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 1586 triangles over 1069 vertices
+    names: 140 bytes said, 140 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_Pants.ao  socket <root> [NOT in its carrier's rig]  box (-23.7,-16.2,-105.2)..(23.7,16.7,-32.4)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 1109 triangles over 746 vertices
+    names: 138 bytes said, 138 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_Beard.ao  socket <root> [NOT in its carrier's rig]  box (-6.6,-13.3,-162.4)..(6.6,-0.2,-144.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 284 triangles over 179 vertices
+    names: 64 bytes said, 64 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_BodyStraps.ao  socket <root> [NOT in its carrier's rig]  box (-16.5,-17.2,-152.5)..(17.1,15.9,-95.9)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 1028 triangles over 1044 vertices
+    names: 74 bytes said, 74 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_Pants.ao  socket <root> [NOT in its carrier's rig]  box (-21.6,-15.8,-101.6)..(22,15.2,-29.6)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 877 triangles over 493 vertices
+    names: 64 bytes said, 64 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_Shirt.ao  socket <root> [NOT in its carrier's rig]  box (-45.8,-17.6,-153.6)..(20.4,17.2,-76.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 2060 triangles over 1279 vertices
+    names: 226 bytes said, 226 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_LeatherHood_Phys.ao  socket head_jntBnd [in its carrier's rig]  box (-9.4,-8.8,-18.4)..(9.4,11.6,9.2)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 440 triangles over 290 vertices
+    names: 76 bytes said, 76 read  [agree]
+    rig 3 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_LeatherHood_R_jntBnd  [its own]  under 0  rests at (-7.5,-1.3,3.1)
+      2 phys_skinned_LeatherHood_L_jntBnd  [its own]  under 0  rests at (7.5,-1.3,3.1)
+  FarmerZombiesMedium01_ClothsPhys.ao  socket <root> [NOT in its carrier's rig]  box (-17.6,-18.3,-156.4)..(19.2,17.7,-64.5)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 7 in the header, 7 in the block · 1890 triangles over 1290 vertices
+    names: 606 bytes said, 606 read  [agree]
+    (no rig of its own)
+    FarmerZombiesMedium01_Cloths_Hangings_F.ao  socket hip_jntBnd [in its carrier's rig]  box (-17,-17.2,-21.5)..(16.1,7.7,25.7)
+      version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+      shapes 1 in the header, 1 in the block · 360 triangles over 258 vertices
+      names: 88 bytes said, 88 read  [agree]
+      rig 6 bones, 3 of them names its carrier's rig also has
+      mesh weights reach bone 5 of 6  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-13.5)  carrier has (0,0.2,-103.7)
+        2 phys_skinned_ClothsHangingF_01_jntBnd  [its own]  under 0  rests at (0.1,-14.7,-3.1)
+        3 spine_2_jntBnd  [shared]  under 1  rests at (0,0,-26.9)  carrier has (0,0.2,-117.1)
+        4 phys_skinned_ClothsHangingF_02_jntBnd  [its own]  under 2  rests at (-0,-14.7,7.5)
+        5 phys_skinned_ClothsHangingF_03_jntBnd  [its own]  under 4  rests at (-0.2,-14.7,19.9)
+  FarmerZombiesMedium01_Beard.ao  socket <root> [NOT in its carrier's rig]  box (-6.8,-11.4,-162.2)..(5.9,-0.6,-148.6)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 190 triangles over 127 vertices
+    names: 64 bytes said, 64 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_Boots.ao  socket <root> [NOT in its carrier's rig]  box (-20.6,-16.1,-37.1)..(19.5,15.3,0.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 1586 triangles over 1069 vertices
+    names: 140 bytes said, 140 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_Cloths.ao  socket <root> [NOT in its carrier's rig]  box (-17.6,-18.3,-156.4)..(19.2,17.7,-64.5)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 7 in the header, 7 in the block · 1890 triangles over 1290 vertices
+    names: 606 bytes said, 606 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_Pants.ao  socket <root> [NOT in its carrier's rig]  box (-23.7,-16.2,-105.2)..(23.7,16.7,-32.4)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 1109 triangles over 746 vertices
+    names: 138 bytes said, 138 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_Beard.ao  socket <root> [NOT in its carrier's rig]  box (-6.6,-13.3,-162.4)..(6.6,-0.2,-144.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 284 triangles over 179 vertices
+    names: 64 bytes said, 64 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_BodyStraps.ao  socket <root> [NOT in its carrier's rig]  box (-16.5,-17.2,-152.5)..(17.1,15.9,-95.9)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 1028 triangles over 1044 vertices
+    names: 74 bytes said, 74 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_LeatherHood.ao  socket <root> [NOT in its carrier's rig]  box (-9.4,-8.5,-178.5)..(9.4,11.5,-151.2)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 414 triangles over 277 vertices
+    names: 76 bytes said, 76 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_Pants.ao  socket <root> [NOT in its carrier's rig]  box (-21.6,-15.8,-101.6)..(22,15.2,-29.6)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 877 triangles over 493 vertices
+    names: 64 bytes said, 64 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_Shirt.ao  socket <root> [NOT in its carrier's rig]  box (-45.8,-17.6,-153.6)..(20.4,17.2,-76.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 2060 triangles over 1279 vertices
+    names: 226 bytes said, 226 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_Beard.ao  socket <root> [NOT in its carrier's rig]  box (-6.8,-11.4,-162.2)..(5.9,-0.6,-148.6)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 190 triangles over 127 vertices
+    names: 64 bytes said, 64 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_Boots.ao  socket <root> [NOT in its carrier's rig]  box (-20.6,-16.1,-37.1)..(19.5,15.3,0.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 1586 triangles over 1069 vertices
+    names: 140 bytes said, 140 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_Pants.ao  socket <root> [NOT in its carrier's rig]  box (-23.7,-16.2,-105.2)..(23.7,16.7,-32.4)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 1109 triangles over 746 vertices
+    names: 138 bytes said, 138 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_ClothsPhys.ao  socket <root> [NOT in its carrier's rig]  box (-17.6,-18.3,-156.4)..(19.2,17.7,-64.5)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 7 in the header, 7 in the block · 1890 triangles over 1290 vertices
+    names: 606 bytes said, 606 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_Beard.ao  socket <root> [NOT in its carrier's rig]  box (-6.8,-11.4,-162.2)..(5.9,-0.6,-148.6)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 190 triangles over 127 vertices
+    names: 64 bytes said, 64 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_Boots.ao  socket <root> [NOT in its carrier's rig]  box (-20.6,-16.1,-37.1)..(19.5,15.3,0.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 1586 triangles over 1069 vertices
+    names: 140 bytes said, 140 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_Cloths.ao  socket <root> [NOT in its carrier's rig]  box (-17.6,-18.3,-156.4)..(19.2,17.7,-64.5)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 7 in the header, 7 in the block · 1890 triangles over 1290 vertices
+    names: 606 bytes said, 606 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium01_Pants.ao  socket <root> [NOT in its carrier's rig]  box (-23.7,-16.2,-105.2)..(23.7,16.7,-32.4)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 1109 triangles over 746 vertices
+    names: 138 bytes said, 138 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_Beard.ao  socket <root> [NOT in its carrier's rig]  box (-6.6,-13.3,-162.4)..(6.6,-0.2,-144.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 284 triangles over 179 vertices
+    names: 64 bytes said, 64 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_BodyStraps.ao  socket <root> [NOT in its carrier's rig]  box (-16.5,-17.2,-152.5)..(17.1,15.9,-95.9)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 1028 triangles over 1044 vertices
+    names: 74 bytes said, 74 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_Pants.ao  socket <root> [NOT in its carrier's rig]  box (-21.6,-15.8,-101.6)..(22,15.2,-29.6)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 877 triangles over 493 vertices
+    names: 64 bytes said, 64 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_Shirt.ao  socket <root> [NOT in its carrier's rig]  box (-45.8,-17.6,-153.6)..(20.4,17.2,-76.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 2060 triangles over 1279 vertices
+    names: 226 bytes said, 226 read  [agree]
+    (no rig of its own)
+  FarmerZombiesMedium02_LeatherHood_Phys.ao  socket head_jntBnd [in its carrier's rig]  box (-9.4,-8.8,-18.4)..(9.4,11.6,9.2)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 440 triangles over 290 vertices
+    names: 76 bytes said, 76 read  [agree]
+    rig 3 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_LeatherHood_R_jntBnd  [its own]  under 0  rests at (-7.5,-1.3,3.1)
+      2 phys_skinned_LeatherHood_L_jntBnd  [its own]  under 0  rests at (7.5,-1.3,3.1)

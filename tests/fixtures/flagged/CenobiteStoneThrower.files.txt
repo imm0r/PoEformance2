@@ -1,0 +1,664 @@
+monster: Filthy Lobber [Metadata/Monsters/Cenobite/CenobiteStoneThrower/CenobiteStoneThrower]
+
+=== .ao Metadata/Monsters/Cenobite/CenobiteStoneThrower/CenobiteStoneThrower.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7743571400642395,
+					"name": "contact",
+					"position": [
+						67.16806030273438,
+						-32.508331298828128,
+						-132.98095703125
+					],
+					"contact_ref": [
+						70.09358215332031,
+						28.50876235961914,
+						-119.43254852294922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8541430234909058,
+					"name": "contact",
+					"position": [
+						50.44911193847656,
+						-70.76582336425781,
+						-75.93631744384766
+					],
+					"contact_ref": [
+						55.27863693237305,
+						-27.034177780151368,
+						-60.45343017578125
+					]
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.26600000262260439,
+					"name": "move",
+					"position": [
+						0.0,
+						120.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.30000001192092898,
+					"name": "move",
+					"position": [
+						120.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.26669999957084658,
+					"name": "move",
+					"position": [
+						-150.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/Cenobite/CenobiteStoneThrower/attachments/Loincloth.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/Cenobite/CenobiteStoneThrower/attachments/Bag.ao"
+}
+
+Melee
+{
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/CenobiteStoneThrower.sm"
+			hide_segments = "accessoriesShape,bagShape,loinclothShape,strapShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "spore_line false chest_jntBnd neck_jntBnd"
+	}
+	
+	AnimatedRender
+	{
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.32385000586509707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/UnarmedWhoosh",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44292300939559939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Attack01",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6704515814781189,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/ProjectileWhooshA",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22297999262809754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Fall",
+						"bone_name": "neck_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.004993489943444729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4262939989566803,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30222100019454958,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28952598571777346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28905999660491946,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26843398809432986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.6429979801177979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Idle",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.288059949874878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/IdleStone",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.012344364076852799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.034564223140478137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4592107832431793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6713762879371643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7875717282295227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9430149793624879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.019537925720215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/KnockdownB",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8490829467773439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02899290807545185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1280519962310791,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32375457882881167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5748711824417114,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7151593565940857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0029289722442629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/KnockdownB",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4160895347595217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.16665099561214448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20612399280071259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Vocals/Run",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5988569855690002,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_11/CenobiteStonethrower/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Cenobite/CenobiteStoneThrower/attachments/Loincloth.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/attachments/Loincloth/rig.amd"
+	default_animation = "idle_01"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Cenobite/CenobiteStoneThrower/attachments/Danglers.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/attachments/Loincloth/rig.ast"
+		linear_allowed_contraction = 0.400
+		attachment_bones = "hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd spine_1_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/attachments/Loincloth/Loincloth.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_thigh_jntBnd R_thigh_jntBnd spine_1_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/Cenobite/CenobiteStoneThrower/attachments/Bag.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/attachments/Bag/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/attachments/Bag/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.150
+		attachment_bones = "hip_jntBnd R_thigh_jntBnd bag_jntBnd spine_1_jntBnd chest_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd neck_jntBnd head_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/attachments/Bag/Bag.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd R_thigh_jntBnd phys_skinned_1_jntBnd spine_1_jntBnd chest_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd neck_jntBnd head_jntBnd "
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Monsters/Cenobite/CenobiteStoneThrower/attachments/Danglers.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/attachments/Loincloth/Danglers/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/attachments/Loincloth/Danglers/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/attachments/Loincloth/Danglers/Danglers.sm"
+	}
+}
+
+=== .sm Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/CenobiteStoneThrower.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/rig_ccc7bec1.smd"
+Materials 2
+	"Art/Models/MONSTERS/Cenobites/Textures/CenobitesStoneThrowerc.mat" 5
+	"Art/Models/MONSTERS/Cenobites/Textures/CenobitesStoneThrowerc.mat" 1
+BoundingBox -85.6125 -49.3471 -169.081 108.383 21.2617 4.15123
+BoneGroups 23
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+	"grp_lower_bicep" 2 "L_shoulder_2_jntBnd" "L_elbow_2_jntBnd"
+	"grp_lower_forearm" 2 "L_elbow_2_jntBnd" "L_wrist_2_jntBnd"
+	"grp_lower_palm" 2 "L_wrist_2_jntBnd" "L_finger_2_2_jntBnd_1"
+
+=== .smd Art/Models/MONSTERS/Cenobites/CenobiteStoneThrower/rig_ccc7bec1.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 6 in the header, 6 in the block · 9398 triangles over 6508 vertices
+  names: 140 bytes said, 140 read  [agree]
+
+=== shapes (12)
+0	accessoriesShape	from 0	count 1044
+1	bagShape	from 1044	count 1992
+2	braceletShape	from 3036	count 288
+3	loinclothShape	from 3324	count 1044
+4	strapShape	from 4368	count 624
+5	bodyShape	from 4992	count 23202
+6	accessoriesShape	from 28194	count 666
+7	loinclothShape	from 28860	count 1044
+8	bagShape	from 29904	count 1902
+9	ropeShape	from 31806	count 180
+10	strapShape	from 31986	count 624
+11	accessoriesShape	from 32610	count 378
+
+=== fitting
+the monster's rig: 58 bones
+mounts: aux_position, aux_head_jntBnd, aux_L_foot_jntBnd, aux_R_foot_jntBnd
+  Loincloth.ao  socket hip_jntBnd [in its carrier's rig]  box (-23.8,-25.2,-17.1)..(23.3,20.9,39.7)
+    version 3 · c0h 2 · 2 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 570 triangles over 484 vertices
+    names: 60 bytes said, 60 read  [agree]
+    rig 12 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 11 of 12  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-0,-18.5)  carrier has (0,-3.8,-109.1)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.9,0,0)  carrier has (10.9,-0,-91)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-10.9,0,0)  carrier has (-10.9,0,-91)
+      4 phys_skinned_1_jntBnd  [its own]  under 0  rests at (0.8,-16.4,12.9)
+      5 phys_skinned_3_jntBnd  [its own]  under 0  rests at (-20.4,-1,2.2)
+      6 phys_skinned_5_jntBnd  [its own]  under 0  rests at (-15,11.7,-0.1)
+      7 phys_skinned_7_jntBnd  [its own]  under 0  rests at (0.1,16,-1.1)
+      8 phys_skinned_2_jntBnd  [its own]  under 4  rests at (0.8,-18.6,29.7)
+      9 phys_skinned_4_jntBnd  [its own]  under 5  rests at (-21,1.3,19.2)
+      10 phys_skinned_5_jntBnd|phys_skinned_6_jntBnd  [its own]  under 6  rests at (-15.6,13.8,15.6)
+      11 phys_skinned_7_jntBnd|phys_skinned_6_jntBnd  [its own]  under 7  rests at (-0.5,17.9,13.1)
+    Danglers.ao  socket <root> [NOT in its carrier's rig]  box (15.2,-18,-16.8)..(35.4,8.1,1.6)
+      version 3 · c0h 2 · 2 level(s) of detail · format 0x3C · stride 32
+      shapes 1 in the header, 1 in the block · 126 triangles over 94 vertices
+      names: 32 bytes said, 32 read  [agree]
+      rig 4 bones, 4 of them names its carrier's rig also has
+      mesh weights reach bone 3 of 4  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_skinned_1_jntBnd  [shared]  under 0  rests at (20.4,-13.5,2.5)  carrier has (0.8,-16.4,12.9)
+        2 phys_skinned_2_jntBnd  [shared]  under 0  rests at (28.5,-1.6,3.7)  carrier has (0.8,-18.6,29.7)
+        3 phys_skinned_3_jntBnd  [shared]  under 0  rests at (24.2,3.8,-5.1)  carrier has (-20.4,-1,2.2)
+  Bag.ao  socket hip_jntBnd [in its carrier's rig]  box (-44.6,-27.1,-69.2)..(15.2,17.8,17.4)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 902 triangles over 673 vertices
+    names: 54 bytes said, 54 read  [agree]
+    rig 9 bones, 8 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 9  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.8,-18.1)  carrier has (0,-3.8,-109.1)
+      2 R_thigh_jntBnd  [shared]  under 0  rests at (-10.9,0,0)  carrier has (-10.9,0,-91)
+      3 chest_jntBnd  [shared]  under 1  rests at (0,-5.1,-36.6)  carrier has (0,-5.1,-127.5)
+      4 phys_skinned_1_jntBnd  [its own]  under 2  rests at (-22.4,-3,4.3)
+      5 R_clavicle_jntBnd  [shared]  under 3  rests at (-13.1,-16.9,-52)  carrier has (-10,-3.3,-148.7)
+      6 L_clavicle_jntBnd  [shared]  under 3  rests at (13.1,-16.9,-52)  carrier has (10.8,-3.3,-141.5)
+      7 neck_jntBnd  [shared]  under 3  rests at (0,-22.6,-54.9)  carrier has (0,-22.6,-145.9)
+      8 head_jntBnd  [shared]  under 7  rests at (0,-30.1,-57.7)  carrier has (-0,-30.1,-148.7)

@@ -1,0 +1,2967 @@
+monster: The Immured Fury [Metadata/Monsters/FallenGodMiniboss/FallenGodMinibossSanctified]
+
+=== .ao Metadata/Monsters/FallenGodMiniboss/Sanctified/FallenGodMinibossSanctified.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FallenGodMiniboss/rig.amd"
+	animations = '[
+		{
+			"name": "bubble_dispel_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.1745400428771974,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "chaos_buff_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7262489795684815,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "chaos_throw_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.44324591755867007,
+					"name": "contact1",
+					"position": [
+						-36.96030044555664,
+						-60.95920181274414,
+						-316.7099914550781
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4442923069000244,
+					"name": "contact2",
+					"position": [
+						43.02220153808594,
+						-66.61479949951172,
+						-309.0199890136719
+					]
+				}
+			]
+		},
+		{
+			"name": "dash_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.12999999523162843,
+					"end_time": 0.5600000023841858,
+					"name": "move",
+					"position": [
+						0.0,
+						350.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "dash_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.12999999523162843,
+					"end_time": 0.5600000023841858,
+					"name": "move",
+					"position": [
+						0.0,
+						-350.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "dash_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.12999999523162843,
+					"end_time": 0.5600000023841858,
+					"name": "move",
+					"position": [
+						350.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "dash_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.12999999523162843,
+					"end_time": 0.5600000023841858,
+					"name": "move",
+					"position": [
+						-350.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "divine_buff_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8186910152435303,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "divine_throw_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4785858690738678,
+					"name": "contact",
+					"position": [
+						2.1678199768066408,
+						-81.55609893798828,
+						-198.18099975585938
+					]
+				}
+			]
+		},
+		{
+			"name": "emerge_throne_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.200000047683716,
+					"name": "hit_ground"
+				}
+			]
+		},
+		{
+			"name": "exalt_buff_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7250000238418579,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "exalt_throw_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.45338326692581179,
+					"name": "contact1",
+					"position": [
+						-45.45370101928711,
+						-90.03569793701172,
+						-241.58599853515626
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4546433985233307,
+					"name": "contact2",
+					"position": [
+						45.55329895019531,
+						-86.443603515625,
+						-234.14700317382813
+					]
+				}
+			]
+		},
+		{
+			"name": "fire_beam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.2514400482177735,
+					"name": "contact",
+					"position": [
+						2.271209955215454,
+						-87.8302001953125,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "fire_beam_big_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.100000023841858,
+					"name": "spawn_slam",
+					"position": [
+						0.0,
+						-250.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.131710052490234,
+					"name": "slam_explode"
+				}
+			]
+		},
+		{
+			"name": "fire_circle_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.7821900844573976,
+					"name": "contact",
+					"position": [
+						0.0,
+						-63.403499603271487,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "heal_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.806730031967163,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "R_Weapon Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Staff_Sanctified.ao"
+	attached_object = "abdomen_1_jntBnd Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Skirt_Sanctified.ao"
+	attached_object = "root_jntBnd Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Shackles_Sanctified.ao"
+	attached_object = "L_Weapon_a Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Heads/Head_Split_Sanctified.ao"
+	attached_object = "R_Weapon_a Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Heads/Head_Split_Sanctified.ao"
+	attached_object = "L_Weapon_b Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Heads/Head_Multi_Sanctified.ao"
+	attached_object = "L_Weapon_c Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Heads/Head_Single_Sanctified.ao"
+	attached_object = "R_Weapon_b Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Heads/Head_Multi_Sanctified.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3278689980506897,
+								0.0
+							],
+							[
+								0.37158501148223879,
+								1.0
+							],
+							[
+								0.37158501148223879,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.3665190041065216,
+						"angle": 2.164210081100464,
+						"length": 233.91799926757813
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.37158501148223879,
+								0.0
+							],
+							[
+								0.5519130229949951,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 1.2391799688339234,
+						"length": 233.91799926757813
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FallenGodMiniboss/rig.ast"
+		socket = "beam_target"
+			translation = "0 -300 50"
+		socket = "bubble_socket"
+			translation = "0 0 -49.1583"
+		socket = "bubble_beam_socket"
+			translation = "0 0 -135"
+		socket = "beam_source"
+			parent = "spine_2_jntBnd"
+			translation = "0 -70 10"
+			ignore_parent_rotation = "yawroll"
+		socket = "weapon_beam_source"
+			parent = "R_Weapon"
+			translation = "0 0 -105"
+		socket = "aux_meleeslash_end"
+			parent = "R_Weapon"
+			translation = "0 0 -135"
+		socket = "aux_beamcore"
+			parent = "R_Weapon"
+			translation = "0 0 -98"
+		socket = "chaos_buff_beam"
+			translation = "-3.00991 -30.1051 -321.291"
+		socket = "exalt_buff_beam"
+			translation = "-3.00991 -30.1051 -310.406"
+		socket = "weapon_1"
+			parent = "L_Weapon_c"
+			translation = "0 0 10"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "aux_staff_start"
+			parent = "R_Weapon"
+			translation = "0 0 160"
+		linear_allowed_contraction = 0.250
+		enclosure_angle = 0.250
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FallenGodMiniboss/FallenGodMinibossSanctified.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "melee_trail false R_Weapon_d aux_meleeslash_end"
+		bone_group = "beam_core false aux_beamcore aux_meleeslash_end"
+		bone_group = "weapon_1 false weapon_1"
+		bone_group = "weapon_2 false R_Weapon_b"
+		bone_group = "weapon_3 false R_Weapon_a"
+		bone_group = "weapon_4 false L_Weapon_a"
+		bone_group = "weapon_5 false L_Weapon_b"
+		bone_group = "fx_staffline false aux_staff_start aux_meleeslash_end"
+	}
+	
+	AttachedAnimatedObject
+	{
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_3_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19942326843738557,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Attack_",
+						"bone_name": "L_Weapon_c",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34357699751853945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhoosh_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5070400238037109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "R_finger_1_d_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2123600244522095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_3_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "bubble_dispel_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09135500341653824,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2698169946670532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3753150999546051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/BubbleDispel",
+						"bone_name": "phys_skinned_R_wing_1_b_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7818319797515869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8455680012702942,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2279900312423707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5126700401306153,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.597659945487976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7357499599456788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7931100130081177,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhoosh_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.20740008354187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2711400985717775,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "bubble_dispel_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/BubbleDispel",
+						"bone_name": "L_clavicle_top_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29499900341033938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhoosh_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7831630110740662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "bubble_summon_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1593409925699234,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3296700119972229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5879120230674744,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7631417512893677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/BubbleDispel",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.928570032119751,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.928570032119751,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9780199527740479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0604400634765627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "L_finger_2_b_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0604400634765627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "R_finger_2_b_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.758239984512329,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.983520030975342,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.016479969024658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "R_finger_2_b_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.093410015106201,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "L_finger_2_b_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.175839900970459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5164999961853029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "R_finger_2_b_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8681399822235109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "L_finger_2_b_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.196125030517578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/FireCircle",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.225289821624756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "R_finger_4_b_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.543970108032227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "L_finger_2_b_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.895619869232178,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "R_finger_4_b_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.1153998374938969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "L_finger_2_b_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.379129886627197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "R_finger_4_b_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.708789825439453,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.291220188140869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.417570114135742,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					}
+				]
+			},
+			{
+				"name": "chaos_buff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12307699769735336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5596723556518555,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/ChaosBuff",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5846149921417236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "L_Weapon_a"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6168490052223206,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "R_Weapon_a"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.284980058670044,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "chaos_throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05421249940991402,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Throw",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1333329975605011,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3882780075073242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "R_Weapon_a"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44249099493026736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "L_Weapon_a"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2219799757003785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "dash_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Dash_",
+						"bone_name": "abdomen_2_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Dash",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "dash_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Dash_",
+						"bone_name": "abdomen_2_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Dash",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "dash_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Dash_",
+						"bone_name": "abdomen_2_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Dash",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "dash_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Dash_",
+						"bone_name": "abdomen_2_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Dash",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Death",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11525899916887284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5762929916381836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.116569995880127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5487899780273438,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "L_finger_1_a_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8729499578475953,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/GoreLong_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8801599740982056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "R_thumb_1_a_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1755099296569826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "L_finger_2_b_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5861198902130129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "R_thumb_1_a_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.845449924468994,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "L_finger_2_b_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0183300971984865,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/GoreLong_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1840200424194338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "R_thumb_1_a_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5369999408721926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "L_finger_2_b_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8107399940490724,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/GoreLong_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9476099014282228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "R_thumb_1_a_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.178120136260986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.683690071105957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.490499973297119,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "L_Weapon_c"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.082509994506836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "R_Weapon_a"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.168950080871582,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "L_Weapon_a"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.18336009979248,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.18336009979248,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.275030136108399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Effects/Death_",
+						"bone_name": "L_Weapon_c"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.442689895629883,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "R_Weapon_b"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.723640441894532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "L_Weapon_b"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.731510162353516,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Fall_Main_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.889320373535157,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/GoreMed_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.010869979858399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Fall_Layer_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "divine_buff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11868099868297577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/DivineBuff",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1465200036764145,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6256409883499146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3904800415039063,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "divine_throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06300350278615952,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Throw",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11868099868297577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20805799961090089,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47325998544692995,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2908400297164918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_throne_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03677450120449066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Emerge_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_wild_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act5/G5_7/FallenGodMiniBoss/Foley/ChestGoreHeal_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.154857337474823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act5/G5_7/FallenGodMiniBoss/Foley/GoreLong_"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5616354942321777,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Emerge",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9968777894973755,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Emerge_"
+					}
+				]
+			},
+			{
+				"name": "exalt_buff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08058609813451767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20219799876213075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39754414558410647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/DivineBuff",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5318679809570313,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3523800373077393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "exalt_throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0014651999808847905,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12307699769735336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Throw",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4146519899368286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "R_Weapon_b"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4146519899368286,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "R_Weapon_b"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4527469873428345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "L_Weapon_b"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4527469873428345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "L_Weapon_b"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1941399574279786,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_beam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Effects/Laser/FireLaser_OnActStaff_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/FireBeam",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05076950043439865,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12329699844121933,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshFlair_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27077001333236697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42065900564193728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7929670214653015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhoosh_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8123080134391785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.888463020324707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Effects/Laser/FireLaser_Start_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3208799362182619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.357140064239502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					}
+				]
+			},
+			{
+				"name": "fire_beam_big_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Fire_Beam_Big_",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05128199979662895,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1025639995932579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshFlair_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1684979945421219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1880178600549698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act5/G5_7/FallenGodMiniBoss/Effects/Laser/Explosion/LaserExplosion_OnAct_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4761900007724762,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6959710121154785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshFlair_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7655680179595947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8095229864120483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Dash_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9130035638809204,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/FireBeamBig",
+						"bone_name": "L_clavicle_top_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4500000476837159,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.903980016708374,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3196699619293215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6861300468444826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1291699409484865,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.484689950942993,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8128700256347658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.162919998168945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.5731401443481449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.945069789886475,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_circle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13649700582027436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24442599713802339,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4031440019607544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5726523399353027,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/FireCircle",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6507440209388733,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7648900151252747,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Effects/Laser/Immolate/Immolate_OnAct_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.834779977798462,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9300099611282349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1331698894500734,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2601399421691896,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.286910057067871,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/DivineBuff_",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.552180051803589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/StaffWhooshSmall_",
+						"bone_name": "aux_meleeslash_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6156699657440187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.393389940261841,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18717899918556214,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12014699727296829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17179499566555024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17142899334430695,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "heal_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementRun_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20446699857711793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Heal_",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2758379876613617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "L_finger_2_d_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45715799927711489,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/GoreLong_",
+						"bone_name": "L_finger_2_d_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5073109865188599,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/ChestGoreHeal_",
+						"bone_name": "L_finger_2_d_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.559391975402832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/GoreMed_",
+						"bone_name": "L_finger_2_d_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6056860089302063,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/GoreShort_",
+						"bone_name": "L_finger_2_d_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9490370154380798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "L_finger_2_d_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.294319987297058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/GoreShort_",
+						"bone_name": "L_finger_2_d_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4833500385284424,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFast_",
+						"bone_name": "L_finger_2_d_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5354299545288087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "L_finger_2_d_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.899999976158142,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "L_finger_2_d_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "heavy_stun_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Dash_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/GoreMed_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Knockdown",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4818600416183472,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.632390022277832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.652459979057312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/GoreLong_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8899600505828858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1308000087738039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3816800117492677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.605799913406372,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6793899536132814,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/GoreLong_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8366100788116457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0808000564575197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3115999698638918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/Movement_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5223400592803957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.024099826812744,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFastQuiet_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8458150029182434,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementIdle_",
+						"bone_name": "abdomen_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3720614910125733,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Idle",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9875400066375733,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementIdle_",
+						"bone_name": "abdomen_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.19384600222110749,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_3_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2630769908428192,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementRun_",
+						"bone_name": "abdomen_3_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9712089896202087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementRun_",
+						"bone_name": "abdomen_3_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.555288314819336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Vocal/Walk",
+						"bone_name": "chest_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6180200576782227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementFloat_",
+						"bone_name": "abdomen_3_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.669450044631958,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementRun_",
+						"bone_name": "abdomen_3_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3657100200653078,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Sanctified/FallenGodMinibossSanctified/Foley/MovementRun_",
+						"bone_name": "abdomen_3_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6290237307548523,
+						"end_time": 0.963533878326416,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/MT_slash.trl",
+						"bone_group": "melee_trail"
+					}
+				]
+			},
+			{
+				"name": "fire_beam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 1.25,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/onacts/firebeam_flick.trl",
+						"bone_group": "beam_core"
+					}
+				]
+			},
+			{
+				"name": "fire_beam_big_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 2.3045716285705568,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/onacts/firebeam_flick.trl",
+						"bone_group": "beam_core"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "chaos_throw_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.4868812561035157,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/onacts/exaltthrow_palmline.pet",
+						"bone_groups": [
+							"grp_l_palm_1",
+							"grp_r_palm_1"
+						]
+					}
+				]
+			},
+			{
+				"name": "dash_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.1284720003604889,
+						"end_time": 0.5683640241622925,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/D_dust_kickup.pet",
+						"bone_group": "grp_abdomen_4"
+					}
+				]
+			},
+			{
+				"name": "dash_fwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.1309109926223755,
+						"end_time": 0.5618590116500855,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/D_dust_kickup.pet",
+						"bone_group": "grp_abdomen_4"
+					}
+				]
+			},
+			{
+				"name": "dash_left_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.12928499281406403,
+						"end_time": 0.5594199895858765,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/D_dust_kickup.pet",
+						"bone_group": "grp_abdomen_4"
+					}
+				]
+			},
+			{
+				"name": "dash_right_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.13172399997711183,
+						"end_time": 0.5618590116500855,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/D_dust_kickup.pet",
+						"bone_group": "grp_abdomen_4"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 8.100000381469727,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/death_currency_particles.pet",
+						"bone_group": "weapon_4"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 8.220572471618653,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/death_currency_particles.pet",
+						"bone_group": "weapon_3"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 8.5205717086792,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/death_currency_particles.pet",
+						"bone_group": "weapon_5"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 8.800000190734864,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/death_currency_particles.pet",
+						"bone_group": "weapon_2"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 9.229999542236329,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/death_currency_particles.pet",
+						"bone_group": "weapon_1"
+					}
+				]
+			},
+			{
+				"name": "divine_throw_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.4868812561035157,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/onacts/exaltthrow_palmline.pet",
+						"bone_groups": [
+							"grp_r_palm_3",
+							"grp_l_palm_3"
+						]
+					}
+				]
+			},
+			{
+				"name": "emerge_wild_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 3.0147511959075929,
+						"filename": "Metadata/Effects/Environment/Endgame/Sanctified_FallenGod_Emerge/fx/emerge_debris_chest.pet",
+						"bone_groups": [
+							"grp_chest",
+							"grp_head",
+							"grp_abdomen_1"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 2.3101048469543459,
+						"filename": "Metadata/Effects/Environment/Endgame/Sanctified_FallenGod_Emerge/fx/emerge_debris.pet",
+						"bone_groups": [
+							"frameupper",
+							"grp_l_bicep_1",
+							"grp_r_bicep_1",
+							"grp_l_bicep_2",
+							"grp_r_bicep_2",
+							"grp_l_bicep_3",
+							"grp_r_bicep_3",
+							"grp_l_forearm_1",
+							"grp_r_forearm_1",
+							"grp_l_forearm_2",
+							"grp_r_forearm_2",
+							"grp_r_forearm_3",
+							"grp_l_forearm_3",
+							"melee_trail",
+							"beam_core"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 2.7721240520477297,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/onacts/emerge_ribbons.pet",
+						"bone_groups": [
+							"grp_r_palm_3",
+							"grp_l_palm_3",
+							"grp_r_palm_4",
+							"grp_l_palm_4",
+							"grp_r_palm_2",
+							"grp_l_palm_2",
+							"grp_l_palm_1",
+							"grp_r_palm_1",
+							"grp_head"
+						]
+					}
+				]
+			},
+			{
+				"name": "exalt_throw_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.4868812561035157,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/onacts/exaltthrow_palmline.pet",
+						"bone_groups": [
+							"grp_r_palm_2",
+							"grp_l_palm_2"
+						]
+					}
+				]
+			},
+			{
+				"name": "fire_beam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.25,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/onacts/fire_beam_drawpull.pet",
+						"bone_group": "melee_trail"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9000000357627869,
+						"end_time": 2.5999999046325685,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/onacts/fire_beam_origin.pet",
+						"bone_group": "beam_core"
+					}
+				]
+			},
+			{
+				"name": "fire_beam_big_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.9110138416290284,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/onacts/fire_circle_drawpull.pet",
+						"bone_group": "melee_trail"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9000000357627869,
+						"end_time": 4.300000190734863,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/onacts/fire_beam_big_origin.pet",
+						"bone_group": "beam_core"
+					}
+				]
+			},
+			{
+				"name": "fire_circle_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.8741401433944703,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/onacts/fire_circle_drawpull.pet",
+						"bone_group": "melee_trail"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.75,
+						"end_time": 2.750000238418579,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/fx/onacts/fire_circle_staffline.pet",
+						"bone_group": "fx_staffline"
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "fire_beam_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.0,
+						"frequency": 1000.0,
+						"amplitude": 4.0,
+						"duration": 0.3499999940395355,
+						"damp": "LinearUp"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.350000023841858,
+						"frequency": 1000.0,
+						"amplitude": 4.0,
+						"duration": 1.0
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 2.3499999046325685,
+						"frequency": 1000.0,
+						"amplitude": 4.0,
+						"duration": 0.75,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "chaos_throw_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.115599 0.114243 Smooth 0.55627 0.610979 Smooth 1.83828 0 Flat 2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 9.833000183105469,
+						"name": "fade",
+						"apply_on_children": true,
+						"curve": "3 0 1 Linear 9.29377 1 Flat 9.833 0.726351 Linear"
+					}
+				]
+			},
+			{
+				"name": "divine_throw_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.115599 0.114243 Smooth 0.55627 0.610979 Smooth 1.83828 0 Flat 2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "emerge_wild_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.5,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 2.7461 0.292285 CustomSmooth -0.439233 3.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "exalt_throw_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.115599 0.114243 Smooth 0.55627 0.610979 Smooth 1.83828 0 Flat 2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "fire_beam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.299999952316284,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "7 0 0 Linear 0.2993 0.272502 Smooth 1.30664 0.648368 Smooth 1.56179 1 Smooth 2.35691 1 Flat 2.64472 0.351632 CustomSmooth -1.40636 3.3 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "fire_beam_big_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.587369 0.272502 Flat 3.94212 0.658259 Smooth 4.16781 1 Flat 4.52739 0.183482 Smooth 5 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "fire_circle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.8329999446868898,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.84909 0.321958 Smooth 2.54111 0.618694 Smooth 2.81383 1 Smooth 3.09828 0.272502 Smooth 3.833 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			state = ""
+				colour = "0.51075 0.356051 0.333198"
+				position = "0 -86 -349"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "on_death"
+				position = "0 0 -125"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "chaos_throw_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.799999952316284,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/epk/exaltthrow_skin.epk"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/epk/currency_fadeout.epk",
+						"bone_name": "L_Weapon_a",
+						"remove_on_animation_end": false
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/epk/currency_fadeout.epk",
+						"bone_name": "L_Weapon_b",
+						"remove_on_animation_end": false
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/epk/currency_fadeout.epk",
+						"bone_name": "L_Weapon_c",
+						"remove_on_animation_end": false
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/epk/currency_fadeout.epk",
+						"bone_name": "R_Weapon_a",
+						"remove_on_animation_end": false
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/epk/currency_fadeout.epk",
+						"bone_name": "R_Weapon_b",
+						"remove_on_animation_end": false
+					}
+				]
+			},
+			{
+				"name": "divine_throw_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.799999952316284,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/epk/exaltthrow_skin.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_wild_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 6.650000095367432,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/epk/exaltthrow_skin.epk"
+					}
+				]
+			},
+			{
+				"name": "exalt_throw_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.799999952316284,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/epk/exaltthrow_skin.epk"
+					}
+				]
+			},
+			{
+				"name": "fire_beam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.299999713897705,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/epk/fire_beambig_staffglow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "fire_beam_big_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 5.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/epk/fire_circle_staffglow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "fire_circle_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.8329999446868898,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act5_FOUR/FallenGods/Miniboss/epk/fire_circle_staffglow.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Staff_Sanctified.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/StaffSanctified/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "aux_dangler_attach Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Staff_danglers_Sanctified.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/StaffSanctified/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/StaffSanctified/staff_Sanctified.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Skirt_Sanctified.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/SkirtSanctified/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/SkirtSanctified/rig.ast"
+		linear_allowed_contraction = 0.350
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.750
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "abdomen_1_jntBnd abdomen_2_jntBnd abdomen_3_jntBnd abdomen_4_jntBnd abdomen_5_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/SkirtSanctified/skirt.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd abdomen_2_jntBnd abdomen_3_jntBnd abdomen_4_jntBnd abdomen_5_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Shackles_Sanctified.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/ShacklesSanctified/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/ShacklesSanctified/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.350
+		attachment_bones = "root_jntBnd L_elbow_b_Twist_jntBnd_2 R_elbow_b_Twist_jntBnd_2 child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/ShacklesSanctified/shackles_Sanctified.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_elbow_b_Twist_jntBnd R_elbow_b_Twist_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Heads/Head_Split_Sanctified.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/HeadsSanctified/head_split_Sanctified.fmt"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Heads/Head_Multi_Sanctified.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/HeadsSanctified/head_multi_Sanctified.fmt"
+	}
+}
+
+=== .ao Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Heads/Head_Single_Sanctified.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/HeadsSanctified/head_single_Sanctified.fmt"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Monsters/FallenGodMiniboss/Sanctified/attachments/Staff_danglers_Sanctified.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/StaffSanctified/attachments/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/StaffSanctified/attachments/rig.ast"
+		linear_allowed_contraction = 0.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FallenGodMiniboss/attachments/StaffSanctified/attachments/danglers_Sanctified.sm"
+	}
+}
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/FallenGodMiniboss/FallenGodMinibossSanctified.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/FallenGodMiniboss/FallenGodMinibossSanctified_armour_b8dd3184.smd"
+Materials 5
+	"Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat" 20
+	"Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat" 20
+	"Art/Models/MONSTERS/FallenGodMiniboss/Textures/FallenGodMiniBossMassc.mat" 1
+	"Art/Models/MONSTERS/FallenGodMiniboss/Textures/FallenGodMinibossSanctified01c.mat" 7
+	"Art/Models/MONSTERS/FallenGodMiniboss/Textures/FallenGodMinibossSanctifiedDoublec.mat" 3
+BoundingBox -149.617 -43.3606 -214.475 149.617 86.4334 91.406
+BoneGroups 37
+	"grp_waist" 2 "spine_1_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle_top" 2 "L_clavicle_top_jntBnd" "L_shoulder_b_jntBnd"
+	"grp_r_clavicle_top" 2 "R_clavicle_top_jntBnd" "R_shoulder_b_jntBnd"
+	"grp_l_bicep_1" 2 "L_shoulder_a_jntBnd" "L_elbow_a_jntBnd"
+	"grp_r_bicep_1" 2 "R_shoulder_a_jntBnd" "R_elbow_a_jntBnd"
+	"grp_l_forearm_1" 2 "L_elbow_a_jntBnd" "L_wrist_a_jntBnd"
+	"grp_r_forearm_1" 2 "R_elbow_a_jntBnd" "R_wrist_a_jntBnd"
+	"grp_l_palm_1" 2 "L_wrist_a_jntBnd" "L_finger_2_a_jntBnd_1"
+	"grp_r_palm_1" 2 "R_wrist_a_jntBnd" "R_finger_2_a_jntBnd_1"
+	"grp_l_bicep_2" 2 "L_shoulder_b_jntBnd" "L_elbow_b_jntBnd"
+	"grp_r_bicep_2" 2 "R_shoulder_b_jntBnd" "R_elbow_b_jntBnd"
+	"grp_l_forearm_2" 2 "L_elbow_b_jntBnd" "L_wrist_b_jntBnd"
+	"grp_r_forearm_2" 2 "R_elbow_b_jntBnd" "R_wrist_b_jntBnd"
+	"grp_l_palm_2" 2 "L_wrist_b_jntBnd" "L_finger_2_b_jntBnd_1"
+	"grp_r_palm_2" 2 "R_wrist_b_jntBnd" "R_finger_2_b_jntBnd_1"
+	"grp_l_bicep_3" 2 "L_shoulder_c_jntBnd" "L_elbow_c_jntBnd"
+	"grp_r_bicep_3" 2 "R_shoulder_c_jntBnd" "R_elbow_c_jntBnd"
+	"grp_l_forearm_3" 2 "L_elbow_c_jntBnd" "L_wrist_c_jntBnd"
+	"grp_r_forearm_3" 2 "R_elbow_c_jntBnd" "R_wrist_c_jntBnd"
+	"grp_l_palm_3" 2 "L_wrist_c_jntBnd" "L_finger_2_c_jntBnd_1"
+	"grp_r_palm_3" 2 "R_wrist_c_jntBnd" "R_finger_2_c_jntBnd_1"
+	"grp_l_bicep_4" 2 "L_shoulder_d_jntBnd" "L_elbow_d_jntBnd"
+	"grp_r_bicep_4" 2 "R_shoulder_d_jntBnd" "R_elbow_d_jntBnd"
+	"grp_l_forearm_4" 2 "L_elbow_d_jntBnd" "L_wrist_d_jntBnd"
+	"grp_r_forearm_4" 2 "R_elbow_d_jntBnd" "R_wrist_d_jntBnd"
+	"grp_l_palm_4" 2 "L_wrist_d_jntBnd" "L_finger_2_d_jntBnd_1"
+	"grp_r_palm_4" 2 "R_wrist_d_jntBnd" "R_finger_2_d_jntBnd_1"
+	"grp_l_clavicle_bot" 2 "L_clavicle_bot_jntBnd" "L_shoulder_c_jntBnd"
+	"grp_r_clavicle_bot" 2 "R_clavicle_bot_jntBnd" "R_shoulder_c_jntBnd"
+	"grp_abdomen_1" 2 "abdomen_1_jntBnd" "abdomen_2_jntBnd"
+	"grp_abdomen_2" 2 "abdomen_2_jntBnd" "abdomen_3_jntBnd"
+	"grp_abdomen_3" 2 "abdomen_3_jntBnd" "abdomen_4_jntBnd"
+	"grp_abdomen_4" 2 "abdomen_4_jntBnd" "abdomen_5_jntBnd"
+	"root" 2 "root_jntBnd" "hip_jntBnd"
+	"frameupper" 6 "R_shoulder_a_cTwist_jntBnd_1" "R_shoulder_a_jntBnd" "R_clavicle_top_jntBnd" "L_clavicle_top_jntBnd" "L_shoulder_a_jntBnd" "L_shoulder_a_cTwist_jntBnd_1"
+	"grp_chest" 3 "spine_1_jntBnd" "spine_2_jntBnd" "chest_jntBnd"
+	"grp_head" 2 "chest_jntBnd" "R_clavicle_top_jntBnd"
+
+=== .smd Art/Models/MONSTERS/FallenGodMiniboss/FallenGodMinibossSanctified_armour_b8dd3184.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 51 in the header, 51 in the block · 24497 triangles over 18042 vertices
+  names: 2016 bytes said, 2016 read  [agree]
+
+=== shapes (81)
+0	Crystal_01_InnerShape	from 0	count 480
+1	Crystal_02_InnerShape	from 480	count 246
+2	Crystal_03_InnerShape	from 726	count 399
+3	Crystal_04_InnerShape	from 1125	count 552
+4	Crystal_05_InnerShape	from 1677	count 534
+5	Crystal_06_InnerShape	from 2211	count 66
+6	Crystal_07_InnerShape	from 2277	count 66
+7	Crystal_08_InnerShape	from 2343	count 345
+8	Crystal_09_InnerShape	from 2688	count 246
+9	Crystal_10_InnerShape	from 2934	count 147
+10	Crystal_11_InnerShape	from 3081	count 246
+11	Crystal_12_InnerShape	from 3327	count 147
+12	Crystal_13_InnerShape	from 3474	count 156
+13	Crystal_14_InnerShape	from 3630	count 66
+14	Crystal_15_InnerShape	from 3696	count 216
+15	Crystal_16_InnerShape	from 3912	count 198
+16	Crystal_17_InnerShape	from 4110	count 66
+17	Crystal_18_InnerShape	from 4176	count 507
+18	Crystal_19_InnerShape	from 4683	count 66
+19	Crystal_20_InnerShape	from 4749	count 198
+20	Crystal_01_OuterShape	from 4947	count 666
+21	Crystal_02_OuterShape	from 5613	count 270
+22	Crystal_03_OuterShape	from 5883	count 717
+23	Crystal_04_OuterShape	from 6600	count 720
+24	Crystal_05_OuterShape	from 7320	count 630
+25	Crystal_06_OuterShape	from 7950	count 90
+26	Crystal_07_OuterShape	from 8040	count 90
+27	Crystal_08_OuterShape	from 8130	count 609
+28	Crystal_09_OuterShape	from 8739	count 270
+29	Crystal_10_OuterShape	from 9009	count 339
+30	Crystal_11_OuterShape	from 9348	count 270
+31	Crystal_12_OuterShape	from 9618	count 339
+32	Crystal_13_OuterShape	from 9957	count 180
+33	Crystal_14_OuterShape	from 10137	count 90
+34	Crystal_15_OuterShape	from 10227	count 306
+35	Crystal_16_OuterShape	from 10533	count 270
+36	Crystal_17_OuterShape	from 10803	count 90
+37	Crystal_18_OuterShape	from 10893	count 663
+38	Crystal_19_OuterShape	from 11556	count 90
+39	Crystal_20_OuterShape	from 11646	count 270
+40	abdomen_massShape	from 11916	count 8760
+41	base_bodyShape	from 20676	count 29514
+42	L_arm_spikesShape	from 50190	count 624
+43	R_arm_spikesShape	from 50814	count 630
+44	ribcageShape	from 51444	count 3120
+45	skirt_top_wrapsShape	from 54564	count 3300
+46	spine_spikesShape	from 57864	count 3156
+47	veins1Shape	from 61020	count 3540
+48	ribcage_innerShape	from 64560	count 3
+49	skirt_topShape	from 64563	count 3
+50	veins2Shape	from 64566	count 8925
+51	Crystal_InnerShape	from 73491	count 4896
+52	Crystal_OuterShape	from 78387	count 8979
+53	WeaponCrystal_InnerShape	from 87366	count 11382
+54	WeaponCrystal_OuterShape	from 98748	count 8976
+55	skirtShape	from 107724	count 5094
+56	L_shackleShape	from 112818	count 2832
+57	L_wrist_linkShape	from 115650	count 648
+58	R_shackleShape	from 116298	count 2832
+59	R_wrist_linkShape	from 119130	count 648
+60	Orb_Chaos_Crystal_1_InnerShape	from 119778	count 1005
+61	Orb_Chaos_Crystal_2_InnerShape	from 120783	count 972
+62	Orb_Chaos_Crystal_1_OuterShape	from 121755	count 2541
+63	Orb_Chaos_Crystal_2_OuterShape	from 124296	count 2361
+64	Orb_ChaosShape	from 126657	count 3243
+65	Orb_Exalted_Crystal_1_InnerShape	from 129900	count 2121
+66	Orb_Exalted_Crystal_2_InnerShape	from 132021	count 429
+67	Orb_Exalted_Crystal_3_InnerShape	from 132450	count 1695
+68	Orb_Exalted_Crystal_4_InnerShape	from 134145	count 582
+69	Orb_Exalted_Crystal_1_OuterShape	from 134727	count 3072
+70	Orb_Exalted_Crystal_2_OuterShape	from 137799	count 867
+71	Orb_Exalted_Crystal_3_OuterShape	from 138666	count 1911
+72	Orb_Exalted_Crystal_4_OuterShape	from 140577	count 1461
+73	Orb_ExaltedShape	from 142038	count 2376
+74	Orb_Divine_Crystal_1_InnerShape	from 144414	count 1842
+75	Orb_Divine_Crystal_2_InnerShape	from 146256	count 1050
+76	Orb_Divine_Crystal_1_OuterShape	from 147306	count 2250
+77	Orb_Divine_Crystal_2_OuterShape	from 149556	count 2637
+78	Orb_DivineShape	from 152193	count 564
+79	dangler_02Shape	from 152757	count 840
+80	dangler_Shape1	from 153597	count 1152
+
+=== fitting
+the monster's rig: 234 bones
+mounts: aux_position
+  Staff_Sanctified.ao  socket R_Weapon [in its carrier's rig]  box (-44.2,-16.9,-150.7)..(44.1,16.5,161.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 11411 triangles over 10477 vertices
+    names: 168 bytes said, 168 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 aux_dangler_attach  [its own]  under 0  rests at (0,0,160.3)
+    Staff_danglers_Sanctified.ao  socket aux_dangler_attach [in its carrier's rig]  box (-5.2,-13.4,-1.1)..(5.2,13.4,39.6)
+      version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+      shapes 2 in the header, 2 in the block · 664 triangles over 498 vertices
+      names: 58 bytes said, 58 read  [agree]
+      rig 3 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 2 of 3  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_skinned_1_jntBnd  [its own]  under 0  rests at (0,0,14.7)
+        2 phys_skinned_2_jntBnd  [its own]  under 1  rests at (0,0,31.8)
+  Skirt_Sanctified.ao  socket abdomen_1_jntBnd [in its carrier's rig]  box (0.5,-89.6,-71.2)..(148.8,89.6,77.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1698 triangles over 1136 vertices
+    names: 20 bytes said, 20 read  [agree]
+    rig 40 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 39 of 40  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 abdomen_2_jntBnd  [shared]  under 0  rests at (45.3,0,-0)  carrier has (0,4.7,-68.6)
+      2 phys_skinned_L_1_jntBnd  [its own]  under 0  rests at (29.5,16.1,-19.3)
+      3 phys_skinned_L_6_jntBnd  [its own]  under 0  rests at (32.8,25.8,-3)
+      4 phys_skinned_L_11_jntBnd  [its own]  under 0  rests at (30.3,18.3,18.4)
+      5 phys_skinned_B_1_jntBnd  [its own]  under 0  rests at (27.8,0,26.7)
+      6 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (29.5,-16.1,-19.3)
+      7 phys_skinned_R_6_jntBnd  [its own]  under 0  rests at (32.8,-25.8,-3)
+      8 phys_skinned_R_11_jntBnd  [its own]  under 0  rests at (30.3,-18.3,18.4)
+      9 abdomen_3_jntBnd  [shared]  under 1  rests at (90.7,0,-0)  carrier has (0,5.7,-23.3)
+      10 phys_skinned_L_2_jntBnd  [its own]  under 2  rests at (54.8,24.4,-29)
+      11 phys_skinned_L_7_jntBnd  [its own]  under 3  rests at (59.2,39.3,-3.6)
+      12 phys_skinned_L_12_jntBnd  [its own]  under 4  rests at (56,28.5,25.5)
+      13 phys_skinned_B_2_jntBnd  [its own]  under 5  rests at (50.8,0,37.1)
+      14 phys_skinned_R_2_jntBnd  [its own]  under 6  rests at (54.8,-24.4,-29)
+      15 phys_skinned_R_7_jntBnd  [its own]  under 7  rests at (59.2,-39.3,-3.6)
+      16 phys_skinned_R_12_jntBnd  [its own]  under 8  rests at (56,-28.5,25.5)
+      17 abdomen_4_jntBnd  [shared]  under 9  rests at (136,0,-0)  carrier has (0,6.7,22)
+      18 phys_skinned_L_3_jntBnd  [its own]  under 10  rests at (80.2,32.8,-38.7)
+      19 phys_skinned_L_8_jntBnd  [its own]  under 11  rests at (85.6,52.8,-4.3)
+      20 phys_skinned_L_13_jntBnd  [its own]  under 12  rests at (81.8,38.7,32.5)
+      21 phys_skinned_B_3_jntBnd  [its own]  under 13  rests at (73.8,0,47.6)
+      22 phys_skinned_R_3_jntBnd  [its own]  under 14  rests at (80.2,-32.8,-38.7)
+      23 phys_skinned_R_8_jntBnd  [its own]  under 15  rests at (85.6,-52.8,-4.3)
+      24 phys_skinned_R_13_jntBnd  [its own]  under 16  rests at (81.8,-38.7,32.5)
+      25 abdomen_5_jntBnd  [shared]  under 17  rests at (181.3,0,-0)  carrier has (0,7.7,67.3)
+      26 phys_skinned_L_4_jntBnd  [its own]  under 18  rests at (105.6,41.1,-48.4)
+      27 phys_skinned_L_9_jntBnd  [its own]  under 19  rests at (111.9,66.2,-5)
+      28 phys_skinned_L_14_jntBnd  [its own]  under 20  rests at (107.6,48.8,39.6)
+      29 phys_skinned_B_4_jntBnd  [its own]  under 21  rests at (96.8,0,58)
+      30 phys_skinned_R_4_jntBnd  [its own]  under 22  rests at (105.6,-41.1,-48.4)
+      31 phys_skinned_R_9_jntBnd  [its own]  under 23  rests at (111.9,-66.2,-5)
+      32 phys_skinned_R_14_jntBnd  [its own]  under 24  rests at (107.6,-48.8,39.6)
+      33 phys_skinned_L_5_jntBnd  [its own]  under 26  rests at (130.9,49.5,-58.2)
+      34 phys_skinned_L_10_jntBnd  [its own]  under 27  rests at (138.3,79.7,-5.7)
+      35 phys_skinned_L_15_jntBnd  [its own]  under 28  rests at (133.4,59,46.7)
+      36 phys_skinned_B_5_jntBnd  [its own]  under 29  rests at (119.7,0,68.4)
+      37 phys_skinned_R_5_jntBnd  [its own]  under 30  rests at (130.9,-49.5,-58.2)
+      38 phys_skinned_R_10_jntBnd  [its own]  under 31  rests at (138.3,-79.7,-5.7)
+      39 phys_skinned_R_15_jntBnd  [its own]  under 32  rests at (133.4,-59,46.7)
+  Shackles_Sanctified.ao  socket root_jntBnd [in its carrier's rig]  box (-75.5,-3.3,-157.4)..(75.5,7.7,-139.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 2320 triangles over 2228 vertices
+    names: 124 bytes said, 124 read  [agree]
+    rig 7 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_elbow_b_Twist_jntBnd  [its own]  under 0  rests at (-66.1,4,-153.8)
+      2 L_elbow_b_Twist_jntBnd  [its own]  under 0  rests at (66.1,4,-153.8)
+      3 phys_skinned_R_1_jntBnd  [its own]  under 1  rests at (-72.2,1.9,-150.2)
+      4 phys_skinned_L_1_jntBnd  [its own]  under 2  rests at (72.2,1.9,-150.2)
+      5 phys_skinned_R_2_jntBnd  [its own]  under 3  rests at (-72.2,1.9,-141.4)
+      6 phys_skinned_L_2_jntBnd  [its own]  under 4  rests at (72.2,1.9,-141.4)
+  Head_Split_Sanctified.ao  socket L_Weapon_a [in its carrier's rig]  fixed mesh head_split_Sanctified.fmt  5 shapes
+      Orb_Chaos_Crystal_1_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Chaos_Crystal_2_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Chaos_Crystal_1_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_Chaos_Crystal_2_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_ChaosShape  ->  Art/Models/MONSTERS/FallenGodMiniboss/Textures/HeadsSanctifiedc.mat
+  Head_Split_Sanctified.ao  socket R_Weapon_a [in its carrier's rig]  fixed mesh head_split_Sanctified.fmt  5 shapes
+      Orb_Chaos_Crystal_1_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Chaos_Crystal_2_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Chaos_Crystal_1_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_Chaos_Crystal_2_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_ChaosShape  ->  Art/Models/MONSTERS/FallenGodMiniboss/Textures/HeadsSanctifiedc.mat
+  Head_Multi_Sanctified.ao  socket L_Weapon_b [in its carrier's rig]  fixed mesh head_multi_Sanctified.fmt  9 shapes
+      Orb_Exalted_Crystal_1_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Exalted_Crystal_2_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Exalted_Crystal_3_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Exalted_Crystal_4_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Exalted_Crystal_1_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_Exalted_Crystal_2_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_Exalted_Crystal_3_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_Exalted_Crystal_4_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_ExaltedShape  ->  Art/Models/MONSTERS/FallenGodMiniboss/Textures/HeadsSanctifiedc.mat
+  Head_Single_Sanctified.ao  socket L_Weapon_c [in its carrier's rig]  fixed mesh head_single_Sanctified.fmt  5 shapes
+      Orb_Divine_Crystal_1_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Divine_Crystal_2_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Divine_Crystal_1_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_Divine_Crystal_2_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_DivineShape  ->  Art/Models/MONSTERS/FallenGodMiniboss/Textures/HeadsSanctifiedc.mat
+  Head_Multi_Sanctified.ao  socket R_Weapon_b [in its carrier's rig]  fixed mesh head_multi_Sanctified.fmt  9 shapes
+      Orb_Exalted_Crystal_1_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Exalted_Crystal_2_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Exalted_Crystal_3_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Exalted_Crystal_4_InnerShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessc.mat
+      Orb_Exalted_Crystal_1_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_Exalted_Crystal_2_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_Exalted_Crystal_3_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_Exalted_Crystal_4_OuterShape  ->  Art/Models/MONSTERS/BabySpider/Textures/CrystalMossAccessOuterc.mat
+      Orb_ExaltedShape  ->  Art/Models/MONSTERS/FallenGodMiniboss/Textures/HeadsSanctifiedc.mat

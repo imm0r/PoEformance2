@@ -1,0 +1,1681 @@
+monster: Strider of the Pit [Metadata/Monsters/LeagueAbyss/Pit/CorpseStrider/CorpseStriderAbyss]
+
+=== .ao Metadata/Monsters/LeagueAbyss/Pit/CorpseStrider/FarudinCorpseStrider.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/FarudinMiniboss/rig.amd"
+	animations = '[
+		{
+			"name": "abyss_emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7076101899147034,
+					"name": "halo_emerge"
+				}
+			]
+		},
+		{
+			"name": "approach_attack_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.13209739327430726,
+					"end_time": 0.80488121509552,
+					"name": "move",
+					"data": "1 0 0 Everything 1 0 Away 1.000000"
+				}
+			]
+		},
+		{
+			"name": "barrage_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.3882700204849243,
+					"end_time": 3.6262497901916506,
+					"name": "start_target_update",
+					"data": "200 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.39165693521499636,
+					"name": "hide_weapons"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2809319496154786,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6445399522781373,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2825963497161867,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.6681599617004396,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.2686855792999269,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.626953363418579,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.338362693786621,
+					"name": "show_weapons"
+				}
+			]
+		},
+		{
+			"name": "lightning_barrage_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 2.450000047683716,
+					"name": "start_target_update",
+					"data": "165 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7992327213287355,
+					"name": "contact",
+					"position": [
+						-46.12528610229492,
+						-95.59228515625,
+						0.0
+					],
+					"contact_ref": [
+						-47.038700103759769,
+						0.0,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7992327213287355,
+					"name": "pb",
+					"position": [
+						-46.72313690185547,
+						1.198028564453125,
+						0.0
+					]
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 2.8199996948242189,
+					"end_time": 3.1700000762939455,
+					"name": "start_target_update",
+					"data": "70 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.193819999694824,
+					"name": "pb",
+					"position": [
+						37.13890075683594,
+						-18.369773864746095,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.193819999694824,
+					"name": "contact",
+					"position": [
+						20.518314361572267,
+						-128.41024780273438,
+						0.0
+					],
+					"contact_ref": [
+						37.038272857666019,
+						-21.21701431274414,
+						0.0
+					]
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 3.205000162124634,
+					"end_time": 3.5399999618530275,
+					"name": "start_target_update",
+					"data": "70 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5637576580047609,
+					"name": "contact",
+					"position": [
+						-34.57366943359375,
+						-126.13536834716797,
+						0.0
+					],
+					"contact_ref": [
+						-41.90181350708008,
+						-6.788852691650391,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.56375789642334,
+					"name": "pb",
+					"position": [
+						-40.73301696777344,
+						-7.188201904296875,
+						0.0
+					]
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 3.575000047683716,
+					"end_time": 3.7950000762939455,
+					"name": "start_target_update",
+					"data": "60 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.8719396591186525,
+					"name": "contact",
+					"position": [
+						11.155768394470215,
+						-135.85975646972657,
+						0.0
+					],
+					"contact_ref": [
+						28.236541748046876,
+						-26.75599479675293,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.8719398975372316,
+					"name": "pb",
+					"position": [
+						27.954002380371095,
+						-23.960594177246095,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "spear_throw_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6525670289993286,
+					"name": "contact",
+					"position": [
+						-6.497950077056885,
+						-89.62370300292969,
+						-112.18599700927735
+					]
+				}
+			]
+		}
+	]'
+
+	anim_driven_subobject = "L_chest_jntBnd_1 1 7 50 50 100 0 0 0 none"
+	anim_driven_subobject = "L_chest_jntBnd_2 1 7 50 50 100 0 0 0 none"
+	anim_driven_subobject = "R_chest_jntBnd_1 1 7 50 50 100 0 0 0 none"
+	anim_driven_subobject = "R_chest_jntBnd_2 1 7 50 50 100 0 0 0 none"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.446927011013031,
+								0.0
+							],
+							[
+								0.5418990254402161,
+								1.0
+							]
+						],
+						"increment_damage_stage": false,
+						"width": 64.3270034790039,
+						"length": 198.8300018310547
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.536312997341156,
+								0.0
+							],
+							[
+								0.6815639734268189,
+								1.0
+							]
+						],
+						"increment_damage_stage": false,
+						"width": 58.47999954223633,
+						"length": 198.8300018310547
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "halo_01 Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_pit_01.ao"
+	attached_object = "L_spear_jntBnd Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/AbyssMinibossSpear_L.ao"
+	attached_object = "R_spear_jntBnd Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/AbyssMinibossSpear_R.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/FarudinMiniboss/rig.ast"
+		socket = "aux_lightning_charge_01"
+			translation = "-3.83597 -12.4844 -217.807"
+		socket = "aux_lightning_charge_02"
+			translation = "-3.83597 -12.4844 -1044.92"
+		socket = "aux_weapon_L_01"
+			parent = "L_Weapon"
+			translation = "0 0 -84.4242"
+		socket = "aux_weapon_L_02"
+			parent = "L_Weapon"
+			translation = "0 0 -125.008"
+		socket = "aux_weapon_R_01"
+			parent = "R_Weapon"
+			translation = "0 0 -85.3708"
+		socket = "aux_weapon_R_02"
+			parent = "R_Weapon"
+			translation = "0 0 -125.639"
+		socket = "halo_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -50"
+			ignore_parent_rotation = "yawpitch"
+		linear_allowed_contraction = 0.283
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/FarudinMiniboss/FarudinMiniboss.sm"
+			R_F_torso_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssFarudinCorpseStrider.mat:0"
+		R_B_torso_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssFarudinCorpseStrider.mat:0"
+		SigilShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssFarudinCorpseStrider.mat:0"
+		limbs_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssFarudinCorpseStrider.mat:0"
+		L_F_torso_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssFarudinCorpseStrider.mat:0"
+		L_B_torso_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssFarudinCorpseStrider.mat:0"
+		F_top_torso_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssFarudinCorpseStrider.mat:0"
+		BodyShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssFarudinCorpseStrider.mat:0"
+		B_top_torso_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssFarudinCorpseStrider.mat:0"
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd cog_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd head_jntBnd L_shoulder_jntBnd"
+		bone_group = "FX_lightningCharge false aux_lightning_charge_02 aux_lightning_charge_01"
+		bone_group = "FX_weapon_L false aux_weapon_L_01 aux_weapon_L_02"
+		bone_group = "FX_weapon_R false aux_weapon_R_01 aux_weapon_R_02"
+		bone_group = "FX_lightningHitPoint false aux_lightning_charge_01"
+		bone_group = "FX_Hand_R false R_Weapon"
+		bone_group = "FX_Hand_L false L_Weapon"
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "abyss_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06989923119544983,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Emerge",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3419395685195923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_inner_ankle_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42947110533714297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5434509515762329,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_inner_ankle_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6693955659866333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_outer_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8318641185760498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "L_outer_ankle_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "approach_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Leap_Whoosh",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5777959823608398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_inner_ankle_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5794489979743958,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Spear_Swish",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7032470107078552,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "L_inner_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9734749794006348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "L_outer_ankle_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0287799835205079,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_outer_ankle_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Attack1A",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4523140788078308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Attack1B",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4682220220565796,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Spear_Swish",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5561439990997315,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_inner_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6462000012397766,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.682204008102417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Spear_Swish",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.697035014629364,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_outer_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0419808626174927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage1",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07849101722240448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4709465503692627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Effects/Special_Charge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5904720425605774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Effects/Abyss/LightningSurge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0347607135772706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage2",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0733511447906495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Effects/Abyss/ProjCast",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0733559131622315,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.436827301979065,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Effects/Abyss/ProjCast",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.522670030593872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage2",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9312858581542969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Effects/Abyss/ProjCast",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.945088267326355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage2",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3447630405426027,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3544082641601564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage2",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3897242546081545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Effects/Abyss/ProjCast",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7899246215820314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage2",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.903830051422119,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Effects/Abyss/ProjCast",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2974815368652345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage2",
+						"bone_name": "jaw_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.31315016746521,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Effects/Abyss/ProjCast",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7004308700561525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.161320209503174,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Spear_Swish",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.171466827392578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage1",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.028248600661754609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19522060453891755,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2895287871360779,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Fall_Legs",
+						"bone_name": "R_outer_clavicle_jntBnd1_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29486536979675295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Fall_Gore",
+						"bone_name": "cog_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3907775282859802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Fall_Body",
+						"bone_name": "L_inner_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8668330311775208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Fall_Spear",
+						"bone_name": "L_spear_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9130163192749023,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Fall_Spear",
+						"bone_name": "R_spear_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9443579912185669,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.333991289138794,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Fall_Body",
+						"bone_name": "R_chest_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4014887809753419,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Fall_Legs",
+						"bone_name": "R_outer_ankle_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5293875932693482,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Fall_Body",
+						"bone_name": "cog_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8366838693618775,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Fall_Legs",
+						"bone_name": "R_outer_ankle_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04019999876618385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Flinch",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.036309998482465747,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Flinch",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_large_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03826000168919563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Flinch",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02877175621688366,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Flinch",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.045809999108314517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Flinch",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03215999901294708,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Flinch",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "hit_reaction",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12376400083303452,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5487290024757385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "lightning_barrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage1",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07043059915304184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementLong",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42258399724960329,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Effects/Special_Charge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4560799598693848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Effects/Special_FullCharge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0796799659729006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.578404426574707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage2",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.610229969024658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Spear_Swish",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8990633487701418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage2",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9562699794769289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Spear_Swish",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.326809883117676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Spear_Swish",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3604257106781008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage2",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7019100189208986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Spear_Swish",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.713806390762329,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/LightningBarrage2",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.019904300570487977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_inner_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06315790116786957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "L_inner_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2817220091819763,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "L_outer_ankle_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3284209966659546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_outer_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4329189956188202,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_outer_ankle_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46889999508857729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "L_outer_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5125370025634766,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_inner_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5318373441696167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6671770215034485,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "L_inner_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.920960009098053,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_outer_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9500510096549988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "L_outer_ankle_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.996749997138977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "L_outer_ankle_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0044000148773194,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_outer_ankle_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1353199481964112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_inner_ankle_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "spear_throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/SpearThrow",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5597652792930603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Spear_Swish",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7300138473510742,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7899693250656128,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_inner_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2475409507751465,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "L_inner_foot_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "stun_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementLong",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01449158601462841,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4173581600189209,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_outer_ankle_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48112037777900698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_inner_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5130030512809753,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "L_outer_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.139039158821106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9246063232421876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.651961326599121,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Vocals/Knockdown3",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9099085330963136,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "L_outer_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.031637668609619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/Footstep",
+						"bone_name": "R_outer_foot_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.135999917984009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Pit/FarudinCorpseStrider/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7244037389755249,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Stab.pet",
+						"bone_group": "FX_weapon_R"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9896513223648071,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Stab.pet",
+						"bone_group": "FX_weapon_L"
+					}
+				]
+			},
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5167877078056336,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Barrage_Hands_Persistant.pet",
+						"bone_group": "FX_Hand_R"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7033994793891907,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Barrage_Hands_Persistant.pet",
+						"bone_group": "FX_Hand_L"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.2788625955581666,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Barrage_Hands.pet",
+						"bone_group": "FX_Hand_R"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.6008085012435914,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Barrage_Hands.pet",
+						"bone_group": "FX_Hand_L"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.264822483062744,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Barrage_Hands.pet",
+						"bone_group": "FX_Hand_R"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.6586313247680666,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Barrage_Hands.pet",
+						"bone_group": "FX_Hand_L"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.2637922763824465,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Barrage_Hands.pet",
+						"bone_group": "FX_Hand_R"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.624469518661499,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Barrage_Hands.pet",
+						"bone_group": "FX_Hand_L"
+					}
+				]
+			},
+			{
+				"name": "lightning_barrage_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9607275128364563,
+						"end_time": 1.5724947452545167,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Lightning_Barrage_OnActBuild.pet",
+						"bone_group": "FX_lightningCharge"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5492019653320313,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Lightning_Barrage_OnActZap.pet",
+						"bone_group": "FX_lightningCharge"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.604367971420288,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/FX/Lightning_Barrage_OnActImpact.pet",
+						"bone_group": "FX_lightningHitPoint"
+					}
+				]
+			}
+		]'
+	}
+
+	Lights
+	{
+		light = "point_light"
+			bone_name = "aux_lightning_charge_01"
+			style_speed = 25
+			state = "lightON"
+				colour = "5.18485 6.39811 3.41706"
+				radius = 350
+				style = 1
+			state = "lightOFF"
+				default_state = true
+				radius = 350
+				style = 1
+		animations = '[
+			{
+				"name": "lightning_barrage_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 1.5836800336837769,
+						"end_time": 1.715156078338623,
+						"state_name": "lightON"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 1.712399959564209,
+						"end_time": 1.9151309728622437,
+						"state_name": "lightOFF"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.199999809265137,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.887358 0 Flat 1.89659 1 Flat 4.14943 1 Flat 4.89568 0.00237005 Flat 5.2 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0028322439175099136,
+						"end_time": 5.199999809265137,
+						"name": "Z_Scale",
+						"apply_on_children": true,
+						"curve": "6 0.00283224 0 Linear 0.293156 0 Linear 0.342859 1 Linear 4.32494 1 Linear 4.45358 0 Linear 5.2 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "lightning_barrage_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.665999889373779,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 1.57796 0 Flat 1.70182 1 Flat 3.23095 1 Flat 4.666 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "barrage_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.23224404454231263,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/Spear_Dissolve.ao",
+						"animation": "OnAct",
+						"from": {
+							"parent_bone": "R_Weapon"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.23625506460666657,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/Spear_Dissolve.ao",
+						"animation": "OnAct",
+						"from": {
+							"parent_bone": "L_Weapon"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.2801740169525147,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/Barrage_Bolt.ao",
+						"offset": [
+							-18.496238708496095,
+							-31.425392150878908
+						],
+						"height": 187.39761352539063,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.6002202033996583,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/Barrage_Bolt.ao",
+						"animation": "bolt",
+						"offset": [
+							34.50400161743164,
+							-31.425392150878908
+						],
+						"height": 187.39761352539063,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.262970447540283,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/Barrage_Bolt.ao",
+						"offset": [
+							-18.496238708496095,
+							-31.425392150878908
+						],
+						"inherit_height": true,
+						"height": 187.39761352539063
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.650667190551758,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/Barrage_Bolt.ao",
+						"animation": "bolt",
+						"offset": [
+							34.50400161743164,
+							-31.425392150878908
+						],
+						"height": 187.39761352539063,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.264857053756714,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/Barrage_Bolt.ao",
+						"offset": [
+							-18.496238708496095,
+							-31.425392150878908
+						],
+						"height": 187.39761352539063,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.6224470138549806,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/Barrage_Bolt.ao",
+						"animation": "bolt",
+						"offset": [
+							34.50400161743164,
+							-31.425392150878908
+						],
+						"height": 187.39761352539063,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 4.311861038208008,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/Spear_Resolve.ao",
+						"from": {
+							"parent_bone": "R_Weapon"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 4.314691066741943,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/Spear_Resolve.ao",
+						"from": {
+							"parent_bone": "L_Weapon"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "lightning_barrage_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.4301364421844484,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/OnActLightning.ao",
+						"animation": "OnAct",
+						"from": {
+							"parent_bone": "aux_weapon_R_02"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.778864622116089,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/OnActLightning.ao",
+						"animation": "OnAct",
+						"from": {
+							"parent_bone": "aux_weapon_L_02"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.127594470977783,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/OnActLightning.ao",
+						"animation": "OnAct",
+						"from": {
+							"parent_bone": "aux_weapon_R_02"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.489577293395996,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/OnActLightning.ao",
+						"animation": "OnAct",
+						"from": {
+							"parent_bone": "aux_weapon_L_02"
+						},
+						"speed": 1.0
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_pit_01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "animate"
+		view_looping = true
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+		socket = "aux_line_01"
+			translation = "0 0 -100"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_line false root aux_line_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "animate",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/fx/halo_pit_01.pet",
+						"bone_group": "FX_line"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/AbyssMinibossSpear_L.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/FarudinMiniboss/attachments/FarudinMinibossSpear.fmt"
+			fixed_FarudinMinibossSpear|FarudinMinibossWeapon3|FarudinMinibossWeapon3 = "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/MATs/AybyssMinibossWeaponc.mat:0"
+	}
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/Attachment/AbyssMinibossSpear_R.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/FarudinMiniboss/attachments/FarudinMinibossSpear.fmt"
+			fixed_FarudinMinibossSpear|FarudinMinibossWeapon3|FarudinMinibossWeapon3 = "Metadata/Effects/Spells/monsters_effects/League_Abyss/FarudinCorpseStrider/MATs/AybyssMinibossWeaponc.mat:0"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/FarudinMiniboss/FarudinMiniboss.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/FarudinMiniboss/rig_111cf23d.smd"
+Materials 3
+	"Art/Models/MONSTERS/FarudinMiniboss/Textures/FarudinMiniboss_furc.mat" 1
+	"Art/Models/MONSTERS/FarudinMiniboss/Textures/FarudinMiniboss_hairc.mat" 1
+	"Art/Models/MONSTERS/FarudinMiniboss/Textures/FarudinMinibossc.mat" 9
+BoundingBox -78.4344 -62.3633 -177.073 76.606 86.3079 6.4742
+BoneGroups 44
+	"grp_head" 2 "head_jntBnd" "jaw_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_body_thigh_1_1" 2 "L_outer_clavicle_jntBnd1_2" "L_outer_thigh_jntBnd_2"
+	"grp_l_body_shin_1_1" 2 "L_outer_thigh_jntBnd_2" "L_outer_knee_jntBnd_2"
+	"grp_l_body_toe_1_1" 2 "L_outer_knee_jntBnd_2" "L_outer_ankle_jntBnd_2"
+	"grp_l_body_foot_1_1" 2 "L_outer_ankle_jntBnd_2" "L_outer_foot_jntBnd_2"
+	"grp_l_body_thigh_1_2" 2 "L_inner_clavicle_jntBnd_2" "L_inner_thigh_jntBnd_2"
+	"grp_l_body_shin_1_2" 2 "L_inner_thigh_jntBnd_2" "L_inner_knee_jntBnd_2"
+	"grp_l_body_toe_1_2" 2 "L_inner_knee_jntBnd_2" "L_inner_ankle_jntBnd_2"
+	"grp_l_body_foot_1_2" 2 "L_inner_ankle_jntBnd_2" "L_inner_foot_jntBnd_2"
+	"grp_l_body_thigh_2_1" 2 "R_inner_clavicle_jntBnd_2" "R_inner_thigh_jntBnd_2"
+	"grp_l_body_shin_2_1" 2 "R_inner_thigh_jntBnd_2" "R_inner_knee_jntBnd_2"
+	"grp_l_body_toe_2_1" 2 "R_inner_knee_jntBnd_2" "R_inner_ankle_jntBnd_2"
+	"grp_l_body_foot_2_1" 2 "R_inner_ankle_jntBnd_2" "R_inner_foot_jntBnd_2"
+	"grp_l_body_thigh_2_2" 2 "R_outer_clavicle_jntBnd1_2" "R_outer_thigh_jntBnd_2"
+	"grp_l_body_shin_2_2" 2 "R_outer_thigh_jntBnd_2" "R_outer_knee_jntBnd_2"
+	"grp_l_body_toe_2_2" 2 "R_outer_knee_jntBnd_2" "R_outer_ankle_jntBnd_2"
+	"grp_l_body_foot_2_2" 2 "R_outer_ankle_jntBnd_2" "R_outer_foot_jntBnd_2"
+	"grp_r_body_thigh_1_1" 2 "L_outer_clavicle_jntBnd1_1" "L_outer_thigh_jntBnd_1"
+	"grp_r_body_shin_1_1" 2 "L_outer_thigh_jntBnd_1" "L_outer_knee_jntBnd_1"
+	"grp_r_body_toe_1_1" 2 "L_outer_knee_jntBnd_1" "L_outer_ankle_jntBnd_1"
+	"grp_r_body_foot_1_1" 2 "L_outer_ankle_jntBnd_1" "L_outer_foot_jntBnd_1"
+	"grp_r_body_thigh_1_2" 2 "L_inner_clavicle_jntBnd_1" "L_inner_thigh_jntBnd_1"
+	"grp_r_body_shin_1_2" 2 "L_inner_thigh_jntBnd_1" "L_inner_knee_jntBnd_1"
+	"grp_r_body_toe_1_2" 2 "L_inner_knee_jntBnd_1" "L_inner_ankle_jntBnd_1"
+	"grp_r_body_foot_1_2" 2 "L_inner_ankle_jntBnd_1" "L_inner_foot_jntBnd_1"
+	"grp_r_body_thigh_2_1" 2 "R_inner_clavicle_jntBnd_1" "R_inner_thigh_jntBnd_1"
+	"grp_r_body_shin_2_1" 2 "R_inner_thigh_jntBnd_1" "R_inner_knee_jntBnd_1"
+	"grp_r_body_toe_2_1" 2 "R_inner_knee_jntBnd_1" "R_inner_ankle_jntBnd_1"
+	"grp_r_body_foot_2_1" 2 "R_inner_ankle_jntBnd_1" "R_inner_foot_jntBnd_1"
+	"grp_r_body_thigh_2_2" 2 "R_outer_clavicle_jntBnd1_1" "R_outer_thigh_jntBnd_1"
+	"grp_r_body_shin_2_2" 2 "R_outer_thigh_jntBnd_1" "R_outer_knee_jntBnd_1"
+	"grp_r_body_toe_2_2" 2 "R_outer_knee_jntBnd_1" "R_outer_ankle_jntBnd_1"
+	"grp_r_body_foot_2_2" 2 "R_outer_ankle_jntBnd_1" "R_outer_foot_jntBnd_1"
+
+=== .smd Art/Models/MONSTERS/FarudinMiniboss/rig_111cf23d.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 11 in the header, 11 in the block · 47266 triangles over 37845 vertices
+  names: 340 bytes said, 340 read  [agree]
+
+=== shapes (13)
+0	fur1Shape	from 0	count 33222
+1	hairShape	from 33222	count 33222
+2	B_top_torso_meshShape	from 66444	count 6528
+3	BodyShape	from 72972	count 18768
+4	F_top_torso_meshShape	from 91740	count 6546
+5	L_B_torso_meshShape	from 98286	count 8658
+6	L_F_torso_meshShape	from 106944	count 8658
+7	limbs_meshShape	from 115602	count 4560
+8	R_B_torso_meshShape	from 120162	count 8658
+9	R_F_torso_meshShape	from 128820	count 8658
+10	SigilShape	from 137478	count 4320
+11	fixed_FarudinMinibossSpear|FarudinMinibossWeapon3|FarudinMinibossWeapon3	from 141798	count 1074
+12	fixed_FarudinMinibossSpear|FarudinMinibossWeapon3|FarudinMinibossWeapon3	from 142872	count 1074
+
+=== fitting
+the monster's rig: 147 bones
+mounts: aux_position
+  halo_pit_01.ao  socket halo_01 [NOT in its carrier's rig]  (no mesh - an effect or a sound)
+  AbyssMinibossSpear_L.ao  socket L_spear_jntBnd [in its carrier's rig]  fixed mesh FarudinMinibossSpear.fmt  1 shapes
+      fixed_FarudinMinibossSpear|FarudinMinibossWeapon3|FarudinMinibossWeapon3  ->  Art/Models/MONSTERS/FarudinMiniboss/Textures/FarudinMinibossWeaponc.mat
+  AbyssMinibossSpear_R.ao  socket R_spear_jntBnd [in its carrier's rig]  fixed mesh FarudinMinibossSpear.fmt  1 shapes
+      fixed_FarudinMinibossSpear|FarudinMinibossWeapon3|FarudinMinibossWeapon3  ->  Art/Models/MONSTERS/FarudinMiniboss/Textures/FarudinMinibossWeaponc.mat

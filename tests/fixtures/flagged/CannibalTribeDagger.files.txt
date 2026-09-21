@@ -1,0 +1,1874 @@
+monster: Orok Throatcutter [Metadata/Monsters/VaalSavage/CannibalTribeDagger]
+
+=== .ao Metadata/Monsters/VaalSavage/CannibalTribeDagger01.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/VaalSavages/dagger/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.19964300096035005,
+					"name": "footstep",
+					"position": [
+						24.555400848388673,
+						-34.59429931640625,
+						-0.05317069962620735
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4729990065097809,
+					"name": "footstep",
+					"position": [
+						-30.771099090576173,
+						31.46649932861328,
+						-1.1989099979400635
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.717179000377655,
+					"name": "footstep",
+					"position": [
+						-27.665599822998048,
+						33.59370040893555,
+						-0.3501110076904297
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9014679789543152,
+					"name": "footstep",
+					"position": [
+						22.12019920349121,
+						-21.760499954223634,
+						-0.01334569975733757
+					]
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3659999966621399,
+					"name": "move",
+					"position": [
+						100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_move_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.07625990360975266,
+					"name": "footstep",
+					"position": [
+						-18.044700622558595,
+						-7.862259864807129,
+						-1.7561800479888917
+					]
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3659999966621399,
+					"name": "move",
+					"position": [
+						-100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "idle_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5437250137329102,
+					"name": "footstep",
+					"position": [
+						-24.624000549316408,
+						35.5536003112793,
+						-1.455989956855774
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3204699754714966,
+					"name": "footstep",
+					"position": [
+						26.210899353027345,
+						-2.524749994277954,
+						-0.05820370092988014
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7271300554275513,
+					"name": "footstep",
+					"position": [
+						-27.0177001953125,
+						33.00400161743164,
+						-0.188277006149292
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.1977500915527345,
+					"name": "footstep",
+					"position": [
+						22.166400909423829,
+						-21.534700393676759,
+						-0.5967379808425903
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.8785500526428224,
+					"name": "footstep",
+					"position": [
+						-27.54509925842285,
+						33.4385986328125,
+						-0.12325000017881394
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.646169900894165,
+					"name": "footstep",
+					"position": [
+						-27.039100646972658,
+						33.602699279785159,
+						-0.8133379817008972
+					]
+				}
+			]
+		},
+		{
+			"name": "run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.18442100286483766,
+					"name": "footstep",
+					"position": [
+						-10.057100296020508,
+						-6.33381986618042,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5105170011520386,
+					"name": "footstep",
+					"position": [
+						8.198599815368653,
+						-7.407279968261719,
+						0.0
+					]
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.32732734084129336,
+								0.0
+							],
+							[
+								0.34834834933280947,
+								0.4396423101425171
+							],
+							[
+								0.42942944169044497,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 3,
+						"rotation": -0.24434611201286317,
+						"angle": 3.0019664764404299,
+						"x_axis_scale": 0.574999988079071,
+						"length": 120.56500244140625,
+						"offset": [
+							7.0,
+							8.0
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.2217299938201905
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5849056839942932,
+								0.0
+							],
+							[
+								0.6194968819618225,
+								1.0
+							]
+						],
+						"damage_statset_index": 3,
+						"rotation": -2.268928050994873,
+						"width": 40.26900100708008,
+						"angle": 2.7750699520111086,
+						"length": 98.19999694824219,
+						"offset": [
+							48.0,
+							56.0
+						],
+						"impact_z_rotation": [
+							-2.2514748573303224,
+							-2.2514748573303224
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4114114046096802,
+								0.0
+							],
+							[
+								0.5135135054588318,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.6108649969100952,
+						"angle": 1.7453299760818482,
+						"x_axis_scale": 0.7160000205039978,
+						"length": 110.43599700927735,
+						"offset": [
+							13.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.3490658700466156,
+							1.2217305898666382
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4114114046096802,
+								0.0
+							],
+							[
+								0.5135135054588318,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.6108649969100952,
+						"angle": 1.7453299760818482,
+						"x_axis_scale": 0.7160000205039978,
+						"length": 110.43599700927735,
+						"offset": [
+							18.0,
+							9.0
+						],
+						"impact_z_rotation": [
+							0.3490658700466156,
+							1.2217305898666382
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_04",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4371579885482788,
+								0.0
+							],
+							[
+								0.4954954981803894,
+								1.0
+							]
+						],
+						"rotation": 0.13962599635124207,
+						"width": 56.652000427246097,
+						"length": 98.98600006103516,
+						"offset": [
+							-24.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							0.17453299462795258
+						],
+						"impact_z_rotation": [
+							0.13962599635124207,
+							0.13962599635124207
+						],
+						"impact_type": "Piercing"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "R_Weapon Metadata/Monsters/VaalSavage/attachments/Weapon/VaalSavageWeaponHeld.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/VaalSavages/dagger/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/CarverTribe/CarverTribe01.sm"
+			body_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalTribe02c.mat:0"
+			ropes_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalTribe01c.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false aux_R_shoulder_attachment neck_jntBnd aux_L_shoulder_attachment"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17763100564479829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/AttackFirst",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28941598534584048,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/OneHandSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6201769709587097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/AttackSecond",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6201779842376709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/OneHandSwing",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.24807299673557282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/AttackFirst",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30379000306129458,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/OneHandSwing",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23436500132083894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/AttackSecond",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28654399514198305,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/OneHandSwing",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11585599929094315,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/AttackFirst",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32722699642181399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/OneHandSwing",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19641800224781037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28865399956703188,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "L_clavicle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2107979953289032,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "R_clavicle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32222801446914675,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28597500920295718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4235309958457947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26655301451683047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35629600286483767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0002871910110116005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/IdleLoop",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09158530086278916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/KnockdownA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1918109953403473,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8432769775390625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownStep",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9642379879951477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/KnockdownB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0707000494003297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownStep",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4377199411392213,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownStep",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7798700332641602,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/KnockdownC",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8603999614715577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05085210129618645,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/KnockdownA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1973150074481964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7714840173721314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownStep",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8827710151672363,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/KnockdownB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2987300157546998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownStep",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.711840033531189,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownStep",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.000890016555786,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/KnockdownC",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1110999584198,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/RunLoop",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.164109006524086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4655500054359436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8161532878875732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1126744747161866,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.448533296585083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7526217699050904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/WalkLoop",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05898910015821457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6570940017700195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/VaalSavage/CannibalTribeDagger02.ao (depth 0)
+version 3
+extends "Metadata/Monsters/VaalSavage/CannibalTribeDagger01"
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/CarverTribe/CarverTribe01.sm"
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/CarverTribe/CarverTribe02.sm"
+			body_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalTribe02c.mat:0"
+			ropes_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalTribe01c.mat:0"
+	}
+	
+	Lights
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/VaalSavage/CannibalTribeDagger03.ao (depth 0)
+version 3
+extends "Metadata/Monsters/VaalSavage/CannibalTribeDagger01"
+
+client
+{
+	SkinMesh
+	{
+		remove_skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/CarverTribe/CarverTribe01.sm"
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/CarverTribe/CarverTribe03.sm"
+			body_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalTribe02c.mat:0"
+			ropes_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalTribe01c.mat:0"
+	}
+	
+	Lights
+	{
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/VaalSavage/attachments/Weapon/VaalSavageWeaponHeld.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/CarverTribe/attachments/WeaponDoubleBlade/DoubleBladeCarverTribeWeapon.fmt"
+	}
+}
+
+=== .ao Metadata/Monsters/VaalSavage/CannibalTribeDagger01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/VaalSavages/dagger/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.19964300096035005,
+					"name": "footstep",
+					"position": [
+						24.555400848388673,
+						-34.59429931640625,
+						-0.05317069962620735
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4729990065097809,
+					"name": "footstep",
+					"position": [
+						-30.771099090576173,
+						31.46649932861328,
+						-1.1989099979400635
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.717179000377655,
+					"name": "footstep",
+					"position": [
+						-27.665599822998048,
+						33.59370040893555,
+						-0.3501110076904297
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9014679789543152,
+					"name": "footstep",
+					"position": [
+						22.12019920349121,
+						-21.760499954223634,
+						-0.01334569975733757
+					]
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3659999966621399,
+					"name": "move",
+					"position": [
+						100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_move_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.07625990360975266,
+					"name": "footstep",
+					"position": [
+						-18.044700622558595,
+						-7.862259864807129,
+						-1.7561800479888917
+					]
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3659999966621399,
+					"name": "move",
+					"position": [
+						-100.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "idle_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5437250137329102,
+					"name": "footstep",
+					"position": [
+						-24.624000549316408,
+						35.5536003112793,
+						-1.455989956855774
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3204699754714966,
+					"name": "footstep",
+					"position": [
+						26.210899353027345,
+						-2.524749994277954,
+						-0.05820370092988014
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7271300554275513,
+					"name": "footstep",
+					"position": [
+						-27.0177001953125,
+						33.00400161743164,
+						-0.188277006149292
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.1977500915527345,
+					"name": "footstep",
+					"position": [
+						22.166400909423829,
+						-21.534700393676759,
+						-0.5967379808425903
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.8785500526428224,
+					"name": "footstep",
+					"position": [
+						-27.54509925842285,
+						33.4385986328125,
+						-0.12325000017881394
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.646169900894165,
+					"name": "footstep",
+					"position": [
+						-27.039100646972658,
+						33.602699279785159,
+						-0.8133379817008972
+					]
+				}
+			]
+		},
+		{
+			"name": "run_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.18442100286483766,
+					"name": "footstep",
+					"position": [
+						-10.057100296020508,
+						-6.33381986618042,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5105170011520386,
+					"name": "footstep",
+					"position": [
+						8.198599815368653,
+						-7.407279968261719,
+						0.0
+					]
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.32732734084129336,
+								0.0
+							],
+							[
+								0.34834834933280947,
+								0.4396423101425171
+							],
+							[
+								0.42942944169044497,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 3,
+						"rotation": -0.24434611201286317,
+						"angle": 3.0019664764404299,
+						"x_axis_scale": 0.574999988079071,
+						"length": 120.56500244140625,
+						"offset": [
+							7.0,
+							8.0
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							1.2217299938201905
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5849056839942932,
+								0.0
+							],
+							[
+								0.6194968819618225,
+								1.0
+							]
+						],
+						"damage_statset_index": 3,
+						"rotation": -2.268928050994873,
+						"width": 40.26900100708008,
+						"angle": 2.7750699520111086,
+						"length": 98.19999694824219,
+						"offset": [
+							48.0,
+							56.0
+						],
+						"impact_z_rotation": [
+							-2.2514748573303224,
+							-2.2514748573303224
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4114114046096802,
+								0.0
+							],
+							[
+								0.5135135054588318,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.6108649969100952,
+						"angle": 1.7453299760818482,
+						"x_axis_scale": 0.7160000205039978,
+						"length": 110.43599700927735,
+						"offset": [
+							13.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.3490658700466156,
+							1.2217305898666382
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4114114046096802,
+								0.0
+							],
+							[
+								0.5135135054588318,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.6108649969100952,
+						"angle": 1.7453299760818482,
+						"x_axis_scale": 0.7160000205039978,
+						"length": 110.43599700927735,
+						"offset": [
+							18.0,
+							9.0
+						],
+						"impact_z_rotation": [
+							0.3490658700466156,
+							1.2217305898666382
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_04",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4371579885482788,
+								0.0
+							],
+							[
+								0.4954954981803894,
+								1.0
+							]
+						],
+						"rotation": 0.13962599635124207,
+						"width": 56.652000427246097,
+						"length": 98.98600006103516,
+						"offset": [
+							-24.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							0.17453299462795258
+						],
+						"impact_z_rotation": [
+							0.13962599635124207,
+							0.13962599635124207
+						],
+						"impact_type": "Piercing"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "R_Weapon Metadata/Monsters/VaalSavage/attachments/Weapon/VaalSavageWeaponHeld.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/VaalSavages/dagger/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/CarverTribe/CarverTribe01.sm"
+			body_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalTribe02c.mat:0"
+			ropes_meshShape = "Art/Models/MONSTERS/CarverTribe/Textures/CannibalTribe01c.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false aux_R_shoulder_attachment neck_jntBnd aux_L_shoulder_attachment"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17763100564479829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/AttackFirst",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28941598534584048,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/OneHandSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6201769709587097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/AttackSecond",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6201779842376709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/OneHandSwing",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.24807299673557282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/AttackFirst",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30379000306129458,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/OneHandSwing",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23436500132083894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/AttackSecond",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28654399514198305,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/OneHandSwing",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_04",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11585599929094315,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/AttackFirst",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32722699642181399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/OneHandSwing",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19641800224781037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28865399956703188,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "L_clavicle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2107979953289032,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "R_clavicle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32222801446914675,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28597500920295718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4235309958457947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26655301451683047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35629600286483767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0002871910110116005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/IdleLoop",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09158530086278916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/KnockdownA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1918109953403473,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8432769775390625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownStep",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9642379879951477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/KnockdownB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0707000494003297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownStep",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4377199411392213,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownStep",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7798700332641602,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/KnockdownC",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8603999614715577,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05085210129618645,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/KnockdownA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1973150074481964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownFall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7714840173721314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownStep",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8827710151672363,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/KnockdownB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2987300157546998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownStep",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.711840033531189,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/KnockdownStep",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.000890016555786,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/KnockdownC",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1110999584198,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/RunLoop",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.164109006524086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4655500054359436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8161532878875732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1126744747161866,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.448533296585083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7526217699050904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Vocal/WalkLoop",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05898910015821457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6570940017700195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_1/CannibalTribe/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/CarverTribe/CarverTribe01.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/CarverTribe/CarverTribe01_armour_74ba6549.smd"
+Materials 2
+	"Art/Models/MONSTERS/CarverTribe/Textures/CarverTribe02c.mat" 1
+	"Art/Models/MONSTERS/CarverTribe/Textures/CarverTribe01c.mat" 1
+BoundingBox -69.3007 -14.5038 -181.22 69.3007 15.3317 -0.0346865
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/CarverTribe/CarverTribe01_armour_74ba6549.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 2 in the header, 2 in the block · 9310 triangles over 7040 vertices
+  names: 58 bytes said, 58 read  [agree]
+
+=== shapes (2)
+0	body_meshShape	from 0	count 10908
+1	ropes_meshShape	from 10908	count 17022
+
+=== fitting
+the monster's rig: 84 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  VaalSavageWeaponHeld.ao  socket R_Weapon [NOT in its carrier's rig]  fixed mesh DoubleBladeCarverTribeWeapon.fmt  1 shapes
+      CarverTribeWeapon_daggerShape  ->  Art/Models/MONSTERS/CarverTribe/Textures/CarverTribeWeaponc.mat

@@ -1,0 +1,1517 @@
+monster: It That Suspects [Metadata/Monsters/Breach/BreachFodderHellscapeDemonElite2]
+
+=== .ao Metadata/Monsters/Breach/Monsters/HellscapeDemonElite2/HellscapeDemonElite2.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachFingerSkullMage/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5724009871482849,
+					"name": "contact",
+					"position": [
+						111.56099700927735,
+						-95.04399871826172,
+						-193.7310028076172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7037609815597534,
+					"name": "contact",
+					"position": [
+						13.012499809265137,
+						-136.4340057373047,
+						-163.77099609375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8189560174942017,
+					"name": "contact",
+					"position": [
+						-55.26179885864258,
+						-115.74400329589844,
+						-176.3249969482422
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4920240044593811,
+					"name": "contact",
+					"position": [
+						-26.0,
+						-106.0,
+						-162.6219940185547
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6422169804573059,
+					"name": "contact",
+					"position": [
+						15.0,
+						-111.0,
+						-173.8800048828125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7941330075263977,
+					"name": "contact",
+					"position": [
+						57.0,
+						-93.0,
+						-181.85499572753907
+					]
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23000001907348634,
+					"name": "move",
+					"position": [
+						160.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23000001907348634,
+					"name": "move",
+					"position": [
+						-160.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "staff_beam_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.625,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6499999761581421,
+					"name": "contact",
+					"position": [
+						-16.012014389038087,
+						-116.73607635498047,
+						-168.98745727539063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.75,
+					"name": "contact",
+					"position": [
+						17.164587020874025,
+						-138.3946990966797,
+						-129.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8500000238418579,
+					"name": "contact",
+					"position": [
+						46.88916015625,
+						-113.05338287353516,
+						-115.55931091308594
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5343865156173707,
+					"name": "move_all_stationary"
+				}
+			]
+		},
+		{
+			"name": "vomit_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0,
+					"name": "start_face",
+					"data": "45 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 1.2000000476837159,
+					"name": "end_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.409999966621399,
+					"name": "contact",
+					"position": [
+						-2.3894400596618654,
+						31.265600204467775,
+						-244.00900268554688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.440000057220459,
+					"name": "contact",
+					"position": [
+						-2.458050012588501,
+						15.127300262451172,
+						-247.2259979248047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4700000286102296,
+					"name": "contact",
+					"position": [
+						-1.8867599964141846,
+						-2.6842200756073,
+						-245.92799377441407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5,
+					"name": "contact",
+					"position": [
+						0.662056028842926,
+						-21.10689926147461,
+						-238.70199584960938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5299999713897706,
+					"name": "contact",
+					"position": [
+						3.212739944458008,
+						-34.62649917602539,
+						-229.4949951171875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.559999942779541,
+					"name": "contact",
+					"position": [
+						3.9046599864959719,
+						-43.68519973754883,
+						-222.25799560546876
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.590000033378601,
+					"name": "contact",
+					"position": [
+						2.4875600337982179,
+						-51.81019973754883,
+						-214.47000122070313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6200000047683716,
+					"name": "contact",
+					"position": [
+						0.3468469977378845,
+						-59.73870086669922,
+						-204.80999755859376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.649999976158142,
+					"name": "contact",
+					"position": [
+						-1.1990699768066407,
+						-66.8583984375,
+						-195.06900024414063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6799999475479127,
+					"name": "contact",
+					"position": [
+						-1.8718600273132325,
+						-73.03060150146485,
+						-186.85299682617188
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/Breach/Monsters/HellscapeDemonElite2/attachments/BreachFingerSkullMageCapeHeld.ao"
+	attached_object = "aux_staff Metadata/Monsters/Breach/Monsters/HellscapeDemonElite2/attachments/BreachFingerSkullMageWeaponHeld.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/Breach/Monsters/HellscapeDemonElite2/attachments/BreachFingerSkullMageNecklaceHeld.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.3302752375602722,
+								0.0
+							],
+							[
+								0.60550457239151,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 0,
+						"rotation": 0.3665192127227783,
+						"angle": 2.1118485927581789,
+						"length": 262.5790100097656,
+						"impact_type": "Blunt",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.2874617874622345,
+								0.0
+							],
+							[
+								0.6207951307296753,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 0,
+						"angle": 1.7627826929092408,
+						"length": 210.6909942626953,
+						"impact_type": "Blunt",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachFingerSkullMage/rig.ast"
+		socket = "aux_weapon_01"
+			parent = "aux_staff"
+			translation = "0 0 -100.149"
+		socket = "aux_weapon_02"
+			parent = "aux_staff"
+			translation = "0 0 -132.868"
+		socket = "aux_head_dir_01"
+			parent = "head_jntBnd"
+			translation = "0 -29.5727 19.2417"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 -7.58353 -3.12604"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -18.4534 4.09149"
+		socket = "aux_flame_attach"
+			parent = "head_jntBnd"
+			translation = "0 0 -60"
+		socket = "aux_flame_attach_02"
+			parent = "neck_01_jntBnd"
+			translation = "0 15 5"
+		socket = "aux_flame_attach_03"
+			parent = "neck_01_jntBnd"
+			translation = "0 10 20"
+		socket = "aux_flame_attach_04"
+			parent = "chest_jntBnd"
+			translation = "0 20 -20"
+		socket = "aux_flame_attach_05"
+			parent = "chest_jntBnd"
+			translation = "0 10 -10"
+		socket = "aux_flame_attach_03b"
+			parent = "neck_01_jntBnd"
+			translation = "0 -3 8"
+		linear_allowed_contraction = 0.100
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 1.000
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+		enable_collisions = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachFingerSkullMage/BreachFingerSkullMage.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_02_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_01_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder false L_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder false R_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow false L_elbow_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_R_elbow false R_elbow_jntBnd R_shoulder_jntBnd"
+		bone_group = "grp_L_wrist false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "grp_R_wrist false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "grp_L_hand false L_finger_2_jntBnd_1 L_wrist_jntBnd"
+		bone_group = "grp_R_hand false R_finger_2_jntBnd_1 R_wrist_jntBnd"
+		bone_group = "grp_R_weapon_blade false aux_weapon_01 aux_weapon_02"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "weapon_spray false aux_weapon_02 aux_weapon_01"
+		bone_group = "vomit_spray false head_jntBnd aux_head_dir_01"
+		bone_group = "flamethrower false aux_weapon_01 aux_weapon_02"
+		bone_group = "flame_attach false aux_flame_attach"
+		bone_group = "flame_attach_01 false neck_01_jntBnd aux_flame_attach_02"
+		bone_group = "flame_attach_02 false aux_flame_attach_03b aux_flame_attach_03"
+		bone_group = "flame_attach_03 false aux_flame_attach_05 aux_flame_attach_04"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "staff_beam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.32641860842704775,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapeDemonElite2/fx/OnAct_FireHands.pet",
+						"bone_group": "flamethrower"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.4650647640228272,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapeDemonElite2/fx/OnAct_Launch.pet",
+						"bone_group": "flamethrower"
+					}
+				]
+			},
+			{
+				"name": "vomit_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.15967999398708344,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Hellscape/elite_xenobyte_sage/FX/on_act_vomit_dir.pet",
+						"bone_group": "vomit_spray"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8435119986534119,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Hellscape/elite_xenobyte_sage/FX/on_act_vomit_splash.pet",
+						"bone_group": "vomit_spray"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.401729941368103,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Hellscape/elite_xenobyte_sage/FX/on_act_vomit_spray.pet",
+						"bone_group": "vomit_spray"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Effects/Magic_Whoosh",
+						"bone_name": "aux_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35794299840927126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Whoosh",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4014210104942322,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Effects/Magic_Cast",
+						"bone_name": "aux_weapon_01"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Effects/Magic_Whoosh",
+						"bone_name": "aux_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07617399841547013,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2699989974498749,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Whoosh",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3512380123138428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Effects/Magic_Cast",
+						"bone_name": "aux_weapon_01"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12155699729919434,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12886999547481538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2587519884109497,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/StaffDrop",
+						"bone_name": "aux_weapon_01"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12886999547481538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15857499837875367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23021699488162995,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/StaffDrop",
+						"bone_name": "aux_weapon_01"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3340596556663513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2879633903503419,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/StaffDrop",
+						"bone_name": "aux_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3275960683822632,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.209914892911911,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2583010494709015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3749978840351105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/StaffDrop",
+						"bone_name": "aux_weapon_01"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19087077677249909,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2348671853542328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34097692370414736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/StaffDrop",
+						"bone_name": "aux_weapon_01"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.209914892911911,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2583010494709015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3749978840351105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/StaffDrop",
+						"bone_name": "aux_weapon_01"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19087077677249909,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2348671853542328,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34097692370414736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/StaffDrop",
+						"bone_name": "aux_weapon_01"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_KnockdownA",
+						"bone_name": "aux_head_dir_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10807710140943527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22765181958675385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43000882863998415,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_KnockdownB",
+						"bone_name": "aux_head_dir_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8324224352836609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0324798822402955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2808274030685425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.60276198387146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.733832597732544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_KnockdownC",
+						"bone_name": "aux_head_dir_01",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Flinch",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_KnockdownA",
+						"bone_name": "aux_head_dir_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10807710140943527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22765181958675385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43000882863998415,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_KnockdownB",
+						"bone_name": "aux_head_dir_01",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8324224352836609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0324798822402955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2808274030685425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.60276198387146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "neck_01_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.733832597732544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_KnockdownC",
+						"bone_name": "aux_head_dir_01",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49855801463127139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Run",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "staff_beam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Effects/Magic_Whoosh",
+						"bone_name": "aux_weapon_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05972350016236305,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Whoosh",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18166300654411317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Spellcast",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5511888265609741,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Effects/Beam_OnAct",
+						"bone_name": "L_elbow_Twist_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3395899534225464,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/MoveFast",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4607800245285035,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Effects/Beam_Cast",
+						"bone_name": "aux_weapon_02"
+					}
+				]
+			},
+			{
+				"name": "vomit_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.039074499160051349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Gag",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6657829880714417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7191280126571655,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Gag",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1863000392913819,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Gag",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.329110026359558,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/VO/VO_Vomit",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.531559944152832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/FingerSkullMage/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	DecalEvents
+	{
+		animations = '[
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "DecalEventType",
+						"time": 0.10000000149011612,
+						"atlas": "Metadata/Decals/bloodnew.atlas",
+						"group": "bloodsplat",
+						"bone_name": "neck_01_jntBnd",
+						"size": 65.0,
+						"fade_in_time": 0.10000000149011612
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "DecalEventType",
+						"time": 0.10000000149011612,
+						"atlas": "Metadata/Decals/bloodnew.atlas",
+						"group": "bloodsplat",
+						"bone_name": "neck_01_jntBnd",
+						"size": 65.0,
+						"fade_in_time": 0.10000000149011612
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "DecalEventType",
+						"time": 0.10000000149011612,
+						"atlas": "Metadata/Decals/bloodnew.atlas",
+						"group": "bloodsplat",
+						"bone_name": "neck_01_jntBnd",
+						"size": 65.0,
+						"fade_in_time": 0.10000000149011612
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "DecalEventType",
+						"time": 0.10000000149011612,
+						"atlas": "Metadata/Decals/bloodnew.atlas",
+						"group": "bloodsplat",
+						"bone_name": "neck_01_jntBnd",
+						"size": 65.0,
+						"fade_in_time": 0.10000000149011612
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.2718338966369629,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapeDemonElite2/ao/flamethrower.ao",
+						"animation": "flamethrower",
+						"from": {
+							"parent_bone": "aux_weapon_01"
+						},
+						"speed_type": "Inherit",
+						"offset": {
+							"rotation": [
+								3.141589879989624,
+								1.4835299253463746,
+								3.141589879989624
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.35207441449165347,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapeDemonElite2/ao/flamethrower.ao",
+						"animation": "flamethrower",
+						"from": {
+							"parent_bone": "aux_weapon_01"
+						},
+						"speed_type": "Inherit",
+						"offset": {
+							"rotation": [
+								3.141589879989624,
+								1.4835299253463746,
+								3.141589879989624
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Breach/Monsters/HellscapeDemonElite2/attachments/BreachFingerSkullMageCapeHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachFingerSkullMage/attachments/cape/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachFingerSkullMage/attachments/cape/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.550
+		animation_velocity_factor = 10.000  
+		animation_force_factor = 100.000
+		enable_collisions = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachFingerSkullMage/attachments/cape/BreachFingerSkullMageCape.sm"
+	}
+	
+	BoneGroups
+	{
+	}
+}
+
+=== .ao Metadata/Monsters/Breach/Monsters/HellscapeDemonElite2/attachments/BreachFingerSkullMageWeaponHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachFingerSkullMage/attachments/staff/weapon.amd"
+	view_of = "animate"
+		view_name = "attack_01"
+		view_end = 1500
+	view_of = "animate"
+		view_name = "attack_02"
+		view_end = 1500
+	view_of = "animate"
+		view_name = "staff_beam_01"
+		view_end = 2000
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachFingerSkullMage/attachments/staff/weapon.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachFingerSkullMage/attachments/staff/weapon.sm"
+	}
+	
+	AnimatedRender
+	{
+		RenderPasses = 
+		'{
+		    "passes": [
+		        {
+		            "is_main": false,
+		            "type": "StandAlone",
+		            "filename": "Metadata/Effects/Spells/monsters_effects/Breach/Fire/HellscapeDemonElite2/mat/weapon_glow/glow_pass.mat"
+		        }
+		    ]
+		}'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "surgeTime_L",
+						"curve": "4 0 0 Linear 0.6 1 Linear 0.8 1 Flat 1.5 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "surgeTime_L",
+						"curve": "4 0 0 Linear 0.6 1 Linear 0.8 1 Flat 1.5 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "staff_beam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "surgeTime_L",
+						"curve": "4 0 0 Linear 1.06587 0.780405 Flat 1.52584 1 Smooth 2 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Breach/Monsters/HellscapeDemonElite2/attachments/BreachFingerSkullMageNecklaceHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachFingerSkullMage/attachments/necklace/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachFingerSkullMage/attachments/necklace/rig.ast"
+		linear_allowed_contraction = 0.300
+		bend_stiffness = 0.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.005
+		tangent_viscosity_multiplier = 0.005
+		enable_heightmap_collisions = true
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachFingerSkullMage/attachments/necklace/necklace.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BreachFingerSkullMage/BreachFingerSkullMage.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BreachFingerSkullMage/rig_e5f2b765.smd"
+Materials 1
+	"Art/Models/MONSTERS/BreachFingerSkullMage/Textures/BreachFingerskullmagec.mat" 6
+BoundingBox -76.8423 -64.6098 -236.671 76.8423 29.1806 7.127
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/BreachFingerSkullMage/rig_e5f2b765.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 6 in the header, 6 in the block · 19190 triangles over 13170 vertices
+  names: 200 bytes said, 200 read  [agree]
+
+=== shapes (9)
+0	Accessories_meshShape	from 0	count 11406
+1	Belt_meshShape	from 11406	count 1296
+2	BeltDetail_meshShape	from 12702	count 3360
+3	Body_meshShape	from 16062	count 27042
+4	Skirt_meshShape	from 43104	count 13410
+5	Tassel_meshShape	from 56514	count 1056
+6	Cape_meshShape	from 57570	count 846
+7	fixed_BreachFingerSkullMageWeaponShape	from 58416	count 14904
+8	Necklace_meshShape	from 73320	count 9822
+
+=== fitting
+the monster's rig: 134 bones
+mounts: aux_staff, aux_animation_control_ratio, aux_position
+  BreachFingerSkullMageCapeHeld.ao  socket chest_jntBnd [in its carrier's rig]  box (-10.2,19.3,3.4)..(10.2,28.2,52.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 282 triangles over 210 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 4 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 phys_skinned_cape_01_jntBnd  [its own]  under 0  rests at (0,19.5,20)
+      2 phys_skinned_cape_02_jntBnd  [its own]  under 1  rests at (0,19.5,50.7)
+      3 aux_animation_control_ratio  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  BreachFingerSkullMageWeaponHeld.ao  socket aux_staff [in its carrier's rig]  box (-21.4,-16.9,-164.7)..(29.6,15.8,47.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 4968 triangles over 3396 vertices
+    names: 76 bytes said, 76 read  [agree]
+    rig 1 bones, 0 of them names its carrier's rig also has
+    mesh weights reach bone 0 of 1  [inside this rig]
+      0 root  [its own]  under nothing  rests at (0,0,0)
+  BreachFingerSkullMageNecklaceHeld.ao  socket chest_jntBnd [in its carrier's rig]  box (-16.7,-11.2,-13.3)..(16,-4.2,30.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 3274 triangles over 2629 vertices
+    names: 36 bytes said, 36 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_necklace_jntBnd  [its own]  under 0  rests at (0,-9.5,19.3)
