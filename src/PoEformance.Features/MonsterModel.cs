@@ -465,7 +465,7 @@ public static class MonsterModels
         }
 
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var queue = new Queue<(string Path, Matrix4x4 Place, int Bone, int Depth)>();
+        var queue = new Queue<(string Path, Matrix4x4 Place, int Bone, int Depth, bool Rooted)>();
 
         // THE MONSTER ITSELF IS THE OUTERMOST CARRIER, at the identity: a piece socketed to
         // "<root>" at the top level is already in the monster's own space and wants no transform
@@ -476,14 +476,14 @@ public static class MonsterModels
             {
                 if (Socketed(socket, where, rest, Matrix4x4.Identity, 0, top: true, local) is { } put)
                 {
-                    queue.Enqueue((path, put.Place, put.Bone, 1));
+                    queue.Enqueue((path, put.Place, put.Bone, 1, Rooted(socket)));
                 }
             }
         }
 
         while (queue.Count > 0 && parts.Count < MostParts)
         {
-            (string path, Matrix4x4 place, int bone, int depth) = queue.Dequeue();
+            (string path, Matrix4x4 place, int bone, int depth, bool rooted) = queue.Dequeue();
             if (path.Length == 0 || !seen.Add(path))
             {
                 continue;
@@ -501,12 +501,12 @@ public static class MonsterModels
                 {
                     if (Socketed(inner, where, rest, place, bone, top: false, local) is { } put)
                     {
-                        queue.Enqueue((under, put.Place, put.Bone, depth + 1));
+                        queue.Enqueue((under, put.Place, put.Bone, depth + 1, Rooted(inner)));
                     }
                 }
             }
 
-            if (Worn(read, ao, place, bone, paints, fallback, where, rest) is { } part)
+            if (Worn(read, ao, place, bone, paints, fallback, where, rooted) is { } part)
             {
                 parts.Add(part);
             }
@@ -622,31 +622,24 @@ public static class MonsterModels
     private const string Shift = "attached_object_translation";
 
     /// <summary>
-    /// Whether a bone rests in the same place in the piece's rig as in the parent's.
+    /// Whether an attachment line names no socket at all - <c>&lt;root&gt;</c>, or nothing.
     /// </summary>
     /// <remarks>
-    /// THE ORIGIN IS NOT EVIDENCE. Every rig has bones sitting at (0,0,0) - the root, and helpers
-    /// like aux_position - and two of them agreeing says only that both files start counting from
-    /// the same place. Counting those made the Frostborn Fiend's block of ice look like a skinned
-    /// cloak, took its socket's transform off, and stood it on the floor beside him.
+    /// THE GAME'S OWN SPELLING DECIDES, which is worth more than any threshold this could invent.
+    /// A line that names a bone is PLACING the piece there: the anchor at aux_anchor_jntBnd, the
+    /// beard at head_jntBnd, the Frostborn Fiend's block of ice at R_Weapon. A line that says
+    /// "&lt;root&gt;" places nothing, so the piece has to carry its own placement - and the only
+    /// thing it can carry it in is a rig of the parent's bones.
     ///
-    /// A UNIT OF TOLERANCE on a body two hundred units tall: the two rigs either carry the same
-    /// rest pose, in which case the numbers are the same ones, or they do not.
+    /// WHAT THIS REPLACED, and why: two goes at reading the piece's rig INSTEAD of the line, and
+    /// each broke a monster the other fixed. Counting shared bone names made the ice - three
+    /// bones, of which the parent has two - into a skinned cloak and stood it upright on the
+    /// floor. Requiring the shared bones to rest in the same place as the parent's then rejected
+    /// Bahlak's feathers, which are the clearest skinned piece there is, and dropped them on the
+    /// floor in three flat clumps. The line was carrying the answer the whole time.
     /// </remarks>
-    private static bool Agrees(SkeletonPose mine, SkeletonPose parent, int bone, int onto)
-    {
-        if (bone >= mine.BindModel.Count || onto >= parent.BindModel.Count)
-        {
-            return false;
-        }
-
-        Vector3 here = mine.BindModel[bone].Translation;
-        return here.LengthSquared() > Somewhere
-            && Vector3.DistanceSquared(here, parent.BindModel[onto].Translation) < Somewhere;
-    }
-
-    /// <summary>One unit, squared - the distance two rest poses may differ by and still be one.</summary>
-    private const float Somewhere = 1f;
+    private static bool Rooted(string socket)
+        => socket.Length == 0 || socket.StartsWith('<');
 
     /// <summary>The socket and file of every .ao this one hangs off itself.</summary>
     /// <remarks>
@@ -697,7 +690,7 @@ public static class MonsterModels
         Paints paints,
         Mipmaps? fallback,
         IReadOnlyDictionary<string, int> where,
-        SkeletonPose rest)
+        bool rooted)
     {
         string skin = Skin(ao);
         if (skin.Length == 0)
@@ -719,8 +712,8 @@ public static class MonsterModels
 
         Dress dress = Dressed(read, mesh, [], manifest, fallback, string.Empty, paints);
 
-        // TWO KINDS OF PIECE, AND THE PIECE'S OWN RIG SAYS WHICH - see Retargeted.
-        if (Retargeted(read, ao, where, rest, mesh) is { } map)
+        // TWO KINDS OF PIECE, AND THE ATTACHMENT LINE SAYS WHICH - see Retargeted.
+        if (rooted && Retargeted(read, ao, where, mesh) is { } map)
         {
             return new Part(mesh, map, null, null, dress.Skins);
         }
@@ -765,24 +758,21 @@ public static class MonsterModels
     /// their nearest real ancestor is the spine or chest they hang off, which is where a tool
     /// that does not simulate cloth should hold them.
     ///
-    /// A SHARED NAME IS NOT ENOUGH ON ITS OWN, and taking it as enough broke a monster that used
-    /// to be right. The Frostborn Fiend holds a block of ice whose rig is three bones -
-    /// root_jntBnd, weapon_jntBnd, aux_position - of which the parent also has TWO. It is
-    /// plainly a prop, held at R_Weapon, and counting that second name made it a skin: the
-    /// socket's transform came off and the ice stood upright on the floor beside him.
+    /// ONLY EVER FOR A PIECE THAT NAMES NO SOCKET - see <see cref="Rooted"/>. The rig's shared
+    /// names alone are NOT enough, and two goes at making them enough each broke a monster the
+    /// other fixed: counting them turned the Frostborn Fiend's block of ice, three bones of which
+    /// the parent has two, into a cloak and stood it on the floor; requiring the shared bones to
+    /// rest where the parent's rest then rejected Bahlak's feathers and dropped them in three
+    /// flat clumps. The attachment line was carrying the answer the whole time.
     ///
-    /// SO THE TEST IS WHETHER THE BONES REST IN THE SAME PLACE, which is the question that was
-    /// meant all along - a piece modelled in the monster's space reproduces the monster's rest
-    /// pose, and one modelled in its own does not. The seaweed's hip_jntBnd is at
-    /// (0,18.7,-97.6) in BOTH rigs; the ice's aux_position is at the origin in its own and
-    /// somewhere on the body in the parent's. Bones resting at the origin are left out of the
-    /// count on both sides, because every rig has some and they agree by accident.
+    /// WHAT IS STILL ASKED OF THE RIG is only the other half: a "&lt;root&gt;" piece that shares
+    /// nothing but the root has no bones to be moved onto and stays where it is. Malgor's ship's
+    /// wheel is that piece, and it is the one thing here still not settled.
     /// </remarks>
     private static byte[]? Retargeted(
         Func<string, byte[]?> read,
         AnimatedObject ao,
         IReadOnlyDictionary<string, int> where,
-        SkeletonPose rest,
         SkinnedMesh mesh)
     {
         string path = Entryed(ao, RigBlock, RigEntry);
@@ -816,7 +806,11 @@ public static class MonsterModels
                 {
                     onto[one] = (byte)found;
 
-                    if (Agrees(mine, rest, at, found))
+                    // THE ROOT DOES NOT COUNT. Every rig has one and every piece shares it, so
+                    // counting it would make a ship's wheel look like a cloak. Asked as "has a
+                    // parent of its own" rather than "is not bone nought", because which NUMBER
+                    // the root carries is the file's business.
+                    if (at < mine.Parents.Count && mine.Parents[at] >= 0)
                     {
                         shared++;
                     }
