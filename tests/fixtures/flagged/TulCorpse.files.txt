@@ -1,0 +1,1845 @@
+monster: Daemon [Metadata/Monsters/Breach/BreachOverseerBoss/Corpses/TulCorpse]
+
+=== .ao Metadata/Monsters/Breach/BreachOverseerBoss/Corpses/TulCorpse.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/rig.amd"
+	view_of = "summon_tul_01"
+		view_name = "underground_idle"
+		view_end = 448
+		view_looping = true
+	view_of = "summon_tul_01"
+		view_name = "underground_once"
+		view_end = 299
+	animations = '[
+		{
+			"name": "summon_tul_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 8.029760360717774,
+					"name": "start_target_update",
+					"data": "45 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5423238277435303,
+					"name": "start_beams",
+					"position": [
+						-4.490531921386719,
+						-121.11088562011719,
+						-131.3804168701172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.3000001907348635,
+					"name": "contact",
+					"position": [
+						-4.490531921386719,
+						-121.11088562011719,
+						-131.3804168701172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.4000000953674318,
+					"name": "contact",
+					"position": [
+						-26.728286743164064,
+						-106.10911560058594,
+						-131.9267578125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5,
+					"name": "contact",
+					"position": [
+						-13.626426696777344,
+						-113.8924560546875,
+						-112.05340576171875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5999999046325685,
+					"name": "contact",
+					"position": [
+						-1.4835968017578126,
+						-95.7012710571289,
+						-101.75111389160156
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5999999046325685,
+					"name": "contact",
+					"position": [
+						-4.155609130859375,
+						-114.1520767211914,
+						-137.50900268554688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.700000047683716,
+					"name": "contact",
+					"position": [
+						23.331863403320314,
+						-81.57746887207031,
+						-145.67269897460938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.700000047683716,
+					"name": "contact",
+					"position": [
+						-27.281143188476564,
+						-109.64784240722656,
+						-136.40487670898438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.799999952316284,
+					"name": "contact",
+					"position": [
+						14.476341247558594,
+						-109.406494140625,
+						-127.5187759399414
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.799999952316284,
+					"name": "contact",
+					"position": [
+						-19.703214645385743,
+						-111.40116882324219,
+						-120.96312713623047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.9000000953674318,
+					"name": "contact",
+					"position": [
+						-6.840667724609375,
+						-61.80178451538086,
+						-140.3505859375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.9000000953674318,
+					"name": "contact",
+					"position": [
+						-15.664840698242188,
+						-99.93084716796875,
+						-111.88549041748047
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.9000000953674318,
+					"name": "contact",
+					"position": [
+						-8.170700073242188,
+						-118.2267837524414,
+						-144.23709106445313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.0,
+					"name": "contact",
+					"position": [
+						16.824508666992189,
+						-80.07880401611328,
+						-147.59396362304688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.0,
+					"name": "contact",
+					"position": [
+						-28.653656005859376,
+						-113.19956970214844,
+						-146.4318084716797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.0,
+					"name": "contact",
+					"position": [
+						-8.052871704101563,
+						-105.34046936035156,
+						-174.17762756347657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.099999904632568,
+					"name": "contact",
+					"position": [
+						8.289169311523438,
+						-106.27381896972656,
+						-130.65542602539063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.099999904632568,
+					"name": "contact",
+					"position": [
+						-19.106182098388673,
+						-120.5366439819336,
+						-127.86663055419922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.199999809265137,
+					"name": "contact",
+					"position": [
+						-3.650970458984375,
+						-68.87127685546875,
+						-137.48007202148438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.199999809265137,
+					"name": "contact",
+					"position": [
+						-16.75562286376953,
+						-90.25303649902344,
+						-115.63532257080078
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.199999809265137,
+					"name": "contact",
+					"position": [
+						-5.7218170166015629,
+						-121.98333740234375,
+						-146.3743896484375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.300000190734863,
+					"name": "contact",
+					"position": [
+						8.548137664794922,
+						-69.59785461425781,
+						-133.83932495117188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.300000190734863,
+					"name": "contact",
+					"position": [
+						-28.617774963378908,
+						-104.34162139892578,
+						-142.15261840820313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.300000190734863,
+					"name": "contact",
+					"position": [
+						-1.9393234252929688,
+						-111.67327880859375,
+						-167.0435791015625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.400000095367432,
+					"name": "contact",
+					"position": [
+						12.022819519042969,
+						-92.68010711669922,
+						-119.1163101196289
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.400000095367432,
+					"name": "contact",
+					"position": [
+						-13.678559303283692,
+						-120.01609802246094,
+						-121.18534851074219
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.5,
+					"name": "contact",
+					"position": [
+						2.3415603637695314,
+						-69.20832061767578,
+						-131.8042449951172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.5,
+					"name": "contact",
+					"position": [
+						-11.363548278808594,
+						-81.61873626708985,
+						-105.49650573730469
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.5,
+					"name": "contact",
+					"position": [
+						-6.917976379394531,
+						-110.9630126953125,
+						-137.59725952148438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.599999904632568,
+					"name": "contact",
+					"position": [
+						8.030616760253907,
+						-73.96757507324219,
+						-129.49217224121095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.599999904632568,
+					"name": "contact",
+					"position": [
+						-28.864734649658204,
+						-98.89802551269531,
+						-135.94186401367188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.599999904632568,
+					"name": "contact",
+					"position": [
+						6.9219207763671879,
+						-127.29135131835938,
+						-157.03172302246095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.699999809265137,
+					"name": "contact",
+					"position": [
+						21.212982177734376,
+						-99.04875946044922,
+						-117.03449249267578
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.699999809265137,
+					"name": "contact",
+					"position": [
+						-11.66230583190918,
+						-106.81967163085938,
+						-115.79298400878906
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.800000190734863,
+					"name": "contact",
+					"position": [
+						5.700714111328125,
+						-57.656654357910159,
+						-128.17724609375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.800000190734863,
+					"name": "contact",
+					"position": [
+						-8.661880493164063,
+						-90.75958251953125,
+						-102.0620346069336
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.800000190734863,
+					"name": "contact",
+					"position": [
+						-4.1411285400390629,
+						-108.27521514892578,
+						-134.51034545898438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.900000095367432,
+					"name": "contact",
+					"position": [
+						18.355201721191408,
+						-84.5758056640625,
+						-136.46775817871095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.900000095367432,
+					"name": "contact",
+					"position": [
+						-21.32678985595703,
+						-111.45425415039063,
+						-139.69253540039063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.900000095367432,
+					"name": "contact",
+					"position": [
+						12.931228637695313,
+						-125.72881317138672,
+						-161.29824829101563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.0,
+					"name": "contact",
+					"position": [
+						26.443954467773439,
+						-111.36219787597656,
+						-125.85249328613281
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.0,
+					"name": "contact",
+					"position": [
+						-3.2229347229003908,
+						-112.39677429199219,
+						-119.28439331054688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.099999904632568,
+					"name": "contact",
+					"position": [
+						5.167121887207031,
+						-61.6297492980957,
+						-137.5522003173828
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.099999904632568,
+					"name": "contact",
+					"position": [
+						-5.054237365722656,
+						-99.54518127441406,
+						-105.77339935302735
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.099999904632568,
+					"name": "contact",
+					"position": [
+						4.349723815917969,
+						-118.14485931396485,
+						-140.5171356201172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.199999809265137,
+					"name": "contact",
+					"position": [
+						27.371734619140626,
+						-85.35411071777344,
+						-143.91798400878907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.199999809265137,
+					"name": "contact",
+					"position": [
+						-13.5123291015625,
+						-119.09736633300781,
+						-145.52450561523438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.199999809265137,
+					"name": "contact",
+					"position": [
+						10.18170166015625,
+						-113.01887512207031,
+						-169.8413543701172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.300000190734863,
+					"name": "contact",
+					"position": [
+						23.97083282470703,
+						-107.72380065917969,
+						-129.59869384765626
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.300000190734863,
+					"name": "contact",
+					"position": [
+						4.312767028808594,
+						-122.40512084960938,
+						-124.24627685546875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.400000095367432,
+					"name": "contact",
+					"position": [
+						5.043556213378906,
+						-70.69650268554688,
+						-148.079833984375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.400000095367432,
+					"name": "contact",
+					"position": [
+						-1.2411727905273438,
+						-88.58023071289063,
+						-108.92903137207031
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.400000095367432,
+					"name": "contact",
+					"position": [
+						7.917091369628906,
+						-121.43550109863281,
+						-146.338134765625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.5,
+					"name": "contact",
+					"position": [
+						24.75220489501953,
+						-71.60958862304688,
+						-143.39480590820313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.5,
+					"name": "contact",
+					"position": [
+						-13.044197082519532,
+						-106.23540496826172,
+						-150.0040740966797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.5,
+					"name": "contact",
+					"position": [
+						9.383872985839844,
+						-117.94203186035156,
+						-171.07980346679688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.599999904632568,
+					"name": "contact",
+					"position": [
+						19.417510986328126,
+						-92.72718811035156,
+						-128.07106018066407
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.599999904632568,
+					"name": "contact",
+					"position": [
+						-0.3990316390991211,
+						-118.61186218261719,
+						-128.40089416503907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.699999809265137,
+					"name": "contact",
+					"position": [
+						6.47222900390625,
+						-66.97269439697266,
+						-148.3824462890625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.699999809265137,
+					"name": "contact",
+					"position": [
+						-1.60546875,
+						-79.73433685302735,
+						-111.4933853149414
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.699999809265137,
+					"name": "contact",
+					"position": [
+						1.4133529663085938,
+						-107.92462158203125,
+						-149.27964782714845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.800000190734863,
+					"name": "contact",
+					"position": [
+						25.854045867919923,
+						-69.78594970703125,
+						-145.86753845214845
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.800000190734863,
+					"name": "contact",
+					"position": [
+						-10.496955871582032,
+						-99.28047180175781,
+						-154.9386444091797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.800000190734863,
+					"name": "contact",
+					"position": [
+						10.919158935546875,
+						-125.15275573730469,
+						-171.38522338867188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.900000095367432,
+					"name": "contact",
+					"position": [
+						17.40478515625,
+						-96.27935791015625,
+						-130.87844848632813
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.900000095367432,
+					"name": "contact",
+					"position": [
+						-12.662221908569336,
+						-104.51338958740235,
+						-131.63710021972657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.0,
+					"name": "contact",
+					"position": [
+						6.660575866699219,
+						-53.3370361328125,
+						-139.01312255859376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.0,
+					"name": "contact",
+					"position": [
+						-5.35284423828125,
+						-87.60758972167969,
+						-114.57493591308594
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.0,
+					"name": "contact",
+					"position": [
+						1.0241546630859376,
+						-105.14336395263672,
+						-151.33135986328126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.099999904632568,
+					"name": "contact",
+					"position": [
+						32.511112213134769,
+						-75.9907455444336,
+						-150.06906127929688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.099999904632568,
+					"name": "contact",
+					"position": [
+						-6.371124267578125,
+						-106.92009735107422,
+						-158.88050842285157
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.099999904632568,
+					"name": "contact",
+					"position": [
+						8.978309631347657,
+						-114.95053100585938,
+						-176.89366149902345
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.199999809265137,
+					"name": "contact",
+					"position": [
+						15.440414428710938,
+						-104.83268737792969,
+						-136.04605102539063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.199999809265137,
+					"name": "contact",
+					"position": [
+						-11.42953872680664,
+						-108.49201965332031,
+						-135.95870971679688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.300000190734863,
+					"name": "contact",
+					"position": [
+						3.6141357421875,
+						-56.66595458984375,
+						-141.42132568359376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.300000190734863,
+					"name": "contact",
+					"position": [
+						-7.760589599609375,
+						-93.98251342773438,
+						-121.4388656616211
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.300000190734863,
+					"name": "contact",
+					"position": [
+						8.568733215332032,
+						-113.11892700195313,
+						-155.9675750732422
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.400000095367432,
+					"name": "contact",
+					"position": [
+						33.769996643066409,
+						-75.0596694946289,
+						-150.16680908203126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.400000095367432,
+					"name": "contact",
+					"position": [
+						-9.22381591796875,
+						-110.72514343261719,
+						-162.80303955078126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.400000095367432,
+					"name": "contact",
+					"position": [
+						5.152217864990234,
+						-102.44514465332031,
+						-183.39889526367188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.5,
+					"name": "contact",
+					"position": [
+						10.599433898925782,
+						-97.83385467529297,
+						-136.29832458496095
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.5,
+					"name": "contact",
+					"position": [
+						-1.519383430480957,
+						-116.28523254394531,
+						-139.67762756347657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.599999904632568,
+					"name": "contact",
+					"position": [
+						0.24559783935546876,
+						-64.17626953125,
+						-151.99795532226563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.599999904632568,
+					"name": "contact",
+					"position": [
+						-9.595455169677735,
+						-80.95225524902344,
+						-123.94630432128906
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.599999904632568,
+					"name": "contact",
+					"position": [
+						9.479896545410157,
+						-113.503173828125,
+						-157.43458557128907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.699999809265137,
+					"name": "contact",
+					"position": [
+						23.052160263061525,
+						-61.30204772949219,
+						-143.6051025390625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.699999809265137,
+					"name": "contact",
+					"position": [
+						-22.33312225341797,
+						-96.23722076416016,
+						-162.6868438720703
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.699999809265137,
+					"name": "contact",
+					"position": [
+						3.8776817321777345,
+						-108.51727294921875,
+						-180.063720703125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.800000190734863,
+					"name": "contact",
+					"position": [
+						4.2050323486328129,
+						-83.26342010498047,
+						-132.0801239013672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.800000190734863,
+					"name": "contact",
+					"position": [
+						-0.9430522918701172,
+						-107.93233489990235,
+						-139.92259216308595
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.900000095367432,
+					"name": "contact",
+					"position": [
+						-2.652191162109375,
+						-59.38018035888672,
+						-158.96075439453126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.900000095367432,
+					"name": "contact",
+					"position": [
+						-14.019027709960938,
+						-73.818115234375,
+						-124.6885757446289
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.900000095367432,
+					"name": "contact",
+					"position": [
+						-1.02996826171875,
+						-99.29084777832031,
+						-157.7686004638672
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.0,
+					"name": "contact",
+					"position": [
+						21.520004272460939,
+						-60.764129638671878,
+						-144.72735595703126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.0,
+					"name": "contact",
+					"position": [
+						-25.71582794189453,
+						-90.15158081054688,
+						-164.408447265625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.0,
+					"name": "contact",
+					"position": [
+						3.5359396934509279,
+						-114.80413818359375,
+						-177.14450073242188
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.099999904632568,
+					"name": "contact",
+					"position": [
+						1.5183486938476563,
+						-87.38739013671875,
+						-133.45025634765626
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.099999904632568,
+					"name": "contact",
+					"position": [
+						-12.74462890625,
+						-93.51024627685547,
+						-141.34161376953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.199999809265137,
+					"name": "contact",
+					"position": [
+						-3.2856979370117189,
+						-46.361602783203128,
+						-155.8009796142578
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.199999809265137,
+					"name": "contact",
+					"position": [
+						-21.434152603149415,
+						-81.08297729492188,
+						-126.90384674072266
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.199999809265137,
+					"name": "contact",
+					"position": [
+						-5.613285064697266,
+						-98.36874389648438,
+						-157.06924438476563
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.300000190734863,
+					"name": "contact",
+					"position": [
+						24.229915618896486,
+						-68.16433715820313,
+						-146.14788818359376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.300000190734863,
+					"name": "contact",
+					"position": [
+						-22.620222091674806,
+						-95.80828094482422,
+						-164.41102600097657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.300000190734863,
+					"name": "contact",
+					"position": [
+						1.3267765045166016,
+						-102.95514678955078,
+						-178.533447265625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.400000095367432,
+					"name": "contact",
+					"position": [
+						0.256256103515625,
+						-95.03567504882813,
+						-132.72161865234376
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.400000095367432,
+					"name": "contact",
+					"position": [
+						-20.703140258789064,
+						-97.77974700927735,
+						-140.0518798828125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.5,
+					"name": "contact",
+					"position": [
+						-7.387630462646484,
+						-51.37244415283203,
+						-146.277099609375
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.5,
+					"name": "contact",
+					"position": [
+						-27.338199615478517,
+						-84.40672302246094,
+						-128.4895477294922
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.5,
+					"name": "contact",
+					"position": [
+						-4.974033355712891,
+						-106.49034118652344,
+						-153.30526733398438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.599999904632568,
+					"name": "contact",
+					"position": [
+						20.89116859436035,
+						-66.82312774658203,
+						-142.8299560546875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.599999904632568,
+					"name": "contact",
+					"position": [
+						-21.64345932006836,
+						-96.49226379394531,
+						-162.60888671875
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.599999904632568,
+					"name": "contact",
+					"position": [
+						3.9537410736083986,
+						-93.47366333007813,
+						-177.8488006591797
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.699999809265137,
+					"name": "contact",
+					"position": [
+						-0.04992103576660156,
+						-86.80069732666016,
+						-129.43380737304688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.699999809265137,
+					"name": "contact",
+					"position": [
+						-22.027095794677736,
+						-106.11029815673828,
+						-139.1695556640625
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 8.390220642089844,
+					"name": "snap_beams",
+					"position": [
+						12.327423095703125,
+						-98.93997192382813,
+						-181.19070434570313
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKCape.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKSkirt.ao"
+	attached_object = "L_shoulder_jntBnd Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKLBicepFingers.ao"
+	attached_object = "L_thigh_jntBnd Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKThighFingers.ao"
+	attached_object = "L_elbow_Twist_jntBnd_1 Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKLForearmFingers.ao"
+	attached_object = "L_knee_jntBnd Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKShinFingers.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/rig.ast"
+		socket = "R_arm_05_ref"
+			parent = "R_arm_05_07_jntBnd"
+			translation = "90.2008 13.3147 17.5577"
+		socket = "R_arm_01_ref"
+			parent = "R_arm_01_10_jntBnd"
+			translation = "90.2008 13.3147 43.2285"
+		socket = "R_arm_02_ref"
+			parent = "R_arm_02_08_jntBnd"
+			translation = "90.2008 13.3147 43.2285"
+		socket = "R_arm_03_ref"
+			parent = "R_arm_03_08_jntBnd"
+			translation = "67.3979 6.69506 93.9178"
+		socket = "R_arm_04_ref"
+			parent = "R_arm_04_08_jntBnd"
+			translation = "90.2008 13.3147 30.1008"
+		socket = "R_arm_06_ref"
+			parent = "R_arm_06_06_jntBnd"
+			translation = "-5.34378 88.7032 -0.89635"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "R_arm_07_ref"
+			parent = "R_arm_07_07_jntBnd"
+			translation = "82.265 31.1729 64.624"
+		socket = "R_arm_08_ref"
+			parent = "R_arm_08_06_jntBnd"
+			translation = "5.18562 70.741 -3.24071"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "aux_arm_circle_01"
+			parent = "R_arm_02_02_jntBnd"
+			translation = "-55 0 -15"
+		socket = "aux_arm_circle_02"
+			parent = "R_arm_02_02_jntBnd"
+			translation = "-50 0 -40"
+		socket = "aux_arm_circle_03"
+			parent = "R_arm_02_02_jntBnd"
+			translation = "-55 35 -15"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/BreachBossFallenKnight.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "arm_circle false aux_arm_circle_03 aux_arm_circle_01 aux_arm_circle_02"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "summon_tul_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1494531631469727,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/BreachOverseerBoss/fx/breach_portal/portal_once.pet",
+						"bone_group": "grp_root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5304864645004273,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/BreachOverseerBoss/fx/breach_portal/portal_summon_surge.pet",
+						"bone_group": "grp_root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.9611473083496095,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/BreachOverseerBoss/fx/tul_projectile/OnAct.pet",
+						"bone_group": "arm_circle"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "summon_tul_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Breach/BreachOverseerBoss/epk/Tul_OnAct.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "summon_tul_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 10.333000183105469,
+						"name": "EmissiveMulti",
+						"curve": "6 0 0 Linear 1.8982 0 Flat 3.55289 1 Flat 7.23779 0.793919 Smooth 8.73992 0 Flat 10.333 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 10.333000183105469,
+						"name": "Portal_Open",
+						"curve": "6 0 0 Linear 1.15 0 Linear 2.61992 1 Linear 8.5815 1 Linear 9.27388 0 Flat 10.333 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "summon_tul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5414338707923889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/Xesht_Boss/Effects/Puppet/Portal",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.418404221534729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/Xesht_Boss/Effects/Puppet/PuppetPortal",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6771554946899416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/Xesht_Boss/Effects/Puppet/Tul/Surge",
+						"bone_name": "R_arm_01_06_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.096573829650879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/Xesht_Boss/Effects/Puppet/Tul/SwarmLoop_",
+						"bone_name": "R_arm_01_06_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.3665452003479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Breach/Xesht_Boss/Effects/Puppet/PuppetPortal",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKCape.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKCape/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKCape/rig.ast"
+		linear_allowed_contraction = 0.600
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.800
+		normal_viscosity_multiplier = 0.200
+		tangent_viscosity_multiplier = 0.020
+		enclosure_radius = 1.000
+		attachment_bones = "L_clavicle_jntBnd R_clavicle_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKCape/BBFKCape.sm"
+	}
+	
+	BoneGroups
+	{
+	    bone_group = "child_attach false L_clavicle_jntBnd R_clavicle_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKSkirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKSkirt/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_radius = 2.000
+		enclosure_angle = 0.000
+		animation_velocity_factor = 5.000
+		animation_force_factor = 5.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKSkirt/BBFKSkirt.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKLBicepFingers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLBicepFingers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLBicepFingers/rig.ast"
+		linear_allowed_contraction = 0.100 
+		bend_stiffness = 500.000 
+		bend_allowed_angle = 0.100 
+		normal_viscosity_multiplier = 0.200 
+		tangent_viscosity_multiplier = 0.025 
+		enclosure_angle = 0.200
+		gravity = 0.100
+		enable_collisions = false
+		attachment_bones = "L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_attachment_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLBicepFingers/LBicepFingers.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_attachment_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKThighFingers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLThighFingers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLThighFingers/rig.ast"
+		linear_allowed_contraction = 0.100 
+		bend_stiffness = 500.000 
+		bend_allowed_angle = 0.100 
+		normal_viscosity_multiplier = 0.200 
+		tangent_viscosity_multiplier = 0.025 
+		enclosure_angle = 0.200
+		gravity = 0.100
+		enable_collisions = false
+		attachment_bones = "L_thigh_jntBnd L_knee_jntBnd L_knee_attachment_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLThighFingers/ThighFingers.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_thigh_jntBnd L_knee_jntBnd L_knee_attachment_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKLForearmFingers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLForearmFingers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLForearmFingers/rig.ast"
+		linear_allowed_contraction = 0.100 
+		bend_stiffness = 500.000 
+		bend_allowed_angle = 0.100 
+		normal_viscosity_multiplier = 0.200 
+		tangent_viscosity_multiplier = 0.025 
+		enclosure_angle = 0.200
+		gravity = 0.100
+		enable_collisions = false
+		attachment_bones = "L_elbow_jntBnd L_elbow_Twist_jntBnd_1 child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLForearmFingers/LForearmFingers.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_elbow_jntBnd L_elbow_Twist_jntBnd_1"
+	}
+}
+
+=== .ao Metadata/Monsters/BreachBossFallenKnight/attachments/BBFKShinFingers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLShinFingers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLShinFingers/rig.ast"
+		linear_allowed_contraction = 0.100 
+		bend_stiffness = 500.000 
+		bend_allowed_angle = 0.100 
+		normal_viscosity_multiplier = 0.200 
+		tangent_viscosity_multiplier = 0.025 
+		enclosure_angle = 0.200
+		gravity = 0.100
+		enable_collisions = false
+		attachment_bones = "L_knee_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachBossFallen/attachments/BBFKLShinFingers/ShinFingers.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_knee_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BreachBossFallen/BreachBossFallenKnight.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BreachBossFallen/rig_5b9f4528.smd"
+Materials 1
+	"Art/Models/MONSTERS/BreachBossFallen/Textures/BreachBossFallenKnightc.mat" 19
+BoundingBox -144.618 -33.6208 -214.858 83.8567 47.7051 1.15064
+BoneGroups 78
+	"grp_root" 2 "root_jntBnd" "hip_jntBnd"
+	"grp_frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "aux_face" "head_jntBnd"
+	"grp_neck" 2 "head_jntBnd" "neck_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_toe"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_toe"
+	"grp_r_arm_01_01" 2 "R_arm_01_01_jntBnd" "R_arm_01_02_jntBnd"
+	"grp_r_arm_01_02" 2 "R_arm_01_02_jntBnd" "R_arm_01_03_jntBnd"
+	"grp_r_arm_01_03" 2 "R_arm_01_03_jntBnd" "R_arm_01_04_jntBnd"
+	"grp_r_arm_01_04" 2 "R_arm_01_04_jntBnd" "R_arm_01_05_jntBnd"
+	"grp_r_arm_01_05" 2 "R_arm_01_05_jntBnd" "R_arm_01_06_jntBnd"
+	"grp_r_arm_01_06" 2 "R_arm_01_06_jntBnd" "R_arm_01_07_jntBnd"
+	"grp_r_arm_01_07" 2 "R_arm_01_07_jntBnd" "R_arm_01_08_jntBnd"
+	"grp_r_arm_01_08" 2 "R_arm_01_08_jntBnd" "R_arm_01_09_jntBnd"
+	"grp_r_arm_01_09" 2 "R_arm_01_09_jntBnd" "R_arm_01_10_jntBnd"
+	"grp_r_hand_01" 2 "R_arm_01_10_jntBnd" "R_arm_01_finger_2_jntBnd_1"
+	"grp_r_arm_02_01" 2 "R_arm_02_01_jntBnd" "R_arm_02_02_jntBnd"
+	"grp_r_arm_02_02" 2 "R_arm_02_02_jntBnd" "R_arm_02_03_jntBnd"
+	"grp_r_arm_02_03" 2 "R_arm_02_03_jntBnd" "R_arm_02_04_jntBnd"
+	"grp_r_arm_02_04" 2 "R_arm_02_04_jntBnd" "R_arm_02_05_jntBnd"
+	"grp_r_arm_02_05" 2 "R_arm_02_05_jntBnd" "R_arm_02_06_jntBnd"
+	"grp_r_arm_02_06" 2 "R_arm_02_06_jntBnd" "R_arm_02_07_jntBnd"
+	"grp_r_arm_02_07" 2 "R_arm_02_07_jntBnd" "R_arm_02_08_jntBnd"
+	"grp_r_hand_02" 2 "R_arm_02_08_jntBnd" "R_arm_02_finger_2_jntBnd_1"
+	"grp_r_arm_03_01" 2 "R_arm_03_01_jntBnd" "R_arm_03_02_jntBnd"
+	"grp_r_arm_03_02" 2 "R_arm_03_02_jntBnd" "R_arm_03_03_jntBnd"
+	"grp_r_arm_03_03" 2 "R_arm_03_03_jntBnd" "R_arm_03_04_jntBnd"
+	"grp_r_arm_03_04" 2 "R_arm_03_04_jntBnd" "R_arm_03_05_jntBnd"
+	"grp_r_arm_03_05" 2 "R_arm_03_05_jntBnd" "R_arm_03_06_jntBnd"
+	"grp_r_arm_03_06" 2 "R_arm_03_06_jntBnd" "R_arm_03_07_jntBnd"
+	"grp_r_arm_03_07" 2 "R_arm_03_07_jntBnd" "R_arm_03_08_jntBnd"
+	"grp_r_hand_03" 2 "R_arm_03_08_jntBnd" "R_arm_03_finger_2_jntBnd_1"
+	"grp_r_arm_04_01" 2 "R_arm_04_01_jntBnd" "R_arm_04_02_jntBnd"
+	"grp_r_arm_04_02" 2 "R_arm_04_02_jntBnd" "R_arm_04_03_jntBnd"
+	"grp_r_arm_04_03" 2 "R_arm_04_03_jntBnd" "R_arm_04_04_jntBnd"
+	"grp_r_arm_04_04" 2 "R_arm_04_04_jntBnd" "R_arm_04_05_jntBnd"
+	"grp_r_arm_04_05" 2 "R_arm_04_05_jntBnd" "R_arm_04_06_jntBnd"
+	"grp_r_arm_04_06" 2 "R_arm_04_06_jntBnd" "R_arm_04_07_jntBnd"
+	"grp_r_arm_04_07" 2 "R_arm_04_07_jntBnd" "R_arm_04_08_jntBnd"
+	"grp_r_hand_04" 2 "R_arm_04_08_jntBnd" "R_arm_04_finger_2_jntBnd_1"
+	"grp_r_arm_05_01" 2 "R_arm_05_01_jntBnd" "R_arm_05_02_jntBnd"
+	"grp_r_arm_05_02" 2 "R_arm_05_02_jntBnd" "R_arm_05_03_jntBnd"
+	"grp_r_arm_05_03" 2 "R_arm_05_03_jntBnd" "R_arm_05_04_jntBnd"
+	"grp_r_arm_05_04" 2 "R_arm_05_04_jntBnd" "R_arm_05_05_jntBnd"
+	"grp_r_arm_05_05" 2 "R_arm_05_05_jntBnd" "R_arm_05_06_jntBnd"
+	"grp_r_arm_05_06" 2 "R_arm_05_06_jntBnd" "R_arm_05_07_jntBnd"
+	"grp_r_hand_05" 2 "R_arm_05_07_jntBnd" "R_arm_05_finger_2_jntBnd_1"
+	"grp_r_arm_06_01" 2 "R_arm_06_01_jntBnd" "R_arm_06_02_jntBnd"
+	"grp_r_arm_06_02" 2 "R_arm_06_02_jntBnd" "R_arm_06_03_jntBnd"
+	"grp_r_arm_06_03" 2 "R_arm_06_03_jntBnd" "R_arm_06_04_jntBnd"
+	"grp_r_arm_06_04" 2 "R_arm_06_04_jntBnd" "R_arm_06_05_jntBnd"
+	"grp_r_arm_06_05" 2 "R_arm_06_05_jntBnd" "R_arm_06_06_jntBnd"
+	"grp_r_hand_06" 2 "R_arm_06_06_jntBnd" "R_arm_06_finger_2_jntBnd_1"
+	"grp_r_arm_07_01" 2 "R_arm_07_01_jntBnd" "R_arm_07_02_jntBnd"
+	"grp_r_arm_07_02" 2 "R_arm_07_02_jntBnd" "R_arm_07_03_jntBnd"
+	"grp_r_arm_07_03" 2 "R_arm_07_03_jntBnd" "R_arm_07_04_jntBnd"
+	"grp_r_arm_07_04" 2 "R_arm_07_04_jntBnd" "R_arm_07_05_jntBnd"
+	"grp_r_arm_07_05" 2 "R_arm_07_05_jntBnd" "R_arm_07_06_jntBnd"
+	"grp_r_hand_07" 2 "R_arm_07_06_jntBnd" "R_arm_07_finger_2_jntBnd_1"
+	"grp_r_arm_08_01" 2 "R_arm_08_01_jntBnd" "R_arm_08_02_jntBnd"
+	"grp_r_arm_08_02" 2 "R_arm_08_02_jntBnd" "R_arm_08_03_jntBnd"
+	"grp_r_arm_08_03" 2 "R_arm_08_03_jntBnd" "R_arm_08_04_jntBnd"
+	"grp_r_arm_08_04" 2 "R_arm_08_04_jntBnd" "R_arm_08_05_jntBnd"
+	"grp_r_arm_08_05" 2 "R_arm_08_05_jntBnd" "R_arm_08_06_jntBnd"
+	"grp_r_hand_08" 2 "R_arm_08_06_jntBnd" "R_arm_08_finger_2_jntBnd_1"
+
+=== .smd Art/Models/MONSTERS/BreachBossFallen/rig_5b9f4528.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 19 in the header, 19 in the block · 30634 triangles over 28054 vertices
+  names: 530 bytes said, 530 read  [agree]
+
+=== shapes (30)
+0	BaseBodyArmour_01Shape	from 0	count 2328
+1	BaseBodyArmour_02Shape	from 2328	count 28872
+2	HeadShape	from 31200	count 1314
+3	HelmetShape	from 32514	count 5766
+4	L_armChainShape	from 38280	count 8064
+5	L_armShape	from 46344	count 3903
+6	L_ChestHornShape	from 50247	count 864
+7	LegsShape	from 51111	count 5781
+8	NeckPieceShape	from 56892	count 1422
+9	R_arm_01Shape	from 58314	count 3000
+10	R_arm_02Shape	from 61314	count 3000
+11	R_arm_03Shape	from 64314	count 3000
+12	R_arm_04Shape	from 67314	count 2940
+13	R_arm_05Shape	from 70254	count 3000
+14	R_arm_06Shape	from 73254	count 2760
+15	R_arm_07Shape	from 76014	count 3000
+16	R_arm_08Shape	from 79014	count 2700
+17	R_ChestHornShape	from 81714	count 864
+18	ShoulderPadsShape	from 82578	count 9324
+19	CapeShape	from 91902	count 2316
+20	BackPlatesShape	from 94218	count 2160
+21	FrontPlatesShape	from 96378	count 2520
+22	SidePlates_01Shape	from 98898	count 3624
+23	SidePlates_02Shape	from 102522	count 1944
+24	SidePlates_03Shape	from 104466	count 2040
+25	WaistBandShape	from 106506	count 6216
+26	L_bicepFingersShape	from 112722	count 1863
+27	ThighFingersShape	from 114585	count 1875
+28	LForearmFingersShape	from 116460	count 789
+29	ShinFingersShape	from 117249	count 843
+
+=== fitting
+the monster's rig: 244 bones
+mounts: aux_position, aux_L_toe, aux_R_toe, aux_face
+  BBFKCape.ao  socket chest_jntBnd [in its carrier's rig]  box (-21.3,19.1,-14.4)..(22.6,33.5,135.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 772 triangles over 458 vertices
+    names: 18 bytes said, 18 read  [agree]
+    rig 22 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 21 of 22  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (6,-1,-15)  carrier has (6,-1,-165.5)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-6,-1,-15)  carrier has (-6,-1,-165.5)
+      3 phys_skinned_Cape_01_01_jntBnd  [its own]  under 0  rests at (14.7,19.7,-4.4)
+      4 phys_skinned_Cape_02_01_jntBnd  [its own]  under 0  rests at (0,20.7,-4.4)
+      5 phys_skinned_Cape_03_01_jntBnd  [its own]  under 0  rests at (-14.7,19.7,-4.4)
+      6 phys_skinned_Cape_01_02_jntBnd  [its own]  under 3  rests at (14.7,20.4,17.3)
+      7 phys_skinned_Cape_02_02_jntBnd  [its own]  under 4  rests at (0,21.4,17.2)
+      8 phys_skinned_Cape_03_02_jntBnd  [its own]  under 5  rests at (-14.7,20.4,17.3)
+      9 phys_skinned_Cape_01_03_jntBnd  [its own]  under 6  rests at (14.7,21.2,38.9)
+      10 phys_skinned_Cape_02_03_jntBnd  [its own]  under 7  rests at (0,22.2,38.8)
+      11 phys_skinned_Cape_03_03_jntBnd  [its own]  under 8  rests at (-14.7,21.2,38.9)
+      12 phys_skinned_Cape_01_04_jntBnd  [its own]  under 9  rests at (14.7,22,60.5)
+      13 phys_skinned_Cape_02_04_jntBnd  [its own]  under 10  rests at (0,22.9,60.4)
+      14 phys_skinned_Cape_03_04_jntBnd  [its own]  under 11  rests at (-14.7,22,60.5)
+      15 phys_skinned_Cape_01_05_jntBnd  [its own]  under 12  rests at (14.7,22.7,82.1)
+      16 phys_skinned_Cape_02_05_jntBnd  [its own]  under 13  rests at (0,23.7,82)
+      17 phys_skinned_Cape_03_05_jntBnd  [its own]  under 14  rests at (-14.7,22.7,82.1)
+      18 phys_skinned_Cape_01_06_jntBnd  [its own]  under 15  rests at (13.2,23.4,102.4)
+      19 phys_skinned_Cape_02_06_jntBnd  [its own]  under 16  rests at (0,24.4,103.6)
+      20 phys_skinned_Cape_03_06_jntBnd  [its own]  under 17  rests at (-13.2,23.4,102.4)
+      21 phys_skinned_Cape_02_07_jntBnd  [its own]  under 19  rests at (0,25.2,125.2)
+  BBFKSkirt.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-30.7,-22.8,-15.4)..(30.7,22.4,26.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 6 in the header, 6 in the block · 6168 triangles over 6170 vertices
+    names: 198 bytes said, 198 read  [agree]
+    rig 31 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 30 of 31  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_frontPlates_01_jntBnd  [its own]  under 0  rests at (0,-16.2,1.1)
+      2 phys_backPlates_01_jntBnd  [its own]  under 0  rests at (0,16.4,2.6)
+      3 phys_L_sidePlates_01_01_jntBnd  [its own]  under 0  rests at (10.3,-11.8,-6.4)
+      4 phys_L_sidePlates_02_01_jntBnd  [its own]  under 0  rests at (17.7,-2.1,-5.7)
+      5 phys_L_sidePlates_03_01_jntBnd  [its own]  under 0  rests at (15.1,7.3,-5.3)
+      6 phys_R_sidePlates_01_01_jntBnd  [its own]  under 0  rests at (-10.3,-11.8,-6.4)
+      7 phys_R_sidePlates_02_01_jntBnd  [its own]  under 0  rests at (-17.7,-2.1,-5.7)
+      8 phys_R_sidePlates_03_01_jntBnd  [its own]  under 0  rests at (-15.1,7.3,-5.3)
+      9 phys_frontPlates_02_jntBnd  [its own]  under 1  rests at (0,-17.5,8.3)
+      10 phys_backPlates_02_jntBnd  [its own]  under 2  rests at (0,18.4,7.8)
+      11 phys_L_sidePlates_01_02_jntBnd  [its own]  under 3  rests at (12.1,-12,1.2)
+      12 phys_L_sidePlates_02_02_jntBnd  [its own]  under 4  rests at (20,-2.3,0.6)
+      13 phys_L_sidePlates_03_02_jntBnd  [its own]  under 5  rests at (17.3,8.1,1.3)
+      14 phys_R_sidePlates_01_02_jntBnd  [its own]  under 6  rests at (-12.1,-12,1.2)
+      15 phys_R_sidePlates_02_02_jntBnd  [its own]  under 7  rests at (-20,-2.3,0.6)
+      16 phys_R_sidePlates_03_02_jntBnd  [its own]  under 8  rests at (-17.3,8.1,1.3)
+      17 phys_frontPlates_03_jntBnd  [its own]  under 9  rests at (0,-18.8,15.6)
+      18 phys_backPlates_03_jntBnd  [its own]  under 10  rests at (0,19.8,15.6)
+      19 phys_L_sidePlates_01_03_jntBnd  [its own]  under 11  rests at (14.3,-12.7,8)
+      20 phys_L_sidePlates_02_03_jntBnd  [its own]  under 12  rests at (22.3,-2.6,6.9)
+      21 phys_L_sidePlates_03_03_jntBnd  [its own]  under 13  rests at (19.5,8.6,7.2)
+      22 phys_R_sidePlates_01_03_jntBnd  [its own]  under 14  rests at (-14.3,-12.7,8)
+      23 phys_R_sidePlates_02_03_jntBnd  [its own]  under 15  rests at (-22.3,-2.6,6.9)
+      24 phys_R_sidePlates_03_03_jntBnd  [its own]  under 16  rests at (-19.5,8.6,7.2)
+      25 phys_L_sidePlates_01_04_jntBnd  [its own]  under 19  rests at (16.4,-13.4,14.6)
+      26 phys_L_sidePlates_02_04_jntBnd  [its own]  under 20  rests at (24.5,-2.8,13)
+      27 phys_L_sidePlates_03_04_jntBnd  [its own]  under 21  rests at (21.9,9.1,13.6)
+      28 phys_R_sidePlates_01_04_jntBnd  [its own]  under 22  rests at (-16.4,-13.4,14.6)
+      29 phys_R_sidePlates_02_04_jntBnd  [its own]  under 23  rests at (-24.5,-2.8,13)
+      30 phys_R_sidePlates_03_04_jntBnd  [its own]  under 24  rests at (-21.9,9.1,13.6)
+  BBFKLBicepFingers.ao  socket L_shoulder_jntBnd [in its carrier's rig]  box (9.5,-8.8,-2.2)..(31.1,5.2,28.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 621 triangles over 446 vertices
+    names: 38 bytes said, 38 read  [agree]
+    rig 8 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_shoulder_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (22.3,7,-157.9)
+      2 L_shoulder_cTwist_jntBnd_1  [shared]  under 1  rests at (13.4,0,8.7)  carrier has (35.7,7,-149.2)
+      3 L_elbow_attachment_jntBnd  [shared]  under 1  rests at (26.8,0,17.4)  carrier has (49.2,7,-140.5)
+      4 phys_LBicepFingers_01_jntBnd  [its own]  under 1  rests at (12.5,-1.7,-0.2)
+      5 phys_LBicepFingers_02_jntBnd  [its own]  under 2  rests at (23.8,-5.1,8.9)
+      6 phys_LBicepFingers_03_jntBnd  [its own]  under 2  rests at (25.5,1.8,9)
+      7 phys_LBicepFingers_04_jntBnd  [its own]  under 2  rests at (19,0.5,23.4)
+  BBFKThighFingers.ao  socket L_thigh_jntBnd [in its carrier's rig]  box (-6.6,-16.3,19.2)..(14.7,1.2,61.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 625 triangles over 450 vertices
+    names: 34 bytes said, 34 read  [agree]
+    rig 7 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_thigh_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (11.5,0,-110)
+      2 L_knee_jntBnd  [shared]  under 1  rests at (5.2,1.7,49.7)  carrier has (16.7,1.7,-60.3)
+      3 L_knee_attachment_jntBnd  [shared]  under 1  rests at (5.2,1.7,49.7)  carrier has (16.7,1.7,-60.3)
+      4 phys_LegFingers_01_jntBnd  [its own]  under 1  rests at (-1.9,-8.8,27.7)
+      5 phys_LegFingers_02_jntBnd  [its own]  under 3  rests at (6,-7.1,48.5)
+      6 phys_LegFingers_03_jntBnd  [its own]  under 3  rests at (11.6,-2.3,56.1)
+  BBFKLForearmFingers.ao  socket L_elbow_Twist_jntBnd_1 [in its carrier's rig]  box (3.2,-9.2,-2.8)..(11.8,1.7,5.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 263 triangles over 190 vertices
+    names: 40 bytes said, 40 read  [agree]
+    rig 5 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_elbow_Twist_jntBnd_1  [shared]  under 0  rests at (0,0,0)  carrier has (59.4,3.3,-131.7)
+      2 L_elbow_jntBnd  [shared]  under 1  rests at (-10.3,3.7,-8.8)  carrier has (49.2,7,-140.5)
+      3 phys_LForearmFingers_01_jntBnd  [its own]  under 1  rests at (6.6,-4,-0.1)
+      4 phys_LForearmFingers_02_jntBnd  [its own]  under 1  rests at (4.9,-6.7,4.7)
+  BBFKShinFingers.ao  socket L_knee_jntBnd [in its carrier's rig]  box (0.4,-3.7,33.4)..(12.2,5.4,45)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 281 triangles over 209 vertices
+    names: 32 bytes said, 32 read  [agree]
+    rig 4 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_knee_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (16.7,1.7,-60.3)
+      2 phys_ShinFingers_01_jntBnd  [its own]  under 1  rests at (2.1,0.5,35.6)
+      3 phys_ShinFingers_02_jntBnd  [its own]  under 1  rests at (8.4,0.1,38.2)

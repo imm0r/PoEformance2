@@ -1,0 +1,1843 @@
+monster: Hadi of the Flaming River [Metadata/Monsters/MarakethSanctumTrial/Boss/SentinelUnarmedBoss__]
+
+=== .ao Metadata/Monsters/MarakethSanctumTrial/Boss/Sentinels/SentinelUnarmedBoss.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/Animations/boss/rig.amd"
+	view_of = "fist_slam_01"
+		view_name = "melee_fist_slam_01"
+		view_exclude_event = "StandardEvent"
+	animations = '[
+		{
+			"name": "activate_stone_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.871537923812866,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.4919135272502899,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.46038615703582766,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 4.8472185134887699,
+					"name": "death"
+				}
+			]
+		},
+		{
+			"name": "fist_slam_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.8135029077529907,
+					"end_time": 1.461613655090332,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769295573234558,
+					"name": "contact",
+					"position": [
+						-3.858795166015625,
+						-90.20858001708985,
+						0.0
+					],
+					"contact_ref": [
+						-3.858795166015625,
+						-113.951904296875,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.769295573234558,
+					"name": "cone",
+					"position": [
+						-4.211822509765625,
+						-125.90241241455078,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "foot_stomp_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.2580120265483856,
+					"end_time": 0.9247668385505676,
+					"name": "start_target_update",
+					"data": "60 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3047178983688355,
+					"name": "contact",
+					"position": [
+						-32.347084045410159,
+						-59.42393112182617,
+						-5.856664180755615
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3071364164352418,
+					"name": "right",
+					"position": [
+						-32.34529113769531,
+						-59.31934356689453,
+						-5.85333776473999
+					],
+					"contact_ref": [
+						-70.7642822265625,
+						-19.868194580078126,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3083096742630005,
+					"name": "left",
+					"position": [
+						-32.34530258178711,
+						-59.31932830810547,
+						-5.853342056274414
+					],
+					"contact_ref": [
+						40.81416702270508,
+						-1.96746826171875,
+						13.459228515625
+					]
+				}
+			]
+		},
+		{
+			"name": "living_bomb_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.5220532417297365,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "melee_fist_slam_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.782986044883728,
+					"name": "contact",
+					"position": [
+						0.0,
+						-82.07711791992188,
+						0.0
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "L_elbow_elbowcut_jntBnd Metadata/Monsters/ColossusSentinels/ColossusSentinel_04/attachments/Boss_L_chain.ao"
+	attached_object = "R_elbow_elbowcut_jntBnd Metadata/Monsters/ColossusSentinels/ColossusSentinel_04/attachments/Boss_R_chain.ao"
+	attached_object = "torso_spine_1_cut_jntBnd Metadata/Monsters/ColossusSentinels/ColossusSentinel_04/attachments/BossSkirt.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3575420081615448,
+								0.0
+							],
+							[
+								0.41923075914382937,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"push_distance_limit": 3,
+						"rotation": 0.10471975803375244,
+						"width": 77.90899658203125,
+						"angle": 2.58309006690979,
+						"length": 144.97300720214845,
+						"local_offset": [
+							-29.0,
+							-23.0
+						],
+						"impact_z_rotation": [
+							0.15707963705062867,
+							0.15707963705062867
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon",
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.39449542760849,
+								0.0
+							],
+							[
+								0.4153846204280853,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"push_distance_limit": 3,
+						"rotation": -0.05235987901687622,
+						"width": 73.95600128173828,
+						"angle": 2.58309006690979,
+						"length": 144.97300720214845,
+						"local_offset": [
+							27.0,
+							-23.0
+						],
+						"impact_z_rotation": [
+							-0.10471975803375244,
+							-0.05235987901687622
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_Weapon",
+						"hand": "OffHand"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/Animations/boss/rig.ast"
+		socket = "aux_light_attach"
+			parent = "head_jntBnd"
+			translation = "0 -40 -90"
+		socket = "FX_footStomp"
+			translation = "-29.9131 -52.4951 0"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/ColossusSentinel_04.sm"
+			top_04_doubleShape = "Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Topc.mat:0"
+			top_opq_Shape1 = "Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Topc.mat:0"
+			top_opqShape = "Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Topc.mat:0"
+			pantsShape = "Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Botc.mat:0"
+			hide_segments = "L_elbowpadShape,L_shoulderpadShape,R_elbowpadShape,R_shoulderpadShape,top_opqShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false torso_hipcut_jntBnd torso_spine_1_cut_jntBnd L_shoulder_spine_2_cut_jntBnd head_chestcut_jntBnd"
+		bone_group = "frameupper false R_elbow_shouldercut_jntBnd upper_chest_section_jntBnd head_chestcut_jntBnd L_shoulder_claviclecut_jntBnd L_elbow_shouldercut_jntBnd"
+		bone_group = "melee_trail_r false R_Weapon"
+		bone_group = "melee_trail_l false L_Weapon"
+		bone_group = "FX_bodyCharge false torso_chestcut_jntBnd"
+		bone_group = "FX_footStomp false FX_footStomp"
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "aux_light_attach"
+			state = "on"
+				colour = "0.2 0.2 0.2"
+				position = "0 -41 70"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "off"
+				colour = "1.86794 0.477904 0.0541539"
+				position = "-51 9 -217"
+				radius = 0
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+		light = "point_light"
+			bone_name = "upper_chest_section_jntBnd"
+			state = "on"
+				colour = "0.514498 0.085502 0"
+				position = "0 -23 27"
+				radius = 300
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "off"
+				colour = "1 0 0"
+				position = "-51 9 -217"
+				radius = 0
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 2.1274049282073976,
+						"end_time": 3.4500460624694826,
+						"state_name": "off"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "activate_stone_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/Enrage",
+						"bone_name": "torso_spine_1_cut_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3582686483860016,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.749055027961731,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/Enrage/EnragePowerUp",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1332733631134035,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5449702739715578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/FistWoosh",
+						"bone_name": "R_hand_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.727236747741699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/Emerge/Emerge_FistBump",
+						"bone_name": "L_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8938028812408449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.534910202026367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.719701766967773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/FirePunch/FirePunch_FistGlowCharge",
+						"bone_name": "R_hand_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14647439122200013,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/AttackA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2170642763376236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8073940873146057,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8292032480239868,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/FirePunch/FirePunch_Impact",
+						"bone_name": "R_hand_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9512023329734802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.746778130531311,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "R_hand_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9147627353668213,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0119364261627199,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/FirePunch/FirePunch_FistGlowCharge",
+						"bone_name": "L_forearm_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08323648571968079,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "L_forearm_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10485618561506272,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/AttackA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25588878989219668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7835164666175842,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/FirePunch/FirePunch_Impact",
+						"bone_name": "L_forearm_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.783611536026001,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7063459157943726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "L_forearm_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9535852670669556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0499961376190187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/Death/Death_Armour",
+						"bone_name": "L_shoulder_spine_2_cut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45565730333328249,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.911313533782959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1773707866668702,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "R_hand_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9051947593688967,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "R_hand_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0183353424072267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.318026542663574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.642201900482178,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "R_hand_wristcut_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_statue_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/Emerge/Emerge_HelmetMove",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2232415676116944,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2735908031463625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.986992359161377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/FistGroundImpactRing",
+						"bone_name": "L_forearm_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.987959623336792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/Emerge/Emerge_FistBump",
+						"bone_name": "L_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.256878852844238,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/Emerge/Emerge_Landing",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.542080402374268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fist_slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/FistSlam",
+						"bone_name": "face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2266002893447876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2857134938240051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "R_hand_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3068694472312927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/FistSlam/FistSlamChargeUp",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.693594217300415,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8177327513694763,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "L_forearm_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.387216567993164,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/FistWoosh",
+						"bone_name": "R_hand_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6551873683929444,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/FistGroundImpactRing",
+						"bone_name": "R_hand_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.661076307296753,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/FistSlam/FistSlamImpact",
+						"bone_name": "L_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6462972164154054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "L_forearm_wristcut_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/Flinch",
+						"bone_name": "face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/Flinch",
+						"bone_name": "face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/Flinch",
+						"bone_name": "face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/Flinch",
+						"bone_name": "face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "foot_stomp_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/FootStomp",
+						"bone_name": "face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/FistSlam/FistSlamChargeUp",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0672773122787476,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2662651538848878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/FistGroundImpactRing",
+						"bone_name": "R_hand_wristcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.268269419670105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/FootSlam/FootSlam_Impact",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.391731023788452,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/Idle",
+						"bone_name": "face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48056235909461977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6330481171607971,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9703682065010071,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.321547031402588,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4601701498031617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1670658588409426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0635693073272707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.488696813583374,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "R_hand_elbowcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.616142749786377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.951328277587891,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/KnockdownC",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.506059646606445,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.046658515930176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.137189865112305,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.64547348022461,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "living_bomb_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/LivingBomb",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/ExplodeSelf/ExplodeSelf_AoeMark"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/ExplodeSelf/ExplodeSelf_OnAct_EnergyBuildUp"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1205992698669435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Effects/ExplodeSelf/ExplodeSelf_Explosion",
+						"bone_name": "L_shoulder_chest_cut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.348763465881348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ChainRattle",
+						"bone_name": "R_hand_wristcut_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/Walk",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20940636098384858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35718676447868349,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0890288352966309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1123312711715699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_angry_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Vocals/Walk",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3690107762813568,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48318082094192507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3914356231689454,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/ArmourMove",
+						"bone_name": "head_chestcut_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.503564715385437,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/Bosses/Sentinels/Unarmed/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.9810254573822022,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/attackFlashFire.ao",
+						"from": {
+							"parent_bone": "R_hand_wristcut_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								-25.000001907348634,
+								0.0,
+								0.0
+							],
+							"rotation": [
+								1.5707999467849732,
+								1.5707999467849732,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.0078539848327637,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/attackFlashFire.ao",
+						"from": {
+							"parent_bone": "L_forearm_wristcut_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								25.000001907348634,
+								0.0,
+								0.0
+							],
+							"rotation": [
+								1.5707999467849732,
+								-1.5707999467849732,
+								0.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 4.787210464477539,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/deathWaveFire.ao",
+						"from": {
+							"parent_bone": "torso_chestcut_jntBnd"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "emerge_statue_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 4.3328022956848148,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/impactEmerge.ao"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.4212043285369873,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheSentinels/footsteps.ao",
+						"from": {
+							"parent_bone": "L_foot_anklecut_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								10.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.2221894264221192,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheSentinels/footsteps.ao",
+						"from": {
+							"parent_bone": "R_foot_anklecut_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								10.0
+							]
+						}
+					}
+				]
+			},
+			{
+				"name": "walk_angry_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.5323304533958435,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheSentinels/footsteps.ao",
+						"from": {
+							"parent_bone": "L_foot_anklecut_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								10.0
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.5328317880630494,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheSentinels/footsteps.ao",
+						"from": {
+							"parent_bone": "R_foot_anklecut_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								10.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.3499999940395355,
+						"end_time": 0.8500000238418579,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheSentinels/fx/onAct/melee_trail_2.trl",
+						"bone_group": "melee_trail_r"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.44999998807907107,
+						"end_time": 0.8500000238418579,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheSentinels/fx/onAct/melee_trail_2.trl",
+						"bone_group": "melee_trail_l"
+					}
+				]
+			},
+			{
+				"name": "fist_slam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.2999999523162842,
+						"end_time": 1.399999976158142,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheSentinels/fx/onAct/melee_trail_2.trl",
+						"bone_group": "melee_trail_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.2999999523162842,
+						"end_time": 1.399999976158142,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheSentinels/fx/onAct/melee_trail_2.trl",
+						"bone_group": "melee_trail_l"
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 4.793987274169922,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "emerge_statue_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 4.403200626373291,
+						"amplitude": 12.0,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "fist_slam_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.774493932723999,
+						"amplitude": 8.0,
+						"duration": 0.75,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "foot_stomp_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.3027485609054566,
+						"amplitude": 8.0,
+						"duration": 0.75,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "living_bomb_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 3.525263786315918,
+						"frequency": 750.0,
+						"amplitude": 12.0,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.41864681243896487,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.2198503017425538,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "walk_angry_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.5323305130004883,
+						"amplitude": 8.0,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.5288214683532715,
+						"amplitude": 8.0,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "surgeTime_R",
+						"curve": "3 0 0 Smooth 0.839911 1 Linear 2.333 1 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "EmissiveMulti",
+						"curve": "3 0 1 Smooth 1.15927 1 Flat 2.333 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "EmissiveMulti",
+						"curve": "3 0 1 Smooth 1.1665 1 Flat 2.333 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "surgeTime_R",
+						"curve": "3 0 0 Smooth 0.738681 1 Linear 2.333 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "EmissiveMulti",
+						"curve": "4 0 0 Linear 3.22315 0 Linear 3.35952 1 Linear 6 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "resume_PARTICLE_CTRL",
+						"curve": "4 0 0 Linear 4.76042 0 Linear 4.76042 1 Linear 6 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "fist_slam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.865999937057495,
+						"name": "EmissiveMulti",
+						"curve": "4 0 1 Smooth 1.92102 1 Flat 3.29895 0 Flat 3.866 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.865999937057495,
+						"name": "surgeTime_R",
+						"curve": "5 0 0 Custom 0 0 0.285472 0.194024 Custom 3.51719 0.288677 0.768746 0.546796 Custom 3.71778 -0 1.27599 1 Custom 3.6006 0 3.866 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "foot_stomp_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.700000047683716,
+						"name": "EmissiveMulti",
+						"curve": "3 0 1 Smooth 1.34163 1 Flat 2.7 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.700000047683716,
+						"name": "surgeTime_R",
+						"curve": "3 0 0 Smooth 0.972036 1 Linear 2.7 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 9.065999984741211,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Linear 0.229237 1 Flat 5.71314 1 Flat 8.09683 0 Flat 9.066 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "living_bomb_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.099999904632568,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "5 0 1 Smooth 3.50366 0.976989 Flat 3.50366 2.30202 Linear 4.72868 0 Flat 5.1 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.099999904632568,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 3.39565 0.446004 Flat 3.56953 1 Linear 5.1 1 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/epk/fistsHeatUp_L.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/epk/fistsHeatUp_R.epk"
+					}
+				]
+			},
+			{
+				"name": "fist_slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/epk/fistsHeatUp_L.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/epk/fistsHeatUp_R.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "foot_stomp_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/epk/footHeatUp_R.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "living_bomb_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/epk/bodyHeatUp.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.778997421264648,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/epk/fire_amulet.pet",
+						"bone_group": "grp_neck"
+					}
+				]
+			},
+			{
+				"name": "foot_stomp_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.3040987253189088,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/fx/onAct_firewave.pet",
+						"bone_group": "FX_footStomp"
+					}
+				]
+			},
+			{
+				"name": "living_bomb_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/fx/livingBombCharge.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 3.4532089233398439,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Sanctum/TheExperimets/fx/livingBombBodyCharge.pet",
+						"bone_group": "FX_bodyCharge"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/ColossusSentinels/ColossusSentinel_04/attachments/Boss_L_chain.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/attachments/L_chain/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/attachments/L_chain/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/attachments/L_chain/chains.sm"
+			L_chains_danglersShape = "Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Botc.mat:0"
+	}
+}
+
+=== .ao Metadata/Monsters/ColossusSentinels/ColossusSentinel_04/attachments/Boss_R_chain.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/attachments/R_chain/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/attachments/R_chain/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/attachments/R_chain/chains.sm"
+			L_chains_danglersShape = "Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Botc.mat:0"
+	}
+}
+
+=== .ao Metadata/Monsters/ColossusSentinels/ColossusSentinel_04/attachments/BossSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/attachments/skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/attachments/skirt/rig.ast"
+		linear_allowed_contraction = 0.100
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "child_attach false torso_hipcut_jntBnd torso_spine_1_cut_jntBnd torso_spine_2_cut_jntBnd torso_chestcut_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/attachments/skirt/skirt.sm"
+			beltsShape = "Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Botc.mat:0"
+			platesShape = "Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Botc.mat:0"
+			ringsShape = "Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Botc.mat:0"
+			chainsShape = "Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Botc.mat:0"
+			fabricShape = "Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Botc.mat:0"
+			hide_segments = "ringsShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false torso_hip_jntBnd root_jntBnd torso_spine_2_jntBnd torso_chest_jntBnd"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/ColossusSentinel_04.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/ColossusSentinel_04_armour_e343750d.smd"
+Materials 8
+	"Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Topc.mat" 4
+	"Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Sunc.mat" 1
+	"Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Sunc.mat" 1
+	"Art/Models/MONSTERS/ColossusSentinels/textures/ReworkedColossusSentinel_04_Topc.mat" 3
+	"Art/Models/MONSTERS/ColossusSentinels/textures/ColossusSentinel_04_Bot_metalc.mat" 2
+	"Art/Models/MONSTERS/ColossusSentinels/textures/ColossusSentinel_04_Topc.mat" 6
+	"Art/Models/MONSTERS/ColossusSentinels/textures/ColossusSentinel_04_Botc.mat" 1
+	"Art/Models/MONSTERS/ColossusSentinels/textures/ColossusSentinel_04_Top_metalc.mat" 1
+BoundingBox -128.349 -29.9235 -269.003 128.349 44.179 1.38632
+BoneGroups 22
+	"root" 1 "torso_hipcut_jntBnd"
+	"frameupper" 5 "torso_L_shouldercut_jntBnd" "torso_L_claviclecut_jntBnd" "torso_chestcut_jntBnd" "torso_R_claviclecut_jntBnd" "torso_R_shouldercut_jntBnd"
+	"grp_head" 2 "head_jntBnd" "face_jntBnd"
+	"grp_neck" 2 "head_neckcut_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "torso_spine_2_cut_jntBnd" "torso_neckcut_jntBnd"
+	"grp_waist" 2 "torso_hipcut_jntBnd" "torso_spine_2_cut_jntBnd"
+	"grp_l_clavicle" 2 "torso_L_claviclecut_jntBnd" "torso_L_shouldercut_jntBnd"
+	"grp_r_clavicle" 2 "torso_R_claviclecut_jntBnd" "torso_R_shouldercut_jntBnd"
+	"grp_l_bicep" 2 "L_elbow_shouldercut_jntBnd" "L_elbow_elbowcut_jntBnd"
+	"grp_r_bicep" 2 "R_elbow_shouldercut_jntBnd" "R_elbow_elbowcut_jntBnd"
+	"grp_l_forearm" 2 "L_hand_elbowcut_jntBnd" "L_hand_wristcut_jntBnd"
+	"grp_r_forearm" 2 "R_hand_elbowcut_jntBnd" "R_hand_wristcut_jntBnd"
+	"grp_l_palm" 2 "L_hand_wristcut_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_hand_wristcut_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_thighcut_jntBnd" "L_thigh_kneecut_jntBnd"
+	"grp_r_thigh" 2 "R_lowerleg_thighcut_jntBnd" "R_lowerleg_kneecut_jntBnd"
+	"grp_l_shin" 2 "L_foot_kneecut_jntBnd" "L_foot_anklecut_jntBnd"
+	"grp_r_shin" 2 "R_foot_kneecut_jntBnd" "R_foot_anklecut_jntBnd"
+	"grp_l_foot" 2 "L_foot_anklecut_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_foot_anklecut_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/MONSTERS/ColossusSentinels/ColossusSentinel_04/ColossusSentinel_04_armour_e343750d.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 19 in the header, 19 in the block · 42812 triangles over 30325 vertices
+  names: 746 bytes said, 746 read  [agree]
+
+=== shapes (27)
+0	boss_L_elbowpadShape	from 0	count 3816
+1	boss_L_shoulderpadShape	from 3816	count 10500
+2	boss_R_elbowpadShape	from 14316	count 3816
+3	boss_R_shoulderpadShape	from 18132	count 10500
+4	boss_ReworkedColossusSentinels_model_GemShape	from 28632	count 180
+5	boss_ReworkedColossusSentinels_model_SunShape	from 28812	count 2808
+6	boss_head_guardShape	from 31620	count 5628
+7	boss_headShape	from 37248	count 4248
+8	boss_top_opqShape	from 41496	count 8202
+9	L_chainsShape	from 49698	count 4920
+10	R_chainsShape	from 54618	count 5160
+11	L_elbowpadShape	from 59778	count 3816
+12	L_shoulderpadShape	from 63594	count 11460
+13	R_elbowpadShape	from 75054	count 3816
+14	R_shoulderpadShape	from 78870	count 11460
+15	top_opq_Shape1	from 90330	count 10692
+16	top_opqShape	from 101022	count 20346
+17	pantsShape	from 121368	count 2772
+18	top_04_doubleShape	from 124140	count 4296
+19	L_chains_danglersShape	from 128436	count 1920
+20	L_chains_danglersShape	from 130356	count 1920
+21	beltsShape	from 132276	count 8622
+22	platesShape	from 140898	count 5448
+23	ringsShape	from 146346	count 3072
+24	chainsShape	from 149418	count 31380
+25	fabricShape	from 180798	count 2556
+26	coinsShape	from 183354	count 1344
+
+=== fitting
+the monster's rig: 91 bones
+mounts: aux_position
+  Boss_L_chain.ao  socket L_elbow_elbowcut_jntBnd [in its carrier's rig]  box (16.4,-9.3,3)..(48.8,16.7,42.5)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 640 triangles over 832 vertices
+    names: 44 bytes said, 44 read  [agree]
+    rig 7 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_chain_1_jntBnd  [its own]  under 0  rests at (23.5,-6.9,15.2)
+      2 phys_skinned_chain_5_jntBnd  [its own]  under 0  rests at (27.2,13,10.4)
+      3 phys_skinned_chain_2_jntBnd  [its own]  under 1  rests at (30.2,-5.9,22.4)
+      4 phys_skinned_chain_6_jntBnd  [its own]  under 2  rests at (36.1,14.3,18.4)
+      5 phys_skinned_chain_3_jntBnd  [its own]  under 3  rests at (38,-4.6,30.8)
+      6 phys_skinned_chain_4_jntBnd  [its own]  under 5  rests at (45.8,-3.4,39.2)
+  Boss_R_chain.ao  socket R_elbow_elbowcut_jntBnd [in its carrier's rig]  box (-48.9,-20.1,-42.3)..(-17,7.5,-2.7)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 640 triangles over 832 vertices
+    names: 44 bytes said, 44 read  [agree]
+    rig 7 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,-0,0)  carrier has (0,0,0)
+      1 phys_skinned_chain_1_jntBnd  [its own]  under 0  rests at (-24,4.8,-15.3)
+      2 phys_skinned_chain_5_jntBnd  [its own]  under 0  rests at (-26.2,-15.2,-10)
+      3 phys_skinned_chain_2_jntBnd  [its own]  under 1  rests at (-30.6,3.1,-22.3)
+      4 phys_skinned_chain_6_jntBnd  [its own]  under 2  rests at (-35,-17.3,-17.9)
+      5 phys_skinned_chain_3_jntBnd  [its own]  under 3  rests at (-38.3,1.1,-30.7)
+      6 phys_skinned_chain_4_jntBnd  [its own]  under 5  rests at (-46.1,-0.9,-39)
+  BossSkirt.ao  socket torso_spine_1_cut_jntBnd [in its carrier's rig]  box (-54.6,-42.6,-14.9)..(54.6,50.2,116.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 6 in the header, 6 in the block · 17474 triangles over 18514 vertices
+    names: 126 bytes said, 126 read  [agree]
+    rig 52 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 51 of 52  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 torso_spine_2_jntBnd  [its own]  under 0  rests at (0,0,-19)
+      2 torso_hip_jntBnd  [its own]  under 0  rests at (0,0,19)
+      3 phys_skinned_L_1_jntBnd  [its own]  under 0  rests at (12.9,-24.4,3.2)
+      4 phys_skinned_L_5_jntBnd  [its own]  under 0  rests at (31.4,-9.2,3.3)
+      5 phys_skinned_L_9_jntBnd  [its own]  under 0  rests at (31.4,12.1,3.3)
+      6 phys_skinned_L_13_jntBnd  [its own]  under 0  rests at (13,27.3,3.3)
+      7 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (-12.9,-24.4,3.2)
+      8 phys_skinned_R_5_jntBnd  [its own]  under 0  rests at (-31.4,-9.2,3.3)
+      9 phys_skinned_R_9_jntBnd  [its own]  under 0  rests at (-31.4,12.1,3.3)
+      10 phys_skinned_R_13_jntBnd  [its own]  under 0  rests at (-13,27.3,3.3)
+      11 phys_skinned_chains_L_1_jntBnd  [its own]  under 0  rests at (12.9,-24.4,3.2)
+      12 phys_skinned_chains_R_1_jntBnd  [its own]  under 0  rests at (-12.9,-24.4,3.2)
+      13 phys_skinned_chains_R_9_jntBnd  [its own]  under 0  rests at (-31.4,12.1,3.3)
+      14 phys_skinned_chains_R_13_jntBnd  [its own]  under 0  rests at (-13,27.3,3.3)
+      15 phys_skinned_chains_L_13_jntBnd  [its own]  under 0  rests at (13,27.3,3.3)
+      16 phys_skinned_chains_L_9_jntBnd  [its own]  under 0  rests at (31.4,12.1,3.3)
+      17 torso_chest_jntBnd  [its own]  under 1  rests at (0,0,-37.9)
+      18 phys_skinned_L_2_jntBnd  [its own]  under 3  rests at (14.6,-23.1,36.4)
+      19 phys_skinned_L_6_jntBnd  [its own]  under 4  rests at (35.2,-7.4,36.2)
+      20 phys_skinned_L_10_jntBnd  [its own]  under 5  rests at (35.2,14.8,36.2)
+      21 phys_skinned_L_14_jntBnd  [its own]  under 6  rests at (14.6,30.6,36.3)
+      22 phys_skinned_R_2_jntBnd  [its own]  under 7  rests at (-14.6,-23.1,36.4)
+      23 phys_skinned_R_6_jntBnd  [its own]  under 8  rests at (-35.2,-7.4,36.2)
+      24 phys_skinned_R_10_jntBnd  [its own]  under 9  rests at (-35.2,14.8,36.2)
+      25 phys_skinned_R_14_jntBnd  [its own]  under 10  rests at (-14.6,30.6,36.3)
+      26 phys_skinned_chains_L_2_jntBnd  [its own]  under 11  rests at (14.6,-23.1,36.4)
+      27 phys_skinned_chains_R_2_jntBnd  [its own]  under 12  rests at (-14.6,-23.1,36.4)
+      28 phys_skinned_chains_R_10_jntBnd  [its own]  under 13  rests at (-35.2,14.8,36.2)
+      29 phys_skinned_chains_R_14_jntBnd  [its own]  under 14  rests at (-14.6,30.6,36.3)
+      30 phys_skinned_chains_L_14_jntBnd  [its own]  under 15  rests at (14.6,30.6,36.3)
+      31 phys_skinned_chains_L_10_jntBnd  [its own]  under 16  rests at (35.2,14.8,36.2)
+      32 phys_skinned_L_3_jntBnd  [its own]  under 18  rests at (16.3,-21.8,69)
+      33 phys_skinned_L_7_jntBnd  [its own]  under 19  rests at (39.1,-5.5,68.7)
+      34 phys_skinned_L_11_jntBnd  [its own]  under 20  rests at (39,17.5,68.6)
+      35 phys_skinned_L_15_jntBnd  [its own]  under 21  rests at (16.1,33.8,68.8)
+      36 phys_skinned_R_3_jntBnd  [its own]  under 22  rests at (-16.3,-21.8,69)
+      37 phys_skinned_R_7_jntBnd  [its own]  under 23  rests at (-39.1,-5.5,68.7)
+      38 phys_skinned_R_11_jntBnd  [its own]  under 24  rests at (-39,17.5,68.6)
+      39 phys_skinned_R_15_jntBnd  [its own]  under 25  rests at (-16.1,33.8,68.8)
+      40 phys_skinned_chains_L_3_jntBnd  [its own]  under 26  rests at (16.3,-21.8,69)
+      41 phys_skinned_chains_R_3_jntBnd  [its own]  under 27  rests at (-16.3,-21.8,69)
+      42 phys_skinned_L_4_jntBnd  [its own]  under 32  rests at (18,-20.4,101.7)
+      43 phys_skinned_L_8_jntBnd  [its own]  under 33  rests at (42.9,-3.7,101.1)
+      44 phys_skinned_L_12_jntBnd  [its own]  under 34  rests at (42.8,20.1,100.9)
+      45 phys_skinned_L_16_jntBnd  [its own]  under 35  rests at (17.7,37.1,101.3)
+      46 phys_skinned_R_4_jntBnd  [its own]  under 36  rests at (-18,-20.4,101.7)
+      47 phys_skinned_R_8_jntBnd  [its own]  under 37  rests at (-42.9,-3.7,101.1)
+      48 phys_skinned_R_12_jntBnd  [its own]  under 38  rests at (-42.8,20.1,100.9)
+      49 phys_skinned_R_16_jntBnd  [its own]  under 39  rests at (-17.7,37.1,101.3)
+      50 phys_skinned_chains_L_4_jntBnd  [its own]  under 40  rests at (18,-20.4,101.7)
+      51 phys_skinned_chains_R_4_jntBnd  [its own]  under 41  rests at (-18,-20.4,101.7)

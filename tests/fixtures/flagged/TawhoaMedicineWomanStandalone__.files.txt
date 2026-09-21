@@ -1,0 +1,1447 @@
+monster: Tawhoa Mystic [Metadata/Monsters/LeagueAncestral/StandaloneTawhoa/MedicineWoman/TawhoaMedicineWomanStandalone__]
+
+=== .ao Metadata/Monsters/LeagueAncestral/StandaloneTawhoa/MedicineWoman/TawhoaMedicineWoman.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/KaruiMedicineWoman/Living/rig.amd"
+	view_of = "attack_01"
+		view_name = "temp_time_reverse_01"
+	view_of = "totem_channel_01"
+		view_name = "totem_channel_start_01"
+		view_end = 200
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+	animations = '[
+		{
+			"name": "healing_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4529713988304138,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "projectile_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.269279956817627,
+					"name": "contact",
+					"position": [
+						0.0,
+						-77.10327911376953,
+						-141.04684448242188
+					],
+					"contact_ref": [
+						0.0,
+						0.0,
+						-131.47518920898438
+					]
+				}
+			]
+		},
+		{
+			"name": "projectile_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.2955000102519989,
+					"name": "attach",
+					"contact_ref": [
+						-40.0,
+						-35.66669845581055,
+						-150.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0129799842834473,
+					"name": "contact",
+					"position": [
+						-35.4822998046875,
+						-87.84200286865235,
+						-154.0760040283203
+					],
+					"contact_ref": [
+						-40.0,
+						-35.66669845581055,
+						-151.09788513183595
+					]
+				}
+			]
+		},
+		{
+			"name": "projectile_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8569231629371643,
+					"name": "contact",
+					"position": [
+						39.512474060058597,
+						-91.19706726074219,
+						-125.38914489746094
+					],
+					"contact_ref": [
+						42.88866424560547,
+						-22.635696411132814,
+						-108.65846252441406
+					]
+				}
+			]
+		},
+		{
+			"name": "summon_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9419639706611633,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "totem_channel_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "heal"
+				}
+			]
+		},
+		{
+			"name": "temp_time_reverse_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7375490069389343,
+					"name": "contact",
+					"position": [
+						-17.43429946899414,
+						-84.8687973022461,
+						-133.98699951171876
+					],
+					"contact_ref": [
+						-17.43400001525879,
+						-21.565099716186525,
+						-132.66400146484376
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/LeagueAncestral/KaruiMedicineWoman/attachments/TawhoaMedicineWomanHair.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/LeagueAncestral/KaruiMedicineWoman/attachments/TawhoaMedicineWomanRobe.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/LeagueAncestral/KaruiMedicineWoman/attachments/TawhoaMedicineWomanShawl.ao"
+	attached_object = "aux_L_Weapon_attachment Metadata/Monsters/LeagueAncestral/KaruiMedicineWoman/attachments/TawhoaMedicineWomanBowl.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.0,
+								0.0
+							],
+							[
+								1.0,
+								1.0
+							]
+						],
+						"width": 100.0,
+						"length": 100.0,
+						"hand": "MainHand"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/KaruiMedicineWoman/Living/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/TawhoaMedicineWoman.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false R_shoulder_jntBnd head_jntBnd L_shoulder_jntBnd"
+		bone_group = "root false root_jntBnd"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveLongGrass",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.027137391269207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1293281763792038,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Attack",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39884281158447268,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7262331247329712,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8149556517601013,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveLongGrass",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "breathing_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23367999494075776,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Idle",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FlinchGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23541657626628877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6582222580909729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FallB",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6759777069091797,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FlinchGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17660659551620484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4937901496887207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FallB",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.507110059261322,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FlinchGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20592328906059266,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5757593512535095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FallB",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5912903547286987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FlinchGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16477394104003907,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4607062041759491,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FallB",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47313371300697329,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FlinchGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20592328906059266,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5757593512535095,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FallB",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5912903547286987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FlinchGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16477394104003907,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4607062041759491,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FallB",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47313371300697329,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FlinchGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07267443835735321,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FlinchGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06879846751689911,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FlinchGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06653748452663422,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FlinchGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06266151368618012,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "healing_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Effects/MedicineWoman_HealLoop",
+						"bone_name": "aux_L_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05593721568584442,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_HealDrinking",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "healing_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_HealEnd",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveLongGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09809572249650955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "healing_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveLongGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Effects/MedicineWoman_HealDrink",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05588056892156601,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08403758704662323,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_HealStart",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.29569000005722048,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Idle",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_KnockdownA",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FlinchGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16085276007652284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17304708063602448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveLongGrass",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34883731603622439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4862624406814575,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FallB",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3435899019241334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveLongGrass",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5213302373886109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5833337306976319,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_KnockdownB",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0523264408111574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5000009536743166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/FlinchGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_KnockdownA",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13266941905021668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveLongGrass",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1782946139574051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42196395993232729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.030085563659668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveLongGrass",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1663531064987183,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2138891220092774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_KnockdownB",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.585336446762085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9166674613952637,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "projectile_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3337307274341583,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43923264741897585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveLongGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45672085881233218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveRattle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6396200060844421,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Effects/MedicineWoman_ProjSurge",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9258469939231873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3835471868515015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_ProjA",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.918426752090454,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1359899044036867,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Effects/MedicineWoman_ProjCast",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "projectile_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.018945712596178056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveLongGrass",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.170018270611763,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_ProjB",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20367418229579926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24511052668094636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Effects/MedicineWoman_ProjSurge",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3433915674686432,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7140799164772034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Effects/MedicineWoman_ProjCast",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7826959490776062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveLongGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8620388507843018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5144753456115723,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "projectile_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveLongGrass",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07807005196809769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31708818674087527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_ProjC",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46838003396987917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6540507674217224,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7754142880439758,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Effects/MedicineWoman_ProjCast",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0232692956924439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/MoveCloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3661084175109864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Foley/Steps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.032602179795503619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tawhoa_Monsters/Tawhoa_MedicineWoman/Vocals/MedicineWoman_Run",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "healing_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiMedicineWoman/fx/healing_aura.pet",
+						"bone_group": "root"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "healing_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiMedicineWoman/epk/bowl_buildup.epk"
+					}
+				]
+			},
+			{
+				"name": "healing_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiMedicineWoman/epk/bowl_buildup.epk"
+					}
+				]
+			},
+			{
+				"name": "healing_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiMedicineWoman/epk/bowl_buildup.epk"
+					}
+				]
+			},
+			{
+				"name": "projectile_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiMedicineWoman/epk/hand_buildup.epk"
+					}
+				]
+			},
+			{
+				"name": "projectile_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiMedicineWoman/epk/hand_buildup.epk"
+					}
+				]
+			},
+			{
+				"name": "projectile_03",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/KaruiMedicineWoman/epk/bowl_buildup.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "healing_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.6660000085830689,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 0.666 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "healing_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.6660000085830689,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 0.666 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "healing_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.448003 1 Linear 0.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "projectile_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.3329999446868898,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Linear 0.618023 0 Linear 1.98891 1 Flat 2.44702 1 Linear 3.09184 0 Flat 3.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "projectile_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.8329999446868897,
+						"name": "surgeTime_R",
+						"curve": "6 0 0 Linear 0.262876 0 Linear 0.717323 1 Flat 1.09761 1 Linear 1.70037 0 Flat 1.833 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "projectile_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.6330000162124634,
+						"name": "surgeTime_L",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.234193 0 Linear 0.639055 1 Flat 0.977849 1 Linear 1.51484 0 Flat 1.633 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueAncestral/KaruiMedicineWoman/attachments/TawhoaMedicineWomanHair.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/Hair/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/Hair/rig.ast"
+		enclosure_angle = 0.250
+		attachment_bones = "head_jntBnd chest_jntBnd neck_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/Hair/TawhoaMedicineWomanHair.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd chest_jntBnd neck_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAncestral/KaruiMedicineWoman/attachments/TawhoaMedicineWomanRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/Robe/rig.ast"
+		attachment_bones = "hip_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/Robe/TawhoaMedicineWomanRobe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false hip_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAncestral/KaruiMedicineWoman/attachments/TawhoaMedicineWomanShawl.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/TawhoaMedicineWomanShawl/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/TawhoaMedicineWomanShawl/rig.ast"
+		enclosure_radius = 7.000
+		enclosure_angle = 0.000
+		attachment_bones = "chest_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd aux_L_upperArm_attachment aux_R_upperArm_attachment L_elbow_jntBnd R_elbow_jntBnd hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/TawhoaMedicineWomanShawl/TawhoaMedicineWomanShawl.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false chest_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd L_shoulder_jntBnd R_shoulder_jntBnd L_elbow_jntBnd R_elbow_jntBnd hip_jntBnd L_thigh_jntBnd R_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAncestral/KaruiMedicineWoman/attachments/TawhoaMedicineWomanBowl.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+AttachedAnimatedObject
+{
+}
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/attachments/Bowl/TawhoaMedicineWomanWeapon.fmt"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/TawhoaMedicineWoman.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/TawhoaMedicineWoman_armour_585b928d.smd"
+Materials 2
+	"Art/Models/MONSTERS/TawhoaMedicineWoman/Textures/TawhoaMedicineWomanUpdate_Bodyc.mat" 6
+	"Art/Models/MONSTERS/TawhoaMedicineWoman/Textures/TawhoaMedicineWomanUpdatec.mat" 4
+BoundingBox -69.4609 -19.2627 -168.322 69.4609 18.9655 1.03072
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_attachment"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_attachment"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/KaruiMedicineWoman/TawhoaMedicineWoman_armour_585b928d.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 10 in the header, 10 in the block · 6975 triangles over 4450 vertices
+  names: 300 bytes said, 300 read  [agree]
+
+=== shapes (29)
+0	BodyShape	from 0	count 14862
+1	L_EyeShape	from 14862	count 540
+2	LowerTeethShape	from 15402	count 180
+3	R_EyeShape	from 15582	count 540
+4	TongueShape	from 16122	count 384
+5	UpperTeethShape	from 16506	count 180
+6	Bracelet_gold_leftShape	from 16686	count 720
+7	Bracelet_jade_rightShape	from 17406	count 720
+8	Fur_body1_mesh1Shape	from 18126	count 1053
+9	NecklaceShape	from 19179	count 1746
+10	HairBottomShape	from 20925	count 273
+11	HairFurShape	from 21198	count 11907
+12	Hair_Gold_NewShape	from 33105	count 336
+13	HairShape	from 33441	count 14526
+14	Bone3Shape	from 47967	count 1452
+15	Cloth2Shape	from 49419	count 666
+16	Cloth_b2Shape	from 50085	count 3024
+17	Flax2Shape	from 53109	count 366
+18	R_Ball_4Shape	from 53475	count 1260
+19	R_Ball_Shape3	from 54735	count 528
+20	Tassel4Shape	from 55263	count 2112
+21	Tassel5Shape	from 57375	count 2640
+22	tawhoaMedicineWoman_Double1Shape	from 60015	count 1065
+23	ClothingFur1Shape	from 61080	count 1065
+24	CloakFur1Shape	from 62145	count 864
+25	Cloak_DoubleShape1	from 63009	count 4590
+26	Cloak_Opaque1Shape	from 67599	count 7341
+27	extractShape1	from 74940	count 816
+28	TawhoaMedicineWoman_weaponShape	from 75756	count 828
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  TawhoaMedicineWomanHair.ao  socket head_jntBnd [in its carrier's rig]  box (-28.2,-20.4,-25.3)..(28.3,22,23.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 9014 triangles over 6515 vertices
+    names: 108 bytes said, 108 read  [agree]
+    rig 12 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 11 of 12  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,0,0)  carrier has (0,0,0)
+      1 phys_tri_M_1_jntBnd  [its own]  under 0  rests at (0,17.4,17.3)
+      2 phys_tri_L_1_jntBnd  [its own]  under 0  rests at (8,-10.4,16.2)
+      3 phys_tri_L_2_jntBnd  [its own]  under 0  rests at (19.9,10,16.6)
+      4 phys_tri_R_1_jntBnd  [its own]  under 0  rests at (-8,-10.4,16.2)
+      5 phys_tri_R_2_jntBnd  [its own]  under 0  rests at (-19.9,10,16.6)
+      6 chest_jntBnd  [shared]  under 0  rests at (-0,-0.6,31.4)  carrier has (0,-0.3,-127.3)
+      7 L_clavicle_jntBnd  [shared]  under 6  rests at (4.7,0.5,17.3)  carrier has (4.7,0.7,-141.4)
+      8 R_clavicle_jntBnd  [shared]  under 6  rests at (-4.7,0.5,17.3)  carrier has (-4.7,0.7,-141.4)
+      9 neck_jntBnd  [shared]  under 6  rests at (-0,2.9,12.3)  carrier has (0,3.2,-146.4)
+      10 L_shoulder_jntBnd  [shared]  under 7  rests at (15.8,5.8,20.3)  carrier has (15.8,6,-138.3)
+      11 R_shoulder_jntBnd  [shared]  under 8  rests at (-15.8,5.8,20.3)  carrier has (-15.8,6,-138.3)
+  TawhoaMedicineWomanRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-40.7,-34.5,-26.8)..(39.8,25.9,70.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 10 in the header, 10 in the block · 4726 triangles over 3610 vertices
+    names: 286 bytes said, 286 read  [agree]
+    rig 18 bones, 8 of them names its carrier's rig also has
+    mesh weights reach bone 17 of 18  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (0,3.2,-89.9)
+      2 phys_tri_front_jntBnd  [its own]  under 0  rests at (0,-20.9,58)
+      3 phys_tri_back_jntBnd  [its own]  under 0  rests at (0,18.8,57.5)
+      4 phys_tri_L_1_jntBnd  [its own]  under 0  rests at (23.5,-15.9,58)
+      5 phys_tri_L_2_jntBnd  [its own]  under 0  rests at (34.2,-1.4,58.2)
+      6 phys_tri_L_3_jntBnd  [its own]  under 0  rests at (23.6,13.7,57.7)
+      7 phys_tri_R_1_jntBnd  [its own]  under 0  rests at (-23.5,-15.9,58)
+      8 phys_tri_R_2_jntBnd  [its own]  under 0  rests at (-34.2,-1.4,58.2)
+      9 phys_tri_R_3_jntBnd  [its own]  under 0  rests at (-23.6,13.7,57.7)
+      10 spine_1_jntBnd  [shared]  under 1  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      11 L_thigh_jntBnd  [shared]  under 1  rests at (10.1,0,-0)  carrier has (10.1,3.2,-89.9)
+      12 R_thigh_jntBnd  [shared]  under 1  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      13 phys_R_sphere_01_jntBnd  [its own]  under 1  rests at (-8.8,-20.1,-2)
+      14 phys_R_sphere_02_jntBnd  [its own]  under 1  rests at (-18.8,-13.8,-3.3)
+      15 spine_2_jntBnd  [shared]  under 10  rests at (0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+      16 L_knee_jntBnd  [shared]  under 11  rests at (13.5,0,40.2)  carrier has (13.5,3.2,-49.8)
+      17 R_knee_jntBnd  [shared]  under 12  rests at (-13.5,-0,40.2)  carrier has (-13.5,3.2,-49.8)
+  TawhoaMedicineWomanShawl.ao  socket chest_jntBnd [in its carrier's rig]  box (-56.2,-21.6,-21.3)..(56.1,52,89.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 4537 triangles over 3852 vertices
+    names: 126 bytes said, 126 read  [agree]
+    rig 20 bones, 13 of them names its carrier's rig also has
+    mesh weights reach bone 18 of 20  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 chest_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (0,-0.3,-127.3)
+      2 L_clavicle_jntBnd  [shared]  under 1  rests at (4.7,1,-14.1)  carrier has (4.7,0.7,-141.4)
+      3 R_clavicle_jntBnd  [shared]  under 1  rests at (-4.7,1,-14.1)  carrier has (-4.7,0.7,-141.4)
+      4 phys_tri_shawl_1_jntBnd  [its own]  under 1  rests at (16.4,21.4,6.2)
+      5 phys_tri_shawl_3_jntBnd  [its own]  under 1  rests at (-16.5,21.4,6.2)
+      6 phys_tri_shawl_4_jntBnd  [its own]  under 1  rests at (18.9,24.1,44.9)
+      7 phys_tri_shawl_5_jntBnd  [its own]  under 1  rests at (-18.9,24.1,44.9)
+      8 phys_tri_shawl_6_jntBnd  [its own]  under 1  rests at (-0,29,73.1)
+      9 hip_jntBnd  [shared]  under 1  rests at (0,3.5,37.3)  carrier has (0,3.2,-89.9)
+      10 phys_tri_shawl_7_jntBnd  [its own]  under 1  rests at (-42.4,13,11.8)
+      11 phys_tri_shawl_7_jntBnd1  [its own]  under 1  rests at (42.4,13,11.8)
+      12 L_shoulder_jntBnd  [shared]  under 2  rests at (15.8,6.3,-11)  carrier has (15.8,6,-138.3)
+      13 R_shoulder_jntBnd  [shared]  under 3  rests at (-15.8,6.3,-11)  carrier has (-15.8,6,-138.3)
+      14 spine_1_jntBnd  [shared]  under 9  rests at (0,0.3,21.9)  carrier has (0,0,-105.4)
+      15 L_thigh_jntBnd  [shared]  under 9  rests at (10.1,3.5,37.3)  carrier has (10.1,3.2,-89.9)
+      16 R_thigh_jntBnd  [shared]  under 9  rests at (-10.1,3.5,37.3)  carrier has (-10.1,3.2,-89.9)
+      17 L_elbow_jntBnd  [shared]  under 12  rests at (35.1,8,4.1)  carrier has (35.1,7.7,-123.2)
+      18 R_elbow_jntBnd  [shared]  under 13  rests at (-35.1,8,4.1)  carrier has (-35.1,7.7,-123.2)
+      19 spine_2_jntBnd  [shared]  under 14  rests at (-0,-0.4,11.7)  carrier has (0,-0.7,-115.5)
+  TawhoaMedicineWomanBowl.ao  socket aux_L_Weapon_attachment [in its carrier's rig]  fixed mesh TawhoaMedicineWomanWeapon.fmt  1 shapes
+      TawhoaMedicineWoman_weaponShape  ->  Art/Models/MONSTERS/TawhoaMedicineWoman/Textures/TawhoaMedicineWomanUpdatec.mat

@@ -1,0 +1,1858 @@
+monster: Wheelbound Hag [Metadata/Monsters/SpinningWheelHag/SpinningWheelHag]
+
+=== .ao Metadata/Monsters/SpinningWheelHag/SpinningWheelHag.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SpinningWheelHag/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/SpinningWheelHag/attachments/Hair.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/SpinningWheelHag/attachments/Necklace.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/SpinningWheelHag/attachments/Shawl/Shawl_Back.ao"
+	attached_object = "L_shoulder_jntBnd Metadata/Monsters/SpinningWheelHag/attachments/Shawl/Shawl_L_Arm_Dangler.ao"
+	attached_object = "L_thigh_jntBnd Metadata/Monsters/SpinningWheelHag/attachments/Shawl/Shawl_L_Dangler.ao"
+	attached_object = "R_clavicle_jntBnd Metadata/Monsters/SpinningWheelHag/attachments/Shawl/Shawl_R_Arm_Dangler.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/SpinningWheelHag/attachments/Shawl/Shawl_R_Dangler.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/SpinningWheelHag/attachments/Skirt/Skirt_R_Dangler.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/SpinningWheelHag/attachments/Skirt/Skirt_Front.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/SpinningWheelHag/attachments/Skirt/Skirt_Back.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.45348837971687319,
+								0.0
+							],
+							[
+								0.4806201457977295,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 6.05629301071167,
+						"width": 41.321998596191409,
+						"angle": 0.7504916191101074,
+						"length": 157.2519989013672,
+						"impact_z_rotation": [
+							-0.5410521030426025,
+							-2.1467549800872804
+						],
+						"impact_type": "Slash"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4848484992980957,
+								0.0
+							],
+							[
+								0.4983164966106415,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"previous_patterns_to_exclude_from": 1,
+						"rotation": 5.3058013916015629,
+						"angle": 0.7504916191101074,
+						"x_axis_scale": 0.5770000219345093,
+						"length": 103.87100219726563
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3643410801887512,
+								0.0
+							],
+							[
+								0.41085270047187807,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.5235987901687622,
+						"angle": 2.0071287155151369,
+						"x_axis_scale": 0.8360000252723694,
+						"length": 150.0,
+						"offset": [
+							16.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.27925270795822146,
+							2.757620334625244
+						],
+						"impact_type": "Slash"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SpinningWheelHag/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SpinningWheelHag/SpinningWheelHagRemake.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1157900020480156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16024799644947053,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Attack1",
+						"bone_name": "aux_face"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45473700761795046,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5378950238227844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Slash",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5378950238227844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/AttackClothA",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5589479804039002,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/AttackClothA",
+						"bone_name": "shawl_L_dangler_1_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5957900285720825,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6094740033149719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8294739723205566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1042100191116334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.056685999035835269,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Attack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1157900020480156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38105300068855288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3905259966850281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4210529923439026,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/AttackClothA",
+						"bone_name": "shawl_L_dangler_1_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4326319992542267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Slash",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4326319992542267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/AttackClothB",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5294740200042725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8294739723205566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0631599426269532,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2599999904632569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/DeathShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "L_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1547970026731491,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2514539957046509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "aux_L_toe"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12207599729299545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Death",
+						"bone_name": "aux_face"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.589389979839325,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6385049819946289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.430899977684021,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6617399454116822,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8696600198745728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/FallAdd",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9269700050354005,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelFlinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Flinch",
+						"bone_name": "aux_face"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelFlinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Flinch",
+						"bone_name": "aux_face"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09824570268392563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0985964983701706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelFlinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Flinch",
+						"bone_name": "aux_face"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelFlinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Flinch",
+						"bone_name": "aux_face"
+					}
+				]
+			},
+			{
+				"name": "hit_reaction_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelFlinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Flinch",
+						"bone_name": "aux_face"
+					}
+				]
+			},
+			{
+				"name": "hit_reaction_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelFlinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Flinch",
+						"bone_name": "aux_face"
+					}
+				]
+			},
+			{
+				"name": "hit_reaction_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelFlinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Flinch",
+						"bone_name": "aux_face"
+					}
+				]
+			},
+			{
+				"name": "hit_reaction_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelFlinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Flinch",
+						"bone_name": "aux_face"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 2.133780002593994,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.133780002593994,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2184500694274904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.552910089492798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_6_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8653500080108644,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/JewlleryClaw",
+						"bone_name": "L_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.199790000915527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/JewlleryClaw",
+						"bone_name": "R_finger_2_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "R_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/KnockdownA",
+						"bone_name": "aux_face"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06568419933319092,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2335440069437027,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3760170042514801,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/KnockdownB",
+						"bone_name": "aux_face"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44154399633407595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "R_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5400710105895996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2055200338363648,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/KnockdownC",
+						"bone_name": "aux_face"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3337600231170655,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3939599990844727,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4249800443649293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.514389991760254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.541759967803955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6001499891281129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/SlashSmall",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.62568998336792,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/SlashSmall",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6329900026321412,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/JewlleryClaw",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6548800468444825,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/JewlleryClaw",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "R_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/KnockdownA",
+						"bone_name": "aux_face"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06735160201787949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23947200179100038,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3855629861354828,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/KnockdownB",
+						"bone_name": "aux_face"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4527530074119568,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "R_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5537809729576111,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2361199855804444,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/KnockdownC",
+						"bone_name": "aux_face"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3676199913024903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3863199949264527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.461150050163269,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5434900522232056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/SlashSmall",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5528299808502198,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5565799474716187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/JewlleryClaw",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5584499835968018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/SlashSmall",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5678000450134278,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/JewlleryClaw",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.580899953842163,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "needle_skewer_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "hair_R_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/JewlleryClaw",
+						"bone_name": "R_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.047965098172426227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6744189858436585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Needle.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8866270184516907,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "hair_R_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9200549721717835,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/JewlleryClaw",
+						"bone_name": "R_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1046500205993653,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5828499794006348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "needle_skewer_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/NeedleEnd",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/NeedleEndSG",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6025620102882385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6907179951667786,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8515310287475586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "needle_skewer_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "candle_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act1/SpinningWheelHag/SpinningWheelHag_NeedleThrow_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/NeedleStartSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4753830134868622,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Slash",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.527072012424469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6041839718818665,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7448499798774719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8024719953536987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/SlashSmall",
+						"bone_name": "R_finger_3_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11926300078630448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23057499527931214,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Jewllery",
+						"bone_name": "R_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28225600719451907,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Cloth",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.380281001329422,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Vocals/Walk.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6456109881401062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/WheelCreak",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6607180237770081,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Step_Bare",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8586940169334412,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SpinningWheelHag/Foley/Leather_",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/SpinningWheelHag/attachments/Hair.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Hair/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Hair/rig.ast"
+		linear_allowed_contraction = 0.300
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Hair/HairRemake.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/SpinningWheelHag/attachments/Necklace.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Necklace/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Necklace/rig.ast"
+		linear_allowed_contraction = 0.300
+		enclosure_angle = 0.300
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Necklace/NecklaceRemake.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/SpinningWheelHag/attachments/Shawl/Shawl_Back.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/Back/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/Back/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.500
+		animation_velocity_factor = 1.000
+		animation_force_factor = 2.000
+		attachment_bones = "spine_1_jntBnd shawl_upper_layer_L_1 shawl_upper_layer_L_2 shawl_upper_layer_L_3 shawl_upper_layer_L_4 shawl_upper_layer_L_5 shawl_upper_layer_L_6 shawl_upper_layer_L_7 
+					shawl_upper_layer_R_1 shawl_upper_layer_R_2 shawl_upper_layer_R_3 shawl_upper_layer_R_4 shawl_upper_layer_R_5 shawl_upper_layer_R_6 shawl_upper_layer_R_7 child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/Back/shawl_upper_layer_Remake.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd phys_skinned_shawl_upper_layer_L_1_jntBnd phys_skinned_shawl_upper_layer_L_2_jntBnd phys_skinned_shawl_upper_layer_L_3_jntBnd phys_skinned_shawl_upper_layer_L_4_jntBnd phys_skinned_shawl_upper_layer_L_5_jntBnd phys_skinned_shawl_upper_layer_L_6_jntBnd phys_skinned_shawl_upper_layer_L_7_jntBnd 
+					phys_skinned_shawl_upper_layer_R_1_jntBnd phys_skinned_shawl_upper_layer_R_2_jntBnd phys_skinned_shawl_upper_layer_R_3_jntBnd phys_skinned_shawl_upper_layer_R_4_jntBnd phys_skinned_shawl_upper_layer_R_5_jntBnd phys_skinned_shawl_upper_layer_R_6_jntBnd phys_skinned_shawl_upper_layer_R_7_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/SpinningWheelHag/attachments/Shawl/Shawl_L_Arm_Dangler.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/L_Arm_Dangler/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/L_Arm_Dangler/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 2.000
+		attachment_bones = "L_shoulder_jntBnd spine_2_jntBnd spine_1_jntBnd hip_jntBnd child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/L_Arm_Dangler/shawl_lower_layer_Remake.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_2_jntBnd spine_1_jntBnd hip_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/SpinningWheelHag/attachments/Shawl/Shawl_L_Dangler.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/L_Dangler/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/L_Dangler/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 2.000
+		attachment_bones = "L_thigh_jntBnd shawl_L_dangler_2_1 shawl_L_dangler_2_2 shawl_L_dangler_2_3 shawl_L_dangler_2_4 shawl_L_dangler_2_5 shawl_L_dangler_2_6 shawl_L_dangler_aim L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd 
+							shawl_L_dangler_1_1 shawl_L_dangler_1_2 shawl_L_dangler_1_3 shawl_L_dangler_1_4 shawl_L_dangler_1_5 shawl_L_dangler_1_6 shawl_L_dangler_1_7 shawl_L_dangler_1_8 
+							child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/L_Dangler/shawl_L_dangler_Remake.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd phys_skinned_shawl_L_dangler_2_1_jntBnd phys_skinned_shawl_L_dangler_2_2_jntBnd phys_skinned_shawl_L_dangler_2_3_jntBnd phys_skinned_shawl_L_dangler_2_4_jntBnd phys_skinned_shawl_L_dangler_2_5_jntBnd phys_skinned_shawl_L_dangler_2_6_jntBnd phys_skinned_shawl_L_dangler_aim_jntBnd L_shoulder_jntBnd L_shoulder_Twist_jntBnd_1 L_elbow_jntBnd phys_skinned_shawl_L_dangler_1_1_jntBnd phys_skinned_shawl_L_dangler_1_2_jntBnd phys_skinned_shawl_L_dangler_1_3_jntBnd phys_skinned_shawl_L_dangler_1_4_jntBnd phys_skinned_shawl_L_dangler_1_5_jntBnd phys_skinned_shawl_L_dangler_1_6_jntBnd phys_skinned_shawl_L_dangler_1_7_jntBnd phys_skinned_shawl_L_dangler_1_8_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/SpinningWheelHag/attachments/Shawl/Shawl_R_Arm_Dangler.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/R_Arm_Dangler/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/R_Arm_Dangler/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 2.000
+		attachment_bones = "R_clavicle_jntBnd R_shoulder_jntBnd head_jntBnd child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/R_Arm_Dangler/shawl_lower_layer_Remake.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd R_shoulder_jntBnd head_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/SpinningWheelHag/attachments/Shawl/Shawl_R_Dangler.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/R_Dangler/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/R_Dangler/rig.ast"
+	  	bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 2.000
+		attachment_bones = "hip_jntBnd shawl_R_dangler_2_1 shawl_R_dangler_2_2 shawl_R_dangler_2_3 shawl_R_dangler_2_4 shawl_R_dangler_2_5 shawl_R_dangler_2_6 shawl_R_dangler_aim 
+							R_thigh_jntBnd shawl_R_dangler_1_1 shawl_R_dangler_1_2 shawl_R_dangler_1_3 shawl_R_dangler_1_4 shawl_R_dangler_1_5 shawl_R_dangler_1_6 
+							child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Shawl/R_Dangler/shawl_R_dangler_Remake.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd phys_skinned_shawl_R_dangler_2_1_jntBnd phys_skinned_shawl_R_dangler_2_2_jntBnd phys_skinned_shawl_R_dangler_2_3_jntBnd phys_skinned_shawl_R_dangler_2_4_jntBnd phys_skinned_shawl_R_dangler_2_5_jntBnd phys_skinned_shawl_R_dangler_2_6_jntBnd phys_skinned_shawl_R_dangler_aim_jntBnd 
+					R_thigh_jntBnd phys_skinned_shawl_R_dangler_1_1_jntBnd phys_skinned_shawl_R_dangler_1_2_jntBnd phys_skinned_shawl_R_dangler_1_3_jntBnd phys_skinned_shawl_R_dangler_1_4_jntBnd phys_skinned_shawl_R_dangler_1_5_jntBnd phys_skinned_shawl_R_dangler_1_6_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/SpinningWheelHag/attachments/Skirt/Skirt_R_Dangler.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Skirt/R_Dangler/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Skirt/R_Dangler/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 2.000
+		attachment_bones = "hip_jntBnd R_thigh_jntBnd skirt_R_dangler_base_jntBnd skirt_R_dangler_1_1 skirt_R_dangler_1_2 skirt_R_dangler_1_3 skirt_R_dangler_1_4 skirt_R_dangler_2_1 skirt_R_dangler_2_2 skirt_R_dangler_2_3 skirt_R_dangler_2_4 child_attach_1"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Skirt/R_Dangler/skirt_R_dangler_Remake.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach_1 false root_jntBnd R_thigh_jntBnd phys_skinned_skirt_R_dangler_base_jntBnd phys_skinned_skirt_R_dangler_1_1_jntBnd phys_skinned_skirt_R_dangler_1_2_jntBnd phys_skinned_skirt_R_dangler_1_3_jntBnd phys_skinned_skirt_R_dangler_1_4_jntBnd phys_skinned_skirt_R_dangler_2_1_jntBnd phys_skinned_skirt_R_dangler_2_2_jntBnd phys_skinned_skirt_R_dangler_2_3_jntBnd phys_skinned_skirt_R_dangler_2_4_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/SpinningWheelHag/attachments/Skirt/Skirt_Front.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Skirt/Front/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Skirt/Front/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.500
+		animation_velocity_factor = 1.000
+		animation_force_factor = 2.000
+	}
+	
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Skirt/Front/skirt_front_Remake.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/SpinningWheelHag/attachments/Skirt/Skirt_Back.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Skirt/Back/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Skirt/Back/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 2.000
+		attachment_bones = "hip_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd 
+							skirt_back_L_1 skirt_back_L_2 skirt_back_L_3 skirt_back_L_4 skirt_back_L_5 skirt_back_L_6 skirt_back_L_7 skirt_back_L_8
+							skirt_back_L_9 skirt_back_L_10 skirt_back_L_11 skirt_back_L_12 skirt_back_L_13 skirt_back_L_14 skirt_back_L_15 skirt_back_L_16 
+							skirt_back_L_17 skirt_back_L_18 skirt_back_L_19 skirt_back_L_20 skirt_back_L_21 skirt_back_L_22 skirt_back_L_23 skirt_back_L_24
+							skirt_back_R_1 skirt_back_R_2 skirt_back_R_3 skirt_back_R_4 skirt_back_R_5 skirt_back_R_6 skirt_back_R_7 skirt_back_R_8 
+							skirt_back_R_9 skirt_back_R_10 skirt_back_R_11 skirt_back_R_12 skirt_back_R_13 skirt_back_R_14 skirt_back_R_15 skirt_back_R_16 
+							skirt_back_R_17 skirt_back_R_18 skirt_back_R_19 skirt_back_R_20 skirt_back_R_21 skirt_back_R_22 skirt_back_R_23 skirt_back_R_24						
+							child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SpinningWheelHag/attachments/Skirt/Back/skirt_back_Remake.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_thigh_jntBnd L_knee_jntBnd R_thigh_jntBnd R_knee_jntBnd 
+					phys_skinned_skirt_back_L_1_jntBnd phys_skinned_skirt_back_L_2_jntBnd phys_skinned_skirt_back_L_3_jntBnd phys_skinned_skirt_back_L_4_jntBnd phys_skinned_skirt_back_L_5_jntBnd phys_skinned_skirt_back_L_6_jntBnd phys_skinned_skirt_back_L_7_jntBnd phys_skinned_skirt_back_L_8_jntBnd 
+					phys_skinned_skirt_back_L_9_jntBnd phys_skinned_skirt_back_L_10_jntBnd phys_skinned_skirt_back_L_11_jntBnd phys_skinned_skirt_back_L_12_jntBnd phys_skinned_skirt_back_L_13_jntBnd phys_skinned_skirt_back_L_14_jntBnd phys_skinned_skirt_back_L_15_jntBnd phys_skinned_skirt_back_L_16_jntBnd 
+					phys_skinned_skirt_back_L_17_jntBnd phys_skinned_skirt_back_L_18_jntBnd phys_skinned_skirt_back_L_19_jntBnd phys_skinned_skirt_back_L_20_jntBnd phys_skinned_skirt_back_L_21_jntBnd phys_skinned_skirt_back_L_22_jntBnd phys_skinned_skirt_back_L_23_jntBnd phys_skinned_skirt_back_L_24_jntBnd 
+					phys_skinned_skirt_back_R_1_jntBnd phys_skinned_skirt_back_R_2_jntBnd phys_skinned_skirt_back_R_3_jntBnd phys_skinned_skirt_back_R_4_jntBnd phys_skinned_skirt_back_R_5_jntBnd phys_skinned_skirt_back_R_6_jntBnd phys_skinned_skirt_back_R_7_jntBnd phys_skinned_skirt_back_R_8_jntBnd 
+					phys_skinned_skirt_back_R_9_jntBnd phys_skinned_skirt_back_R_10_jntBnd phys_skinned_skirt_back_R_11_jntBnd phys_skinned_skirt_back_R_12_jntBnd phys_skinned_skirt_back_R_13_jntBnd phys_skinned_skirt_back_R_14_jntBnd phys_skinned_skirt_back_R_15_jntBnd phys_skinned_skirt_back_R_16_jntBnd 
+					phys_skinned_skirt_back_R_17_jntBnd phys_skinned_skirt_back_R_18_jntBnd phys_skinned_skirt_back_R_19_jntBnd phys_skinned_skirt_back_R_20_jntBnd phys_skinned_skirt_back_R_21_jntBnd phys_skinned_skirt_back_R_22_jntBnd phys_skinned_skirt_back_R_23_jntBnd phys_skinned_skirt_back_R_24_jntBnd "
+					}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/SpinningWheelHag/SpinningWheelHagRemake.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/SpinningWheelHag/SpinningWheelHagRemake_armour_2b23ddc6.smd"
+Materials 1
+	"Art/Models/MONSTERS/SpinningWheelHag/Textures/SpinningWheelHagRemakec.mat" 26
+BoundingBox -123.378 -14.3303 -229.617 123.378 90.5593 -1.32435
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_face"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_toe"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_toe"
+
+=== .smd Art/Models/MONSTERS/SpinningWheelHag/SpinningWheelHagRemake_armour_2b23ddc6.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 26 in the header, 26 in the block · 21860 triangles over 18242 vertices
+  names: 824 bytes said, 824 read  [agree]
+
+=== shapes (37)
+0	bodyShape	from 0	count 10512
+1	candles10Shape	from 10512	count 366
+2	candles11Shape	from 10878	count 366
+3	candles12Shape	from 11244	count 396
+4	candles13Shape	from 11640	count 402
+5	candles14Shape	from 12042	count 396
+6	candles1Shape	from 12438	count 372
+7	candles2Shape	from 12810	count 372
+8	candles3Shape	from 13182	count 372
+9	candles4Shape	from 13554	count 366
+10	candles5Shape	from 13920	count 372
+11	candles6Shape	from 14292	count 366
+12	candles7Shape	from 14658	count 444
+13	candles8Shape	from 15102	count 444
+14	candles9Shape	from 15546	count 366
+15	clawShape	from 15912	count 1422
+16	crownShape	from 17334	count 28812
+17	needle1Shape	from 46146	count 1017
+18	needle2Shape	from 47163	count 1017
+19	shawl_L_dangler_skinned1Shape	from 48180	count 156
+20	shawl_lower_layer_mergedShape	from 48336	count 6162
+21	shawl_R_dangler_skinnedShape	from 54498	count 282
+22	shawl_upper_layer_skinnedShape	from 54780	count 3042
+23	skirt_back_skinnedShape	from 57822	count 2112
+24	skirt_front_skinnedShape	from 59934	count 1764
+25	wheelShape	from 61698	count 3882
+26	hairShape	from 65580	count 3720
+27	chain1Shape	from 69300	count 660
+28	chainShape	from 69960	count 360
+29	shawl_upper_layer_physShape	from 70320	count 738
+30	shawl_lower_layer_L_2_physShape	from 71058	count 270
+31	robe_leftShape	from 71328	count 1824
+32	shawl_lower_layer_R_1_physShape	from 73152	count 510
+33	shawl_R_dangler_physShape	from 73662	count 1068
+34	skirt_robeShape3	from 74730	count 1182
+35	skirt_front_physShape	from 75912	count 1218
+36	skirt_back_physShape	from 77130	count 3306
+
+=== fitting
+the monster's rig: 194 bones
+mounts: aux_position, aux_L_toe, aux_R_toe, aux_face
+  Hair.ao  socket head_jntBnd [in its carrier's rig]  box (-8.3,-14.1,-14.5)..(8.3,4.5,24)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 1240 triangles over 1088 vertices
+    names: 18 bytes said, 18 read  [agree]
+    rig 13 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 12 of 13  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L_1_jntBnd  [its own]  under 0  rests at (5.8,-9.5,3.2)
+      2 phys_skinned_L_4_jntBnd  [its own]  under 0  rests at (5.8,-3.8,5.4)
+      3 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (-5.8,-9.5,3.2)
+      4 phys_skinned_R_4_jntBnd  [its own]  under 0  rests at (-5.8,-3.8,5.4)
+      5 phys_skinned_L_2_jntBnd  [its own]  under 1  rests at (5.8,-12.5,11.1)
+      6 phys_skinned_L_5_jntBnd  [its own]  under 2  rests at (5.8,-6.8,13.3)
+      7 phys_skinned_R_2_jntBnd  [its own]  under 3  rests at (-5.8,-12.5,11.1)
+      8 phys_skinned_R_5_jntBnd  [its own]  under 4  rests at (-5.8,-6.8,13.3)
+      9 phys_skinned_L_3_jntBnd  [its own]  under 5  rests at (5.8,-15.6,19)
+      10 phys_skinned_L_6_jntBnd  [its own]  under 6  rests at (5.8,-9.9,21.2)
+      11 phys_skinned_R_3_jntBnd  [its own]  under 7  rests at (-5.8,-15.6,19)
+      12 phys_skinned_R_6_jntBnd  [its own]  under 8  rests at (-5.8,-9.9,21.2)
+  Necklace.ao  socket chest_jntBnd [in its carrier's rig]  box (-16.1,-30.2,-23)..(16,12.4,-14.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 340 triangles over 492 vertices
+    names: 42 bytes said, 42 read  [agree]
+    rig 22 bones, 6 of them names its carrier's rig also has
+    mesh weights reach bone 21 of 22  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 neck_jntBnd  [shared]  under 0  rests at (0,0,-21)  carrier has (0,23.3,-140.3)
+      2 L_clavicle_jntBnd  [shared]  under 0  rests at (3,-6.6,-14.5)  carrier has (3,28.8,-132.8)
+      3 R_clavicle_jntBnd  [shared]  under 0  rests at (-3,-6.6,-14.5)  carrier has (-3,28.8,-132.8)
+      4 phys_skinned_8_jntBnd  [its own]  under 0  rests at (-13.2,-8.7,-19.3)
+      5 phys_skinned_1_jntBnd  [its own]  under 0  rests at (-10.8,-8.7,-19.2)
+      6 L_shoulder_jntBnd  [shared]  under 2  rests at (19.8,-1.2,-14.4)  carrier has (19.8,30.1,-138.1)
+      7 R_shoulder_jntBnd  [shared]  under 3  rests at (-19.8,-1.2,-14.4)  carrier has (-19.8,30.1,-138.1)
+      8 phys_skinned_9_jntBnd  [its own]  under 4  rests at (-12.8,-16.2,-18.2)
+      9 phys_skinned_2_jntBnd  [its own]  under 5  rests at (-9.1,-14.8,-18.4)
+      10 phys_skinned_10_jntBnd  [its own]  under 8  rests at (-10.6,-22.8,-17.3)
+      11 phys_skinned_3_jntBnd  [its own]  under 9  rests at (-5.5,-19.6,-17.7)
+      12 phys_skinned_11_jntBnd  [its own]  under 10  rests at (-6.2,-27.7,-16.7)
+      13 phys_skinned_4_jntBnd  [its own]  under 11  rests at (-0,-21.5,-17.5)
+      14 phys_skinned_12_jntBnd  [its own]  under 12  rests at (0,-29.7,-16.4)
+      15 phys_skinned_5_jntBnd  [its own]  under 13  rests at (5.4,-19.6,-17.7)
+      16 phys_skinned_13_jntBnd  [its own]  under 14  rests at (6.2,-27.7,-16.7)
+      17 phys_skinned_6_jntBnd  [its own]  under 15  rests at (9.1,-14.8,-18.4)
+      18 phys_skinned_14_jntBnd  [its own]  under 16  rests at (10.6,-22.7,-17.3)
+      19 phys_skinned_7_jntBnd  [its own]  under 17  rests at (10.8,-8.7,-19.2)
+      20 phys_skinned_15_jntBnd  [its own]  under 18  rests at (12.8,-16.2,-18.2)
+      21 phys_skinned_16_jntBnd  [its own]  under 20  rests at (13.2,-8.6,-19.3)
+  Shawl_Back.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-29.2,-12.6,-7.1)..(35.1,15.5,75.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 246 triangles over 162 vertices
+    names: 54 bytes said, 54 read  [agree]
+    rig 15 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 14 of 15  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_shawl_upper_layer_L_5_jntBnd  [its own]  under 0  rests at (22.8,1.7,16.9)
+      2 phys_skinned_shawl_upper_layer_L_1_jntBnd  [its own]  under 0  rests at (8.3,1.7,17.1)
+      3 phys_skinned_shawl_upper_layer_R_1_jntBnd  [its own]  under 0  rests at (-8.3,1.7,17.1)
+      4 phys_skinned_shawl_upper_layer_R_5_jntBnd  [its own]  under 0  rests at (-22.8,1.7,16.9)
+      5 phys_skinned_shawl_upper_layer_L_6_jntBnd  [its own]  under 1  rests at (20.9,0.6,32.5)
+      6 phys_skinned_shawl_upper_layer_L_2_jntBnd  [its own]  under 2  rests at (7.5,0.4,32.9)
+      7 phys_skinned_shawl_upper_layer_R_2_jntBnd  [its own]  under 3  rests at (-7.5,0.4,32.9)
+      8 phys_skinned_shawl_upper_layer_R_6_jntBnd  [its own]  under 4  rests at (-20.9,0.6,32.5)
+      9 phys_skinned_shawl_upper_layer_L_7_jntBnd  [its own]  under 5  rests at (18.2,-3.4,47.8)
+      10 phys_skinned_shawl_upper_layer_L_3_jntBnd  [its own]  under 6  rests at (7.3,-3.9,49.5)
+      11 phys_skinned_shawl_upper_layer_R_3_jntBnd  [its own]  under 7  rests at (-7.3,-3.9,49.5)
+      12 phys_skinned_shawl_upper_layer_R_7_jntBnd  [its own]  under 8  rests at (-18.2,-3.4,47.8)
+      13 phys_skinned_shawl_upper_layer_L_4_jntBnd  [its own]  under 10  rests at (6.8,-7.8,67.9)
+      14 phys_skinned_shawl_upper_layer_R_4_jntBnd  [its own]  under 11  rests at (-6.8,-7.8,67.9)
+  Shawl_L_Arm_Dangler.ao  socket L_shoulder_jntBnd [in its carrier's rig]  box (9.6,3.4,2.9)..(40.2,28.6,40.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 90 triangles over 74 vertices
+    names: 62 bytes said, 62 read  [agree]
+    rig 5 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_2_jntBnd  [shared]  under 0  rests at (-8.9,25.9,23.2)  carrier has (-0,58,-127.2)
+      2 phys_skinned_1_jntBnd  [its own]  under 0  rests at (32.4,16.5,18)
+      3 spine_1_jntBnd  [shared]  under 1  rests at (-1,30.6,37.8)  carrier has (0,66,-111.9)
+      4 hip_jntBnd  [shared]  under 3  rests at (6.8,27,52.8)  carrier has (0,66,-94.7)
+  Shawl_L_Dangler.ao  socket L_thigh_jntBnd [in its carrier's rig]  box (-0.4,-4,-42.3)..(71,50.2,114.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 608 triangles over 388 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 19 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 18 of 19  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_shawl_L_dangler_2_1_jntBnd  [its own]  under 0  rests at (3.9,9,9.5)
+      2 phys_skinned_shawl_L_dangler_aim_jntBnd  [its own]  under 0  rests at (27,25,108)
+      3 L_shoulder_jntBnd  [shared]  under 0  rests at (-6.3,4.6,-56.1)  carrier has (19.8,30.1,-138.1)
+      4 phys_skinned_shawl_L_dangler_2_2_jntBnd  [its own]  under 1  rests at (14,16.5,28)
+      5 L_shoulder_Twist_jntBnd_1  [its own]  under 3  rests at (1.6,23.3,-48.2)
+      6 L_elbow_jntBnd  [shared]  under 3  rests at (9.5,42,-40.3)  carrier has (58.3,35.9,-118.6)
+      7 phys_skinned_shawl_L_dangler_2_3_jntBnd  [its own]  under 4  rests at (24,24.6,46.6)
+      8 phys_skinned_shawl_L_dangler_1_1_jntBnd  [its own]  under 6  rests at (11,47,-32)
+      9 phys_skinned_shawl_L_dangler_2_4_jntBnd  [its own]  under 7  rests at (33.5,32,64.6)
+      10 phys_skinned_shawl_L_dangler_1_2_jntBnd  [its own]  under 8  rests at (35.4,42.7,-11.8)
+      11 phys_skinned_shawl_L_dangler_2_5_jntBnd  [its own]  under 9  rests at (37.2,38.6,82.5)
+      12 phys_skinned_shawl_L_dangler_1_3_jntBnd  [its own]  under 10  rests at (57.4,36.6,9.9)
+      13 phys_skinned_shawl_L_dangler_2_6_jntBnd  [its own]  under 11  rests at (31.8,37.8,100.5)
+      14 phys_skinned_shawl_L_dangler_1_4_jntBnd  [its own]  under 12  rests at (66.8,26.8,34.7)
+      15 phys_skinned_shawl_L_dangler_1_5_jntBnd  [its own]  under 14  rests at (63.9,17.6,55.3)
+      16 phys_skinned_shawl_L_dangler_1_6_jntBnd  [its own]  under 15  rests at (56.2,11.2,73.1)
+      17 phys_skinned_shawl_L_dangler_1_7_jntBnd  [its own]  under 16  rests at (44.4,8.5,88.3)
+      18 phys_skinned_shawl_L_dangler_1_8_jntBnd  [its own]  under 17  rests at (31.9,11.1,101.7)
+  Shawl_R_Arm_Dangler.ao  socket R_clavicle_jntBnd [in its carrier's rig]  box (-48.5,1.7,-6.3)..(-5.8,24.5,27.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 170 triangles over 122 vertices
+    names: 62 bytes said, 62 read  [agree]
+    rig 4 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_shoulder_jntBnd  [shared]  under 0  rests at (-16.8,-5.4,-0.1)  carrier has (-19.8,30.1,-138.1)
+      2 head_jntBnd  [shared]  under 0  rests at (1.9,-3.5,25.1)  carrier has (0,6.7,-144.9)
+      3 phys_skinned_1_jntBnd  [its own]  under 0  rests at (-13.9,14.5,8.8)
+  Shawl_R_Dangler.ao  socket hip_jntBnd [in its carrier's rig]  box (-66.7,-21.7,0.9)..(0.2,79.8,95.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 356 triangles over 236 vertices
+    names: 50 bytes said, 50 read  [agree]
+    rig 15 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 14 of 15  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_shawl_R_dangler_2_1_jntBnd  [its own]  under 0  rests at (-15.7,14.5,22.9)
+      2 phys_skinned_shawl_R_dangler_aim_jntBnd  [its own]  under 0  rests at (-45.2,72.9,92.6)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-13.5,-0,-0)  carrier has (-13.5,66,-94.7)
+      4 phys_skinned_shawl_R_dangler_2_2_jntBnd  [its own]  under 1  rests at (-15.7,22.2,41.5)
+      5 phys_skinned_shawl_R_dangler_1_1_jntBnd  [its own]  under 3  rests at (-28.5,-7.2,14.4)
+      6 phys_skinned_shawl_R_dangler_2_3_jntBnd  [its own]  under 4  rests at (-15.6,32.5,58.6)
+      7 phys_skinned_shawl_R_dangler_1_2_jntBnd  [its own]  under 5  rests at (-37,1.3,35.5)
+      8 phys_skinned_shawl_R_dangler_2_4_jntBnd  [its own]  under 6  rests at (-15.2,45.2,73.7)
+      9 phys_skinned_shawl_R_dangler_1_3_jntBnd  [its own]  under 7  rests at (-46.4,11.2,54.3)
+      10 phys_skinned_shawl_R_dangler_2_5_jntBnd  [its own]  under 8  rests at (-17.8,59.5,86)
+      11 phys_skinned_shawl_R_dangler_1_4_jntBnd  [its own]  under 9  rests at (-55.1,24.9,71.5)
+      12 phys_skinned_shawl_R_dangler_2_6_jntBnd  [its own]  under 10  rests at (-28.2,72.1,92)
+      13 phys_skinned_shawl_R_dangler_1_5_jntBnd  [its own]  under 11  rests at (-59.1,42.6,85.2)
+      14 phys_skinned_shawl_R_dangler_1_6_jntBnd  [its own]  under 13  rests at (-57.4,61,91.5)
+  Skirt_R_Dangler.ao  socket hip_jntBnd [in its carrier's rig]  box (-43.9,-28.1,-11.2)..(-6.7,24,72.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 394 triangles over 256 vertices
+    names: 32 bytes said, 32 read  [agree]
+    rig 13 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 11 of 13  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_thigh_jntBnd  [shared]  under 0  rests at (-13.5,-0,-0)  carrier has (-13.5,66,-94.7)
+      2 phys_skinned_skirt_R_dangler_base_jntBnd  [its own]  under 1  rests at (-17.9,-3.8,11.1)
+      3 phys_skinned_skirt_R_dangler_1_1_jntBnd  [its own]  under 2  rests at (-20.1,-21.2,1.3)
+      4 phys_skinned_skirt_R_dangler_2_1_jntBnd  [its own]  under 2  rests at (-17.7,9.1,25.7)
+      5 phys_skinned_skirt_R_dangler_aim_jntBnd  [its own]  under 2  rests at (-36.7,-38.8,56.8)
+      6 phys_skinned_skirt_R_dangler_1_2_jntBnd  [its own]  under 3  rests at (-27.3,-36.9,16.1)
+      7 phys_skinned_skirt_R_dangler_2_2_jntBnd  [its own]  under 4  rests at (-23.6,-0.6,42.2)
+      8 phys_skinned_skirt_R_dangler_1_3_jntBnd  [its own]  under 6  rests at (-33.3,-46.1,33.2)
+      9 phys_skinned_skirt_R_dangler_2_3_jntBnd  [its own]  under 7  rests at (-29.9,-13.5,55.6)
+      10 phys_skinned_skirt_R_dangler_1_4_jntBnd  [its own]  under 8  rests at (-36.3,-43.3,50.4)
+      11 phys_skinned_skirt_R_dangler_2_4_jntBnd  [its own]  under 9  rests at (-35.2,-30.3,59.8)
+      12 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  Skirt_Front.ao  socket hip_jntBnd [in its carrier's rig]  box (-22.4,-38.4,3.4)..(25.2,-11.9,82.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 406 triangles over 252 vertices
+    names: 42 bytes said, 42 read  [agree]
+    rig 19 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 18 of 19  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_skirt_front_L_1_jntBnd  [its own]  under 0  rests at (-6.2,-21.6,11)
+      2 phys_skinned_skirt_front_L_6_jntBnd  [its own]  under 0  rests at (-18.5,-21.6,11)
+      3 phys_skinned_skirt_front_R_1_jntBnd  [its own]  under 0  rests at (6.2,-21.6,11)
+      4 phys_skinned_skirt_front_R_6_jntBnd  [its own]  under 0  rests at (18.5,-21.6,11)
+      5 phys_skinned_skirt_front_L_2_jntBnd  [its own]  under 1  rests at (-6.1,-28.5,23.8)
+      6 phys_skinned_skirt_front_L_7_jntBnd  [its own]  under 2  rests at (-18.4,-28.5,23.8)
+      7 phys_skinned_skirt_front_R_2_jntBnd  [its own]  under 3  rests at (6.1,-28.5,23.8)
+      8 phys_skinned_skirt_front_R_7_jntBnd  [its own]  under 4  rests at (18.4,-28.5,23.8)
+      9 phys_skinned_skirt_front_L_3_jntBnd  [its own]  under 5  rests at (-6,-32.1,38)
+      10 phys_skinned_skirt_front_L_8_jntBnd  [its own]  under 6  rests at (-17.3,-32.1,38)
+      11 phys_skinned_skirt_front_R_3_jntBnd  [its own]  under 7  rests at (6,-32.1,38)
+      12 phys_skinned_skirt_front_R_8_jntBnd  [its own]  under 8  rests at (17.3,-32.1,38)
+      13 phys_skinned_skirt_front_L_4_jntBnd  [its own]  under 9  rests at (-6,-32.7,54.5)
+      14 phys_skinned_skirt_front_L_9_jntBnd  [its own]  under 10  rests at (-15.1,-32.7,54.3)
+      15 phys_skinned_skirt_front_R_4_jntBnd  [its own]  under 11  rests at (6,-32.7,54.5)
+      16 phys_skinned_skirt_front_R_9_jntBnd  [its own]  under 12  rests at (15.1,-32.7,54.3)
+      17 phys_skinned_skirt_front_L_5_jntBnd  [its own]  under 13  rests at (-6,-33.6,72.5)
+      18 phys_skinned_skirt_front_R_5_jntBnd  [its own]  under 15  rests at (6,-33.6,72.5)
+  Skirt_Back.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-50.9,-35.6,2.6)..(49,73.7,94.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 1102 triangles over 618 vertices
+    names: 40 bytes said, 40 read  [agree]
+    rig 53 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 52 of 53  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_thigh_jntBnd  [shared]  under 0  rests at (13.5,-0,0)  carrier has (13.5,66,-94.7)
+      2 R_thigh_jntBnd  [shared]  under 0  rests at (-13.5,0,-0)  carrier has (-13.5,66,-94.7)
+      3 phys_skinned_skirt_back_L_1_jntBnd  [its own]  under 0  rests at (7.8,10.5,10.6)
+      4 phys_skinned_skirt_back_L_9_jntBnd  [its own]  under 0  rests at (19.6,0.8,18.4)
+      5 phys_skinned_skirt_back_L_17_jntBnd  [its own]  under 0  rests at (23.7,-13.7,30.7)
+      6 phys_skinned_skirt_back_R_1_jntBnd  [its own]  under 0  rests at (-7.8,10.5,10.6)
+      7 phys_skinned_skirt_back_R_9_jntBnd  [its own]  under 0  rests at (-19.6,0.8,18.4)
+      8 phys_skinned_skirt_back_R_17_jntBnd  [its own]  under 0  rests at (-23.7,-13.7,30.7)
+      9 L_knee_jntBnd  [shared]  under 1  rests at (20.3,-31.3,33.4)  carrier has (20.3,34.7,-61.2)
+      10 R_knee_jntBnd  [shared]  under 2  rests at (-20.3,-31.3,33.4)  carrier has (-20.3,34.7,-61.2)
+      11 phys_skinned_skirt_back_L_2_jntBnd  [its own]  under 3  rests at (7.1,11.8,28.3)
+      12 phys_skinned_skirt_back_L_10_jntBnd  [its own]  under 4  rests at (18.4,4.4,34.4)
+      13 phys_skinned_skirt_back_L_18_jntBnd  [its own]  under 5  rests at (24,-8.1,44.9)
+      14 phys_skinned_skirt_back_R_2_jntBnd  [its own]  under 6  rests at (-7.1,11.8,28.3)
+      15 phys_skinned_skirt_back_R_10_jntBnd  [its own]  under 7  rests at (-18.4,4.4,34.4)
+      16 phys_skinned_skirt_back_R_18_jntBnd  [its own]  under 8  rests at (-24,-8.1,44.9)
+      17 phys_skinned_skirt_back_L_3_jntBnd  [its own]  under 11  rests at (7.2,16.1,45.6)
+      18 phys_skinned_skirt_back_L_11_jntBnd  [its own]  under 12  rests at (18.5,9.6,50.7)
+      19 phys_skinned_skirt_back_L_19_jntBnd  [its own]  under 13  rests at (24.7,-1.4,57.8)
+      20 phys_skinned_skirt_back_R_3_jntBnd  [its own]  under 14  rests at (-7.2,16.1,45.6)
+      21 phys_skinned_skirt_back_R_11_jntBnd  [its own]  under 15  rests at (-18.5,9.6,50.7)
+      22 phys_skinned_skirt_back_R_19_jntBnd  [its own]  under 16  rests at (-24.7,-1.4,57.8)
+      23 phys_skinned_skirt_back_L_4_jntBnd  [its own]  under 17  rests at (7.1,22.5,60.8)
+      24 phys_skinned_skirt_back_L_12_jntBnd  [its own]  under 18  rests at (18.7,16.3,65)
+      25 phys_skinned_skirt_back_L_20_jntBnd  [its own]  under 19  rests at (26.1,6.2,70.6)
+      26 phys_skinned_skirt_back_R_4_jntBnd  [its own]  under 20  rests at (-7.1,22.5,60.8)
+      27 phys_skinned_skirt_back_R_12_jntBnd  [its own]  under 21  rests at (-18.7,16.3,65)
+      28 phys_skinned_skirt_back_R_20_jntBnd  [its own]  under 22  rests at (-26.1,6.2,70.6)
+      29 phys_skinned_skirt_back_L_5_jntBnd  [its own]  under 23  rests at (7.2,31.5,74)
+      30 phys_skinned_skirt_back_L_13_jntBnd  [its own]  under 24  rests at (19.3,25.6,76.9)
+      31 phys_skinned_skirt_back_L_21_jntBnd  [its own]  under 25  rests at (27.7,15.9,80.7)
+      32 phys_skinned_skirt_back_R_5_jntBnd  [its own]  under 26  rests at (-7.2,31.5,74)
+      33 phys_skinned_skirt_back_R_13_jntBnd  [its own]  under 27  rests at (-19.3,25.6,76.9)
+      34 phys_skinned_skirt_back_R_21_jntBnd  [its own]  under 28  rests at (-27.7,15.9,80.7)
+      35 phys_skinned_skirt_back_L_6_jntBnd  [its own]  under 29  rests at (7.6,43.3,84.7)
+      36 phys_skinned_skirt_back_L_14_jntBnd  [its own]  under 30  rests at (21.6,37.1,86.1)
+      37 phys_skinned_skirt_back_L_22_jntBnd  [its own]  under 31  rests at (31.4,26.9,87.5)
+      38 phys_skinned_skirt_back_R_6_jntBnd  [its own]  under 32  rests at (-7.6,43.3,84.7)
+      39 phys_skinned_skirt_back_R_14_jntBnd  [its own]  under 33  rests at (-21.6,37.1,86.1)
+      40 phys_skinned_skirt_back_R_22_jntBnd  [its own]  under 34  rests at (-31.4,26.9,87.5)
+      41 phys_skinned_skirt_back_L_7_jntBnd  [its own]  under 35  rests at (9.8,56.2,92.2)
+      42 phys_skinned_skirt_back_L_15_jntBnd  [its own]  under 36  rests at (26.4,48.6,92.3)
+      43 phys_skinned_skirt_back_L_23_jntBnd  [its own]  under 37  rests at (37.8,36.7,91.7)
+      44 phys_skinned_skirt_back_R_7_jntBnd  [its own]  under 38  rests at (-9.8,56.2,92.2)
+      45 phys_skinned_skirt_back_R_15_jntBnd  [its own]  under 39  rests at (-26.4,48.6,92.3)
+      46 phys_skinned_skirt_back_R_23_jntBnd  [its own]  under 40  rests at (-37.8,36.7,91.7)
+      47 phys_skinned_skirt_back_L_8_jntBnd  [its own]  under 41  rests at (13.6,69.3,94.5)
+      48 phys_skinned_skirt_back_L_16_jntBnd  [its own]  under 42  rests at (34.8,58.7,94.6)
+      49 phys_skinned_skirt_back_L_24_jntBnd  [its own]  under 43  rests at (46.7,43.5,94.1)
+      50 phys_skinned_skirt_back_R_8_jntBnd  [its own]  under 44  rests at (-13.6,69.3,94.5)
+      51 phys_skinned_skirt_back_R_16_jntBnd  [its own]  under 45  rests at (-34.8,58.7,94.6)
+      52 phys_skinned_skirt_back_R_24_jntBnd  [its own]  under 46  rests at (-46.7,43.5,94.1)

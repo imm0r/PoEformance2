@@ -1,0 +1,1018 @@
+monster: Twilight Order Officer [Metadata/Monsters/TwilightOrderSoldiers/Runemarked/TwilightOrderOfficerRunemarked]
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderSoldiers/Runemarked/TwilightOrderOfficerRunemarked.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/TwilightOrderSoldiers/2h_sword/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/TwilightOrder/TwilightOrderSoldiers/attachments/Officer_SkirtMetalHeld.ao"
+	attached_object = "aux_L_upperArm_attachment Metadata/Monsters/TwilightOrder/TwilightOrderSoldiers/attachments/Officer_LShoulderHeld.ao"
+	attached_object = "aux_R_upperArm_attachment Metadata/Monsters/TwilightOrder/TwilightOrderSoldiers/attachments/Officer_RShoulderHeld.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.37988799810409548,
+								0.0
+							],
+							[
+								0.463687002658844,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.034906599670648578,
+						"angle": 2.199120044708252,
+						"length": 161.85000610351563,
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							0.5235990285873413,
+							1.3962600231170655
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.3743019998073578,
+								0.0
+							],
+							[
+								0.4581010043621063,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.10471999645233154,
+						"angle": 1.9024100303649903,
+						"length": 150.0,
+						"impact_x_rotation": [
+							0.0,
+							-0.26179900765419009
+						],
+						"impact_z_rotation": [
+							-0.43633198738098147,
+							-1.483530044555664
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/TwilightOrderSoldiers/2h_sword/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderSoldiers/TwilightOrderOfficer.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "shoulderpad_grp false L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+		bone_group = "root false"
+		bone_group = "frameupper false"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "alert_transition_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05340069904923439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07332629710435868,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act2/TwilightOrderOfficer/TwilightOrderOfficer_Aggro_$(#).dialogue.ogg",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24973399937152863,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32731199264526369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4779520034790039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1866299957036972,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Attack1",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2953779995441437,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/SwordSwish",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30785199999809267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11818599700927735,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Attack1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3205139935016632,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3828530013561249,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3854700028896332,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/SwordSwish",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cleave_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2146659940481186,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2486719936132431,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44102001190185549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/SpellBuff",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5770450234413147,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/SwordSwish",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6227419972419739,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6482470035552979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6216800212860108,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6886399984359742,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.93094003200531,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.029353799298405649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2103230059146881,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3350819945335388,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4428269863128662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/WeaponDrop2",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8697649836540222,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/FallSmall",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02546750009059906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Death",
+						"bone_name": "Head_Attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21170499920845033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2745319902896881,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3104340136051178,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/WeaponDrop2",
+						"bone_name": "aux_R_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02210170030593872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16716499626636506,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/FallSmall",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19184699654579163,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2591620087623596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33320900797843935,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/WeaponDrop2",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.01873599924147129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17165300250053407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/FallSmall",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23526500165462495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26365000009536745,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/WeaponDrop2",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2715030014514923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05998450145125389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11047100275754929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourCloth",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.20956000685691834,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/GroundSlam",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24624699354171754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37480399012565615,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5076479911804199,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6988120079040527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7960159778594971,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/SwordCleave",
+						"bone_name": "L_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0147199630737305,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0503599643707276,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.465090036392212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8312300443649293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8708369731903076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "jog_2hsword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06791099905967713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07974869757890701,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48908400535583498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49780601263046267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothRun",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6476519703865051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Idle"
+					}
+				]
+			},
+			{
+				"name": "patrol_flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05998450145125389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11047100275754929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourCloth",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "patrol_flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05998450145125389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11047100275754929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourCloth",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "patrol_flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05998450145125389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11047100275754929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourCloth",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "patrol_flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05998450145125389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11047100275754929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourCloth",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "patrol_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8708369731903076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "patrol_turn_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.7683290243148804,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8172159790992737,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4240200519561768,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4580199718475342,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "patrol_turn_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.7502639889717102,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8119019865989685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3815100193023682,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4357099533081055,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "patrol_walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0680127963423729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10308200120925904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6110510230064392,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6349629759788513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_2hsword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.043337300419807437,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05429619923233986,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3365820050239563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/RunLoop",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3440540134906769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothRun",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39053401350975039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "spell_buff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.26014500856399538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34681999683380129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/SpellBuff",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5424240231513977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6301479935646057,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClankTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6958609819412231,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/SwordSwish",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8351219892501831,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothTiny",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1702300310134888,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4970200061798096,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "walk_2hsword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04385190084576607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05979809910058975,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothRun",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5532280206680298,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Vocal/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5684800148010254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/ArmourClothRun",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5772500038146973,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_10_1/TwilightOrder/Officer/Foley/Footsteps",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderSoldiers/attachments/Officer_SkirtMetalHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderSoldiers/attachments/TwilightOrderOfficer/skirt_metal/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderSoldiers/attachments/TwilightOrderOfficer/skirt_metal/rig.ast"
+	    attachment_bones = "aux_L_plate aux_R_plate L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderSoldiers/attachments/TwilightOrderOfficer/skirt_metal/TwilightOrderOfficerRobe.sm"
+	}
+	
+	
+	BoneGroups
+	{
+	    bone_group = "child_attach false L_plate_jntBnd R_plate_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderSoldiers/attachments/Officer_LShoulderHeld.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderSoldiers/attachments/TwilightOrderOfficer/shoulderpads/TwilightOrderOfficerLShoulderpad.fmt"
+	}
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderSoldiers/attachments/Officer_RShoulderHeld.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderSoldiers/attachments/TwilightOrderOfficer/shoulderpads/TwilightOrderOfficerRShoulderpad.fmt"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderSoldiers/TwilightOrderOfficer.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderSoldiers/TwilightOrderOfficer_armour_b870e5fa.smd"
+Materials 1
+	"Art/Textures/Monsters/TwilightOrderSoldiers/TwilightOrderOfficerc.mat" 12
+BoundingBox -69.0331 -17.9137 -183.849 69.0331 21.0493 0.684802
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderSoldiers/TwilightOrderOfficer_armour_b870e5fa.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 12 in the header, 12 in the block · 6146 triangles over 4662 vertices
+  names: 286 bytes said, 286 read  [agree]
+
+=== shapes (13)
+0	beltShape	from 0	count 558
+1	BodyShape	from 558	count 6534
+2	chest_clothShape	from 7092	count 168
+3	collarShape	from 7260	count 576
+4	helmetShape	from 7836	count 3258
+5	legsShape	from 11094	count 2574
+6	LoinClothShape	from 13668	count 192
+7	neckShape	from 13860	count 480
+8	shoesShape	from 14340	count 1074
+9	shoulderclothShape	from 15414	count 1356
+10	shoulderpadsShape	from 16770	count 804
+11	SkirtShape	from 17574	count 864
+12	skirt_metalShape	from 18438	count 2526
+
+=== fitting
+the monster's rig: 85 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_L_plate, aux_R_plate, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  Officer_SkirtMetalHeld.ao  socket hip_jntBnd [in its carrier's rig]  box (-25.2,-19,-20.5)..(25.2,17.3,6.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 842 triangles over 822 vertices
+    names: 32 bytes said, 32 read  [agree]
+    rig 9 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 9  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_L_plate_jntBnd  [its own]  under 0  rests at (18.1,-5.6,-8.2)
+      2 phys_R_plate_jntBnd  [its own]  under 0  rests at (-18.1,-5.6,-8.2)
+      3 L_plate_jntBnd  [its own]  under 0  rests at (15,-5.6,-19.9)
+      4 R_plate_jntBnd  [its own]  under 0  rests at (-15,-5.6,-19.9)
+      5 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      6 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      7 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      8 spine_2_jntBnd  [shared]  under 7  rests at (-0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+  Officer_LShoulderHeld.ao  socket aux_L_upperArm_attachment [in its carrier's rig]  fixed mesh TwilightOrderOfficerLShoulderpad.fmt  (did not read: version 8 puts its geometry outside a DOLm block, which this does not read)
+  Officer_RShoulderHeld.ao  socket aux_R_upperArm_attachment [in its carrier's rig]  fixed mesh TwilightOrderOfficerRShoulderpad.fmt  (did not read: version 8 puts its geometry outside a DOLm block, which this does not read)

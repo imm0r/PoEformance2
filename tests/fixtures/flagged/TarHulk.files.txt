@@ -1,0 +1,1809 @@
+monster: Blackblooded Tarhulk [Metadata/Monsters/LeagueAbyss/Blackblood/TarHulk]
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/TarHulk/TarHulkNoPhys.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/TarHulk/rig.amd"
+	animations = '[
+		{
+			"name": "abyss_emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8844193816184998,
+					"name": "halo_emerge"
+				}
+			]
+		},
+		{
+			"name": "attack_combo_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.0870158672332764,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				}
+			]
+		},
+		{
+			"name": "attack_combo_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.0254623889923097,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0254623889923097,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0254623889923097,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0254623889923097,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0254623889923097,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0254623889923097,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0254623889923097,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0254623889923097,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0254623889923097,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0254623889923097,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0254623889923097,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0254623889923097,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_combo_hit_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.496162086725235,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.496162086725235,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.496162086725235,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.496162086725235,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.496162086725235,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.496162086725235,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.496162086725235,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.496162086725235,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.496162086725235,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.496162086725235,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.496162086725235,
+					"name": "contact",
+					"position": [
+						-3.3220062255859377,
+						-81.21945190429688,
+						-133.86505126953126
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_ground_cast_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.6332900524139405,
+					"name": "contact",
+					"position": [
+						33.76409912109375,
+						-30.43402862548828,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"position": [
+						135.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"position": [
+						-135.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.37988799810409548,
+								0.0
+							],
+							[
+								0.4301680028438568,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 3.141590118408203,
+						"length": 160.0,
+						"impact_z_rotation": [
+							-0.5235990285873413,
+							-1.5707999467849732
+						],
+						"impact_type": "Blunt"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "halo_01 Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_blackblood_01.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/TarHulk/rig.ast"
+		socket = "halo_01"
+			parent = "head_jntBnd"
+			translation = "0 -10 -60"
+			ignore_parent_rotation = "yawpitchroll"
+		linear_allowed_contraction = 0.100
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/TarHulk/TarHulk.sm"
+			arm_tentacles_mesh_NoPhysShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssTarHulk.mat:0"
+			body_meshShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssTarHulk.mat:0"
+			mouth_tentacles_mesh_NoPhysShape = "Art/Textures/Monsters/AbyssalMonsters/AbyssTarHulk.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "abyss_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08038999885320664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Whoosh",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16704000532627107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5323899984359741,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5815200209617615,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6083199977874756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Aggro",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Attack",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementLong",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43625110387802126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Whoosh",
+						"bone_name": "arm_tentacles_jntBnd_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9290900230407715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementShort",
+						"bone_name": "L_shoulder_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Attack",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementLong",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29083406925201418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Whoosh",
+						"bone_name": "arm_tentacles_jntBnd_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6193933486938477,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementShort",
+						"bone_name": "L_shoulder_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementShort",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/GroundSplash",
+						"bone_name": "arm_tentacles_jntBnd_9_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/PullStart",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9803299903869629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementLong",
+						"bone_name": "arm_tentacles_jntBnd_4"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9901049733161926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/Whoosh",
+						"bone_name": "arm_tentacles_jntBnd_9_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0080300569534302,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleShort",
+						"bone_name": "arm_tentacles_jntBnd_9_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.199049949645996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/Submerge",
+						"bone_name": "arm_tentacles_jntBnd_9_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.19923996925354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Whoosh",
+						"bone_name": "arm_tentacles_jntBnd_8"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2211899757385255,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/ArmPull",
+						"bone_name": "arm_tentacles_jntBnd_9_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.711359977722168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Whoosh",
+						"bone_name": "arm_tentacles_jntBnd_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7258100509643555,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementShort",
+						"bone_name": "L_shoulder_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_combo_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Attack",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementLong",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0933587551116944,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/ArmPull",
+						"bone_name": "phys_tri_L_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.308753252029419,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Whoosh",
+						"bone_name": "arm_tentacles_jntBnd_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4378399848937989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/Submerge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.786494255065918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/Whoosh"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7872700691223146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementShort",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.900399923324585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Attack",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "attack_combo_hit_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementLong",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleShort",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Attack",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8831509947776794,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementShort",
+						"bone_name": "R_mouth_tentacles_end_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.922694981098175,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleWhoosh",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9546989798545837,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/PullEnd",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4870400428771973,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementShort",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6197799444198609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleShort",
+						"bone_name": "arm_tentacles_jntBnd_7"
+					}
+				]
+			},
+			{
+				"name": "attack_combo_miss_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementLong",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_ground_cast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementLong",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/GroundStart",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7350630164146423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/SubmergeMagic",
+						"bone_name": "arm_tentacles_jntBnd_9_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8287540078163147,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Gore.loop.ogg",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.013069987297058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/Ground.Loop.ogg",
+						"bone_name": "arm_tentacles_jntBnd_7"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2855499982833863,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/GroundSplash",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6585801839828492,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/GroundMiddle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9609500169754029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/GroundSplash",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7603399753570558,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/GroundSplash",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.010079860687256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/Submerge",
+						"bone_name": "arm_tentacles_jntBnd_9_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.303659915924072,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/GroundEnd",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.339540004730225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleShort",
+						"bone_name": "arm_tentacles_jntBnd_8"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.5272297859191898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Effects/GroundSplash",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Death",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07751119881868363,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23819400370121003,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Death",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Death",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5938560962677002,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1464052200317383,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Death",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Death",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06119305267930031,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18804790079593659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Death",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Death",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05438022315502167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23157012462615968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Death",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Death",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15243969857692719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2944628596305847,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Death",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Death",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05438022315502167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleMedium",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16711188852787019,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Death",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Flinch",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.057543519884347919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/GoreFlinch",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Flinch",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05778529495000839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/GoreFlinch",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Flinch",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07108315825462342,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/GoreFlinch",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Flinch",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05174080654978752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/GoreFlinch",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/GoreIdle.loop.ogg",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.356469988822937,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Idle.loop.ogg",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16082000732421876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16227999329566956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/GoreFlinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26728084683418276,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3040899932384491,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5248500108718872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4663699865341187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7515994310379029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0277700424194338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1622800827026369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13491316139698029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16227999329566956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/GoreFlinch"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26728084683418276,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementLong",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3040899932384491,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4410054683685303,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4663699865341187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7515994310379029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.256573438644409,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Gore.loop.ogg",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2089349925518036,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.415242999792099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleShort",
+						"bone_name": "arm_tentacles_jntBnd_9_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4326469898223877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Run.loop.ogg",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6290041208267212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0420500040054322,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleShort",
+						"bone_name": "arm_tentacles_jntBnd_9_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1408631801605225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.491551399230957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5256199836730958,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementShort",
+						"bone_name": "arm_tentacles_jntBnd_5"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7844899892807007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/TentacleShort",
+						"bone_name": "arm_tentacles_jntBnd_9_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8500840663909913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.199890613555908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5053750276565552,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Vocals/Walk.loop.ogg",
+						"bone_name": "mouth_tentacles_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6668859720230103,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/MovementLong",
+						"bone_name": "phys_tri_F_belly_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8269379734992981,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Abyss/Blackblood/TarHulk/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_combo_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.2836121320724488,
+						"end_time": 3.14332914352417,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/TarHulk/AOs/OnAct_Headbutt_Ice.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed_type": "Stretch"
+					}
+				]
+			},
+			{
+				"name": "attack_ground_cast_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.0484964847564698,
+						"end_time": 4.402724266052246,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/TarHulk/AOs/OnAct_RemnantEruption_Cold.ao",
+						"from": {
+							"parent_bone": "L_Weapon"
+						},
+						"speed": 1.0
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_combo_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/TarHulk/EPKs/OnACT_headButt.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_combo_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.615663 1 Linear 3.76772 1 Linear 4.5 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.5,
+						"name": "Albedo_Mult",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.826869 0.780405 Smooth 1.41294 1 Linear 2.09074 0 Flat 4.5 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/TarHulk/TarHulk.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/LeagueAbyss/Blackblood/TarHulk/attachments/TarHulkArmTentacles.ao"
+	attached_object = "L_Weapon Metadata/Monsters/LeagueAbyss/Blackblood/TarHulk/attachments/TarHulkMouthTentacles.ao"
+	attached_object = "halo_01 Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_blackblood_02.ao"
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/TarHulk/rig.amd"
+	animations = '[
+		{
+			"name": "attack_combo_02",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.8321712017059327,
+					"end_time": 2.44545316696167,
+					"name": "start_target_update",
+					"data": "80 0 1"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.37988799810409548,
+								0.0
+							],
+							[
+								0.4301680028438568,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 3.141590118408203,
+						"length": 160.0,
+						"impact_z_rotation": [
+							-0.5235990285873413,
+							-1.5707999467849732
+						],
+						"impact_type": "Blunt"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/TarHulk/rig.ast"
+		socket = "halo_01"
+			parent = "head_jntBnd"
+			translation = "0 -10 -60"
+			ignore_parent_rotation = "yawpitchroll"
+		linear_allowed_contraction = 0.100
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		use_shock_propagation = false
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/TarHulk/TarHulk.sm"
+			hide_segments = "arm_tentacles_mesh_NoPhysShape,mouth_tentacles_mesh_NoPhysShape"
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1"
+		bone_group = "dripping_line false arm_tentacles_jntBnd_5 arm_tentacles_jntBnd_6"
+		bone_group = "trail_1 false arm_tentacles_jntBnd_9_end arm_tentacles_jntBnd_9"
+		bone_group = "trail_2 false arm_tentacles_jntBnd_9 arm_tentacles_jntBnd_8"
+		bone_group = "trail_3 false arm_tentacles_jntBnd_8 arm_tentacles_jntBnd_7"
+		bone_group = "trail_4 false arm_tentacles_jntBnd_7 arm_tentacles_jntBnd_6"
+		bone_group = "trail_5 false arm_tentacles_jntBnd_6 arm_tentacles_jntBnd_5"
+		bone_group = "trail_6 false arm_tentacles_jntBnd_5 L_elbow_Twist_jntBnd_1"
+		bone_group = "channel_line false arm_tentacles_jntBnd_6 arm_tentacles_jntBnd_5"
+		bone_group = "line_arm false L_shoulder_jntBnd arm_tentacles_jntBnd_5"
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3125,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TarHulk/pet/onAct_drips.pet",
+						"bone_group": "dripping_line"
+					}
+				]
+			},
+			{
+				"name": "attack_combo_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TarHulk/pet/onAct_drips.pet",
+						"bone_group": "dripping_line"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1932049989700318,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TarHulk/pet/cast_lineout.pet",
+						"bone_group": "line_arm"
+					}
+				]
+			}
+		]'
+	}
+
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4969260096549988,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TarHulk/trl/melee_trail.trl",
+						"bone_group": "trail_2"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4979510009288788,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TarHulk/trl/melee_trail.trl",
+						"bone_group": "trail_3"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4979510009288788,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TarHulk/trl/melee_trail.trl",
+						"bone_group": "trail_4"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4979510009288788,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TarHulk/trl/melee_trail.trl",
+						"bone_group": "trail_5"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4979510009288788,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TarHulk/trl/melee_trail.trl",
+						"bone_group": "trail_6"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_ground_cast_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/TarHulk/EPKs/OnACT_GroundCast_01.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_ground_cast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.966000080108643,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.679418 1 Linear 4.15789 1 Linear 4.966 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_ground_cast_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.0484964847564698,
+						"end_time": 4.402724266052246,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/TarHulk/AOs/OnAct_RemnantEruption_Cold.ao",
+						"from": {
+							"parent_bone": "L_Weapon"
+						},
+						"speed": 1.0
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_blackblood_01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "animate"
+		view_looping = true
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+		socket = "aux_line_01"
+			translation = "0 0 -100"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_line false root aux_line_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "animate",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/fx/halo_blackblood_01.pet",
+						"bone_group": "FX_line"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/TarHulk/attachments/TarHulkArmTentacles.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/TarHulk/attachments/ArmTentacles/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/TarHulk/attachments/ArmTentacles/rig.ast"
+		linear_allowed_contraction = 0.100
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		enclosure_angle = 0.350
+		animation_velocity_factor = 10.000
+		animation_force_factor = 7.000
+		use_shock_propagation = false
+		attachment_bones = "L_clavicle_jntBnd chest_jntBnd neck_jntBnd arm_tentacles_jntBnd_1 arm_tentacles_jntBnd_2 arm_tentacles_jntBnd_3 arm_tentacles_jntBnd_4 arm_tentacles_jntBnd_5 arm_tentacles_jntBnd_6 arm_tentacles_jntBnd_7 arm_tentacles_jntBnd_8 arm_tentacles_jntBnd_9 arm_tentacles_jntBnd_9_end child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/TarHulk/attachments/ArmTentacles/TarHulkArmTentacles.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_clavicle_jntBnd chest_jntBnd neck_jntBnd phys_tri_arm_tentacles_jntBnd_1 phys_tri_arm_tentacles_jntBnd_2 phys_tri_arm_tentacles_jntBnd_3 phys_tri_arm_tentacles_jntBnd_4 phys_tri_arm_tentacles_jntBnd_5 phys_tri_arm_tentacles_jntBnd_6 phys_tri_arm_tentacles_jntBnd_7 phys_tri_arm_tentacles_jntBnd_8 phys_tri_arm_tentacles_jntBnd_9 phys_tri_arm_tentacles_jntBnd_9_end"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAbyss/Blackblood/TarHulk/attachments/TarHulkMouthTentacles.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/TarHulk/attachments/MouthTentacles/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/TarHulk/attachments/MouthTentacles/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		animation_velocity_factor = 10.000
+		animation_force_factor = 7.000
+		use_shock_propagation = false
+		attachment_bones = "head_jntBnd mouth_tentacles_jntBnd_1 mouth_tentacles_jntBnd_2 mouth_tentacles_jntBnd_3 mouth_tentacles_jntBnd_4 mouth_tentacles_end_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/TarHulk/attachments/MouthTentacles/TarHulkMouthTentacles.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false head_jntBnd phys_tri_mouth_tentacles_jntBnd_1 phys_tri_mouth_tentacles_jntBnd_2 phys_tri_mouth_tentacles_jntBnd_3 phys_tri_mouth_tentacles_jntBnd_4 phys_tri_mouth_tentacles_end_jntBnd"
+	}
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/halo_blackblood_02.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "animate"
+		view_looping = true
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+		socket = "aux_line_01"
+			translation = "0 0 -100"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_line false root aux_line_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "animate",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Abyss/general_effects/faction_halos/fx/halo_blackblood_02.pet",
+						"bone_group": "FX_line"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/TarHulk/TarHulk.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/TarHulk/rig_90fe9269.smd"
+Materials 1
+	"Art/Models/MONSTERS/TarHulk/Textures/TarHulkc.mat" 3
+BoundingBox -97.1708 -39.7991 -198.061 149.311 26.1131 1.3699
+BoneGroups 32
+	"grp_head" 2 "head_jntBnd" "phys_tri_tumor_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_mouth_tentacles_01" 2 "mouth_tentacles_jntBnd_1" "mouth_tentacles_jntBnd_2"
+	"grp_mouth_tentacles_02" 2 "mouth_tentacles_jntBnd_2" "mouth_tentacles_jntBnd_3"
+	"grp_mouth_tentacles_03" 2 "mouth_tentacles_jntBnd_3" "mouth_tentacles_jntBnd_4"
+	"grp_mouth_tentacles_04" 2 "mouth_tentacles_jntBnd_4" "mouth_tentacles_end_jntBnd"
+	"grp_l_arm_tentacle_01" 2 "arm_tentacles_jntBnd_1" "arm_tentacles_jntBnd_2"
+	"grp_l_arm_tentacle_02" 2 "arm_tentacles_jntBnd_2" "arm_tentacles_jntBnd_3"
+	"grp_l_arm_tentacle_03" 2 "arm_tentacles_jntBnd_3" "arm_tentacles_jntBnd_4"
+	"grp_l_arm_tentacle_04" 2 "arm_tentacles_jntBnd_4" "arm_tentacles_jntBnd_5"
+	"grp_l_arm_tentacle_05" 2 "arm_tentacles_jntBnd_5" "arm_tentacles_jntBnd_6"
+	"grp_l_arm_tentacle_06" 2 "arm_tentacles_jntBnd_6" "arm_tentacles_jntBnd_7"
+	"grp_l_arm_tentacle_07" 2 "arm_tentacles_jntBnd_7" "arm_tentacles_jntBnd_8"
+	"grp_l_arm_tentacle_08" 2 "arm_tentacles_jntBnd_8" "arm_tentacles_jntBnd_9"
+	"grp_l_arm_tentacle_09" 2 "arm_tentacles_jntBnd_9" "arm_tentacles_jntBnd_9_end"
+	"grp_belly" 2 "spine_1_jntBnd" "phys_tri_F_belly_jntBnd"
+
+=== .smd Art/Models/MONSTERS/TarHulk/rig_90fe9269.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 3 in the header, 3 in the block · 7790 triangles over 4736 vertices
+  names: 152 bytes said, 152 read  [agree]
+
+=== shapes (3)
+0	arm_tentacles_mesh_NoPhysShape	from 0	count 6588
+1	body_meshShape	from 6588	count 13362
+2	mouth_tentacles_mesh_NoPhysShape	from 19950	count 3420
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position
+  halo_blackblood_01.ao  socket halo_01 [NOT in its carrier's rig]  (no mesh - an effect or a sound)
+  TarHulkArmTentacles.ao  socket head_jntBnd [in its carrier's rig]  box (-73.3,-31.5,-35.5)..(103.3,11.6,29.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 2196 triangles over 1317 vertices
+    names: 46 bytes said, 46 read  [agree]
+    rig 14 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 14  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_arm_tentacles_jntBnd_5  [its own]  under 0  rests at (12,-4.7,1.7)
+      2 phys_tri_arm_tentacles_jntBnd_6  [its own]  under 0  rests at (-5.5,-3.5,-2.9)
+      3 L_clavicle_jntBnd  [shared]  under 0  rests at (98.8,-5.8,5.4)  carrier has (5.2,6.7,-151.7)
+      4 phys_tri_arm_tentacles_jntBnd_4  [its own]  under 1  rests at (29.3,-7.3,6.2)
+      5 phys_tri_arm_tentacles_jntBnd_7  [its own]  under 2  rests at (-22.9,-2.4,-7.5)
+      6 chest_jntBnd  [shared]  under 3  rests at (95.4,8.7,-0.5)  carrier has (-0,0.1,-138)
+      7 neck_jntBnd  [shared]  under 3  rests at (104.5,-5,-0.7)  carrier has (0,0.8,-154.4)
+      8 phys_tri_arm_tentacles_jntBnd_3  [its own]  under 4  rests at (46.7,-9.9,10.7)
+      9 phys_tri_arm_tentacles_jntBnd_8  [its own]  under 5  rests at (-40.4,-1.2,-12.1)
+      10 phys_tri_arm_tentacles_jntBnd_2  [its own]  under 8  rests at (63.7,-12,9.2)
+      11 phys_tri_arm_tentacles_jntBnd_9  [its own]  under 9  rests at (-57.8,0,-16.7)
+      12 phys_tri_arm_tentacles_jntBnd_1  [its own]  under 10  rests at (80.8,-14.1,7.7)
+      13 phys_tri_arm_tentacles_jntBnd_9_end  [its own]  under 11  rests at (-75.3,1.2,-21.2)
+  TarHulkMouthTentacles.ao  socket L_Weapon [in its carrier's rig]  box (-15.4,-41.5,0.2)..(15.1,-4.8,58.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1140 triangles over 692 vertices
+    names: 50 bytes said, 50 read  [agree]
+    rig 7 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 head_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (-0,-3.4,-170.8)
+      2 phys_tri_mouth_tentacles_jntBnd_1  [its own]  under 1  rests at (-0,-13.6,9.5)
+      3 phys_tri_mouth_tentacles_jntBnd_2  [its own]  under 2  rests at (-0,-15,23.4)
+      4 phys_tri_mouth_tentacles_jntBnd_3  [its own]  under 3  rests at (0,-18.8,36.9)
+      5 phys_tri_mouth_tentacles_jntBnd_4  [its own]  under 4  rests at (0,-26.3,48.8)
+      6 phys_tri_mouth_tentacles_end_jntBnd  [its own]  under 5  rests at (0,-33.6,60.7)
+  halo_blackblood_02.ao  socket halo_01 [NOT in its carrier's rig]  (no mesh - an effect or a sound)

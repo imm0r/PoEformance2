@@ -1,0 +1,877 @@
+monster: Prowling Skeleton [Metadata/Monsters/SkeletonProwler/SkeletonProwlerWet_]
+
+=== .ao Metadata/Monsters/SkeletonProwler/SeaweedSkeletonProwler.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SkeletonProwler/rig.amd"
+	animations = '[
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.20000000298023225,
+					"name": "move",
+					"position": [
+						0.0,
+						127.37300109863281,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.2666666805744171,
+					"name": "move",
+					"position": [
+						0.0,
+						-146.22000122070313,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.23333333432674409,
+					"name": "move",
+					"position": [
+						75.41400146484375,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.30000001192092898,
+					"name": "move",
+					"position": [
+						-103.052001953125,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/SkeletonProwler/attachments/SkeletonProwler_SeaweedHair.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/SkeletonProwler/attachments/SkeletonProwler_BodySeaweedHair.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5028250217437744,
+								0.0
+							],
+							[
+								0.5536720156669617,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.17453299462795258,
+						"angle": 1.7453299760818482,
+						"x_axis_scale": 0.7049999833106995,
+						"length": 177.85699462890626,
+						"offset": [
+							-28.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.8203049898147583,
+							2.4609100818634035
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_hand_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4689269959926605,
+								0.0
+							],
+							[
+								0.5762709975242615,
+								1.0
+							]
+						],
+						"width": 105.9520034790039,
+						"length": 188.093994140625,
+						"offset": [
+							42.0,
+							19.0
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_hand_jntBnd"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SkeletonProwler/rig.ast"
+		socket = "aux_r_mid_forearm"
+			parent = "R_elbow_jntBnd"
+			translation = "-38.3762 0 0"
+		socket = "aux_l_mid_forearm"
+			parent = "L_elbow_jntBnd"
+			translation = "39.5829 0 0"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SkeletonProwler/SeaweedSkeletonProwler.sm"
+			hide_segments = "seaweed_bodyShape,seaweed_headShape,short_seaweed_bodyShape,short_seaweed_headShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false jaw_jntBnd head_jntBnd neck_jntBnd_2 neck_jntBnd_1 L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_r_forearm false R_hand_tip_jntBnd aux_r_mid_forearm R_elbow_jntBnd"
+		bone_group = "grp_l_forearm false L_hand_tip_jntBnd aux_l_mid_forearm L_elbow_jntBnd"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2583410143852234,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3290480077266693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Vocals/Attack1",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4876829981803894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Whoosh",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5737969875335693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7996219992637634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3769659996032715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3874279856681824,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Vocals/Attack2",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5263460278511047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Whoosh",
+						"bone_name": "L_finger_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5298609733581543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8883739709854126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/DeathLow",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Vocals/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4746209979057312,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/StepHeavy",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4835210144519806,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Death",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.489452987909317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_prison_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25375500321388247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3152709901332855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.667451024055481,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "L_hand_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7935590147972107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "R_hand_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.824317991733551,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9242799878120422,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0273200273513795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0273200273513795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0288599729537964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "L_hand_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1211299896240235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "R_hand_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1365100145339966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.184190034866333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.194949984550476,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3133699893951417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "R_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7803200483322144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Vocals/Emerge",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.088469982147217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/StepHeavy",
+						"bone_name": "R_finger_3_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.090009927749634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "L_finger_3_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.12076997756958,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.162290096282959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9459850192070007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Vocals/Idle",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2680949866771698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Seaweed",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2699410021305084,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"alternate_sound": "{none]",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31147000193595889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "L_hand_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5462509989738464,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Vocals/Run",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6270939707756043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "L_toe_tip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6473910212516785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/SkeletonProwler/Foley/Step",
+						"bone_name": "R_hand_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5529540181159973,
+						"end_time": 0.7200000286102295,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/HairySkeletonProwler/trl/hairy_melee_trail.trl",
+						"bone_group": "grp_r_forearm"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5880770087242127,
+						"end_time": 0.7699999809265137,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/HairySkeletonProwler/trl/hairy_melee_trail.trl",
+						"bone_group": "grp_l_forearm"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/SkeletonProwler/attachments/SkeletonProwler_SeaweedHair.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SkeletonProwler/attachments/SkeletonProwler_SeaweedHair/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SkeletonProwler/attachments/SkeletonProwler_SeaweedHair/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		enclosure_angle = 0.700
+		use_shock_propagation = false
+	
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SkeletonProwler/attachments/SkeletonProwler_SeaweedHair/SkeletonSeaweedHair.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/SkeletonProwler/attachments/SkeletonProwler_BodySeaweedHair.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SkeletonProwler/attachments/SkeletonProwler_BodySeaweedHair/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SkeletonProwler/attachments/SkeletonProwler_BodySeaweedHair/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 100.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.050
+		tangent_viscosity_multiplier = 0.010
+		enclosure_angle = 0.700
+		use_shock_propagation = false
+	
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SkeletonProwler/attachments/SkeletonProwler_BodySeaweedHair/SeaweedBodyHair.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/SkeletonProwler/SeaweedSkeletonProwler.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/SkeletonProwler/SeaweedSkeletonProwler_armour_50f65c67.smd"
+Materials 2
+	"Art/Models/MONSTERS/WerewolfProwler/textures/SeaweedSkeletonProwlerc.mat" 4
+	"Art/Models/MONSTERS/WerewolfProwler/textures/SeaweedSkeletonProwlerc.mat" 24
+BoundingBox -68.0588 -80.8542 -154.531 68.0588 145.565 -0.8085
+BoneGroups 23
+	"grp_head" 2 "head_jntBnd" "jaw_jntBnd"
+	"grp_neck" 2 "head_jntBnd" "neck_jntBnd_2"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd_1"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_hand_jntBnd"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_hand_jntBnd"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+	"grp_neck_base" 2 "neck_jntBnd_1" "neck_jntBnd_2"
+	"grp_tail_01" 2 "phys_skinned_tail_jntBnd_1" "phys_skinned_tail_jntBnd_2"
+	"grp_tail_02" 2 "phys_skinned_tail_jntBnd_2" "phys_skinned_tail_jntBnd_3"
+
+=== .smd Art/Models/MONSTERS/SkeletonProwler/SeaweedSkeletonProwler_armour_50f65c67.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 28 in the header, 28 in the block · 12270 triangles over 10391 vertices
+  names: 1034 bytes said, 1034 read  [agree]
+
+=== shapes (30)
+0	seaweed_bodyShape	from 0	count 3672
+1	seaweed_headShape	from 3672	count 1530
+2	short_seaweed_bodyShape	from 5202	count 3672
+3	short_seaweed_headShape	from 8874	count 1530
+4	hip_alpha_meshShape	from 10404	count 114
+5	hip_spine_meshShape	from 10518	count 282
+6	hips_meshShape	from 10800	count 1272
+7	jaw_meshShape	from 12072	count 462
+8	L_clavicle_meshShape	from 12534	count 1128
+9	L_foot_meshShape	from 13662	count 2052
+10	L_lower_arm_meshShape	from 15714	count 2820
+11	L_shin_meshShape	from 18534	count 168
+12	L_thigh_meshShape	from 18702	count 246
+13	L_upper_arm_meshShape	from 18948	count 192
+14	merged_body_alpha_meshShape	from 19140	count 705
+15	merged_body_meshShape	from 19845	count 7584
+16	R_clavicle_meshShape	from 27429	count 1128
+17	R_foot_meshShape	from 28557	count 2052
+18	R_lower_arm_meshShape	from 30609	count 2820
+19	R_shin_meshShape	from 33429	count 168
+20	R_thigh_meshShape	from 33597	count 246
+21	R_upper_arm_meshShape	from 33843	count 192
+22	ribcage_meshShape	from 34035	count 588
+23	skull_meshShape	from 34623	count 924
+24	spine_alpha_meshShape	from 35547	count 240
+25	spine_meshShape	from 35787	count 600
+26	tail_alpha_meshShape	from 36387	count 114
+27	tail_meshShape	from 36501	count 309
+28	seaweedShape	from 36810	count 1530
+29	seaweed_hairShape	from 38340	count 3672
+
+=== fitting
+the monster's rig: 48 bones
+mounts: aux_position
+  SkeletonProwler_SeaweedHair.ao  socket head_jntBnd [in its carrier's rig]  box (-23.4,-46.6,-25.6)..(24.5,13,53.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 510 triangles over 418 vertices
+    names: 24 bytes said, 24 read  [agree]
+    rig 30 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 29 of 30  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,-0.6,0.5)
+      1 L_phys_skinned_hair_1_jntBnd  [its own]  under 0  rests at (6.1,0.1,1.3)
+      2 L_phys_skinned_hair_5_jntBnd  [its own]  under 0  rests at (13.4,-8,-0.7)
+      3 L_phys_skinned_hair_9_jntBnd  [its own]  under 0  rests at (14.7,-16.6,-6.1)
+      4 root_jntBnd|L_phys_skinned_hair_13_jntBnd  [its own]  under 0  rests at (10.6,-22.4,-11.1)
+      5 root_jntBnd|mid_phys_skinned_hair_1_jntBnd  [its own]  under 0  rests at (0.1,-23.2,-15.2)
+      6 R_phys_skinned_hair_9_jntBnd  [its own]  under 0  rests at (-8.3,-19.7,-12.3)
+      7 R_phys_skinned_hair_5_jntBnd  [its own]  under 0  rests at (-14.2,-8.9,-7)
+      8 R_phys_skinned_hair_1_jntBnd  [its own]  under 0  rests at (-8,-0.7,-1.2)
+      9 L_phys_skinned_hair_2_jntBnd  [its own]  under 1  rests at (7.6,-3.6,13.5)
+      10 L_phys_skinned_hair_6_jntBnd  [its own]  under 2  rests at (13,-13,11)
+      11 L_phys_skinned_hair_10_jntBnd  [its own]  under 3  rests at (15.6,-22.1,6.2)
+      12 root_jntBnd|L_phys_skinned_hair_13_jntBnd|L_phys_skinned_hair_14_jntBnd  [its own]  under 4  rests at (10.4,-28.2,0.5)
+      13 R_phys_skinned_hair_10_jntBnd  [its own]  under 6  rests at (-10.1,-24.8,-0)
+      14 R_phys_skinned_hair_06_jntBnd  [its own]  under 7  rests at (-15.4,-13.9,5.1)
+      15 R_phys_skinned_hair_2_jntBnd  [its own]  under 8  rests at (-9.9,-4.4,10.5)
+      16 L_phys_skinned_hair_3_jntBnd  [its own]  under 9  rests at (7.8,-7.1,28.4)
+      17 L_phys_skinned_hair_7_jntBnd  [its own]  under 10  rests at (12.3,-18.9,25.3)
+      18 L_phys_skinned_hair_11_jntBnd  [its own]  under 11  rests at (15,-27.9,22.2)
+      19 root_jntBnd|L_phys_skinned_hair_13_jntBnd|L_phys_skinned_hair_14_jntBnd|L_phys_skinned_hair_15_jntBnd  [its own]  under 12  rests at (9.6,-33.4,13.4)
+      20 R_phys_skinned_hair_11_jntBnd  [its own]  under 13  rests at (-10.5,-31,13)
+      21 R_phys_skinned_hair_07_jntBnd  [its own]  under 14  rests at (-15.7,-18.8,19.1)
+      22 R_phys_skinned_hair_3_jntBnd  [its own]  under 15  rests at (-10.4,-9.2,22.6)
+      23 L_phys_skinned_hair_4_jntBnd  [its own]  under 16  rests at (7.3,-12,43.2)
+      24 L_phys_skinned_hair_8_jntBnd  [its own]  under 17  rests at (11.7,-23.5,36.7)
+      25 L_phys_skinned_hair_12_jntBnd  [its own]  under 18  rests at (14.2,-32.1,36.8)
+      26 root_jntBnd|L_phys_skinned_hair_13_jntBnd|L_phys_skinned_hair_14_jntBnd|L_phys_skinned_hair_15_jntBnd|L_phys_skinned_hair_16_jntBnd  [its own]  under 19  rests at (9.5,-38.3,26.8)
+      27 R_phys_skinned_hair_12_jntBnd  [its own]  under 20  rests at (-10.9,-35.5,30.4)
+      28 R_phys_skinned_hair_08_jntBnd  [its own]  under 21  rests at (-13.5,-27.5,33.7)
+      29 R_phys_skinned_hair_4_jntBnd  [its own]  under 22  rests at (-10.4,-15.6,37.1)
+  SkeletonProwler_BodySeaweedHair.ao  socket chest_jntBnd [in its carrier's rig]  box (-35.6,-48.9,-27)..(35.6,26.2,76.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1224 triangles over 1164 vertices
+    names: 34 bytes said, 34 read  [agree]
+    rig 25 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 24 of 25  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,-0.6,0.5)
+      1 phys_skinned_L_BodySeaweed_1_jntBnd  [its own]  under 0  rests at (-15.9,9.4,11.4)
+      2 phys_skinned_L_BodySeaweed_4_jntBnd  [its own]  under 0  rests at (-19.4,-7.3,11.4)
+      3 phys_skinned_L_BodySeaweed_7_jntBnd  [its own]  under 0  rests at (-18.9,-22.9,10.7)
+      4 phys_skinned_L_BodySeaweed_10_jntBnd  [its own]  under 0  rests at (-16.9,-38.4,10.8)
+      5 phys_skinned_R_BodySeaweed_1_jntBnd  [its own]  under 0  rests at (21.6,4.5,10.3)
+      6 phys_skinned_R_BodySeaweed_4_jntBnd  [its own]  under 0  rests at (24.4,-12,8.8)
+      7 phys_skinned_R_BodySeaweed_7_jntBnd  [its own]  under 0  rests at (21.4,-27.6,7.3)
+      8 phys_skinned_R_BodySeaweed_10_jntBnd  [its own]  under 0  rests at (16,-41.9,6.1)
+      9 phys_skinned_L_BodySeaweed_2_jntBnd  [its own]  under 1  rests at (-17.3,8.3,36.8)
+      10 phys_skinned_L_BodySeaweed_5_jntBnd  [its own]  under 2  rests at (-19.3,-8.5,36.7)
+      11 phys_skinned_L_BodySeaweed_8_jntBnd  [its own]  under 3  rests at (-19.5,-23.6,35.8)
+      12 phys_skinned_L_BodySeaweed_11_jntBnd  [its own]  under 4  rests at (-18.3,-39.1,33.5)
+      13 phys_skinned_R_BodySeaweed_2_jntBnd  [its own]  under 5  rests at (20.1,3.3,34.1)
+      14 phys_skinned_R_BodySeaweed_5_jntBnd  [its own]  under 6  rests at (21.9,-12.6,33.1)
+      15 phys_skinned_R_BodySeaweed_8_jntBnd  [its own]  under 7  rests at (21.1,-28.3,30.7)
+      16 phys_skinned_R_BodySeaweed_11_jntBnd  [its own]  under 8  rests at (19.3,-41.4,28.6)
+      17 phys_skinned_L_BodySeaweed_3_jntBnd  [its own]  under 9  rests at (-13.5,6.6,61.6)
+      18 phys_skinned_L_BodySeaweed_6_jntBnd  [its own]  under 10  rests at (-14.8,-10.9,59.9)
+      19 phys_skinned_L_BodySeaweed_9_jntBnd  [its own]  under 11  rests at (-15.5,-24.6,56.8)
+      20 phys_skinned_L_BodySeaweed_12_jntBnd  [its own]  under 12  rests at (-17,-39.4,48.8)
+      21 phys_skinned_R_BodySeaweed_3_jntBnd  [its own]  under 13  rests at (14.4,2,61.9)
+      22 phys_skinned_R_BodySeaweed_6_jntBnd  [its own]  under 14  rests at (15.7,-13.2,60.2)
+      23 phys_skinned_R_BodySeaweed_9_jntBnd  [its own]  under 15  rests at (17.4,-25.9,56.1)
+      24 phys_skinned_R_BodySeaweed_12_jntBnd  [its own]  under 16  rests at (14.2,-40.3,48.6)

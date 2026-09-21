@@ -1,0 +1,1070 @@
+monster: Slimy Stalker [Metadata/Monsters/PrisonStalker/SlimyStalker__]
+
+=== .ao Metadata/Monsters/Stalker/SlimyStalker.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Stalker/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.25099998712539675,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.515500009059906,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4964999854564667,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.25999999046325686,
+					"name": "move",
+					"position": [
+						145.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_move_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5329999923706055,
+					"name": "move",
+					"position": [
+						0.0,
+						-250.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.25999999046325686,
+					"name": "move",
+					"position": [
+						-145.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "taunt_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.21229000389575959,
+								0.0
+							],
+							[
+								0.2829457223415375,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"damage_statset_index": 3,
+						"rotation": -0.2967059910297394,
+						"angle": 2.0245819091796877,
+						"x_axis_scale": 0.7960000038146973,
+						"length": 107.34300231933594,
+						"offset": [
+							12.0,
+							2.0
+						],
+						"local_offset": [
+							8.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.3839724659919739,
+							2.286381483078003
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5050504803657532,
+								0.0
+							],
+							[
+								0.5555555820465088,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"damage_statset_index": 3,
+						"rotation": -0.22689281404018403,
+						"angle": 1.0646508932113648,
+						"x_axis_scale": 0.6119999885559082,
+						"length": 132.11700439453126,
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							-0.6981317400932312,
+							-2.565634250640869
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4806201457977295,
+								0.0
+							],
+							[
+								0.4922480583190918,
+								1.0
+							]
+						],
+						"width": 66.04399871826172,
+						"length": 113.12200164794922,
+						"local_offset": [
+							4.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.2617989778518677
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "spine_2_jntBnd Metadata/Monsters/Stalker/attachments/SlimyStalker/slimyStalkerHood.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/Stalker/attachments/SlimyStalker/slimyStalkerRobe.ao"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Stalker/rig.ast"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Stalker/Stalker.sm"
+			StalkerFaceRagShape = "Art/Models/MONSTERS/Stalker/Textures/SlimyStalkerc.mat:0"
+			StalkerFurShape = "Art/Models/MONSTERS/Stalker/Textures/SlimyStalkerc.mat:0"
+			StalkerShape = "Art/Models/MONSTERS/Stalker/Textures/SlimyStalkerc.mat:0"
+			hide_segments = "StalkerPonchoShape,StalkerRobeShortShape"
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.15146200358867646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20877200365066529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Slash",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47192999720573428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Slash",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.38655000925064089,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42222198843955996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Slash",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3330410122871399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24573899805545808,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23278500139713288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4203430116176605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_04",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4220319986343384,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6394929885864258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20631299912929536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2680700123310089,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20473100244998933,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2747589945793152,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/FlinchSmall",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_large_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/FlinchLarge",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/FlinchSmall",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/FlinchSmall",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/FlinchSmall",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Idle.loop.ogg",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.16943399608135224,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31370601058006289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/FallKnockdown",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43134498596191409,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/FallKnockdown",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49075499176979067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9910240173339844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Step",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.281559944152832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Step",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5221799612045289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Step",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5249099731445313,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.962440013885498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Step",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.233370065689087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Step",
+						"bone_name": "aux_L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07764790207147598,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.055126700550317767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Death",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.14898300170898438,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Knockdown1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21909199655056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Fall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31370601058006289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/FallKnockdown",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43134498596191409,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/FallKnockdown",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9910240173339844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Step",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.281559944152832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Step",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5221799612045289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Step",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7154899835586548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Knockdown2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.962440013885498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Step",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.233370065689087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Step",
+						"bone_name": "aux_R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Chase.loop.ogg",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.053185999393463138,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3334349989891052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "summon_clone_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Chase.loop.ogg",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6495790481567383,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Aggro",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6589793562889099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Slash",
+						"bone_name": "L_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6589793562889099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Slash",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "summon_clone_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Chase.loop.ogg",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6495790481567383,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Aggro",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6589793562889099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Slash",
+						"bone_name": "L_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6589793562889099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Slash",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "taunt_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.20263199508190156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Aggro",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "teleport_strike_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Chase.loop.ogg",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9746122360229492,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Vocal/Aggro",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1269408464431763,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Slash",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2016927003860474,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_7_1/Stalker/Movement/Slash",
+						"bone_name": "L_finger_2_jntBnd_1"
+					}
+				]
+			}
+		]'
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd spine_2_jntBnd"
+		bone_group = "frameupper false R_elbow_jntBnd R_shoulder_jntBnd chest_jntBnd L_shoulder_jntBnd L_elbow_jntBnd"
+		bone_group = "l_hand false L_finger_1_jntBnd_1 L_finger_1_jntBnd_3"
+		bone_group = "r_hand false R_finger_1_jntBnd_1 R_finger_1_jntBnd_3"
+	}
+
+	Lights
+	{
+	}
+
+	WindEvents
+	{
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.22357699275016786,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/SlimySalker/pet/onAct/attack_01/melee_swipe.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4752030074596405,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/SlimySalker/pet/onAct/attack_01/melee_l_swipe.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.45569100975990298,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/SlimySalker/pet/onAct/attack_02/melee_double_slash.pet",
+						"bone_group": "root"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Stalker/attachments/SlimyStalker/slimyStalkerHood.ao (depth 1)
+version 3
+extends "Metadata/Monsters/Stalker/attachments/Stalker/stalkerHood"
+
+client
+{
+
+	SkinMesh
+	{
+		hood_meshShape = "Art/Models/MONSTERS/Stalker/Textures/SlimyStalkerc.mat:0"
+	}
+}
+
+=== .ao Metadata/Monsters/Stalker/attachments/SlimyStalker/slimyStalkerRobe.ao (depth 1)
+version 3
+extends "Metadata/Monsters/Stalker/attachments/Stalker/stalkerRobe"
+
+client
+{
+	SkinMesh
+	{
+		skirt_01_meshShape = "Art/Models/MONSTERS/Stalker/Textures/SlimyStalkerc.mat:0"
+		skirt_02_meshShape = "Art/Models/MONSTERS/Stalker/Textures/SlimyStalkerc.mat:0"
+	}
+
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Monsters/Stalker/attachments/Stalker/stalkerHood.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Stalker/attachments/Stalker/Hood/rig.amd"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Stalker/attachments/Stalker/Hood/rig.ast"
+		linear_allowed_contraction = 0.700
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_radius = 1.000
+		enclosure_angle = 0.400
+		animation_velocity_factor = 5.000
+		animation_force_factor = 5.000
+		attachment_bones = "chest_jntBnd neck_jntBnd head_jntBnd L_poncho_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd R_poncho_jntBnd child_attach"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Stalker/attachments/Stalker/Hood/stalkerHood.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "child_attach false chest_jntBnd neck_jntBnd head_jntBnd L_poncho_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd R_poncho_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/Stalker/attachments/Stalker/stalkerRobe.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Stalker/attachments/Stalker/Robe/rig.amd"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Stalker/attachments/Stalker/Robe/rig.ast"
+		linear_allowed_contraction = 0.700
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_radius = 1.000
+		enclosure_angle = 0.200
+		animation_velocity_factor = 1.000
+		animation_force_factor = 1.000
+		attachment_bones = "L_knee_jntBnd L_thigh_jntBnd spine_1_jntBnd R_thigh_jntBnd R_knee_jntBnd child_attach"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Stalker/attachments/Stalker/Robe/stalkerRobe.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "child_attach false L_knee_jntBnd L_thigh_jntBnd spine_1_jntBnd R_thigh_jntBnd R_knee_jntBnd"
+	}
+}
+
+=== .sm Art/Models/MONSTERS/Stalker/Stalker.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/Stalker/rig_7d4a5f98.smd"
+Materials 1
+	"Art/Models/MONSTERS/Stalker/Textures/Stalkerc.mat" 5
+BoundingBox -77.4335 -50.6796 -179.932 77.4335 9.0094 0.702895
+BoneGroups 21
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+	"grp_tongue" 2 "jaw_jntBnd" "tongue_jntBnd"
+
+=== .smd Art/Models/MONSTERS/Stalker/rig_7d4a5f98.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 5 in the header, 5 in the block · 9046 triangles over 9162 vertices
+  names: 170 bytes said, 170 read  [agree]
+
+=== shapes (8)
+0	StalkerFaceRagShape	from 0	count 138
+1	StalkerFurShape	from 138	count 12168
+2	StalkerPonchoShape	from 12306	count 2472
+3	StalkerRobeShortShape	from 14778	count 1518
+4	StalkerShape	from 16296	count 10842
+5	hood_meshShape	from 27138	count 2472
+6	skirt_01_meshShape	from 29610	count 1746
+7	skirt_02_meshShape	from 31356	count 156
+
+=== fitting
+the monster's rig: 51 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  slimyStalkerHood.ao  socket spine_2_jntBnd [in its carrier's rig]  box (-30.3,-18.5,-56.4)..(29,17,8.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 824 triangles over 480 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 14 bones, 10 of them names its carrier's rig also has
+    mesh weights reach bone 13 of 14  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 chest_jntBnd  [shared]  under 0  rests at (0,0,-13.1)  carrier has (0,-6.8,-136.6)
+      2 L_clavicle_jntBnd  [shared]  under 1  rests at (4.7,-2.1,-28.8)  carrier has (4.7,-8.8,-152.3)
+      3 R_clavicle_jntBnd  [shared]  under 1  rests at (-4.7,-2.1,-28.8)  carrier has (-4.7,-8.8,-152.3)
+      4 neck_jntBnd  [shared]  under 1  rests at (0,-1.7,-33.6)  carrier has (0,-8.5,-157.1)
+      5 phys_tri_poncho_jntBnd_3  [its own]  under 1  rests at (8.4,11.8,-6.8)
+      6 phys_tri_poncho_jntBnd_4  [its own]  under 1  rests at (-8.4,11.8,-6.8)
+      7 L_shoulder_jntBnd  [shared]  under 2  rests at (17.6,-1.3,-25.4)  carrier has (17.6,-8,-149)
+      8 L_poncho_jntBnd  [shared]  under 2  rests at (14.7,-11.3,-13.3)  carrier has (14.7,-18,-136.8)
+      9 R_shoulder_jntBnd  [shared]  under 3  rests at (-17.6,-1.3,-25.4)  carrier has (-17.6,-8,-149)
+      10 R_poncho_jntBnd  [shared]  under 3  rests at (-15.3,-11.3,-14.3)  carrier has (-15.3,-18,-137.8)
+      11 head_jntBnd  [shared]  under 4  rests at (0,-6.9,-42.2)  carrier has (0,-13.6,-165.8)
+      12 phys_tri_poncho_jntBnd_1  [its own]  under 8  rests at (15.7,-12.5,-5.8)
+      13 phys_tri_poncho_jntBnd_2  [its own]  under 10  rests at (-15.7,-12.6,-0.8)
+  slimyStalkerRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-26.3,-17.4,-19.3)..(29.7,23,61)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 634 triangles over 420 vertices
+    names: 72 bytes said, 72 read  [agree]
+    rig 19 bones, 6 of them names its carrier's rig also has
+    mesh weights reach bone 18 of 19  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-13.1)  carrier has (0,-6.8,-110.4)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (11.1,0,0)  carrier has (11.1,-6.8,-97.3)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-11.1,0,0)  carrier has (-11.1,-6.8,-97.3)
+      4 phys_tri_skirt_jntBnd_1  [its own]  under 0  rests at (-0,-12.8,33.6)
+      5 phys_tri_skirt_jntBnd_5  [its own]  under 0  rests at (0,15.6,33.6)
+      6 L_knee_jntBnd  [shared]  under 2  rests at (14.3,0.7,40.9)  carrier has (14.3,-6.1,-56.5)
+      7 phys_tri_skirt_jntBnd_7  [its own]  under 2  rests at (15.9,-5.7,33.6)
+      8 phys_tri_skirt_jntBnd_3  [its own]  under 2  rests at (15.9,8.5,33.6)
+      9 phys_tri_skirt_jntBnd_10  [its own]  under 2  rests at (9.6,13.2,26.2)
+      10 phys_tri_skirt_jntBnd_17  [its own]  under 2  rests at (9.3,-10.5,26.3)
+      11 R_knee_jntBnd  [shared]  under 3  rests at (-14.3,0.7,40.9)  carrier has (-14.3,-6.1,-56.5)
+      12 phys_tri_skirt_jntBnd_18  [its own]  under 3  rests at (-9.3,-10.5,26.3)
+      13 phys_tri_skirt_jntBnd_9  [its own]  under 3  rests at (-15.9,8.5,33.6)
+      14 phys_tri_skirt_jntBnd_14  [its own]  under 3  rests at (-9.6,13.2,26.2)
+      15 phys_tri_skirt_jntBnd_2  [its own]  under 4  rests at (-0,-12.8,48.6)
+      16 phys_tri_skirt_jntBnd_6  [its own]  under 5  rests at (0,15.6,48.6)
+      17 phys_tri_skirt_jntBnd_4  [its own]  under 8  rests at (14.3,8.5,48.6)
+      18 phys_tri_skirt_jntBnd_11  [its own]  under 9  rests at (7.9,13.2,56)

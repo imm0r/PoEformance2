@@ -1,0 +1,2023 @@
+monster: Risen Tale-woman [Metadata/Monsters/UndeadMarakethPriest/UndeadMarakethPriestSanctumTrialTime]
+
+=== .ao Metadata/Monsters/UndeadMarakethPriest/MetalPriest.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/UndeadMarakethPriest/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.065999984741211,
+					"name": "move",
+					"data": "1 1 0 Everything 0 0 Away"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.2328770011663437,
+					"end_time": 0.6157957911491394,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.5999999046325685,
+					"name": "move",
+					"data": "1 1 0 Everything 0 0 Away"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.2950490117073059,
+					"end_time": 0.9604982137680054,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				}
+			]
+		},
+		{
+			"name": "death_bwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.2965056002140045,
+					"name": "move",
+					"position": [
+						0.0,
+						125.0,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_dot_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.1326500028371811,
+					"end_time": 0.3325638175010681,
+					"name": "move",
+					"position": [
+						0.0,
+						-50.0,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.29819416999816897,
+					"name": "move",
+					"position": [
+						0.0,
+						-149.0,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.26843494176864626,
+					"name": "move",
+					"position": [
+						118.0,
+						0.0,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_move_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3651518225669861,
+					"name": "move",
+					"position": [
+						0.0,
+						-143.0,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.26843494176864626,
+					"name": "move",
+					"position": [
+						-118.0,
+						0.0,
+						0.0
+					],
+					"data": "0 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "fire_special_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 3.132999897003174,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 Away"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.4399999976158142,
+					"name": "start_target_update",
+					"data": "125 0 1"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.6502100229263306,
+					"end_time": 2.0,
+					"name": "start_target_update",
+					"data": "360 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2861599922180177,
+					"name": "contact",
+					"position": [
+						1.890589952468872,
+						-72.35140228271485,
+						-81.70680236816406
+					]
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.39899998903274538,
+					"name": "move",
+					"position": [
+						0.0,
+						-200.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "L_shoulder_jntBnd Metadata/Monsters/UndeadMarakethPriest/attachments/MPSleeves.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/UndeadMarakethPriest/attachments/MPSkirt.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/UndeadMarakethPriest/attachments/MPHood.ao"
+	attached_object = "root_jntBnd Metadata/Monsters/UndeadMarakethPriest/attachments/MPIncenceChain.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.43169400095939639,
+								0.0
+							],
+							[
+								0.508197009563446,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"width": 55.21500015258789,
+						"length": 349.6929931640625,
+						"impact_type": "Slash",
+						"impact_bone": "aux_position"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5573769807815552,
+								0.0
+							],
+							[
+								0.6174860000610352,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"width": 45.0,
+						"length": 386.50299072265627,
+						"offset": [
+							10.0,
+							0.0
+						],
+						"impact_type": "Slash",
+						"impact_bone": "aux_position"
+					}
+				]
+			}
+		},
+		{
+			"name": "fire_special_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.23529399931430818,
+								0.0
+							],
+							[
+								0.33689799904823305,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"angle": 4.485499858856201,
+						"length": 89.38500213623047
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.446927011013031,
+								0.0
+							],
+							[
+								0.5474860072135925,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"update_target_direction": true,
+						"rotation": 0.9250249862670898,
+						"angle": 3.1590499877929689,
+						"length": 152.0469970703125,
+						"offset": [
+							-16.0,
+							0.0
+						]
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/UndeadMarakethPriest/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/MetalPriest.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_elbow_jntBnd R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 L_elbow_jntBnd"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Attack1",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12092900276184082,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/StepCloth",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4662339985370636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7401459813117981,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7518050074577332,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/OneHandSwing",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7634580135345459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0082299709320069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4773800373077393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5283700227737427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.576449990272522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "neck_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Attack2",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4382230043411255,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5023990273475647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7260940074920654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8177710175514221,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/OneHandSwing",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0176299810409547,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2743300199508668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/OneHandSwing",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3769999742507935,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5438599586486817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8262399435043336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0682599544525148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/FallLowImpact",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12126900255680084,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32945001125335696,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5083209872245789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5265120267868042,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0970299020409584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/FallLowImpact",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3470039963722229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41360899806022646,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4596570134162903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.676738977432251,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7326549887657166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/FallLowImpact",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1499910056591034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44908198714256289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47140300273895266,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5240780115127564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/FallLowImpact",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14608199894428254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4373759925365448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45911499857902529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5104169845581055,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/FallLowImpact",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1499910056591034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44908198714256289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47140300273895266,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5240780115127564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/FallLowImpact",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14608199894428254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4373759925365448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45911499857902529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5104169845581055,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_special_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/FireA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11268199980258942,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18117499351501466,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5081729888916016,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6760920286178589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2549599409103394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4206700325012208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7565100193023682,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9266400337219239,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0813000202178957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1718900203704836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/OneHandSwing",
+						"bone_name": "L_finger_4_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6049399375915529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothRun",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothFast",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothFast",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothFast",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.4593057930469513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Idle",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6317769885063171,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothRun",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/KnockdownA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1629060059785843,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8005639910697937,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0643199682235718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0897889137268067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/KnockdownB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5623400211334229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5747499465942383,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothRun",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/KnockdownA",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12943999469280244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29563501477241518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4826039969921112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8884999752044678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3497904539108277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/KnockdownB",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5037399530410767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.80417001247406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "summon_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2024153470993042,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Chain/ChainMovementSoft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22111532092094422,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6575138568878174,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Chain/ChainMovementSoft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.96686589717865,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Chain/ChainMovementSoft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5683443546295168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Cloth",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.80770206451416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Chain/ChainMovementSoft",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Chain/ChainMovementMediumChance",
+						"bone_name": "R_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18050800263881684,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40012601017951968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7400810122489929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9296140074729919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.287619948387146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4169800281524659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4530800580978394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothFast",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4579710960388184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Vocals/Walk.loop.ogg",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5222899913787842,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.838170051574707,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9284199476242066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2864298820495607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Jewllery",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.328550100326538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.430840015411377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothFast",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.500030040740967,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.87007999420166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0024499893188478,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4356698989868166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5199100971221926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/ClothRun",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9380900859832765,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_Ascendancy/MetalPriest/Foley/Step_Ring",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/UndeadMarakethPriest/attachments/MPSleeves.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/attachments/SleevesMetalPriest/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/attachments/SleevesMetalPriest/rig.ast"
+		attachment_bones = "L_shoulder_jntBnd L_elbow_jntBnd L_wrist_jntBnd L_shoulder_cTwist_jntBnd_1 child_attach "
+	    linear_allowed_contraction = 0.600
+	    bend_stiffness = 200.000
+	    bend_allowed_angle = 0.800
+	    normal_viscosity_multiplier = 0.200
+	    tangent_viscosity_multiplier = 0.020
+	    enclosure_radius = 1.000
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_elbow_jntBnd L_wrist_jntBnd L_shoulder_cTwist_jntBnd_1"
+	}
+	
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/attachments/SleevesMetalPriest/MetalPriestSleeves.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/UndeadMarakethPriest/attachments/MPSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/attachments/SkirtMetalPriest/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/attachments/SkirtMetalPriest/rig.ast"
+	    linear_allowed_contraction = 0.500
+	    bend_stiffness = 250.000
+	    bend_allowed_angle = 0.500
+	    normal_viscosity_multiplier = 0.150
+	    tangent_viscosity_multiplier = 0.020
+	    enclosure_radius = 1.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/attachments/SkirtMetalPriest/MetalPriestSkirt.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/UndeadMarakethPriest/attachments/MPHood.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/attachments/HoodMetalPriest/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/attachments/HoodMetalPriest/rig.ast"
+	    attachment_bones = "chest_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd  R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 neck_jntBnd head_jntBnd child_attach"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd  R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 neck_jntBnd head_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/attachments/HoodMetalPriest/MetalPriestHood.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/UndeadMarakethPriest/attachments/MPIncenceChain.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/attachments/Weapon/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/attachments/Weapon/rig.ast"
+		socket = "aux_brazier"
+			parent = "phys_incense_bowl_jntBnd"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_radius = 10.000
+		enclosure_angle = 0.600
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+		use_shock_propagation = false
+		enable_collisions = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/attachments/Weapon/UMPIncenseWeapon.sm"
+			chain_end_meshShape = "Art/Models/MONSTERS/UndeadMarakethPriest/Textures/MetalPriestWeaponc.mat:0"
+			chain_meshShape = "Art/Models/MONSTERS/UndeadMarakethPriest/Textures/MetalPriestWeaponc.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_brazier false phys_incense_bowl_jntBnd"
+		bone_group = "root false root_jntBnd"
+		bone_group = "grp_weapon_end false phys_emblem_jntBnd"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8634229898452759,
+						"end_time": 1.0997430086135865,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MarakethPriest/pet/embers_weapon.pet",
+						"bone_group": "grp_weapon_end"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MarakethPriest/pet/attack_01_02_weapon.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.4705359935760499,
+						"end_time": 1.6598000526428223,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MarakethPriest/pet/embers_weapon.pet",
+						"bone_group": "grp_weapon_end"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5268900394439698,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MarakethPriest/pet/attack_01_02_weapon.pet",
+						"bone_group": "root"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MarakethPriest/epk/weapon_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/MarakethPriest/epk/weapon_glow.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.26188701391220095,
+						"end_time": 2.065999984741211,
+						"name": "EmissiveMulti",
+						"curve": "5 0.261887 0 Linear 1.04026 1 Flat 1.1221 1 Linear 1.28577 0 Flat 2.066 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.16707700490951539,
+						"end_time": 2.5999999046325685,
+						"name": "EmissiveMulti",
+						"curve": "5 0.167077 0 Smooth 1.53 1 CustomSmooth 0 1.6 1 Linear 1.81123 0 Flat 2.6 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainWhooshMed",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.338019996881485,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8537909984588623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainWhooshShort",
+						"bone_name": "phys_emblem_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.11312997341156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5750000476837159,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementSoft",
+						"bone_name": "chain_base_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainWhooshMed",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5775730013847351,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2981599569320679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainWhooshShort",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5860400199890137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15967099368572236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainDrop",
+						"bone_name": "phys_incense_bowl_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainDrop",
+						"bone_name": "phys_incense_bowl_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainDrop",
+						"bone_name": "phys_incense_bowl_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainDrop",
+						"bone_name": "phys_incense_bowl_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainDrop",
+						"bone_name": "phys_incense_bowl_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainDrop",
+						"bone_name": "phys_incense_bowl_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "fire_special_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainWhooshMed",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9412260055541992,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0958900451660157,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainWhooshMed",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7498799562454224,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0238499641418459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainWhooshShort",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5695900917053224,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementSoft",
+						"bone_name": "chain_base_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.6167349815368652,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementIde.loop.ogg",
+						"bone_name": "chain_base_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48716598749160769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1667100191116334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainWhooshMed",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3854700326919556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0015980299795046449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5113679766654968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8805140256881714,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6236000061035157,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementMedium",
+						"bone_name": "chain_base_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.4302099943161011,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_9_1/UndeadMarakethPriest/Foley/Chain/ChainMovementIde.loop.ogg",
+						"bone_name": "chain_base_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/MetalPriest.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/MetalPriest_armour_09dbabcc.smd"
+Materials 1
+	"Art/Models/MONSTERS/UndeadMarakethPriest/Textures/MetalPriestc.mat" 6
+BoundingBox -69.2314 -18.2365 -171.381 69.2314 16.5112 2.66335
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/UndeadMarakethPriest/MetalPriest_armour_09dbabcc.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 6 in the header, 6 in the block · 18864 triangles over 14056 vertices
+  names: 182 bytes said, 182 read  [agree]
+
+=== shapes (18)
+0	arm_sleevesShape	from 0	count 3222
+1	body_sleevesShape	from 3222	count 2844
+2	bodyShape	from 6066	count 45144
+3	boots_attachmentsShape	from 51210	count 2946
+4	braceletsShape	from 54156	count 2064
+5	necklaceShape	from 56220	count 372
+6	L_sleeveShape	from 56592	count 1722
+7	cloth_skirtShape	from 58314	count 5514
+8	coin_attachment_01Shape	from 63828	count 2148
+9	coin_attachment_02Shape	from 65976	count 912
+10	metal_attachment_01Shape	from 66888	count 2712
+11	metal_attachment_Shape2	from 69600	count 2976
+12	head_attachmentShape	from 72576	count 6180
+13	head_attachmentsShape	from 78756	count 585
+14	Metal_shawlShape	from 79341	count 234
+15	shawlShape	from 79575	count 5148
+16	chain_end_meshShape	from 84723	count 2676
+17	chain_meshShape	from 87399	count 21450
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  MPSleeves.ao  socket L_shoulder_jntBnd [in its carrier's rig]  box (15.1,-16.1,-6.1)..(60.2,15.2,20.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 574 triangles over 394 vertices
+    names: 26 bytes said, 26 read  [agree]
+    rig 11 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 11  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_elbow_jntBnd  [shared]  under 0  rests at (24.6,0,0)  carrier has (35.1,7.7,-123.2)
+      2 L_shoulder_cTwist_jntBnd_1  [shared]  under 0  rests at (12.3,-0,0)  carrier has (25.5,6.8,-130.7)
+      3 L_wrist_jntBnd  [shared]  under 1  rests at (50.1,-9.1,0)  carrier has (55.6,0.3,-107.1)
+      4 phys_skinned_sleeve_2_jntBnd  [its own]  under 1  rests at (33.1,1.7,4.4)
+      5 phys_skinned_sleeve_3_jntBnd  [its own]  under 1  rests at (40.9,2.8,5.9)
+      6 phys_skinned_sleeve_4_jntBnd  [its own]  under 1  rests at (49.9,4.2,7.3)
+      7 phys_skinned_sleeve_1_jntBnd  [its own]  under 2  rests at (23.7,0.9,2.8)
+      8 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+      9 aux_position1  [its own]  under 0  rests at (0,0,0)
+      10 aux_position2  [its own]  under 0  rests at (0,0,0)
+  MPSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-24.4,-27.6,-16.3)..(40.2,23.3,87)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 5 in the header, 5 in the block · 4754 triangles over 3982 vertices
+    names: 218 bytes said, 218 read  [agree]
+    rig 33 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 31 of 33  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L_skirt_01_jntBnd  [its own]  under 0  rests at (8.6,-11.4,-1.3)
+      2 phys_skinned_L_skirt_06_jntBnd  [its own]  under 0  rests at (13.5,-3.7,-3.7)
+      3 phys_skinned_L_skirt_11_jntBnd  [its own]  under 0  rests at (3.9,5.6,-5.3)
+      4 phys_B_skirt_1_jntBnd  [its own]  under 0  rests at (-7.7,9.1,1.3)
+      5 phys_skinned_R_skirt_4_jntBnd  [its own]  under 0  rests at (-14.7,5.2,2.6)
+      6 phys_skinned_R_skirt_1_jntBnd  [its own]  under 0  rests at (-13.4,-7.8,0.8)
+      7 phys_skinned_F_skirt_1_jntBnd  [its own]  under 0  rests at (-4,-12,-0.7)
+      8 phys_F_skirt_1_jntBnd  [its own]  under 0  rests at (-4,-12,-0.7)
+      9 phys_skinned_L_skirt_02_jntBnd  [its own]  under 1  rests at (12.7,-11.8,19.7)
+      10 phys_skinned_L_skirt_07_jntBnd  [its own]  under 2  rests at (18.8,-2.6,17.6)
+      11 phys_skinned_L_skirt_12_jntBnd  [its own]  under 3  rests at (6.3,8.1,16.1)
+      12 phys_B_skirt_2_jntBnd  [its own]  under 4  rests at (-7.6,9.8,14)
+      13 phys_skinned_R_skirt_5_jntBnd  [its own]  under 5  rests at (-18.1,7.1,17.5)
+      14 phys_skinned_R_skirt_2_jntBnd  [its own]  under 6  rests at (-16,-12.1,15.3)
+      15 phys_skinned_F_skirt_2_jntBnd  [its own]  under 7  rests at (-3.5,-13.2,20.3)
+      16 phys_F_skirt_2_jntBnd  [its own]  under 8  rests at (-3.5,-13.2,20.3)
+      17 phys_skinned_L_skirt_03_jntBnd  [its own]  under 9  rests at (16.4,-12.5,40.2)
+      18 phys_skinned_L_skirt_08_jntBnd  [its own]  under 10  rests at (23.9,-2,38.5)
+      19 phys_skinned_L_skirt_13_jntBnd  [its own]  under 11  rests at (8.5,10.3,37.2)
+      20 phys_B_skirt_3_jntBnd  [its own]  under 12  rests at (-7.6,10.1,27.5)
+      21 phys_skinned_R_skirt_6_jntBnd  [its own]  under 13  rests at (-20.4,7.6,32.7)
+      22 phys_skinned_R_skirt_3_jntBnd  [its own]  under 14  rests at (-17.6,-14.6,27.5)
+      23 phys_skinned_F_skirt_3_jntBnd  [its own]  under 15  rests at (-3,-14.2,40.6)
+      24 phys_F_skirt_3_jntBnd  [its own]  under 16  rests at (-3,-14.2,40.6)
+      25 phys_skinned_L_skirt_04_jntBnd  [its own]  under 17  rests at (19.6,-13.1,60.6)
+      26 phys_skinned_L_skirt_09_jntBnd  [its own]  under 18  rests at (28.7,-1.5,59.7)
+      27 phys_skinned_L_skirt_14_jntBnd  [its own]  under 19  rests at (10.9,12.2,58.5)
+      28 phys_skinned_F_skirt_4_jntBnd  [its own]  under 23  rests at (-2.6,-15.1,60.5)
+      29 phys_skinned_L_skirt_05_jntBnd  [its own]  under 25  rests at (22.6,-13.6,81.1)
+      30 phys_skinned_L_skirt_10_jntBnd  [its own]  under 26  rests at (33.2,-0.8,80.8)
+      31 phys_skinned_L_skirt_15_jntBnd  [its own]  under 27  rests at (13.4,14.3,79.7)
+      32 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+  MPHood.ao  socket chest_jntBnd [in its carrier's rig]  box (-30.2,-14,-66.9)..(22.3,18,28.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 4 in the header, 4 in the block · 4049 triangles over 2989 vertices
+    names: 134 bytes said, 134 read  [agree]
+    rig 26 bones, 9 of them names its carrier's rig also has
+    mesh weights reach bone 23 of 26  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (4.7,1,-14.1)  carrier has (4.7,0.7,-141.4)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-4.7,1,-14.1)  carrier has (-4.7,0.7,-141.4)
+      3 neck_jntBnd  [shared]  under 0  rests at (0,3.5,-19.1)  carrier has (0,3.2,-146.4)
+      4 phys_skinned_L_backcloth_1_jntBnd  [its own]  under 0  rests at (-1.3,14.4,-6.5)
+      5 phys_skinned_R_backcloth_1_jntBnd  [its own]  under 0  rests at (-16.3,12,-6.7)
+      6 phys_skinned_frontcloth_1_jntBnd  [its own]  under 0  rests at (-14.7,-4.7,-5.3)
+      7 L_shoulder_jntBnd  [shared]  under 1  rests at (15.8,6.3,-11)  carrier has (15.8,6,-138.3)
+      8 R_shoulder_jntBnd  [shared]  under 2  rests at (-15.8,6.3,-11)  carrier has (-15.8,6,-138.3)
+      9 head_jntBnd  [shared]  under 3  rests at (-0,0.5,-31.4)  carrier has (0,0.2,-158.6)
+      10 phys_skinned_L_backcloth_2_jntBnd  [its own]  under 4  rests at (-0.7,13.9,6.5)
+      11 phys_skinned_R_backcloth_2_jntBnd  [its own]  under 5  rests at (-18.5,12.8,5.2)
+      12 phys_skinned_frontcloth_2_jntBnd  [its own]  under 6  rests at (-13.7,-6.3,2.7)
+      13 R_shoulder_cTwist_jntBnd_1  [shared]  under 8  rests at (-25.5,7.2,-3.5)  carrier has (-25.5,6.8,-130.7)
+      14 phys_R_headattachment_03_jntBnd  [its own]  under 9  rests at (-15.2,-1.6,-31.8)
+      15 phys_R_headattachment_01_jntBnd  [its own]  under 9  rests at (-8.6,-3.7,-29.1)
+      16 phys_L_headattachment_03_jntBnd  [its own]  under 9  rests at (15.2,-1.6,-31.8)
+      17 phys_L_headattachment_01_jntBnd  [its own]  under 9  rests at (8.6,-3.7,-29.1)
+      18 phys_skinned_L_backcloth_3_jntBnd  [its own]  under 10  rests at (2.9,13.4,19.8)
+      19 phys_skinned_R_backcloth_3_jntBnd  [its own]  under 11  rests at (-20.3,12.2,16.7)
+      20 phys_skinned_frontcloth_3_jntBnd  [its own]  under 12  rests at (-12.3,-8,10.8)
+      21 phys_R_headattachment_02_jntBnd  [its own]  under 15  rests at (-8.6,-4.2,-22.5)
+      22 phys_L_headattachment_02_jntBnd  [its own]  under 17  rests at (8.6,-4.2,-22.5)
+      23 phys_skinned_frontcloth_4_jntBnd  [its own]  under 20  rests at (-11,-10.2,18.7)
+      24 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)
+      25 aux_position1  [its own]  under 0  rests at (0,0,0)
+  MPIncenceChain.ao  socket root_jntBnd [in its carrier's rig]  box (-29.8,-439.8,-23.3)..(29.5,121,32.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23D · stride 36
+    shapes 2 in the header, 2 in the block · 8042 triangles over 9413 vertices
+    names: 68 bytes said, 68 read  [agree]
+    rig 38 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 26 of 38  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 chain_base_jntBnd  [its own]  under 0  rests at (0,0,0)
+      2 chain_jntBnd_01  [its own]  under 0  rests at (0,-19.2,0)
+      3 chain_jntBnd_02  [its own]  under 0  rests at (0,-33.6,0)
+      4 chain_jntBnd_03  [its own]  under 0  rests at (0,-47.8,0)
+      5 chain_jntBnd_04  [its own]  under 0  rests at (0,-64.4,0)
+      6 chain_jntBnd_05  [its own]  under 0  rests at (0,-83.4,0)
+      7 chain_jntBnd_06  [its own]  under 0  rests at (0,-102,0)
+      8 chain_jntBnd_07  [its own]  under 0  rests at (0,-118.3,0)
+      9 chain_jntBnd_08  [its own]  under 0  rests at (0,-133.9,0)
+      10 chain_jntBnd_09  [its own]  under 0  rests at (0,-149.7,0)
+      11 chain_jntBnd_10  [its own]  under 0  rests at (0,-165.7,0)
+      12 chain_jntBnd_11  [its own]  under 0  rests at (0,-181.5,0)
+      13 chain_jntBnd_12  [its own]  under 0  rests at (0,-197.1,0)
+      14 chain_jntBnd_13  [its own]  under 0  rests at (0,-213.3,0)
+      15 chain_jntBnd_14  [its own]  under 0  rests at (0,-231.8,0)
+      16 chain_jntBnd_15  [its own]  under 0  rests at (0,-250.6,0)
+      17 chain_jntBnd_16  [its own]  under 0  rests at (0,-266.5,0)
+      18 chain_jntBnd_17  [its own]  under 0  rests at (0,-280.5,0)
+      19 chain_jntBnd_18  [its own]  under 0  rests at (0,-295.9,0)
+      20 chain_jntBnd_19  [its own]  under 0  rests at (0,-316.3,0)
+      21 phys_chain_end_jntBnd_1  [its own]  under 0  rests at (0,-0,0)
+      22 phys_chain_end_jntBnd_2  [its own]  under 0  rests at (-0,27.5,0)
+      23 phys_chain_end_jntBnd_3  [its own]  under 0  rests at (-0,48.5,0)
+      24 phys_chain_end_jntBnd_4  [its own]  under 0  rests at (-0,69.6,0)
+      25 phys_emblem_jntBnd  [its own]  under 0  rests at (-0,91.8,0)
+      26 phys_incense_bowl_jntBnd  [its own]  under 20  rests at (0,-397.4,0)
+      27 phys_tri_blade_6_jntBnd  [its own]  under 25  rests at (0,118.6,0)
+      28 phys_tri_blade_cyl_1_jntBnd  [its own]  under 25  rests at (11.2,91.8,0)
+      29 phys_tri_mid_1_jntBnd  [its own]  under 25  rests at (0,101.6,0)
+      30 phys_tri_blade_02_1_jntBnd  [its own]  under 26  rests at (0,-439.8,0)
+      31 phys_tri_blade_cyl_02_jntBnd  [its own]  under 30  rests at (19.5,-439.8,11.3)
+      32 aux_animation_control_ratio  [its own]  under 0  rests at (0,0,0)
+      33 aux_root_end_jntBnd  [its own]  under 0  rests at (0,-3,0)
+      34 aux_mid_1_jntBnd  [its own]  under 1  rests at (0,-1,0)
+      35 aux_handle_cyl_1_jntBnd  [its own]  under 8  rests at (4.3,-118.3,0)
+      36 aux_blade_02_3_jntBnd  [its own]  under 20  rests at (0,-316.3,0)
+      37 aux_mid_2_jntBnd  [its own]  under 34  rests at (0,0,0)

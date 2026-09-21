@@ -1,0 +1,2226 @@
+monster: Skeletal Brute [Metadata/Monsters/Skeletons/PlayerSummoned/SkeletonBrutePlayerSummoned_]
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/Brute/SkeletonBrutePlayerSummoned.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/Animation/PlayerMinions/Maul/rig.amd"
+	view_of = "flinch_bwd_maul_01"
+		view_name = "warcry_maul_01"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	animations = '[
+		{
+			"name": "attack_maul_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.75,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.6660000085830689,
+					"name": "move",
+					"position": [
+						0.0,
+						-266.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride 1.000000"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.802236020565033,
+					"end_time": 0.9164636135101318,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8799999952316284,
+					"name": "contact",
+					"position": [
+						29.478099822998048,
+						-142.5189971923828,
+						-123.95500183105469
+					]
+				}
+			]
+		},
+		{
+			"name": "bone_shatter_maul_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 1.5,
+					"name": "move",
+					"data": "0 1 0 Everything 0 5 Away 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.008620689623057843,
+					"end_time": 0.36321204900741579,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5256710052490234,
+					"name": "contact",
+					"position": [
+						0.0,
+						-130.0,
+						-130.0
+					]
+				}
+			]
+		},
+		{
+			"name": "bone_shatter_maul_01_moving",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 1.5,
+					"name": "move",
+					"data": "0 1 0 Everything 0 5 Away 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.008620689623057843,
+					"end_time": 0.36321204900741579,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5256710052490234,
+					"name": "contact",
+					"position": [
+						0.0,
+						-130.0,
+						-130.0
+					]
+				}
+			]
+		},
+		{
+			"name": "despawn_maul_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8999999761581421,
+					"name": "delete"
+				}
+			]
+		},
+		{
+			"name": "groundslam_maul_01",
+			"events": [
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.7586439847946167,
+					"end_time": 0.8242639303207398,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.817779004573822,
+					"name": "contact",
+					"position": [
+						0.0,
+						-124.83599853515625,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "warcry_maul_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.1385243684053421,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "R_Weapon Metadata/Monsters/Skeletons/PlayerSummoned/Brute/attachments/Sledgehammer.ao"
+	attached_object = "<root> Metadata/Monsters/Skeletons/PlayerSummoned/Brute/attachments/BruteArmour/BruteSummonArmour.ao"
+	attached_object = "eye_L Metadata/Effects/Spells/undead_summon_skeletons/eye_glow.ao"
+	attached_object = "eye_R Metadata/Effects/Spells/undead_summon_skeletons/eye_glow.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_maul_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.49720698595046999,
+								0.0
+							],
+							[
+								0.519553005695343,
+								1.0
+							]
+						],
+						"width": 70.17500305175781,
+						"angle": 0.7330380082130432,
+						"length": 163.74200439453126,
+						"impact_x_rotation": [
+							-1.36135995388031,
+							-0.8377580046653748
+						],
+						"impact_z_rotation": [
+							1.1693700551986695,
+							0.663224995136261
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "bone_shatter_maul_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.27374300360679629,
+								0.0
+							],
+							[
+								0.39664798974990847,
+								1.0
+							]
+						],
+						"width": 64.3270034790039,
+						"length": 163.7429962158203,
+						"impact_x_rotation": [
+							0.0,
+							0.8203049898147583
+						],
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "bone_shatter_maul_01_moving",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.27374300360679629,
+								0.0
+							],
+							[
+								0.39664798974990847,
+								1.0
+							]
+						],
+						"width": 64.3270034790039,
+						"length": 163.7429962158203,
+						"impact_x_rotation": [
+							0.0,
+							0.8203049898147583
+						],
+						"hand": "MainHand"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/Animation/PlayerMinions/Maul/rig.ast"
+		socket = "Back"
+			parent = "aux_back_attachment"
+		socket = "aux_tip"
+			parent = "R_Weapon"
+			translation = "0 0 -35"
+		socket = "aux_lightning_hit"
+			parent = "R_Weapon"
+			translation = "-40 120 -500"
+		socket = "aux_meleeslash_control"
+			parent = "chest_jntBnd"
+			translation = "0 -25 0"
+		socket = "aux_axe_end"
+			parent = "R_Weapon"
+			translation = "0 0 -60"
+		socket = "eye_L"
+			parent = "aux_head_jntBnd"
+			translation = "3 1.5 -3"
+		socket = "eye_R"
+			parent = "aux_head_jntBnd"
+			translation = "-3 1.5 -3"
+		socket = "aux_chest_attachment"
+			translation = "0 0 -145"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/BoneRabbleBruteSkeleton.sm"
+			HipsShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_FemurShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_FootShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_ForearmShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_HandShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_HumerusShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_ShinShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_FemurShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_FootShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_ForearmShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_HandShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_HumerusShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_ShinShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			RibsShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			skullShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "back false aux_back_attachment"
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false L_elbow_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd neck_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd R_elbow_jntBnd"
+		bone_group = "meleeslash_control false chest_jntBnd aux_meleeslash_control"
+		bone_group = "melee_trail false R_Weapon aux_axe_end"
+		bone_group = "aux_weapon false aux_tip R_finger_1_jntBnd_3 R_wrist_jntBnd"
+		bone_group = "aux_lightning false aux_tip aux_lightning_hit"
+		bone_group = "eye_L false eye_L"
+		bone_group = "eye_R false eye_R"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "death_maul_broken_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.5 1 Flat 2.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_maul_broken_bwd_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.5 1 Flat 2.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_maul_broken_bwd_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.4 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_maul_broken_fwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.5 1 Flat 2.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_maul_broken_left_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.4 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_maul_broken_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.5 1 Flat 2.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "despawn_maul_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.9995070099830627,
+						"name": "SummonFade",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.799606 0.980154 Flat 0.999507 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "emerge_maul_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "SummonFade",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "emerge_maul_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "SummonFade",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "offering_maul_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "offering_maul_idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "offering_maul_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.4 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0012820500414818526,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.00128205 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_bwd_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0012820500414818526,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.00128205 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_bwd_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0012820500414818526,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.00128205 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_fwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0012820500414818526,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.00128205 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_left_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0012820500414818526,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.00128205 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0012820500414818526,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.00128205 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10591600090265274,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3308880031108856,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Swing_2hMacePullback",
+						"bone_name": "aux_axe_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4561469852924347,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6101769804954529,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Swing_2hMace",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "bone_shatter_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0030181100592017175,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04518749937415123,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Swing_2hMacePullback",
+						"bone_name": "aux_axe_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18108700215816499,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26257601380348208,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2860870063304901,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Swing_2hMace",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4469220042228699,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.482897013425827,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6624749898910523,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6778079867362976,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1589499711990357,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "bone_shatter_maul_01_moving",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0030181100592017175,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04518749937415123,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Swing_2hMacePullback",
+						"bone_name": "aux_axe_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18108700215816499,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26257601380348208,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2860870063304901,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Swing_2hMace",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4469220042228699,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.482897013425827,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6624749898910523,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6778079867362976,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1589499711990357,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_maul_broken_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20970800518989564,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2136159986257553,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Drop_2hMace",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23913699388504029,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_maul_broken_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20970800518989564,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2136159986257553,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Drop_2hMace",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23913699388504029,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_maul_broken_bwd_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1677670031785965,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17089299857616425,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Drop_2hMace",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19131000339984895,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_maul_broken_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20970800518989564,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2136159986257553,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Drop_2hMace",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23913699388504029,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_maul_broken_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1677670031785965,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17089299857616425,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Drop_2hMace",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19131000339984895,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_maul_broken_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20970800518989564,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2136159986257553,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Drop_2hMace",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23913699388504029,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "despawn_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Fade",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19416899979114533,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateEmergeB",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_maul_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09645950049161911,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2341039925813675,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35583099722862246,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateEmergeB",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "groundslam_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15255500376224519,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4482190012931824,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Swing_2hMace",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5347520112991333,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.48542800545692446,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6739599704742432,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "jog_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.14952099323272706,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21849699318408967,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4115619957447052,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4127799868583679,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateSteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5491340160369873,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7348250150680542,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateSteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7364199757575989,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1501599550247193,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateSteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1514400243759156,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.179550051689148,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5642199516296387,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateSteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5722500085830689,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "offering_maul_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22204500436782838,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_Drop_2hMace",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28594300150871279,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Hard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2875719964504242,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Skeleton_PlateDrop",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "offering_maul_revive_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateEmerge",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "offering_maul_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02715660072863102,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11271700263023377,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25722500681877139,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_bwd_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1143689975142479,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21125300228595735,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23884500563144685,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateSteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2463809996843338,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41624999046325686,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5885260105133057,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5915259718894959,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateSteps",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_maul_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09488820284605026,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1903180032968521,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24009600281715394,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateSteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24667499959468842,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.375,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5375959873199463,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateSteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5419089794158936,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sprint_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08905909955501557,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1795330047607422,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22191299498081208,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22423000633716584,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateSteps",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35374999046325686,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4991689920425415,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateSteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5009769797325134,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05671880021691322,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateSteps",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05713669955730438,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27469199895858767,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32924601435661318,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.446833997964859,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/SkeletonBrute_PlateSteps",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45677798986434939,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5412499904632568,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			},
+			{
+				"name": "warcry_maul_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Brute/Slam/Skeleton_Brute_WarcryOnAct"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "emerge_maul_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.4000000059604645,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_speed": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "emerge_maul_02",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.4000000059604645,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BoneRabble_Trailer/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_bwd_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_bwd_02",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_bwd_03",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_fwd_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_left_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_maul_broken_right_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/Brute/attachments/Sledgehammer.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/Weapons/BruteWarriorWeapon.fmt"
+	}
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/Brute/attachments/BruteArmour/BruteSummonArmour.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/Skeletons/PlayerSummoned/Brute/attachments/BruteArmour/BruteSummonArmourChainSkirt.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/BruteWarriorSkeletonArmour.sm"
+	}
+}
+
+=== .ao Metadata/Effects/Spells/undead_summon_skeletons/eye_glow.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "eye_glow"
+		view_looping = true
+	default_animation = "eye_glow"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_point false root"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "eye_glow",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.12325900048017502,
+						"filename": "Metadata/Effects/Spells/undead_summon_skeletons/pet/eye_glow.pet",
+						"bone_group": "FX_point"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "eye_glow",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/undead_summon_skeletons/trl/eye_glow.trl",
+						"bone_group": "FX_point"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Skin.ao (depth 2)
+version 3
+extends "nothing"
+
+BaseAnimationEvents { }
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	SkinMesh { }
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/Brute/attachments/BruteArmour/BruteSummonArmourChainSkirt.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/attachments/ChainmailSkirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "root_jntBnd Metadata/Monsters/Skeletons/PlayerSummoned/Brute/attachments/BruteArmour/BruteSummonArmourPlateSkirt.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/attachments/ChainmailSkirt/rig.ast"
+		linear_allowed_contraction = 0.200
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.200
+		normal_viscosity_multiplier = 0.001
+		tangent_viscosity_multiplier = 0.001
+		enclosure_radius = 20.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/attachments/ChainmailSkirt/BruteArmourChainmailSkirt.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/Brute/attachments/BruteArmour/BruteSummonArmourPlateSkirt.ao (depth 3)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/attachments/PlateSkirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/attachments/PlateSkirt/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.001
+		tangent_viscosity_multiplier = 0.001
+		enclosure_radius = 10.000
+		enclosure_angle = 0.000
+		animation_velocity_factor = 5.000
+		animation_force_factor = 10.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/attachments/PlateSkirt/BruteArmourPlateSkirt.sm"
+	}
+}
+
+=== .sm Art/Models/MONSTERS/BasicSkeleton/BoneRabbleBruteSkeleton.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BasicSkeleton/BruteBoneRabbleSkeleton_armour_a37b51af.smd"
+Materials 1
+	"Art/Textures/Monsters/BasicSkeleton/BoneRabble/BoneRabblec.mat" 15
+BoundingBox -77.8888 -14.5222 -189.048 77.8888 14.4987 -0.423605
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_1_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_1_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/BasicSkeleton/BruteBoneRabbleSkeleton_armour_a37b51af.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 15 in the header, 15 in the block · 5510 triangles over 3830 vertices
+  names: 348 bytes said, 348 read  [agree]
+
+=== shapes (27)
+0	HipsShape	from 0	count 2334
+1	L_FemurShape	from 2334	count 636
+2	L_FootShape	from 2970	count 996
+3	L_ForearmShape	from 3966	count 288
+4	L_HandShape	from 4254	count 2370
+5	L_HumerusShape	from 6624	count 300
+6	L_ShinShape	from 6924	count 270
+7	R_FemurShape	from 7194	count 636
+8	R_FootShape	from 7830	count 996
+9	R_ForearmShape	from 8826	count 288
+10	R_HandShape	from 9114	count 2370
+11	R_HumerusShape	from 11484	count 300
+12	R_ShinShape	from 11784	count 270
+13	RibsShape	from 12054	count 2124
+14	skullShape	from 14178	count 2352
+15	mesh1Shape	from 16530	count 1140
+16	bandages_meshShape	from 17670	count 1140
+17	body_armour_meshShape	from 18810	count 6180
+18	bracer_meshShape	from 24990	count 5484
+19	chainmail_meshShape	from 30474	count 744
+20	collar_meshShape	from 31218	count 1728
+21	hip_platesShape	from 32946	count 2136
+22	L_shoulderpad_meshShape	from 35082	count 1746
+23	R_shoulderpad_meshShape	from 36828	count 1392
+24	helmet_meshShape	from 38220	count 5760
+25	chainmail_skirtShape	from 43980	count 990
+26	plate_skirt_meshShape	from 44970	count 2136
+
+=== fitting
+the monster's rig: 49 bones
+mounts: aux_position, aux_back_attachment, aux_head_jntBnd, aux_L_foot_jntBnd, aux_R_foot_jntBnd
+  Sledgehammer.ao  socket R_Weapon [in its carrier's rig]  fixed mesh BruteWarriorWeapon.fmt  1 shapes
+      mesh1Shape  ->  Art/Models/MONSTERS/BasicSkeleton/Textures/BruteWarriorWeaponc.mat
+  BruteSummonArmour.ao  socket <root> [NOT in its carrier's rig]  box (-65.1,-18,-196.3)..(65.1,21.1,-9.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 9 in the header, 9 in the block · 8770 triangles over 7252 vertices
+    names: 334 bytes said, 334 read  [agree]
+    (no rig of its own)
+    BruteSummonArmourChainSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-19,-15.6,-21.2)..(18.6,13.6,42.1)
+      version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+      shapes 1 in the header, 1 in the block · 330 triangles over 236 vertices
+      names: 40 bytes said, 40 read  [agree]
+      rig 27 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 25 of 27  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_skinned_skirt_jntBnd_07  [its own]  under 0  rests at (5.2,-11.9,0.1)
+        2 phys_skinned_skirt_jntBnd_08  [its own]  under 0  rests at (-4.4,-10.2,0.1)
+        3 phys_skinned_skirt_jntBnd_09  [its own]  under 0  rests at (-11.7,-4.5,0.1)
+        4 phys_skinned_skirt_jntBnd_10  [its own]  under 0  rests at (-12.6,2.6,0.1)
+        5 phys_skinned_skirt_jntBnd_11  [its own]  under 0  rests at (-5.2,8.2,0.1)
+        6 phys_skinned_skirt_jntBnd_12  [its own]  under 0  rests at (5.2,8.2,0.1)
+        7 phys_skinned_skirt_jntBnd_13  [its own]  under 0  rests at (13.8,1.8,0.1)
+        8 phys_skinned_skirt_jntBnd_14  [its own]  under 0  rests at (13.8,-7,0.1)
+        9 phys_skinned_skirt_jntBnd_15  [its own]  under 2  rests at (-4.6,-9.5,12.7)
+        10 phys_skinned_skirt_jntBnd_16  [its own]  under 3  rests at (-12.2,-3.9,12.7)
+        11 phys_skinned_skirt_jntBnd_17  [its own]  under 4  rests at (-13,3.5,12.7)
+        12 phys_skinned_skirt_jntBnd_18  [its own]  under 5  rests at (-5.4,9.1,12.7)
+        13 phys_skinned_skirt_jntBnd_19  [its own]  under 6  rests at (5.4,9.1,12.7)
+        14 phys_skinned_skirt_jntBnd_20  [its own]  under 7  rests at (14.3,2.7,12.7)
+        15 phys_skinned_skirt_jntBnd_21  [its own]  under 9  rests at (-4.7,-8.8,25.3)
+        16 phys_skinned_skirt_jntBnd_22  [its own]  under 10  rests at (-12.6,-3.2,25.3)
+        17 phys_skinned_skirt_jntBnd_23  [its own]  under 11  rests at (-13.5,4.4,25.3)
+        18 phys_skinned_skirt_jntBnd_24  [its own]  under 12  rests at (-5.6,10,25.3)
+        19 phys_skinned_skirt_jntBnd_25  [its own]  under 13  rests at (5.6,10,25.3)
+        20 phys_skinned_skirt_jntBnd_26  [its own]  under 14  rests at (14.7,3.6,25.3)
+        21 phys_skinned_skirt_jntBnd_05  [its own]  under 15  rests at (-4.9,-8.2,37.9)
+        22 phys_skinned_skirt_jntBnd_04  [its own]  under 16  rests at (-13.1,-2.6,37.9)
+        23 phys_skinned_skirt_jntBnd_03  [its own]  under 17  rests at (-13.9,5.3,37.8)
+        24 phys_skinned_skirt_jntBnd_02  [its own]  under 18  rests at (-5.8,10.9,37.8)
+        25 phys_skinned_skirt_jntBnd_01  [its own]  under 19  rests at (5.8,10.9,37.8)
+        26 phys_skinned_skirt_jntBnd_06  [its own]  under 20  rests at (15.2,4.5,37.8)
+      BruteSummonArmourPlateSkirt.ao  socket root_jntBnd [in its carrier's rig]  box (-22.4,-17.6,-18.2)..(-0.4,13.8,15.8)
+        version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+        shapes 1 in the header, 1 in the block · 712 triangles over 710 vertices
+        names: 42 bytes said, 42 read  [agree]
+        rig 4 bones, 1 of them names its carrier's rig also has
+        mesh weights reach bone 3 of 4  [inside this rig]
+          0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+          1 phys_hip_plates_jntBnd_1  [its own]  under 0  rests at (-11,-1.7,-11.4)
+          2 phys_hip_plates_jntBnd_2  [its own]  under 1  rests at (-11,-1.7,-1.5)
+          3 phys_hip_plates_jntBnd_3  [its own]  under 2  rests at (-11,-1.7,10)
+  eye_glow.ao  socket eye_L [NOT in its carrier's rig]  (no mesh - an effect or a sound)
+  eye_glow.ao  socket eye_R [NOT in its carrier's rig]  (no mesh - an effect or a sound)

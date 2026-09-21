@@ -1,0 +1,2364 @@
+monster: Skeletal Storm Mage [Metadata/Monsters/Skeletons/PlayerSummoned/SkeletonStormMagePlayerSummoned_]
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/StormMage/SkeletonStormMagePlayerSummoned.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/Animation/PlayerMinions/Staff/rig.amd"
+	animations = '[
+		{
+			"name": "despawn_staff_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8999999761581421,
+					"name": "delete"
+				}
+			]
+		},
+		{
+			"name": "lightning_strike_staff_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6876360177993774,
+					"name": "contact",
+					"position": [
+						-1.7937999963760377,
+						-55.38890075683594,
+						-256.4460144042969
+					]
+				}
+			]
+		},
+		{
+			"name": "lightning_strike_staff_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5277789831161499,
+					"name": "contact",
+					"position": [
+						-1.7937999963760377,
+						-55.38890075683594,
+						-256.4460144042969
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_aoe_staff_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.571310043334961,
+					"name": "contact",
+					"position": [
+						0.7637310028076172,
+						-31.570600509643556,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_projectile_staff_01a",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5005943179130554,
+					"name": "contact",
+					"position": [
+						11.954498291015625,
+						-95.29908752441406,
+						-141.06385803222657
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_projectile_staff_01b",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5005943179130554,
+					"name": "contact",
+					"position": [
+						6.099959373474121,
+						-95.07402801513672,
+						-134.99642944335938
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_projectile_staff_02a",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4147663116455078,
+					"name": "contact",
+					"position": [
+						11.954498291015625,
+						-95.29908752441406,
+						-141.06385803222657
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_projectile_staff_02b",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.41330987215042117,
+					"name": "contact",
+					"position": [
+						6.099959373474121,
+						-95.07402801513672,
+						-134.99642944335938
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_projectile_staff_03a",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3439202904701233,
+					"name": "contact",
+					"position": [
+						11.954498291015625,
+						-95.29908752441406,
+						-141.06385803222657
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_projectile_staff_03b",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3439199924468994,
+					"name": "contact",
+					"position": [
+						6.099959373474121,
+						-95.07402801513672,
+						-134.99642944335938
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_projectile_staff_04a",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.3347634971141815,
+					"name": "contact",
+					"position": [
+						11.954498291015625,
+						-95.29908752441406,
+						-141.06385803222657
+					]
+				}
+			]
+		},
+		{
+			"name": "spell_projectile_staff_04b",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.33476299047470095,
+					"name": "contact",
+					"position": [
+						6.099959373474121,
+						-95.07402801513672,
+						-134.99642944335938
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/Skeletons/PlayerSummoned/StormMage/attachments/StormMageSummonSkirt.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/Skeletons/PlayerSummoned/StormMage/attachments/StormMageSummonToga.ao"
+	attached_object = "<root> Metadata/Monsters/Skeletons/PlayerSummoned/StormMage/attachments/StormMageSummonBangle.ao"
+	attached_object = "eye_L Metadata/Effects/Spells/undead_summon_skeletons/eye_glow.ao"
+	attached_object = "eye_R Metadata/Effects/Spells/undead_summon_skeletons/eye_glow.ao"
+	attached_object = "R_Weapon Metadata/Monsters/Skeletons/PlayerSummoned/StormMage/attachments/StormMageSummonStaff.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/Animation/PlayerMinions/Staff/rig.ast"
+		socket = "Back"
+			parent = "aux_back_attachment"
+		socket = "aux_tip"
+			parent = "R_Weapon"
+			translation = "0 0 -35"
+		socket = "aux_lightning_hit"
+			parent = "R_Weapon"
+			translation = "-40 120 -500"
+		socket = "aux_meleeslash_control"
+			parent = "chest_jntBnd"
+			translation = "0 -25 0"
+		socket = "aux_axe_end"
+			parent = "R_Weapon"
+			translation = "0 0 -60"
+		socket = "eye_L"
+			parent = "aux_head_jntBnd"
+			translation = "3 1.5 -3"
+		socket = "eye_R"
+			parent = "aux_head_jntBnd"
+			translation = "-3 1.5 -3"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/FrostMageSummon.sm"
+			HipsShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_FemurShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_FootShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_ForearmShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Storm.mat:0"
+			L_HandShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Storm.mat:0"
+			L_HumerusShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Storm.mat:0"
+			L_ShinShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_FemurShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_FootShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_ForearmShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Storm.mat:0"
+			R_HandShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Storm.mat:0"
+			R_HumerusShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Storm.mat:0"
+			R_ShinShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			RibsShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			SkullShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "back false aux_back_attachment"
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false L_elbow_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd neck_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd R_elbow_jntBnd"
+		bone_group = "meleeslash_control false chest_jntBnd aux_meleeslash_control"
+		bone_group = "melee_trail false R_Weapon aux_axe_end"
+		bone_group = "aux_weapon false aux_tip R_finger_1_jntBnd_3 R_wrist_jntBnd"
+		bone_group = "aux_lightning false aux_tip aux_lightning_hit"
+		bone_group = "eye_L false eye_L"
+		bone_group = "eye_R false eye_R"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "lightning_strike_staff_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/spell_surges/EPKs/W_Flow_Lightning_01.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "lightning_strike_staff_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/spell_surges/EPKs/W_Flow_Lightning_01.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "spell_aoe_staff_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/undead_summon_skeletons/epk/death_storm_surge.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_01a",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/spell_surges/EPKs/W_Flow_Lightning_01.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_01b",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/spell_surges/EPKs/W_Flow_Lightning_01.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_02a",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/spell_surges/EPKs/W_Flow_Lightning_01.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_02b",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/spell_surges/EPKs/W_Flow_Lightning_01.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_03a",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/spell_surges/EPKs/W_Flow_Lightning_01.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_03b",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/spell_surges/EPKs/W_Flow_Lightning_01.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_04a",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/spell_surges/EPKs/W_Flow_Lightning_01.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_04b",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/spell_surges/EPKs/W_Flow_Lightning_01.epk",
+						"bone_name": "R_Weapon"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "death_staff_broken_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5039740204811096,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.56358402967453,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_staff_broken_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5039740204811096,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.56358402967453,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_staff_broken_bwd_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40317898988723757,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4508669972419739,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_staff_broken_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5039740204811096,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.56358402967453,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_staff_broken_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5039740204811096,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.56358402967453,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_staff_broken_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5039740204811096,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.56358402967453,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "despawn_staff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Fade",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_staff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_staff_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_staff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_staff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_staff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_staff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "jog_staff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1618500053882599,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.342195987701416,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.507515013217926,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7283269762992859,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1514400243759156,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5722500085830689,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "lightning_strike_staff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/Skeleton_LightningSurge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2034350037574768,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2678360044956207,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			},
+			{
+				"name": "lightning_strike_staff_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/Skeleton_LightningSurge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16274799406528474,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2142689973115921,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			},
+			{
+				"name": "offering_staff_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2875719964504242,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Hard",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "offering_staff_revive_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "offering_staff_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11271700263023377,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25722500681877139,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_bwd_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_staff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.21125300228595735,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23964400589466096,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41624999046325686,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6125869750976563,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_staff_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1903180032968521,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23150299489498139,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.375,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5206660032272339,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spell_aoe_staff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/DeathStorm_Surge",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1748580038547516,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/DeathStorm_Staff_Up",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1814740002155304,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41776901483535769,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6553800106048584,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.953685998916626,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/DeathStorm_Staff_Up",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2400699853897095,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2847800254821778,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/Skeleton_LightningSurge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6534899473190308,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_01a",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/Skeleton_LightningSurge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16274800896644593,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21426880359649659,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_01b",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/Skeleton_LightningSurge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16274800896644593,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21426880359649659,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_02a",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/Skeleton_LightningSurge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12206100672483444,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16070160269737245,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_02b",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/Skeleton_LightningSurge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12206100672483444,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16070160269737245,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_03a",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/Skeleton_LightningSurge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09488209336996079,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12491871416568756,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_03b",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/Skeleton_LightningSurge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09488209336996079,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12491871416568756,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_04a",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/Skeleton_LightningSurge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08137400448322296,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10713440179824829,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_04b",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/StormMage/Skeleton_LightningSurge",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08137400448322296,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10713440179824829,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			},
+			{
+				"name": "sprint_staff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1795330047607422,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22370100021362306,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35374999046325686,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5001590251922607,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_staff_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04943209886550903,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27469199895858767,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46804100275039675,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5412499904632568,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "death_staff_broken_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.5 1 Flat 2.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_staff_broken_bwd_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.5 1 Flat 2.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_staff_broken_bwd_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.4 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_staff_broken_fwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.5 1 Flat 2.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_staff_broken_left_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.4 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_staff_broken_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.5 1 Flat 2.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "despawn_staff_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.9995070099830627,
+						"name": "SummonFade",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.799606 0.980154 Flat 0.999507 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "emerge_staff_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "SummonFade",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "emerge_staff_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "SummonFade",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "lightning_strike_staff_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.6798329949378967,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.679833 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "lightning_strike_staff_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5157099962234497,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.51571 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "offering_staff_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "offering_staff_idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "offering_staff_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.4 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0006410260102711618,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.000641026 1 Smooth 1.00015 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_bwd_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_bwd_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_fwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_left_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "spell_aoe_staff_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 1.47984 0.3 Flat 1.5 1 Linear 2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_01a",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5186235308647156,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.518624 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_01b",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5186235308647156,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.518624 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_02a",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.42027801275253298,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.420278 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_02b",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.42027825117111208,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.420278 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_03a",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.3510350286960602,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.351035 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_03b",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.34990325570106509,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.349903 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_04a",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.33746686577796938,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.337467 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_staff_04b",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.3364962339401245,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "2 0 0 Linear 0.336496 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "emerge_staff_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.39891698956489565,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "emerge_staff_02",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.39891698956489565,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_bwd_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_bwd_02",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_bwd_03",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_fwd_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_left_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_staff_broken_right_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "spell_aoe_staff_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.30000001192092898,
+						"end_time": 1.5,
+						"filename": "Metadata/Effects/Spells/spell_surges/surgeWave.ao",
+						"animation": "surgeWave_Lightning_01",
+						"from": {
+							"parent_bone": "aux_position"
+						},
+						"to": {
+							"parent_bone": "neck_jntBnd"
+						},
+						"speed_type": "Stretch"
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.5,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/skeleton_bolt_upwards.ao",
+						"offset": [
+							5.3231201171875,
+							-31.39430046081543
+						],
+						"height": 162.58900451660157
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.5009900331497193,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/death_storm_upwards.ao",
+						"offset": [
+							0.0,
+							-33.0
+						]
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/StormMage/attachments/StormMageSummonSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/attachments/FrostMageSummon/Skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/attachments/FrostMageSummon/Skirt/rig.ast"
+		linear_allowed_contraction = 0.600
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.800
+		enclosure_radius = 1.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/FrostMageSummon/Skirt/FrostMageSummonSkirt.sm"
+			skirt_meshShape = "Art/Models/MONSTERS/BasicSkeleton/Textures/LightningMageSkeletonc.mat:0"
+	}
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/StormMage/attachments/StormMageSummonToga.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/attachments/FrostMageSummon/Toga/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/attachments/FrostMageSummon/Toga/rig.ast"
+		linear_allowed_contraction = 0.600
+		bend_stiffness = 200.000
+		bend_allowed_angle = 0.800
+		enclosure_radius = 1.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/FrostMageSummon/Toga/FrostMageSummonToga.sm"
+			shawl_meshShape = "Art/Models/MONSTERS/BasicSkeleton/Textures/LightningMageSkeletonc.mat:0"
+		toga_meshShape = "Art/Models/MONSTERS/BasicSkeleton/Textures/LightningMageSkeletonc.mat:0"
+	}
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/StormMage/attachments/StormMageSummonBangle.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/FrostMageSummon/FrostMageSummonBangle.sm"
+			arm_wrap_meshShape = "Art/Models/MONSTERS/BasicSkeleton/Textures/LightningMageSkeletonc.mat:0"
+		bangle_meshShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_StormBangle.mat:0"
+	}
+}
+
+=== .ao Metadata/Effects/Spells/undead_summon_skeletons/eye_glow.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "eye_glow"
+		view_looping = true
+	default_animation = "eye_glow"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_point false root"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "eye_glow",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.12325900048017502,
+						"filename": "Metadata/Effects/Spells/undead_summon_skeletons/pet/eye_glow.pet",
+						"bone_group": "FX_point"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "eye_glow",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/undead_summon_skeletons/trl/eye_glow.trl",
+						"bone_group": "FX_point"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/StormMage/attachments/StormMageSummonStaff.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/Items/Weapons/TwoHandWeapons/Staves/Basetypes/Staff1.fmt"
+			mesh0Shape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/Storm_Staff.mat:0"
+	}
+	
+	ParticleEffects
+	{
+		continuous_effect = "blade Metadata/Effects/Spells/undead_summon_skeletons/pet/skeleton_storm_staff.pet"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Skin.ao (depth 2)
+version 3
+extends "nothing"
+
+BaseAnimationEvents { }
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	SkinMesh { }
+}
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/BasicSkeleton/FrostMageSummon.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BasicSkeleton/FrostMageSkeleton_armour_f80fe041.smd"
+Materials 1
+	"Art/Textures/Monsters/BasicSkeleton/BoneRabble/BoneRabblec.mat" 15
+BoundingBox -76.245 -14.4066 -189.231 77.8251 14.8169 0.491275
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_1_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_1_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/BasicSkeleton/FrostMageSkeleton_armour_f80fe041.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 15 in the header, 15 in the block · 4692 triangles over 3138 vertices
+  names: 348 bytes said, 348 read  [agree]
+
+=== shapes (21)
+0	HipsShape	from 0	count 2220
+1	L_FemurShape	from 2220	count 762
+2	L_FootShape	from 2982	count 1116
+3	L_ForearmShape	from 4098	count 372
+4	L_HandShape	from 4470	count 1200
+5	L_HumerusShape	from 5670	count 354
+6	L_ShinShape	from 6024	count 366
+7	R_FemurShape	from 6390	count 762
+8	R_FootShape	from 7152	count 1116
+9	R_ForearmShape	from 8268	count 372
+10	R_HandShape	from 8640	count 1200
+11	R_HumerusShape	from 9840	count 354
+12	R_ShinShape	from 10194	count 366
+13	RibsShape	from 10560	count 2340
+14	SkullShape	from 12900	count 1176
+15	skirt_meshShape	from 14076	count 5688
+16	shawl_meshShape	from 19764	count 2370
+17	toga_meshShape	from 22134	count 3654
+18	arm_wrap_meshShape	from 25788	count 1437
+19	bangle_meshShape	from 27225	count 720
+20	mesh0Shape	from 27945	count 13392
+
+=== fitting
+the monster's rig: 49 bones
+mounts: aux_position, aux_back_attachment, aux_head_jntBnd, aux_L_foot_jntBnd, aux_R_foot_jntBnd
+  StormMageSummonSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-21.5,-11.8,-21)..(19.4,11,72.8)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 1896 triangles over 1210 vertices
+    names: 30 bytes said, 30 read  [agree]
+    rig 46 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 45 of 46  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-14)  carrier has (0,0,-111.6)
+      2 phys_skinned_skirt_jntBnd_28  [its own]  under 0  rests at (-4.9,6.1,4)
+      3 phys_skinned_skirt_jntBnd_16  [its own]  under 0  rests at (-10.7,-3.6,4)
+      4 phys_skinned_skirt_jntBnd_33  [its own]  under 0  rests at (-3.8,-8,4)
+      5 phys_skinned_skirt_jntBnd_12  [its own]  under 0  rests at (12.1,-3.3,4)
+      6 phys_skinned_skirt_jntBnd_38  [its own]  under 0  rests at (4.7,-7.7,4)
+      7 phys_skinned_skirt_jntBnd_05  [its own]  under 0  rests at (3.5,6.6,4)
+      8 phys_skinned_skirt_jntBnd_44  [its own]  under 0  rests at (-11.4,2.4,4)
+      9 phys_skinned_skirt_jntBnd_01  [its own]  under 0  rests at (11.3,2.9,4)
+      10 phys_skinned_skirt_jntBnd_27  [its own]  under 2  rests at (-5.4,6.8,12.7)
+      11 phys_skinned_skirt_jntBnd_17  [its own]  under 3  rests at (-11.4,-3.6,12.7)
+      12 phys_skinned_skirt_jntBnd_32  [its own]  under 4  rests at (-3.9,-8.1,12.7)
+      13 phys_skinned_skirt_jntBnd_13  [its own]  under 5  rests at (12.8,-3.3,12.9)
+      14 phys_skinned_skirt_jntBnd_37  [its own]  under 6  rests at (4.9,-7.7,12.8)
+      15 phys_skinned_skirt_jntBnd_06  [its own]  under 7  rests at (3.7,7,12.7)
+      16 phys_skinned_skirt_jntBnd_43  [its own]  under 8  rests at (-12.4,2.8,12.8)
+      17 phys_skinned_skirt_jntBnd_02  [its own]  under 9  rests at (12,3,12.7)
+      18 phys_skinned_skirt_jntBnd_26  [its own]  under 10  rests at (-6.1,7.2,21.5)
+      19 phys_skinned_skirt_jntBnd_18  [its own]  under 11  rests at (-12.1,-3.7,21.5)
+      20 phys_skinned_skirt_jntBnd_31  [its own]  under 12  rests at (-4,-8.1,21.3)
+      21 phys_skinned_skirt_jntBnd_14  [its own]  under 13  rests at (13.6,-3.3,21.6)
+      22 phys_skinned_skirt_jntBnd_36  [its own]  under 14  rests at (4.8,-7.8,21.4)
+      23 phys_skinned_skirt_jntBnd_07  [its own]  under 15  rests at (3.7,7.3,21.3)
+      24 phys_skinned_skirt_jntBnd_42  [its own]  under 16  rests at (-13.5,3,21.7)
+      25 phys_skinned_skirt_jntBnd_03  [its own]  under 17  rests at (12.6,3.1,21.4)
+      26 phys_skinned_skirt_jntBnd_25  [its own]  under 18  rests at (-6.8,7.5,31)
+      27 phys_skinned_skirt_jntBnd_19  [its own]  under 19  rests at (-12.9,-3.7,30.7)
+      28 phys_skinned_skirt_jntBnd_30  [its own]  under 20  rests at (-3.6,-8.2,29.5)
+      29 phys_skinned_skirt_jntBnd_15  [its own]  under 21  rests at (14.3,-3.1,31.4)
+      30 phys_skinned_skirt_jntBnd_35  [its own]  under 22  rests at (4.3,-7.6,30.2)
+      31 phys_skinned_skirt_jntBnd_08  [its own]  under 23  rests at (3.6,7.6,30.9)
+      32 phys_skinned_skirt_jntBnd_41  [its own]  under 24  rests at (-14.7,3.1,31.2)
+      33 phys_skinned_skirt_jntBnd_04  [its own]  under 25  rests at (13.2,3.1,31.3)
+      34 phys_skinned_skirt_jntBnd_24  [its own]  under 26  rests at (-7.6,7.5,41.1)
+      35 phys_skinned_skirt_jntBnd_20  [its own]  under 27  rests at (-13.8,-3.7,40)
+      36 phys_skinned_skirt_jntBnd_29  [its own]  under 28  rests at (-2.6,-8.4,37.2)
+      37 phys_skinned_skirt_jntBnd_34  [its own]  under 30  rests at (3.7,-7.4,39.4)
+      38 phys_skinned_skirt_jntBnd_09  [its own]  under 31  rests at (3.3,7.6,41.1)
+      39 phys_skinned_skirt_jntBnd_40  [its own]  under 32  rests at (-15.8,3.1,41.2)
+      40 phys_skinned_skirt_jntBnd_23  [its own]  under 34  rests at (-8.2,7.5,51.1)
+      41 phys_skinned_skirt_jntBnd_21  [its own]  under 35  rests at (-14.6,-3.7,49.2)
+      42 phys_skinned_skirt_jntBnd_10  [its own]  under 38  rests at (3.1,7.5,51.1)
+      43 phys_skinned_skirt_jntBnd_39  [its own]  under 39  rests at (-16.9,3.1,51.1)
+      44 phys_skinned_skirt_jntBnd_22  [its own]  under 40  rests at (-8.7,7.4,64.8)
+      45 phys_skinned_skirt_jntBnd_11  [its own]  under 42  rests at (3,7.4,64.8)
+  StormMageSummonToga.ao  socket chest_jntBnd [in its carrier's rig]  box (-21.1,-17.2,-22.9)..(19.8,16.4,60.5)
+    version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 2008 triangles over 1276 vertices
+    names: 58 bytes said, 58 read  [agree]
+    rig 10 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 9 of 10  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_cloth_mesh_jntBnd_1  [its own]  under 0  rests at (-3.2,7.9,17.5)
+      2 phys_skinned_cloth_mesh_jntBnd_2  [its own]  under 0  rests at (-10.5,4.7,23.3)
+      3 phys_skinned_cloth_mesh_jntBnd_3  [its own]  under 0  rests at (-14.2,-1.4,27.6)
+      4 phys_skinned_cloth_mesh_jntBnd_4  [its own]  under 0  rests at (-12.2,-8.2,28.1)
+      5 phys_skinned_cloth_mesh_jntBnd_5  [its own]  under 0  rests at (-5.6,-11.7,25.6)
+      6 phys_skinned_cloth_mesh_jntBnd_6  [its own]  under 0  rests at (1.7,-10.2,21.8)
+      7 phys_skinned_cloth_mesh_jntBnd_9  [its own]  under 5  rests at (-4.3,-12,36.4)
+      8 phys_skinned_cloth_mesh_jntBnd_8  [its own]  under 7  rests at (-4.3,-13.1,46.6)
+      9 phys_skinned_cloth_mesh_jntBnd_7  [its own]  under 8  rests at (-4.3,-12.9,56.8)
+  StormMageSummonBangle.ao  socket <root> [NOT in its carrier's rig]  box (39.2,-2.3,-128.8)..(66.3,12.4,-106.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 719 triangles over 589 vertices
+    names: 68 bytes said, 68 read  [agree]
+    (no rig of its own)
+  eye_glow.ao  socket eye_L [NOT in its carrier's rig]  (no mesh - an effect or a sound)
+  eye_glow.ao  socket eye_R [NOT in its carrier's rig]  (no mesh - an effect or a sound)
+  StormMageSummonStaff.ao  socket R_Weapon [in its carrier's rig]  fixed mesh Staff1.fmt  1 shapes
+      mesh0Shape  ->  Art/Models/Items/Weapons/TwoHandWeapons/Staves/Basetypes/Textures/RootStaffSpecularc.mat

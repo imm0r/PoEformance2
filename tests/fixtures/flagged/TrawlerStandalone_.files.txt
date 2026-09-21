@@ -1,0 +1,1548 @@
+monster: Tasalio Trawler [Metadata/Monsters/LeagueAncestral/StandaloneTasalio/TrawlerStandalone_]
+
+=== .ao Metadata/Monsters/LeagueAncestral/StandaloneTasalio/Trawler/TasalioKaruiFishingTaiha.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/KaruiWarriorTaiaha/rig.amd"
+	animations = '[
+		{
+			"name": "combo_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.20000000298023225,
+					"end_time": 1.0,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "0 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_left_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"position": [
+						150.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "death_right_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"position": [
+						-150.0,
+						0.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "throw_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0,
+					"name": "start_face",
+					"data": "0 0 -1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8694850206375122,
+					"name": "contact",
+					"position": [
+						14.375499725341797,
+						-92.32579803466797,
+						-133.05299377441407
+					]
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.8804399967193604,
+					"name": "end_face"
+				}
+			]
+		},
+		{
+			"name": "warp_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6396710872650147,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/LeagueAncestral/StandaloneTasalio/Trawler/attachments/TasalioKaruiFishingTaiha/TasalioKaruiFishingTaihaRobe.ao"
+	attached_object = "R_Weapon Metadata/Monsters/LeagueAncestral/StandaloneTasalio/Trawler/attachments/TasalioKaruiFishingTaiha/TasalioKaruiFishingTaihaWeapon.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3818897604942322,
+								0.0
+							],
+							[
+								0.4251968562602997,
+								0.7888675928115845
+							],
+							[
+								0.4448818862438202,
+								1.0
+							]
+						],
+						"rotation": -0.05235987901687622,
+						"width": 40.0,
+						"length": 190.7519989013672,
+						"offset": [
+							13.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.10471975803375244,
+							-0.10471975803375244
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon_btm"
+					}
+				]
+			}
+		},
+		{
+			"name": "combo_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.16141732037067414,
+								0.0
+							],
+							[
+								0.16929133236408235,
+								0.25143951177597048
+							],
+							[
+								0.17716535925865174,
+								0.6429942846298218
+							],
+							[
+								0.19291338324546815,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"damage_statset_index": 4,
+						"update_target_direction": true,
+						"rotation": -0.41887903213500979,
+						"width": 28.902000427246095,
+						"angle": 1.6231600046157838,
+						"x_axis_scale": 0.6840000152587891,
+						"length": 138.72799682617188,
+						"offset": [
+							-4.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.0,
+							-0.24434611201286317
+						],
+						"impact_z_rotation": [
+							-0.19198623299598695,
+							1.6057028770446778
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon_btm"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.35958904027938845,
+								0.0
+							],
+							[
+								0.36986300349235537,
+								0.20921307802200318
+							],
+							[
+								0.39041095972061159,
+								0.5508637428283691
+							],
+							[
+								0.4178082048892975,
+								0.790402889251709
+							],
+							[
+								0.44178083539009097,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"defer_damage_prediction": true,
+						"damage_statset_index": 4,
+						"update_target_direction": true,
+						"rotation": -0.01745329424738884,
+						"angle": 2.268929958343506,
+						"x_axis_scale": 0.7950000166893005,
+						"length": 138.72799682617188,
+						"offset": [
+							-7.0,
+							0.0
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon_btm"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.6301369667053223,
+								0.0
+							],
+							[
+								0.6335616707801819,
+								0.4894433617591858
+							],
+							[
+								0.664383590221405,
+								0.7543185949325562
+							],
+							[
+								0.6849315166473389,
+								1.0
+							]
+						],
+						"defer_damage_prediction": true,
+						"damage_statset_index": 4,
+						"update_target_direction": true,
+						"rotation": 0.05235987901687622,
+						"width": 40.0,
+						"length": 179.1909942626953,
+						"offset": [
+							-12.0,
+							-25.0
+						],
+						"impact_z_rotation": [
+							0.06981317698955536,
+							0.06981317698955536
+						],
+						"impact_type": "Piercing"
+					}
+				]
+			}
+		},
+		{
+			"name": "double_thrust_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.24015748500823975,
+								0.0
+							],
+							[
+								0.24803149700164796,
+								0.5700575709342957
+							],
+							[
+								0.33070865273475649,
+								0.834932804107666
+							],
+							[
+								0.36220473051071169,
+								1.0
+							]
+						],
+						"damage_statset_index": 2,
+						"rotation": 0.05235987901687622,
+						"width": 40.0,
+						"length": 150.28900146484376,
+						"offset": [
+							-8.0,
+							-14.0
+						],
+						"impact_z_rotation": [
+							0.05235987901687622,
+							0.05235987901687622
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "R_Weapon_top"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.5582191944122315,
+								0.0
+							],
+							[
+								0.5616438388824463,
+								0.7236084342002869
+							],
+							[
+								0.6027397513389587,
+								1.0
+							]
+						],
+						"damage_statset_index": 2,
+						"rotation": 0.03490658849477768,
+						"width": 40.0,
+						"length": 179.1909942626953,
+						"local_offset": [
+							-6.0,
+							-11.0
+						],
+						"impact_z_rotation": [
+							0.03490658849477768,
+							0.03490658849477768
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "R_Weapon_top"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/Animation/KaruiWarriorTaiaha/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "R_Weapon_btm"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 41"
+		socket = "R_Weapon_top"
+			parent = "aux_R_Weapon_attachment"
+			translation = "0 0 -184"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TasalioTribe/TasalioKaruiFishingTaiha.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_upperArm_attachment_jntBnd"
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "spear_line false R_Weapon_btm R_Weapon_top"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.3377816677093506,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tasalio/TasalioKaruiFishingTaiha/fx/onAct/combo_01/stab2.pet",
+						"bone_group": "spear_line"
+					}
+				]
+			},
+			{
+				"name": "double_thrust_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5329868793487549,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tasalio/TasalioKaruiFishingTaiha/fx/onAct/double_thrust_01/stab1.pet",
+						"bone_group": "spear_line"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9032769799232483,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tasalio/TasalioKaruiFishingTaiha/fx/onAct/double_thrust_01/stab1.pet",
+						"bone_group": "spear_line"
+					}
+				]
+			},
+			{
+				"name": "throw_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tasalio/TasalioKaruiFishingTaiha/fx/onAct/throw_01/surge.pet",
+						"bone_group": "grp_l_palm"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8814457058906555,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tasalio/TasalioKaruiFishingTaiha/fx/onAct/throw_01/shoot.pet",
+						"bone_group": "grp_l_palm"
+					}
+				]
+			},
+			{
+				"name": "warp_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tasalio/TasalioKaruiFishingTaiha/fx/onAct/warp_01/bu_warp.pet",
+						"bone_group": "root"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.2792728841304779,
+						"end_time": 0.5106449723243713,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tasalio/TasalioKaruiFishingTaiha/fx/onAct/attack_fast_01/melee_trail_01.trl",
+						"bone_group": "spear_line"
+					}
+				]
+			},
+			{
+				"name": "attack_fast_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.4000000059604645,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tasalio/TasalioKaruiFishingTaiha/fx/onAct/attack_fast_01/melee_trail_01.trl",
+						"bone_group": "spear_line"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.20072737336158753,
+						"end_time": 0.44092661142349245,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tasalio/TasalioKaruiFishingTaiha/fx/onAct/attack_fast_01/melee_trail_01.trl",
+						"bone_group": "spear_line"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.41745397448539736,
+						"end_time": 1.168197751045227,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tasalio/TasalioKaruiFishingTaiha/fx/onAct/attack_fast_01/melee_trail_01.trl",
+						"bone_group": "spear_line"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "throw_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tasalio/TasalioKaruiFishingTaiha/epk/throw_01/arm_glow.epk"
+					}
+				]
+			},
+			{
+				"name": "warp_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Tasalio/TasalioKaruiFishingTaiha/epk/warp_01/warp_body.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "throw_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.9329999685287476,
+						"name": "surgeTime_R",
+						"auto_reset": false,
+						"curve": "4 0 0 Linear 1 1 Linear 1.03507 0 Linear 1.933 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "warp_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.2000000476837159,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "5 0 0 Linear 0.639671 1 Linear 0.70948 1 Linear 1.03932 0 Flat 1.2 0 Flat"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/AttackPower",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28767985105514529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30591997504234316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Swish_Wood",
+						"bone_name": "R_Weapon_btm"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5500802397727966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/StepSoft",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7385604977607727,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8297600746154785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/StepSoft",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_approach_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/AttackApproach",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.012991361320018769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14903302490711213,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Swish_Spear",
+						"bone_name": "R_Weapon_btm"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2760051488876343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5968673229217529,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_fast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10109560191631317,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/AttackPowerShort",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17966145277023316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Swish_Wood",
+						"bone_name": "R_Weapon_btm"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Combo",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2700797915458679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Swish_Wood",
+						"bone_name": "R_Weapon_btm"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.293759822845459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6963200569152832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Swish_Wood",
+						"bone_name": "R_Weapon_btm"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7411197423934937,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1391998529434205,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Swish_Spear",
+						"bone_name": "R_Weapon_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.175040364265442,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveFastGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5084805488586426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "R_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1291198879480362,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Fall2",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29519975185394289,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/WoodDropLight",
+						"bone_name": "R_Weapon_btm"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.755040168762207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/DeathFallSmall",
+						"bone_name": "R_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveFastGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2917670011520386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/WoodDropLight",
+						"bone_name": "R_Weapon_btm"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6052887439727783,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/DeathFallSmall",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6696992516517639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Fall2",
+						"bone_name": "R_knee_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.052800145000219348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/DeathFallSmall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1190401241183281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Fall2",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21984010934829713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/WoodDropLight",
+						"bone_name": "R_Weapon_top"
+					}
+				]
+			},
+			{
+				"name": "death_knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveFastGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15926387906074525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/DeathFallSmall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveFastGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1827995479106903,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/DeathFallSmall",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03284169360995293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/DeathFallSmall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07404296100139618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Fall2",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1367405503988266,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/WoodDropLight",
+						"bone_name": "R_Weapon_top"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05864335969090462,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/DeathFallSmall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.13221389055252076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Fall2",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24416907131671906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/WoodDropLight",
+						"bone_name": "R_Weapon_top"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Death",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.052800145000219348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/DeathFallSmall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1190401241183281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Fall2",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21984010934829713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/WoodDropLight",
+						"bone_name": "R_Weapon_top"
+					}
+				]
+			},
+			{
+				"name": "double_thrust_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09455999732017517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveFastGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21311980485916139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/StepSoft",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2369077205657959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/DoubleThrust",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36048009991645815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveFastGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37823981046676638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Swish_Spear",
+						"bone_name": "R_Weapon_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3926401138305664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/StepSoft",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7137596607208252,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Swish_Spear",
+						"bone_name": "R_Weapon_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7641600966453552,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveFastGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.146239995956421,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/StepSoft",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Flinch",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.6592975854873657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Idle",
+						"bone_name": "aux_face_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Knockdown",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2097834199666977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Fall2",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6181519031524658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8443588614463806,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9712746739387512,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2288386821746827,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4938677549362183,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1135129928588869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Knockdown",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12990157306194306,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Fall2",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6181519031524658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6539855599403381,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6957939267158508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2288386821746827,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7454578876495362,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1135129928588869,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15270847082138062,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5191233158111572,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7235652804374695,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Run",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8168627023696899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1628026962280274,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/Throw",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6266587376594544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveFastGrassSkirt",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7742713689804077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Effects/WaterTrap_Throw",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7905540466308594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Swish_Unarmed",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3931087255477906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/StepSoft",
+						"bone_name": "L_toe_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "warp_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Dialogue/4.0/Monsters/Part1/Act4/KaruiTasalioFishingTaiaha/KaruiTasalioFishingTaiaha_DialogueWarp_$(#).dialogue.ogg",
+						"alternate_sound": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Vocals/AggroSG",
+						"fmod_event": "Audio/Dialogue/4.0/Monsters/AreaMonsterDialogue",
+						"bone_name": "aux_face_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26724401116371157,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_FishingTaiaha/Effects/WaterTeleport",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3511221706867218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/Swish_Unarmed",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5915213227272034,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_4_2/Tasalio_Monsters/Tasalio_Foley/MoveLongGrassSkirt",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/LeagueAncestral/StandaloneTasalio/Trawler/attachments/TasalioKaruiFishingTaiha/TasalioKaruiFishingTaihaRobe.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TasalioTribe/attachments/Robe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TasalioTribe/attachments/Robe/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.400
+		attachment_bones = "L_thigh_jntBnd R_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TasalioTribe/attachments/Robe/TasalioKaruiFishingTaihaRobe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_thigh_jntBnd R_thigh_jntBnd spine_1_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/LeagueAncestral/StandaloneTasalio/Trawler/attachments/TasalioKaruiFishingTaiha/TasalioKaruiFishingTaihaWeapon.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/TasalioTribe/TasalioKaruiFishingTaihaWeapon.fmt"
+	}
+	
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TasalioTribe/TasalioKaruiFishingTaiha.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TasalioTribe/TasalioKaruiFishingTaiha_armour_cf4c4470.smd"
+Materials 4
+	"Art/Models/MONSTERS/TasalioTribe/Textures/TasalioKaruiFishingTaihaArmourHairFurc.mat" 1
+	"Art/Models/MONSTERS/TasalioTribe/Textures/TasalioKaruiFishingTaihaBodyc.mat" 1
+	"Art/Models/MONSTERS/TasalioTribe/Textures/TasalioKaruiFishingTaihaArmourc.mat" 5
+	"Art/Models/MONSTERS/TasalioTribe/Textures/TasalioKaruiFishingTaihaArmourBodyFurc.mat" 1
+BoundingBox -82.775 -16.3548 -208.301 82.7751 27.0042 0.55955
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedLarge/ModelVariants/TasalioTribe/TasalioKaruiFishingTaiha_armour_cf4c4470.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 8 in the header, 8 in the block · 16298 triangles over 11038 vertices
+  names: 316 bytes said, 316 read  [agree]
+
+=== shapes (11)
+0	Hair_FurShape	from 0	count 7035
+1	TasalioKaruiFishingTaihaBodyShape	from 7035	count 9954
+2	hairShape	from 16989	count 14148
+3	L_ankle_attachShape	from 31137	count 1980
+4	R_ankle_attachShape	from 33117	count 1980
+5	tasalio_ankle_attachShape	from 35097	count 4308
+6	tasalio_TopShape	from 39405	count 9450
+7	tasalio_Feather_furShape	from 48855	count 39
+8	tasalio_beltShape	from 48894	count 7842
+9	tasalio_skirtShape	from 56736	count 9216
+10	tasalio_skirt_top_furShape	from 65952	count 1200
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  TasalioKaruiFishingTaihaRobe.ao  socket hip_jntBnd [in its carrier's rig]  box (-36.1,-22.6,-30.9)..(38.1,20.8,70.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 6086 triangles over 5732 vertices
+    names: 122 bytes said, 122 read  [agree]
+    rig 13 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 12 of 13  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-12.8)  carrier has (0,2,-119.5)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (11,0,-0)  carrier has (11,2,-106.8)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-11,-0,-0)  carrier has (-11,2,-106.8)
+      4 phys_tri_skirt_F01_jntBnd  [its own]  under 0  rests at (0,-15.3,9.8)
+      5 phys_tri_skirt_B01_jntBnd  [its own]  under 0  rests at (-0,12.9,13.9)
+      6 spine_2_jntBnd  [shared]  under 1  rests at (0,0,-25.6)  carrier has (-0,2,-132.3)
+      7 phys_tri_skirt_L_jntBnd  [its own]  under 2  rests at (20.5,-2.5,25.8)
+      8 phys_tri_skirt_R_jntBnd  [its own]  under 3  rests at (-20.5,-2.5,25.8)
+      9 phys_tri_skirt_F02_jntBnd  [its own]  under 4  rests at (0,-14.4,36.1)
+      10 phys_tri_skirt_B02_jntBnd  [its own]  under 5  rests at (-0,15,38)
+      11 phys_tri_skirt_F03_jntBnd  [its own]  under 9  rests at (0,-13.7,58)
+      12 phys_tri_skirt_B03_jntBnd  [its own]  under 10  rests at (-0,16.5,58)
+  TasalioKaruiFishingTaihaWeapon.ao  socket R_Weapon [NOT in its carrier's rig]  fixed mesh TasalioKaruiFishingTaihaWeapon.fmt  1 shapes
+      TasalioKaruiFishingTaihaWeaponShape  ->  Art/Models/MONSTERS/TasalioTribe/Textures/TasalioKaruiFishingTaihaWeaponc.mat

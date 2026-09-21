@@ -1,0 +1,689 @@
+monster: Totem [Metadata/Monsters/Totems/SpellTotem]
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/DruidicTotem1.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Totems/DruidicTotem/DruidicTotemBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Totems/DruidicTotem/attachments/trunks/DruidicTotemTrunk1.ao"
+	attached_object = "totem_jntBnd Metadata/Monsters/Totems/DruidicTotem/attachments/stones/DruidicTotemStone1.ao"
+}
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/DruidicTotem2.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Totems/DruidicTotem/DruidicTotemBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Totems/DruidicTotem/attachments/trunks/DruidicTotemTrunk2.ao"
+	attached_object = "totem_jntBnd Metadata/Monsters/Totems/DruidicTotem/attachments/stones/DruidicTotemStone2.ao"
+}
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/DruidicTotem3.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Totems/DruidicTotem/DruidicTotemBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Totems/DruidicTotem/attachments/trunks/DruidicTotemTrunk3.ao"
+	attached_object = "totem_jntBnd Metadata/Monsters/Totems/DruidicTotem/attachments/stones/DruidicTotemStone3.ao"
+}
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/DruidicTotem4.ao (depth 0)
+version 3
+extends "Metadata/Monsters/Totems/DruidicTotem/DruidicTotemBase"
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Totems/DruidicTotem/attachments/trunks/DruidicTotemTrunk4.ao"
+		attached_object_translation = "5.2 5.8 0"
+		attached_object_rotation = "0 -0 0.4363"
+	attached_object = "totem_jntBnd Metadata/Monsters/Totems/DruidicTotem/attachments/stones/DruidicTotemStone4.ao"
+}
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/DruidicTotemBase.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/druidic_totems/rig.amd"
+	on_death_01 = { trunk.PlayAnimation( death_01 ); }
+	on_submerge_01 = { trunk.PlayAnimation( submerge_01 ); }
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/druidic_totems/rig.ast"
+		socket = "aux_up"
+			parent = "root_jntBnd"
+			translation = "0 0 -100"
+		socket = "aux_core"
+			parent = "totem_jntBnd"
+			translation = "0 0 7"
+		bend_allowed_angle = 0.500
+		normal_viscosity_multiplier = 0.010
+		tangent_viscosity_multiplier = 0.010
+		enclosure_angle = 0.300
+		animation_velocity_factor = 10.000
+		animation_force_factor = 20.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/Effects/druidic_totems/DruidicTotems.sm"
+			hide_segments = "temp_meshShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false totem_jntBnd"
+		bone_group = "fx_up false root_jntBnd aux_up"
+		bone_group = "fx_core false aux_core totem_jntBnd"
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "pskillTotemBase_CTRL",
+						"apply_on_children": true,
+						"curve": "4 0 1 Linear 0.596954 1 Flat 1.275 0.62 Smooth 1.5 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "pskillTotemBase_CTRL",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 0.271084 0.6 Smooth 1.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "pskillTotemBase_CTRL",
+						"apply_on_children": true,
+						"curve": "4 0 1 Linear 0.596954 1 Flat 1.275 0.62 Smooth 1.5 0 Smooth"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "channel_loop_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Channel_Loop",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "channel_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Channel_Start",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Submerge",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02500000223517418,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Emerge",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Flinch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Flinch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Flinch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Flinch",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spell_epic_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Spell_Epic_OnAct",
+						"bone_name": "root_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4500000476837159,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Spell_Cast",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spell_nova_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Spell_Nova_OnAct",
+						"bone_name": "root_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42500001192092898,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Spell_Cast",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spell_projectile_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.019999999552965165,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Spell_Proj_OnAct",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.375,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Spell_Cast"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Primal/SpellTotemMetagem/Submerge",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		continuous_effect = "root @orphan Metadata/Effects/Spells/warrior_totems/global/FX/totem_grdBase_SpellTotem.pet"
+	}
+}
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/attachments/trunks/DruidicTotemTrunk1.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/druidic_totems/attachments/trunks/trunk_1/rig.amd"
+	default_animation = "emerge_01"
+}
+
+BaseAnimationEvents
+{
+	on_attachment_chain_complete = { this.parent_ao.trunk = this; }
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/druidic_totems/attachments/trunks/trunk_1/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/Effects/druidic_totems/attachments/trunks/trunk_1/DruidicTotemTrunk1.sm"
+	}
+	
+	AnimatedRender
+	{
+		ignore_parent_rotation = true
+	}
+}
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/attachments/stones/DruidicTotemStone1.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/Effects/druidic_totems/attachments/DruidicTotem1.fmt"
+	}
+}
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/attachments/trunks/DruidicTotemTrunk2.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/druidic_totems/attachments/trunks/trunk_2/rig.amd"
+	default_animation = "emerge_01"
+}
+
+BaseAnimationEvents
+{
+	on_attachment_chain_complete = { this.parent_ao.trunk = this; }
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/druidic_totems/attachments/trunks/trunk_2/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/Effects/druidic_totems/attachments/trunks/trunk_2/DruidicTotemTrunk2.sm"
+	}
+	
+	AnimatedRender
+	{
+		ignore_parent_rotation = true
+	}
+}
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/attachments/stones/DruidicTotemStone2.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/Effects/druidic_totems/attachments/DruidicTotem2.fmt"
+	}
+}
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/attachments/trunks/DruidicTotemTrunk3.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/druidic_totems/attachments/trunks/trunk_3/rig.amd"
+	default_animation = "emerge_01"
+}
+
+BaseAnimationEvents
+{
+	on_attachment_chain_complete = { this.parent_ao.trunk = this; }
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/druidic_totems/attachments/trunks/trunk_3/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/Effects/druidic_totems/attachments/trunks/trunk_3/DruidicTotemTrunk3.sm"
+	}
+	
+	AnimatedRender
+	{
+		ignore_parent_rotation = true
+	}
+}
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/attachments/stones/DruidicTotemStone3.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/Effects/druidic_totems/attachments/DruidicTotem3.fmt"
+	}
+}
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/attachments/trunks/DruidicTotemTrunk4.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/druidic_totems/attachments/trunks/trunk_4/rig.amd"
+	default_animation = "emerge_01"
+}
+
+BaseAnimationEvents
+{
+	on_attachment_chain_complete = { this.parent_ao.trunk = this; }
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/druidic_totems/attachments/trunks/trunk_4/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/Effects/druidic_totems/attachments/trunks/trunk_4/DruidicTotemTrunk4.sm"
+	}
+	
+	AnimatedRender
+	{
+		ignore_parent_rotation = true
+	}
+}
+
+=== .ao Metadata/Monsters/Totems/DruidicTotem/attachments/stones/DruidicTotemStone4.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/Effects/druidic_totems/attachments/DruidicTotem4.fmt"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/Effects/druidic_totems/DruidicTotems.sm
+version 6
+SkinnedMeshData "Art/Models/Effects/druidic_totems/rig_68cc17c7.smd"
+Materials 4
+	"Art/Models/Effects/druidic_totems/Textures/DruidicTotems01c.mat" 2
+	"Art/Models/Effects/druidic_totems/Textures/DruidicTotems01c.mat" 2
+	"Art/Models/Effects/druidic_totems/Textures/DruidicTotems01c.mat" 2
+	"Art/Models/Effects/druidic_totems/Textures/DruidicTotems02c.mat" 1
+BoundingBox -12.4577 -5.45106 -184.705 12.4577 6.56011 0
+BoneGroups 0
+
+=== .smd Art/Models/Effects/druidic_totems/rig_68cc17c7.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 7 in the header, 7 in the block · 8900 triangles over 8142 vertices
+  names: 456 bytes said, 456 read  [agree]
+
+=== shapes (45)
+0	DruidicTotemsVineThick01_DoubleShape	from 0	count 5748
+1	DruidicTotemsVineThick01_OpaqueShape	from 5748	count 4488
+2	DruidicTotemsVineThick02_DoubleShape	from 10236	count 5748
+3	DruidicTotemsVineThick02_OpaqueShape	from 15984	count 4488
+4	DruidicTotemsVineThin03_DoubleShape	from 20472	count 3084
+5	DruidicTotemsVineThin03_OpaqueShape	from 23556	count 1800
+6	temp_meshShape	from 25356	count 1344
+7	leaves_lrg_1_dsShape	from 26700	count 2670
+8	trunk_1_ss_1Shape	from 29370	count 2256
+9	trunk_1_ss_2Shape	from 31626	count 834
+10	trunk_1_ss_3Shape	from 32460	count 1050
+11	trunk_1_ss_4Shape	from 33510	count 1332
+12	trunk_1_ssShape	from 34842	count 4404
+13	totems_1_leavesShape	from 39246	count 7758
+14	totems_1_vinesShape	from 47004	count 2580
+15	totems_1Shape	from 49584	count 2832
+16	leaves_lrg_2_dsShape	from 52416	count 11280
+17	mushies_2_ssShape	from 63696	count 2145
+18	trunk_2_ss_Shape1	from 65841	count 3252
+19	trunk_2_ss_Shape2	from 69093	count 5400
+20	trunk_2_ss_Shape3	from 74493	count 2328
+21	trunk_2_ssShape	from 76821	count 13362
+22	totems_2_leavesShape	from 90183	count 2268
+23	totems_2_vinesShape	from 92451	count 3090
+24	totems_Shape2	from 95541	count 1080
+25	leaves_lrg_3_dsShape	from 96621	count 6096
+26	leaves_sml_3_dsShape	from 102717	count 2640
+27	mushies_3_ssShape	from 105357	count 429
+28	trunk_3_ss_Shape1	from 105786	count 2556
+29	trunk_3_ss_Shape2	from 108342	count 2580
+30	trunk_3_ss_Shape3	from 110922	count 1536
+31	trunk_3_ss_Shape4	from 112458	count 1032
+32	trunk_3_ssShape	from 113490	count 5052
+33	totems_3_leavesShape	from 118542	count 1938
+34	totems_3_vinesShape	from 120480	count 2397
+35	totems_Shape3	from 122877	count 1344
+36	leaves_lrg_4_dsShape	from 124221	count 5952
+37	trunk_4_ss_Shape1	from 130173	count 3996
+38	trunk_4_ss_Shape2	from 134169	count 4428
+39	trunk_4_ss_Shape3	from 138597	count 2556
+40	trunk_4_ss_Shape4	from 141153	count 1872
+41	trunk_4_ssShape	from 143025	count 12444
+42	totems_4_leavesShape	from 155469	count 3294
+43	totems_4_vinesShape	from 158763	count 3303
+44	totems_Shape4	from 162066	count 1788
+
+=== fitting
+the monster's rig: 51 bones
+mounts: aux_position
+  DruidicTotemTrunk1.ao  socket <root> [NOT in its carrier's rig]  box (-43.2,-57.2,-79)..(50.4,62.5,9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 6 in the header, 6 in the block · 4182 triangles over 2948 vertices
+    names: 206 bytes said, 206 read  [agree]
+    rig 20 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 19 of 20  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 trunk_jntBnd_1  [its own]  under 0  rests at (3.1,-3.1,-33.3)
+      2 leaves_1_jntBnd_1  [its own]  under 0  rests at (13.7,24.6,0)
+      3 leaves_2_jntBnd_1  [its own]  under 0  rests at (-8.9,22.5,0)
+      4 rts_1_jntBnd_1  [its own]  under 0  rests at (14.2,-17.6,-4.6)
+      5 rts_2_jntBnd_1  [its own]  under 0  rests at (28.1,-5.5,-2.1)
+      6 rts_3_jntBnd_1  [its own]  under 0  rests at (-20.3,-8.5,-3.2)
+      7 branch_1_jntBnd_1  [its own]  under 1  rests at (-8.7,-3.8,-29.8)
+      8 branch_2_jntBnd_1  [its own]  under 1  rests at (-2.2,-12.3,-38.6)
+      9 branch_3_jntBnd_1  [its own]  under 1  rests at (9.3,-10.4,-32.9)
+      10 branch_4_jntBnd_1  [its own]  under 1  rests at (6.5,9.5,-26.2)
+      11 leaves_1_jntBnd_2  [its own]  under 2  rests at (14.5,24.8,-19.9)
+      12 leaves_2_jntBnd_2  [its own]  under 3  rests at (-11.8,22.1,-12.1)
+      13 rts_1_jntBnd_2  [its own]  under 4  rests at (23,-46.9,-1.5)
+      14 branch_1_jntBnd_2  [its own]  under 7  rests at (-3.1,13,-41.5)
+      15 branch_2_jntBnd_2  [its own]  under 8  rests at (-8.7,-10.1,-55.9)
+      16 branch_3_jntBnd_2  [its own]  under 9  rests at (14.8,5.4,-45.3)
+      17 branch_4_jntBnd_2  [its own]  under 10  rests at (17.7,14.5,-42.8)
+      18 branch_3_jntBnd_3  [its own]  under 16  rests at (9.4,0.5,-63.9)
+      19 branch_4_jntBnd_3  [its own]  under 17  rests at (17.6,11.8,-57.7)
+  DruidicTotemStone1.ao  socket totem_jntBnd [in its carrier's rig]  fixed mesh DruidicTotem1.fmt  3 shapes
+      totems_1_leavesShape  ->  Art/Models/Effects/druidic_totems/Textures/DruidicTotems01c.mat
+      totems_1_vinesShape  ->  Art/Models/Effects/druidic_totems/Textures/DruidicTotems01c.mat
+      totems_1Shape  ->  Art/Models/Effects/druidic_totems/Textures/DruidicTotems02c.mat
+  DruidicTotemTrunk2.ao  socket <root> [NOT in its carrier's rig]  box (-37.6,-33.7,-87.5)..(42.9,59.3,6.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 6 in the header, 6 in the block · 12589 triangles over 8328 vertices
+    names: 206 bytes said, 206 read  [agree]
+    rig 13 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 12 of 13  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 trunk_jntBnd_1  [its own]  under 0  rests at (-3.1,2.7,-40.8)
+      2 rts_1_jntBnd_1  [its own]  under 0  rests at (-2.3,-13.9,-5.1)
+      3 rts_1_jntBnd_2  [its own]  under 0  rests at (8.6,-5.5,-6)
+      4 rts_1_jntBnd_3  [its own]  under 0  rests at (5.9,22.8,-5.5)
+      5 leaves_1_jntBnd_1  [its own]  under 0  rests at (-19.2,30.7,0)
+      6 leaves_2_jntBnd_1  [its own]  under 0  rests at (10.7,39.7,0)
+      7 branch_1_jntBnd_1  [its own]  under 1  rests at (-6.7,4,-59.3)
+      8 branch_2_jntBnd_1  [its own]  under 1  rests at (7.6,-1.3,-36.5)
+      9 leaves_1_jntBnd_2  [its own]  under 5  rests at (-19.2,30.7,-29.8)
+      10 leaves_2_jntBnd_2  [its own]  under 6  rests at (21.6,38.6,-28.4)
+      11 branch_1_jntBnd_2  [its own]  under 7  rests at (-1.3,-1,-74.1)
+      12 branch_2_jntBnd_2  [its own]  under 8  rests at (16.8,2.8,-52)
+  DruidicTotemStone2.ao  socket totem_jntBnd [in its carrier's rig]  fixed mesh DruidicTotem2.fmt  3 shapes
+      totems_2_leavesShape  ->  Art/Models/Effects/druidic_totems/Textures/DruidicTotems01c.mat
+      totems_2_vinesShape  ->  Art/Models/Effects/druidic_totems/Textures/DruidicTotems01c.mat
+      totems_Shape2  ->  Art/Models/Effects/druidic_totems/Textures/DruidicTotems02c.mat
+  DruidicTotemTrunk3.ao  socket <root> [NOT in its carrier's rig]  box (-44.4,-41.1,-89.9)..(29.7,51.1,6.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 8 in the header, 8 in the block · 7307 triangles over 5262 vertices
+    names: 280 bytes said, 280 read  [agree]
+    rig 16 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 15 of 16  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 trunk_jntBnd_1  [its own]  under 0  rests at (0,0,-30.8)
+      2 rts_1_jntBnd_1  [its own]  under 0  rests at (-4,-2,0)
+      3 rts_1_jntBnd_2  [its own]  under 0  rests at (5.5,14.4,-5.6)
+      4 leaves_1_jntBnd_1  [its own]  under 0  rests at (-9.8,19,0)
+      5 leaves_2_jntBnd_1  [its own]  under 0  rests at (1,25.7,-0.1)
+      6 branch_1_jntBnd_1  [its own]  under 1  rests at (-16,-3.2,-44.6)
+      7 branch_2_jntBnd_1  [its own]  under 1  rests at (5.2,-7.8,-43.6)
+      8 branch_3_jntBnd_1  [its own]  under 1  rests at (-3.7,14.8,-35.2)
+      9 leaves_1_jntBnd_2  [its own]  under 4  rests at (-28.7,22.9,-28.9)
+      10 leaves_2_jntBnd_2  [its own]  under 5  rests at (11.9,33.3,-25.5)
+      11 branch_1_jntBnd_2  [its own]  under 6  rests at (-13.4,10.8,-59.4)
+      12 branch_2_jntBnd_2  [its own]  under 7  rests at (8.4,-7,-64)
+      13 branch_2_jntBnd_4  [its own]  under 7  rests at (7.5,4.7,-64.8)
+      14 branch_2_jntBnd_5  [its own]  under 7  rests at (17.9,-3.3,-53.7)
+      15 branch_2_jntBnd_3  [its own]  under 12  rests at (3.4,1.5,-75.1)
+  DruidicTotemStone3.ao  socket totem_jntBnd [in its carrier's rig]  fixed mesh DruidicTotem3.fmt  3 shapes
+      totems_3_leavesShape  ->  Art/Models/Effects/druidic_totems/Textures/DruidicTotems01c.mat
+      totems_3_vinesShape  ->  Art/Models/Effects/druidic_totems/Textures/DruidicTotems01c.mat
+      totems_Shape3  ->  Art/Models/Effects/druidic_totems/Textures/DruidicTotems02c.mat
+  DruidicTotemTrunk4.ao  socket <root> [NOT in its carrier's rig]  attached_object_translation = "5.2 5.8 0"  attached_object_rotation = "0 -0 0.4363"  box (-60.5,-48.8,-91.7)..(29.5,54,5.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 6 in the header, 6 in the block · 10416 triangles over 6724 vertices
+    names: 206 bytes said, 206 read  [agree]
+    rig 11 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 10 of 11  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 trunk_jntBnd_1  [its own]  under 0  rests at (-4.1,-5.8,-34.5)
+      2 rts_1_jntBnd_1  [its own]  under 0  rests at (-5.8,-6.1,0)
+      3 leaves_1_jntBnd_1  [its own]  under 0  rests at (-24.7,25.6,0.8)
+      4 leaves_2_jntBnd_1  [its own]  under 0  rests at (6.1,26.9,2.5)
+      5 branch_1_jntBnd_1  [its own]  under 1  rests at (-16.5,-6.2,-34.8)
+      6 branch_2_jntBnd_1  [its own]  under 1  rests at (7.4,-1.9,-42.9)
+      7 leaves_1_jntBnd_2  [its own]  under 3  rests at (-36.4,36.6,-31.3)
+      8 leaves_2_jntBnd_2  [its own]  under 4  rests at (18.6,31.5,-25.3)
+      9 branch_2_jntBnd_2  [its own]  under 6  rests at (-0.7,5.9,-68.6)
+      10 branch_2_jntBnd_3  [its own]  under 6  rests at (11.8,3,-37)
+  DruidicTotemStone4.ao  socket totem_jntBnd [in its carrier's rig]  fixed mesh DruidicTotem4.fmt  3 shapes
+      totems_4_leavesShape  ->  Art/Models/Effects/druidic_totems/Textures/DruidicTotems01c.mat
+      totems_4_vinesShape  ->  Art/Models/Effects/druidic_totems/Textures/DruidicTotems01c.mat
+      totems_Shape4  ->  Art/Models/Effects/druidic_totems/Textures/DruidicTotems02c.mat

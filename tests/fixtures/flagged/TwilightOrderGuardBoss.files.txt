@@ -1,0 +1,3808 @@
+monster: Torvian, Hand of the Saviour [Metadata/Monsters/TwilightOrderSoldiers/TwilightOrderGuardBoss]
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderSoldiers/TwilightOrderGuardBoss.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwollenMiller/Animations/LargeDualAxeBoss/Twighlight_Order/rig.amd"
+	view_of = "emerge_01"
+		view_name = "emerge_idle_01"
+		view_end = 1
+		view_looping = true
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+		view_exclude_event = "ActiveDodgeEvent"
+		view_exclude_event = "TriggerEffectEvent"
+	view_of = "axe_spin_01"
+		view_name = "holy_axe_spin_01"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	view_of = "combo_01"
+		view_name = "holy_combo_01"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	view_of = "rock_toss_01"
+		view_name = "holy_rock_toss_01"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	view_of = "leapslam_01"
+		view_name = "holy_leapslam_01"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "CharacterAudioEvent"
+	animations = '[
+		{
+			"name": "axe_spin_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.2330000400543215,
+					"name": "move",
+					"data": "0 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.6187705397605896,
+					"name": "start_target_update",
+					"data": "60 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7513977289199829,
+					"name": "contact",
+					"position": [
+						65.79972839355469,
+						-49.56884002685547,
+						-81.87570190429688
+					],
+					"contact_ref": [
+						76.99009704589844,
+						0.0,
+						-82.67396545410156
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7513980269432068,
+					"name": "detach_weapons"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.6040184497833253,
+					"name": "recover_weapons"
+				}
+			]
+		},
+		{
+			"name": "combo_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.8846280574798585,
+					"name": "start_target_update",
+					"data": "100 0 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.5299999713897705,
+					"end_time": 0.9330000281333923,
+					"name": "move",
+					"position": [
+						-16.05500030517578,
+						-92.43800354003906,
+						0.0
+					],
+					"data": "1 0 1 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.9330000281333923,
+					"end_time": 1.5333333015441895,
+					"name": "move",
+					"position": [
+						20.121999740600587,
+						-108.94200134277344,
+						0.0
+					],
+					"data": "1 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.5333333015441895,
+					"end_time": 2.2300000190734865,
+					"name": "move",
+					"position": [
+						15.954999923706055,
+						-165.33900451660157,
+						0.0
+					],
+					"data": "1 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 2.2300000190734865,
+					"end_time": 2.926666736602783,
+					"name": "move",
+					"position": [
+						-20.02199935913086,
+						-155.36900329589845,
+						0.0
+					],
+					"data": "1 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2703092098236086,
+					"name": "combo_impact",
+					"position": [
+						19.870956420898439,
+						-97.12499237060547,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "cyclone_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.865999937057495,
+					"name": "move",
+					"data": "1 1 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.4999999701976776,
+					"end_time": 1.9999998807907105,
+					"name": "move",
+					"position": [
+						0.0,
+						-536.9920043945313,
+						0.0
+					],
+					"data": "0 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.480315685272217,
+					"name": "landing"
+				}
+			]
+		},
+		{
+			"name": "holy_axe_throw_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.9066575765609742,
+					"name": "contact",
+					"position": [
+						-11.3798828125,
+						-50.436561584472659,
+						-161.3878173828125
+					],
+					"contact_ref": [
+						-8.983978271484375,
+						0.0,
+						-192.83853149414063
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9066575765609742,
+					"name": "detach_weapons",
+					"position": [
+						-11.3798828125,
+						-50.436561584472659,
+						-161.3878173828125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5382375717163088,
+					"name": "recover_weapons",
+					"position": [
+						-11.3798828125,
+						-50.436561584472659,
+						-161.3878173828125
+					]
+				}
+			]
+		},
+		{
+			"name": "leapslam_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.33000001311302187,
+					"name": "move",
+					"position": [
+						0.0,
+						-98.53399658203125,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.3337939977645874,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8147040009498596,
+					"name": "hit_ground"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.8300000429153442,
+					"end_time": 1.2000000476837159,
+					"name": "move",
+					"position": [
+						0.0,
+						-132.96200561523438,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8370516300201416,
+					"name": "create_wall",
+					"position": [
+						0.0,
+						-131.64608764648438,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8400294780731201,
+					"name": "slam",
+					"position": [
+						0.0,
+						-25.79646110534668,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "rock_toss_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 3.6659998893737795,
+					"name": "move",
+					"data": "1 1 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0983589887619019,
+					"name": "boulder"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.7328851222991944,
+					"end_time": 2.7287189960479738,
+					"name": "start_target_update",
+					"data": "300 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.911259889602661,
+					"name": "contact",
+					"position": [
+						-0.7270822525024414,
+						-79.78514099121094,
+						-163.09506225585938
+					],
+					"contact_ref": [
+						-0.9029293060302734,
+						-24.979448318481447,
+						-171.90499877929688
+					]
+				}
+			]
+		},
+		{
+			"name": "spider_gyser_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.4660000801086427,
+					"name": "move",
+					"position": [
+						0.0,
+						-665.0390014648438,
+						0.0
+					],
+					"data": "0 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8260170221328735,
+					"name": "boulder",
+					"contact_ref": [
+						-33.065101623535159,
+						-83.90370178222656,
+						-224.08399963378907
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4835000038146973,
+					"name": "throw",
+					"position": [
+						-33.065101623535159,
+						-123.39399719238281,
+						-215.5229949951172
+					],
+					"contact_ref": [
+						-33.065101623535159,
+						-83.90370178222656,
+						-224.08399963378907
+					]
+				}
+			]
+		},
+		{
+			"name": "summon_council_01",
+			"events": [
+				{
+					"type": "StartFaceEventType",
+					"time": 0.0,
+					"name": "start_face",
+					"data": "90 60 -1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 3.1659998893737795,
+					"name": "move",
+					"position": [
+						0.0,
+						-260.8840026855469,
+						0.0
+					],
+					"data": "0 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 0.7691500186920166,
+					"name": "end_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8448610305786133,
+					"name": "detach_weapons"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.8448610901832581,
+					"name": "contact",
+					"position": [
+						65.79972839355469,
+						-49.56884002685547,
+						-81.87570190429688
+					],
+					"contact_ref": [
+						76.99009704589844,
+						0.0,
+						-82.67396545410156
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.4946999549865724,
+					"name": "recover_weapons"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/TwilightOrder/TwilightOrderSoldiers/attachments/TwilightMedVedBossCloakHeld.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/TwilightOrder/TwilightOrderSoldiers/attachments/TwilightMedVedBossLoinClothHeld.ao"
+	attached_object = "R_Weapon Metadata/Monsters/TwilightOrder/TwilightOrderTenderizerTwin/attachments/TwilightOrderTenderizerTwinWeapon.ao"
+	attached_object = "L_Weapon Metadata/Monsters/TwilightOrder/TwilightOrderTenderizerTwin/attachments/TwilightOrderTenderizerTwinWeapon.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.3463689982891083,
+								0.0
+							],
+							[
+								0.4301680028438568,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": 0.26179900765419009,
+						"angle": 2.617990016937256,
+						"length": 138.72799682617188,
+						"impact_z_rotation": [
+							0.785398006439209,
+							1.9198600053787232
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.446927011013031,
+								0.0
+							],
+							[
+								0.49720698595046999,
+								1.0
+							]
+						],
+						"width": 120.0,
+						"length": 185.0,
+						"impact_x_rotation": [
+							-0.34906598925590517,
+							-0.9599310159683228
+						],
+						"impact_type": "Slash",
+						"impact_bone": "saw_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.36312800645828249,
+								0.0
+							],
+							[
+								0.40782099962234499,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"width": 63.58399963378906,
+						"angle": 1.5707999467849732,
+						"length": 225.0,
+						"impact_x_rotation": [
+							0.0,
+							-0.26179900765419009
+						],
+						"impact_z_rotation": [
+							-0.5235990285873413,
+							-1.483530044555664
+						],
+						"impact_type": "Slash",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "combo_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.21653543412685395,
+								0.0
+							],
+							[
+								0.24409449100494386,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"update_target_direction": true,
+						"rotation": 0.5061454772949219,
+						"angle": 2.094395160675049,
+						"length": 158.53700256347657,
+						"hand": "MainHand"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.36220473051071169,
+								0.0
+							],
+							[
+								0.3976377844810486,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"update_target_direction": true,
+						"rotation": -0.7504916191101074,
+						"angle": 2.6179940700531008,
+						"x_axis_scale": 0.8270000219345093,
+						"length": 150.0,
+						"local_offset": [
+							-8.0,
+							37.0
+						],
+						"hand": "MainHand"
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.6769911646842957,
+								0.0
+							],
+							[
+								0.7035398483276367,
+								1.0
+							]
+						],
+						"update_target_direction": true,
+						"rotation": 0.0872664675116539,
+						"width": 75.0,
+						"length": 150.0,
+						"local_offset": [
+							20.0,
+							0.0
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "cyclone_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.20472441613674165,
+								0.0
+							],
+							[
+								0.22047244012355805,
+								0.48148149251937868
+							],
+							[
+								0.23622047901153565,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.45378562808036806,
+						"angle": 2.4434611797332765,
+						"x_axis_scale": 0.699999988079071,
+						"length": 180.0,
+						"local_offset": [
+							33.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.3141592741012573,
+							-0.645771861076355
+						],
+						"impact_z_rotation": [
+							-0.9250245094299316,
+							2.094395160675049
+						],
+						"impact_type": "Slash",
+						"hand": "MainHand"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3425196707248688,
+								0.0
+							],
+							[
+								0.36220473051071169,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.3490658700466156,
+						"angle": 2.094395160675049,
+						"length": 150.0,
+						"local_offset": [
+							16.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.15707963705062867,
+							-0.6632251739501953
+						],
+						"impact_z_rotation": [
+							-1.1693706512451172,
+							1.1693706512451172
+						],
+						"impact_type": "Slash",
+						"hand": "OffHand"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4212598502635956,
+								0.0
+							],
+							[
+								0.4566929042339325,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.19198623299598695,
+						"angle": 2.6179940700531008,
+						"x_axis_scale": 0.800000011920929,
+						"length": 160.0,
+						"impact_x_rotation": [
+							0.1745329350233078,
+							-0.6632251739501953
+						],
+						"impact_z_rotation": [
+							-0.7679449319839478,
+							2.4085545539855959
+						],
+						"impact_type": "Slash",
+						"hand": "MainHand"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5748031735420227,
+								0.0
+							],
+							[
+								0.5984252095222473,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.3141592741012573,
+						"angle": 1.7453293800354005,
+						"x_axis_scale": 0.8999999761581421,
+						"length": 160.0,
+						"local_offset": [
+							8.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.2617993950843811,
+							-0.5585054159164429
+						],
+						"impact_z_rotation": [
+							0.3490658700466156,
+							1.2217305898666382
+						],
+						"impact_type": "Slash",
+						"hand": "OffHand"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6614173054695129,
+								0.0
+							],
+							[
+								0.7086614370346069,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"update_target_direction": true,
+						"rotation": -0.3490658700466156,
+						"angle": 2.4434611797332765,
+						"x_axis_scale": 0.699999988079071,
+						"length": 150.0,
+						"local_offset": [
+							29.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.40142571926116946,
+							0.4886922240257263
+						],
+						"impact_z_rotation": [
+							0.15707963705062867,
+							1.9896754026412964
+						],
+						"impact_type": "Slash",
+						"hand": "MainHand"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwollenMiller/Animations/LargeDualAxeBoss/Twighlight_Order/rig.ast"
+		socket = "aux_mid"
+			translation = "0 0 -117.683"
+		socket = "aux_root"
+		socket = "aux_weapon_grd_1"
+			translation = "-48.2139 -61.0382 0"
+		socket = "aux_weapon_grd_2"
+			translation = "34.6668 -61.0382 0"
+		socket = "aux_front"
+			translation = "0 -49.706 -117.683"
+		socket = "aux_breath"
+			parent = "head_jntBnd"
+			translation = "-1 -15.7073 8.17035"
+		socket = "aux_grd_circle_01"
+			translation = "0 -98.1163 0"
+		socket = "aux_grd_circle_02"
+			translation = "-98.12 0 0"
+		socket = "aux_light_attach"
+			translation = "0 -69.9526 -203.289"
+		socket = "aux_weptrl_l1"
+			parent = "L_Weapon"
+			translation = "-31.8453 0.781124 -72.778"
+		socket = "aux_weptrl_l2"
+			parent = "L_Weapon"
+			translation = "-27.2223 -5.34275 7.41768"
+		socket = "aux_weptrl_r1"
+			parent = "R_Weapon"
+			translation = "-30.9313 1.05 -72.5378"
+		socket = "aux_weptrl_r2"
+			parent = "R_Weapon"
+			translation = "-28.0469 1.05 4.49594"
+		socket = "boulder"
+			parent = "R_Weapon"
+			translation = "-12.0854 -28.7672 -28.9566"
+		socket = "aux_weapon_mid"
+			parent = "L_Weapon"
+			translation = "-34.6693 8.76717 -51.7216"
+		normal_viscosity_multiplier = 0.300
+		enclosure_angle = 0.300
+		animation_velocity_factor = 10.000
+		animation_force_factor = 5.000
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwollenMiller/TwilightMedVed.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "cloak_bone_group false chest_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd head_jntBnd"
+		bone_group = "necklace_bone_group false chest_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+		bone_group = "root false hip_jntBnd spine_1_jntBnd spine_2_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd neck_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "front false aux_mid aux_front"
+		bone_group = "foot_l false L_foot_jntBnd"
+		bone_group = "foot_r false R_foot_jntBnd"
+		bone_group = "FX_wep_grd false aux_weapon_grd_1 aux_weapon_grd_2"
+		bone_group = "grd false aux_root"
+		bone_group = "yawp false head_jntBnd aux_breath"
+		bone_group = "arm_charge false R_wrist_jntBnd R_shoulder_jntBnd"
+		bone_group = "wep_l false aux_weptrl_l1 aux_weptrl_l2"
+		bone_group = "wep_r false aux_weptrl_r1 aux_weptrl_r2"
+		bone_group = "FX_weapon_mid false aux_weapon_mid"
+		bone_group = "FX_weapon_01 false aux_weptrl_r2 aux_weptrl_r1"
+		bone_group = "FX_weapon_02 false aux_weptrl_l2 aux_weptrl_l1"
+	}
+
+	Lights
+	{
+		light = "point_light"
+			usage_frequency = 1
+			style_speed = 8
+			randomise_start_time = true
+			state = "on"
+				colour = "5.70005 4.09048 2.20947"
+				position = "0 0 -250"
+				radius = 350
+				style = 1
+				distance_threshold = 100
+			state = "off"
+				default_state = true
+				position = "0 0 -250"
+				radius = 0
+				style = 1
+				distance_threshold = 100
+		animations = '[
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "off"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 2.0705559253692629,
+						"end_time": 2.75,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 2.810474395751953,
+						"state_name": "off"
+					}
+				]
+			}
+		]'
+	}
+
+	WindEvents
+	{
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "holy_axe_throw_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.280779242515564,
+						"end_time": 1.9867204427719117,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.27440398931503298,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/medved/pets/step_dust.pet",
+						"bone_group": "foot_r"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.616720974445343,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/medved/pets/step_dust.pet",
+						"bone_group": "foot_l"
+					}
+				]
+			},
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5845947265625,
+						"end_time": 2.7200000286102297,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/skybeam/onact_skybeam_cir.pet",
+						"bone_group": "cloak_bone_group"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7862600088119507,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/medved/pets/step_dust.pet",
+						"bone_group": "foot_r"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5732500553131104,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition/boss/medved/pets/step_dust.pet",
+						"bone_group": "foot_l"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_spin_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.307058185338974,
+						"end_time": 0.8250956535339356,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_combo_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5078877210617065,
+						"end_time": 0.8824937343597412,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0816127061843873,
+						"end_time": 1.3457064628601075,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8504981994628907,
+						"end_time": 2.196887969970703,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_group": "wep_r"
+					}
+				]
+			},
+			{
+				"name": "holy_rock_toss_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7511846423149109,
+						"end_time": 3.0059754848480226,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_leapslam_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3499999940395355,
+						"end_time": 0.8600000143051148,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/pet/axe_throw/onact_holy_leapslam.pet",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			}
+		]'
+	}
+
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 2.5287184715270998,
+						"frequency": 85.0,
+						"amplitude": 16.0,
+						"duration": 0.30000001192092898,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.6078280210494996,
+						"frequency": 85.0,
+						"amplitude": 12.0,
+						"duration": 0.25,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "spider_gyser_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.7170850038528442,
+						"frequency": 300.0,
+						"amplitude": 2.0,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.1563199758529664,
+						"frequency": 300.0,
+						"amplitude": 3.0,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "summon_council_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.6045000553131104,
+						"frequency": 300.0,
+						"amplitude": 1.5,
+						"duration": 1.2999999523162842,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.8019599914550781,
+						"amplitude": 1.5,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.577239990234375,
+						"amplitude": 1.5,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38078051805496218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/MeleeSwing",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.392890602350235,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5759149789810181,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6013699769973755,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/CapeFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6355699896812439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.220229983329773,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21126000583171845,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/MeleeSwing",
+						"bone_name": "L_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4337512254714966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5303280353546143,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/CapeFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7844752073287964,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1688026189804078,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "axe_spin_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.13389360904693604,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18390999734401704,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1850000023841858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/GruntLonger",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3140052258968353,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/ThrowWeapon/ThrowWeaponBuildUp",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4918699860572815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.611600399017334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/ThrowWeapon/ThrowWeapon",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.121940016746521,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5147156715393067,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05132589861750603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2822900116443634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/GruntShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4599800109863281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/MeleeSwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5156800150871277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6860719919204712,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8026580214500427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9568610191345215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/GruntShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1199848651885987,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.15392005443573,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/MeleeSwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.405079960823059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6125799417495728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/GruntLonger",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8526400327682496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/MeleeSwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0325000286102297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.707789897918701,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cyclone_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4328022301197052,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/MeleeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44967275857925417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5933103561401367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6570988297462463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/CapeFlap",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6640780568122864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/MeleeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.729997456073761,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0003902912139893,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0206199884414673,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/MeleeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0542999505996705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/GruntShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2051199674606324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2898262739181519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7776598930358887,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7849899530410767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/GruntShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9398008584976197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.994075894355774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/MeleeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.028059959411621,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2853989601135256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3897500038146974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/GruntShort"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/DeathA",
+						"bone_name": "hip_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5156540274620056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8160139918327332,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5264999866485596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7647600173950196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/DeathB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.014645576477051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/DeathC",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.023193836212158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/Fall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.266923189163208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2936394214630129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.20478293299674989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5062900185585022,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2337299585342408,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3129417896270753,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4077999591827393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6408528089523316,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Roar",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7310199737548829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.776238203048706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/RockThrow/RockThrow",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8303600549697877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0415000915527345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4540998935699465,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/Fall",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.577810049057007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Slam/Slam",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Roar",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5699907541275024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.504390001296997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.762969970703125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7909400463104249,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Attack",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8318698406219483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/ThrowWeapon/ThrowWeapon",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3418538570404054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8154820203781128,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Walk",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3974800109863281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8072999715805054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7177174091339112,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/KnockdownB"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8835699558258058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.118109941482544,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1798300743103029,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/KnockdownC",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7839503288269045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "leapslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03553299978375435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/LeapA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21222400665283204,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.253807008266449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Leap",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2949199974536896,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5813819766044617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7351771593093872,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/LeapB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7669439911842346,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8172221183776856,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Slam/Slam",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8405439853668213,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1989200115203858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "rock_toss_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.32128000259399416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44269999861717226,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5024799704551697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.881659984588623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/GruntShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9458315968513489,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9993399977684021,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0357836484909058,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8538895845413209,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/RockThrow/RockThrowBuildUp",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2508599758148195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5627999305725099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Roar",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.644627809524536,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/RockThrow/RockThrow"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.648191213607788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.756105661392212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8006575107574465,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.355710029602051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.014379999600350857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Run",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25449100136756899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33419299125671389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6169099807739258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/SkyBeam/SkyBeamStart",
+						"bone_name": "neck_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23587000370025636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Roar",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7098640203475952,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3333300352096558,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9921998977661135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spider_gyser_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.27570199966430666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.545628011226654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6001250147819519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/Roll",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6041968464851379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/MeleeSwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6331019997596741,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6958199739456177,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9035040140151978,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9838100075721741,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1054400205612183,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2751215696334839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/MeleeSwing",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3082900047302247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3447699546813965,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5914058685302735,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8574899435043336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0218899250030519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "aux_R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "summon_council_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.016100000590085985,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/Move",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18918099999427796,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3049609959125519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48858100175857546,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/AxeThrow",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6250990033149719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7143970131874085,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/Whoosh",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7859969735145569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1638599634170533,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2645900249481202,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Roar",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.090019941329956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08007899671792984,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.682233989238739,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Walk",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7992460131645203,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8894149661064148,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_spin_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28280940651893618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/GruntLonger",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2927300035953522,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30142998695373537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/ThrowWeapon/ThrowWeaponBuildUp",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41355836391448977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.671840250492096,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/ThrowWeapon/ThrowWeapon",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6931899785995483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1012699604034424,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1110600233078004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "holy_combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.21646000444889069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3835799992084503,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/GruntShort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5077300071716309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weapon_grd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8753900527954102,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9772499799728394,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/GruntShort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0059000253677369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1507400274276734,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4331916570663453,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4977099895477296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5454599857330323,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/GruntShort",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9557079076766968,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/LeapB",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9847499132156373,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weapon_mid"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1184399127960207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.20989990234375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2224621772766115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Slam/WeaponImpactGround",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2569100856781008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9611399173736574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "holy_rock_toss_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunk",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4688499867916107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weapon_mid"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6014699935913086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7882699966430664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2086244821548463,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/Roar",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.682098627090454,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weapon_mid"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7525999546051026,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/RockThrow/RockThrowBuildUp",
+						"bone_name": "neck_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7084999084472658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/RockThrow/RockThrow"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.715980052947998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weptrl_l1"
+					}
+				]
+			},
+			{
+				"name": "holy_leapslam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.18055999279022218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_r1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20613999664783479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21272000670433045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/LeapA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28363001346588137,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3489537835121155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Leap",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45495373010635378,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Empowered/EmpoweredSwing",
+						"bone_name": "aux_weapon_mid"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7412300109863281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/AxeSwing",
+						"bone_name": "aux_weptrl_l1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7712000012397766,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8033699989318848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/ArmourClunkShort",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8295903205871582,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Effects/Slam/Slam",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.833329975605011,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Vocals/LeapB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8421100378036499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderGuardBoss/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5411672592163086,
+						"end_time": 0.7801509499549866,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_r"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.47814100980758669,
+						"end_time": 0.5954644083976746,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_l"
+					}
+				]
+			},
+			{
+				"name": "axe_spin_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.3906547725200653,
+						"end_time": 0.7955112457275391,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5431584119796753,
+						"end_time": 0.9013935327529907,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.041637897491455,
+						"end_time": 1.374011754989624,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.8716620206832886,
+						"end_time": 2.196984052658081,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_l"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.8740116357803345,
+						"end_time": 2.3451175689697267,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_r"
+					}
+				]
+			},
+			{
+				"name": "cyclone_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.3797666132450104,
+						"end_time": 0.5427547693252564,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_l"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5728681683540344,
+						"end_time": 0.7058184146881104,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8861222863197327,
+						"end_time": 1.079148769378662,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_l"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.083514928817749,
+						"end_time": 1.3473451137542725,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.6692564487457276,
+						"end_time": 1.9309409856796265,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_l"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.7207504510879517,
+						"end_time": 2.0746946334838869,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_r"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.906095027923584,
+						"end_time": 2.530518054962158,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.356108546257019,
+						"end_time": 1.5982199907302857,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_axe_throw_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.205183506011963,
+						"end_time": 1.9392836093902588,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/onact_holy_trl.trl",
+						"bone_groups": [
+							"wep_r",
+							"wep_l"
+						]
+					}
+				]
+			},
+			{
+				"name": "leapslam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4330458641052246,
+						"end_time": 0.8779699802398682,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.4330458641052246,
+						"end_time": 0.8779699802398682,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_group": "wep_l"
+					}
+				]
+			},
+			{
+				"name": "rock_toss_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8072165846824646,
+						"end_time": 1.0827890634536744,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.6952621936798096,
+						"end_time": 2.517918348312378,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.6153366565704347,
+						"end_time": 3.0652811527252199,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_trl.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.5774056911468508,
+						"end_time": 2.9686858654022219,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_holy_trl.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_axe_spin_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.30545008182525637,
+						"end_time": 0.7919735908508301,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/onact_holy_02_trl.trl",
+						"bone_groups": [
+							"wep_r",
+							"wep_l"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5078886151313782,
+						"end_time": 0.8862416744232178,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/combo_holy_trl.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.0863152742385865,
+						"end_time": 1.3423993587493897,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/combo_holy_trl.trl",
+						"bone_group": "wep_r"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.852852463722229,
+						"end_time": 2.1998658180236818,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/combo_holy_trl.trl",
+						"bone_group": "wep_l"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.862254023551941,
+						"end_time": 2.268052577972412,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/combo_holy_trl.trl",
+						"bone_group": "wep_r"
+					}
+				]
+			},
+			{
+				"name": "holy_rock_toss_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7360271215438843,
+						"end_time": 1.1863272190093995,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/onact_holy_trl.trl",
+						"bone_groups": [
+							"wep_r",
+							"wep_l"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.721705436706543,
+						"end_time": 2.6305899620056154,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/onact_holy_trl.trl",
+						"bone_groups": [
+							"wep_r",
+							"wep_l"
+						]
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.6436409950256349,
+						"end_time": 3.1487059593200685,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/onact_holy_trl.trl",
+						"bone_groups": [
+							"wep_r",
+							"wep_l"
+						]
+					}
+				]
+			},
+			{
+				"name": "holy_leapslam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.35421237349510195,
+						"end_time": 0.8606915473937988,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/trl/melee_holy_trl.trl",
+						"bone_groups": [
+							"wep_l",
+							"wep_r"
+						]
+					}
+				]
+			}
+		]'
+	}
+
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.7632703185081482,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							11.445330619812012,
+							-125.45590209960938
+						],
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.2615511417388918,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							26.480405807495118,
+							-81.58150482177735
+						],
+						"inherit_scale": true,
+						"scale": [
+							1.149999976158142,
+							1.149999976158142,
+							1.149999976158142
+						],
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.0,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_deathimpact.ao",
+						"offset": [
+							18.26795196533203,
+							-23.8890380859375
+						],
+						"inherit_height": true,
+						"height": 120.25674438476563,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.15657250583171845,
+						"end_time": 3.1200499534606935,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_deathimpact.ao",
+						"animation": "loop",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 3.064344644546509,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_death_01.ao",
+						"offset": [
+							11.529022216796875,
+							-27.469497680664064
+						]
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.524066209793091,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_rock_toss.ao",
+						"offset": [
+							2.41290283203125,
+							-100.85809326171875
+						],
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "groundslam_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.5874180793762208,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_rock_toss.ao",
+						"offset": [
+							2.41290283203125,
+							-112.414794921875
+						],
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "holy_axe_throw_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.5075589418411255,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_holy_axethrow.ao",
+						"offset": [
+							0.9799184799194336,
+							40.36629104614258
+						],
+						"inherit_height": true,
+						"height": 273.24981689453127,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "rock_toss_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0639917850494385,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							-3.0899200439453127,
+							-136.0558624267578
+						],
+						"height": -0.3470458984375,
+						"orientation": 0.2617993950843811
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0663224458694459,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							37.004966735839847,
+							-136.11105346679688
+						]
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0905784368515015,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_rock_toss.ao",
+						"offset": [
+							-10.22308349609375,
+							-127.17106628417969
+						]
+					}
+				]
+			},
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.03312087059021,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_skybeam.ao",
+						"offset": [
+							14.645416259765625,
+							16.05351448059082
+						],
+						"height": 276.93597412109377,
+						"inherit_scale": true
+					}
+				]
+			},
+			{
+				"name": "holy_combo_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.7077520489692688,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_holycombo_swipes.ao",
+						"animation": "swipe_01",
+						"offset": [
+							0.0,
+							-37.253143310546878
+						],
+						"inherit_height": true,
+						"height": 135.0,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.1780163049697877,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_holycombo_swipes.ao",
+						"animation": "swipe_02",
+						"offset": [
+							0.0,
+							-37.253143310546878
+						],
+						"inherit_height": true,
+						"height": 135.0,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.139716625213623,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_holycombo_swipes.ao",
+						"animation": "swipe_03",
+						"offset": [
+							0.0,
+							10.91717529296875
+						],
+						"inherit_height": true,
+						"height": 135.0,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.270068645477295,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/leap_impact.ao",
+						"offset": [
+							20.25897216796875,
+							-105.9993896484375
+						],
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "holy_rock_toss_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0609588623046876,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							-7.752388000488281,
+							-135.81103515625
+						]
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0613102912902833,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/melee_impact.ao",
+						"offset": [
+							-48.55006408691406,
+							-136.79510498046876
+						],
+						"height": -0.3470458984375,
+						"orientation": 0.2617993950843811
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.0718058347702027,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/ao/onact_rock_toss.ao",
+						"offset": [
+							-1.3687744140625,
+							-137.06739807128907
+						]
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderGuardBoss/epk/boss_blood_death.epk"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_throw_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.1936444491147995,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.11916584521532059,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "holy_combo_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			}
+		]'
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "axe_spin_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.2330000400543215,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.559934 1 Linear 2.233 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.400000095367432,
+						"name": "releaseTime_L",
+						"curve": "3 0 0 Linear 0.1 0.5 Flat 4.4 0.5 Linear"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_throw_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.42 0 Linear 1.15 1 Flat 2.13164 1 Linear 2.13164 0 Linear 3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "sky_beam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 1.99241 1 Linear 3.0091 1 CustomSmooth 0 4 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_spin_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.2330000400543215,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 0.600606 1 Flat 1.43417 1 Flat 1.43417 0 Flat 2.233 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.2330000400543215,
+						"name": "releaseTime_L",
+						"curve": "3 0 0 Smooth 0.559934 1 Linear 2.233 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "holy_combo_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.2660000324249269,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 0.561266 1 Flat 2.45693 1 Flat 3.266 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "holy_rock_toss_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.6659998893737795,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 0.85 1 Linear 2.98593 1 Flat 3.666 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "holy_leapslam_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.219082 0 Linear 0.575 1 Flat 0.97 1 Flat 1.397 0 Linear 1.5 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.5771300196647644,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "axe_spin_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.786899983882904,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.7256699800491333,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.2182199954986573,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.787345290184021,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 3.0733799934387209,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.0,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.30125299096107485,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.5553534626960754,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.7623019218444824,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "rock_toss_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 3.3534600734710695,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.0,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.2559228539466858,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.5405458807945252,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.0,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 0.8091122508049011,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.572665810585022,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "holy_axe_spin_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.7799957394599915,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "holy_rock_toss_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 3.4372498989105226,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderSoldiers/attachments/TwilightMedVedBossCloakHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/Cloak/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/Cloak/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.700
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+		attachment_groups = "cloak_bone_group body_bone_group"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/Cloak/TwilightMedVedBossCloak.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "body_bone_group false root_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd head_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderSoldiers/attachments/TwilightMedVedBossLoinClothHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/LoinCloth/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/LoinCloth/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwollenMiller/attachments/LargeDualAxeBoss/LoinCloth/LargeDualAxeBossLoinCloth.sm"
+			LoinClothShape = "Art/Models/MONSTERS/LargeDualAxeBoss/Textures/TwilightMedVedc.mat"
+	}
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderTenderizerTwin/attachments/TwilightOrderTenderizerTwinWeapon.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/TwilightOrderTenderizer/attachments/Weapon/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/TwilightOrderTenderizer/attachments/Weapon/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/TwilightOrderTenderizer/attachments/Weapon/TenderizerTwinWeapon.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/SwollenMiller/TwilightMedVed.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/SwollenMiller/TwilightMedVedBoss_armour_eb43fc2e.smd"
+Materials 2
+	"Art/Models/MONSTERS/LargeDualAxeBoss/Textures/TwilightMedVedc.mat" 6
+	"Art/Textures/Monsters/TwilightOrderSoldiers/TwilightOrderOfficerc.mat" 1
+BoundingBox -93.5023 -31.4634 -183.647 93.5023 25.7819 0.922776
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/SwollenMiller/TwilightMedVedBoss_armour_eb43fc2e.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 7 in the header, 7 in the block · 12941 triangles over 9919 vertices
+  names: 210 bytes said, 210 read  [agree]
+
+=== shapes (12)
+0	arm_armourShape	from 0	count 7116
+1	BodyShape	from 7116	count 14292
+2	maskShape	from 21408	count 603
+3	shin_armourShape	from 22011	count 6108
+4	shouldercroissantsShape	from 28119	count 4812
+5	thigh_armourShape	from 32931	count 5484
+6	belt_buckleShape	from 38415	count 408
+7	BackChainAmuletShape	from 38823	count 1818
+8	BackChainShape	from 40641	count 168
+9	CloakShape	from 40809	count 2508
+10	LoinClothShape	from 43317	count 555
+11	TenderizerTwinWeaponShape	from 43872	count 2070
+
+=== fitting
+the monster's rig: 71 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  TwilightMedVedBossCloakHeld.ao  socket chest_jntBnd [in its carrier's rig]  box (-46.6,-36.6,-75.4)..(40.5,69.5,94.7)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 3 in the header, 3 in the block · 1498 triangles over 1218 vertices
+    names: 88 bytes said, 88 read  [agree]
+    rig 25 bones, 7 of them names its carrier's rig also has
+    mesh weights reach bone 23 of 25  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (12.6,0,-19.7)  carrier has (12.6,1.5,-152.5)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-12.6,0,-19.7)  carrier has (-12.6,1.5,-152.5)
+      3 neck_jntBnd  [shared]  under 0  rests at (0,-11.5,-21)  carrier has (0,-10,-153.8)
+      4 phys_skinned_R_cloth_01_jntBnd  [its own]  under 0  rests at (-27.9,17.3,-15.1)
+      5 phys_skinned_M_cloth_01_jntBnd  [its own]  under 0  rests at (0,17.3,-15.1)
+      6 phys_skinned_L_cloth_01_jntBnd  [its own]  under 0  rests at (27.9,17.3,-15.1)
+      7 phys_croissant_jntBnd  [its own]  under 0  rests at (0,17.3,-15.1)
+      8 L_shoulder_jntBnd  [shared]  under 1  rests at (28.5,0,-11.5)  carrier has (28.5,1.6,-144.3)
+      9 R_shoulder_jntBnd  [shared]  under 2  rests at (-28.5,0,-11.5)  carrier has (-28.5,1.6,-144.3)
+      10 head_jntBnd  [shared]  under 3  rests at (0,-19.2,-28)  carrier has (0,-17.6,-160.8)
+      11 phys_skinned_R_cloth_02_jntBnd  [its own]  under 4  rests at (-27.9,27.9,9.9)
+      12 phys_skinned_M_cloth_02_jntBnd  [its own]  under 5  rests at (0,27.9,9.9)
+      13 phys_skinned_L_cloth_02_jntBnd  [its own]  under 6  rests at (27.9,27.9,9.9)
+      14 phys_hood_jntBnd  [its own]  under 10  rests at (0.4,-1.5,-63)
+      15 phys_skinned_R_cloth_03_jntBnd  [its own]  under 11  rests at (-27.9,38.6,34.9)
+      16 phys_skinned_M_cloth_03_jntBnd  [its own]  under 12  rests at (0,38.6,34.9)
+      17 phys_skinned_L_cloth_03_jntBnd  [its own]  under 13  rests at (27.9,38.6,34.9)
+      18 phys_skinned_R_cloth_04_jntBnd  [its own]  under 15  rests at (-27.9,49.2,59.8)
+      19 phys_skinned_M_cloth_04_jntBnd  [its own]  under 16  rests at (0,49.2,59.8)
+      20 phys_skinned_L_cloth_04_jntBnd  [its own]  under 17  rests at (27.9,49.2,59.8)
+      21 phys_skinned_R_cloth_05_jntBnd  [its own]  under 18  rests at (-27.9,59.9,84.8)
+      22 phys_skinned_M_cloth_05_jntBnd  [its own]  under 19  rests at (0,59.9,84.8)
+      23 phys_skinned_L_cloth_05_jntBnd  [its own]  under 20  rests at (27.9,59.9,84.8)
+      24 aux_animation_control_ratio  [its own]  under 0  rests at (0,0,0)
+  TwilightMedVedBossLoinClothHeld.ao  socket hip_jntBnd [in its carrier's rig]  box (-25.6,-30,-4.3)..(25.3,-11.8,46.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 185 triangles over 116 vertices
+    names: 28 bytes said, 28 read  [agree]
+    rig 8 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_R_cloth_01_jntBnd  [its own]  under 0  rests at (-7.7,-18.3,11.4)
+      2 phys_skinned_L_cloth_01_jntBnd  [its own]  under 0  rests at (7.7,-18.3,11.4)
+      3 phys_skinned_R_cloth_02_jntBnd  [its own]  under 1  rests at (-7.7,-16.6,26)
+      4 phys_skinned_L_cloth_02_jntBnd  [its own]  under 2  rests at (7.7,-16.6,26)
+      5 phys_skinned_R_cloth_03_jntBnd  [its own]  under 3  rests at (-7.7,-14.8,40.5)
+      6 phys_skinned_L_cloth_03_jntBnd  [its own]  under 4  rests at (7.7,-14.8,40.5)
+      7 aux_animation_control_ratio  [its own]  under 0  rests at (0,0,0)
+  TwilightOrderTenderizerTwinWeapon.ao  socket R_Weapon [in its carrier's rig]  box (-36.2,-4.2,-73.7)..(11.3,4.2,31.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 690 triangles over 734 vertices
+    names: 50 bytes said, 50 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 weapon_jntBnd  [its own]  under 0  rests at (0,0,0)
+  TwilightOrderTenderizerTwinWeapon.ao  socket L_Weapon [in its carrier's rig]  box (-36.2,-4.2,-73.7)..(11.3,4.2,31.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 690 triangles over 734 vertices
+    names: 50 bytes said, 50 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 weapon_jntBnd  [its own]  under 0  rests at (0,0,0)

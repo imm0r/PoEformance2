@@ -1,0 +1,2781 @@
+monster: Quadrilla Sergeant [Metadata/Monsters/LeagueIncursionNew/MiniBosses/SoulCoreQuadrillaBoss/SoulCoreQuadrillaMinion]
+
+=== .ao Metadata/Monsters/LeagueIncursionNew/MiniBosses/SoulCoreQuadrillaBoss/SoulCoreQuadrilla.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Quadrilla/rig.amd"
+	view_of = "idle_01"
+		view_name = "fake_start"
+		view_end = 1
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8126320242881775,
+					"name": "contact",
+					"position": [
+						0.0,
+						-199.39700317382813,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "charge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.06772720068693161,
+					"name": "contact",
+					"position": [
+						35.76210021972656,
+						-197.16099548339845,
+						-3.659029960632324
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.14133299887180329,
+					"name": "contact",
+					"position": [
+						-40.44729995727539,
+						-169.50799560546876,
+						-7.787720203399658
+					]
+				}
+			]
+		},
+		{
+			"name": "charge_end_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0017582400469109417,
+					"end_time": 0.9164860248565674,
+					"name": "move",
+					"position": [
+						0.0,
+						-338.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 5 Away 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9321449995040894,
+					"name": "contact",
+					"position": [
+						2.4233999252319338,
+						-129.05099487304688,
+						-8.311670303344727
+					]
+				}
+			]
+		},
+		{
+			"name": "death_pillar_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.9019700288772584,
+					"name": "crush"
+				}
+			]
+		},
+		{
+			"name": "heavy_slam_pillar_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.9426788091659546,
+					"name": "start_target_update",
+					"data": "155 0 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.0,
+					"end_time": 1.2000000476837159,
+					"name": "move",
+					"position": [
+						0.0,
+						-50.70100021362305,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.16225004196167,
+					"name": "rect_slam",
+					"position": [
+						10.707799911499024,
+						-35.42499923706055,
+						0.0
+					],
+					"contact_ref": [
+						-1.8058600425720215,
+						-480.34100341796877,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1674100160598755,
+					"name": "sunder",
+					"position": [
+						17.953899383544923,
+						-480.34100341796877,
+						0.0
+					],
+					"contact_ref": [
+						27.363300323486329,
+						-667.2949829101563,
+						0.0
+					]
+				},
+				{
+					"type": "MoveEventType",
+					"time": 2.0,
+					"end_time": 2.4000000953674318,
+					"name": "move",
+					"position": [
+						0.0,
+						50.70100021362305,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "roll_pillar_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 1.2999999523162842,
+					"name": "move",
+					"data": "1 0 0 Everything 0 10 Away 1.000000"
+				}
+			]
+		},
+		{
+			"name": "spin_slam_pillar_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.8809549808502197,
+					"end_time": 1.4064722061157227,
+					"name": "start_target_update",
+					"data": "180 -90 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.3300000429153443,
+					"end_time": 2.8299999237060549,
+					"name": "move",
+					"position": [
+						0.0,
+						-292.0,
+						0.0
+					],
+					"data": "1 1 0 Everything 0 5 Away 1.000000"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.830989956855774,
+					"end_time": 2.6284987926483156,
+					"name": "start_target_update",
+					"data": "180 -90 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.621109962463379,
+					"name": "rect_slam",
+					"position": [
+						-10.379300117492676,
+						-104.73400115966797,
+						0.0
+					],
+					"contact_ref": [
+						-28.130699157714845,
+						-538.0269775390625,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.671109914779663,
+					"name": "sunder",
+					"position": [
+						-28.130699157714845,
+						-538.0269775390625,
+						0.0
+					],
+					"contact_ref": [
+						-28.130699157714845,
+						-538.0269775390625,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "sweep_slam_pillar_left_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.1656689643859865,
+					"name": "rect_slam",
+					"position": [
+						58.32040023803711,
+						-18.131500244140626,
+						0.0
+					],
+					"contact_ref": [
+						293.4079895019531,
+						-374.4309997558594,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2125000953674318,
+					"name": "sunder",
+					"position": [
+						293.4079895019531,
+						-374.4309997558594,
+						0.0
+					],
+					"contact_ref": [
+						317.4020080566406,
+						-412.4309997558594,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "sweep_slam_pillar_right_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.941101312637329,
+					"name": "rect_slam",
+					"position": [
+						-59.75279998779297,
+						2.9033100605010988,
+						0.0
+					],
+					"contact_ref": [
+						-391.1650085449219,
+						-305.31298828125,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "sunder",
+					"position": [
+						-388.6561584472656,
+						-302.80413818359377,
+						0.0
+					],
+					"contact_ref": [
+						-426.56121826171877,
+						-340.7548522949219,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "throw_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.1145999431610108,
+					"name": "contact"
+				},
+				{
+					"type": "StartFaceEventType",
+					"time": 2.690459966659546,
+					"name": "start_face",
+					"data": "0 0 -1"
+				},
+				{
+					"type": "EndFaceEventType",
+					"time": 3.380079984664917,
+					"name": "end_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5603599548339845,
+					"name": "throw",
+					"position": [
+						-150.56399536132813,
+						-112.25,
+						-224.13400268554688
+					]
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_pillar_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4384615421295166,
+								0.0
+							],
+							[
+								0.4615384638309479,
+								0.3120300769805908
+							],
+							[
+								0.48846152424812319,
+								0.7706766724586487
+							],
+							[
+								0.5115384459495544,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 12,
+						"angle": 3.5779199600219728,
+						"x_axis_scale": 0.949999988079071,
+						"length": 329.4800109863281,
+						"local_offset": [
+							42.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.5410521030426025,
+							3.4208455085754396
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "aux_melee_03"
+					}
+				]
+			}
+		},
+		{
+			"name": "roll_pillar_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.33076924085617068,
+								0.0
+							],
+							[
+								0.3384615480899811,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 6,
+						"angle": 6.2831854820251469,
+						"length": 125.0
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.3720000088214874,
+								0.0
+							],
+							[
+								0.3840000033378601,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 6,
+						"angle": 6.2831854820251469,
+						"length": 125.0
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.42399999499320986,
+								0.0
+							],
+							[
+								0.4320000112056732,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 6,
+						"angle": 6.2831854820251469,
+						"length": 125.0
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.48399999737739565,
+								0.0
+							],
+							[
+								0.492000013589859,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 6,
+						"angle": 6.2831854820251469,
+						"length": 125.0
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.527999997138977,
+								0.0
+							],
+							[
+								0.5400000214576721,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 6,
+						"angle": 6.2831854820251469,
+						"length": 125.0
+					}
+				]
+			}
+		},
+		{
+			"name": "spin_slam_pillar_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.23461538553237916,
+								0.0
+							],
+							[
+								0.25,
+								0.4060150384902954
+							],
+							[
+								0.26538461446762087,
+								0.7819548845291138
+							],
+							[
+								0.2846153974533081,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 8,
+						"update_target_direction": true,
+						"rotation": 0.5934119820594788,
+						"angle": 3.961899995803833,
+						"x_axis_scale": 0.9359999895095825,
+						"length": 372.5,
+						"offset": [
+							69.0,
+							0.0
+						],
+						"local_offset": [
+							3.0,
+							-18.0
+						],
+						"impact_z_rotation": [
+							-0.12217305600643158,
+							3.0543265342712404
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "aux_melee_03"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.40400001406669619,
+								0.0
+							],
+							[
+								0.41600000858306887,
+								0.2969924807548523
+							],
+							[
+								0.4320000112056732,
+								0.6278195381164551
+							],
+							[
+								0.4519999921321869,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"defer_damage_prediction": true,
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 8,
+						"update_target_direction": true,
+						"rotation": -0.12217305600643158,
+						"angle": 3.473205327987671,
+						"x_axis_scale": 0.9190000295639038,
+						"length": 347.0369873046875,
+						"impact_z_rotation": [
+							-0.6632251739501953,
+							2.3387413024902345
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "aux_melee_03"
+					}
+				]
+			}
+		},
+		{
+			"name": "sweep_slam_pillar_left_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.26923078298568728,
+								0.0
+							],
+							[
+								0.2807692289352417,
+								0.44360899925231936
+							],
+							[
+								0.2884615361690521,
+								0.6428571343421936
+							],
+							[
+								0.30000001192092898,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 12,
+						"angle": 3.1415927410125734,
+						"x_axis_scale": 0.949999988079071,
+						"length": 360.0,
+						"offset": [
+							73.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.24434611201286317,
+							3.0368731021881105
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "sweep_slam_pillar_right_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.23846153914928437,
+								0.0
+							],
+							[
+								0.2461538463830948,
+								0.2368420958518982
+							],
+							[
+								0.2538461685180664,
+								0.48120301961898806
+							],
+							[
+								0.26153847575187685,
+								0.6127819418907166
+							],
+							[
+								0.29615384340286257,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"push_targets": true,
+						"pushiness_modifier": 10,
+						"push_distance_limit": 12,
+						"angle": 3.1415927410125734,
+						"x_axis_scale": 0.9850000143051148,
+						"length": 370.0,
+						"offset": [
+							-5.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							0.13962635397911073,
+							-2.478367567062378
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "chest_jntBnd Metadata/Monsters/Quadrilla/attachments/SoulCoreQuadrillaFeathers.ao"
+	attached_object = "R_Weapon Metadata/Monsters/Quadrilla/Ice/SoulCoreQuadrillaGemHeld.ao"
+		attached_object_translation = "0 0 -55"
+		attached_object_rotation = "-3.141 -0 0"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Quadrilla/rig.ast"
+		socket = "aux_melee_01"
+			parent = "root_jntBnd"
+			translation = "0 0 -126.381"
+		socket = "aux_melee_02"
+			parent = "root_jntBnd"
+			translation = "-76.0266 0 -175.193"
+		socket = "aux_melee_03"
+			parent = "root_jntBnd"
+			translation = "68.6847 0 -175.193"
+		socket = "aux_spittle_back"
+			parent = "head_jntBnd"
+			translation = "0 0 8.21244"
+		socket = "aux_spittle_front"
+			parent = "head_jntBnd"
+			translation = "0 -15.5204 12.3859"
+		socket = "aux_R_weapon_fwd"
+			parent = "R_Weapon"
+			translation = "0 0 -185"
+		socket = "aux_L_lower_weapon_back"
+			parent = "L_lower_Weapon"
+			translation = "56.7941 0 0"
+		socket = "aux_R_weapon_back"
+			parent = "R_Weapon"
+			translation = "56.7941 0 0"
+		socket = "aux_R_weapon_front"
+			parent = "R_Weapon"
+			translation = "-57 0 0"
+		socket = "aux_L_lower_weapon_front"
+			parent = "L_lower_Weapon"
+			translation = "-56 0 0"
+		socket = "aux_pillar_grd_01"
+			translation = "0 -205 0"
+		socket = "aux_pillar_grd_02"
+			translation = "-50 -205 0"
+		socket = "aux_pillar_grd_03"
+			translation = "50 -205 0"
+		socket = "aux_grd_hand_impact"
+			translation = "0 -49.0251 0"
+		socket = "aux_pillar_head"
+			parent = "R_Weapon"
+			translation = "-10 0 140"
+		linear_allowed_contraction = 0.300
+	}
+	
+	AnimatedRender
+	{
+		scale = 1.200000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Quadrilla/SoulCoreQuadrilla.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false chest_jntBnd L_lower_clavicle_jntBnd L_lower_shoulder_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_lower_clavicle_jntBnd R_lower_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+		bone_group = "melee false aux_melee_01 aux_melee_02"
+		bone_group = "melee_02 false aux_melee_01 aux_melee_03"
+		bone_group = "melee_trail_r_01 false R_elbow_Twist_jntBnd_1 R_wrist_jntBnd R_finger_2_jntBnd_3"
+		bone_group = "melee_trail_r_02 false R_lower_elbow_Twist_jntBnd_1 R_lower_wrist_jntBnd R_lower_finger_2_jntBnd_3"
+		bone_group = "melee_trail_l_01 false L_elbow_Twist_jntBnd_1 L_wrist_jntBnd L_finger_2_jntBnd_3"
+		bone_group = "melee_trail_l_02 false L_lower_elbow_Twist_jntBnd_1 L_lower_wrist_jntBnd L_lower_finger_2_jntBnd_3"
+		bone_group = "grp_r_bttm_palm false R_lower_wrist_jntBnd R_lower_finger_2_jntBnd_1"
+		bone_group = "spittle_line false aux_spittle_back aux_spittle_front"
+		bone_group = "grp_l_bttm_palm false L_lower_wrist_jntBnd L_lower_finger_2_jntBnd_1"
+		bone_group = "grp_pillar_along false R_Weapon aux_R_weapon_fwd"
+		bone_group = "grp_L_lower_back_01 false aux_L_lower_weapon_back"
+		bone_group = "grp_L_lower_weapon false L_lower_Weapon aux_L_lower_weapon_back"
+		bone_group = "grp_R_weapon false R_Weapon aux_R_weapon_back"
+		bone_group = "grp_R_stick false aux_R_weapon_front aux_R_weapon_back"
+		bone_group = "grp_L_stick false aux_L_lower_weapon_front aux_L_lower_weapon_back"
+		bone_group = "grp_mirror false R_Weapon"
+		bone_group = "grp_pillar_grd_01 false aux_pillar_grd_01 aux_pillar_grd_02"
+		bone_group = "grp_pillar_grd_02 false aux_pillar_grd_01 aux_pillar_grd_03"
+		bone_group = "grp_hand_impact false aux_grd_hand_impact"
+		bone_group = "grp_l_palm false L_wrist_jntBnd L_Weapon"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_r_palm false R_wrist_jntBnd R_Weapon"
+		bone_group = "grp_l_toe false L_foot_jntBnd L_toe_jntBnd_1"
+		bone_group = "grp_r_toe false R_foot_jntBnd R_toe_jntBnd_1"
+		bone_group = "grp_pillar_full false aux_pillar_head aux_R_weapon_fwd"
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "death_pillar_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.05148205906152725,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/death_brain.ao",
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.23781365156173707,
+						"ao_type": "Metadata/Effects/Microtransactions/pets/Quadrilla/ao/emerge.ao",
+						"inherit_scale": true
+					}
+				]
+			},
+			{
+				"name": "idle_relaxed_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.3720117211341858,
+						"ao_type": "Metadata/Effects/Microtransactions/pets/Quadrilla/ao/pound_impact.ao",
+						"offset": [
+							-10.479293823242188,
+							-107.33856201171875
+						],
+						"inherit_scale": true
+					},
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.08577561378479,
+						"ao_type": "Metadata/Effects/Microtransactions/pets/Quadrilla/ao/pound_impact_weak.ao",
+						"offset": [
+							0.0,
+							-55.44652557373047
+						],
+						"inherit_scale": true
+					}
+				]
+			},
+			{
+				"name": "idle_relaxed_02",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.6605138778686523,
+						"end_time": 6.858480453491211,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/ao/pillar.ao",
+						"animation": "idle",
+						"from": {
+							"parent_bone": "R_Weapon"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "idle_relaxed_03",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.7400656938552857,
+						"ao_type": "Metadata/Effects/Microtransactions/pets/Quadrilla/ao/hand_grd_decal.ao",
+						"offset": [
+							-24.277416229248048,
+							0.18314361572265626
+						],
+						"inherit_scale": true
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 1.9449344873428345,
+						"end_time": 7.840793132781982,
+						"filename": "Metadata/Pet/QuadrillaPet/MirrorOfKalandra.ao",
+						"from": {
+							"parent_bone": "R_Weapon"
+						},
+						"offset": {
+							"rotation": [
+								3.141589879989624,
+								1.3438999652862549,
+								3.141589879989624
+							],
+							"scale": [
+								2.5,
+								2.5,
+								2.5
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06613220274448395,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Attack_01",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45942583680152895,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "L_toe_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5636348724365234,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Sweep",
+						"bone_name": "R_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5942216515541077,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Swish_Big",
+						"bone_name": "R_lower_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.129870057106018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.435670256614685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "R_lower_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.469414472579956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "R_toe_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.651650071144104,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_lower_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.655431866645813,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "R_toe_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09612994641065598,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "L_toe_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2661319971084595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Attack_02",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46379515528678896,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4687889516353607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Swish_Big",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.230970025062561,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5106111764907838,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "R_toe_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5418227910995484,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "R_lower_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5967538356781006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_lower_finger_3_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "attack_pillar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Pillar",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6761869788169861,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Sweep",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.540470004081726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5489221811294556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.775879979133606,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.932889699935913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_lower_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9788602590560914,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_finger_2_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "charge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Charge",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.007708451710641384,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "R_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.021671025082468988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "R_lower_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21947376430034638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "R_toe_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3150300979614258,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "L_toe_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40375038981437685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.42338502407073977,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_lower_finger_3_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "charge_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0008241760078817606,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Charge_End",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4788469970226288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Whoosh",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7392849922180176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Impact",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.942031979560852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09148400276899338,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1293960064649582,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.786266028881073,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/FallSoft",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4781525731086731,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Death",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8320855498313904,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/FallSoft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9650436043739319,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_thumb_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1223474740982056,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_pillar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09286200255155564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3280220031738281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9956089854240418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2453800439834595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6129599809646607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Fall",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9146100282669068,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Impact",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9624099731445313,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Head_Crush",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9887800216674805,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Impact",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.286139965057373,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/FallSoft",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.19878622889518739,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Fall",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7325220108032227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/FallSoft",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_pillar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06506480276584625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Lift",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6546189785003662,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3596800565719605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6851767301559449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_lower_finger_2_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.748769998550415,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7787950038909913,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9868700504302979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Aggro",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_heavy_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_shoulder_cTwist_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.019645467400550844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/FlinchHeavy",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28245919942855837,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3641965389251709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_lower_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3667290210723877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_shoulder_cTwist_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39169761538505556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43371206521987917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/FallSoft"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6346999406814575,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7958793044090271,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4467639923095704,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.570359230041504,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Heavy_Slam",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9701197147369386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Swish_Big",
+						"bone_name": "L_lower_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.096524715423584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Chest_Hit",
+						"bone_name": "L_lower_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.230595111846924,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Chest_Hit",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_pillar_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_pillar_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_pillar_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_pillar_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_pillar_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "heavy_slam_pillar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Heavy_Slam",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4234760105609894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8446440100669861,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Whoosh",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.116271734237671,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Impact",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.125220537185669,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Effects/SoulCoreSlam",
+						"bone_name": "aux_pillar_grd_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2393300533294678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0143399238586427,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.136620044708252,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Lift",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.630079984664917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0695700645446779,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5777699947357179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1886419951915741,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Idle",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_pillar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.21020999550819398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Idle",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "pre_emerge_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.41130900382995608,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Idle",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.951970100402832,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Idle",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "roll_pillar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Lift",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11766530573368073,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Swish_Big",
+						"bone_name": "phys_skinned_R_fur_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24831444025039674,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Fall",
+						"bone_name": "phys_skinned_R_fur_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.348938912153244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "L_lower_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4799935519695282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/FallSoft",
+						"bone_name": "phys_skinned_R_fur_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5225965976715088,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "R_lower_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.669475257396698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.731960117816925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7323653101921082,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7591448426246643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_lower_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8122971653938294,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "phys_skinned_R_fur_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8232523798942566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_finger_3_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Charge",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_pillar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Charge",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "L_lower_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07130704075098038,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "R_lower_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2798349857330322,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4342924654483795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_finger_3_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5081536769866943,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_lower_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5125280022621155,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5330780148506165,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "L_lower_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.606814980506897,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "R_lower_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8098909854888916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9942319989204407,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Soft",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spin_slam_pillar_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.03654789924621582,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Charge_End",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39019399881362917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Chest_Hit",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5559089779853821,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Chest_Hit",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7477480173110962,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8810529112815857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Spin_A",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1574599742889405,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Sweep",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4842499494552613,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8243399858474732,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9861199855804444,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Spin_B",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.096440076828003,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2851500511169435,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Sweep",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5035901069641115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.563110113143921,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Spin_Slam",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7861599922180177,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9446499347686769,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Step_Hard",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3453121185302736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Whoosh",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.568303108215332,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Impact",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5887999534606935,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Effects/SoulCoreSlam",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.805389881134033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.113450050354004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.125820159912109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Lift",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.329520225524902,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.8223700523376469,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.281000137329102,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					}
+				]
+			},
+			{
+				"name": "sweep_slam_pillar_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Sweep",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2678230106830597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7531980276107788,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Sweep",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4924399852752686,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8610299825668336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Whoosh",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.088383913040161,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Impact",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1096582412719728,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Effects/SoulCoreSlam",
+						"bone_name": "aux_pillar_grd_01"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.323349952697754,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Lift",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5199899673461916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1588499546051027,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4447500705718996,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.70100998878479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sweep_slam_pillar_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Sweep",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3271639943122864,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6674839854240418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Sweep",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.441890001296997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6519936323165894,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Whoosh",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8564820289611817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Impact",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.884228229522705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Effects/SoulCoreSlam",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2483201026916506,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Lift",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.552949905395508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.020390033721924,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3590400218963625,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.590320110321045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "throw_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39109399914741518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Foley",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5209789872169495,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Lift",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7109699845314026,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.335260033607483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Throw",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6360199451446534,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Movement",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.041949987411499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Foley/Pillar_Whoosh",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6746299266815187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/MiniBosses/SoulCoreQuadrilla/Vocal/Grunt",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "idle_relaxed_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9306077361106873,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/pound_chest_pt.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.0885623693466187,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/pound_chest_pt.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1285268068313599,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/pound_chest_pt.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.3321566581726075,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/pound_chest_pt.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.5338833332061768,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/pound_chest_pt.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "idle_relaxed_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.708377480506897,
+						"end_time": 5.47265625,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/pillar_dirt_down.pet",
+						"bone_group": "grp_pillar_along"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7275228500366211,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/pillar_grd_hand_impact.pet",
+						"bone_group": "grp_hand_impact"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7370949983596802,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/pillar_dirt_grd.pet",
+						"bone_groups": [
+							"grp_pillar_grd_01",
+							"grp_pillar_grd_02"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7573018670082092,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/pillar_dirt_along.pet",
+						"bone_group": "grp_pillar_along"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 6.846955299377441,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/pillar_impact.pet",
+						"bone_group": "grp_l_palm"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 6.855800151824951,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/pillar_dust_impact.pet",
+						"bone_group": "grp_pillar_along"
+					}
+				]
+			},
+			{
+				"name": "idle_relaxed_03",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7534480094909668,
+						"end_time": 10.409217834472657,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/idle_03_stick.pet",
+						"bone_group": "grp_L_lower_weapon"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.3715054988861086,
+						"end_time": 3.6309566497802736,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/hand_dirt_down.pet",
+						"bone_group": "grp_r_palm"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.6171295642852785,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/stick_dirt_along.pet",
+						"bone_group": "grp_L_stick"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.6941049098968508,
+						"end_time": 7.766489028930664,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/idle_03_mirror_ambient.pet",
+						"bone_group": "grp_r_palm"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 7.3444905281066898,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/idle_03_magic_weak.pet",
+						"bone_group": "grp_L_lower_back_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 7.758227348327637,
+						"end_time": 9.25,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/idle_03_stick_ambient.pet",
+						"bone_group": "grp_R_stick"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 7.817515850067139,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/idle_03_magic.pet",
+						"bone_group": "grp_L_lower_back_01"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 7.824256896972656,
+						"end_time": 10.34904670715332,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/idle_03_stick_copy.pet",
+						"bone_group": "grp_R_weapon"
+					}
+				]
+			},
+			{
+				"name": "roll_pillar_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4451637864112854,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/fx/roll_dust.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0587543249130249,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/footstep.pet",
+						"bone_group": "grp_l_toe"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5038183331489563,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/pet/footstep.pet",
+						"bone_group": "grp_r_toe"
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "idle_relaxed_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.9762817621231079,
+						"frequency": 85.0,
+						"amplitude": 2.0,
+						"duration": 0.10000000149011612
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.1171083450317383,
+						"frequency": 85.0,
+						"amplitude": 1.0,
+						"duration": 0.10000000149011612
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.1532666683197022,
+						"frequency": 85.0,
+						"amplitude": 1.0,
+						"duration": 0.10000000149011612
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.3568964004516602,
+						"frequency": 85.0,
+						"amplitude": 1.0,
+						"duration": 0.10000000149011612
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 1.564332365989685,
+						"frequency": 85.0,
+						"amplitude": 2.0,
+						"duration": 0.10000000149011612
+					}
+				]
+			},
+			{
+				"name": "idle_relaxed_03",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 7.88351583480835,
+						"frequency": 85.0,
+						"amplitude": 4.0,
+						"duration": 0.3499999940395355,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "surgeTime_R",
+						"curve": "3 0 1 Linear 0.288574 0.179054 Linear 2.333 0.179054 Linear"
+					}
+				]
+			},
+			{
+				"name": "idle_relaxed_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 11.065999984741211,
+						"name": "releaseTime_R",
+						"curve": "5 0 0 Linear 6.79497 0 Linear 7.57536 1 Flat 9.60014 1 Linear 11.066 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "idle_relaxed_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 1.9321993589401246,
+						"end_time": 10.666000366210938,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "7 1.9322 0 Linear 7.32738 0 Linear 7.41307 1 Linear 7.57127 0 Linear 7.80856 0 Linear 7.86789 1 Linear 10.666 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 7.385571002960205,
+						"end_time": 9.0,
+						"name": "surgeTime_L",
+						"curve": "6 7.38557 1 Linear 7.38557 0 Linear 7.80769 0 Flat 7.85 0 Linear 7.85 1 Linear 9 0 Flat"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 7.385571479797363,
+						"end_time": 8.723761558532715,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 7.38557 0 Linear 7.4 1 Linear 7.73546 0 Flat 7.85 0 Linear 7.85 1 Linear 8.72376 0 Flat"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			usage_frequency = 1
+			bone_name = "head_jntBnd"
+			state = "on"
+				colour = "0.547147 0.0533642 0.0294892"
+				position = "0 -50 0"
+				radius = 358
+			state = "off"
+				default_state = true
+				position = "0 -50 0"
+				radius = 200
+				distance_threshold = 100
+		light = "point_light"
+			usage_frequency = 1
+			bone_name = "R_Weapon"
+			randomise_start_time = true
+			state = "mirror_on"
+				colour = "0.547414 0.76842 1.68416"
+				position = "0 0 -15"
+				radius = 75
+				style = 1
+				distance_threshold = 85
+			state = "mirror_off"
+				default_state = true
+				position = "0 0 -25"
+				radius = 50
+				style = 1
+				distance_threshold = 50
+		animations = '[
+			{
+				"name": "idle_relaxed_03",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 2.558629035949707,
+						"state_name": "mirror_on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 7.872696399688721,
+						"state_name": "mirror_off"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Microtransactions/pets/Quadrilla/epk/fade.epk"
+					}
+				]
+			},
+			{
+				"name": "heavy_slam_pillar_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6723837852478027,
+						"end_time": 1.0298413038253785,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/fx/melee_soulcore.trl",
+						"bone_group": "grp_pillar_along"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6817500591278076,
+						"end_time": 0.9861677885055542,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/fx/melee_soulcore2.trl",
+						"bone_group": "melee_trail_l_02"
+					}
+				]
+			},
+			{
+				"name": "attack_pillar_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.9809961915016174,
+						"end_time": 1.3258999586105347,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/fx/melee_soulcore.trl",
+						"bone_group": "grp_pillar_full"
+					}
+				]
+			},
+			{
+				"name": "heavy_slam_pillar_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.1192258596420289,
+						"end_time": 1.3143112659454346,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/fx/melee_soulcore.trl",
+						"bone_group": "grp_pillar_full"
+					}
+				]
+			},
+			{
+				"name": "spin_slam_pillar_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.35764479637146,
+						"end_time": 1.7034016847610474,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/fx/melee_soulcore.trl",
+						"bone_group": "grp_pillar_full"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.393141746520996,
+						"end_time": 2.757300615310669,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/fx/melee_soulcore.trl",
+						"bone_group": "grp_pillar_full"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 3.5666921138763429,
+						"end_time": 3.8158020973205568,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/fx/melee_soulcore.trl",
+						"bone_group": "grp_pillar_full"
+					}
+				]
+			},
+			{
+				"name": "sweep_slam_pillar_left_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.0670832395553589,
+						"end_time": 1.1985303163528443,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/fx/melee_soulcore.trl",
+						"bone_group": "grp_pillar_full"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.1029670238494875,
+						"end_time": 2.2656166553497316,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/fx/melee_soulcore.trl",
+						"bone_group": "grp_pillar_full"
+					}
+				]
+			},
+			{
+				"name": "sweep_slam_pillar_right_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8664575219154358,
+						"end_time": 1.0693938732147217,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/fx/melee_soulcore.trl",
+						"bone_group": "grp_pillar_full"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.8673218488693238,
+						"end_time": 1.99590265750885,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/SoulCoreQuadrilla/fx/melee_soulcore.trl",
+						"bone_group": "grp_pillar_full"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Quadrilla/attachments/SoulCoreQuadrillaFeathers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Quadrilla/attachments/Feathered/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Quadrilla/attachments/Feathered/rig.ast"
+		linear_allowed_contraction = 0.100
+		bend_stiffness = 500.000
+		enclosure_angle = 0.200
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Quadrilla/attachments/Feathered/SoulCoreQuadrillaFeathers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/Quadrilla/Ice/SoulCoreQuadrillaGemHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/Quadrilla/attachments/QuadrillaArctic/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/Quadrilla/attachments/QuadrillaArctic/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/Quadrilla/attachments/QuadrillaArctic/QuadrillaArctic_Weapon.sm"
+			QuadrillaArcticWeaponShape = "Art/Models/MONSTERS/Quadrilla/Textures/SoulCoreQuadrillaWeapon.mat:0"
+	}
+	
+	AnimatedRender
+	{
+		x_scale = 1.100000
+		y_scale = 1.100000
+		z_scale = 1.400000
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/Quadrilla/SoulCoreQuadrilla.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/Quadrilla/SoulCoreQuadrilla_armour_0bad8f53.smd"
+Materials 3
+	"Art/Models/MONSTERS/Quadrilla/Textures/SoulCoreQuadrillaGemc.mat" 1
+	"Art/Models/MONSTERS/Quadrilla/Textures/SoulCoreQuadrillaWc.mat" 2
+	"Art/Models/Pet/QuadrillaPet/textures/SoulCoreVaalArmourKitc.mat" 1
+BoundingBox -221.323 -44.1176 -232.182 221.321 53.9383 0.506927
+BoneGroups 27
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "spine_1_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd_1"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd_1"
+	"grp_l_clavicle_02" 2 "L_lower_clavicle_jntBnd" "L_lower_shoulder_jntBnd"
+	"grp_r_clavicle_02" 2 "R_lower_clavicle_jntBnd" "R_lower_shoulder_jntBnd"
+	"grp_l_bicep_02" 2 "L_lower_shoulder_jntBnd" "L_lower_elbow_jntBnd"
+	"grp_r_bicep_02" 2 "R_lower_shoulder_jntBnd" "R_lower_elbow_jntBnd"
+	"grp_l_forearm_02" 2 "L_lower_elbow_jntBnd" "L_lower_wrist_jntBnd"
+	"grp_r_forearm_02" 2 "R_lower_elbow_jntBnd" "R_lower_wrist_jntBnd"
+	"grp_l_palm_02" 2 "L_lower_wrist_jntBnd" "L_lower_finger_2_jntBnd_1"
+
+=== .smd Art/Models/MONSTERS/Quadrilla/SoulCoreQuadrilla_armour_0bad8f53.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 4 in the header, 4 in the block · 15573 triangles over 12459 vertices
+  names: 138 bytes said, 138 read  [agree]
+
+=== shapes (6)
+0	GemsShape	from 0	count 1338
+1	QuadrillaW_Beard_EditedShape	from 1338	count 948
+2	QuadrillaW_v02_BodyShape	from 2286	count 20346
+3	opqShape	from 22632	count 24087
+4	feathers_meshShape	from 46719	count 1068
+5	QuadrillaArcticWeaponShape	from 47787	count 3324
+
+=== fitting
+the monster's rig: 126 bones
+mounts: aux_position, aux_head_jntBnd
+  SoulCoreQuadrillaFeathers.ao  socket chest_jntBnd [in its carrier's rig]  box (-50.3,12,-97)..(45.3,81.4,-43)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 356 triangles over 416 vertices
+    names: 36 bytes said, 36 read  [agree]
+    rig 5 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_L_feathers_jntBnd_1  [its own]  under 0  rests at (14.2,30.2,-65.8)
+      2 phys_R_feathers_jntBnd_1  [its own]  under 0  rests at (-14.2,30.2,-65.8)
+      3 phys_L_feathers_jntBnd_2  [its own]  under 1  rests at (20.8,55.8,-69.3)
+      4 phys_R_feathers_jntBnd_2  [its own]  under 2  rests at (-20.8,55.8,-69.3)
+  SoulCoreQuadrillaGemHeld.ao  socket R_Weapon [in its carrier's rig]  attached_object_translation = "0 0 -55"  attached_object_rotation = "-3.141 -0 0"  box (-37.5,-37.4,-192.2)..(37.5,37.4,102.1)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 1108 triangles over 701 vertices
+    names: 52 bytes said, 52 read  [agree]
+    rig 3 bones, 2 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 weapon_jntBnd  [its own]  under 0  rests at (0,0,0)
+      2 aux_position  [shared]  under 0  rests at (0,0,0)  carrier has (0,0,0)

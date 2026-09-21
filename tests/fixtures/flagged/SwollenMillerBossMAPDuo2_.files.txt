@@ -1,0 +1,2078 @@
+monster: Colm, the Rancorous [Metadata/Monsters/SwollenMiller/SwollenMillerBossMAPDuo2_]
+
+=== .ao Metadata/Monsters/SwollenMiller/SwollenMillerMAP.ao (depth 0)
+version 3
+extends "Metadata/Monsters/SwollenMiller/SwollenMiller"
+
+AnimationController
+{
+	animations = '[
+		{
+			"name": "charge_start_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.7596923112869263,
+					"end_time": 0.9855512976646423,
+					"name": "start_target_update",
+					"data": "80 0 1"
+				}
+			]
+		},
+		{
+			"name": "slam_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.935366153717041,
+					"end_time": 1.4198838472366334,
+					"name": "start_target_update",
+					"data": "100 0 1"
+				}
+			]
+		}
+	]'
+}
+
+=== .ao Metadata/Monsters/SwollenMiller/SwollenMiller.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwollenMiller/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 2.4275400638580324,
+					"name": "face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5388801097869875,
+					"name": "damage",
+					"position": [
+						60.52949905395508,
+						-87.9677963256836,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "charge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.010099800303578377,
+					"name": "trample"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.05127570033073425,
+					"name": "tutorial_pause"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.09814699739217758,
+					"name": "trample"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.15236100554466248,
+					"name": "tutorial_pause"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.20000000298023225,
+					"name": "trample"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.25843900442123415,
+					"name": "tutorial_pause"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.27847400307655337,
+					"name": "right_step"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.30000001192092898,
+					"name": "trample"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.35827600955963137,
+					"name": "tutorial_pause"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4000000059604645,
+					"name": "trample"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.45894598960876467,
+					"name": "tutorial_pause"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5,
+					"name": "trample"
+				}
+			]
+		},
+		{
+			"name": "charge_end_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.26620787382125857,
+					"name": "move",
+					"position": [
+						0.0,
+						-83.49199676513672,
+						0.0
+					],
+					"data": "0 0 0 Everything 0 0 Away 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.2150000035762787,
+					"name": "swipe",
+					"position": [
+						0.4380519986152649,
+						-117.00299835205078,
+						-156.34500122070313
+					]
+				}
+			]
+		},
+		{
+			"name": "charge_start_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.7689999938011169,
+					"end_time": 0.9884999990463257,
+					"name": "move",
+					"position": [
+						0.0,
+						-72.0,
+						0.0
+					],
+					"data": "0 0 0 Everything 0 5 Away 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9599999785423279,
+					"name": "tutorial_pause"
+				}
+			]
+		},
+		{
+			"name": "combo_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8105409741401672,
+					"name": "pushback"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.8177779912948608,
+					"end_time": 1.1190600395202637,
+					"name": "move",
+					"position": [
+						0.0,
+						-130.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9771220088005066,
+					"name": "pushback"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.7740299701690674,
+					"end_time": 2.275559902191162,
+					"name": "move",
+					"position": [
+						0.0,
+						-90.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "get_angry_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.9283030033111572,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9887499809265137,
+					"name": "heal"
+				}
+			]
+		},
+		{
+			"name": "heavy_stun_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.9814200401306153,
+					"name": "summon_zombies"
+				}
+			]
+		},
+		{
+			"name": "slam_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.4999799728393555,
+					"name": "start_target_update",
+					"data": "120 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5036900043487549,
+					"name": "tutorial_pause",
+					"position": [
+						0.0,
+						-247.07200622558595,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8029999732971192,
+					"name": "contact",
+					"position": [
+						0.0,
+						-247.07200622558595,
+						0.0
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "spine_1_jntBnd Metadata/Monsters/SwollenMiller/Attachments/RobePhysics.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/SwollenMiller/Attachments/RobePhysics.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.31843599677085879,
+								0.0
+							],
+							[
+								0.33519598841667178,
+								1.0
+							]
+						],
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": 0.6108649969100952,
+						"width": 167.6300048828125,
+						"length": 283.23699951171877,
+						"impact_x_rotation": [
+							-0.17453299462795258,
+							-0.5235990285873413
+						],
+						"impact_z_rotation": [
+							0.6108649969100952,
+							0.6108649969100952
+						],
+						"impact_type": "Slash"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.3854750096797943,
+								0.0
+							],
+							[
+								0.4301680028438568,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": 0.17453299462795258,
+						"angle": 2.897249937057495,
+						"length": 167.6300048828125,
+						"impact_z_rotation": [
+							-0.6981319785118103,
+							-1.309000015258789
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_wrist_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4357540011405945,
+								0.0
+							],
+							[
+								0.50279301404953,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": 0.10471999645233154,
+						"angle": 2.687809944152832,
+						"length": 173.41000366210938,
+						"offset": [
+							40.0,
+							25.0
+						],
+						"impact_z_rotation": [
+							0.6981319785118103,
+							1.309000015258789
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_wrist_jntBnd"
+					}
+				]
+			}
+		},
+		{
+			"name": "combo_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.29050299525260928,
+								0.0
+							],
+							[
+								0.35195499658584597,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": 0.4014259874820709,
+						"angle": 2.146749973297119,
+						"length": 294.7980041503906,
+						"offset": [
+							-70.0,
+							40.0
+						],
+						"impact_x_rotation": [
+							-0.08726649731397629,
+							-0.26179900765419009
+						],
+						"impact_z_rotation": [
+							0.6981319785118103,
+							1.3962600231170655
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					},
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.5865920186042786,
+								0.0
+							],
+							[
+								0.6256979703903198,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 5,
+						"rotation": -0.6981319785118103,
+						"angle": 1.8500499725341797,
+						"length": 248.55499267578126,
+						"offset": [
+							25.0,
+							-45.0
+						],
+						"impact_x_rotation": [
+							0.08726649731397629,
+							0.17453299462795258
+						],
+						"impact_z_rotation": [
+							-0.6981319785118103,
+							-1.3962600231170655
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwollenMiller/rig.ast"
+		socket = "mouth"
+			parent = "jaw_jntBnd"
+			translation = "0 -12.3746 -3.5312"
+		socket = "aux_weapon_end"
+			parent = "saw_jntBnd"
+			translation = "0 9.88186 -126.169"
+		socket = "aux_sword_grd_01"
+			parent = "root_jntBnd"
+			translation = "-32.1373 143 0"
+		socket = "aux_sword_grd_02"
+			parent = "root_jntBnd"
+			translation = "-46.7966 143 0"
+		normal_viscosity_multiplier = 0.300
+		enclosure_angle = 0.300
+		animation_velocity_factor = 10.000
+		animation_force_factor = 5.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwollenMiller/SwollenMiller.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0018665000097826124,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.700107991695404,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Attack",
+						"bone_name": "neck_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8078500032424927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordMove",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.889689028263092,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordSwing",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9257839918136597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/MovementFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.997875988483429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SwingMain",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3974800109863282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Growl",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4316099882125855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMainSoft",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2176198959350588,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordDrag",
+						"bone_name": "R_finger_3_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3573899269104006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3685901165008547,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Attack",
+						"bone_name": "neck_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5104401111602785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.824850082397461,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMainSoft",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9645700454711916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SholderBlade",
+						"bone_name": "R_clavicle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0497100353240969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Gargle70",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1923079937696457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36375001072883608,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/MovementFast",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4859650135040283,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/HandSwing",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6382499933242798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8497589826583862,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Gargle70",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08474999666213989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/MovementFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5359650254249573,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Attack",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5497499704360962,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5649120211601257,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/HandSwing",
+						"bone_name": "L_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9824560284614563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Gargle70",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "celebrate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/BreathA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8905349969863892,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/BreathB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "charge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChargeStart.once.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Charge.loop.ogg",
+						"bone_name": "saw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChargeMuddy.once.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.022141600027680398,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.02667669951915741,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/BreathShortB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18005000054836274,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepSprint",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28250598907470705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4374319911003113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepSprint",
+						"bone_name": "aux_L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "charge_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.023499999195337297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Attack",
+						"bone_name": "neck_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09300000220537186,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SwingMain",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12659099698066712,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordSwing",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2980000078678131,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Gargle70",
+						"bone_name": "jaw_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6900579929351807,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SholderBlade",
+						"bone_name": "R_clavicle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "charge_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Growl",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8199999928474426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Anger",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8573099970817566,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45261698961257937,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordMove"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.459199994802475,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7871999740600586,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8127999901771545,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/MovementFast",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8240000009536743,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SwingMain",
+						"bone_name": "R_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8295800089836121,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordSwing",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9936839938163757,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Gargle70",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1789499521255494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMainSoft",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6480000019073487,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/MovementFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7344000339508057,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SwingMain",
+						"bone_name": "R_finger_3_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.793660044670105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordSwing",
+						"bone_name": "saw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8112000226974488,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.083199977874756,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2137999534606935,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Gargle70",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4047999382019045,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMainSoft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7641398906707765,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SholderBladeScuff",
+						"bone_name": "R_shoulder_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/DeathA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3547379970550537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordMove",
+						"bone_name": "R_finger_3_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4947670102119446,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SwingMain",
+						"bone_name": "R_finger_2_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49726900458335879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordSwing",
+						"bone_name": "saw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5148000121116638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMainSoft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8822000026702881,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMainSoft",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9855999946594238,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.195970058441162,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordDrag",
+						"bone_name": "R_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7180999517440797,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/DeathB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8075199127197267,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/DeathImpactMain",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.152600049972534,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/DeathImpactSword",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7378499507904054,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/DeathImpactLegA",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7941300868988039,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/DeathImpactLegB",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "engage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.4187979996204376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47317299246788027,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SawDebris",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6186779737472534,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SawPull",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6512389779090881,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SawDebris",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7160069942474365,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordMove",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7387449741363525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SawDebris",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7633910179138184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SwingMain",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8008350133895874,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordSwing",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0439499616622925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0734200477600098,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2055699825286866,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMainSoft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.692520022392273,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SholderBladeScuff",
+						"bone_name": "R_clavicle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_big_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/FlinchBig",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/FlinchSmall",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "get_angry_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/BreathA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6458879709243774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordMove",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6669170260429382,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Effects/EnrageAoe",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.76739901304245,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/AngryShout",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7885429859161377,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SwingMain"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.533750057220459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6575000286102296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Gargle70",
+						"bone_name": "jaw_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3245298862457277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SholderBladeScuff",
+						"bone_name": "R_clavicle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "heavy_stun_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/MovementFast",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SawDebris",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/KnockdownA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28137698769569399,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMain",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41856101155281069,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordMove",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.566100001335144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMain",
+						"bone_name": "aux_R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6318510174751282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/MovementFast",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7521269917488098,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SholderBladeScuff",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1963499784469605,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4000099897384644,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordMove",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4168272018432618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/KnockdownB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5715999603271485,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/HandSwing",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6533900499343873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StunStomp",
+						"bone_name": "aux_L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8490400314331055,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMain",
+						"bone_name": "aux_L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08669999986886978,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/BreathA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7539499998092651,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/BreathB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/BreathShortA",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34054499864578249,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMain",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5936279892921448,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5948709845542908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Growl",
+						"bone_name": "neck_jntBnd",
+						"chance": 0.30000001192092898,
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8047810196876526,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMain",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "saw_wood_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.40421101450920107,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SawMain",
+						"bone_name": "L_finger_3_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6434999704360962,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SawDebris"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3673700094223023,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SawMain",
+						"bone_name": "L_finger_2_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5947400331497193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SawDebris"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4544999897480011,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.740451991558075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordMove",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.757423996925354,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordDrag",
+						"bone_name": "R_finger_3_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8996109962463379,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordMove",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5678999423980713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Vocal/Attack",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6421500444412232,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordSwing",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6634999513626099,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SwingMain",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7295000553131104,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMainSoft",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7384999990463257,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMainSoft",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8564399480819703,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/ChainSwordMove",
+						"bone_name": "L_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8869999647140504,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/Movement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2074100971221926,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Effects/Slam",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.753999948501587,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/SholderBladeScuff",
+						"bone_name": "R_clavicle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08479999750852585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMain",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4472000002861023,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8208000063896179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepMain",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2294700145721436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_1/SwollenMiller/Foley/StepScuff",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd phys_skinned_belly_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd phys_skinned_beard_jntBnd neck_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd R_clavicle_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd"
+		bone_group = "shout false mouth"
+		bone_group = "foot_l false L_foot_jntBnd"
+		bone_group = "foot_r false R_foot_jntBnd"
+		bone_group = "angry_cyl false root_jntBnd L_shoulder_jntBnd"
+		bone_group = "grp_mouth_fwd false jaw_jntBnd mouth"
+		bone_group = "grp_weapon_trl false R_Weapon aux_weapon_end"
+		bone_group = "l_arm_trl false L_finger_2_jntBnd_3 L_finger_2_jntBnd_1 L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "sword_grd_trl false aux_sword_grd_02 aux_sword_grd_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "charge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/pet/charge_01.pet",
+						"bone_group": "sword_grd_trl"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.2297700047492981,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/charge/step_big.pet",
+						"bone_group": "foot_r"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1776000261306763,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/charge/step.pet",
+						"bone_group": "foot_r"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.4000000953674318,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/charge/step.pet",
+						"bone_group": "foot_l"
+					}
+				]
+			},
+			{
+				"name": "engage_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.1415300369262696,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/charge/step.pet",
+						"bone_group": "foot_l"
+					}
+				]
+			},
+			{
+				"name": "get_angry_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6944440007209778,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/enrage/dayumsonhemadnow.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.7379029989242554,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/enrage/shout.pet",
+						"bone_group": "shout"
+					}
+				]
+			},
+			{
+				"name": "heavy_stun_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.43088299036026,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/charge/step.pet",
+						"bone_group": "foot_l"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6899080276489258,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/charge/step.pet",
+						"bone_group": "foot_r"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8384569883346558,
+						"end_time": 2.1374640464782717,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Gallows/Act1/SwollenMiller/pet/heavy_stun_01/mouth_fwd.pet",
+						"bone_group": "grp_mouth_fwd"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.0195720195770265,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/charge/step.pet",
+						"bone_group": "foot_l"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.34054499864578249,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/charge/step.pet",
+						"bone_group": "foot_r"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8051789999008179,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/charge/step.pet",
+						"bone_group": "foot_l"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.07148899883031845,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/charge/step.pet",
+						"bone_group": "foot_l"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.805446982383728,
+						"filename": "Metadata/Particles/monster_effects/Gallows/Act1/SwollenMiller/charge/step.pet",
+						"bone_group": "foot_r"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "head_jntBnd"
+			state = ""
+				colour = "0.133841 0.174617 0.291542"
+				position = "0 62 -125"
+				radius = 600
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "on_death"
+				colour = "0.000669205 0.000873083 0.00145771"
+				position = "0 62 -125"
+				radius = 600
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+	}
+	
+	WindEvents
+	{
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "charge_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.12166500091552735,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.085319995880127,
+						"end_time": 1.2335169315338135,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/trl/weapon_trl.trl",
+						"bone_group": "grp_weapon_trl"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5660369992256165,
+						"end_time": 0.6720409989356995,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/trl/hand_trl.trl",
+						"bone_group": "l_arm_trl"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6572189927101135,
+						"end_time": 0.8133950233459473,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/trl/hand_trl.trl",
+						"bone_group": "l_arm_trl"
+					}
+				]
+			},
+			{
+				"name": "charge_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/trl/charge_grd_trl.trl",
+						"bone_group": "sword_grd_trl"
+					}
+				]
+			},
+			{
+				"name": "charge_end_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 0.12521399557590486,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/trl/weapon_trl.trl",
+						"bone_group": "grp_weapon_trl"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.2358500063419342,
+						"end_time": 0.3816460072994232,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/trl/weapon_trl.trl",
+						"bone_group": "grp_weapon_trl"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8507729768753052,
+						"end_time": 0.9506011605262756,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/trl/weapon_trl.trl",
+						"bone_group": "grp_weapon_trl"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.0209200382232667,
+						"end_time": 1.2168060541152955,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/trl/weapon_trl.trl",
+						"bone_group": "grp_weapon_trl"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.8497400283813477,
+						"end_time": 1.9082342386245728,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/trl/weapon_trl.trl",
+						"bone_group": "grp_weapon_trl"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.0196900367736818,
+						"end_time": 2.2879650592803957,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/trl/weapon_trl.trl",
+						"bone_group": "grp_weapon_trl"
+					}
+				]
+			},
+			{
+				"name": "slam_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.7975980043411255,
+						"end_time": 1.10874605178833,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/trl/weapon_trl.trl",
+						"bone_group": "grp_weapon_trl"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.7375799417495728,
+						"end_time": 1.8145902156829835,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/trl/weapon_trl.trl",
+						"bone_group": "grp_weapon_trl"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.2229900360107422,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SwollenMiller/ao/attack_01.ao",
+						"offset": [
+							142.51699829101563,
+							-241.13400268554688
+						]
+					}
+				]
+			},
+			{
+				"name": "saw_wood_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Gallows/Act1/SwollenMiller/on_act_saw_wood.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								-200.00001525878907,
+								0.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	AnimationController
+	{
+		animations = '[
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.6013399958610535,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.6887500286102295,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "combo_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.9910200238227844,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 1.9025100469589234,
+						"haptic_id": "Haptic_BasicBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.01582733914256096,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					},
+					{
+						"type": "HapticEventType",
+						"time": 3.1736900806427,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			},
+			{
+				"name": "get_angry_01",
+				"events": [
+					{
+						"type": "HapticEventType",
+						"time": 0.6944440603256226,
+						"haptic_id": "Haptic_LargeBoss_Impact_AoE_3D"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/SwollenMiller/Attachments/RobePhysics.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwollenMiller/SwollenMillerRobe/SwollenMillerRobe.amd"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwollenMiller/SwollenMillerRobe/SwollenMillerRobe.ast"
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		animation_velocity_factor = 10.000
+		animation_force_factor = 2.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwollenMiller/SwollenMillerRobe/SwollenMillerRobe.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/SwollenMiller/SwollenMiller.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/SwollenMiller/rig_b24bd88d.smd"
+Materials 4
+	"Art/Textures/Monsters/LumberjackZombies/SwollenMillerM2c.mat" 1
+	"Art/Textures/Monsters/LumberjackZombies/SwollenMillerM2Beardc.mat" 3
+	"Art/Textures/Monsters/LumberjackZombies/SwollenMillerM2c.mat" 4
+	"Art/Textures/Monsters/LumberjackZombies/SwollenMillerweaponM2c.mat" 1
+BoundingBox -124.009 -133.25 -183.429 93.7549 47.4235 0.348686
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/SwollenMiller/rig_b24bd88d.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 9 in the header, 9 in the block · 22216 triangles over 17179 vertices
+  names: 418 bytes said, 418 read  [agree]
+
+=== shapes (9)
+0	SwollenMillerArrowsShape	from 0	count 5340
+1	SwollenMillerBeard1Shape	from 5340	count 4605
+2	SwollenMillerBeard2Shape	from 9945	count 4605
+3	SwollenMillerBeard3Shape	from 14550	count 4605
+4	SwollenMillerBeardShape	from 19155	count 9210
+5	SwollenMillerBodyShape	from 28365	count 13383
+6	SwollenMillerCoatShape	from 41748	count 10668
+7	SwollenMillerHairShape	from 52416	count 5952
+8	SwollenMillerWeaponShape	from 58368	count 8280
+
+=== fitting
+the monster's rig: 71 bones
+mounts: aux_position, aux_L_foot_jntBnd, aux_R_foot_jntBnd, aux_head_jntBnd
+  RobePhysics.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-39.3,-15,-7.9)..(39.3,28.2,56.8)
+    (the geometry did not read)
+    rig 16 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L_robe_jntBnd_1  [its own]  under 0  rests at (36.1,0.2,-2.9)
+      2 phys_skinned_L_back_robe_jntBnd_1  [its own]  under 0  rests at (23.2,20,-1)
+      3 phys_skinned_back_robe_jntBnd_1  [its own]  under 0  rests at (0,21,-1.1)
+      4 phys_skinned_R_back_robe_jntBnd_1  [its own]  under 0  rests at (-23.2,20,-1)
+      5 phys_skinned_R_robe_jntBnd_1  [its own]  under 0  rests at (-36.1,0.2,-2.9)
+      6 phys_skinned_L_robe_jntBnd_2  [its own]  under 1  rests at (36.7,1.3,17.7)
+      7 phys_skinned_L_back_robe_jntBnd_2  [its own]  under 2  rests at (23.2,22.1,18.1)
+      8 phys_skinned_back_robe_jntBnd_2  [its own]  under 3  rests at (0,23.2,18.8)
+      9 phys_skinned_R_back_robe_jntBnd_2  [its own]  under 4  rests at (-23.2,22.1,18.1)
+      10 phys_skinned_R_robe_jntBnd_2  [its own]  under 5  rests at (-36.7,1.3,17.7)
+      11 phys_skinned_L_robe_jntBnd_3  [its own]  under 6  rests at (37.2,2.4,38.3)
+      12 phys_skinned_L_back_robe_jntBnd_3  [its own]  under 7  rests at (23.2,24.2,37.5)
+      13 phys_skinned_back_robe_jntBnd_3  [its own]  under 8  rests at (0,25.3,38.7)
+      14 phys_skinned_R_back_robe_jntBnd_3  [its own]  under 9  rests at (-23.2,24.2,37.5)
+      15 phys_skinned_R_robe_jntBnd_3  [its own]  under 10  rests at (-37.2,2.4,38.3)
+  RobePhysics.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-39.3,-15,-7.9)..(39.3,28.2,56.8)
+    (the geometry did not read)
+    rig 16 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L_robe_jntBnd_1  [its own]  under 0  rests at (36.1,0.2,-2.9)
+      2 phys_skinned_L_back_robe_jntBnd_1  [its own]  under 0  rests at (23.2,20,-1)
+      3 phys_skinned_back_robe_jntBnd_1  [its own]  under 0  rests at (0,21,-1.1)
+      4 phys_skinned_R_back_robe_jntBnd_1  [its own]  under 0  rests at (-23.2,20,-1)
+      5 phys_skinned_R_robe_jntBnd_1  [its own]  under 0  rests at (-36.1,0.2,-2.9)
+      6 phys_skinned_L_robe_jntBnd_2  [its own]  under 1  rests at (36.7,1.3,17.7)
+      7 phys_skinned_L_back_robe_jntBnd_2  [its own]  under 2  rests at (23.2,22.1,18.1)
+      8 phys_skinned_back_robe_jntBnd_2  [its own]  under 3  rests at (0,23.2,18.8)
+      9 phys_skinned_R_back_robe_jntBnd_2  [its own]  under 4  rests at (-23.2,22.1,18.1)
+      10 phys_skinned_R_robe_jntBnd_2  [its own]  under 5  rests at (-36.7,1.3,17.7)
+      11 phys_skinned_L_robe_jntBnd_3  [its own]  under 6  rests at (37.2,2.4,38.3)
+      12 phys_skinned_L_back_robe_jntBnd_3  [its own]  under 7  rests at (23.2,24.2,37.5)
+      13 phys_skinned_back_robe_jntBnd_3  [its own]  under 8  rests at (0,25.3,38.7)
+      14 phys_skinned_R_back_robe_jntBnd_3  [its own]  under 9  rests at (-23.2,24.2,37.5)
+      15 phys_skinned_R_robe_jntBnd_3  [its own]  under 10  rests at (-37.2,2.4,38.3)

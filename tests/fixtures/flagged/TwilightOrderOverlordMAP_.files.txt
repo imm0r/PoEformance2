@@ -1,0 +1,4606 @@
+monster: Aurelian, the Grand Adjudicator [Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/TwilightOrderOverlordMAP_]
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/TwilightOrderOverlordMAP.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/TwilightOrderExcavationOverlord/rig.amd"
+	view_of = "death_bwd_01"
+		view_name = "death_long_temp_01"
+		view_end = 5000
+	view_of = "lightning_warp_end_01"
+		view_name = "lightning_warp_end_01_01"
+	view_of = "rock_storm_01"
+		view_name = "lightning_barrage_test"
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+		view_exclude_event = "ActiveDodgeEvent"
+		view_exclude_event = "TriggerEffectEvent"
+	view_of = "dig_prefight_start_01"
+		view_name = "dig_prefight_start_short_01"
+		view_begin = 21408
+	view_of = "dig_fight_end_01"
+		view_name = "death_map_01"
+		view_end = 5000
+		view_exclude_event = "StandardEvent"
+		view_exclude_event = "SoundEvent"
+		view_exclude_event = "ParticleEffectEvent"
+		view_exclude_event = "VolumetricEffectEvent"
+		view_exclude_event = "WindEvent"
+		view_exclude_event = "DecalEvent"
+		view_exclude_event = "ScreenShakeEvent"
+		view_exclude_event = "TrailsEffectEvent"
+		view_exclude_event = "SoundParamEvent"
+		view_exclude_event = "EffectPackEvent"
+		view_exclude_event = "AnimatedObjectEvent"
+		view_exclude_event = "AttachedAnimatedObjectEvent"
+		view_exclude_event = "TimelineParameterEvent"
+		view_exclude_event = "LightStateEvent"
+		view_exclude_event = "GEALEvent"
+		view_exclude_event = "HapticEvent"
+		view_exclude_event = "MoveEvent"
+		view_exclude_event = "PoiseEvent"
+		view_exclude_event = "StartFaceEvent"
+		view_exclude_event = "EndFaceEvent"
+		view_exclude_event = "StartRotateEvent"
+		view_exclude_event = "StartTargetUpdateEvent"
+		view_exclude_event = "InterruptSkillEvent"
+		view_exclude_event = "SubobjectCollidableEvent"
+		view_exclude_event = "AltPoseEvent"
+		view_exclude_event = "LockCancellingEvent"
+		view_exclude_event = "WeaponAnimationEvent"
+		view_exclude_event = "MeleeTrailEvent"
+		view_exclude_event = "RulesetEvent"
+		view_exclude_event = "UnleashedSlowZoneEvent"
+		view_exclude_event = "BarrageRepeatZoneEvent"
+		view_exclude_event = "CharacterAudioEvent"
+		view_exclude_event = "ActiveDodgeEvent"
+		view_exclude_event = "TriggerEffectEvent"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.19963352382183076,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7849307060241699,
+					"name": "dash"
+				}
+			]
+		},
+		{
+			"name": "dig_fight_end_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.6000000238418579,
+					"name": "move",
+					"position": [
+						0.0,
+						96.51200103759766,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.946962833404541,
+					"name": "move_to_die"
+				}
+			]
+		},
+		{
+			"name": "dig_prefight_start_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 25.21831703186035,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 25.739471435546876,
+					"name": "reappear"
+				}
+			]
+		},
+		{
+			"name": "dig_prefight_start_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.927426338195801,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.390025615692139,
+					"name": "reappear"
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				}
+			]
+		},
+		{
+			"name": "lightning_snake_barrage_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.016689544543623925,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3438191413879395,
+					"name": "start"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.3860206604003907,
+					"end_time": 2.9520668983459474,
+					"name": "start_target_update",
+					"data": "100 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.052067279815674,
+					"name": "stop"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.169478416442871,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.7886738777160648,
+					"name": "start"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 4.849553108215332,
+					"end_time": 6.379909515380859,
+					"name": "start_target_update",
+					"data": "100 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.479910373687744,
+					"name": "stop"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.596536159515381,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 8.192654609680176,
+					"name": "start"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 8.228385925292969,
+					"end_time": 9.792332649230957,
+					"name": "start_target_update",
+					"data": "100 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 9.892333030700684,
+					"name": "stop"
+				}
+			]
+		},
+		{
+			"name": "lightning_warp_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.559327244758606,
+					"name": "telegraph"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.005000114440918,
+					"name": "strike"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0299999713897707,
+					"name": "strike"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.059999942779541,
+					"name": "strike"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0899999141693117,
+					"name": "strike"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0999999046325685,
+					"name": "reappear"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.200000047683716,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "lightning_warp_end_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.029999999329447748,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "pillar_destruction_01",
+			"events": [
+				{
+					"type": "PoiseEventType",
+					"time": 0.0,
+					"end_time": 9.800000190734864,
+					"name": "poise",
+					"data": "1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7217056155204773,
+					"name": "audio"
+				}
+			]
+		},
+		{
+			"name": "raise_and_raze_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 6.0,
+					"name": "move",
+					"data": "0 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.055220365524292,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5131630897521974,
+					"name": "rocks_up",
+					"position": [
+						-40.369659423828128,
+						-9.49395751953125,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.202418327331543,
+					"name": "strike_rocks",
+					"position": [
+						-40.369659423828128,
+						-9.49395751953125,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "retreat_combo_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 2.065999984741211,
+					"name": "move",
+					"data": "1 0 0 Everything 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.688080370426178,
+					"name": "spawn_rock",
+					"position": [
+						0.0,
+						-57.121421813964847,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.2708920240402222,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "rock_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.00649783480912447,
+					"end_time": 0.25,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.25,
+					"name": "contact",
+					"position": [
+						105.38204956054688,
+						0.0,
+						-134.487548828125
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1165941953659058,
+					"name": "move_stationary"
+				}
+			]
+		},
+		{
+			"name": "rock_attack_02",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.4451083242893219,
+					"name": "start_target_update",
+					"data": "180 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.46477439999580386,
+					"name": "contact",
+					"position": [
+						-121.1387939453125,
+						0.0,
+						-134.56478881835938
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.1579067707061768,
+					"name": "move_stationary"
+				}
+			]
+		},
+		{
+			"name": "rock_storm_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.009036172181367875,
+					"name": "rock_storm",
+					"position": [
+						-4.281745910644531,
+						-44.14945983886719,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.023007869720459,
+					"name": "rock_fall"
+				}
+			]
+		},
+		{
+			"name": "rock_storm_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.009036172181367875,
+					"name": "rock_storm",
+					"position": [
+						-4.281745910644531,
+						-44.14945983886719,
+						0.0
+					]
+				},
+				{
+					"type": "PoiseEventType",
+					"time": 0.030179843306541444,
+					"end_time": 9.732999801635743,
+					"name": "poise",
+					"data": "1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.023007869720459,
+					"name": "rock_fall"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.219176292419434,
+					"name": "rock_storm2",
+					"position": [
+						-4.281745910644531,
+						-44.14945983886719,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.735114097595215,
+					"name": "rock_fall2"
+				}
+			]
+		},
+		{
+			"name": "snake_attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.4600757956504822,
+					"end_time": 0.6607986688613892,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7700589895248413,
+					"name": "contact"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 1.0850684642791749,
+					"end_time": 1.2998865842819214,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4622535705566407,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "snake_attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.14569582045078278,
+					"end_time": 0.44159671664237978,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.5981806516647339,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "wall_escape_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.687749981880188,
+					"name": "donut"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.626900553703308,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.796459674835205,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.088070869445801,
+					"name": "reappear"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.687750339508057,
+					"name": "wall1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.777421951293945,
+					"name": "wall2"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.920344352722168,
+					"name": "wall3"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 6.063267230987549,
+					"name": "wall4"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 7.194141864776611,
+					"name": "detonate"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 12.1068754196167,
+					"name": "backtoearth"
+				}
+			]
+		},
+		{
+			"name": "x_blast_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "spawn_outer"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 2.2969067096710207,
+					"name": "start_target_update",
+					"data": "90 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "audio"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.210134983062744,
+					"name": "spawn_inner"
+				}
+			]
+		},
+		{
+			"name": "death_long_temp_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 3.099653720855713,
+					"name": "chieftain_spawn"
+				}
+			]
+		},
+		{
+			"name": "lightning_barrage_test",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "start"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.12057416141033173,
+					"end_time": 1.065251350402832,
+					"name": "start_target_update",
+					"data": "80 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.3519128561019898,
+					"name": "stop"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0581350326538088,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.2220096588134767,
+					"name": "start"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 2.4270191192626955,
+					"end_time": 3.0346336364746095,
+					"name": "start_target_update",
+					"data": "80 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5394773483276369,
+					"name": "stop"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.975844144821167,
+					"name": "tele"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.099521636962891,
+					"name": "start"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 4.3217549324035648,
+					"end_time": 5.227931976318359,
+					"name": "start_target_update",
+					"data": "80 0 1"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.663884162902832,
+					"name": "stop"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "spine_1_jntBnd Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/attachments/Skirt.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/attachments/Skirt_attach.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/attachments/Shoulder_danglers.ao"
+	attached_object = "spine_2_jntBnd Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/attachments/Cape.ao"
+	attached_object = "root_jntBnd Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/attachments/Weapon_01.ao"
+	attached_object = "L_Weapon Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/attachments/Weapon_02.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.36614173650741579,
+								0.0
+							],
+							[
+								0.4881889820098877,
+								1.0
+							]
+						],
+						"width": 109.75599670410156,
+						"angle": 0.5235987901687622,
+						"length": 191.0570068359375
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.36614173650741579,
+								0.0
+							],
+							[
+								0.4881889820098877,
+								1.0
+							]
+						],
+						"width": 109.75599670410156,
+						"angle": 0.5235987901687622,
+						"length": 191.0570068359375
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/TwilightOrderExcavationOverlord/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+		socket = "Staff_bottom"
+			parent = "aux_L_Weapon_attachment"
+			translation = "0 0 39.2295"
+		socket = "Staff_top"
+			parent = "aux_L_Weapon_attachment"
+			translation = "0 0 -136.997"
+		socket = "retreat_hit"
+			translation = "0 -301.23 -145"
+		socket = "punch_location"
+			translation = "-60 -35 0"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/TwilightOrderExcavationOverlord.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd aux_R_shoulder_attachment aux_face_jntBnd aux_L_shoulder_attachment L_shoulder_jntBnd head_jntBnd"
+		bone_group = "staff_bottom false Staff_bottom aux_L_Weapon_attachment"
+		bone_group = "staff_top false Staff_top aux_L_Weapon_attachment"
+		bone_group = "retreat_hit false retreat_hit aux_R_Weapon_attachment"
+		bone_group = "death_rock_platform false root_jntBnd L_foot_jntBnd R_foot_jntBnd"
+		bone_group = "fists false L_finger_2_jntBnd_3 R_finger_2_jntBnd_3"
+		bone_group = "punch_location false punch_location"
+		bone_group = "L_weapon false L_Weapon Staff_top"
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "dig_fight_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 14.190244674682618,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/death_blood.epk",
+						"remove_on_animation_end": false
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 24.049650192260743,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_warp_start.epk"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 2.972170829772949,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_warp_start.epk"
+					}
+				]
+			},
+			{
+				"name": "lightning_snake_barrage_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_warp_start.epk"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_warp_start.epk"
+					}
+				]
+			},
+			{
+				"name": "pillar_destruction_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "wall_escape_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.07050999999046326,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_warp_start.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 8.394209861755371,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/glow_fist.epk"
+					}
+				]
+			},
+			{
+				"name": "death_map_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 4.5,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/death_crush_hide.epk",
+						"remove_on_animation_end": false
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "dig_fight_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 31.200000762939454,
+						"name": "PlatformRaise",
+						"auto_reset": false,
+						"curve": "4 0 1 Linear 4.0108 1 Linear 4.45126 0 Linear 31.2 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 31.200000762939454,
+						"name": "WobbleMulti",
+						"auto_reset": false,
+						"curve": "6 0 0 Linear 0.5 0 Linear 1.04775 0 Linear 14.1837 5 Linear 14.1837 0 Linear 31.2 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 31.200000762939454,
+						"name": "PlatformStop",
+						"auto_reset": false,
+						"curve": "6 0 0 Linear 0.5 0 Linear 0.5 1 Linear 14.1837 1 Linear 14.1837 0 Linear 31.2 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 21.33300018310547,
+						"end_time": 26.666000366210939,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "5 21.333 0 Linear 24.7473 0 Linear 25.3099 1 Linear 25.4661 1 Linear 26.666 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.333000183105469,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "5 0 0 Linear 3.41433 0 Linear 3.97687 1 Linear 4.13313 1 Linear 5.333 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "lightning_snake_barrage_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 2.8489911556243898,
+						"end_time": 5.104213237762451,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 2.84899 0 Linear 3.96608 0.625 Smooth 4.20882 1 Linear 4.35744 1 Linear 5.10421 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 6.481147289276123,
+						"end_time": 8.622827529907227,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 6.48115 0 Linear 7.54258 0.510135 Smooth 7.66072 1 Linear 7.88456 1 Linear 8.62283 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "2 0 0 Linear 2 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 2.0,
+						"end_time": 3.200000047683716,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "4 2 1 Linear 2 0.416667 Smooth 2.19819 0 Flat 3.2 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.2000000476837159,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "4 0 1 Linear 0.186103 0.416667 Smooth 0.683885 0 Flat 1.2 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "2 0 0 Linear 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "wall_escape_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.5487300157546997,
+						"end_time": 2.110701084136963,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "2 0.54873 0 Linear 2.1107 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 2.148754358291626,
+						"end_time": 3.0688953399658205,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"auto_reset": false,
+						"curve": "2 2.14875 1 Linear 3.0689 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 4.136560916900635,
+						"end_time": 7.5255889892578129,
+						"name": "WobbleMulti",
+						"apply_on_children": true,
+						"curve": "5 4.13656 0 Linear 5.22282 0 Linear 5.62186 4 Linear 7.08498 0 Flat 7.52559 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 7.622541904449463,
+						"end_time": 14.965999603271485,
+						"name": "WobbleMulti",
+						"apply_on_children": true,
+						"curve": "4 7.62254 0 Linear 12.1058 4 Linear 12.3289 0 Linear 14.966 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.0,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/ao/knockdown_rocks.ao",
+						"inherit_height": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "death_map_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.550000011920929,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/ao/rock_death_map.ao",
+						"offset": [
+							-4.55206298828125,
+							0.0
+						],
+						"height": -17.16204833984375
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "dig_fight_end_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_warp_surge_death.pet",
+						"bone_group": "staff_top"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/death_rock_platform.pet",
+						"bone_group": "death_rock_platform"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.460000038146973,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/death_rock_platform_emerge.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 7.936000347137451,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/death_rock_platform_rumble.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 14.164337158203125,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/death_rock_platform_shatter.pet",
+						"bone_group": "death_rock_platform"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 14.183699607849121,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/death_chest_burst.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 25.193866729736329,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/barrage_tele_up.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.896710157394409,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/barrage_tele_up.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_warp_surge_knockdown.pet",
+						"bone_group": "staff_top"
+					}
+				]
+			},
+			{
+				"name": "lightning_snake_barrage_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.133700370788574,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/barrage_tele_up.pet",
+						"bone_group": "grp_chest"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 7.584839820861816,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/barrage_tele_up.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.8955299854278565,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/lightning_warp_surge.pet",
+						"bone_groups": [
+							"grp_head",
+							"grp_neck",
+							"grp_chest",
+							"grp_r_clavicle",
+							"grp_waist",
+							"grp_l_clavicle",
+							"grp_l_bicep",
+							"grp_r_bicep",
+							"grp_l_forearm",
+							"grp_r_forearm",
+							"grp_l_palm",
+							"grp_r_palm",
+							"grp_l_thigh",
+							"grp_r_thigh",
+							"grp_l_shin",
+							"grp_r_shin",
+							"grp_l_foot",
+							"grp_r_foot"
+						]
+					}
+				]
+			},
+			{
+				"name": "pillar_destruction_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_warp_surge_pillar_destruction.pet",
+						"bone_group": "staff_top"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/invulnerablity_pillar_destruction.pet",
+						"bone_group": "grp_chest"
+					}
+				]
+			},
+			{
+				"name": "raise_and_raze_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_warp_surge_raise.pet",
+						"bone_group": "staff_top"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.5034799575805666,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/crushing_step.pet",
+						"bone_group": "grp_r_foot"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.0594000816345219,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/barrage_tele_up.pet",
+						"bone_group": "grp_r_forearm"
+					}
+				]
+			},
+			{
+				"name": "retreat_combo_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_warp_surge_retreat.pet",
+						"bone_group": "staff_top"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.364840030670166,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/retreat_hit.pet",
+						"bone_group": "retreat_hit"
+					}
+				]
+			},
+			{
+				"name": "rock_attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_warp_surge_basic_proj.pet",
+						"bone_group": "staff_top"
+					}
+				]
+			},
+			{
+				"name": "rock_attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_warp_surge_basic_proj.pet",
+						"bone_group": "staff_top"
+					}
+				]
+			},
+			{
+				"name": "rock_storm_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_warp_surge_rock_storm.pet",
+						"bone_group": "staff_top"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.023007869720459,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/crushing_step.pet",
+						"bone_group": "staff_bottom"
+					}
+				]
+			},
+			{
+				"name": "rock_storm_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_warp_surge_rock_storm.pet",
+						"bone_group": "staff_top"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.023007869720459,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/crushing_step.pet",
+						"bone_group": "staff_bottom"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.955912113189697,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_warp_surge_raise.pet",
+						"bone_group": "staff_top"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 7.735114097595215,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/crushing_step.pet",
+						"bone_group": "staff_bottom"
+					}
+				]
+			},
+			{
+				"name": "wall_escape_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.7268481254577638,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_warp_surge_wall_escape.pet",
+						"bone_group": "staff_top"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 7.194141864776611,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/fist_surge_wall_escape.pet",
+						"bone_group": "fists"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 12.1068754196167,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/lightning_punch.pet",
+						"bone_group": "punch_location"
+					}
+				]
+			},
+			{
+				"name": "x_blast_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_warp_surge_xblast.pet",
+						"bone_group": "staff_top"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.9805266857147217,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_stab.pet",
+						"bone_group": "staff_top"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.217092990875244,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_stab.pet",
+						"bone_group": "staff_top"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "dig_fight_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14108528196811677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30232536792755129,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4434109032154083,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/StompSoft",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9503891468048097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.425834655761719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/PillarSlam/PillarSlam_GravityCast",
+						"bone_name": "Staff_top"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 1.8259669542312623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0499064922332765,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.721724510192871,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 22.01356315612793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Emerge/Emerge_WeaponForm",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 22.20444679260254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 22.41115951538086,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 22.440799713134767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 22.68678092956543,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 23.44472885131836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 24.03041648864746,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 24.072500228881837,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeWhip",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 24.088111877441408,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "R_finger_1_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 24.310319900512697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Emerge/Emerge_ThunderWhip",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 24.41846466064453,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Emerge/Emerge_WhipSlam"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 24.478296279907228,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 24.946767807006837,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Emerge/Emerge_ThunderSkySnake",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 25.569419860839845,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Stomp",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.8700506091117859,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Emerge/Emerge_WeaponForm",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0438628196716309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1021653413772584,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3332505226135255,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.025714159011841,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.500872850418091,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.518362283706665,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7388482093811037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.888641834259033,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Emerge/Emerge_ThunderWhip",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0740692615509035,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Emerge/Emerge_WhipSlam",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.138478994369507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.774357318878174,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Emerge/Emerge_ThunderSkySnake",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.21827507019043,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Stomp",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "aux_cape_R_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "aux_cape_R_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "aux_cape_R_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "aux_cape_R_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5370974540710449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/IdleRobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8819433450698853,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.262165069580078,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/IdleSnakeSlither",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5105481147766115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_attention_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3527442216873169,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6474816799163818,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/IdleSnakeSlither",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3047435283660889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/IdleSnakeSlither",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4040874242782593,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03424276411533356,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockThrow/RockThrow_RockSummon",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2380891889333725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "aux_cape_R_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2532399892807007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.197103977203369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.072932720184326,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.077346324920654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockStorm/RockStorm_RockExplosion",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.240956783294678,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/MovementWhoosh",
+						"bone_name": "L_thumb_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.929389476776123,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeSlither",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.549681663513184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.079470157623291,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/HandleCatch",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "lightning_snake_barrage_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17105427384376527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3563629984855652,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4490175247192383,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "aux_cape_R_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2636446952819826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/LightningBarrage/LightningBarrage_ChargeBeam",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8010146617889406,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "aux_cape_R_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3783226013183595,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.0041399002075199,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/LightningWarp/LightningWarp_WarpSweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.646975517272949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.442404747009277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/LightningBarrage/LightningBarrage_ChargeBeam",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.815846920013428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.16151762008667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/LightningWarp/LightningWarp_WarpSweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.982534885406494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.096571922302246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.234108924865723,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/LightningBarrage/LightningBarrage_ChargeBeam",
+						"bone_name": "R_finger_1_jntBnd_2"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/Cast",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19059999287128449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23126621544361115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2674419581890106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeSlither",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28940579295158389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.407289981842041,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/LightningWarp/LightningWarp_TeleportCharge",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4189448356628418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/MovementWhoosh",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8824292421340942,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeSlither",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9031010866165161,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.645094633102417,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/LightningWarp/LightningWarp_WarpSweetener"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0477800369262697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0571799278259279,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0976743698120119,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1100776195526125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeSlither",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1240310668945314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1908388137817385,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/WarpEnd",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5787878036499025,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7054266929626467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.8364343643188478,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.927490234375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/HandleCatch",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0992252826690676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.047780003398656848,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.057179998606443408,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09767445176839829,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11007755994796753,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeSlither",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12403105199337006,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5787879228591919,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7054266333580017,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8364344835281372,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9274901151657105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/HandleCatch",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0992252826690674,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19059999287128449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23126621544361115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2674419581890106,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeSlither",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28940579295158389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3010035753250122,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/LightningWarp/LightningWarp_TeleportCharge",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4189448356628418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/MovementWhoosh",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8824292421340942,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeSlither",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9031010866165161,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "aux_R_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "pillar_destruction_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10465116798877716,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16253231465816499,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/PillarSlam/PillarSlam_GravityLift",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.17093025147914887,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4304910898208618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/PillarSlam/PillarSlam_ShieldBubble",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5038760900497437,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0775201320648195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3527140617370607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3914742469787599,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.7170562744140629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.023257732391357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "R_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.252992153167725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/PillarSlam/PillarSlam_GravityCastSweetener",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.276265621185303,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/PillarSlam/PillarSlam_GravityCast",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 8.649486541748047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					}
+				]
+			},
+			{
+				"name": "raise_and_raze_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.3172299861907959,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5683574676513672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RaiseRaze/RaiseRaze_GravitySummon",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8953490257263184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0465118885040284,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1878234148025513,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.067124366760254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "R_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.188556671142578,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/MovementWhoosh",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4482243061065676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Stomp",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4908599853515627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RaiseRaze/RaiseRaze_ThunderTelegraph",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.755815029144287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.814620018005371,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RaiseRaze/RaiseRaze_ThunderSkySnake",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.170544147491455,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeSlither",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.585273265838623,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.602567195892334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/HandleCatch",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "retreat_combo_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1957044154405594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RaiseRaze/RaiseRaze_GravitySummon",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2073855996131897,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.377699077129364,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5008991360664368,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/MovementWhoosh",
+						"bone_name": "L_thumb_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5536632537841797,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6836390495300293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RetreatCombo/RetreatCombo_Whip",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7500597238540649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8707877993583679,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8821876645088196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0636967420578004,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1603084802627564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1984939575195313,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.586869716644287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7657099962234498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "rock_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2547321617603302,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockThrow/RockThrow_RockSummon",
+						"bone_name": "L_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3563450574874878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4142526090145111,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "aux_L_shoulder_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4671355187892914,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/Cast",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7834252715110779,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9925206303596497,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockThrow/RockThrow_Cast",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0709552764892579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.096142292022705,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/MovementWhoosh",
+						"bone_name": "L_thumb_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7283403873443604,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "rock_attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21602652966976167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockThrow/RockThrow_RockSummon",
+						"bone_name": "L_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31592321395874026,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5157319903373718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/Cast",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8691009879112244,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9782864451408386,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9985541701316834,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockThrow/RockThrow_Cast",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4122891426086426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "rock_storm_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4249465763568878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockStorm/RockStorm_GravitySummon",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47674429416656496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeSlither",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5864592790603638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5968993902206421,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.073643684387207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7015509605407715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8871195316314698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockStorm/RockStorm_GravitySlam_Telegraph",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.008941173553467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5038766860961916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7325596809387209,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.795107364654541,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/MovementWhoosh",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8463943004608156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockStorm/StaffGroundSlam",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9438600540161135,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/StaffGroundSlam",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.848559856414795,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeSlither",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.201552391052246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.589149475097656,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.8269476890563969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/HandleCatch",
+						"bone_name": "aux_R_Weapon_attachment"
+					}
+				]
+			},
+			{
+				"name": "rock_storm_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4249465763568878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockStorm/RockStorm_GravitySummon",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47674429416656496,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeSlither",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5864592790603638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5968993902206421,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.073643684387207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7015509605407715,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8871195316314698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockStorm/RockStorm_GravitySlam_Telegraph",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0089409351348879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.5038766860961916,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7325596809387209,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.795107364654541,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/MovementWhoosh",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8463943004608156,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockStorm/StaffGroundSlam",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.086445331573486,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.350929260253906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.579002380371094,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.561654090881348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.108819007873535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockStorm/RockStorm_GravitySummon",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.14212703704834,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/XBlast/XBlast_ExplosionTelegraph",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.719475746154785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockStorm/StaffGroundSlam",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "snake_attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.046899255365133288,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19328171014785767,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21459956467151643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4094369113445282,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeWhip",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4121447801589966,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/SnakeAttack",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5409867763519287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/LightningWhip_DoubleStrike",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.064470648765564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/SnakeAttackB",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1043983697891236,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeWhip",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1568479537963868,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.796905517578125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/MovementWhoosh",
+						"bone_name": "aux_R_Weapon_attachment_02"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9690033197402955,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/HandleCatch",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0323007106781008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "snake_attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Snake_LightningSweetener",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04627778008580208,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1851111799478531,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeMovement",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4179544746875763,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Vocals/SnakeAttackB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43802469968795779,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46610841155052187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/SnakeWhip",
+						"bone_name": "aux_R_Weapon_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5398759841918945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/SnakeWhip/LightningWhip_SingleStrike",
+						"bone_name": "R_finger_1_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3614282608032227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1074373722076416,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5471965670585632,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_attention_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.2596900165081024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8457368016242981,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "wall_escape_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12700000405311585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/LightningWarp/LightningWarp_TeleportCharge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1512047052383423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Emerge/Emerge_ThunderSkySnake",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5827573537826539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/LightningWarp/LightningWarp_WarpSweetener",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0338587760925295,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/LightningWarp/LightningWarp_Nova",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1784698963165285,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Stomp",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1260600090026857,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Maze/Maze_Levitate",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.355595111846924,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Maze/Maze_Float",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 9.009803771972657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Maze/Maze_ChargePunch",
+						"bone_name": "R_elbow_Twist_jntBnd_2"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 12.074399948120118,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/Maze/Maze_GravityPunch",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "x_blast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.020155038684606553,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.049813225865364078,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4361214339733124,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7511216402053833,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/XBlast/XBlast_GravitySummon",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1210979223251343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2390697002410889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.575569748878479,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.314080238342285,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/XBlast/XBlast_ExplosionTelegraph",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5558996200561525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.789635419845581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9996299743652345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.388974905014038,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/MagicSweeteners/Sceptre_CastSweetener",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.024084568023682,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Effects/RockStorm/StaffGroundSlam",
+						"bone_name": "Staff_top"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.551558494567871,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "L_upperArm_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.594118118286133,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.012505054473877,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_map_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.02260981872677803,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.048449575901031497,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07105943560600281,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/StompSoft",
+						"bone_name": "aux_R_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6330751180648804,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2808568477630617,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_8/TwilightOrderOverlordBoss/Foley/RobeMovement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "dig_fight_end_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 4.460000038146973,
+						"frequency": 30.0,
+						"amplitude": 50.0,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 5.0,
+						"frequency": 100.0,
+						"amplitude": 18.0,
+						"duration": 9.5,
+						"damp": "LinearUp"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 14.15809154510498,
+						"frequency": 20.0,
+						"amplitude": 40.0,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					}
+				]
+			},
+			{
+				"name": "raise_and_raze_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 2.5034799575805666,
+						"duration": 0.20000000298023225,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			state = ""
+				position = "0 0 -125"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "on_death"
+				position = "0 0 -125"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+			state = "on"
+				colour = "0.820782 0.820796 1.35842"
+				position = "0 -55 -314"
+				radius = 500
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+		animations = '[
+			{
+				"name": "dig_fight_end_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 0.08828891813755036,
+						"end_time": 0.7382381558418274,
+						"state_name": "on_death"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_idle_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on_death"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on_death"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 25.462766647338868,
+						"end_time": 26.666000366210939,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_02",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on_death"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 2.1050171852111818,
+						"end_time": 2.948857545852661,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 3.1347625255584719,
+						"end_time": 3.4973325729370119,
+						"state_name": "on_death"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 3.5835142135620119,
+						"end_time": 5.333000183105469,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "lightning_snake_barrage_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 4.240375518798828,
+						"end_time": 4.358087539672852,
+						"state_name": "on_death"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 4.433228492736816,
+						"end_time": 4.559910297393799,
+						"state_name": "on"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 7.635486602783203,
+						"end_time": 7.73077392578125,
+						"state_name": "on_death"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 7.944948673248291,
+						"end_time": 8.125450134277344,
+						"state_name": "on"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 1.9612925052642823,
+						"end_time": 2.0720109939575197,
+						"state_name": "on_death"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 2.239908456802368,
+						"end_time": 2.591130256652832,
+						"state_name": "on"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/attachments/Skirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Skirt/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Skirt/Skirt.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false hip_jntBnd root_jntBnd spine_2_jntBnd chest_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/attachments/Skirt_attach.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Skirt_attach/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Skirt_attach/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd chest_jntBnd child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Skirt_attach/Skirt_attach.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false hip_jntBnd root_jntBnd spine_2_jntBnd chest_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/attachments/Shoulder_danglers.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Shoulder_danglers/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Shoulder_danglers/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		linear_allowed_contraction = 0.000
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd head_jntBnd child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Shoulder_danglers/Shoulder_danglers.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd head_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/attachments/Cape.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Cape/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Cape/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.800
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "spine_2_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 R_clavicle_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 
+		aux_cape_L_1_jntBnd aux_cape_L_2_jntBnd aux_cape_L_3_jntBnd aux_cape_L_4_jntBnd aux_cape_L_5_jntBnd aux_cape_L_6_jntBnd aux_cape_L_7_jntBnd 
+		aux_cape_L_8_jntBnd aux_cape_L_9_jntBnd aux_cape_L_10_jntBnd aux_cape_L_11_jntBnd aux_cape_L_12_jntBnd aux_cape_L_13_jntBnd aux_cape_L_14_jntBnd
+		aux_cape_R_1_jntBnd aux_cape_R_2_jntBnd aux_cape_R_3_jntBnd aux_cape_R_4_jntBnd aux_cape_R_5_jntBnd aux_cape_R_6_jntBnd aux_cape_R_7_jntBnd 
+		aux_cape_R_8_jntBnd aux_cape_R_9_jntBnd aux_cape_R_10_jntBnd aux_cape_R_11_jntBnd aux_cape_R_12_jntBnd aux_cape_R_13_jntBnd aux_cape_R_14_jntBnd child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Cape/Cape.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 R_clavicle_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 
+		phys_skinned_cape_L_1_jntBnd phys_skinned_cape_L_2_jntBnd phys_skinned_cape_L_3_jntBnd phys_skinned_cape_L_4_jntBnd phys_skinned_cape_L_5_jntBnd phys_skinned_cape_L_6_jntBnd phys_skinned_cape_L_7_jntBnd 
+		phys_skinned_cape_L_8_jntBnd phys_skinned_cape_L_9_jntBnd phys_skinned_cape_L_10_jntBnd phys_skinned_cape_L_11_jntBnd phys_skinned_cape_L_12_jntBnd phys_skinned_cape_L_13_jntBnd phys_skinned_cape_L_14_jntBnd
+		phys_skinned_cape_R_1_jntBnd phys_skinned_cape_R_2_jntBnd phys_skinned_cape_R_3_jntBnd phys_skinned_cape_R_4_jntBnd phys_skinned_cape_R_5_jntBnd phys_skinned_cape_R_6_jntBnd phys_skinned_cape_R_7_jntBnd 
+		phys_skinned_cape_R_8_jntBnd phys_skinned_cape_R_9_jntBnd phys_skinned_cape_R_10_jntBnd phys_skinned_cape_R_11_jntBnd phys_skinned_cape_R_12_jntBnd phys_skinned_cape_R_13_jntBnd phys_skinned_cape_R_14_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/attachments/Weapon_01.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Weapon_01/rig.amd"
+	view_of = "rock_storm_01"
+		view_name = "lightning_barrage_test"
+	view_of = "dig_prefight_start_01"
+		view_name = "dig_prefight_start_short_01"
+		view_begin = 21408
+	view_of = "dig_fight_end_01"
+		view_name = "death_map_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Weapon_01/rig.ast"
+		socket = "NewSocket_1"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 600.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		animation_velocity_factor = 10.000
+		animation_force_factor = 100.000
+		animation_max_velocity = 5000.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Weapon_01/Weapon_01.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "body false phys_head_jntBnd phys_snake_16_jntBnd phys_snake_15_jntBnd phys_snake_13_jntBnd phys_snake_11_jntBnd phys_snake_09_jntBnd phys_snake_07_jntBnd phys_snake_05_jntBnd phys_snake_03_jntBnd phys_snake_01_jntBnd"
+		bone_group = "head false phys_head_jntBnd"
+		bone_group = "root false root_jntBnd"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "dig_fight_end_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_shatter.pet",
+						"bone_group": "body"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_idle_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_summon.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 21.33300018310547,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_lightning_emerge.pet",
+						"bone_group": "body"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 24.420907974243165,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_stab_step.pet",
+						"bone_group": "head"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_lightning_emerge.pet",
+						"bone_group": "body"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.0729284286499025,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/staff_stab_step.pet",
+						"bone_group": "head"
+					}
+				]
+			},
+			{
+				"name": "lightning_snake_barrage_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.9282792210578919,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_lightning_barrage_surge.pet",
+						"bone_group": "body"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.41070032119751,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_lightning_barrage_surge.pet",
+						"bone_group": "body"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 7.811112403869629,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_lightning_barrage_surge.pet",
+						"bone_group": "body"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3089430332183838,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_lightning_warp_surge.pet",
+						"bone_group": "body"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.3089430332183838,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_lightning_warp_surge.pet",
+						"bone_group": "body"
+					}
+				]
+			},
+			{
+				"name": "raise_and_raze_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.4682958126068117,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_raise_and_raze_surge.pet",
+						"bone_group": "body"
+					}
+				]
+			},
+			{
+				"name": "retreat_combo_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.4787072241306305,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_lightning_retreat.pet",
+						"bone_group": "body"
+					}
+				]
+			},
+			{
+				"name": "wall_escape_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.30799999833106997,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_lightning_warp_surge.pet",
+						"bone_group": "body"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 7.689874172210693,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_lightning_wall_escape.pet",
+						"bone_group": "body"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "lightning_snake_barrage_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6421800255775452,
+						"end_time": 3.200230836868286,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_head_trl_lightning_warp.trl",
+						"bone_group": "head"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 4.694646835327148,
+						"end_time": 6.592922210693359,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_head_trl_lightning_warp.trl",
+						"bone_group": "head"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 8.192913055419922,
+						"end_time": 10.014907836914063,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_head_trl_lightning_warp.trl",
+						"bone_group": "head"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 1.9699187278747559,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_head_trl_lightning_warp.trl",
+						"bone_group": "head"
+					}
+				]
+			},
+			{
+				"name": "lightning_warp_start_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"end_time": 1.9699187278747559,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_head_trl_lightning_warp.trl",
+						"bone_group": "head"
+					}
+				]
+			},
+			{
+				"name": "raise_and_raze_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 2.9658522605895998,
+						"end_time": 5.739024639129639,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_head_trl_lightning_warp.trl",
+						"bone_group": "head"
+					}
+				]
+			},
+			{
+				"name": "retreat_combo_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.0970999002456666,
+						"end_time": 1.364680290222168,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_head_trl_lightning_warp.trl",
+						"bone_group": "head"
+					}
+				]
+			},
+			{
+				"name": "rock_storm_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.5439021587371827,
+						"end_time": 4.131709098815918,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_head_trl_lightning_warp.trl",
+						"bone_group": "head"
+					}
+				]
+			},
+			{
+				"name": "rock_storm_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.2699600458145142,
+						"end_time": 6.718316555023193,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_head_trl_lightning_warp.trl",
+						"bone_group": "head"
+					}
+				]
+			},
+			{
+				"name": "snake_attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.6000813245773315,
+						"end_time": 0.7601625323295593,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_head_trl_lightning_warp.trl",
+						"bone_group": "head"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 1.3504064083099366,
+						"end_time": 1.468675136566162,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_head_trl_lightning_warp.trl",
+						"bone_group": "head"
+					}
+				]
+			},
+			{
+				"name": "snake_attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.45891186594963076,
+						"end_time": 0.6989070773124695,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/fx/onact/snake_head_trl_lightning_warp.trl",
+						"bone_group": "head"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "dig_fight_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/hide_snake.epk",
+						"remove_on_animation_end": false
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_idle_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/summon_snake.epk"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/summon_snake.epk"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.174316883087158,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/summon_snake.epk"
+					}
+				]
+			},
+			{
+				"name": "lightning_snake_barrage_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_surge_snake_epic.epk"
+					}
+				]
+			},
+			{
+				"name": "pillar_destruction_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_surge_snake_epic.epk"
+					}
+				]
+			},
+			{
+				"name": "raise_and_raze_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 4.039621829986572,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_surge_snake.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 4.041460990905762,
+						"end_time": 6.607914924621582,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_warp_start.epk"
+					}
+				]
+			},
+			{
+				"name": "retreat_combo_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_surge_snake_epic.epk"
+					}
+				]
+			},
+			{
+				"name": "rock_storm_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_surge_snake.epk"
+					}
+				]
+			},
+			{
+				"name": "rock_storm_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_surge_snake.epk"
+					}
+				]
+			},
+			{
+				"name": "snake_attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_surge_snake.epk"
+					}
+				]
+			},
+			{
+				"name": "snake_attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_surge_snake_epic.epk"
+					}
+				]
+			},
+			{
+				"name": "wall_escape_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/TwilightOrderOverlord/epk/lightning_surge_snake_epic.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "dig_fight_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.345708847045898,
+						"name": "releaseTime_R",
+						"auto_reset": false,
+						"curve": "5 0 0 Linear 0.276699 0.834459 Flat 4.5 0.834 Linear 4.5 1 Linear 6.34571 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.3329999446868898,
+						"name": "releaseTime_R",
+						"curve": "4 0 1 Linear 1.69161 1 Linear 1.9539 1 Flat 3.333 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 21.33300018310547,
+						"name": "releaseTime_R",
+						"curve": "4 0 1 Linear 10.8272 1 Linear 12.506 1 Flat 21.333 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 21.33300018310547,
+						"end_time": 26.666000366210939,
+						"name": "releaseTime_R",
+						"curve": "5 21.333 1 Linear 22.89 1 Linear 24.0397 0.922297 Linear 24.4594 0 Flat 26.666 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 21.33300018310547,
+						"end_time": 26.666000366210939,
+						"name": "Condition",
+						"curve": "4 21.333 0 Linear 22.7784 0 Linear 23.1043 1 Linear 26.666 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 21.33300018310547,
+						"end_time": 26.666000366210939,
+						"name": "releaseTime_L",
+						"curve": "7 21.333 0 Linear 21.5931 0 Flat 23.9705 0.577703 Flat 24.3187 1 Linear 24.4192 0.652027 Linear 25.3992 0 Flat 26.666 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "dig_prefight_start_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.333000183105469,
+						"name": "releaseTime_R",
+						"curve": "5 0 1 Linear 1.55704 1 Linear 2.6 0.9 Linear 3.12636 0 Flat 5.333 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.333000183105469,
+						"name": "Condition",
+						"curve": "4 0 0 Linear 1.04361 0 Linear 2.11735 1 Linear 5.333 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.333000183105469,
+						"name": "releaseTime_L",
+						"curve": "7 0 0 Linear 0.260065 0 Flat 2.63748 0.577703 Flat 2.98572 1 Linear 3.08618 0.652027 Linear 4.06616 0 Flat 5.333 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "lightning_snake_barrage_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.4144301414489748,
+						"name": "surgeTime_L",
+						"curve": "7 0 0 Custom 0 0 0.932368 0.287162 Flat 1 0.66 Custom 3.58585 -1.33925 2.87166 0.402027 Flat 2.996 0.766892 Linear 3.08207 0.753378 Linear 3.41443 0.3 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 3.4144299030303957,
+						"end_time": 6.924383640289307,
+						"name": "surgeTime_L",
+						"curve": "6 3.41443 0.3 Smooth 6.36641 0.402027 Flat 6.49423 0.766892 Linear 6.58273 0.753378 Linear 6.64666 0.402027 Smooth 6.92438 0.3 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 7.072115421295166,
+						"end_time": 11.032999992370606,
+						"name": "surgeTime_L",
+						"curve": "7 7.07212 0.3 Smooth 7.62966 0.320946 Smooth 9.57196 0.408784 Flat 9.84334 0.820946 Linear 10.0043 0.800676 Linear 10.5365 0.206081 Smooth 11.033 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "pillar_destruction_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 9.800000190734864,
+						"name": "surgeTime_L",
+						"curve": "6 0 0 Smooth 0.781457 0.0641892 Flat 0.94144 0.246622 Flat 8.85446 0.158784 Smooth 8.99803 0.293919 Smooth 9.8 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "raise_and_raze_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "surgeTime_R",
+						"auto_reset": false,
+						"curve": "7 0 0 Linear 0.583926 0.733108 Smooth 3.79364 0.638514 Flat 4.21557 1 Smooth 4.29845 1 Linear 4.49686 0.415541 Smooth 6 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "retreat_combo_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.065999984741211,
+						"name": "surgeTime_L",
+						"auto_reset": false,
+						"curve": "5 0 0 Linear 0.934413 0.341216 Flat 1.42908 0.60473 Linear 1.60809 0 Flat 2.066 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "rock_storm_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 6.0,
+						"name": "surgeTime_R",
+						"auto_reset": false,
+						"curve": "6 0 0 Linear 0.769778 0.638514 Smooth 4 0.719595 Flat 4 0.885135 Smooth 4.68522 0 Linear 6 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "rock_storm_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 9.732999801635743,
+						"name": "surgeTime_R",
+						"auto_reset": false,
+						"curve": "6 0 0 Linear 1.24871 0.638514 Smooth 7.7533 0.719595 Flat 7.7533 0.885135 Smooth 8.82652 0 Linear 9.733 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "snake_attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.200000047683716,
+						"name": "surgeTime_R",
+						"auto_reset": false,
+						"curve": "6 0 0 Linear 0.768481 0.888514 Smooth 0.768481 0.489865 Linear 1.55952 0.827703 Smooth 1.55952 0 Linear 2.2 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "snake_attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.6660000085830689,
+						"name": "surgeTime_L",
+						"auto_reset": false,
+						"curve": "5 0 0 Smooth 0.604962 0.307432 Flat 0.699106 0.503378 Linear 0.970381 0 Flat 1.666 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "wall_escape_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.4144301414489748,
+						"name": "surgeTime_L",
+						"curve": "4 0 0 Linear 1.57057 0.489865 Custom 0 0 2.42028 0 Linear 3.41443 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 3.1331253051757814,
+						"end_time": 13.215331077575684,
+						"name": "surgeTime_L",
+						"curve": "7 3.13313 0 Smooth 5.71342 0.408784 Flat 5.99704 0.577703 Flat 7.32881 0 Flat 11.8852 0.429054 Flat 11.9592 1 Flat 13.2153 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/TwilightOrder/TwilightOrderExcavationOverlord/attachments/Weapon_02.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/attachments/Weapon_02/TwilightOrderOverlordWeapon.fmt"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/TwilightOrderExcavationOverlord.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/TwilightOrderExcavationOverlord_armour_7ea1835a.smd"
+Materials 1
+	"Art/Models/MONSTERS/TwilightOrderExcavationOverlord/Textures/TwilightOrderExcavationOverlordc.mat" 18
+BoundingBox -68.8228 -17.9589 -201.183 68.8228 23.6229 0.353292
+BoneGroups 18
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/TwilightOrderExcavationOverlord/TwilightOrderExcavationOverlord_armour_7ea1835a.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 18 in the header, 18 in the block · 13280 triangles over 9868 vertices
+  names: 538 bytes said, 538 read  [agree]
+
+=== shapes (39)
+0	beltShape	from 0	count 744
+1	bodyShape	from 744	count 8304
+2	cape_base_chestShape	from 9048	count 327
+3	cape_top_chestShape	from 9375	count 24
+4	chest_chainsShape	from 9399	count 1728
+5	chest_cloth_baseShape	from 11127	count 1620
+6	chest_cloth_midShape	from 12747	count 1728
+7	chest_cloth_topShape	from 14475	count 1044
+8	chestpieceShape	from 15519	count 477
+9	headpieceShape	from 15996	count 4440
+10	hoodShape	from 20436	count 4512
+11	L_bootShape	from 24948	count 3546
+12	L_gauntletShape	from 28494	count 786
+13	L_handShape	from 29280	count 2646
+14	R_bootShape	from 31926	count 3546
+15	R_gauntletShape	from 35472	count 786
+16	R_handShape	from 36258	count 2646
+17	shoulder_ringmailShape	from 38904	count 936
+18	front_danglersShape	from 39840	count 120
+19	skirt_baseShape	from 39960	count 5592
+20	front_scrollShape	from 45552	count 3888
+21	L_belt_danglerShape	from 49440	count 1944
+22	L_skirt_danglerShape	from 51384	count 1080
+23	R_belt_danglerShape	from 52464	count 1944
+24	R_skirt_danglerShape	from 54408	count 1080
+25	skirt_front_baseShape	from 55488	count 2028
+26	skirt_midShape	from 57516	count 1848
+27	L_shoulder_danglerShape	from 59364	count 936
+28	R_shoulder_danglerShape	from 60300	count 936
+29	shoulder_cloth_danglersShape	from 61236	count 1392
+30	cape_baseShape	from 62628	count 3306
+31	cape_cloth_danglersShape	from 65934	count 936
+32	cape_midShape	from 66870	count 1272
+33	cape_topShape	from 68142	count 1908
+34	L_cape_danglerShape	from 70050	count 936
+35	R_cape_danglerShape	from 70986	count 936
+36	scrollsShape	from 71922	count 3552
+37	doubleShape	from 75474	count 3702
+38	opaqueShape	from 79176	count 15210
+
+=== fitting
+the monster's rig: 111 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_cape_L_8_jntBnd, aux_cape_L_1_jntBnd, aux_cape_R_8_jntBnd, aux_cape_R_1_jntBnd, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_cape_L_9_jntBnd, aux_cape_L_2_jntBnd, aux_cape_R_9_jntBnd, aux_cape_R_2_jntBnd, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_cape_L_10_jntBnd, aux_cape_L_3_jntBnd, aux_cape_R_10_jntBnd, aux_cape_R_3_jntBnd, aux_cape_L_11_jntBnd, aux_cape_L_4_jntBnd, aux_cape_R_11_jntBnd, aux_cape_R_4_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment, aux_cape_L_12_jntBnd, aux_cape_L_5_jntBnd, aux_cape_R_12_jntBnd, aux_cape_R_5_jntBnd, aux_cape_L_13_jntBnd, aux_cape_L_6_jntBnd, aux_cape_R_13_jntBnd, aux_cape_R_6_jntBnd, aux_cape_L_14_jntBnd, aux_cape_L_7_jntBnd, aux_cape_R_14_jntBnd, aux_cape_R_7_jntBnd
+  Skirt.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-39.7,-15.4,-1.3)..(39.7,27,100.3)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 1904 triangles over 1212 vertices
+    names: 68 bytes said, 68 read  [agree]
+    rig 52 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 51 of 52  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,3.2,15.4)  carrier has (0,3.2,-89.9)
+      2 spine_2_jntBnd  [shared]  under 0  rests at (-0,-0.7,-10.2)  carrier has (0,-0.7,-115.5)
+      3 phys_skinned_skirt_L_1_jntBnd  [its own]  under 0  rests at (5.9,-11.9,4.3)
+      4 phys_skinned_skirt_L_7_jntBnd  [its own]  under 0  rests at (15.1,-5.2,4.2)
+      5 phys_skinned_skirt_L_13_jntBnd  [its own]  under 0  rests at (14.2,4.5,4.3)
+      6 phys_skinned_skirt_L_19_jntBnd  [its own]  under 0  rests at (5.3,11.2,4.3)
+      7 phys_skinned_skirt_R_1_jntBnd  [its own]  under 0  rests at (-5.9,-11.9,4.3)
+      8 phys_skinned_skirt_R_7_jntBnd  [its own]  under 0  rests at (-15.1,-5.2,4.2)
+      9 phys_skinned_skirt_R_13_jntBnd  [its own]  under 0  rests at (-14.2,4.5,4.3)
+      10 phys_skinned_skirt_R_19_jntBnd  [its own]  under 0  rests at (-5.3,11.2,4.3)
+      11 chest_jntBnd  [shared]  under 2  rests at (-0,-0.3,-21.9)  carrier has (0,-0.3,-127.3)
+      12 phys_skinned_skirt_L_2_jntBnd  [its own]  under 3  rests at (7,-11.8,22.3)
+      13 phys_skinned_skirt_L_8_jntBnd  [its own]  under 4  rests at (17.8,-4.5,22.2)
+      14 phys_skinned_skirt_L_14_jntBnd  [its own]  under 5  rests at (16.7,6.1,22.2)
+      15 phys_skinned_skirt_L_20_jntBnd  [its own]  under 6  rests at (6.2,13.4,22.3)
+      16 phys_skinned_skirt_R_2_jntBnd  [its own]  under 7  rests at (-7,-11.8,22.3)
+      17 phys_skinned_skirt_R_8_jntBnd  [its own]  under 8  rests at (-17.8,-4.5,22.2)
+      18 phys_skinned_skirt_R_14_jntBnd  [its own]  under 9  rests at (-16.7,6.1,22.2)
+      19 phys_skinned_skirt_R_20_jntBnd  [its own]  under 10  rests at (-6.2,13.4,22.3)
+      20 phys_skinned_skirt_L_3_jntBnd  [its own]  under 12  rests at (8.1,-11.7,40.2)
+      21 phys_skinned_skirt_L_9_jntBnd  [its own]  under 13  rests at (20.6,-3.8,40.1)
+      22 phys_skinned_skirt_L_15_jntBnd  [its own]  under 14  rests at (19.2,7.7,40.2)
+      23 phys_skinned_skirt_L_21_jntBnd  [its own]  under 15  rests at (7.2,15.6,40.2)
+      24 phys_skinned_skirt_R_3_jntBnd  [its own]  under 16  rests at (-8.1,-11.7,40.2)
+      25 phys_skinned_skirt_R_9_jntBnd  [its own]  under 17  rests at (-20.6,-3.8,40.1)
+      26 phys_skinned_skirt_R_15_jntBnd  [its own]  under 18  rests at (-19.2,7.7,40.2)
+      27 phys_skinned_skirt_R_21_jntBnd  [its own]  under 19  rests at (-7.2,15.6,40.2)
+      28 phys_skinned_skirt_L_4_jntBnd  [its own]  under 20  rests at (9.2,-11.5,58.2)
+      29 phys_skinned_skirt_L_10_jntBnd  [its own]  under 21  rests at (23.3,-3.1,58.1)
+      30 phys_skinned_skirt_L_16_jntBnd  [its own]  under 22  rests at (21.7,9.3,58.1)
+      31 phys_skinned_skirt_L_22_jntBnd  [its own]  under 23  rests at (8.2,17.8,58.2)
+      32 phys_skinned_skirt_R_4_jntBnd  [its own]  under 24  rests at (-9.2,-11.5,58.2)
+      33 phys_skinned_skirt_R_10_jntBnd  [its own]  under 25  rests at (-23.3,-3.1,58.1)
+      34 phys_skinned_skirt_R_16_jntBnd  [its own]  under 26  rests at (-21.7,9.3,58.1)
+      35 phys_skinned_skirt_R_22_jntBnd  [its own]  under 27  rests at (-8.2,17.8,58.2)
+      36 phys_skinned_skirt_L_5_jntBnd  [its own]  under 28  rests at (10.2,-11.4,76.2)
+      37 phys_skinned_skirt_L_11_jntBnd  [its own]  under 29  rests at (26,-2.3,76.1)
+      38 phys_skinned_skirt_L_17_jntBnd  [its own]  under 30  rests at (24.2,10.9,76.1)
+      39 phys_skinned_skirt_L_23_jntBnd  [its own]  under 31  rests at (9.1,20,76.1)
+      40 phys_skinned_skirt_R_5_jntBnd  [its own]  under 32  rests at (-10.2,-11.4,76.2)
+      41 phys_skinned_skirt_R_11_jntBnd  [its own]  under 33  rests at (-26,-2.3,76.1)
+      42 phys_skinned_skirt_R_17_jntBnd  [its own]  under 34  rests at (-24.2,10.9,76.1)
+      43 phys_skinned_skirt_R_23_jntBnd  [its own]  under 35  rests at (-9.1,20,76.1)
+      44 phys_skinned_skirt_L_6_jntBnd  [its own]  under 36  rests at (11.3,-11.3,94.1)
+      45 phys_skinned_skirt_L_12_jntBnd  [its own]  under 37  rests at (28.7,-1.6,94.1)
+      46 phys_skinned_skirt_L_18_jntBnd  [its own]  under 38  rests at (26.7,12.5,94.1)
+      47 phys_skinned_skirt_L_24_jntBnd  [its own]  under 39  rests at (10.1,22.2,94)
+      48 phys_skinned_skirt_R_6_jntBnd  [its own]  under 40  rests at (-11.3,-11.3,94.1)
+      49 phys_skinned_skirt_R_12_jntBnd  [its own]  under 41  rests at (-28.7,-1.6,94.1)
+      50 phys_skinned_skirt_R_18_jntBnd  [its own]  under 42  rests at (-26.7,12.5,94.1)
+      51 phys_skinned_skirt_R_24_jntBnd  [its own]  under 43  rests at (-10.1,22.2,94)
+  Skirt_attach.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-29.3,-19.7,-4.6)..(29.3,22.3,101.4)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 7 in the header, 7 in the block · 4604 triangles over 3646 vertices
+    names: 260 bytes said, 260 read  [agree]
+    rig 44 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 42 of 44  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,3.2,15.4)  carrier has (0,3.2,-89.9)
+      2 spine_2_jntBnd  [shared]  under 0  rests at (-0,-0.7,-10.2)  carrier has (0,-0.7,-115.5)
+      3 phys_skinned_skirt_L_1_jntBnd  [its own]  under 0  rests at (5.9,-11.9,4.3)
+      4 phys_skinned_skirt_L_7_jntBnd  [its own]  under 0  rests at (15.1,-5.2,4.2)
+      5 phys_skinned_skirt_L_13_jntBnd  [its own]  under 0  rests at (14.2,4.5,4.3)
+      6 phys_skinned_skirt_L_19_jntBnd  [its own]  under 0  rests at (5.3,11.2,4.3)
+      7 phys_skinned_skirt_R_1_jntBnd  [its own]  under 0  rests at (-5.9,-11.9,4.3)
+      8 phys_skinned_skirt_R_7_jntBnd  [its own]  under 0  rests at (-15.1,-5.2,4.2)
+      9 phys_skinned_skirt_R_13_jntBnd  [its own]  under 0  rests at (-14.2,4.5,4.3)
+      10 phys_skinned_skirt_R_19_jntBnd  [its own]  under 0  rests at (-5.3,11.2,4.3)
+      11 chest_jntBnd  [shared]  under 2  rests at (-0,-0.3,-21.9)  carrier has (0,-0.3,-127.3)
+      12 phys_skinned_skirt_L_2_jntBnd  [its own]  under 3  rests at (7,-11.8,22.3)
+      13 phys_skinned_skirt_L_8_jntBnd  [its own]  under 4  rests at (17.8,-4.5,22.2)
+      14 phys_skinned_skirt_L_14_jntBnd  [its own]  under 5  rests at (16.7,6.1,22.2)
+      15 phys_skinned_skirt_L_20_jntBnd  [its own]  under 6  rests at (6.2,13.4,22.3)
+      16 phys_skinned_skirt_R_2_jntBnd  [its own]  under 7  rests at (-7,-11.8,22.3)
+      17 phys_skinned_skirt_R_8_jntBnd  [its own]  under 8  rests at (-17.8,-4.5,22.2)
+      18 phys_skinned_skirt_R_14_jntBnd  [its own]  under 9  rests at (-16.7,6.1,22.2)
+      19 phys_skinned_skirt_R_20_jntBnd  [its own]  under 10  rests at (-6.2,13.4,22.3)
+      20 phys_skinned_skirt_L_3_jntBnd  [its own]  under 12  rests at (8.1,-11.7,40.2)
+      21 phys_skinned_skirt_L_9_jntBnd  [its own]  under 13  rests at (20.6,-3.8,40.1)
+      22 phys_skinned_skirt_L_15_jntBnd  [its own]  under 14  rests at (19.2,7.7,40.2)
+      23 phys_skinned_skirt_L_21_jntBnd  [its own]  under 15  rests at (7.2,15.6,40.2)
+      24 phys_skinned_skirt_R_3_jntBnd  [its own]  under 16  rests at (-8.1,-11.7,40.2)
+      25 phys_skinned_skirt_R_9_jntBnd  [its own]  under 17  rests at (-20.6,-3.8,40.1)
+      26 phys_skinned_skirt_R_15_jntBnd  [its own]  under 18  rests at (-19.2,7.7,40.2)
+      27 phys_skinned_skirt_R_21_jntBnd  [its own]  under 19  rests at (-7.2,15.6,40.2)
+      28 phys_skinned_skirt_L_4_jntBnd  [its own]  under 20  rests at (9.2,-11.5,58.2)
+      29 phys_skinned_skirt_L_10_jntBnd  [its own]  under 21  rests at (23.3,-3.1,58.1)
+      30 phys_skinned_skirt_L_16_jntBnd  [its own]  under 22  rests at (21.7,9.3,58.1)
+      31 phys_skinned_skirt_L_22_jntBnd  [its own]  under 23  rests at (8.2,17.8,58.2)
+      32 phys_skinned_skirt_R_4_jntBnd  [its own]  under 24  rests at (-9.2,-11.5,58.2)
+      33 phys_skinned_skirt_R_10_jntBnd  [its own]  under 25  rests at (-23.3,-3.1,58.1)
+      34 phys_skinned_skirt_R_16_jntBnd  [its own]  under 26  rests at (-21.7,9.3,58.1)
+      35 phys_skinned_skirt_R_22_jntBnd  [its own]  under 27  rests at (-8.2,17.8,58.2)
+      36 phys_skinned_skirt_L_5_jntBnd  [its own]  under 28  rests at (10.2,-11.4,76.2)
+      37 phys_skinned_skirt_L_11_jntBnd  [its own]  under 29  rests at (26,-2.3,76.1)
+      38 phys_skinned_skirt_R_5_jntBnd  [its own]  under 32  rests at (-10.2,-11.4,76.2)
+      39 phys_skinned_skirt_R_11_jntBnd  [its own]  under 33  rests at (-26,-2.3,76.1)
+      40 phys_skinned_skirt_L_6_jntBnd  [its own]  under 36  rests at (11.3,-11.3,94.1)
+      41 phys_skinned_skirt_L_12_jntBnd  [its own]  under 37  rests at (28.7,-1.6,94.1)
+      42 phys_skinned_skirt_R_6_jntBnd  [its own]  under 38  rests at (-11.3,-11.3,94.1)
+      43 phys_skinned_skirt_R_12_jntBnd  [its own]  under 39  rests at (-28.7,-1.6,94.1)
+  Shoulder_danglers.ao  socket chest_jntBnd [in its carrier's rig]  box (-27.7,-10.6,-21.2)..(27.7,1.2,27.1)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 1088 triangles over 918 vertices
+    names: 148 bytes said, 148 read  [agree]
+    rig 17 bones, 9 of them names its carrier's rig also has
+    mesh weights reach bone 16 of 17  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (4.7,1,-14.1)  carrier has (4.7,0.7,-141.4)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-4.7,1,-14.1)  carrier has (-4.7,0.7,-141.4)
+      3 neck_jntBnd  [shared]  under 0  rests at (0,3.5,-19.1)  carrier has (0,3.2,-146.4)
+      4 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (-20.2,-5.2,1.2)
+      5 phys_skinned_L_1_jntBnd  [its own]  under 0  rests at (20.2,-5.2,1.2)
+      6 L_shoulder_jntBnd  [shared]  under 1  rests at (15.8,6.3,-11)  carrier has (15.8,6,-138.3)
+      7 R_shoulder_jntBnd  [shared]  under 2  rests at (-15.8,6.3,-11)  carrier has (-15.8,6,-138.3)
+      8 head_jntBnd  [shared]  under 3  rests at (-0,0.5,-31.4)  carrier has (-0,0.2,-158.6)
+      9 phys_skinned_R_2_jntBnd  [its own]  under 4  rests at (-20.5,-5.5,7.2)
+      10 phys_skinned_L_2_jntBnd  [its own]  under 5  rests at (20.5,-5.5,7.2)
+      11 L_shoulder_cTwist_jntBnd_1  [shared]  under 6  rests at (25.5,7.2,-3.5)  carrier has (25.5,6.8,-130.7)
+      12 R_shoulder_cTwist_jntBnd_1  [shared]  under 7  rests at (-25.5,7.2,-3.5)  carrier has (-25.5,6.8,-130.7)
+      13 phys_skinned_R_3_jntBnd  [its own]  under 9  rests at (-20.7,-5.8,13)
+      14 phys_skinned_L_3_jntBnd  [its own]  under 10  rests at (20.7,-5.8,13)
+      15 phys_skinned_R_3_jntBnd|phys_skinned_R_4_jntBnd  [its own]  under 13  rests at (-20.9,-6,22.9)
+      16 phys_skinned_L_3_jntBnd|phys_skinned_R_4_jntBnd  [its own]  under 14  rests at (20.9,-6,22.9)
+  Cape.ao  socket spine_2_jntBnd [in its carrier's rig]  box (-78.7,12.8,-17.4)..(80.2,101,115.5)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 7 in the header, 7 in the block · 4282 triangles over 3366 vertices
+    names: 228 bytes said, 228 read  [agree]
+    rig 36 bones, 8 of them names its carrier's rig also has
+    mesh weights reach bone 35 of 36  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 chest_jntBnd  [shared]  under 0  rests at (0,0.4,-11.7)  carrier has (0,-0.3,-127.3)
+      2 L_clavicle_jntBnd  [shared]  under 1  rests at (4.7,1.4,-25.8)  carrier has (4.7,0.7,-141.4)
+      3 R_clavicle_jntBnd  [shared]  under 1  rests at (-4.7,1.4,-25.8)  carrier has (-4.7,0.7,-141.4)
+      4 phys_skinned_cape_R_1_jntBnd  [its own]  under 1  rests at (-8.4,14.8,2.4)
+      5 phys_skinned_cape_R_8_jntBnd  [its own]  under 1  rests at (-25.5,14.8,2.6)
+      6 phys_skinned_cape_L_1_jntBnd  [its own]  under 1  rests at (8.4,14.8,2.4)
+      7 phys_skinned_cape_L_8_jntBnd  [its own]  under 1  rests at (25.5,14.8,2.6)
+      8 L_shoulder_jntBnd  [shared]  under 2  rests at (15.8,6.7,-22.8)  carrier has (15.8,6,-138.3)
+      9 R_shoulder_jntBnd  [shared]  under 3  rests at (-15.8,6.7,-22.8)  carrier has (-15.8,6,-138.3)
+      10 phys_skinned_cape_R_2_jntBnd  [its own]  under 4  rests at (-10.2,21.2,29.5)
+      11 phys_skinned_cape_R_9_jntBnd  [its own]  under 5  rests at (-31.2,21.2,29.6)
+      12 phys_skinned_cape_L_2_jntBnd  [its own]  under 6  rests at (10.2,21.2,29.5)
+      13 phys_skinned_cape_L_9_jntBnd  [its own]  under 7  rests at (31.2,21.2,29.6)
+      14 L_shoulder_cTwist_jntBnd_1  [shared]  under 8  rests at (25.5,7.5,-15.2)  carrier has (25.5,6.8,-130.7)
+      15 R_shoulder_cTwist_jntBnd_1  [shared]  under 9  rests at (-25.5,7.5,-15.2)  carrier has (-25.5,6.8,-130.7)
+      16 phys_skinned_cape_R_3_jntBnd  [its own]  under 10  rests at (-12.2,27.8,57)
+      17 phys_skinned_cape_R_10_jntBnd  [its own]  under 11  rests at (-37,27.8,56.9)
+      18 phys_skinned_cape_L_3_jntBnd  [its own]  under 12  rests at (12.2,27.8,57)
+      19 phys_skinned_cape_L_10_jntBnd  [its own]  under 13  rests at (37,27.8,56.9)
+      20 phys_skinned_cape_R_4_jntBnd  [its own]  under 16  rests at (-14.2,34,82.7)
+      21 phys_skinned_cape_R_11_jntBnd  [its own]  under 17  rests at (-42.8,34,82.8)
+      22 phys_skinned_cape_L_4_jntBnd  [its own]  under 18  rests at (14.2,34,82.7)
+      23 phys_skinned_cape_L_11_jntBnd  [its own]  under 19  rests at (42.8,34,82.8)
+      24 phys_skinned_cape_R_5_jntBnd  [its own]  under 20  rests at (-16.2,45.1,102.5)
+      25 phys_skinned_cape_R_12_jntBnd  [its own]  under 21  rests at (-49.2,45.1,102.5)
+      26 phys_skinned_cape_L_5_jntBnd  [its own]  under 22  rests at (16.2,45.1,102.5)
+      27 phys_skinned_cape_L_12_jntBnd  [its own]  under 23  rests at (49.2,45.1,102.5)
+      28 phys_skinned_cape_R_6_jntBnd  [its own]  under 24  rests at (-18.1,64.4,112.7)
+      29 phys_skinned_cape_R_13_jntBnd  [its own]  under 25  rests at (-55.6,64.6,112.8)
+      30 phys_skinned_cape_L_6_jntBnd  [its own]  under 26  rests at (18.1,64.4,112.7)
+      31 phys_skinned_cape_L_13_jntBnd  [its own]  under 27  rests at (55.6,64.6,112.8)
+      32 phys_skinned_cape_R_7_jntBnd  [its own]  under 28  rests at (-20.1,88.8,115.5)
+      33 phys_skinned_cape_R_14_jntBnd  [its own]  under 29  rests at (-62.5,89,115.5)
+      34 phys_skinned_cape_L_7_jntBnd  [its own]  under 30  rests at (20.1,88.8,115.5)
+      35 phys_skinned_cape_L_14_jntBnd  [its own]  under 31  rests at (62.5,89,115.5)
+  Weapon_01.ao  socket root_jntBnd [in its carrier's rig]  box (-24.2,-16.8,-238.5)..(24.2,7.7,34.9)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 6304 triangles over 4569 vertices
+    names: 44 bytes said, 44 read  [agree]
+    rig 22 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 20 of 22  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (-0,-0,-0)  carrier has (0,0,0)
+      1 phys_snake_01_jntBnd  [its own]  under 0  rests at (-0,-0,-31.2)
+      2 phys_snake_02_jntBnd  [its own]  under 0  rests at (-0,-0,-42.2)
+      3 phys_snake_03_jntBnd  [its own]  under 0  rests at (-0,-0,-53.2)
+      4 phys_snake_04_jntBnd  [its own]  under 0  rests at (-0,-0,-64.2)
+      5 phys_snake_05_jntBnd  [its own]  under 0  rests at (-0,-0,-75.1)
+      6 phys_snake_06_jntBnd  [its own]  under 0  rests at (-0,-0,-86.1)
+      7 phys_snake_07_jntBnd  [its own]  under 0  rests at (-0,-0,-97.1)
+      8 phys_snake_08_jntBnd  [its own]  under 0  rests at (-0,-0,-108)
+      9 phys_snake_09_jntBnd  [its own]  under 0  rests at (-0,-0,-119)
+      10 phys_snake_10_jntBnd  [its own]  under 0  rests at (-0,-0,-130)
+      11 phys_snake_11_jntBnd  [its own]  under 0  rests at (-0,-0,-140.9)
+      12 phys_snake_12_jntBnd  [its own]  under 0  rests at (-0,-0,-151.9)
+      13 phys_snake_13_jntBnd  [its own]  under 0  rests at (-0,-0,-162.9)
+      14 phys_snake_14_jntBnd  [its own]  under 0  rests at (-0,-0,-173.9)
+      15 phys_snake_15_jntBnd  [its own]  under 0  rests at (-0,-0,-184.8)
+      16 phys_snake_16_jntBnd  [its own]  under 0  rests at (-0,-0,-195.8)
+      17 phys_snake_17_jntBnd  [its own]  under 0  rests at (-0,-0,-206.8)
+      18 phys_head_jntBnd  [its own]  under 0  rests at (-0,-0,-210.9)
+      19 phys_jaw_jntBnd  [its own]  under 0  rests at (-0,0,-210.9)
+      20 phys_tri_jaw_jntBnd  [its own]  under 0  rests at (-0,0,-210.9)
+      21 aux_animation_control_ratio  [its own]  under 0  rests at (-0,-0,-0)
+  Weapon_02.ao  socket L_Weapon [NOT in its carrier's rig]  fixed mesh TwilightOrderOverlordWeapon.fmt  1 shapes
+      TwilightOrderOverlordWeaponShape  ->  Art/Models/MONSTERS/TwilightOrderExcavationOverlord/Textures/TwilightOrderOverlordWeaponc.mat

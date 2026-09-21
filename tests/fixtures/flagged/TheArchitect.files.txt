@@ -1,0 +1,3589 @@
+monster: Xipocado, Royal Architect [Metadata/Monsters/LeagueIncursionNew/ArchitectBoss/TheArchitect]
+
+=== .ao Metadata/Monsters/LeagueIncursionNew/ArchitectBoss/ArchitectBoss.ao (depth 0)
+version 3
+extends "Metadata/Monsters/HeadVaalArchivist/HeadVaalArchivistMinibossT3"
+
+AnimationController
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8365100026130676,
+					"name": "rune_1",
+					"position": [
+						-75.0,
+						-50.0,
+						-150.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9080161452293396,
+					"name": "rune_2",
+					"position": [
+						0.0,
+						-75.0,
+						-150.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9426860809326172,
+					"name": "rune_3",
+					"position": [
+						75.0,
+						-50.0,
+						-150.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0348800420761109,
+					"name": "i_only_exist_to_provide_a_height_value",
+					"position": [
+						0.0,
+						0.0,
+						-150.0
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8365100026130676,
+					"name": "rune_3",
+					"position": [
+						75.0,
+						-50.0,
+						-150.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9080161452293396,
+					"name": "rune_2",
+					"position": [
+						0.0,
+						-75.0,
+						-150.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.9426860809326172,
+					"name": "rune_1",
+					"position": [
+						-75.0,
+						-50.0,
+						-150.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.0348800420761109,
+					"name": "i_only_exist_to_provide_a_height_value",
+					"position": [
+						0.0,
+						0.0,
+						-150.0
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.4687747955322266,
+					"name": "helix_rune_left",
+					"position": [
+						150.0,
+						0.0,
+						-180.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.4687747955322266,
+					"name": "helix_rune_right",
+					"position": [
+						-150.0,
+						1.8369701782925894e-14,
+						-180.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9730000495910645,
+					"name": "spin",
+					"position": [
+						0.0,
+						0.0,
+						-180.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9739999771118165,
+					"name": "helix_point",
+					"position": [
+						-150.0,
+						1.8369701782925894e-14,
+						-180.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9739999771118165,
+					"name": "helix_point",
+					"position": [
+						150.0,
+						0.0,
+						-180.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.067333221435547,
+					"name": "helix_point",
+					"position": [
+						-114.90666961669922,
+						-96.41814422607422,
+						-165.55555725097657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.067333221435547,
+					"name": "helix_point",
+					"position": [
+						114.90666961669922,
+						96.41814422607422,
+						-165.55555725097657
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.1606667041778566,
+					"name": "helix_point",
+					"position": [
+						-26.047225952148439,
+						-147.72116088867188,
+						-151.11111450195313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.1606667041778566,
+					"name": "helix_point",
+					"position": [
+						26.047225952148439,
+						147.72116088867188,
+						-151.11111450195313
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.253999948501587,
+					"name": "helix_point",
+					"position": [
+						75.0,
+						-129.90380859375,
+						-136.6666717529297
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.253999948501587,
+					"name": "helix_point",
+					"position": [
+						-75.0,
+						129.90380859375,
+						-136.6666717529297
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.3473334312438967,
+					"name": "helix_point",
+					"position": [
+						140.95388793945313,
+						-51.30302047729492,
+						-122.22222137451172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.3473334312438967,
+					"name": "helix_point",
+					"position": [
+						-140.95388793945313,
+						51.30302047729492,
+						-122.22222137451172
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.440666675567627,
+					"name": "helix_point",
+					"position": [
+						140.95388793945313,
+						51.30302047729492,
+						-107.77777862548828
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.440666675567627,
+					"name": "helix_point",
+					"position": [
+						-140.95388793945313,
+						-51.30302047729492,
+						-107.77777862548828
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5339999198913576,
+					"name": "helix_point",
+					"position": [
+						75.0,
+						129.90380859375,
+						-93.33333587646485
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.5339999198913576,
+					"name": "helix_point",
+					"position": [
+						-75.0,
+						-129.90380859375,
+						-93.33333587646485
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.627333402633667,
+					"name": "helix_point",
+					"position": [
+						-26.047225952148439,
+						147.72116088867188,
+						-78.88888549804688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.627333402633667,
+					"name": "helix_point",
+					"position": [
+						26.047225952148439,
+						-147.72116088867188,
+						-78.88888549804688
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7206666469573976,
+					"name": "helix_point",
+					"position": [
+						-114.90666961669922,
+						96.41814422607422,
+						-64.44444274902344
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7206666469573976,
+					"name": "helix_point",
+					"position": [
+						114.90666961669922,
+						-96.41814422607422,
+						-64.44444274902344
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.813999891281128,
+					"name": "helix_point",
+					"position": [
+						-150.0,
+						5.510910534877768e-14,
+						-50.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.813999891281128,
+					"name": "helix_point",
+					"position": [
+						150.0,
+						-3.6739403565851789e-14,
+						-50.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.815000057220459,
+					"name": "finished_rune_spawning",
+					"position": [
+						0.0,
+						0.0,
+						-50.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5792038440704347,
+					"name": "end_spin",
+					"position": [
+						0.0,
+						0.0,
+						-50.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.935210943222046,
+					"name": "i_only_exist_to_provide_a_height_value",
+					"position": [
+						0.0,
+						0.0,
+						-180.0
+					]
+				}
+			]
+		},
+		{
+			"name": "emerge_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6686323881149292,
+					"name": "float_tablets"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.883772850036621,
+					"name": "send_tablets"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.927203416824341,
+					"name": "end_send"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.2291855812072756,
+					"name": "slam_tablets"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.440620422363281,
+					"name": "warp"
+				}
+			]
+		},
+		{
+			"name": "restricted_area_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7924200296401978,
+					"name": "create_slow_area",
+					"position": [
+						-6.929286956787109,
+						-23.029319763183595,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7924163341522219,
+					"name": "contact",
+					"position": [
+						-6.929286956787109,
+						-23.029319763183595,
+						0.0
+					]
+				}
+			]
+		},
+		{
+			"name": "shuffle_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5755100250244141,
+					"name": "float_tablets"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.9967613220214845,
+					"name": "send_tablets"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.414865493774414,
+					"name": "slam_tablets"
+				}
+			]
+		},
+		{
+			"name": "summon_tablets_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.008057452738285065,
+					"name": "choose_first_rune"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.01611490547657013,
+					"name": "choose_second_rune"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.9028398990631104,
+					"name": "face_upwards"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7861902713775636,
+					"name": "stop_face"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.0,
+					"name": "spawn_rune_visuals"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 4.947714328765869,
+					"name": "blast_em",
+					"position": [
+						30.0,
+						200.0,
+						-150.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 5.326414108276367,
+					"name": "i_only_exist_to_provide_a_height_value",
+					"position": [
+						30.0,
+						200.0,
+						-150.0
+					]
+				}
+			]
+		},
+		{
+			"name": "tablet_warp_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7659862637519836,
+					"name": "choose_warp_target"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7464699745178224,
+					"name": "warp"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.7522506713867189,
+					"name": "contact"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.000000238418579,
+					"name": "proj",
+					"position": [
+						0.0,
+						-87.63087463378906,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.1971096992492677,
+					"name": "proj",
+					"position": [
+						0.0,
+						-87.63099670410156,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.4000000953674318,
+					"name": "proj",
+					"position": [
+						0.0,
+						-87.63099670410156,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.5999999046325685,
+					"name": "proj",
+					"position": [
+						0.0,
+						-87.63099670410156,
+						-100.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.799999952316284,
+					"name": "proj",
+					"position": [
+						0.0,
+						-87.63099670410156,
+						-100.0
+					]
+				}
+			]
+		},
+		{
+			"name": "tablet_warp_02",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4108942449092865,
+					"name": "choose_warp_target"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7073099613189698,
+					"name": "warp"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.7103992700576783,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+
+	subdivide_animation = "summon_tablets_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		socket = "aux_interface"
+			translation = "0 45 -170"
+		socket = "aux_shuffle_01"
+			translation = "100 0 -240"
+		socket = "aux_shuffle_02"
+			translation = "0 0 -240"
+		socket = "aux_shuffle_03"
+			translation = "0 -100 -240"
+		socket = "aux_summontablet_rune_01"
+			translation = "30 200 -193.283"
+			ignore_parent_axis = "z"
+		socket = "aux_bloodfountain_01"
+			translation = "-2.5 135 -117"
+		socket = "aux_bloodfountain_02"
+			translation = "-2.5 125 -117"
+		socket = "aux_runecatch_R"
+			parent = "R_wrist_jntBnd"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "aux_runecatch_L"
+			parent = "L_wrist_jntBnd"
+			ignore_parent_rotation = "yawpitchroll"
+		socket = "aux_lightningball_origin"
+			translation = "-5 -85 -95"
+		socket = "aux_blood_direction_01"
+			parent = "aux_L_Weapon_attachment"
+			translation = "-5 0 -10"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0756082683801651,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.438964307308197,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/SmallCast",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5733169317245483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/VaalEnergy_Sweetener",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6029593348503113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7091600894927979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7484591007232666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2395323514938355,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovementSoft",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3659298419952393,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/BasicCast_Telegraph",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43773120641708376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/SmallCast",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5733169317245483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/VaalEnergy_Sweetener",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6029593348503113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6535148024559021,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7091600894927979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "R_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.343109369277954,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovementSoft",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3807259798049927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/BasicCast_Telegraph",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.40978962182998659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4610227942466736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5674468874931336,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Runes/HelixCast/HelixRuneCast_Levitate",
+						"bone_name": "hip_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9024034738540649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Runes/HelixCast/HelixRuneCast_SummonSweetener",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0716578960418702,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/VaalEnergy_Sweetener",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1569348573684693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3210500478744507,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/CastCharge",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3721674680709839,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/Hologram_ShortSweetener",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4184991121292115,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8525344133377076,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.982487201690674,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0867552757263185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2510018348693849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Runes/HelixCast/HelixRuneCast_NovaSurge"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4515600204467775,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.528503894805908,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7574965953826906,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/SmallCast",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.077459812164307,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Runes/HelixCast/HelixRuneCast_Nova",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.490289211273193,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.869740009307861,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/KnockdownA",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10511702299118042,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/Step",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2746608853340149,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3051788806915283,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Death/Death_Hologram",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7222569584846497,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9426625967025757,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9934231042861939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.386867642402649,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8750476837158204,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.946360468864441,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4246599674224855,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/Hologram_ShortSweetener",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5023574829101564,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5058529376983644,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.726262092590332,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.485820770263672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.740934371948242,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Death/Death_CrackExplosion",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.547421455383301,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/Death",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.306030750274658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Death/Death_BloodBurst",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.407870292663574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Death/Death_BloodMist"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.16322501003742219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3368687331676483,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6032900214195252,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Emerge/Emerge_TabletLift",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7258305549621582,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8272780776023865,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Emerge/Emerge_RuneHologram",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9757075905799866,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Emerge/Emerge_TabletWhirlwind",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0210232734680176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.844092845916748,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9066053628921509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7840490341186525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/Hologram_ShortSweetener",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9693055152893068,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0040366649627687,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.163780927658081,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/Step",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.397087335586548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Emerge/Emerge_TabletSlamSweetener",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.585808753967285,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Emerge/Emerge_BloodWarpOut",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6760060787200929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/ShuffleTablets/ShuffleTablets_SlotSweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.961198329925537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.191764831542969,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.323741436004639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.351521968841553,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.60643196105957,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/VaalEnergy_Sweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.695794582366943,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Emerge/Emerge_BloodWarpIn",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.018303394317627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.04855233058333397,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/IdleBlingJingle",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.057288531213998798,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/Hologram_Idle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18548999726772309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/Idle",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1856122612953186,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/IdleClothRustle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8643826246261597,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/Hologram_Idle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5363702774047852,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/IdleBlingJingle",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.713869333267212,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/IdleClothRustle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8349190950393677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/Hologram_Idle",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.060727715492248538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05363770201802254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.060727715492248538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/Flinch",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.060727715492248538,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.5798299908638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/Idle",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05424785614013672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/KnockdownA",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.133811354637146,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24230708181858064,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.405219167470932,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BodyFall",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8908939361572266,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/KnockdownB",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0867340564727785,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.2806499004364015,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/Hologram_ShortSweetener",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4556171894073488,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_elbow_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.477410078048706,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "L_elbow_attachment_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1826348304748537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7394859790802,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8865790367126467,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/VaalEnergy_Sweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.887760639190674,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.094016075134277,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "L_elbow_Twist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.218699932098389,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Emerge/Emerge_BloodWarpIn",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.929325103759766,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.377806663513184,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.634583950042725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "restricted_area_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08640998601913452,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1281251460313797,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18303169310092927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/CastCharge",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36610522866249087,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/Hologram_ShortSweetener",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6912797093391419,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7536200284957886,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/ReplulseSlam/ReplulseSlam_GroundPunch",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8074846863746643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4719512462615967,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0589399337768556,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1602511405944826,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.529728412628174,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.5636720657348635,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/WarpCast",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.598259210586548,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6638553142547609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/ReplulseSlam/ReplulseSlam_Nova",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.1077816486358644,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.6977577209472658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7037103176116945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovementSoft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.365215301513672,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "shuffle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24714601039886475,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/ShuffleTablets/ShuffleTablets_WhirlindStart",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33036619424819949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33191579580307009,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/SmallCast",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3399359881877899,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6080653667449951,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6186529994010925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/Hologram_ShortSweetener",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6449152827262878,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/ShuffleTablets/ShuffleTablets_WhirlindSweetener",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6135271787643433,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.22637939453125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.4903900623321535,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.505692958831787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/Hologram_ShortSweetener",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.013303279876709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/SlamCast",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.01706075668335,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.035990238189697,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/ShuffleTablets/ShuffleTablets_TabletBrake",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.088874816894531,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.155910968780518,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.229615211486816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/ShuffleTablets/ShuffleTablets_WhirlindEnd",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.222671985626221,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/ShuffleTablets/ShuffleTablets_TabletWhooshDown",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.2762861251831059,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.290667533874512,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.577032566070557,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/ShuffleTablets/ShuffleTablets_SlotSweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.162056922912598,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.822811126708984,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.995172500610352,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					}
+				]
+			},
+			{
+				"name": "summon_tablets_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/DualRune_SummonSweetener",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19332420825958253,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19705258309841157,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/SmallCast",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.257765531539917,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8975964188575745,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.109312891960144,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0068907737731935,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.232433557510376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.45328950881958,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/Hologram_ShortSweetener",
+						"bone_name": "R_elbow_Twist_jntBnd_3",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.688129425048828,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7361679077148439,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/CastCharge",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.881448745727539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9458889961242677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0639100074768068,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/DualRune_HologramBurst",
+						"bone_name": "R_elbow_Twist_jntBnd_3",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.134615898132324,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.387777805328369,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3973050117492677,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/Hologram_ShortSweetener",
+						"bone_name": "L_elbow_Twist_jntBnd_2",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.562683343887329,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.571890115737915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "L_toe_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.552332878112793,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.759461879730225,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.8285112380981449,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "L_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.852606296539307,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/WarpCast",
+						"bone_name": "aux_face_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.952354907989502,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/DualRuneCombo/Holograms/DualRune_Nova",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.537365913391113,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.172572135925293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.310669422149658,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.379715442657471,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.494795322418213,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.89065408706665,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "tablet_warp_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05260666459798813,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22357839345932008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/VaalEnergy_Sweetener",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2860491871833801,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3020104169845581,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Teleport/Teleport_WarpSweetener"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3452312648296356,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/SmallCast",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9206165075302124,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1540573835372925,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2921499013900757,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1850640773773195,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Teleport/Teleport_WarpIn",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.232494592666626,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4330554008483888,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.4867262840270998,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Teleport/Teleport_WarpOut",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.508676528930664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.544846296310425,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6529500484466554,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Teleport/Teleport_Whoosh",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7307381629943849,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Teleport/Teleport_BlastSweetener",
+						"bone_name": "L_elbow_Twist_jntBnd_2",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7618472576141359,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7881505489349367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/MovementWhoosh",
+						"bone_name": "R_elbow_Twist_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.831733226776123,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/WarpCast",
+						"bone_name": "head_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.9553637504577638,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.998110771179199,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.405822277069092,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.977926731109619,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "L_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "tablet_warp_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Vocals/SmallCast",
+						"bone_name": "aux_face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Teleport/Teleport_FastWarpSweetener",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.01874229498207569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07965477555990219,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/VaalEnergy_Sweetener",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10191138833761215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/StepSoft",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5669541954994202,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/BlingJingle",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8270033001899719,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.188965082168579,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Foley/ClothRustle",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.203023076057434,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/VaalEnergy_Sweetener",
+						"bone_name": "L_shoulder_cTwist_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2583526372909547,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Teleport/Teleport_WarpOut",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2602769136428834,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Teleport/Teleport_Whoosh",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5160173177719117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/League/Incursion/ArchitectBoss/Effects/Teleport/Teleport_WarpIn",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			state = ""
+				colour = "2.37238 0.81616 0.411464"
+				position = "0 -17 -344"
+				radius = 500
+				distance_threshold = 400
+			state = "on_death_delayed"
+				position = "0 -87 -339"
+				radius = 500
+			state = "warp_fade"
+				position = "0 -87 -339"
+				radius = 400
+		animations = '[
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 4.324217796325684,
+						"end_time": 4.440620422363281,
+						"state_name": "warp_fade"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 4.450620174407959,
+						"end_time": 4.578009128570557,
+						"state_name": ""
+					}
+				]
+			},
+			{
+				"name": "tablet_warp_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 2.625067949295044,
+						"end_time": 2.7414700984954836,
+						"state_name": "warp_fade"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 2.7522506713867189,
+						"end_time": 2.8796396255493166,
+						"state_name": ""
+					}
+				]
+			},
+			{
+				"name": "tablet_warp_02",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 1.5888817310333253,
+						"end_time": 1.7052838802337647,
+						"state_name": "warp_fade"
+					},
+					{
+						"type": "LightStateEventType",
+						"time": 1.7114289999008179,
+						"end_time": 1.8388179540634156,
+						"state_name": ""
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "summon_tablets_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 1.2999999523162842,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/AOs/OnAct_SummonTablets_Left.ao",
+						"from": {
+							"parent_bone": "aux_runecatch_L"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"end_time": 1.2999999523162842,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/AOs/OnAct_SummonTablets_Right.ao",
+						"from": {
+							"parent_bone": "aux_runecatch_R"
+						},
+						"speed": 1.0
+					}
+				]
+			},
+			{
+				"name": "tablet_warp_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 2.7464699745178224,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/AOs/Tablet_WarpOut.ao"
+					}
+				]
+			},
+			{
+				"name": "tablet_warp_02",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 1.7000000476837159,
+						"ao_type": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/AOs/Tablet_WarpOut.ao"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_Root false root_jntBnd"
+		bone_group = "FX_FingerPainting false L_finger_2_jntBnd_3"
+		bone_group = "FX_Interface false aux_interface"
+		bone_group = "FX_Shuffle false aux_shuffle_01 aux_shuffle_02 aux_shuffle_03"
+		bone_group = "FX_Tablet false aux_summontablet_rune_01"
+		bone_group = "FX_BloodFountain false aux_bloodfountain_01 aux_bloodfountain_02"
+		bone_group = "FX_LightningBall false aux_lightningball_origin"
+		bone_group = "FX_BloodGush_01 false L_Weapon aux_blood_direction_01"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.14262382686138154,
+						"end_time": 1.271635890007019,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_BloodDrips.pet",
+						"bone_groups": [
+							"grp_l_forearm",
+							"grp_l_palm"
+						]
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.14262382686138154,
+						"end_time": 1.271635890007019,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_BloodDrips.pet",
+						"bone_groups": [
+							"grp_r_forearm",
+							"grp_r_palm"
+						]
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5573960542678833,
+						"end_time": 4.363919258117676,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_BloodDrips.pet",
+						"bone_groups": [
+							"grp_l_forearm",
+							"grp_r_forearm"
+						]
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.6347384452819826,
+						"end_time": 2.7550511360168459,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_RuneCYLs.pet",
+						"bone_group": "grp_l_forearm"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 5.32934045791626,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_Death_Blended.pet",
+						"bone_group": "FX_BloodFountain"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_RuneCYLs.pet",
+						"bone_groups": [
+							"grp_l_forearm",
+							"grp_r_forearm"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_Interface_EmergeStart.pet",
+						"bone_group": "FX_Interface"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 1.9993081092834473,
+						"end_time": 2.9106030464172365,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_RuneCYLs_Casting.pet",
+						"bone_groups": [
+							"grp_l_palm",
+							"grp_r_palm"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 3.2370986938476564,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_Shuffle_Slam.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.0,
+						"end_time": 4.429863929748535,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_BloodWarp_UP.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.611328601837158,
+						"end_time": 4.890937328338623,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_BloodWarp_Down.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "emerge_idle_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_Interface.pet",
+						"bone_group": "FX_Interface"
+					}
+				]
+			},
+			{
+				"name": "knockdown_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.2225100994110109,
+						"end_time": 2.4785592555999758,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_RuneCYLs.pet",
+						"bone_group": "grp_l_forearm"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 4.253416538238525,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_BloodGush.pet",
+						"bone_group": "FX_BloodGush_01"
+					}
+				]
+			},
+			{
+				"name": "restricted_area_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_RuneCYLs.pet",
+						"bone_group": "grp_r_forearm"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.7168383598327638,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_Shuffle_Slam.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "shuffle_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_RuneCYLs.pet",
+						"bone_groups": [
+							"grp_l_forearm",
+							"grp_r_forearm"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6919069886207581,
+						"end_time": 4.180535793304443,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_ConvenientBlur.pet",
+						"bone_group": "FX_Shuffle"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6919074654579163,
+						"end_time": 6.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_Shuffle.pet",
+						"bone_group": "FX_Shuffle"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 5.377453804016113,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_Shuffle_Slam.pet",
+						"bone_group": "root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 5.386056423187256,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_RuneCYLs_Casting.pet",
+						"bone_groups": [
+							"grp_l_palm",
+							"grp_r_palm"
+						]
+					}
+				]
+			},
+			{
+				"name": "summon_tablets_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 4.912935733795166,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_RuneCYLs.pet",
+						"bone_groups": [
+							"grp_l_forearm",
+							"grp_r_forearm"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 5.070001125335693,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_Scan.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "tablet_warp_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5573960542678833,
+						"end_time": 4.363919258117676,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_BloodDrips.pet",
+						"bone_groups": [
+							"grp_l_forearm",
+							"grp_r_forearm"
+						]
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6000000238418579,
+						"end_time": 2.7300000190734865,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/Tablet_WarpOut.pet",
+						"bone_group": "FX_Root"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.8914990425109865,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_BallLightningMuzzle.pet",
+						"bone_group": "FX_LightningBall"
+					}
+				]
+			},
+			{
+				"name": "tablet_warp_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 1.7000000476837159,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/Tablet_WarpOut.pet",
+						"bone_group": "FX_Root"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.356172 1 Flat 1.22367 1 Flat 1.57814 0 Flat 2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.356172 1 Flat 1.22367 1 Flat 1.57814 0 Flat 2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.099999904632568,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 0.671433 1 Flat 3.51888 1 Flat 4.39969 0 Flat 5.1 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.5,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "7 0 0 Linear 1.94805 0 Linear 2.34357 0.327703 Smooth 2.55535 1 Linear 3.86028 1 Linear 4.05648 0 Linear 5.5 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.5,
+						"name": "releaseTime_L",
+						"apply_on_children": true,
+						"curve": "3 0 0 Linear 5.25864 0 Linear 5.5 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.5,
+						"name": "BlendArm",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 3.8011 0 Linear 3.86962 1 Linear 5.5 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.5,
+						"name": "FadeFloat",
+						"apply_on_children": true,
+						"curve": "4 0 0 Linear 3.8011 0 Linear 3.86962 1 Linear 5.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.632999897003174,
+						"name": "hide_me",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 4.31406 0 Linear 4.43208 0.125 Linear 4.71277 0 Linear 5.633 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.632999897003174,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Smooth 1.85481 1 Flat 3.95363 1 Flat 4.48 0 Flat 5.633 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.632999897003174,
+						"name": "FadeFloat",
+						"curve": "6 0 1 Linear 2.02705 1 Linear 2.18016 0 Linear 4.04932 0.422297 Custom 0.48884 0 4.19604 1 Flat 5.633 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.632999897003174,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 3.67612 0 Linear 4.03975 0.39527 Flat 4.48312 0.956081 Flat 5.17528 0 Flat 5.633 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "knockdown_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.866000175476074,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 4.19024 0 Linear 4.64862 0.787162 Smooth 4.97746 1 Linear 5.866 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "restricted_area_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.5329999923706059,
+						"name": "FadeFloat",
+						"curve": "6 0 1 Linear 0.394006 1 Linear 0.876568 0 Linear 2.79398 0 Linear 2.93772 1 Flat 4.533 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 4.5329999923706059,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "7 0 0 Smooth 0.5 0.5 Flat 1.56704 0.5 Flat 1.97773 1 Flat 3.05323 1 Flat 3.57685 0 Flat 4.533 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "shuffle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 7.433000087738037,
+						"name": "FadeFloat",
+						"curve": "6 0 1 Linear 0.646073 1 Linear 0.654491 0 Linear 5.3643 0 Linear 5.51162 1 Flat 7.433 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 7.433000087738037,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Smooth 0.321984 0 Flat 1.09643 1 Flat 5.1286 1 Flat 6.41233 0 Flat 7.433 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "tablet_warp_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.333000183105469,
+						"name": "EmissiveMulti",
+						"curve": "5 0 1 Linear 2.26335 1 Flat 2.63479 3 Linear 2.73 1 Linear 5.333 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.333000183105469,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 0.702108 1 Flat 4.28663 1 Linear 5.333 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.333000183105469,
+						"name": "warp",
+						"curve": "6 0 1 Linear 2.7 1 Linear 2.7 0 Linear 2.8 0 Linear 2.8 1 Linear 5.333 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.333000183105469,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "7 0 0 Linear 1.71677 0 Flat 2.65593 0.557432 Linear 2.84014 1 Flat 2.84014 0.388514 Flat 3.22366 1 Flat 5.333 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "tablet_warp_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.899999976158142,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "5 0 0 Linear 1.31956 0 Flat 1.76498 0.510135 Smooth 1.86073 1 Flat 1.9 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.899999976158142,
+						"name": "warp",
+						"curve": "6 0 1 Linear 1.7 1 Linear 1.7 0 Linear 1.71 0 Linear 1.715 1 Linear 1.9 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.899999976158142,
+						"name": "releaseTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Smooth 0.218941 0 Flat 0.449179 1 Flat 1.11407 1 Linear 1.4874 0 Flat 1.9 0 Smooth"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.899999976158142,
+						"name": "EmissiveMulti",
+						"curve": "5 0 1 Linear 0.434117 1 Flat 0.589043 3 Linear 0.925793 1 Flat 1.9 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/EPKs/OnAct_BloodGlow_Left.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/EPKs/OnAct_BloodGlow_Right.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_03",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/EPKs/OnAct_BloodGlow_BothArms.epk"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/EPKs/OnAct_Death.epk"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/EPKs/OnAct_Emerge.epk"
+					}
+				]
+			},
+			{
+				"name": "knockdown_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/EPKs/OnAct_Knockdown_01.epk"
+					}
+				]
+			},
+			{
+				"name": "restricted_area_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/EPKs/OnAct_BloodGlow_Right.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/unblockable_marker/epk/unblockable.epk"
+					}
+				]
+			},
+			{
+				"name": "shuffle_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/EPKs/OnAct_BloodGlow_BothArms.epk"
+					}
+				]
+			},
+			{
+				"name": "tablet_warp_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/EPKs/Tablet_Warp_Boss.epk"
+					}
+				]
+			},
+			{
+				"name": "tablet_warp_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/EPKs/Tablet_Warp_Boss.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "emerge_idle_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_FingerPainting.trl",
+						"bone_group": "FX_FingerPainting"
+					}
+				]
+			}
+		]'
+	}
+	
+	ScreenShake
+	{
+		animations = '[
+			{
+				"name": "shuffle_01",
+				"events": [
+					{
+						"type": "ScreenShakeEventType",
+						"time": 0.8294876217842102,
+						"amplitude": 8.0,
+						"damp": "LinearDown"
+					},
+					{
+						"type": "ScreenShakeEventType",
+						"time": 5.361327171325684,
+						"frequency": 400.0,
+						"amplitude": 12.0,
+						"damp": "LinearDown"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/HeadVaalArchivist/HeadVaalArchivistMinibossT3.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/HeadVaalArchivistMiniboss/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "head_jntBnd Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossHeadFeathers.ao"
+	attached_object = "L_elbow_Twist_jntBnd_3 Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossLTags.ao"
+	attached_object = "R_elbow_Twist_jntBnd_3 Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossRTags.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossShouldersMisc.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossT3Robe.ao"
+	attached_object = "Back Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossWings.ao"
+	attached_object = "R_thigh_jntBnd Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossSkulls.ao"
+	attached_object = "<root> Metadata/Monsters/HeadVaalArchivist/attachments/HeadVaalBackatacchment/HeadVaalArchivistBackatacchment.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/Animations/HeadVaalArchivistMiniboss/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/HeadVaalArchivistMiniboss.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd aux_R_shoulder_attachment head_jntBnd aux_L_shoulder_attachment L_shoulder_jntBnd"
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 2)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossHeadFeathers.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/head_feathers/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/head_feathers/rig.ast"
+		linear_allowed_contraction = 0.100 
+		bend_stiffness = 500.000 
+		bend_allowed_angle = 0.100 
+		normal_viscosity_multiplier = 0.200 
+		tangent_viscosity_multiplier = 0.025 
+		enclosure_angle = 0.200
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/head_feathers/HeadVaalArchivistMinibossHeadFeathers.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossLTags.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/tags/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/tags/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_radius = 5.000
+		enclosure_angle = 0.000
+		animation_velocity_factor = 5.000
+		animation_force_factor = 5.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/tags/HeadVaalArchivistMinibossTags.sm"
+			hide_segments = "R_tagShape"
+	}
+}
+
+=== .ao Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossRTags.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/tags/rig.amd"
+	default_animation = "idle_02"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/tags/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_radius = 5.000
+		enclosure_angle = 0.000
+		animation_velocity_factor = 5.000
+		animation_force_factor = 5.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/tags/HeadVaalArchivistMinibossTags.sm"
+			hide_segments = "L_tagShape"
+	}
+}
+
+=== .ao Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossShouldersMisc.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/shoulders_misc/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/shoulders_misc/rig.ast"
+		linear_allowed_contraction = 0.200
+		bend_stiffness = 300.000
+		bend_allowed_angle = 0.200
+		normal_viscosity_multiplier = 0.150
+		animation_velocity_factor = 10.000
+		animation_force_factor = 1.000
+		attachment_bones = "L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/shoulders_misc/HeadVaalArchivistMinibossShouldersMisc.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossT3Robe.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/robe_T3/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/robe_T3/rig.ast"
+		linear_allowed_contraction = 0.500
+		bend_stiffness = 250.000
+		bend_allowed_angle = 0.500
+		normal_viscosity_multiplier = 0.150
+		tangent_viscosity_multiplier = 0.020
+		attachment_bones = "spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd R_thigh_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/robe_T3/HeadVaalArchivistMinibossT3Robe.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false spine_1_jntBnd spine_2_jntBnd L_thigh_jntBnd R_thigh_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossWings.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/wings/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/wings/rig.ast"
+		linear_allowed_contraction = 0.100
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.100
+		tangent_viscosity_multiplier = 0.025
+		enclosure_angle = 0.200
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/wings/HeadVaultArchitectWings.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/HeadVaalArchivist/attachments/Miniboss/HeadVaalArchivistMinibossSkulls.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/waist_misc/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/waist_misc/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.000
+		tangent_viscosity_multiplier = 0.000
+		enclosure_radius = 5.000
+		enclosure_angle = 0.000
+		animation_velocity_factor = 5.000
+		animation_force_factor = 5.000
+		use_shock_propagation = false
+		attachment_bones = "hip_jntBnd spine_1_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/attachments/waist_misc/HeadVaalArchivistMinibossWaistMisc.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false hip_jntBnd spine_1_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/HeadVaalArchivist/attachments/HeadVaalBackatacchment/HeadVaalArchivistBackatacchment.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivist/attachments/HeadVaalBackAttachment/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivist/attachments/HeadVaalBackAttachment/rig.ast"
+		socket = "aux_tablet_screen"
+			parent = "aux_L_slot_jntBnd"
+			translation = "-15 -20 10"
+		socket = "aux_lightningattach_R"
+			parent = "root_jntBnd"
+			translation = "-32 35 -20"
+		socket = "aux_lightningattach_L"
+			parent = "root_jntBnd"
+			translation = "32 35 -20"
+		socket = "aux_tablet_mid"
+			parent = "aux_L_slot_jntBnd"
+			translation = "-15 0 10"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.300
+		animation_velocity_factor = 7.000
+		animation_force_factor = 5.000
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivist/attachments/HeadVaalBackAttachment/HeadVaalArchivistBackAttachment.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_Tablet_L false aux_L_slot_jntBnd"
+		bone_group = "FX_Tablet_R false aux_R_slot_jntBnd"
+		bone_group = "FX_Line_01 false phys_R_feathers_3_jntBnd phys_R_feathers_1_jntBnd"
+		bone_group = "FX_Line_02 false phys_L_feathers_3_jntBnd phys_L_feathers_1_jntBnd"
+		bone_group = "FX_Interface false aux_tablet_mid aux_tablet_screen"
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 4.478984832763672,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/EPKs/OnAct_Back_Death.epk"
+					}
+				]
+			},
+			{
+				"name": "summon_tablets_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/EPKs/OnAct_Back_Summon_Tablets_01.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "summon_tablets_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.0,
+						"end_time": 4.976866245269775,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/AOs/OnAct_BackAttachment_Lightning_Left.ao",
+						"from": {
+							"parent_bone": "aux_lightningattach_L"
+						},
+						"speed": 1.0
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 3.7913553714752199,
+						"end_time": 5.599999904632568,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/AOs/OnAct_BackAttachment_Lightning_Right.ao",
+						"from": {
+							"parent_bone": "aux_lightningattach_R"
+						},
+						"speed": 1.0
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 4.467280864715576,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_Death_Interface.pet",
+						"bone_group": "FX_Interface"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.8933121562004089,
+						"end_time": 4.237129211425781,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_Death_LightningZaps.pet",
+						"bone_group": "FX_Tablet_L"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.679943323135376,
+						"end_time": 5.532251358032227,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Incursion/ArchitectBoss/FX/OnAct_Death_FoodProcessor.pet",
+						"bone_group": "FX_Interface"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "summon_tablets_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 7.433000087738037,
+						"name": "surgeTime_R",
+						"curve": "5 0 0 Linear 0.965953 0 Linear 2.80105 0.5 Linear 5.47794 0.611486 Linear 7.433 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 7.433000087738037,
+						"name": "FadeFloat",
+						"curve": "4 0 1 Linear 4.96445 1 Linear 5.48636 0 Linear 7.433 0 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 7.433000087738037,
+						"name": "surgeTime_L",
+						"curve": "6 0 0 Linear 2.85156 0 Linear 3.4 0.5 Linear 3.6 0.5 Linear 3.79857 1 Linear 7.433 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 3)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/HeadVaalArchivistMiniboss.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/HeadVaalArchivistMiniboss_armour_6393709d.smd"
+Materials 1
+	"Art/Models/MONSTERS/VaalArchivist/Textures/HeadVaultArchitectMinibossc.mat" 5
+BoundingBox -68.8009 -16.2676 -208.342 68.8009 18.878 1.44859
+BoneGroups 22
+	"grp_root" 1 "hip_jntBnd"
+	"grp_frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "aux_face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/MONSTERS/GenericBiped/BipedMedium/ModelVariants/HeadVaalArchivistMiniboss/HeadVaalArchivistMiniboss_armour_6393709d.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 5 in the header, 5 in the block · 6808 triangles over 5553 vertices
+  names: 118 bytes said, 118 read  [agree]
+
+=== shapes (23)
+0	arm_feathersShape	from 0	count 1332
+1	bodyShape	from 1332	count 11988
+2	lacesShape	from 13320	count 2304
+3	miscShape	from 15624	count 2202
+4	shouldersShape	from 17826	count 2598
+5	head_feathersShape	from 20424	count 6450
+6	head_ringsShape	from 26874	count 768
+7	L_tagShape	from 27642	count 312
+8	R_tagShape	from 27954	count 312
+9	L_tagShape	from 28266	count 312
+10	R_tagShape	from 28578	count 312
+11	shoulders_miscShape	from 28890	count 432
+12	belt_endsShape	from 29322	count 4656
+13	beltsShape	from 33978	count 7695
+14	chainsShape	from 41673	count 420
+15	danglers_dsShape	from 42093	count 648
+16	danglers_ssShape	from 42741	count 1134
+17	robe_feathers_baseShape	from 43875	count 5580
+18	robe_feathersShape	from 49455	count 3054
+19	loin_clothShape	from 52509	count 3240
+20	skullsShape	from 55749	count 6348
+21	HeadVaalArchivistFeathersShape	from 62097	count 2118
+22	HeadVaalArchivistWeaponShape	from 64215	count 9960
+
+=== fitting
+the monster's rig: 83 bones
+mounts: aux_position, aux_L_Weapon_attachment_02, aux_R_Weapon_attachment_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_L_shoulder_attachment, aux_R_shoulder_attachment, aux_L_upperArm_attachment, aux_R_upperArm_attachment, aux_Head_attachment, aux_face_jntBnd, aux_L_Weapon_attachment, aux_R_Weapon_attachment
+  HeadVaalArchivistMinibossHeadFeathers.ao  socket head_jntBnd [in its carrier's rig]  box (-45.6,-8.2,-63.4)..(45.6,19.6,5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 2406 triangles over 2656 vertices
+    names: 66 bytes said, 66 read  [agree]
+    rig 7 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_L_feathers_front_1_jntBnd_1  [its own]  under 0  rests at (6,-5.5,-48.2)
+      2 phys_tri_R_feathers_front_1_jntBnd_1  [its own]  under 0  rests at (-6,-5.5,-48.2)
+      3 phys_tri_L_feathers_back_1_jntBnd_1  [its own]  under 0  rests at (23.3,8.1,-13.8)
+      4 phys_tri_R_feathers_back_1_jntBnd_1  [its own]  under 0  rests at (-23.3,8.1,-13.8)
+      5 phys_tri_L_feathers_back_2_jntBnd_1  [its own]  under 0  rests at (9.7,6.4,-27.3)
+      6 phys_tri_R_feathers_back_2_jntBnd_1  [its own]  under 0  rests at (-9.7,6.4,-27.3)
+  HeadVaalArchivistMinibossLTags.ao  socket L_elbow_Twist_jntBnd_3 [in its carrier's rig]  box (4.4,-4.9,-3.9)..(10.5,4.9,-1.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 208 triangles over 216 vertices
+    names: 40 bytes said, 40 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_tag_jntBnd_1  [its own]  under 0  rests at (8.6,-0.7,-2.4)
+  HeadVaalArchivistMinibossRTags.ao  socket R_elbow_Twist_jntBnd_3 [in its carrier's rig]  box (4.4,-4.9,-3.9)..(10.5,4.9,-1.5)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 208 triangles over 216 vertices
+    names: 40 bytes said, 40 read  [agree]
+    rig 2 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 2  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_tag_jntBnd_1  [its own]  under 0  rests at (8.6,-0.7,-2.4)
+  HeadVaalArchivistMinibossShouldersMisc.ao  socket chest_jntBnd [in its carrier's rig]  box (-20.8,-8.1,-6.5)..(20.8,-6.1,7.8)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 144 triangles over 166 vertices
+    names: 38 bytes said, 38 read  [agree]
+    rig 7 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (4.7,1,-14.1)  carrier has (4.7,0.7,-141.4)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-4.7,1,-14.1)  carrier has (-4.7,0.7,-141.4)
+      3 phys_tri_L_misc_jntBnd_1  [its own]  under 0  rests at (17.7,-7,-1.5)
+      4 phys_tri_R_misc_jntBnd_1  [its own]  under 0  rests at (-17.7,-7,-1.5)
+      5 L_shoulder_jntBnd  [shared]  under 1  rests at (15.8,6.3,-11)  carrier has (15.8,6,-138.3)
+      6 R_shoulder_jntBnd  [shared]  under 2  rests at (-15.8,6.3,-11)  carrier has (-15.8,6,-138.3)
+  HeadVaalArchivistMinibossT3Robe.ao  socket hip_jntBnd [in its carrier's rig]  box (-34.7,-23.4,-24.6)..(34.1,27,84.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 8 in the header, 8 in the block · 8809 triangles over 8391 vertices
+    names: 246 bytes said, 246 read  [agree]
+    rig 13 bones, 5 of them names its carrier's rig also has
+    mesh weights reach bone 12 of 13  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,-3.2,-15.4)  carrier has (0,0,-105.4)
+      2 L_thigh_jntBnd  [shared]  under 0  rests at (10.1,0,0)  carrier has (10.1,3.2,-89.9)
+      3 R_thigh_jntBnd  [shared]  under 0  rests at (-10.1,-0,0)  carrier has (-10.1,3.2,-89.9)
+      4 phys_tri_robe_jntBnd_1  [its own]  under 0  rests at (9.6,-9.9,40.6)
+      5 phys_tri_robe_jntBnd_2  [its own]  under 0  rests at (-0.8,-11,68.6)
+      6 phys_tri_robe_jntBnd_3  [its own]  under 0  rests at (-11.2,-10.5,41.2)
+      7 phys_tri_robe_jntBnd_4  [its own]  under 0  rests at (-23.4,-6.6,43.1)
+      8 phys_tri_robe_jntBnd_5  [its own]  under 0  rests at (-24.4,6.6,42.7)
+      9 phys_tri_robe_jntBnd_6  [its own]  under 0  rests at (-13.4,15.5,41.5)
+      10 phys_tri_robe_jntBnd_7  [its own]  under 0  rests at (0.1,17.8,40.2)
+      11 phys_tri_robe_jntBnd_8  [its own]  under 0  rests at (11.9,15.6,38.5)
+      12 spine_2_jntBnd  [shared]  under 1  rests at (0,-3.9,-25.6)  carrier has (0,-0.7,-115.5)
+  HeadVaalArchivistMinibossWings.ao  socket Back [NOT in its carrier's rig]  box (-67.3,2.6,-22.9)..(67.3,21.3,84.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 4322 triangles over 4852 vertices
+    names: 144 bytes said, 144 read  [agree]
+    rig 8 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 8  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_tri_wings_1_jntBnd_1  [its own]  under 0  rests at (0,12.4,46.9)
+      2 phys_tri_L_wings_1_jntBnd_1  [its own]  under 0  rests at (26.4,12.2,37)
+      3 phys_tri_R_wings_1_jntBnd_1  [its own]  under 0  rests at (-26.4,12.2,37)
+      4 phys_tri_L_wings_2_jntBnd_1  [its own]  under 0  rests at (41.8,12.3,18.2)
+      5 phys_tri_R_wings_2_jntBnd_1  [its own]  under 0  rests at (-41.8,12.3,18.2)
+      6 phys_tri_L_wings_3_jntBnd_1  [its own]  under 0  rests at (45.9,12.4,-6.1)
+      7 phys_tri_R_wings_3_jntBnd_1  [its own]  under 0  rests at (-45.9,12.4,-6.1)
+  HeadVaalArchivistMinibossSkulls.ao  socket R_thigh_jntBnd [in its carrier's rig]  box (-12.9,-21.3,8.7)..(10.6,2.3,27.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 2116 triangles over 1824 vertices
+    names: 22 bytes said, 22 read  [agree]
+    rig 5 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0.8,10,-0.7)  carrier has (0,3.2,-89.9)
+      2 spine_1_jntBnd  [shared]  under 0  rests at (16.2,9,2.6)  carrier has (0,0,-105.4)
+      3 phys_tri_skull_1_jntBnd  [its own]  under 0  rests at (-3.4,-12.3,11.6)
+      4 phys_tri_skull_2_jntBnd  [its own]  under 0  rests at (-3.2,-2.8,19)
+  HeadVaalArchivistBackatacchment.ao  socket <root> [NOT in its carrier's rig]  box (-48.7,29.6,-150.9)..(48.7,52.1,124.3)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 4026 triangles over 4891 vertices
+    names: 116 bytes said, 116 read  [agree]
+    rig 21 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 18 of 21  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_L_feathers_1_jntBnd  [its own]  under 0  rests at (29.6,42.6,-122.7)
+      2 phys_skinned_mid_cloth_1_jntBnd  [its own]  under 0  rests at (-0.3,45.6,16.4)
+      3 phys_skinned_L_cloth_1_jntBnd  [its own]  under 0  rests at (26.8,39.9,10)
+      4 phys_R_feathers_1_jntBnd  [its own]  under 0  rests at (-29.6,42.6,-122.7)
+      5 phys_skinned_R_cloth_1_jntBnd  [its own]  under 0  rests at (-26.8,39.9,10)
+      6 phys_L_feathers_2_jntBnd  [its own]  under 1  rests at (30.5,39.6,-68.5)
+      7 phys_skinned_mid_cloth_2_jntBnd  [its own]  under 2  rests at (-0.3,46.1,45.1)
+      8 phys_skinned_L_cloth_2_jntBnd  [its own]  under 3  rests at (26.8,39.9,42.3)
+      9 phys_R_feathers_2_jntBnd  [its own]  under 4  rests at (-30.5,39.6,-68.5)
+      10 phys_skinned_R_cloth_2_jntBnd  [its own]  under 5  rests at (-26.8,39.9,42.3)
+      11 phys_L_feathers_3_jntBnd  [its own]  under 6  rests at (31.3,36.8,-19.1)
+      12 phys_skinned_mid_cloth_3_jntBnd  [its own]  under 7  rests at (-0.3,46.4,76.8)
+      13 phys_skinned_L_cloth_3_jntBnd  [its own]  under 8  rests at (26.8,39.9,74.6)
+      14 phys_R_feathers_3_jntBnd  [its own]  under 9  rests at (-31.3,36.8,-19.1)
+      15 phys_skinned_R_cloth_3_jntBnd  [its own]  under 10  rests at (-26.8,39.9,74.6)
+      16 phys_skinned_mid_cloth_4_jntBnd  [its own]  under 12  rests at (-0.3,46.6,108.3)
+      17 phys_skinned_L_cloth_4_jntBnd  [its own]  under 13  rests at (26.8,39.9,107)
+      18 phys_skinned_R_cloth_4_jntBnd  [its own]  under 15  rests at (-26.8,39.9,107)
+      19 aux_L_slot_jntBnd  [its own]  under 0  rests at (14.6,33.1,-75.8)
+      20 aux_R_slot_jntBnd  [its own]  under 0  rests at (-14.6,33.2,-75.8)

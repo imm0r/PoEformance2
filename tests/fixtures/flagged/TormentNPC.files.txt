@@ -1,0 +1,789 @@
+monster: Delwyn [Metadata/Monsters/NPC/Torment/TormentNPC]
+
+=== .ao Metadata/NPC/League/Torment/TormentNPC.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/GenericBiped/OneRig/Animations/HuntressBrother/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "Head_Attachment Metadata/NPC/League/Torment/attachments/BoarGuardHairHeld.ao"
+	attached_object = "spine_1_jntBnd Metadata/NPC/League/Torment/attachments/BoarGuardRobeHeld.ao"
+	attached_object = "L_thigh_jntBnd Metadata/NPC/League/Torment/attachments/BoarGuardLegClothHeld.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.29921260476112368,
+								0.0
+							],
+							[
+								0.4527558982372284,
+								1.0
+							]
+						],
+						"rotation": 0.05235987901687622,
+						"width": 100.0,
+						"length": 290.0,
+						"local_offset": [
+							-18.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.12217305600643158,
+							0.12217305600643158
+						],
+						"impact_z_rotation": [
+							-0.10471975803375244,
+							0.10471975803375244
+						],
+						"impact_bone": "R_Weapon",
+						"weapon_sound_type_override": "SpearWood",
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3976377844810486,
+								0.0
+							],
+							[
+								0.4763779640197754,
+								1.0
+							]
+						],
+						"rotation": 0.0872664675116539,
+						"width": 80.0,
+						"length": 215.0,
+						"local_offset": [
+							-30.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							0.01745329424738884,
+							0.06981317698955536
+						],
+						"impact_z_rotation": [
+							-0.15707963705062867,
+							0.13962635397911073
+						],
+						"impact_bone": "R_Weapon",
+						"weapon_sound_type_override": "SpearWood",
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "dash_fwd_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.4133858382701874,
+								0.0
+							],
+							[
+								0.4724409580230713,
+								1.0
+							]
+						],
+						"rotation": 0.10471975803375244,
+						"width": 60.0,
+						"length": 220.0,
+						"local_offset": [
+							-10.0,
+							0.0
+						],
+						"impact_x_rotation": [
+							-0.4712389409542084,
+							-0.5934119820594788
+						],
+						"impact_z_rotation": [
+							0.15707963705062867,
+							0.15707963705062867
+						],
+						"impact_type": "Piercing",
+						"hand": "MainHand"
+					}
+				]
+			}
+		},
+		{
+			"name": "multistab_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.17716535925865174,
+								0.0
+							],
+							[
+								0.21653543412685395,
+								1.0
+							]
+						],
+						"rotation": 0.12217305600643158,
+						"width": 60.0,
+						"length": 220.0,
+						"local_offset": [
+							-28.0,
+							0.0
+						]
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.3700787425041199,
+								0.0
+							],
+							[
+								0.3937007784843445,
+								1.0
+							]
+						],
+						"rotation": 0.20943951606750489,
+						"width": 60.0,
+						"length": 220.0,
+						"local_offset": [
+							-29.0,
+							0.0
+						]
+					},
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.6220472455024719,
+								0.0
+							],
+							[
+								0.6614173054695129,
+								1.0
+							]
+						],
+						"rotation": 0.06981317698955536,
+						"width": 60.0,
+						"length": 270.0,
+						"local_offset": [
+							-9.0,
+							0.0
+						]
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/GenericBiped/OneRig/Animations/HuntressBrother/rig.ast"
+		socket = "Back"
+			parent = "aux_Back_attachment"
+		socket = "Head_Attachment"
+			parent = "aux_Head_attachment"
+		socket = "R_Weapon"
+			parent = "aux_R_Weapon_attachment_jntBnd"
+		socket = "L_Weapon"
+			parent = "aux_L_Weapon_attachment_jntBnd"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/BoarGuard/HuntressBrother.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1"
+	}
+	
+	Lights
+	{
+		light = "point_light"
+			bone_name = "head_jntBnd"
+			state = ""
+				colour = "0.6 0.6 0.6"
+				position = "0 0 -65"
+				radius = 120
+				penumbra_dist = 0.5
+				penumbra_radius = 0.01
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.15657225251197816,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Efforts/AttackShort",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23295021057128907,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.28736838698387148,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/Swing",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39047589898109438,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7780872583389282,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1553543210029602,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Efforts/AttackLong",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22167478501796723,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.31252411007881167,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/Swing",
+						"bone_name": "R_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37157580256462099,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.740425705909729,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "dash_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/ArmourMovement",
+						"bone_name": "phys_skinned_L_chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06329583376646042,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Efforts/Dash",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19877901673316956,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22179533541202546,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "R_ankle_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "dash_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Efforts/AttackJump",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21289290487766267,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/ArmourMovement",
+						"bone_name": "phys_skinned_L_chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2592414319515228,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FinalStab"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49491482973098757,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "aux_L_foot_attachment"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6386759281158447,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "aux_R_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Efforts/Flinch",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.008317919448018074,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/ArmourMovementSoft",
+						"bone_name": "phys_skinned_L_chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_crouched_to_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.11922363936901093,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5822548866271973,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_crouched_to_idle_relaxed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.17084747552871705,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5721390247344971,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0807069540023804,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "idle_relaxed_to_idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.047387219965457919,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26092100143432619,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.32936856150627139,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "idle_to_idle_relaxed_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.13891498744487763,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/ArmourMovement",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38029199838638308,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7428497672080994,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepWalk",
+						"bone_name": "aux_L_foot_attachment"
+					}
+				]
+			},
+			{
+				"name": "multistab_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23428840935230256,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Efforts/AttackMulti",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.26340118050575259,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/MultiStab",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5573002099990845,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/MultiStab",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9191303253173828,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FinalStab",
+						"bone_name": "R_thumb_1_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Efforts/RunLoop",
+						"bone_name": "face_jntBnd",
+						"dialogue_sfx": true,
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1655767560005188,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepRun",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.44911155104637148,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/ArmourMovementSoft"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.49796006083488467,
+						"filename": "Audio/Sound Effects/NPC/4.0/Leagues/DawnOfTheHunt/Delwyn/Foley/FootstepRun",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/NPC/League/Torment/attachments/BoarGuardHairHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/BoarGuard/attachments/BoarGuardHair/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/BoarGuard/attachments/BoarGuardHair/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/BoarGuard/attachments/BoarGuardHair/BoarGuardHair.sm"
+	}
+}
+
+=== .ao Metadata/NPC/League/Torment/attachments/BoarGuardRobeHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/BoarGuard/attachments/BoarGuardRobe/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/BoarGuard/attachments/BoarGuardRobe/rig.ast"
+		attachment_bones = "spine_1_jntBnd hip_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/BoarGuard/attachments/BoarGuardRobe/Skirt.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd hip_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/NPC/League/Torment/attachments/BoarGuardLegClothHeld.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/NPC/BoarGuard/attachments/BoarGuardLegCloth/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/NPC/BoarGuard/attachments/BoarGuardLegCloth/rig.ast"
+		enclosure_angle = 0.400
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/NPC/BoarGuard/attachments/BoarGuardLegCloth/Dangler.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/NPC/BoarGuard/HuntressBrother.sm
+version 6
+SkinnedMeshData "Art/Models/NPC/BoarGuard/HuntressBrother_armour_c4b108a7.smd"
+Materials 6
+	"Art/Models/NPC/BoarGuard/Textures/HuntressBrotherAccessc.mat" 2
+	"Art/Models/NPC/BoarGuard/Textures/HuntressBrother_normalc.mat" 1
+	"Art/Models/NPC/BoarGuard/Textures/HuntressBrotherAccessc.mat" 1
+	"Art/Models/NPC/BoarGuard/Textures/HuntressBrotherc.mat" 1
+	"Art/Models/NPC/BoarGuard/Textures/HuntressBrother_normalc.mat" 1
+	"Art/Models/NPC/BoarGuard/Textures/HuntressBrotherc.mat" 13
+BoundingBox -74.6147 -15.6292 -189.89 74.6147 20.0525 0.113644
+BoneGroups 22
+	"root" 1 "hip_jntBnd"
+	"frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_head" 2 "head_jntBnd" "face_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "L_toe_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "R_toe_jntBnd"
+
+=== .smd Art/Models/NPC/BoarGuard/HuntressBrother_armour_c4b108a7.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 19 in the header, 19 in the block · 16850 triangles over 13310 vertices
+  names: 628 bytes said, 628 read  [agree]
+
+=== shapes (26)
+0	arm_bonesShape	from 0	count 3885
+1	lowerlegsShape	from 3885	count 12114
+2	lowerleg_tassles_furShape	from 15999	count 468
+3	necklace_bonesShape	from 16467	count 2520
+4	shoulderpad_fur_baseShape	from 18987	count 5250
+5	shoulderpad_fur_layerShape	from 24237	count 2520
+6	base_bodyShape	from 26757	count 11583
+7	BottomTeethShape	from 38340	count 360
+8	chest_strapShape	from 38700	count 1464
+9	Eye_LShape	from 40164	count 1080
+10	Eye_RShape	from 41244	count 1080
+11	handsShape	from 42324	count 2856
+12	lowerleg_tasslesShape	from 45180	count 468
+13	necklace_stringShape	from 45648	count 1680
+14	R_arm_tieShape	from 47328	count 204
+15	R_leg_danglerShape	from 47532	count 288
+16	shoulderpadShape	from 47820	count 1986
+17	TongueShape	from 49806	count 384
+18	UpperTeethShape	from 50190	count 360
+19	ClothingFurShape1	from 50550	count 1017
+20	ClothingFur2Shape	from 51567	count 255
+21	beltShape	from 51822	count 432
+22	bonesShape	from 52254	count 4320
+23	front_beltShape	from 56574	count 108
+24	skirt_baseShape	from 56682	count 6552
+25	L_leg_danglerShape	from 63234	count 624
+
+=== fitting
+the monster's rig: 87 bones
+mounts: aux_position, aux_camera_position, aux_L_Weapon_attachment_jntBnd_02, aux_R_Weapon_attachment_jntBnd_02, aux_Back_attachment, aux_L_foot_attachment, aux_R_foot_attachment, aux_Head_attachment, aux_L_Weapon_attachment_jntBnd, aux_R_Weapon_attachment_jntBnd
+  BoarGuardHairHeld.ao  socket Head_Attachment [NOT in its carrier's rig]  box (-14.6,-9.5,-19.3)..(14.6,17.2,9.6)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 2 in the header, 2 in the block · 6910 triangles over 4386 vertices
+    names: 42 bytes said, 42 read  [agree]
+    rig 17 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 16 of 17  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_L3_hair_01_jntBnd  [its own]  under 0  rests at (7,3.5,-13)
+      2 phys_skinned_L4_hair_01_jntBnd  [its own]  under 0  rests at (2.7,6.7,-13)
+      3 phys_skinned_L2_hair_01_jntBnd  [its own]  under 0  rests at (8.5,-1.8,-13)
+      4 phys_skinned_L1_hair_01_jntBnd  [its own]  under 0  rests at (6.8,-7.6,-13)
+      5 phys_skinned_R1_hair_01_jntBnd  [its own]  under 0  rests at (-6.8,-7.6,-13)
+      6 phys_skinned_R2_hair_01_jntBnd  [its own]  under 0  rests at (-8.5,-1.8,-13)
+      7 phys_skinned_R3_hair_01_jntBnd  [its own]  under 0  rests at (-7,3.5,-13)
+      8 phys_skinned_R4_hair_01_jntBnd  [its own]  under 0  rests at (-2.7,6.7,-13)
+      9 phys_skinned_L3_hair_02_jntBnd  [its own]  under 1  rests at (8.3,5.4,-5.3)
+      10 phys_skinned_L4_hair_02_jntBnd  [its own]  under 2  rests at (3.2,8.9,-5.3)
+      11 phys_skinned_L2_hair_02_jntBnd  [its own]  under 3  rests at (10.1,-0.3,-5.3)
+      12 phys_skinned_L1_hair_02_jntBnd  [its own]  under 4  rests at (8,-6.9,-5.3)
+      13 phys_skinned_R1_hair_02_jntBnd  [its own]  under 5  rests at (-8,-6.9,-5.3)
+      14 phys_skinned_R2_hair_02_jntBnd  [its own]  under 6  rests at (-10.1,-0.3,-5.3)
+      15 phys_skinned_R3_hair_02_jntBnd  [its own]  under 7  rests at (-8.3,5.4,-5.3)
+      16 phys_skinned_R4_hair_02_jntBnd  [its own]  under 8  rests at (-3.2,8.9,-5.3)
+  BoarGuardRobeHeld.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-25.9,-25.1,-11)..(25.2,20.6,49.4)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 6 in the header, 6 in the block · 4228 triangles over 2731 vertices
+    names: 166 bytes said, 166 read  [agree]
+    rig 25 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 24 of 25  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 hip_jntBnd  [shared]  under 0  rests at (0,0,13.4)  carrier has (0,0,-99.8)
+      2 spine_2_jntBnd  [shared]  under 0  rests at (0,0,-12.3)  carrier has (0,0,-125.5)
+      3 phys_skinned_skirt_L_1_jntBnd  [its own]  under 0  rests at (6,-14.1,5.9)
+      4 phys_skinned_skirt_L_4_jntBnd  [its own]  under 0  rests at (15.5,-7,5.8)
+      5 phys_skinned_skirt_L_7_jntBnd  [its own]  under 0  rests at (15.5,3.7,5.6)
+      6 phys_skinned_skirt_L_10_jntBnd  [its own]  under 0  rests at (6,10.9,5.5)
+      7 phys_skinned_skirt_R_1_jntBnd  [its own]  under 0  rests at (-6,-14.1,5.9)
+      8 phys_skinned_skirt_R_4_jntBnd  [its own]  under 0  rests at (-15.5,-7,5.8)
+      9 phys_skinned_skirt_R_7_jntBnd  [its own]  under 0  rests at (-15.5,3.7,5.6)
+      10 phys_skinned_skirt_R_10_jntBnd  [its own]  under 0  rests at (-6,10.9,5.5)
+      11 phys_skinned_skirt_L_2_jntBnd  [its own]  under 3  rests at (6.7,-15,23)
+      12 phys_skinned_skirt_L_5_jntBnd  [its own]  under 4  rests at (17.4,-7,22.7)
+      13 phys_skinned_skirt_L_8_jntBnd  [its own]  under 5  rests at (17.4,4.8,22.1)
+      14 phys_skinned_skirt_L_11_jntBnd  [its own]  under 6  rests at (6.7,12.8,21.7)
+      15 phys_skinned_skirt_R_2_jntBnd  [its own]  under 7  rests at (-6.7,-15,23)
+      16 phys_skinned_skirt_R_5_jntBnd  [its own]  under 8  rests at (-17.4,-7,22.7)
+      17 phys_skinned_skirt_R_8_jntBnd  [its own]  under 9  rests at (-17.4,4.8,22.1)
+      18 phys_skinned_skirt_R_11_jntBnd  [its own]  under 10  rests at (-6.7,12.8,21.7)
+      19 phys_skinned_skirt_L_3_jntBnd  [its own]  under 11  rests at (7.4,-15.8,40.1)
+      20 phys_skinned_skirt_L_12_jntBnd  [its own]  under 14  rests at (7.4,14.8,38)
+      21 phys_skinned_skirt_R_3_jntBnd  [its own]  under 15  rests at (-7.4,-15.8,40.1)
+      22 phys_skinned_skirt_R_6_jntBnd  [its own]  under 16  rests at (-19.2,-7,39.5)
+      23 phys_skinned_skirt_R_9_jntBnd  [its own]  under 17  rests at (-19.2,6,38.6)
+      24 phys_skinned_skirt_R_12_jntBnd  [its own]  under 18  rests at (-7.4,14.8,38)
+  BoarGuardLegClothHeld.ao  socket L_thigh_jntBnd [in its carrier's rig]  box (32,5.7,-0.6)..(52,8.3,3.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 1 in the header, 1 in the block · 208 triangles over 183 vertices
+    names: 36 bytes said, 36 read  [agree]
+    rig 3 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 2 of 3  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_dangler_1_jntBnd  [its own]  under 0  rests at (37.2,7,1.2)
+      2 phys_skinned_dangler_2_jntBnd  [its own]  under 1  rests at (47.2,6,1.4)

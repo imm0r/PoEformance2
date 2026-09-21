@@ -1,0 +1,3008 @@
+monster: Skeletal Warrior [Metadata/Monsters/Skeletons/PlayerSummoned/SkeletonWarriorPlayerSummoned]
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/SkeletonWarriorPlayerSummoned.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/Animation/PlayerMinions/SwordShield/rig.amd"
+	animations = '[
+		{
+			"name": "attack_long_sword_shield_01a",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.2922878563404083,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3230000138282776,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.39989200234413149,
+					"name": "contact",
+					"position": [
+						0.0,
+						-100.0,
+						-130.0
+					]
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.42291200160980227,
+					"end_time": 0.48081862926483157,
+					"name": "melee_trail",
+					"data": "Right 0 1 3 0.422912 0 Linear 0.446539 0.537162 Smooth 0.480819 1 CustomSmooth 8.91427 0 1 13.1502 -40.993 -124.558 0 5.58505 5.65747 1 1 1"
+				}
+			]
+		},
+		{
+			"name": "attack_long_sword_shield_01b",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.2922878563404083,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3230000138282776,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.39989200234413149,
+					"name": "contact",
+					"position": [
+						0.0,
+						-100.0,
+						-130.0
+					]
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.4191820025444031,
+					"end_time": 0.4822724461555481,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_01a",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.42367061972618105,
+					"end_time": 0.4720322787761688,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.44366371631622317,
+					"name": "contact",
+					"position": [
+						0.0,
+						-100.0,
+						-130.0
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_01b",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_01c",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.43546390533447268,
+					"end_time": 0.5031607747077942,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.4672635793685913,
+					"name": "contact",
+					"position": [
+						0.0,
+						-100.0,
+						-130.0
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_01d",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "move",
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				},
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.3330000042915344,
+					"name": "start_target_update",
+					"data": "0 0 1"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_02a",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.25,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.25,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.3365049958229065,
+					"end_time": 0.39235106110572817,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.35081952810287478,
+					"name": "contact",
+					"position": [
+						0.0,
+						-100.0,
+						-130.0
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_02b",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.25,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.25,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_02c",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.25,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.25,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.25,
+					"name": "stop"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.36120009422302248,
+					"end_time": 0.42161935567855837,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.38649022579193118,
+					"name": "contact",
+					"position": [
+						0.0,
+						-100.0,
+						-130.0
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_02d",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.25,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.25,
+					"name": "move",
+					"position": [
+						0.0,
+						-100.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_03a",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "move",
+					"position": [
+						0.0,
+						-200.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.25106701254844668,
+					"end_time": 0.28600895404815676,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.2686992287635803,
+					"name": "contact",
+					"position": [
+						0.0,
+						-100.0,
+						-130.0
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_03b",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "move",
+					"position": [
+						0.0,
+						-200.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_03c",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "move",
+					"position": [
+						0.0,
+						-200.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.25106701254844668,
+					"end_time": 0.28600895404815676,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.2686992287635803,
+					"name": "contact",
+					"position": [
+						0.0,
+						-100.0,
+						-130.0
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_03d",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "move",
+					"position": [
+						0.0,
+						-200.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_04a",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "move",
+					"position": [
+						0.0,
+						-200.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.25106701254844668,
+					"end_time": 0.28600895404815676,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.2686992287635803,
+					"name": "contact",
+					"position": [
+						0.0,
+						-100.0,
+						-130.0
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_04b",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "move",
+					"position": [
+						0.0,
+						-200.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_04c",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "move",
+					"position": [
+						0.0,
+						-200.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				},
+				{
+					"type": "MeleeTrailEventType",
+					"time": 0.25106701254844668,
+					"end_time": 0.28600895404815676,
+					"name": "melee_trail",
+					"data": "Right 0 0 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.2686992287635803,
+					"name": "contact",
+					"position": [
+						0.0,
+						-100.0,
+						-130.0
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_sword_shield_04d",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "start_target_update",
+					"data": "540 -360 1"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.13300000131130219,
+					"name": "move",
+					"position": [
+						0.0,
+						-200.0,
+						0.0
+					],
+					"data": "1 0 0 Everything 1 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "despawn_sword_shield_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8999999761581421,
+					"name": "delete"
+				}
+			]
+		},
+		{
+			"name": "hunkerdown_end_sword_shield_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.21068799495697022,
+					"name": "remove_buff"
+				}
+			]
+		},
+		{
+			"name": "hunkerdown_start_sword_shield_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.6499999761581421,
+					"name": "contact"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/attachments/WarriorSummonArmour.ao"
+	attached_object = "eye_L Metadata/Effects/Spells/undead_summon_skeletons/eye_glow.ao"
+	attached_object = "eye_R Metadata/Effects/Spells/undead_summon_skeletons/eye_glow.ao"
+	attached_object = "L_Weapon Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/attachments/WarriorSummonShield05.ao"
+	attached_object = "R_Weapon Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/attachments/WarriorSummonSword02.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_sword_shield_01a",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4212598502635956,
+								0.0
+							],
+							[
+								0.4645669162273407,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"angle": 1.9198600053787232,
+						"length": 183.89199829101563,
+						"impact_x_rotation": [
+							-0.785398006439209,
+							-0.785398006439209
+						],
+						"impact_z_rotation": [
+							0.8726649880409241,
+							2.268929958343506
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_shield_01c",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.437007874250412,
+								0.0
+							],
+							[
+								0.4921259880065918,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 1.9198600053787232,
+						"length": 183.89199829101563,
+						"impact_x_rotation": [
+							-0.785398006439209,
+							-0.785398006439209
+						],
+						"impact_z_rotation": [
+							-0.8726649880409241,
+							-2.268929958343506
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_shield_02a",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4527558982372284,
+								0.0
+							],
+							[
+								0.5078740119934082,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"angle": 1.9198600053787232,
+						"length": 183.89199829101563,
+						"impact_x_rotation": [
+							-0.785398006439209,
+							-0.785398006439209
+						],
+						"impact_z_rotation": [
+							0.8726649880409241,
+							2.268929958343506
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_shield_02c",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4803149700164795,
+								0.0
+							],
+							[
+								0.539370059967041,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 1.9198600053787232,
+						"length": 183.89199829101563,
+						"impact_x_rotation": [
+							-0.785398006439209,
+							-0.785398006439209
+						],
+						"impact_z_rotation": [
+							-0.8726649880409241,
+							-2.268929958343506
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_shield_03a",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.5236220359802246,
+								0.0
+							],
+							[
+								0.5826771855354309,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"angle": 1.9198600053787232,
+						"length": 183.89199829101563,
+						"impact_x_rotation": [
+							-0.785398006439209,
+							-0.785398006439209
+						],
+						"impact_z_rotation": [
+							0.8726649880409241,
+							2.268929958343506
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_shield_03c",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.5196850299835205,
+								0.0
+							],
+							[
+								0.5629921555519104,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 1.9198600053787232,
+						"length": 183.89199829101563,
+						"impact_x_rotation": [
+							-0.785398006439209,
+							-0.785398006439209
+						],
+						"impact_z_rotation": [
+							-0.8726649880409241,
+							-2.268929958343506
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_shield_04a",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.625984251499176,
+								0.0
+							],
+							[
+								0.6929134130477905,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"angle": 1.9198600053787232,
+						"length": 183.89199829101563,
+						"impact_x_rotation": [
+							-0.785398006439209,
+							-0.785398006439209
+						],
+						"impact_z_rotation": [
+							0.8726649880409241,
+							2.268929958343506
+						]
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_shield_04c",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.6220472455024719,
+								0.0
+							],
+							[
+								0.6692913174629211,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"angle": 1.9198600053787232,
+						"length": 183.89199829101563,
+						"impact_x_rotation": [
+							-0.785398006439209,
+							-0.785398006439209
+						],
+						"impact_z_rotation": [
+							-0.8726649880409241,
+							-2.268929958343506
+						]
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/Animation/PlayerMinions/SwordShield/rig.ast"
+		socket = "Back"
+			parent = "aux_back_attachment"
+		socket = "aux_tip"
+			parent = "R_Weapon"
+			translation = "0 0 -35"
+		socket = "aux_lightning_hit"
+			parent = "R_Weapon"
+			translation = "-40 120 -500"
+		socket = "aux_meleeslash_control"
+			parent = "chest_jntBnd"
+			translation = "0 -25 0"
+		socket = "aux_axe_end"
+			parent = "R_Weapon"
+			translation = "0 0 -60"
+		socket = "eye_L"
+			parent = "aux_head_jntBnd"
+			translation = "3 1.5 -3"
+		socket = "eye_R"
+			parent = "aux_head_jntBnd"
+			translation = "-3 1.5 -3"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/FrostMageSummon.sm"
+			HipsShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_FemurShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_FootShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_ForearmShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_HandShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_HumerusShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			L_ShinShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_FemurShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_FootShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_ForearmShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_HandShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_HumerusShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			R_ShinShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			RibsShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+			SkullShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Base.mat:0"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "back false aux_back_attachment"
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false L_elbow_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd neck_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd R_elbow_jntBnd"
+		bone_group = "meleeslash_control false chest_jntBnd aux_meleeslash_control"
+		bone_group = "melee_trail false R_Weapon aux_axe_end"
+		bone_group = "aux_weapon false aux_tip R_finger_1_jntBnd_3 R_wrist_jntBnd"
+		bone_group = "aux_lightning false aux_tip aux_lightning_hit"
+		bone_group = "eye_L false eye_L"
+		bone_group = "eye_R false eye_R"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "death_sword_shield_broken_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.299999952316284,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.46 1 Flat 2.3 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_sword_shield_broken_bwd_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.5 1 Flat 2.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_sword_shield_broken_bwd_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.4 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_sword_shield_broken_fwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.5 1 Flat 2.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_sword_shield_broken_left_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.4 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_sword_shield_broken_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.5,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.5 1 Flat 2.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "despawn_sword_shield_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0004930970026180148,
+						"end_time": 0.9995070099830627,
+						"name": "SummonFade",
+						"apply_on_children": true,
+						"curve": "3 0.000493097 0 Smooth 0.799705 0.980154 Flat 0.999507 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "emerge_sword_shield_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "SummonFade",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "emerge_sword_shield_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "SummonFade",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "hunkerdown_end_sword_shield_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "ShieldGlow",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 0.5 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "hunkerdown_idle_sword_shield_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.333000183105469,
+						"name": "ShieldGlow",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 5.333 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "hunkerdown_start_sword_shield_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "ShieldGlow",
+						"apply_on_children": true,
+						"curve": "2 0 0 Smooth 1 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "offering_sword_shield_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "offering_sword_shield_idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "2 0 1 Linear 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "offering_sword_shield_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.4 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0012820500414818526,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.00128205 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_bwd_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0012820500414818526,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.00128205 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_bwd_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0012820500414818526,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.00128205 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_fwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0012820500414818526,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.00128205 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_left_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0012820500414818526,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.00128205 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0012820500414818526,
+						"end_time": 1.2999999523162842,
+						"name": "HideEmissive",
+						"apply_on_children": true,
+						"curve": "3 0.00128205 1 Smooth 1 0 Flat 1.3 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_long_sword_shield_01a",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09780439734458924,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12037599831819534,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24556699395179749,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Swing_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "attack_long_sword_shield_01b",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09780439734458924,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12037599831819534,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2738550007343292,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Swing_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_shield_01a",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09780439734458924,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12037599831819534,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2738550007343292,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Swing_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_shield_01c",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09780439734458924,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12037599831819534,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2738550007343292,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Swing_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_shield_02a",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07819650322198868,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09624280035495758,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20018500089645387,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Swing_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_shield_02c",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07819650322198868,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09624280035495758,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20018500089645387,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Swing_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_shield_03a",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05870610103011131,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07225430011749268,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11199399828910828,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Swing_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_shield_03c",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05870610103011131,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07225430011749268,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11199399828910828,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Swing_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_shield_04a",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05870610103011131,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07225430011749268,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11199399828910828,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Swing_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_shield_04c",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05870610103011131,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07225430011749268,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11199399828910828,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Swing_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "death_sword_shield_broken_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4636560082435608,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.508529007434845,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Shield",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5367770195007324,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6414750218391419,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "death_sword_shield_broken_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4786849915981293,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4895229935646057,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5690029859542847,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Sword",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5906820297241211,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Shield",
+						"bone_name": "L_finger_1_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "death_sword_shield_broken_bwd_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.29335498809814455,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Shield",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3034690022468567,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Sword",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30924901366233828,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47543299198150637,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_sword_shield_broken_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2402449995279312,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.473268985748291,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Shield",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48590999841690066,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.655709981918335,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "death_sword_shield_broken_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3771669864654541,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4089620113372803,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Shield",
+						"bone_name": "L_finger_1_jntBnd_1"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.468207985162735,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6112750172615051,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Sword",
+						"bone_name": "aux_tip"
+					}
+				]
+			},
+			{
+				"name": "death_sword_shield_broken_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Break",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.33598199486732485,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Death_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3468230068683624,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Sword",
+						"bone_name": "aux_tip"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.46965301036834719,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Skull",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5310729742050171,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Shield",
+						"bone_name": "L_Weapon"
+					}
+				]
+			},
+			{
+				"name": "despawn_sword_shield_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Fade",
+						"bone_name": "spine_1_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_sword_shield_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_sword_shield_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_sword_shield_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_sword_shield_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_sword_shield_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_sword_shield_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Flinch",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_LeatherMovement",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_sword_shield_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.9710379838943481,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.3485400676727297,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Idle",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "jog_sword_shield_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.1618500053882599,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.36184900999069216,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.507515013217926,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7283269762992859,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1514400243759156,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5722500085830689,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "offering_sword_shield_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonBrute_PlateMovement",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2875719964504242,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Fall_Hard",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.34824299812316897,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Drop_Shield",
+						"bone_name": "L_finger_1_jntBnd_1"
+					}
+				]
+			},
+			{
+				"name": "offering_sword_shield_revive_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "offering_sword_shield_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11271700263023377,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25722500681877139,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Death",
+						"bone_name": "aux_head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0479045994579792,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_bwd_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.026300599798560144,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_bwd_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05917629972100258,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.05166180059313774,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.04414739832282066,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Summon",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Skeleton_SummonRattle",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonBrute_PlateEmerge",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Cleric/Revive/Revive_Rune",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06950859725475311,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Emerge_Bones",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_sword_shield_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.09816759824752808,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12021999806165695,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_ChainStep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21125300228595735,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2733300030231476,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.551630973815918,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_ChainStep",
+						"bone_name": "L_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5875639915466309,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_sword_shield_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08843919634819031,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10830699652433396,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_ChainStep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1903180032968521,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.24624300003051759,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5079870223999023,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_ChainStep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5293369889259338,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sprint_sword_shield_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08342769742012024,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1795330047607422,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2228740006685257,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_ChainStep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23228900134563447,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47920098900794985,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_ChainStep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4993410110473633,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_sword_shield_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.12764699757099152,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Soft",
+						"bone_name": "chest_jntBnd",
+						"chance": 0.25
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27469199895858767,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Vocal/Skeleton_Effort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3444629907608032,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_ChainStep",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.35541099309921267,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7546370029449463,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Warrior/SkeletonWarrior_ChainStep",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7640100121498108,
+						"filename": "Audio/Sound Effects/Skills/4.0/Occult/SummonSkeleton/Basic/Skeleton_Move_Step",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "hunkerdown_end_sword_shield_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/undead_summon_skeletons/epk/shield_glow.epk",
+						"bone_name": "L_Weapon"
+					}
+				]
+			},
+			{
+				"name": "hunkerdown_idle_sword_shield_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/undead_summon_skeletons/epk/shield_glow.epk",
+						"bone_name": "L_Weapon"
+					}
+				]
+			},
+			{
+				"name": "hunkerdown_start_sword_shield_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/undead_summon_skeletons/epk/shield_glow.epk",
+						"bone_name": "L_Weapon"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "hunkerdown_idle_sword_shield_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/undead_summon_skeletons/pet/skeleton_hunker_block.pet",
+						"bone_group": "grp_l_forearm"
+					}
+				]
+			},
+			{
+				"name": "hunkerdown_start_sword_shield_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/undead_summon_skeletons/pet/skeleton_hunker_start.pet",
+						"bone_group": "grp_l_forearm"
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "emerge_sword_shield_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.4006420075893402,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_speed": true,
+						"inherit_scale": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "emerge_sword_shield_02",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.4000000059604645,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_bwd_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_bwd_02",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_bwd_03",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_fwd_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_left_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			},
+			{
+				"name": "revive_sword_shield_broken_right_01",
+				"events": [
+					{
+						"type": "AnimatedObjectEventType",
+						"time": 0.20000000298023225,
+						"ao_type": "Metadata/Effects/Spells/undead_summon_skeletons/summon_circle.ao",
+						"inherit_height": true,
+						"inherit_orientation": true
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/attachments/WarriorSummonArmour.ao (depth 1)
+version 3
+extends "Metadata/Skin"
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/attachments/WarriorSummonArmourChainSkirt.ao"
+}
+
+client
+{
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/WarriorArmour/WarriorSkeletonArmour.sm"
+			body_armour_meshShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Armour.mat:0"
+		chainmail_meshShape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Armour.mat:0"
+	}
+}
+
+=== .ao Metadata/Effects/Spells/undead_summon_skeletons/eye_glow.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/particles/FXRIGs/fx_start/fxRIG.amd"
+	view_of = "animationPreSet"
+		view_name = "eye_glow"
+		view_looping = true
+	default_animation = "eye_glow"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/particles/FXRIGs/fx_start/fxRIG.ast"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "FX_point false root"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "eye_glow",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.12325900048017502,
+						"filename": "Metadata/Effects/Spells/undead_summon_skeletons/pet/eye_glow.pet",
+						"bone_group": "FX_point"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "eye_glow",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/undead_summon_skeletons/trl/eye_glow.trl",
+						"bone_group": "FX_point"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/attachments/WarriorSummonShield05.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/Items/Weapons/Monsters/SkeletonWeapons/SkeletonShield05.fmt"
+			mesh5Shape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Shield05.mat:0"
+	}
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/attachments/WarriorSummonSword02.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/Items/Weapons/Monsters/SkeletonWeapons/SkeletonSword02.fmt"
+			fixed_SkeletonSword02|mesh2|mesh2Shape = "Metadata/Effects/Spells/undead_summon_skeletons/mat/SummonSkeleton_Sword02.mat:0"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Skin.ao (depth 2)
+version 3
+extends "nothing"
+
+BaseAnimationEvents { }
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	SkinMesh { }
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/attachments/WarriorSummonArmourChainSkirt.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/attachments/ChainmailSkirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "root_jntBnd Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/attachments/WarriorSummonArmourPlateSkirt.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/attachments/ChainmailSkirt/rig.ast"
+		linear_allowed_contraction = 0.200
+		bend_stiffness = 500.000
+		bend_allowed_angle = 0.200
+		normal_viscosity_multiplier = 0.001
+		tangent_viscosity_multiplier = 0.001
+		enclosure_radius = 20.000
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/attachments/ChainmailSkirt/BruteArmourChainmailSkirt.sm"
+	}
+}
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/Skeletons/PlayerSummoned/Warrior/attachments/WarriorSummonArmourPlateSkirt.ao (depth 3)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/attachments/PlateSkirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/attachments/PlateSkirt/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		bend_allowed_angle = 0.000
+		normal_viscosity_multiplier = 0.001
+		tangent_viscosity_multiplier = 0.001
+		enclosure_radius = 20.000
+		enclosure_angle = 0.100
+		use_shock_propagation = false
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BasicSkeleton/attachments/WarriorSummon/BruteArmour/attachments/PlateSkirt/BruteArmourPlateSkirt.sm"
+	}
+}
+
+=== .sm Art/Models/MONSTERS/BasicSkeleton/FrostMageSummon.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BasicSkeleton/FrostMageSkeleton_armour_f80fe041.smd"
+Materials 1
+	"Art/Textures/Monsters/BasicSkeleton/BoneRabble/BoneRabblec.mat" 15
+BoundingBox -76.245 -14.4066 -189.231 77.8251 14.8169 0.491275
+BoneGroups 20
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_1_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_1_jntBnd_1"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_foot_jntBnd"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_foot_jntBnd"
+
+=== .smd Art/Models/MONSTERS/BasicSkeleton/FrostMageSkeleton_armour_f80fe041.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 15 in the header, 15 in the block · 4692 triangles over 3138 vertices
+  names: 348 bytes said, 348 read  [agree]
+
+=== shapes (23)
+0	HipsShape	from 0	count 2220
+1	L_FemurShape	from 2220	count 762
+2	L_FootShape	from 2982	count 1116
+3	L_ForearmShape	from 4098	count 372
+4	L_HandShape	from 4470	count 1200
+5	L_HumerusShape	from 5670	count 354
+6	L_ShinShape	from 6024	count 366
+7	R_FemurShape	from 6390	count 762
+8	R_FootShape	from 7152	count 1116
+9	R_ForearmShape	from 8268	count 372
+10	R_HandShape	from 8640	count 1200
+11	R_HumerusShape	from 9840	count 354
+12	R_ShinShape	from 10194	count 366
+13	RibsShape	from 10560	count 2340
+14	SkullShape	from 12900	count 1176
+15	body_armour_meshShape	from 14076	count 10578
+16	chainmail_meshShape	from 24654	count 966
+17	helmet_meshShape	from 25620	count 4092
+18	mouth_guard_meshShape	from 29712	count 1668
+19	mesh5Shape	from 31380	count 834
+20	fixed_SkeletonSword02|mesh2|mesh2Shape	from 32214	count 1104
+21	chainmail_skirtShape	from 33318	count 990
+22	plate_skirt_meshShape	from 34308	count 2136
+
+=== fitting
+the monster's rig: 49 bones
+mounts: aux_position, aux_back_attachment, aux_head_jntBnd, aux_L_foot_jntBnd, aux_R_foot_jntBnd
+  WarriorSummonArmour.ao  socket <root> [NOT in its carrier's rig]  box (-25.1,-16.6,-196)..(22.1,15,-109.2)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+    shapes 4 in the header, 4 in the block · 5768 triangles over 4924 vertices
+    names: 154 bytes said, 154 read  [agree]
+    (no rig of its own)
+    WarriorSummonArmourChainSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-19,-15.6,-21.2)..(18.6,13.6,42.1)
+      version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+      shapes 1 in the header, 1 in the block · 330 triangles over 236 vertices
+      names: 40 bytes said, 40 read  [agree]
+      rig 27 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 25 of 27  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+        1 phys_skinned_skirt_jntBnd_07  [its own]  under 0  rests at (5.2,-11.9,0.1)
+        2 phys_skinned_skirt_jntBnd_08  [its own]  under 0  rests at (-4.4,-10.2,0.1)
+        3 phys_skinned_skirt_jntBnd_09  [its own]  under 0  rests at (-11.7,-4.5,0.1)
+        4 phys_skinned_skirt_jntBnd_10  [its own]  under 0  rests at (-12.6,2.6,0.1)
+        5 phys_skinned_skirt_jntBnd_11  [its own]  under 0  rests at (-5.2,8.2,0.1)
+        6 phys_skinned_skirt_jntBnd_12  [its own]  under 0  rests at (5.2,8.2,0.1)
+        7 phys_skinned_skirt_jntBnd_13  [its own]  under 0  rests at (13.8,1.8,0.1)
+        8 phys_skinned_skirt_jntBnd_14  [its own]  under 0  rests at (13.8,-7,0.1)
+        9 phys_skinned_skirt_jntBnd_15  [its own]  under 2  rests at (-4.6,-9.5,12.7)
+        10 phys_skinned_skirt_jntBnd_16  [its own]  under 3  rests at (-12.2,-3.9,12.7)
+        11 phys_skinned_skirt_jntBnd_17  [its own]  under 4  rests at (-13,3.5,12.7)
+        12 phys_skinned_skirt_jntBnd_18  [its own]  under 5  rests at (-5.4,9.1,12.7)
+        13 phys_skinned_skirt_jntBnd_19  [its own]  under 6  rests at (5.4,9.1,12.7)
+        14 phys_skinned_skirt_jntBnd_20  [its own]  under 7  rests at (14.3,2.7,12.7)
+        15 phys_skinned_skirt_jntBnd_21  [its own]  under 9  rests at (-4.7,-8.8,25.3)
+        16 phys_skinned_skirt_jntBnd_22  [its own]  under 10  rests at (-12.6,-3.2,25.3)
+        17 phys_skinned_skirt_jntBnd_23  [its own]  under 11  rests at (-13.5,4.4,25.3)
+        18 phys_skinned_skirt_jntBnd_24  [its own]  under 12  rests at (-5.6,10,25.3)
+        19 phys_skinned_skirt_jntBnd_25  [its own]  under 13  rests at (5.6,10,25.3)
+        20 phys_skinned_skirt_jntBnd_26  [its own]  under 14  rests at (14.7,3.6,25.3)
+        21 phys_skinned_skirt_jntBnd_05  [its own]  under 15  rests at (-4.9,-8.2,37.9)
+        22 phys_skinned_skirt_jntBnd_04  [its own]  under 16  rests at (-13.1,-2.6,37.9)
+        23 phys_skinned_skirt_jntBnd_03  [its own]  under 17  rests at (-13.9,5.3,37.8)
+        24 phys_skinned_skirt_jntBnd_02  [its own]  under 18  rests at (-5.8,10.9,37.8)
+        25 phys_skinned_skirt_jntBnd_01  [its own]  under 19  rests at (5.8,10.9,37.8)
+        26 phys_skinned_skirt_jntBnd_06  [its own]  under 20  rests at (15.2,4.5,37.8)
+      WarriorSummonArmourPlateSkirt.ao  socket root_jntBnd [in its carrier's rig]  box (-22.4,-17.6,-18.2)..(-0.4,13.8,15.8)
+        version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+        shapes 1 in the header, 1 in the block · 712 triangles over 710 vertices
+        names: 42 bytes said, 42 read  [agree]
+        rig 4 bones, 1 of them names its carrier's rig also has
+        mesh weights reach bone 3 of 4  [inside this rig]
+          0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+          1 phys_hip_plates_jntBnd_1  [its own]  under 0  rests at (-11,-1.7,-11.4)
+          2 phys_hip_plates_jntBnd_2  [its own]  under 1  rests at (-11,-1.7,-1.5)
+          3 phys_hip_plates_jntBnd_3  [its own]  under 2  rests at (-11,-1.7,10)
+  eye_glow.ao  socket eye_L [NOT in its carrier's rig]  (no mesh - an effect or a sound)
+  eye_glow.ao  socket eye_R [NOT in its carrier's rig]  (no mesh - an effect or a sound)
+  WarriorSummonShield05.ao  socket L_Weapon [in its carrier's rig]  fixed mesh SkeletonShield05.fmt  1 shapes
+      mesh5Shape  ->  Art/Models/Items/Weapons/Monsters/SkeletonWeapons/Textures/SkeletonShield05c.mat
+  WarriorSummonSword02.ao  socket R_Weapon [in its carrier's rig]  fixed mesh SkeletonSword02.fmt  1 shapes
+      fixed_SkeletonSword02|mesh2|mesh2Shape  ->  Art/Models/Items/Weapons/Monsters/SkeletonWeapons/Textures/SkeletonSword02c.mat

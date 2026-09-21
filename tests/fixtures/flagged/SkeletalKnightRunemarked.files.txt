@@ -1,0 +1,2442 @@
+monster: Eternal Knight [Metadata/Monsters/SkeletalKnight/Runemarked/SkeletalKnightRunemarked]
+
+=== .ao Metadata/Monsters/SkeletalKnight/Runemarked/SkeletalKnightRunemarked.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwordSkeleton/Animations/SkeletalKnight/rig.amd"
+	animations = '[
+		{
+			"name": "attack_sword_03",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "no_block"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.5,
+					"name": "block"
+				}
+			]
+		},
+		{
+			"name": "cleave_sword_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "no_block"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.0,
+					"name": "block"
+				}
+			]
+		},
+		{
+			"name": "knockdown_bwd_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.0,
+					"name": "no_block"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 3.4660000801086427,
+					"name": "block"
+				}
+			]
+		},
+		{
+			"name": "knockdown_fwd_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.26600000262260439,
+					"name": "move",
+					"position": [
+						0.0,
+						-175.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				},
+				{
+					"type": "MoveEventType",
+					"time": 1.2660000324249268,
+					"end_time": 1.7990000247955323,
+					"name": "move",
+					"position": [
+						0.0,
+						-70.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride 1.000000"
+				}
+			]
+		},
+		{
+			"name": "shield_bash_sword_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.164180040359497,
+					"name": "contact",
+					"position": [
+						-11.333000183105469,
+						-120.0,
+						0.0
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "spine_1_jntBnd Metadata/Monsters/SkeletalKnight/attachments/SKThighGuards.ao"
+	attached_object = "spine_2_jntBnd Metadata/Monsters/SkeletalKnight/attachments/SKBeltAccss.ao"
+	attached_object = "spine_1_jntBnd Metadata/Monsters/SkeletalKnight/attachments/SKSkirt.ao"
+	attached_object = "L_shoulder_jntBnd Metadata/Monsters/SkeletalKnight/attachments/SKLShoulderPad.ao"
+	attached_object = "R_shoulder_jntBnd Metadata/Monsters/SkeletalKnight/attachments/SKRShoulderPad.ao"
+	attached_object = "R_Weapon Metadata/Monsters/SkeletalKnight/attachments/SKHalberd.ao"
+	attached_object = "L_Weapon Metadata/Monsters/SkeletalKnight/attachments/SKShield.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.36871498823165896,
+								0.0
+							],
+							[
+								0.5810059905052185,
+								1.0
+							]
+						],
+						"width": 76.02300262451172,
+						"length": 198.8300018310547
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.39664798974990847,
+								0.0
+							],
+							[
+								0.558659017086029,
+								1.0
+							]
+						],
+						"width": 93.56700134277344,
+						"length": 192.98199462890626
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.553072988986969,
+								0.0
+							],
+							[
+								0.6145250201225281,
+								1.0
+							]
+						],
+						"width": 99.41500091552735,
+						"length": 163.7429962158203
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_sword_03",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Rectangle",
+						"key_frames": [
+							[
+								0.43843844532966616,
+								0.0
+							],
+							[
+								0.4444444477558136,
+								1.0
+							]
+						],
+						"rotation": 0.27925270795822146,
+						"width": 65.0,
+						"length": 197.07699584960938,
+						"offset": [
+							16.0,
+							-6.0
+						],
+						"local_offset": [
+							-49.0,
+							-47.0
+						],
+						"impact_z_rotation": [
+							0.24434611201286317,
+							0.24434611201286317
+						],
+						"impact_type": "Piercing",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "cleave_sword_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.4864864945411682,
+								0.0
+							],
+							[
+								0.4954954981803894,
+								0.28166913986206057
+							],
+							[
+								0.5105105042457581,
+								0.61847984790802
+							],
+							[
+								0.5315315127372742,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 2,
+						"angle": 3.5953800678253176,
+						"x_axis_scale": 0.8769999742507935,
+						"length": 217.85699462890626,
+						"offset": [
+							9.0,
+							0.0
+						],
+						"impact_z_rotation": [
+							-0.5235987901687622,
+							2.9321537017822267
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwordSkeleton/Animations/SkeletalKnight/rig.ast"
+		socket = "aux_weapon_trail_01"
+			parent = "R_Weapon"
+			translation = "-14.4094 0 -104.773"
+		socket = "aux_weapon_trail_02"
+			parent = "R_Weapon"
+			translation = "-10.1049 0 -61.3632"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwordSkeleton/SkeletalKnight.sm"
+	}
+
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd hip_jntBnd spine_1_jntBnd"
+		bone_group = "frameupper false R_shoulder_cTwist_jntBnd_1 R_shoulder_jntBnd R_clavicle_jntBnd chest_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1"
+		bone_group = "FX_ghostflame false R_clavicle_jntBnd L_clavicle_jntBnd neck_jntBnd neck_mid_jntBnd chest_jntBnd spine_2_jntBnd"
+		bone_group = "FX_weapon_trail false aux_weapon_trail_01 aux_weapon_trail_02"
+		bone_group = "FX_shield_trl false aux_serverbone_xyzy_R_shield aux_serverbone_xyzy_M_shield"
+	}
+
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5399990081787109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5957900285720825,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Attack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.610526978969574,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Swish_Knifestick_",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6284210085868836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6821060180664063,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0463099479675294,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5399990081787109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5557900071144104,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Attack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5884220004081726,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Swish_Knifestick_",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6284210085868836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6821060180664063,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0463099479675294,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_03",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25368401408195498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Attack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5315790176391602,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5399990081787109,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5442109704017639,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Swish_Knifestick_",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6821060180664063,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0463099479675294,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "cleave_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5143259763717651,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Attack2",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7199990153312683,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8140360116958618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Swish_Knifestick_",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8140360116958618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Cleave",
+						"bone_name": "R_Weapon"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8378949761390686,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9094750285148621,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3950899839401246,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/DeathB_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/DeathShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25543901324272158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Fall_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Death",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12933799624443055,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7318260073661804,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7547469735145569,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "R_knee_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8169599771499634,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0959800481796265,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Fall_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1296600103378297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1951500177383423,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/WeaponDrop",
+						"bone_name": "R_finger_3_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2589999437332154,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2671899795532227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/ShieldDrop",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5749800205230713,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_sword_broken_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/DeathB_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/DeathShort",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.25543901324272158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Fall_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_break_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.004089360125362873,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7810680270195007,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.292240023612976,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/WeaponDrop",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3740299940109254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5048799514770508,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7870500087738038,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.958799958229065,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9833400249481202,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.58447003364563,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/ShieldDrop",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.0220301151275636,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.2592198848724367,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.7090399265289308,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8112800121307375,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8971500396728517,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.355160236358643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.40831995010376,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.596429824829102,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/KnockbackC",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.600520133972168,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "L_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.939939975738525,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.197559833526611,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "root_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/KnockbackC",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2184399962425232,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/WeaponDrop",
+						"bone_name": "R_finger_4_jntBnd_3"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4212769865989685,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43971601128578188,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5560280084609985,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "R_ankle_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6184390187263489,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "neck_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_sword_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "hit_reaction_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "hit_reaction_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "hit_reaction_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "hit_reaction_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0003508770023472607,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Flinch",
+						"bone_name": "head_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.7859119772911072,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/ArmourIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7859119772911072,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoftIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.9864799976348879,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Idle",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.529129981994629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/ArmourIdle",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.529129981994629,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoftIdle",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/KnockbackA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23349900543689729,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.48888900876045229,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7880600094795227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8561639785766602,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.904807984828949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.155329942703247,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/KnockbackB",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.607740044593811,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8388099670410157,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1720199584960939,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.390929937362671,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/KnockbackC",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.476059913635254,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.062230110168457,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.196010112762451,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/ArmourIdle",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/KnockbackA",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.18656806647777558,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2646222710609436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7880600094795227,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.904807984828949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoft",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.159388542175293,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/KnockbackC",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.607740044593811,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.781392216682434,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8388099670410157,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.107295036315918,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoftIdle",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Run.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08926299959421158,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/ArmourIdle",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3014729917049408,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3031579852104187,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.409263014793396,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoftIdle",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5731930136680603,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/ArmourIdle",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6383150219917297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.641120970249176,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "R_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "shield_bash_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Effects/VerisiumSurge",
+						"bone_name": "chest_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8306379914283752,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9310640096664429,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9480860233306885,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Attack1",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0468100309371949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0558035373687745,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Effects/ShieldBoom",
+						"bone_name": "L_elbow_Twist_jntBnd_2",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.09266996383667,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Effects/VerisiumBody",
+						"bone_name": "L_elbow_Twist_jntBnd_2",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0927599668502808,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/ShieldSlam",
+						"bone_name": "root_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7889399528503419,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementQuickHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9268100261688233,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10920400172472,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.21178999543190003,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6601889729499817,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7578120231628418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1714600324630738,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2872899770736695,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3336199522018433,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6910099983215333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9259699583053589,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.1708500385284426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_emerge_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Emerge",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.12011100351810456,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23294200003147126,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7261229753494263,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.73158198595047,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8061969876289368,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.270259976387024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.415850043296814,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedHard",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4668099880218506,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.530500054359436,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8598899841308594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.11830997467041,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.3876500129699709,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "walk_sword_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoftIdle",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Vocals/Run.loop.ogg",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1152610033750534,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/ArmourIdle",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.38927701115608218,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.39145299792289736,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5284609794616699,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/MovementMedSoftIdle",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7401350140571594,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/ArmourIdle",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8278470039367676,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Armour",
+						"bone_name": "R_foot_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8425400257110596,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act1/G1_8/SkeletalKnight/Runemarked/Foley/Step_Boot_",
+						"bone_name": "L_foot_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+
+	Lights
+	{
+		light = "point_light"
+			bone_name = "chest_jntBnd"
+			style_speed = 25
+			state = "alive"
+				colour = "0.170565 3.7923 2.03714"
+				radius = 60
+				style = 1
+				distance_threshold = 50
+			state = "on_death"
+				radius = 170
+				style = 1
+				distance_threshold = 43
+	}
+
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_sword_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.002216750057414174,
+						"end_time": 1.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0.00221675 1 Smooth 1.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_sword_03",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "cleave_sword_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 2 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "WeaponEmissiveMulti",
+						"apply_on_children": true,
+						"curve": "4 0 0 Smooth 0.803982 1 Linear 1.20214 1 Linear 2 0 Smooth"
+					}
+				]
+			},
+			{
+				"name": "death_sword_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 1.887 0 Flat 2.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_sword_broken_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "3 0 1 Smooth 1.61766 0 Flat 2 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "emerge_sword_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "3 0 0 Smooth 0.701123 1 Flat 1 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 0.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 0.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "flinch_large_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 0.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 0.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 0.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 0.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "flinch_sword_small_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.5,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 0.5 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "idle_sword_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 5.333000183105469,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 5.333 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.4660000801086427,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 3.466 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "run_sword_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 0.800000011920929,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 0.8 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "shield_bash_sword_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3760600090026857,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 2.37606 1 Linear"
+					},
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.4000000953674318,
+						"name": "surgeTime_R",
+						"apply_on_children": true,
+						"curve": "6 0 0 Linear 0.210882 0 Linear 0.75 0.5 Flat 1.2 0.5 Flat 1.95 1 Flat 2.4 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "walk_emerge_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.3329999446868898,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 2.333 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "walk_emerge_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.565579891204834,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 2.56558 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "walk_sword_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0329999923706055,
+						"name": "EmissiveMulti",
+						"apply_on_children": true,
+						"curve": "2 0 1 Smooth 1.033 1 Linear"
+					}
+				]
+			}
+		]'
+	}
+
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "cleave_sword_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.8502479791641235,
+						"end_time": 1.30759596824646,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act1_FOUR/SkeletalKnight/fx/ghostflameTrail_core.trl",
+						"bone_group": "FX_weapon_trail"
+					}
+				]
+			},
+			{
+				"name": "shield_bash_sword_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.9023042917251587,
+						"end_time": 1.1670844554901124,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/SkeletalKnightRunemarked/fx/shield_bash_trail.trl",
+						"bone_group": "FX_shield_trl"
+					}
+				]
+			}
+		]'
+	}
+
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "shield_bash_sword_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6121583580970764,
+						"end_time": 1.3052407503128052,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/SkeletalKnightRunemarked/fx/barricadeWall_onact.pet",
+						"bone_group": "FX_shield_trl"
+					}
+				]
+			}
+		]'
+	}
+
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "shield_bash_sword_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/League_Expedition_New/SkeletalKnightRunemarked/epk/shield_glow.epk"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/SkeletalKnight/attachments/SKThighGuards.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/ThighGuards/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/ThighGuards/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.300
+		attachment_bones = "chest_jntBnd spine_2_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/ThighGuards/SKThighGuards.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false chest_jntBnd spine_2_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/SkeletalKnight/attachments/SKBeltAccss.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/BeltAccessories/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/BeltAccessories/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		normal_viscosity_multiplier = 0.100
+		enclosure_angle = 0.200
+		attachment_bones = "chest_jntBnd spine_1_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/BeltAccessories/SKBeltAccessories.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false chest_jntBnd spine_1_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/SkeletalKnight/attachments/SKSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/Skirt/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/Skirt/rig.ast"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		enclosure_angle = 0.600
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/Skirt/SKSkirt.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/SkeletalKnight/attachments/SKLShoulderPad.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/LShoulderPads/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/LShoulderPads/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		normal_viscosity_multiplier = 0.050
+		enclosure_angle = 0.200
+		attachment_bones = "L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1 child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/LShoulderPads/LShoulderPad.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false L_clavicle_jntBnd L_shoulder_jntBnd L_shoulder_cTwist_jntBnd_1"
+	}
+}
+
+=== .ao Metadata/Monsters/SkeletalKnight/attachments/SKRShoulderPad.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/RShoulderPads/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/RShoulderPads/rig.ast"
+		linear_allowed_contraction = 0.000
+		bend_stiffness = 800.000
+		normal_viscosity_multiplier = 0.050
+		enclosure_angle = 0.200
+		attachment_bones = "R_clavicle_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1 child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/RShoulderPads/RShoulderPad.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false R_clavicle_jntBnd R_shoulder_jntBnd R_shoulder_cTwist_jntBnd_1"
+	}
+}
+
+=== .ao Metadata/Monsters/SkeletalKnight/attachments/SKHalberd.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/Halberd/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/Halberd/rig.ast"
+	}
+
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/Halberd/SkeletalKnightHalberd.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/SkeletalKnight/attachments/SKShield.ao (depth 1)
+version 3
+extends "Metadata/FmtParent"
+
+client
+{
+	FixedMesh
+	{
+		fixed_mesh = "Art/Models/MONSTERS/SwordSkeleton/attachments/SkeletalKnight/Shield/SkeletalKnightShield.fmt"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/FmtParent.ao (depth 2)
+version 3
+extends "nothing"
+
+AttachedAnimatedObject { }
+Hull { }
+
+client
+{
+	AnimatedRender { }
+	FixedMesh { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .sm Art/Models/MONSTERS/SwordSkeleton/SkeletalKnight.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/SwordSkeleton/SkeletalKnight_armour_51a29469.smd"
+Materials 2
+	"Art/Models/MONSTERS/SkeletalKnight/Textures/SkeletalKnightc.mat" 8
+	"Art/Models/MONSTERS/SkeletalKnight/Textures/SkeletalKnightFurc.mat" 1
+BoundingBox -78.3519 -34.3425 -177.292 78.3519 28.802 -0.169916
+BoneGroups 22
+	"grp_head" 2 "head_jntBnd" "aux_head_tip"
+	"grp_neck" 3 "head_jntBnd" "neck_mid_jntBnd" "neck_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_thigh" 2 "L_thigh_jntBnd" "L_knee_jntBnd"
+	"grp_r_thigh" 2 "R_thigh_jntBnd" "R_knee_jntBnd"
+	"grp_l_shin" 2 "L_knee_jntBnd" "L_ankle_jntBnd"
+	"grp_r_shin" 2 "R_knee_jntBnd" "R_ankle_jntBnd"
+	"grp_l_foot" 2 "L_ankle_jntBnd" "L_foot_jntBnd"
+	"grp_r_foot" 2 "R_ankle_jntBnd" "R_foot_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_l_toe" 2 "L_foot_jntBnd" "aux_L_toe_tip"
+	"grp_r_toe" 2 "R_foot_jntBnd" "aux_R_toe_tip"
+	"grp_root" 1 "root_jntBnd"
+	"grp_frameupper" 5 "R_shoulder_jntBnd" "R_clavicle_jntBnd" "chest_jntBnd" "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+
+=== .smd Art/Models/MONSTERS/SwordSkeleton/SkeletalKnight_armour_51a29469.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x23C · stride 32
+  shapes 9 in the header, 9 in the block · 34668 triangles over 28611 vertices
+  names: 228 bytes said, 228 read  [agree]
+
+=== shapes (26)
+0	BodyArmourShape	from 0	count 2580
+1	BootsShape	from 2580	count 7380
+2	Fur1Shape	from 9960	count 1062
+3	LoinArmourShape	from 11022	count 264
+4	ShoulderStrapShape	from 11286	count 1800
+5	SkeletonShape	from 13086	count 86856
+6	SpikesShape	from 99942	count 2640
+7	WaistBeltShape	from 102582	count 360
+8	Fur2Shape	from 102942	count 1062
+9	ThighGuardRopesShape	from 104004	count 5082
+10	ThighGuardsShape	from 109086	count 41268
+11	BonesShape	from 150354	count 666
+12	KnifeShape	from 151020	count 846
+13	SkirtShape	from 151866	count 1398
+14	L_ShoulderPad_01Shape	from 153264	count 486
+15	L_ShoulderPad_02Shape	from 153750	count 1860
+16	L_ShoulderPad_03Shape	from 155610	count 696
+17	L_ShoulderPad_04Shape	from 156306	count 690
+18	L_ShoulderPad_05Shape	from 156996	count 600
+19	L_ShoulderPad_06Shape	from 157596	count 522
+20	L_ShoulderPad_BonesShape	from 158118	count 3828
+21	R_ShoulderPad_01Shape	from 161946	count 486
+22	R_ShoulderPad_02Shape	from 162432	count 1860
+23	R_ShoulderPad_03Shape	from 164292	count 696
+24	SkeletalKnightHalberdShape	from 164988	count 6540
+25	SkeletalKnightShieldShape	from 171528	count 10830
+
+=== fitting
+the monster's rig: 85 bones
+mounts: aux_position, aux_L_toe_tip, aux_R_toe_tip, aux_head_tip, aux_serverbone_xyzy_L_shield, aux_serverbone_xyzy_M_shield, aux_serverbone_xyzy_R_shield
+  SKThighGuards.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-44.3,-29,-19.5)..(44.3,28.9,32.5)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 15450 triangles over 11250 vertices
+    names: 72 bytes said, 72 read  [agree]
+    rig 5 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_R_thighGuard_jntBnd  [its own]  under 0  rests at (-15,0.3,-12.5)
+      2 phys_skinned_L_thighGuard_jntBnd  [its own]  under 0  rests at (15,0.3,-12.5)
+      3 spine_2_jntBnd  [shared]  under 0  rests at (0,0,-15.7)  carrier has (0,-0.7,-108.8)
+      4 chest_jntBnd  [shared]  under 3  rests at (0,0,-31.4)  carrier has (0,-4,-124.1)
+  SKBeltAccss.ao  socket spine_2_jntBnd [in its carrier's rig]  box (-2.7,-25.3,-14.5)..(30.2,-0.5,16.4)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 2 in the header, 2 in the block · 504 triangles over 386 vertices
+    names: 40 bytes said, 40 read  [agree]
+    rig 6 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 5 of 6  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 chest_jntBnd  [shared]  under 0  rests at (0,0,-15.7)  carrier has (0,-4,-124.1)
+      2 phys_skinned_bone_02_jntBnd  [its own]  under 0  rests at (27.8,-2.3,-4.7)
+      3 phys_skinned_bone_01_jntBnd  [its own]  under 0  rests at (26.7,-6.4,-4.3)
+      4 phys_skinned_knife_jntBnd  [its own]  under 0  rests at (15.5,-16.9,-3.2)
+      5 spine_1_jntBnd  [shared]  under 0  rests at (-0,-0,15.7)  carrier has (0,6.2,-94.7)
+  SKSkirt.ao  socket spine_1_jntBnd [in its carrier's rig]  box (-31.4,-24.9,-8)..(31.6,23,89)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 466 triangles over 356 vertices
+    names: 20 bytes said, 20 read  [agree]
+    rig 47 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 46 of 47  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_skirt_01_jntBnd  [its own]  under 0  rests at (6.3,-19,19.2)
+      2 phys_skinned_skirt_02_01_jntBnd  [its own]  under 0  rests at (16.1,-14.3,7.1)
+      3 phys_skinned_skirt_03_01_jntBnd  [its own]  under 0  rests at (24,-6.6,0.8)
+      4 phys_skinned_skirt_04_01_jntBnd  [its own]  under 0  rests at (26.9,1.6,-0.5)
+      5 phys_skinned_skirt_05_01_jntBnd  [its own]  under 0  rests at (23.4,10.2,-1.5)
+      6 phys_skinned_skirt_06_01_jntBnd  [its own]  under 0  rests at (15.5,17.5,-2.3)
+      7 phys_skinned_skirt_07_01_jntBnd  [its own]  under 0  rests at (5.4,21,-2.6)
+      8 phys_skinned_skirt_08_01_jntBnd  [its own]  under 0  rests at (-5.4,21,-2.6)
+      9 phys_skinned_skirt_09_01_jntBnd  [its own]  under 0  rests at (-15.5,17.7,-2.5)
+      10 phys_skinned_skirt_10_01_jntBnd  [its own]  under 0  rests at (-23.5,11.3,-1.9)
+      11 phys_skinned_skirt_11_01_jntBnd  [its own]  under 0  rests at (-27,2.2,-1)
+      12 phys_skinned_skirt_12_01_jntBnd  [its own]  under 0  rests at (-22.9,-7.8,0.2)
+      13 phys_skinned_skirt_13_01_jntBnd  [its own]  under 0  rests at (-14.6,-15.2,6.8)
+      14 phys_skinned_skirt_14_01_jntBnd  [its own]  under 0  rests at (-5.1,-20,18.9)
+      15 phys_skinned_skirt_02_02_jntBnd  [its own]  under 2  rests at (17.6,-15.7,19.7)
+      16 phys_skinned_skirt_03_02_jntBnd  [its own]  under 3  rests at (26.4,-8.4,18.6)
+      17 phys_skinned_skirt_04_02_jntBnd  [its own]  under 4  rests at (29,0.8,19.7)
+      18 phys_skinned_skirt_05_02_jntBnd  [its own]  under 5  rests at (25.1,9.9,19.5)
+      19 phys_skinned_skirt_06_02_jntBnd  [its own]  under 6  rests at (16.9,17.4,19)
+      20 phys_skinned_skirt_07_02_jntBnd  [its own]  under 7  rests at (5.8,21.4,18.7)
+      21 phys_skinned_skirt_08_02_jntBnd  [its own]  under 8  rests at (-5.8,21.4,18.7)
+      22 phys_skinned_skirt_09_02_jntBnd  [its own]  under 9  rests at (-16.7,18,18.5)
+      23 phys_skinned_skirt_10_02_jntBnd  [its own]  under 10  rests at (-25.9,10.8,17)
+      24 phys_skinned_skirt_11_02_jntBnd  [its own]  under 11  rests at (-29.4,0.5,16.7)
+      25 phys_skinned_skirt_12_02_jntBnd  [its own]  under 12  rests at (-24.6,-10.3,17.8)
+      26 phys_skinned_skirt_13_02_jntBnd  [its own]  under 13  rests at (-14.4,-17.9,18.1)
+      27 phys_skinned_skirt_14_02_jntBnd  [its own]  under 14  rests at (-5,-22.4,38.5)
+      28 phys_skinned_skirt_02_03_jntBnd  [its own]  under 15  rests at (18.1,-17.9,35.1)
+      29 phys_skinned_skirt_03_03_jntBnd  [its own]  under 16  rests at (27.4,-11.1,34.8)
+      30 phys_skinned_skirt_04_03_jntBnd  [its own]  under 17  rests at (29.1,-1.1,43)
+      31 phys_skinned_skirt_05_03_jntBnd  [its own]  under 18  rests at (25.5,7.3,41.4)
+      32 phys_skinned_skirt_06_03_jntBnd  [its own]  under 19  rests at (17.1,15.2,40.8)
+      33 phys_skinned_skirt_07_03_jntBnd  [its own]  under 20  rests at (5.9,18.8,41.9)
+      34 phys_skinned_skirt_08_03_jntBnd  [its own]  under 21  rests at (-5.7,18.6,41.9)
+      35 phys_skinned_skirt_09_03_jntBnd  [its own]  under 22  rests at (-16.6,15.2,40.4)
+      36 phys_skinned_skirt_10_03_jntBnd  [its own]  under 23  rests at (-27.7,7.7,34.7)
+      37 phys_skinned_skirt_11_03_jntBnd  [its own]  under 24  rests at (-30.1,-1.9,34)
+      38 phys_skinned_skirt_12_03_jntBnd  [its own]  under 25  rests at (-26.2,-14,36.7)
+      39 phys_skinned_skirt_13_03_jntBnd  [its own]  under 26  rests at (-13,-20.6,38.2)
+      40 phys_skinned_skirt_02_04_jntBnd  [its own]  under 28  rests at (18.2,-19.7,49.4)
+      41 phys_skinned_skirt_06_04_jntBnd  [its own]  under 32  rests at (16.7,12,62.1)
+      42 phys_skinned_skirt_07_04_jntBnd  [its own]  under 33  rests at (5.9,13.9,67.5)
+      43 phys_skinned_skirt_08_04_jntBnd  [its own]  under 34  rests at (-5.6,13.5,67.6)
+      44 phys_skinned_skirt_09_04_jntBnd  [its own]  under 35  rests at (-16,11.4,62.1)
+      45 phys_skinned_skirt_10_04_jntBnd  [its own]  under 36  rests at (-27.4,3.5,52.2)
+      46 phys_skinned_skirt_11_04_jntBnd  [its own]  under 37  rests at (-29.8,-4.4,51.9)
+  SKLShoulderPad.ao  socket L_shoulder_jntBnd [in its carrier's rig]  box (-7.6,-13.7,-23.3)..(37.3,27.1,38.2)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 7 in the header, 7 in the block · 2894 triangles over 2398 vertices
+    names: 300 bytes said, 300 read  [agree]
+    rig 5 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 L_clavicle_jntBnd  [shared]  under 0  rests at (-23,1.7,1.2)  carrier has (3.2,-7.4,-141.9)
+      2 L_shoulder_jntBnd  [shared]  under 0  rests at (-0,0,0)  carrier has (26.2,-9.1,-143.1)
+      3 L_shoulder_cTwist_jntBnd_1  [shared]  under 2  rests at (11.6,1.7,23.5)  carrier has (37.8,-7.4,-119.6)
+      4 phys_skinned_LShoulderPad_jntBnd  [its own]  under 3  rests at (11.1,5.5,23.7)
+  SKRShoulderPad.ao  socket R_shoulder_jntBnd [in its carrier's rig]  box (-27.8,-13.7,-23.3)..(7.6,27.1,18.8)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 1014 triangles over 850 vertices
+    names: 126 bytes said, 126 read  [agree]
+    rig 5 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 4 of 5  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_clavicle_jntBnd  [shared]  under 0  rests at (23,1.7,1.2)  carrier has (-3.2,-7.4,-141.9)
+      2 R_shoulder_jntBnd  [shared]  under 0  rests at (0,0,0)  carrier has (-26.2,-9.1,-143.1)
+      3 R_shoulder_cTwist_jntBnd_1  [shared]  under 2  rests at (-11.6,1.7,23.5)  carrier has (-37.8,-7.4,-119.6)
+      4 phys_skinned_RShoulderPad_jntBnd  [its own]  under 2  rests at (-7.7,5.4,11)
+  SKHalberd.ao  socket R_Weapon [in its carrier's rig]  box (-17.9,-6.5,-116.3)..(20.4,6.2,66.3)
+    version 3 · c0h 4 · 1 level(s) of detail · format 0x23D · stride 36
+    shapes 1 in the header, 1 in the block · 2180 triangles over 1644 vertices
+    names: 52 bytes said, 52 read  [agree]
+    rig 15 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 1 of 15  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 weapon_jntBnd  [its own]  under 0  rests at (0,0,0)
+      2 aux_blade_1_jntBnd  [its own]  under 1  rests at (-9.4,0,-60.1)
+      3 aux_mid_1_jntBnd  [its own]  under 1  rests at (-8.8,0,-73.8)
+      4 aux_handle_1_jntBnd  [its own]  under 1  rests at (0,0,66.3)
+      5 aux_root_end_jntBnd  [its own]  under 1  rests at (0,-1,0)
+      6 aux_blade_2_jntBnd  [its own]  under 2  rests at (-10.3,0,-68)
+      7 aux_blade_cyl_1_jntBnd  [its own]  under 2  rests at (-11.7,0,-60.1)
+      8 aux_mid_2_jntBnd  [its own]  under 3  rests at (-8.8,0,-78.8)
+      9 aux_handle_2_jntBnd  [its own]  under 4  rests at (0,0,-116.3)
+      10 aux_handle_cyl_1_jntBnd  [its own]  under 4  rests at (2.3,0,66.3)
+      11 aux_blade_3_jntBnd  [its own]  under 6  rests at (-8.1,0,-76.3)
+      12 aux_blade_4_jntBnd  [its own]  under 11  rests at (-13.2,0,-86.6)
+      13 aux_blade_5_jntBnd  [its own]  under 12  rests at (-15.2,0,-95.2)
+      14 aux_blade_6_jntBnd  [its own]  under 13  rests at (-14.8,0,-106.5)
+  SKShield.ao  socket L_Weapon [in its carrier's rig]  fixed mesh SkeletalKnightShield.fmt  1 shapes
+      SkeletalKnightShieldShape  ->  Art/Models/MONSTERS/SkeletalKnight/Textures/SkeletalKnightShieldc.mat

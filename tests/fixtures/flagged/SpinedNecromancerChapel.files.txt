@@ -1,0 +1,1566 @@
+monster: Forael, the Soulkeeper [Metadata/Monsters/NecromancerRemakeBook/SpinedNecromancerChapel]
+
+=== .ao Metadata/Monsters/NecromancerRemakeBook/NecromancerRemakeBook.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/NecromancerRemakeBook/rig.amd"
+	animations = '[
+		{
+			"name": "aoe_revive_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.3876899480819703,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "delayed_blast_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.75,
+					"name": "contact"
+				}
+			]
+		},
+		{
+			"name": "delayed_blast_dash_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.5756300091743469,
+					"name": "leave_ground"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.7124180197715759,
+					"name": "contact",
+					"position": [
+						0.0,
+						-159.76800537109376,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8739900588989258,
+					"name": "hit_ground"
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/NecromancerRemakeBook/attachments/Skirt/Skirt.ao"
+	attached_object = "hip_jntBnd Metadata/Monsters/NecromancerRemakeBook/attachments/Skirt/Chains.ao"
+	attached_object = "L_elbow_jntBnd Metadata/Monsters/NecromancerRemakeBook/attachments/L_Sleeve.ao"
+	attached_object = "R_elbow_jntBnd Metadata/Monsters/NecromancerRemakeBook/attachments/R_Sleeve.ao"
+	attached_object = "chest_jntBnd Metadata/Monsters/NecromancerRemakeBook/attachments/Shawl.ao"
+	attached_object = "L_wrist_jntBnd Metadata/Monsters/NecromancerRemakeBook/attachments/ClothDanglers/L_Dangler_1.ao"
+	attached_object = "R_elbow_Twist_jntBnd_2 Metadata/Monsters/NecromancerRemakeBook/attachments/ClothDanglers/R_Dangler_2.ao"
+	attached_object = "R_wrist_jntBnd Metadata/Monsters/NecromancerRemakeBook/attachments/ClothDanglers/R_Dangler_1.ao"
+	attached_object = "L_elbow_Twist_jntBnd_2 Metadata/Monsters/NecromancerRemakeBook/attachments/ClothDanglers/L_Dangler_2.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.4134080111980438,
+								0.0
+							],
+							[
+								0.5418990254402161,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": 0.34906598925590517,
+						"angle": 2.094399929046631,
+						"length": 110.0,
+						"impact_z_rotation": [
+							-0.5235990285873413,
+							-0.9599310159683228
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "L_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Cone",
+						"key_frames": [
+							[
+								0.44134101271629336,
+								0.0
+							],
+							[
+								0.519553005695343,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"rotation": -0.26179900765419009,
+						"angle": 1.9198600053787232,
+						"length": 130.0,
+						"impact_z_rotation": [
+							0.5235990285873413,
+							0.9599310159683228
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/NecromancerRemakeBook/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/NecromancerRemakeBook/NecromancerRemakeBook.sm"
+			hide_segments = "L_dangler_Shape1,L_dangler_Shape2,L_sleeveShape,R_dangler_Shape1,R_dangler_Shape2,R_sleeveShape,beltShape,belt_strapShape,bookShape,shawl_chainsShape,shawl_clothShape,shawl_danglersShape,skirt_1Shape,skirt_Shape2,skirt_Shape3,skirt_chainsShape,skirt_danglersShape"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false R_shoulder_jntBnd L_shoulder_jntBnd L_elbow_jntBnd R_elbow_jntBnd back_hunch_jntBnd head_jntBnd"
+		bone_group = "R_palm_aim false R_wrist_jntBnd R_Weapon"
+	}
+	
+	ParticleEffects
+	{
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "delayed_blast_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Necromancer/pet/on_act/delayed_blast_01/R_palm.trl",
+						"bone_group": "R_palm_aim"
+					}
+				]
+			},
+			{
+				"name": "delayed_blast_dash_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Necromancer/pet/on_act/delayed_blast_01/R_palm.trl",
+						"bone_group": "R_palm_aim"
+					}
+				]
+			}
+		]'
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "aoe_revive_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.019780300557613374,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.285165011882782,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Revive_",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.724049985408783,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8423089981079102,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1333570033311844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Attack_",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43675801157951357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Swing_",
+						"bone_name": "L_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1333570033311844,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Attack_",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.43675801157951357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Swing_",
+						"bone_name": "R_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.032417599111795428,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2511740028858185,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Fall_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10801500827074051,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6837930083274841,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0338300466537476,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Fall_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.023626400157809259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2786470055580139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Fall_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.024175800383090974,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2226029932498932,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Fall_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.025274699553847314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.15109899640083314,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2539219856262207,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Fall_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.023626400157809259,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Death_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.27260300517082217,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Fall_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "delayed_blast_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4275740087032318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4895800054073334,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Effects/Spell_OnCast_",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5377029776573181,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Spellcast_",
+						"bone_name": "head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6876659989356995,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Effects/Spell_Channel_",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.123479962348938,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "delayed_blast_dash_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Dash_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.03662639856338501,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Dash_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4275740087032318,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5175579786300659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Spellcast_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5481820106506348,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Effects/Spell_OnCast_",
+						"bone_name": "R_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6620270013809204,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Effects/Spell_Channel_",
+						"bone_name": "R_wrist_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9440069794654846,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5226999521255494,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Flinch_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Flinch_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Flinch_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Flinch_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.08268959820270539,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_35%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1839420050382614,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Idle_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.835710048675537,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_35%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.7087299823760988,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Idle_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.035250186920166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_35%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 4.952390193939209,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Idle_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.777239799499512,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_35%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 6.981040000915527,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Idle_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.932690143585205,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_35%_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/KnockdownA",
+						"bone_name": "aux_head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08848334848880768,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2801699936389923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "tail_0_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0069478750228882,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "tail_0_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3405390977859498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6584199666976929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/KnockdownB",
+						"bone_name": "aux_head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/KnockdownA",
+						"bone_name": "aux_head_jntBnd",
+						"allow_stop_on_interrupt": true
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.08848334848880768,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2801699936389923,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "tail_0_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0069478750228882,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "tail_0_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3405390977859498,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6584199666976929,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/KnockdownB",
+						"bone_name": "aux_head_jntBnd",
+						"allow_stop_on_interrupt": true
+					}
+				]
+			},
+			{
+				"name": "revive_aoe_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.019780300557613374,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41263800859451296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Revive_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7460280060768127,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Move_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.317039966583252,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Run_Yell_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.758239984512329,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.8901100158691408,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 5.456049919128418,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 7.2032999992370609,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Run_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_bwdleft_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Run_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_bwdright_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Run_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Run_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_fwdleft_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Run_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_fwdright_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Run_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Run_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Vocals/Run_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act4/G4_5_1/Necromancer/Foley/Float_100%_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "delayed_blast_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Necromancer/epks/delayedBlast.epk"
+					}
+				]
+			},
+			{
+				"name": "delayed_blast_dash_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act4_FOUR/Necromancer/epks/delayedBlast.epk"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "delayed_blast_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.3329999446868898,
+						"name": "EmissiveMulti",
+						"curve": "7 0 0 Linear 0.392491 0.334459 Smooth 2.02343 1.88514 Smooth 2.18093 6 Linear 2.32827 1.35811 Smooth 2.71441 0 Flat 3.333 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "delayed_blast_dash_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.3329999446868898,
+						"name": "EmissiveMulti",
+						"curve": "7 0 0 Linear 0.392491 0.334459 Smooth 1.82782 1.08446 Smooth 2.08185 6 Linear 2.18601 1.60135 Smooth 2.71441 0 Flat 3.333 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/NecromancerRemakeBook/attachments/Skirt/Skirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/Skirt/rig.amd"
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Monsters/NecromancerRemakeBook/attachments/Skirt/Book.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/Skirt/rig.ast"
+		linear_allowed_contraction = 0.300
+		bend_stiffness = 500.000
+		enclosure_radius = 3.000
+		enclosure_angle = 0.000
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd tail_0_jntBnd tail_1_jntBnd tail_2_jntBnd tail_3_jntBnd tail_4_jntBnd tail_5_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/Skirt/Skirt.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd phys_skinned_tail_0_jntBnd phys_skinned_tail_1_jntBnd phys_skinned_tail_2_jntBnd phys_skinned_tail_3_jntBnd phys_skinned_tail_4_jntBnd phys_skinned_tail_5_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/NecromancerRemakeBook/attachments/Skirt/Chains.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/Skirt/attachments/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/Skirt/attachments/rig.ast"
+		linear_allowed_contraction = 0.250
+		bend_stiffness = 500.000
+		enclosure_radius = 2.500
+		enclosure_angle = 0.000
+		attachment_bones = "hip_jntBnd spine_1_jntBnd spine_2_jntBnd tail_0_jntBnd tail_1_jntBnd tail_2_jntBnd tail_3_jntBnd tail_4_jntBnd tail_5_jntBnd child_attach"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/Skirt/attachments/Chains.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd spine_1_jntBnd spine_2_jntBnd phys_skinned_tail_0_jntBnd phys_skinned_tail_1_jntBnd phys_skinned_tail_2_jntBnd phys_skinned_tail_3_jntBnd phys_skinned_tail_4_jntBnd phys_skinned_tail_5_jntBnd"
+	}
+}
+
+=== .ao Metadata/Monsters/NecromancerRemakeBook/attachments/L_Sleeve.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/L_Sleeve/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/L_Sleeve/rig.ast"
+		enclosure_angle = 0.250
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "L_elbow_jntBnd L_shoulder_jntBnd child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/L_Sleeve/L_Sleeve.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd L_shoulder_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/NecromancerRemakeBook/attachments/R_Sleeve.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/R_Sleeve/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/R_Sleeve/rig.ast"
+		enclosure_angle = 0.250
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "R_elbow_jntBnd R_shoulder_jntBnd child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/R_Sleeve/R_Sleeve.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd R_shoulder_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/NecromancerRemakeBook/attachments/Shawl.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/Shawl/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/Shawl/rig.ast"
+		bend_stiffness = 120.000
+		bend_allowed_angle = 0.100
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		animation_velocity_factor = 1.000
+		animation_force_factor = 4.000
+		attachment_bones = "chest_jntBnd back_hunch_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd head_jntBnd child_attach "
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/Shawl/Shawl.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "child_attach false root_jntBnd back_hunch_jntBnd L_clavicle_jntBnd L_shoulder_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd neck_jntBnd head_jntBnd "
+	}
+}
+
+=== .ao Metadata/Monsters/NecromancerRemakeBook/attachments/ClothDanglers/L_Dangler_1.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/L_Dangler_1/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/L_Dangler_1/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/L_Dangler_1/L_Dangler_1.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/NecromancerRemakeBook/attachments/ClothDanglers/R_Dangler_2.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/R_Dangler_2/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/R_Dangler_2/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/R_Dangler_2/R_Dangler_2.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/NecromancerRemakeBook/attachments/ClothDanglers/R_Dangler_1.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/R_Dangler_1/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/R_Dangler_1/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/R_Dangler_1/R_Dangler_1.sm"
+	}
+}
+
+=== .ao Metadata/Monsters/NecromancerRemakeBook/attachments/ClothDanglers/L_Dangler_2.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/L_Dangler_2/rig.amd"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/L_Dangler_2/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/L_Dangler_2/L_Dangler_2.sm"
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .ao Metadata/Monsters/NecromancerRemakeBook/attachments/Skirt/Book.ao (depth 2)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/Book/rig.amd"
+	default_animation = "idle_01"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/Book/rig.ast"
+		linear_allowed_contraction = 0.000
+		enclosure_angle = 0.150
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/NecromancerRemakeBook/attachments/Book/Book.sm"
+	}
+}
+
+=== .sm Art/Models/MONSTERS/NecromancerRemakeBook/NecromancerRemakeBook.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/NecromancerRemakeBook/rig_50b56b34.smd"
+Materials 2
+	"Art/Models/MONSTERS/NecromancerRemakeBook/Textures/NecromancerRemakeBookc.mat" 24
+	"Art/Models/MONSTERS/NecromancerRemakeBook/Textures/NecromancerRemakeBookc.mat" 1
+BoundingBox -60.072 -30.0387 -191.488 60.072 33.3621 -11.9925
+BoneGroups 17
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "chest_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_1_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_tail_01" 2 "hip_jntBnd" "tail_1_jntBnd"
+	"grp_tail_02" 2 "tail_1_jntBnd" "tail_2_jntBnd"
+	"grp_tail_03" 2 "tail_2_jntBnd" "tail_3_jntBnd"
+	"grp_tail_04" 2 "tail_3_jntBnd" "tail_4_jntBnd"
+	"grp_tail_05" 2 "tail_4_jntBnd" "tail_5_jntBnd"
+
+=== .smd Art/Models/MONSTERS/NecromancerRemakeBook/rig_50b56b34.smd
+  version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 25 in the header, 25 in the block · 10935 triangles over 13370 vertices
+  names: 730 bytes said, 730 read  [agree]
+
+=== shapes (43)
+0	arm_wrapsShape	from 0	count 1614
+1	belt_strapShape	from 1614	count 78
+2	beltShape	from 1692	count 624
+3	bodyShape	from 2316	count 4857
+4	bookShape	from 7173	count 2136
+5	chains_frontShape	from 9309	count 756
+6	chains_torsoShape	from 10065	count 672
+7	front_clothShape	from 10737	count 522
+8	L_dangler_Shape1	from 11259	count 48
+9	L_dangler_Shape2	from 11307	count 60
+10	L_sleeveShape	from 11367	count 762
+11	R_dangler_Shape1	from 12129	count 48
+12	R_dangler_Shape2	from 12177	count 60
+13	R_sleeveShape	from 12237	count 762
+14	shawl_chainsShape	from 12999	count 708
+15	shawl_clothShape	from 13707	count 420
+16	shawl_danglersShape	from 14127	count 342
+17	skirt_1Shape	from 14469	count 2376
+18	skirt_chainsShape	from 16845	count 7758
+19	skirt_danglersShape	from 24603	count 99
+20	skirt_Shape2	from 24702	count 846
+21	skirt_Shape3	from 25548	count 201
+22	torsoShape	from 25749	count 2484
+23	upper_torsoShape	from 28233	count 4440
+24	front_danglersShape	from 32673	count 132
+25	belt_strapShape	from 32805	count 78
+26	beltShape	from 32883	count 624
+27	skirt_1Shape	from 33507	count 2376
+28	skirt_Shape2	from 35883	count 846
+29	skirt_Shape3	from 36729	count 201
+30	chainsShape	from 36930	count 5016
+31	danglersShape	from 41946	count 129
+32	front_chainShape	from 42075	count 2742
+33	L_sleeveShape	from 44817	count 762
+34	armour_R_Sleeve|R_sleeve|R_sleeveShape	from 45579	count 816
+35	chainsShape	from 46395	count 660
+36	clothShape	from 47055	count 420
+37	danglersShape	from 47475	count 318
+38	clothShape	from 47793	count 60
+39	clothShape	from 47853	count 60
+40	clothShape	from 47913	count 48
+41	L_dangler_Shape3	from 47961	count 60
+42	bookShape	from 48021	count 2136
+
+=== fitting
+the monster's rig: 54 bones
+mounts: aux_position, aux_head_jntBnd
+  Skirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-39.7,-29.4,-8.8)..(42.6,41.9,102.4)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 5 in the header, 5 in the block · 1375 triangles over 1370 vertices
+    names: 120 bytes said, 120 read  [agree]
+    rig 11 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 9 of 11  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,-0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-9.3)  carrier has (0,0,-130.7)
+      2 phys_skinned_beltstrap_1_jntBnd  [its own]  under 0  rests at (-9.5,-12.3,-1.8)
+      3 phys_skinned_tail_0_jntBnd  [its own]  under 0  rests at (-0.1,-2.7,16.6)
+      4 spine_2_jntBnd  [shared]  under 1  rests at (0,0.8,-18.5)  carrier has (-0,0.8,-140)
+      5 phys_skinned_beltstrap_2_jntBnd  [its own]  under 2  rests at (-14.5,-9.3,-1.8)
+      6 phys_skinned_tail_1_jntBnd  [its own]  under 3  rests at (-0.1,-2.3,33.1)
+      7 phys_skinned_tail_2_jntBnd  [its own]  under 6  rests at (-0.1,-2,49.2)
+      8 phys_skinned_tail_3_jntBnd  [its own]  under 7  rests at (-0.1,-1.7,65.2)
+      9 phys_skinned_tail_4_jntBnd  [its own]  under 8  rests at (-0.1,-1.4,81.3)
+      10 phys_skinned_tail_5_jntBnd  [its own]  under 9  rests at (-0.1,-1.1,97.4)
+    Book.ao  socket <root> [NOT in its carrier's rig]  box (6,-23.9,-10.4)..(26.5,-3.8,20.1)
+      version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+      shapes 1 in the header, 1 in the block · 712 triangles over 624 vertices
+      names: 18 bytes said, 18 read  [agree]
+      rig 2 bones, 1 of them names its carrier's rig also has
+      mesh weights reach bone 1 of 2  [inside this rig]
+        0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,-0)
+        1 phys_skinned_1_jntBnd  [its own]  under 0  rests at (14.5,-12.5,4.4)
+  Chains.ao  socket hip_jntBnd [in its carrier's rig]  box (-28,-24.5,-8)..(28,39.9,76.9)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 2629 triangles over 2908 vertices
+    names: 80 bytes said, 80 read  [agree]
+    rig 9 bones, 3 of them names its carrier's rig also has
+    mesh weights reach bone 7 of 9  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,-0)  carrier has (0,0,0)
+      1 spine_1_jntBnd  [shared]  under 0  rests at (0,0,-9.3)  carrier has (0,0,-130.7)
+      2 phys_skinned_tail_0_jntBnd  [its own]  under 0  rests at (-0.1,-2.7,16.6)
+      3 spine_2_jntBnd  [shared]  under 1  rests at (0,0.8,-18.5)  carrier has (-0,0.8,-140)
+      4 phys_skinned_tail_1_jntBnd  [its own]  under 2  rests at (-0.1,-2.3,33.1)
+      5 phys_skinned_tail_2_jntBnd  [its own]  under 4  rests at (-0.1,-2,49.2)
+      6 phys_skinned_tail_3_jntBnd  [its own]  under 5  rests at (-0.1,-1.7,65.2)
+      7 phys_skinned_tail_4_jntBnd  [its own]  under 6  rests at (-0.1,-1.4,81.3)
+      8 phys_skinned_tail_5_jntBnd  [its own]  under 7  rests at (-0.1,-1.1,97.4)
+  L_Sleeve.ao  socket L_elbow_jntBnd [in its carrier's rig]  box (-8.6,-11,-14.4)..(33.2,18.5,22.9)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 254 triangles over 216 vertices
+    names: 26 bytes said, 26 read  [agree]
+    rig 7 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,-0,0)  carrier has (0,0,0)
+      1 L_elbow_Twist_jntBnd_1  [shared]  under 0  rests at (8,-0,0)  carrier has (35.5,4.1,-132.3)
+      2 L_elbow_Twist_jntBnd_2  [shared]  under 0  rests at (15.9,-0,0)  carrier has (40.6,2.1,-126.6)
+      3 L_shoulder_jntBnd  [shared]  under 0  rests at (-22.1,-9.2,-1.2)  carrier has (14.6,2.7,-155.8)
+      4 phys_skinned_1_jntBnd  [its own]  under 0  rests at (1.9,-0.6,1)
+      5 phys_skinned_2_jntBnd  [its own]  under 4  rests at (13.9,2.1,1.8)
+      6 phys_skinned_3_jntBnd  [its own]  under 5  rests at (26.2,5,2.7)
+  R_Sleeve.ao  socket R_elbow_jntBnd [in its carrier's rig]  box (-33.2,-18.5,-22.9)..(8.6,11,14.4)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 272 triangles over 228 vertices
+    names: 76 bytes said, 76 read  [agree]
+    rig 7 bones, 4 of them names its carrier's rig also has
+    mesh weights reach bone 6 of 7  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 R_elbow_Twist_jntBnd_1  [shared]  under 0  rests at (-8,0,0)  carrier has (-35.5,4.1,-132.3)
+      2 R_elbow_Twist_jntBnd_2  [shared]  under 0  rests at (-15.9,0,0)  carrier has (-40.6,2.1,-126.6)
+      3 R_shoulder_jntBnd  [shared]  under 0  rests at (13.2,5.5,0.7)  carrier has (-14.6,2.7,-155.8)
+      4 phys_skinned_1_jntBnd  [its own]  under 0  rests at (-4,-0,-1.4)
+      5 phys_skinned_2_jntBnd  [its own]  under 4  rests at (-14,-2.6,-2.9)
+      6 phys_skinned_3_jntBnd  [its own]  under 5  rests at (-24.3,-5.2,-4.4)
+  Shawl.ao  socket chest_jntBnd [in its carrier's rig]  box (-17.4,7,-14.3)..(19.6,22.1,54.6)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 3 in the header, 3 in the block · 466 triangles over 394 vertices
+    names: 68 bytes said, 68 read  [agree]
+    rig 19 bones, 8 of them names its carrier's rig also has
+    mesh weights reach bone 18 of 19  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 neck_jntBnd  [shared]  under 0  rests at (0,-0,-16.5)  carrier has (-0,2.4,-165.7)
+      2 R_clavicle_jntBnd  [shared]  under 0  rests at (-3.5,-7.5,-8.5)  carrier has (-3.5,-5.1,-157.6)
+      3 L_clavicle_jntBnd  [shared]  under 0  rests at (3.5,-7.5,-8.5)  carrier has (3.5,-5.1,-157.6)
+      4 back_hunch_jntBnd  [shared]  under 0  rests at (0,14.9,-8.5)  carrier has (-0,17.3,-157.6)
+      5 phys_skinned_L_1_jntBnd  [its own]  under 0  rests at (7.7,13.4,10.2)
+      6 phys_skinned_R_1_jntBnd  [its own]  under 0  rests at (-7.7,13.4,10.2)
+      7 phys_skinned_C_1_jntBnd  [its own]  under 0  rests at (-0,13.4,43.5)
+      8 phys_skinned_R_dangler_1_jntBnd  [its own]  under 0  rests at (-10.9,17.9,4.8)
+      9 phys_skinned_C_dangler_1_jntBnd  [its own]  under 0  rests at (-6.3,19.4,0.7)
+      10 phys_skinned_L_dangler_1_jntBnd  [its own]  under 0  rests at (6.1,19.1,6.6)
+      11 head_jntBnd  [shared]  under 1  rests at (0,-2.7,-21.9)  carrier has (-0,-0.3,-171)
+      12 R_shoulder_jntBnd  [shared]  under 2  rests at (-14.6,0.3,-6.6)  carrier has (-14.6,2.7,-155.8)
+      13 L_shoulder_jntBnd  [shared]  under 3  rests at (14.6,0.3,-6.6)  carrier has (14.6,2.7,-155.8)
+      14 phys_skinned_L_2_jntBnd  [its own]  under 5  rests at (5.8,13.4,27.5)
+      15 phys_skinned_R_2_jntBnd  [its own]  under 6  rests at (-6.2,13.4,27.5)
+      16 phys_skinned_R_dangler_2_jntBnd  [its own]  under 8  rests at (-10.9,17.9,14.1)
+      17 phys_skinned_L_dangler_2_jntBnd  [its own]  under 10  rests at (6.1,19.1,17.1)
+      18 phys_skinned_L_dangler_3_jntBnd  [its own]  under 17  rests at (6.1,19.1,27.6)
+  L_Dangler_1.ao  socket L_wrist_jntBnd [in its carrier's rig]  box (0.7,2.5,-2.1)..(24,12.1,22)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 20 triangles over 24 vertices
+    names: 20 bytes said, 20 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_1_jntBnd  [its own]  under 0  rests at (5.3,5.6,3.5)
+      2 phys_skinned_2_jntBnd  [its own]  under 1  rests at (12.9,8.2,10.5)
+      3 phys_skinned_3_jntBnd  [its own]  under 2  rests at (20.4,10.9,17.5)
+  R_Dangler_2.ao  socket R_elbow_Twist_jntBnd_2 [in its carrier's rig]  box (-24,-12.1,-22)..(-0.7,-2.5,2.1)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 20 triangles over 24 vertices
+    names: 20 bytes said, 20 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_1_jntBnd  [its own]  under 0  rests at (-5.3,-4.9,-3.3)
+      2 phys_skinned_2_jntBnd  [its own]  under 1  rests at (-12.7,-7.9,-10.4)
+      3 phys_skinned_3_jntBnd  [its own]  under 2  rests at (-20.1,-10.8,-17.4)
+  R_Dangler_1.ao  socket R_wrist_jntBnd [in its carrier's rig]  box (-32.2,-12.5,-17.8)..(-4.6,-3.5,0.8)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 16 triangles over 20 vertices
+    names: 20 bytes said, 20 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_1_jntBnd  [its own]  under 0  rests at (-9.3,-5.5,-3.3)
+      2 phys_skinned_2_jntBnd  [its own]  under 1  rests at (-18.2,-8.3,-8.5)
+      3 phys_skinned_3_jntBnd  [its own]  under 2  rests at (-27,-11.1,-13.7)
+  L_Dangler_2.ao  socket L_elbow_Twist_jntBnd_2 [in its carrier's rig]  box (0.7,2.5,-2.1)..(24,12.1,22)
+    version 3 · c0h 2 · 1 level(s) of detail · format 0x3C · stride 32
+    shapes 1 in the header, 1 in the block · 20 triangles over 24 vertices
+    names: 32 bytes said, 32 read  [agree]
+    rig 4 bones, 1 of them names its carrier's rig also has
+    mesh weights reach bone 3 of 4  [inside this rig]
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_1_jntBnd  [its own]  under 0  rests at (4.9,5.1,3)
+      2 phys_skinned_2_jntBnd  [its own]  under 1  rests at (12.4,8,10.1)
+      3 phys_skinned_3_jntBnd  [its own]  under 2  rests at (19.8,10.9,17.1)

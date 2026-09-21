@@ -1,0 +1,1313 @@
+monster: Priest of the Sun [Metadata/Monsters/LeagueIncursionNew/Corruption/SunVaalApparitionIncursion]
+
+=== .ao Metadata/Monsters/LeagueIncursionNew/Corruption/VaalApparition/VaalApparition.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/BreachApparitionBoss/rig.amd"
+	animations = '[
+		{
+			"name": "attack_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.5,
+					"name": "start_target_update",
+					"data": "90 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6449999809265137,
+					"name": "contact",
+					"position": [
+						-55.79218292236328,
+						-98.30271911621094,
+						-187.53509521484376
+					]
+				}
+			]
+		},
+		{
+			"name": "attack_02",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 1.5,
+					"name": "start_target_update",
+					"data": "90 0 0"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 0.6399999856948853,
+					"name": "contact",
+					"position": [
+						58.47977828979492,
+						-103.28248596191406,
+						-185.64207458496095
+					]
+				}
+			]
+		},
+		{
+			"name": "laser_channel_loop_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 2.0,
+					"name": "start_target_update",
+					"data": "0 0 1 100 30"
+				}
+			]
+		},
+		{
+			"name": "laser_channel_start_01",
+			"events": [
+				{
+					"type": "StartTargetUpdateEventType",
+					"time": 0.0,
+					"end_time": 2.0,
+					"name": "start_target_update",
+					"data": "0 0 1 100 30"
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8413200378417969,
+					"name": "spear",
+					"position": [
+						0.0,
+						-63.25080108642578,
+						-166.64700317382813
+					]
+				}
+			]
+		},
+		{
+			"name": "summon_orb_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 1.028380036354065,
+					"name": "contact",
+					"position": [
+						0.0,
+						-191.5760040283203,
+						0.0
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 1.8978400230407715,
+					"name": "move_daemons"
+				}
+			]
+		},
+		{
+			"name": "sun_orb_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8516299724578857,
+					"name": "contact",
+					"position": [
+						0.0,
+						-133.5659942626953,
+						-146.58700561523438
+					]
+				},
+				{
+					"type": "StandardEventType",
+					"time": 2.094559907913208,
+					"name": "move_daemons"
+				}
+			]
+		}
+	]'
+}
+
+Melee
+{
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "<root> Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/scorching_ignite_audio.ao"
+	attached_object = "<root> Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/scorching_loop_audio.ao"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/BreachApparitionBoss/rig.ast"
+		socket = "jnt_L_thumb"
+			translation = "0 -73.952 -164.598"
+		socket = "jnt_R_thumb"
+			translation = "0 -73.952 -164.598"
+		socket = "jnt_FX"
+			translation = "0 -73.9525 -164.598"
+		socket = "aux_light_attach"
+			parent = "chest_jntBnd"
+		socket = "aux_target_head_01"
+			parent = "head_jntBnd"
+			translation = "0 0 -7.65549"
+		socket = "aux_target_head_02"
+			parent = "head_jntBnd"
+			translation = "0 -11.7692 -5.83517"
+		socket = "R_Weapon"
+			parent = "aux_R_top_Weapon"
+			translation = "0 0 10.2318"
+			ignore_parent_axis = "x"
+			ignore_parent_rotation = "yawpitchroll"
+		linear_allowed_contraction = 0.600
+		normal_viscosity_multiplier = 0.300
+		tangent_viscosity_multiplier = 0.100
+		animation_velocity_factor = 10.000
+		animation_force_factor = 2.335
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/BreachApparitionBoss/BreachApparitionBoss.sm"
+	}
+	
+	BoneGroups
+	{
+		bone_group = "grp_head false aux_target_head_01 aux_target_head_02"
+		bone_group = "grp_neck false neck_jntBnd head_jntBnd"
+		bone_group = "grp_chest false chest_jntBnd neck_jntBnd"
+		bone_group = "grp_belly false spine_1_jntBnd chest_jntBnd"
+		bone_group = "grp_waist false hip_jntBnd spine_1_jntBnd"
+		bone_group = "grp_L_shoulder_01_01 false L_top_shoulder_jntBnd L_clavicle_jntBnd"
+		bone_group = "grp_R_shoulder_01_01 false R_top_shoulder_jntBnd R_clavicle_jntBnd"
+		bone_group = "grp_L_elbow_01_01 false L_top_elbow_jntBnd L_top_shoulder_jntBnd"
+		bone_group = "grp_R_elbow_01_01 false R_top_elbow_jntBnd R_top_shoulder_jntBnd"
+		bone_group = "grp_L_wrist_01_01 false L_top_wrist_jntBnd L_top_elbow_jntBnd"
+		bone_group = "grp_R_wrist_01_01 false R_top_wrist_jntBnd R_top_elbow_jntBnd"
+		bone_group = "grp_L_hand_01_01 false L_top_finger_2_jntBnd_1 L_top_wrist_jntBnd"
+		bone_group = "grp_R_hand_01_01 false R_top_finger_2_jntBnd_1 R_top_wrist_jntBnd"
+		bone_group = "grp_L_shoulder_02_01 false L_bot_shoulder_jntBnd chest_jntBnd"
+		bone_group = "grp_R_shoulder_02_01 false R_bot_shoulder_jntBnd chest_jntBnd"
+		bone_group = "grp_L_elbow_02_01 false L_bot_elbow_jntBnd L_bot_shoulder_jntBnd"
+		bone_group = "grp_R_elbow_02_01 false R_bot_elbow_jntBnd R_bot_shoulder_jntBnd"
+		bone_group = "grp_L_wrist_02_01 false L_bot_wrist_jntBnd L_bot_elbow_jntBnd"
+		bone_group = "grp_R_wrist_02_01 false R_bot_wrist_jntBnd R_bot_elbow_jntBnd"
+		bone_group = "grp_L_hand_02_01 false L_bot_finger_2_jntBnd_1 L_bot_wrist_jntBnd"
+		bone_group = "grp_R_hand_02_01 false R_bot_finger_2_jntBnd_1 R_bot_wrist_jntBnd"
+		bone_group = "root false L_bot_shoulder_jntBnd chest_jntBnd R_bot_shoulder_jntBnd"
+		bone_group = "frameupper false L_top_shoulder_jntBnd neckHands_L_jntBnd L_clavicle_jntBnd R_clavicle_jntBnd neckHands_R_jntBnd R_top_shoulder_jntBnd"
+		bone_group = "aux_parasite false L_bot_elbow_jntBnd R_bot_elbow_jntBnd R_top_elbow_jntBnd L_top_elbow_jntBnd L_top_shoulder_jntBnd R_top_shoulder_jntBnd neckHands_L_back_jntBnd neckHands_R_back_jntBnd R_top_wrist_jntBnd L_top_wrist_jntBnd L_bot_wrist_jntBnd R_bot_wrist_jntBnd phys_skinned_R_chain_jntBnd_1 phys_skinned_L_chain_jntBnd_1"
+		bone_group = "FX_hand_R_U false aux_R_top_Weapon"
+		bone_group = "FX_hand_R_B false aux_R_bot_Weapon"
+		bone_group = "FX_hand_L_U false aux_L_top_Weapon"
+		bone_group = "FX_hand_L_B false aux_L_bot_Weapon"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Effects/Attack_OnAct",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10258398950099945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Attack",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.47918200492858889,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Fast_",
+						"bone_name": "R_top_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Effects/Attack_OnAct",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10258398950099945,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Attack",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4399789869785309,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Fast_",
+						"bone_name": "L_top_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10000000149011612,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Effects/Death_Engulf",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16650648415088654,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Slow_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3617209196090698,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Death",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6098599433898927,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Fall_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07999999821186066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07999999821186066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07999999821186066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07999999821186066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07999999821186066,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.21096718311309815,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Chains_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5347020030021668,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Idle",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4073374271392823,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Chains_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16965217888355256,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30792000889778139,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Effects/SubOrb_End",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5926511883735657,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Idle",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2999998331069947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Attack_Long",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.480558156967163,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Fast_",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.637480616569519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Fast_",
+						"bone_name": "R_top_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Flinch",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16528856754302979,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Flinch_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.30000001192092898,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Effects/SubOrb_End",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7202648520469666,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Idle",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2492467164993287,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Attack_Long",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.442476749420166,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Fast_",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5953630208969117,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Fast_",
+						"bone_name": "R_top_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_end_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.033955901861190799,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_start_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06960950046777725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.10061725974082947,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Effort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.22049960494041444,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Effects/Beam_OnAct",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.752265989780426,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1035748720169068,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Attack_Long",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2482813596725464,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Effects/Beam_Caster_Loop",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5115861892700196,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Swing_OnAct_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5703799724578858,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Swing_Spell_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6156284809112549,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Effects/Beam_Start",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "projectile_spell_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.05348049849271774,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Slow_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.990979015827179,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Attack_Long_",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3319200277328492,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Swing_Spell_",
+						"bone_name": "R_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.6859099864959717,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Swing_Spell_",
+						"bone_name": "L_top_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0263800621032717,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Swing_Spell_",
+						"bone_name": "R_bot_wrist_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.087869882583618,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Attack_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.34335994720459,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Swing_Spell_",
+						"bone_name": "L_bot_wrist_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.23330000042915345,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Chains_",
+						"bone_name": "chest_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5235554575920105,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Run",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.377310037612915,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Chains_",
+						"bone_name": "chest_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "sun_orb_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.06960950046777725,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07524893432855606,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Effects/Beam_OnAct",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3437541723251343,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Effort",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7996304631233215,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5290418863296509,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.5330114364624024,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Vocals/Attack_Long",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8687777519226075,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Effects/SunOrb_Push",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.665785551071167,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/VaalApparition/Foley/Move_Slow_",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			}
+		]'
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.005144032649695873,
+						"end_time": 0.4984567165374756,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/pet/handBuildUp.pet",
+						"bone_groups": [
+							"FX_hand_R_B",
+							"FX_hand_R_U"
+						]
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"end_time": 0.4717077612876892,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/pet/handBuildUp.pet",
+						"bone_groups": [
+							"FX_hand_L_U",
+							"FX_hand_L_B"
+						]
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6085614562034607,
+						"end_time": 2.6155619621276857,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/pet/death/death.pet",
+						"bone_group": "frameupper"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 2.5999999046325685,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/pet/death/death_puff.pet",
+						"bone_group": "root"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_start_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.24279865622520448,
+						"end_time": 1.7138195037841797,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/pet/handBuildUp.pet",
+						"bone_groups": [
+							"FX_hand_L_U",
+							"FX_hand_R_U"
+						]
+					}
+				]
+			},
+			{
+				"name": "sun_orb_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.005144032649695873,
+						"end_time": 2.22082257270813,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/pet/handBuildUp.pet",
+						"bone_groups": [
+							"FX_hand_L_U",
+							"FX_hand_R_U"
+						]
+					}
+				]
+			}
+		]'
+	}
+	
+	AttachedAnimatedObject
+	{
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/ao/Death_light.ao",
+						"from": {
+							"parent_bone": "chest_jntBnd"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								0.0,
+								-25.000001907348634
+							]
+						}
+					},
+					{
+						"type": "AttachedAnimatedObjectEventType",
+						"time": 2.847130060195923,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/ao/Death_dust_puff.ao",
+						"from": {
+							"parent_bone": "<root>"
+						},
+						"speed": 1.0,
+						"offset": {
+							"translation": [
+								0.0,
+								80.0,
+								0.0
+							]
+						}
+					}
+				]
+			}
+		]'
+	}
+	
+	Lights
+	{
+		animations = '[
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "LightStateEventType",
+						"time": 0.0,
+						"state_name": "on"
+					}
+				]
+			}
+		]'
+	}
+	
+	TimelineParameters
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Flat 0.351874 1 Flat 0.639291 1 Flat 0.965031 0 Flat 1.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.5,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Flat 0.351874 1 Flat 0.639291 1 Flat 0.965031 0 Flat 1.5 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.327810049057007,
+						"name": "EmissiveMulti",
+						"auto_reset": false,
+						"curve": "2 0 0 Smooth 3.32781 1 Smooth"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_end_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 1.0,
+						"name": "EmissiveMulti",
+						"curve": "3 0 1 Flat 0.64597 0 Flat 1 0 Linear"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_loop_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "EmissiveMulti",
+						"curve": "2 0 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_start_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 2.0,
+						"name": "EmissiveMulti",
+						"curve": "3 0 0 Flat 1.30126 1 Flat 2 1 Linear"
+					}
+				]
+			},
+			{
+				"name": "sun_orb_01",
+				"events": [
+					{
+						"type": "TimelineParameterEventType",
+						"time": 0.0,
+						"end_time": 3.6659998893737795,
+						"name": "EmissiveMulti",
+						"curve": "5 0 0 Flat 2.20303 1 Flat 2.66415 1 Flat 3.43269 0 Flat 3.666 0 Linear"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5505312085151672,
+						"end_time": 0.6828774213790894,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_R_hand_02_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5867204070091248,
+						"end_time": 0.7343580722808838,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_R_hand_02_01"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5451006293296814,
+						"end_time": 0.7053936123847961,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_L_hand_01_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5775241851806641,
+						"end_time": 0.7093187570571899,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_L_hand_02_01"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_start_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24248504638671876,
+						"end_time": 1.8539093732833863,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_R_hand_01_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24248504638671876,
+						"end_time": 1.8539093732833863,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_R_hand_02_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24248504638671876,
+						"end_time": 1.8539093732833863,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_L_hand_01_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24248504638671876,
+						"end_time": 1.8539093732833863,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_L_hand_02_01"
+					}
+				]
+			},
+			{
+				"name": "sun_orb_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24611416459083558,
+						"end_time": 2.1841719150543215,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_R_hand_01_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24611416459083558,
+						"end_time": 2.1841719150543215,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_L_hand_02_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24611416459083558,
+						"end_time": 2.1841719150543215,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_R_hand_02_01"
+					},
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.24611416459083558,
+						"end_time": 2.1841719150543215,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/trl/hands_trail.trl",
+						"bone_group": "grp_L_hand_01_01"
+					}
+				]
+			}
+		]'
+	}
+	
+	EffectPack
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.5166831016540528,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_01.epk"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 1.5219435691833497,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_01.epk"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_end_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_02.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_02.epk"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_loop_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_02.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_02.epk"
+					}
+				]
+			},
+			{
+				"name": "laser_channel_start_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_02.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 2.0236968994140627,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_02.epk"
+					}
+				]
+			},
+			{
+				"name": "sun_orb_01",
+				"events": [
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.7262930870056154,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.7354767322540285,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_L_01_02.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.7281298637390138,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_01.epk"
+					},
+					{
+						"type": "EffectPackEventType",
+						"time": 0.0,
+						"end_time": 3.711599588394165,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act3_FOUR/VaalApparition/epk/handGlow_R_01_02.epk"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/scorching_ignite_audio.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/skill_impact_sound/skillhitsounds.amd"
+	default_animation = "animate_02"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/skill_impact_sound/skillhitsounds.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/Effects/skill_impact_sound/skillhitsounds.sm"
+	}
+}
+
+=== .ao Metadata/Effects/Spells/monsters_effects/Act3_FOUR/BloodBather/epk/scorching_loop_audio.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+AnimationController
+{
+	metadata = "Art/Models/Effects/whirlwind/whirlwind_soundhands.amd"
+	default_animation = "animate"
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/Effects/whirlwind/whirlwind_soundhands.ast"
+	}
+	
+	SkinMesh
+	{
+	}
+	
+	Lights
+	{
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "animate",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act3/G3_12/BloodBathers/BloodBatherFX/ScorchEPKLoop"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/BreachApparitionBoss/BreachApparitionBoss.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/BreachApparitionBoss/BreachApparitionBoss_armour_491b021c.smd"
+Materials 2
+	"Art/Models/Portals/BreachApparitionPortal/Textures/VaalGoldApparitionPropsc.mat" 3
+	"Art/Models/Portals/BreachApparitionPortal/Textures/VaalApparitionPortal1c.mat" 9
+BoundingBox -121.001 -28.6287 -299.424 121.001 58.8977 -43.8459
+BoneGroups 0
+
+=== .smd Art/Models/MONSTERS/BreachApparitionBoss/BreachApparitionBoss_armour_491b021c.smd
+  version 3 · c0h 4 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 12 in the header, 12 in the block · 24909 triangles over 23481 vertices
+  names: 422 bytes said, 422 read  [agree]
+
+=== shapes (12)
+0	BackPieceShape	from 0	count 4734
+1	HeadPieceShape	from 4734	count 8244
+2	NeckPieceShape	from 12978	count 642
+3	apparition_body_ringsShape	from 13620	count 528
+4	apparition_body_spikesShape	from 14148	count 20403
+5	apparition_bodyShape	from 34551	count 12258
+6	arm_chain_meshShape	from 46809	count 2520
+7	arm_wrapsShape	from 49329	count 1632
+8	braceletsShape	from 50961	count 3696
+9	chains_set_meshShape	from 54657	count 15432
+10	ponchoShape	from 70089	count 2406
+11	shoulder_padsShape	from 72495	count 2232
+
+=== fitting
+the monster's rig: 166 bones
+mounts: aux_R_02_float_hand_jntBnd, aux_R_01_float_hand_jntBnd, aux_L_02_float_hand_jntBnd, aux_L_01_float_hand_jntBnd, aux_animation_control_ratio, aux_position, aux_R_bot_Weapon, aux_L_bot_Weapon, aux_L_top_Weapon, aux_R_top_Weapon
+  scorching_ignite_audio.ao  socket <root> [NOT in its carrier's rig]  box (-50.5,-50.5,-170.6)..(50.5,50.5,0)
+    (the geometry did not read)
+    rig 1 bones, 0 of them names its carrier's rig also has
+      0 root  [its own]  under nothing  rests at (0,0,0)
+  scorching_loop_audio.ao  socket <root> [NOT in its carrier's rig]  (no mesh - an effect or a sound)

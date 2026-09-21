@@ -1,0 +1,1136 @@
+monster: Serpent Shaman [Metadata/Monsters/SerpentClanMonster/SerpentClanCaster]
+
+=== .ao Metadata/Monsters/SerpentClanMonster/SerpentClanCaster.ao (depth 0)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SerpentClanMonster/rig.amd"
+	animations = '[
+		{
+			"name": "death_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.5,
+					"name": "move",
+					"position": [
+						-69.0,
+						42.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_dot_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.3330000042915344,
+					"end_time": 1.1650638580322266,
+					"name": "move",
+					"position": [
+						-69.0,
+						42.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "death_move_01",
+			"events": [
+				{
+					"type": "MoveEventType",
+					"time": 0.0,
+					"end_time": 0.699999988079071,
+					"name": "move",
+					"position": [
+						0.0,
+						-260.0,
+						0.0
+					],
+					"data": "1 0 0 Terrain 0 0 NoOverride"
+				}
+			]
+		},
+		{
+			"name": "spellcast_curse_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.8294799327850342,
+					"name": "contact",
+					"position": [
+						3.5558900833129885,
+						-169.22500610351563,
+						-156.7449951171875
+					]
+				}
+			]
+		},
+		{
+			"name": "spellcast_projectile_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.7783690690994263,
+					"name": "contact",
+					"position": [
+						1.648292064666748,
+						-127.31961059570313,
+						-155.1665802001953
+					]
+				}
+			]
+		},
+		{
+			"name": "spit_01",
+			"events": [
+				{
+					"type": "StandardEventType",
+					"time": 0.4012190103530884,
+					"name": "contact",
+					"position": [
+						-5.339980125427246,
+						-109.2969970703125,
+						-135.86199951171876
+					]
+				}
+			]
+		}
+	]'
+}
+
+AttachedAnimatedObject
+{
+	attached_object = "hip_jntBnd Metadata/Monsters/SerpentClanMonster/attachments/SerpentClanSkirt.ao"
+}
+
+Melee
+{
+	animations = '[
+		{
+			"name": "attack_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5692307949066162,
+								0.0
+							],
+							[
+								0.5884615182876587,
+								0.5526316165924072
+							],
+							[
+								0.6115384697914124,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"width": 28.902000427246095,
+						"angle": 1.1344599723815919,
+						"x_axis_scale": 0.5260000228881836,
+						"length": 177.21499633789063,
+						"impact_x_rotation": [
+							0.0,
+							-0.1745329350233078
+						],
+						"impact_z_rotation": [
+							0.34906598925590517,
+							2.1118485927581789
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "attack_02",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.5653846263885498,
+								0.0
+							],
+							[
+								0.6499999761581421,
+								1.0
+							]
+						],
+						"direction": "Right",
+						"rotation": -0.4886922240257263,
+						"angle": 2.181661605834961,
+						"x_axis_scale": 0.7149999737739563,
+						"length": 144.63600158691407,
+						"impact_x_rotation": [
+							0.0,
+							-0.17453299462795258
+						],
+						"impact_z_rotation": [
+							-0.06981317698955536,
+							-2.670353889465332
+						],
+						"impact_type": "Slash",
+						"impact_bone": "R_Weapon"
+					}
+				]
+			}
+		},
+		{
+			"name": "tail_whip_01",
+			"melee_data": {
+				"damage_patterns": [
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6384615302085877,
+								0.0
+							],
+							[
+								0.6884615421295166,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 20,
+						"rotation": 0.01745329424738884,
+						"angle": 3.1415927410125734,
+						"x_axis_scale": 0.9399999976158142,
+						"length": 239.28900146484376,
+						"offset": [
+							2.0,
+							0.0
+						],
+						"local_offset": [
+							69.0,
+							21.0
+						],
+						"impact_z_rotation": [
+							-0.24434611201286317,
+							2.094395160675049
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "aux_tail_jntBnd_end"
+					},
+					{
+						"shape": "Circle",
+						"key_frames": [
+							[
+								0.6919999718666077,
+								0.0
+							],
+							[
+								0.7120000123977661,
+								0.5
+							],
+							[
+								0.7559999823570252,
+								1.0
+							]
+						],
+						"direction": "Left",
+						"previous_patterns_to_exclude_from": 1,
+						"push_targets": true,
+						"pushiness_modifier": 5,
+						"push_distance_limit": 20,
+						"rotation": 2.4260077476501467,
+						"angle": 1.972222089767456,
+						"length": 306.9949951171875,
+						"offset": [
+							-8.0,
+							5.0
+						],
+						"local_offset": [
+							-4.0,
+							42.0
+						],
+						"impact_z_rotation": [
+							2.687807083129883,
+							4.7123894691467289
+						],
+						"impact_type": "Blunt",
+						"impact_bone": "aux_tail_jntBnd_end"
+					}
+				]
+			}
+		}
+	]'
+}
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SerpentClanMonster/rig.ast"
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SerpentClanMonster/SerpentClanSpellCaster.sm"
+	}
+	
+	SoundEvents
+	{
+		animations = '[
+			{
+				"name": "attack_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Attack",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.37283098697662356,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Swing",
+						"bone_name": "weapon_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "attack_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.07048030197620392,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Attack"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.45463499426841738,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Swing"
+					}
+				]
+			},
+			{
+				"name": "death_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.20833399891853333,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8909850120544434,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/FallSmall",
+						"bone_name": "tail_jntBnd_9"
+					}
+				]
+			},
+			{
+				"name": "death_dot_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6371070146560669,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7729189991950989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.199869990348816,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/FallSmall",
+						"bone_name": "tail_jntBnd_9"
+					}
+				]
+			},
+			{
+				"name": "death_move_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Death",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09718780219554901,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Fall",
+						"bone_name": "spine_2_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "emerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.06526249647140503,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/SlitherRun.loop.ogg",
+						"bone_name": "hip_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.11530300229787827,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Aggro",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6918190121650696,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "hip_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "flinch_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Flinch",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2411849945783615,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/SlitherRun.loop.ogg",
+						"bone_name": "tail_jntBnd_6"
+					}
+				]
+			},
+			{
+				"name": "flinch_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Flinch",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19052599370479585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/SlitherRun.loop.ogg",
+						"bone_name": "tail_jntBnd_6"
+					}
+				]
+			},
+			{
+				"name": "flinch_left_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Flinch",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19052599370479585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/SlitherRun.loop.ogg",
+						"bone_name": "tail_jntBnd_6"
+					}
+				]
+			},
+			{
+				"name": "flinch_right_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Flinch",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19052599370479585,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/SlitherRun.loop.ogg",
+						"bone_name": "tail_jntBnd_6"
+					}
+				]
+			},
+			{
+				"name": "flinch_small_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Flinch",
+						"bone_name": "jaw_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "idle_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/HissIdle.loop.ogg",
+						"bone_name": "aux_tongue_end_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/IdleMovement",
+						"bone_name": "tail_jntBnd_11"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.0009899139404299,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/IdleBreath",
+						"bone_name": "aux_tongue_end_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.028209924697876,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/IdleMovement",
+						"bone_name": "tail_jntBnd_11"
+					}
+				]
+			},
+			{
+				"name": "knockdown_bwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Flinch",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.14996300637722016,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.524878978729248,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/FallSmall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5623729825019836,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/KnockdownB",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.036120057106018,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4178600311279297,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/SlitherRun.loop.ogg",
+						"bone_name": "tail_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.7620999813079835,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/KnockdownC",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 3.663949966430664,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_10"
+					}
+				]
+			},
+			{
+				"name": "knockdown_fwd_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.10239599645137787,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Fall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.16057799756526948,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Flinch",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.3583900034427643,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/FallSmall",
+						"bone_name": "spine_1_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6283490061759949,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/KnockdownB",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.707472026348114,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9681209921836853,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/SlitherRun.loop.ogg",
+						"bone_name": "tail_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.9967600107192994,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/KnockdownC",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.50177001953125,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_10"
+					}
+				]
+			},
+			{
+				"name": "run_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/HissRun.loop.ogg",
+						"bone_name": "jaw_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/SlitherRun.loop.ogg",
+						"bone_name": "tail_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8955870270729065,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/RunBreath",
+						"bone_name": "tongue_3_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spellcast_curse_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_9"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.41041699051856997,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7182649970054627,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_9"
+					}
+				]
+			},
+			{
+				"name": "spellcast_projectile_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_7"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Effects/BloodChargeUp"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5005509853363037,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Attack",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5532439947128296,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_7"
+					}
+				]
+			},
+			{
+				"name": "spin_detonate_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "aux_tail_jntBnd_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.19112922251224519,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Spell",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.7662059664726257,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "aux_tail_jntBnd_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.1271748542785645,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "aux_tail_jntBnd_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.4438718557357789,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "aux_tail_jntBnd_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.8274507522583008,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Attack",
+						"bone_name": "aux_tongue_end_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6354477405548097,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/WhipWhoosh",
+						"bone_name": "aux_tail_jntBnd_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 2.6455302238464357,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Effects/TailSand",
+						"bone_name": "aux_tail_jntBnd_end"
+					}
+				]
+			},
+			{
+				"name": "spit_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/KnockdownB",
+						"bone_name": "tail_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.09906700998544693,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.5232009887695313,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Attack",
+						"bone_name": "aux_tongue_end_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "spit_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/KnockdownB",
+						"bone_name": "tail_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2278538942337036,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_10"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.9215884804725647,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Attack",
+						"bone_name": "aux_tongue_end_jntBnd"
+					}
+				]
+			},
+			{
+				"name": "submerge_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Attack",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.2884339988231659,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_8"
+					}
+				]
+			},
+			{
+				"name": "submerge_02",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Attack",
+						"bone_name": "aux_head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.23074720799922944,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "tail_jntBnd_8"
+					}
+				]
+			},
+			{
+				"name": "tail_whip_01",
+				"events": [
+					{
+						"type": "SoundEventType",
+						"time": 0.0,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "aux_tail_jntBnd_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.1143672987818718,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Vocal/Spell",
+						"bone_name": "head_jntBnd"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.4584798812866211,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "aux_tail_jntBnd_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.6744753122329712,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "aux_tail_jntBnd_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 0.8639794588088989,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/Movement",
+						"bone_name": "aux_tail_jntBnd_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.2475597858428956,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Foley/WhipWhoosh",
+						"bone_name": "aux_tail_jntBnd_end"
+					},
+					{
+						"type": "SoundEventType",
+						"time": 1.3308887481689454,
+						"filename": "Audio/Sound Effects/MonsterSounds/4.0/Part1/Act2/G2_4_1/SerpentClan/Effects/TailSand",
+						"bone_name": "aux_tail_jntBnd_end"
+					}
+				]
+			}
+		]'
+	}
+	
+	BoneGroups
+	{
+		bone_group = "root false root_jntBnd"
+		bone_group = "frameupper false L_elbow_jntBnd L_shoulder_jntBnd L_clavicle_jntBnd chest_jntBnd R_clavicle_jntBnd R_shoulder_jntBnd R_elbow_jntBnd"
+		bone_group = "arm_L_fx false L_wrist_jntBnd L_elbow_jntBnd"
+		bone_group = "arm_R_fx false R_wrist_jntBnd R_elbow_jntBnd"
+		bone_group = "palm_L_fx false L_wrist_jntBnd"
+		bone_group = "palm_R_fx false R_wrist_jntBnd"
+		bone_group = "tail false tail_jntBnd_4 tail_jntBnd_5 tail_jntBnd_6 tail_jntBnd_7 tail_jntBnd_8 tail_jntBnd_9 tail_jntBnd_10 tail_jntBnd_11"
+		bone_group = "tail_tip false aux_tail_jntBnd_end tail_jntBnd_13 tail_jntBnd_12 tail_jntBnd_11 tail_jntBnd_10 tail_jntBnd_9 tail_jntBnd_8 tail_jntBnd_7 tail_jntBnd_6 tail_jntBnd_5 tail_jntBnd_4"
+		bone_group = "tail_trail false tail_jntBnd_8"
+		bone_group = "tail_idle false tail_jntBnd_5 tail_jntBnd_6 tail_jntBnd_7"
+		bone_group = "tail_idle_01 false tail_jntBnd_11 tail_jntBnd_12 tail_jntBnd_13 aux_tail_jntBnd_end"
+		bone_group = "tail_trail_01 false tail_jntBnd_8 aux_tail_jntBnd_end"
+		bone_group = "tail_trail_02 false tail_jntBnd_12"
+		bone_group = "tail_trail_03 false aux_tail_jntBnd_end"
+		bone_group = "dir false tail_jntBnd_2 aux_tail_jntBnd_end tail_jntBnd_11"
+	}
+	
+	ParticleEffects
+	{
+		animations = '[
+			{
+				"name": "spellcast_projectile_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.0,
+						"filename": "Metadata/Monsters/SerpentClanMonster/Effects/Pet/arm_surge.pet",
+						"bone_group": "arm_L_fx"
+					}
+				]
+			},
+			{
+				"name": "tail_whip_01",
+				"events": [
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.5600000023841858,
+						"filename": "Metadata/Monsters/SerpentClanMonster/Effects/Pet/tailwhip.pet",
+						"bone_group": "tail"
+					},
+					{
+						"type": "ParticleEffectEventType",
+						"time": 0.6210600137710571,
+						"filename": "Metadata/Effects/Spells/monsters_effects/Act2_FOUR/SerpentClanMonster/sand.pet",
+						"bone_group": "dir"
+					}
+				]
+			}
+		]'
+	}
+	
+	TrailsEffects
+	{
+		animations = '[
+			{
+				"name": "tail_whip_01",
+				"events": [
+					{
+						"type": "TrailsEffectEventType",
+						"time": 0.5600000023841858,
+						"end_time": 0.7295680046081543,
+						"filename": "Metadata/Monsters/SerpentClanMonster/Effects/Pet/tailwhip_trl.trl",
+						"bone_group": "tail"
+					}
+				]
+			}
+		]'
+	}
+}
+
+=== .ao Metadata/Parent.ao (depth 1)
+version 3
+abstract
+extends "nothing"
+
+BaseAnimationEvents { }
+AnimationController { }
+AttachedAnimatedObject { }
+Hull { }
+
+
+client
+{
+	ClientAnimationController { }
+	AnimatedRender { }
+	SkinMesh { }
+	SoundEvents { }
+	BoneGroups { }
+	ParticleEffects { }
+	TrailsEffects { }
+	VolumetricEffects { }
+	Lights { }
+	EffectPack { }
+}
+
+=== .ao Metadata/Monsters/SerpentClanMonster/attachments/SerpentClanSkirt.ao (depth 1)
+version 3
+extends "Metadata/Parent"
+
+BaseAnimationEvents
+{
+}
+
+AnimationController
+{
+	metadata = "Art/Models/MONSTERS/SerpentClanMonster/attachments/SerpentSkirt.amd"
+	default_animation = "idle"
+}
+
+
+
+client
+{
+	ClientAnimationController
+	{
+		skeleton = "Art/Models/MONSTERS/SerpentClanMonster/attachments/SerpentSkirt.ast"
+		linear_allowed_contraction = 0.394
+		bend_stiffness = 250.000
+		normal_viscosity_multiplier = 0.100
+		tangent_viscosity_multiplier = 0.050
+		enclosure_angle = 0.750
+	}
+	
+	SkinMesh
+	{
+		skin = "Art/Models/MONSTERS/SerpentClanMonster/attachments/SerpentSkirt.sm"
+	}
+	
+	Lights
+	{
+	}
+	
+	WindEvents
+	{
+	}
+	
+	
+}
+
+=== .ao nothing.ao (depth 2)
+(not in the install)
+
+=== .sm Art/Models/MONSTERS/SerpentClanMonster/SerpentClanSpellCaster.sm
+version 6
+SkinnedMeshData "Art/Models/MONSTERS/SerpentClanMonster/SerpentClanSpellCaster_armour_1802276d.smd"
+Materials 2
+	"Art/Textures/Monsters/SerpentClanMonster/SerpentClanMonsterWeaponc.mat" 1
+	"Art/Textures/Monsters/SerpentClanMonster/SerpentClanSpellcasterc.mat" 5
+BoundingBox -172.588 -47.5426 -210.943 93.5711 30.8374 248.588
+BoneGroups 26
+	"grp_head" 2 "head_jntBnd" "aux_head_jntBnd"
+	"grp_neck" 2 "neck_jntBnd" "head_jntBnd"
+	"grp_chest" 2 "spine_2_jntBnd" "neck_jntBnd"
+	"grp_waist" 2 "hip_jntBnd" "spine_2_jntBnd"
+	"grp_l_clavicle" 2 "L_clavicle_jntBnd" "L_shoulder_jntBnd"
+	"grp_r_clavicle" 2 "R_clavicle_jntBnd" "R_shoulder_jntBnd"
+	"grp_l_bicep" 2 "L_shoulder_jntBnd" "L_elbow_jntBnd"
+	"grp_r_bicep" 2 "R_shoulder_jntBnd" "R_elbow_jntBnd"
+	"grp_l_forearm" 2 "L_elbow_jntBnd" "L_wrist_jntBnd"
+	"grp_r_forearm" 2 "R_elbow_jntBnd" "R_wrist_jntBnd"
+	"grp_l_palm" 2 "L_wrist_jntBnd" "L_finger_2_jntBnd_1"
+	"grp_r_palm" 2 "R_wrist_jntBnd" "R_finger_2_jntBnd_1"
+	"grp_tail_01" 2 "hip_jntBnd" "tail_jntBnd_1"
+	"grp_tail_02" 2 "tail_jntBnd_1" "tail_jntBnd_2"
+	"grp_tail_03" 2 "tail_jntBnd_2" "tail_jntBnd_3"
+	"grp_tail_04" 2 "tail_jntBnd_3" "tail_jntBnd_4"
+	"grp_tail_05" 2 "tail_jntBnd_4" "tail_jntBnd_5"
+	"grp_tail_06" 2 "tail_jntBnd_5" "tail_jntBnd_6"
+	"grp_tail_07" 2 "tail_jntBnd_6" "tail_jntBnd_7"
+	"grp_tail_08" 2 "tail_jntBnd_7" "tail_jntBnd_8"
+	"grp_tail_09" 2 "tail_jntBnd_8" "tail_jntBnd_9"
+	"grp_tail_10" 2 "tail_jntBnd_9" "tail_jntBnd_10"
+	"grp_tail_11" 2 "tail_jntBnd_10" "tail_jntBnd_11"
+	"grp_tail_12" 2 "tail_jntBnd_11" "tail_jntBnd_12"
+	"grp_tail_13" 2 "tail_jntBnd_12" "tail_jntBnd_13"
+	"grp_tail_14" 2 "tail_jntBnd_13" "aux_tail_jntBnd_end"
+
+=== .smd Art/Models/MONSTERS/SerpentClanMonster/SerpentClanSpellCaster_armour_1802276d.smd
+  version 3 · c0h 3 · 1 level(s) of detail · format 0x3C · stride 32
+  shapes 6 in the header, 6 in the block · 6755 triangles over 4862 vertices
+  names: 168 bytes said, 168 read  [agree]
+
+=== shapes (6)
+0	SerpentClanMonsterWeaponShape	from 0	count 2376
+1	beltsShape	from 2376	count 879
+2	bodyShape	from 3255	count 13734
+3	teethShape	from 16989	count 2448
+4	tongueShape	from 19437	count 342
+5	underskirtShape	from 19779	count 486
+
+=== fitting
+the monster's rig: 57 bones
+mounts: aux_position, aux_head_jntBnd, aux_tongue_end_jntBnd, aux_tail_jntBnd_end
+  SerpentClanSkirt.ao  socket hip_jntBnd [in its carrier's rig]  box (-34,-22.5,-9)..(34,28.6,47.3)
+    (the geometry did not read)
+    rig 13 bones, 1 of them names its carrier's rig also has
+      0 root_jntBnd  [shared]  under nothing  rests at (0,0,0)  carrier has (0,0,0)
+      1 phys_skinned_skirt_jntBnd_5  [its own]  under 0  rests at (12.4,-5.9,-2.5)
+      2 phys_skinned_skirt_jntBnd_4  [its own]  under 0  rests at (5.6,9.9,-3.8)
+      3 phys_skinned_skirt_jntBnd_1  [its own]  under 0  rests at (-4.9,9.6,-3.8)
+      4 phys_skinned_skirt_jntBnd_3  [its own]  under 0  rests at (-12,3.7,-3.3)
+      5 phys_skinned_skirt_jntBnd_6  [its own]  under 0  rests at (13.5,3.9,-3.3)
+      6 phys_skinned_skirt_jntBnd_2  [its own]  under 0  rests at (-11,-5.5,-2.5)
+      7 phys_skinned_skirt_jntBnd_7  [its own]  under 1  rests at (17.1,-8.3,20.4)
+      8 phys_skinned_skirt_jntBnd_9  [its own]  under 2  rests at (8.5,15,19.5)
+      9 phys_skinned_skirt_jntBnd_10  [its own]  under 3  rests at (-7.3,15,19.5)
+      10 phys_skinned_skirt_jntBnd_11  [its own]  under 4  rests at (-18,6,19.8)
+      11 phys_skinned_skirt_jntBnd_8  [its own]  under 5  rests at (20,5.8,19.8)
+      12 phys_skinned_skirt_jntBnd_12  [its own]  under 6  rests at (-16.1,-7.7,20.4)
