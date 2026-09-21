@@ -542,7 +542,7 @@ public static class MonsterModels
                     // Counted here because nothing downstream will ever see this piece again.
                     told.Add(new PartFit(
                         path, socket, PartPlace.Dropped, 1, PartKind.None, 0, 0, 0, 0, false, 0, false,
-                        Vector3.Zero, Vector3.Zero));
+                        string.Empty, Vector3.Zero, Vector3.Zero));
                 }
             }
         }
@@ -730,6 +730,61 @@ public static class MonsterModels
     }
 
     /// <summary>
+    /// The bone a SOCKET means, including the mount a rig spells out in full.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED OVER THE WHOLE TABLE, and it is the largest thing the first sweep found: 451
+    /// attachments name a socket their monster's rig has no bone for, so they are dropped
+    /// outright, and 220 of those name a mount the rig plainly HAS under a longer spelling.
+    /// Unanimously, with no exception in 220:
+    ///
+    ///     the line says        the rig carries               how many
+    ///     Head_Attachment      aux_Head_attachment                115
+    ///     R_Weapon             aux_R_Weapon_attachment             81
+    ///     L_Weapon             aux_L_Weapon_attachment             12
+    ///     Back                 aux_Back_attachment                 12
+    ///
+    /// One transformation covers both shapes: put <c>aux_</c> in front, and add
+    /// <c>_attachment</c> where the socket does not already end in it. What was being thrown
+    /// away is not decoration - it is VaalGuard02HeaddressLivingLow, VaalLivingSpear,
+    /// TwilightOrderSorcererStaff, BlackJawSuperuniqueWeaponHeld, Olroth_SwordHeld: helmets,
+    /// headdresses and held weapons, on something close to a hundred and eighty monsters.
+    ///
+    /// THE OTHER 185 ARE RIGHT TO BE DROPPED and are what makes this checkable rather than a
+    /// guess: halo_01, core_light, aux_facelight, eye_L, FX_eye, spore_r_1..5. Those name
+    /// nothing of the sort on their own rigs, they are lights and effect points, and this leaves
+    /// every one of them exactly where it was.
+    ///
+    /// A FALLBACK AND ONLY A FALLBACK. The literal name is tried first, so this cannot move a
+    /// piece that already resolves; the only pieces it can reach are ones currently drawn
+    /// nowhere at all. That is what makes it a different animal from the bone-matching rules
+    /// that broke two monsters apiece earlier - those chose among candidates for a piece already
+    /// on screen.
+    ///
+    /// NO OPEN REFERENCE ANSWERS THIS. poe_data_tools has no .ao parser and its FORMATS.md is
+    /// diagrams; the game does answer it, in the bone names its own rigs carry, which is what
+    /// the 220 above are counted from.
+    /// </remarks>
+    private static bool Mounts(IReadOnlyDictionary<string, int> where, string socket, out int at)
+    {
+        if (where.TryGetValue(socket, out at))
+        {
+            return true;
+        }
+
+        string aux = Aux + socket;
+        return where.TryGetValue(aux, out at)
+            || (!socket.EndsWith(Mount, StringComparison.OrdinalIgnoreCase)
+                && where.TryGetValue(aux + Mount, out at));
+    }
+
+    /// <summary>What a rig calls an attachment point, around the name a socket writes.</summary>
+    private const string Aux = "aux_";
+
+    /// <inheritdoc cref="Aux"/>
+    private const string Mount = "_attachment";
+
+    /// <summary>
     /// Where a socket puts a piece: the transform to model space, and the bone it then follows.
     /// </summary>
     /// <remarks>
@@ -774,7 +829,7 @@ public static class MonsterModels
             return (local * carrier, bone, put, -1);
         }
 
-        if (fit.Where.TryGetValue(socket, out int at) && at < fit.Rest.BindModel.Count)
+        if (Mounts(fit.Where, socket, out int at) && at < fit.Rest.BindModel.Count)
         {
             (int onto, Matrix4x4 into) = Through(fit, at);
             Matrix4x4 there = fit.Rest.BindModel[at] * into;
@@ -1068,13 +1123,18 @@ public static class MonsterModels
         MeshManifest manifest = Read(read, skin, MeshManifest.Read);
         if (!manifest.Ready)
         {
-            return (null, body, Told(hung, where, PartKind.Unread, default, null));
+            return (null, body, Told(hung, where, PartKind.Unread, default, null, "the manifest: " + skin));
         }
 
         SkinnedMesh mesh = Read(read, manifest.Geometry, SkinnedMesh.Read);
         if (!mesh.Ready)
         {
-            return (null, body, Told(hung, where, PartKind.Unread, default, null));
+            // THE READER'S OWN REASON, not just that it failed. "version 1 puts its geometry
+            // outside a ..." names a format gap; a missing file names an install. A corpus that
+            // cannot tell those apart cannot say whether 113 monsters are 113 problems or one.
+            return (null, body, Told(
+                hung, where, PartKind.Unread, default, null,
+                mesh.Why.Length > 0 ? mesh.Why : "the geometry: " + manifest.Geometry));
         }
 
         Dress dress = Dressed(read, mesh, [], manifest, fallback, string.Empty, paints);
@@ -1105,7 +1165,8 @@ public static class MonsterModels
     /// box sits at the origin under a monster who does not is the shape of every report this
     /// month.
     /// </remarks>
-    private static PartFit Told(Hangs_ hung, PartPlace where, PartKind kind, Retold counted, Part? part)
+    private static PartFit Told(
+        Hangs_ hung, PartPlace where, PartKind kind, Retold counted, Part? part, string why = "")
     {
         (Vector3 least, Vector3 most) = part is { } made
             ? made.Place is { } put
@@ -1126,6 +1187,7 @@ public static class MonsterModels
             counted.Malformed,
             counted.Paths,
             counted.Past,
+            why,
             Vector3.Min(least, most),
             Vector3.Max(least, most));
     }

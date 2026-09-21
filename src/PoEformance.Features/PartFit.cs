@@ -71,6 +71,12 @@ public enum PartKind
 /// </param>
 /// <param name="Paths">How many of its bone names are MERGED-rig paths - <c>a|b|c</c>.</param>
 /// <param name="Past">Whether its mesh is indexed past its own rig, so the numbers are its carrier's.</param>
+/// <param name="Why">
+/// Why a piece did not read, where <see cref="PartKind.Unread"/>; empty otherwise. Without it a
+/// corpus can say 113 monsters have an unreadable piece and not whether that is 113 problems or
+/// one format seen 113 times - which is exactly the question the first sweep could not answer
+/// about itself.
+/// </param>
 /// <param name="Least">The corner of its box in MODEL space, once everything is on it.</param>
 /// <param name="Most">The far corner of the same.</param>
 public readonly record struct PartFit(
@@ -86,6 +92,7 @@ public readonly record struct PartFit(
     bool Malformed,
     int Paths,
     bool Past,
+    string Why,
     Vector3 Least,
     Vector3 Most)
 {
