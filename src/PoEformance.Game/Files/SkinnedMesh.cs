@@ -17,7 +17,22 @@ public readonly record struct MeshShape(string Name, int From, int Count);
 /// the joined mesh will be posed with - or null to keep what the file said. An attachment is
 /// rigged to a skeleton of its own, so its numbers mean nothing against the parent's.
 /// </param>
-public readonly record struct MeshJoin(SkinnedMesh? Mesh, byte[]? Bones = null);
+/// <param name="Weights">
+/// Four weights per vertex to use instead of the mesh's own, matching <paramref name="Bones"/>,
+/// or null to keep what the file said.
+/// </param>
+/// <param name="Place">
+/// Where to put the mesh before joining it, or null to take its vertices as they are. A piece a
+/// monster wears is modelled in ITS OWN space - measured: every one of Doryani's thirteen has a
+/// box a few tens of units across sitting on the origin, with the left and right shoulder pieces
+/// mirrored in x rather than standing apart - so it means nothing in the monster's space until
+/// the socket bone's rest transform is on it.
+/// </param>
+public readonly record struct MeshJoin(
+    SkinnedMesh? Mesh,
+    byte[]? Bones = null,
+    byte[]? Weights = null,
+    Matrix4x4? Place = null);
 
 /// <summary>
 /// A monster's geometry, out of the game's own <c>.smd</c> files.
@@ -248,7 +263,7 @@ public sealed class SkinnedMesh
             return None;
         }
 
-        if (usable.Count == 1 && usable[0].Bones is null)
+        if (usable.Count == 1 && usable[0].Bones is null && usable[0].Place is null)
         {
             return usable[0].Mesh!;
         }
@@ -271,18 +286,36 @@ public sealed class SkinnedMesh
             SkinnedMesh mesh = part.Mesh!;
             int count = mesh.Positions.Length;
 
-            mesh.Positions.CopyTo(positions.AsSpan(at));
-            mesh.Normals.CopyTo(normals.AsSpan(at));
+            if (part.Place is { } put)
+            {
+                for (var one = 0; one < count; one++)
+                {
+                    positions[at + one] = Vector3.Transform(mesh.Positions[one], put);
+
+                    // TransformNormal and not Transform: a normal is a direction, and carrying
+                    // the translation into it would tip every face by however far the bone sits
+                    // from the origin - which at a shoulder is the whole model.
+                    normals[at + one] = Vector3.Normalize(Vector3.TransformNormal(mesh.Normals[one], put));
+                }
+            }
+            else
+            {
+                mesh.Positions.CopyTo(positions.AsSpan(at));
+                mesh.Normals.CopyTo(normals.AsSpan(at));
+            }
+
             mesh.Coordinates.CopyTo(coordinates.AsSpan(at));
 
             // FOUR PER VERTEX, and only where the file really carried them: a mesh read without
             // bones has empty arrays rather than short ones, and copying a short span here would
             // be the crash a still picture never needed to risk.
             byte[]? which = part.Bones ?? (mesh.Bones.Length == count * 4 ? mesh.Bones : null);
-            if (which is { } sure && sure.Length == count * 4 && mesh.Weights.Length == count * 4)
+            byte[]? much = part.Weights ?? (mesh.Weights.Length == count * 4 ? mesh.Weights : null);
+            if (which is { } sure && much is { } held
+                && sure.Length == count * 4 && held.Length == count * 4)
             {
                 sure.CopyTo(bones.AsSpan(at * 4));
-                mesh.Weights.CopyTo(weights.AsSpan(at * 4));
+                held.CopyTo(weights.AsSpan(at * 4));
             }
 
             foreach (MeshShape shape in mesh.Shapes)
@@ -295,8 +328,16 @@ public sealed class SkinnedMesh
                 joined[wrote + one] = mesh.Indices[one] + at;
             }
 
-            least = Vector3.Min(least, mesh.Least);
-            most = Vector3.Max(most, mesh.Most);
+            // THE BOX GOES THROUGH THE SAME TRANSFORM, by its eight corners rather than its two:
+            // a rotated box's min and max are not the transforms of the old min and max, and a
+            // box taken that way is smaller than the geometry inside it - which is a camera
+            // framing a monster with its skirt cut off.
+            (Vector3 low, Vector3 high) = part.Place is { } moved
+                ? Corners(mesh.Least, mesh.Most, moved)
+                : (mesh.Least, mesh.Most);
+
+            least = Vector3.Min(least, low);
+            most = Vector3.Max(most, high);
             at += count;
             wrote += mesh.Indices.Length;
         }
@@ -313,6 +354,25 @@ public sealed class SkinnedMesh
             Least = least,
             Most = most,
         };
+    }
+
+    /// <summary>A box through a transform, by its eight corners - the only way that holds under rotation.</summary>
+    private static (Vector3 Least, Vector3 Most) Corners(Vector3 least, Vector3 most, Matrix4x4 through)
+    {
+        Vector3 low = new(float.MaxValue), high = new(float.MinValue);
+        for (var one = 0; one < 8; one++)
+        {
+            var corner = new Vector3(
+                (one & 1) == 0 ? least.X : most.X,
+                (one & 2) == 0 ? least.Y : most.Y,
+                (one & 4) == 0 ? least.Z : most.Z);
+
+            Vector3 put = Vector3.Transform(corner, through);
+            low = Vector3.Min(low, put);
+            high = Vector3.Max(high, put);
+        }
+
+        return (low, high);
     }
 
     /// <summary>Reads one out of an open install, by the path a <c>.sm</c> named.</summary>

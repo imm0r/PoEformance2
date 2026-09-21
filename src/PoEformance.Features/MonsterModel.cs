@@ -290,7 +290,11 @@ public static class MonsterModels
 
         if (parts.Count > 0)
         {
-            List<MeshJoin> join = [new MeshJoin(mesh), .. parts.Select(one => new MeshJoin(one.Mesh, one.Bones))];
+            List<MeshJoin> join =
+            [
+                new MeshJoin(mesh),
+                .. parts.Select(one => new MeshJoin(one.Mesh, one.Bones, one.Weights, one.Place)),
+            ];
             List<Mipmaps?> worn = [.. dress.Skins, .. parts.SelectMany(one => one.Skins)];
             mesh = SkinnedMesh.Joined(join);
             dress = dress with { Skins = worn };
@@ -318,7 +322,12 @@ public static class MonsterModels
     /// <param name="Mesh">Its geometry.</param>
     /// <param name="Bones">Its vertex bones, remapped onto the PARENT's rig, or null where they could not be.</param>
     /// <param name="Skins">One texture per shape of it, in its order - the same rule the body follows.</param>
-    private readonly record struct Part(SkinnedMesh Mesh, byte[]? Bones, IReadOnlyList<Mipmaps?> Skins);
+    private readonly record struct Part(
+        SkinnedMesh Mesh,
+        byte[]? Bones,
+        byte[]? Weights,
+        System.Numerics.Matrix4x4? Place,
+        IReadOnlyList<Mipmaps?> Skins);
 
     /// <summary>The entry keys whose value is another .ao. From the format diagram; see AoSurvey.</summary>
     private static readonly string[] Hangs =
@@ -372,20 +381,33 @@ public static class MonsterModels
         Mipmaps? fallback)
     {
         var parts = new List<Part>();
+        if (SkeletonPose.Of(parent) is not { } rest)
+        {
+            // Without the parent's rest pose there is nowhere to put a piece, and a pile of
+            // clothing at the monster's feet is worse than a monster in its underwear.
+            return parts;
+        }
+
+        var where = new Dictionary<string, int>(parent.Bones.Count, StringComparer.OrdinalIgnoreCase);
+        for (var one = 0; one < parent.Bones.Count; one++)
+        {
+            where.TryAdd(parent.Bones[one].Name, one);
+        }
+
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var queue = new Queue<(string Path, string Socket, int Depth)>();
+        var queue = new Queue<(string Path, int Bone, int Depth)>();
 
         foreach (string one in files)
         {
             foreach ((string socket, string path) in Hung(Object(read, one)))
             {
-                queue.Enqueue((path, socket, 1));
+                queue.Enqueue((path, where.GetValueOrDefault(socket, 0), 1));
             }
         }
 
         while (queue.Count > 0 && parts.Count < MostParts)
         {
-            (string path, string socket, int depth) = queue.Dequeue();
+            (string path, int bone, int depth) = queue.Dequeue();
             if (path.Length == 0 || !seen.Add(path))
             {
                 continue;
@@ -401,14 +423,17 @@ public static class MonsterModels
             {
                 foreach ((string inner, string under) in Hung(ao))
                 {
-                    // THE SOCKET OF THE THING IT HANGS ON, where the inner one names none worth
-                    // having: a dagger on a belt whose own socket is "<root>" belongs where the
-                    // belt is, not where the monster's origin is.
-                    queue.Enqueue((under, inner.StartsWith('<') ? socket : inner, depth + 1));
+                    // A PIECE ON A PIECE IS SOCKETED INTO ITS CARRIER'S RIG, not the body's -
+                    // measured: Doryani's dagger and mirror hang off phys_skinned_L_1_jntBnd and
+                    // _2_, which are bones of the BELT, and his ropes off "<root>", which is the
+                    // skirt's. None of the three is a bone the body has. So an inner socket the
+                    // parent does not carry falls back to wherever the thing it hangs on went,
+                    // which is the nearest place the body knows about.
+                    queue.Enqueue((under, where.GetValueOrDefault(inner, bone), depth + 1));
                 }
             }
 
-            if (Worn(read, ao, parent, socket, paints, fallback) is { } part)
+            if (Worn(read, ao, rest.BindModel[bone], bone, paints, fallback) is { } part)
             {
                 parts.Add(part);
             }
@@ -445,12 +470,24 @@ public static class MonsterModels
         }
     }
 
-    /// <summary>One attachment read whole: its mesh, its textures, and its bones on the parent's rig.</summary>
+    /// <summary>One attachment read whole: its mesh, its textures, and where on the body it goes.</summary>
+    /// <remarks>
+    /// RIGID AT ITS SOCKET, which is what the boxes said to do. Every one of Doryani's thirteen
+    /// pieces has a box a few tens of units across sitting on the origin - the left and right
+    /// shoulder pieces mirrored in x rather than standing apart - so each is modelled in its own
+    /// space and means nothing in the monster's until the socket bone's rest transform is on it.
+    ///
+    /// WHY NOT POSE IT WITH ITS OWN RIG. A piece has one, and in the game it is simulated - the
+    /// .ao carries bend stiffness, viscosity and an enclosure angle. At rest that rig puts the
+    /// vertices exactly where the file already has them, so the rest pose IS the mesh, and
+    /// hanging it rigidly off the bone is the same answer with none of the work. What it gives
+    /// up is cloth that swings while the monster moves, which a turning picture does not miss.
+    /// </remarks>
     private static Part? Worn(
         Func<string, byte[]?> read,
         AnimatedObject ao,
-        AnimationSkeleton parent,
-        string socket,
+        System.Numerics.Matrix4x4 place,
+        int bone,
         Paints paints,
         Mipmaps? fallback)
     {
@@ -474,7 +511,24 @@ public static class MonsterModels
         }
 
         Dress dress = Dressed(read, mesh, [], manifest, fallback, string.Empty, paints);
-        return new Part(mesh, Boned(read, ao, mesh, parent, socket), dress.Skins);
+
+        // ONE BONE, ALL THE WEIGHT. The piece moves with the socket and nothing else, so every
+        // vertex names that bone four times over with the whole 255 on the first - which is what
+        // SkeletonPose.Move expects and what makes the piece follow an arm that lifts.
+        int count = mesh.Positions.Length;
+        var bones = new byte[count * 4];
+        var weights = new byte[count * 4];
+        var at = bone is >= 0 and <= byte.MaxValue ? (byte)bone : (byte)0;
+        for (var one = 0; one < count; one++)
+        {
+            bones[one * 4] = at;
+            bones[(one * 4) + 1] = at;
+            bones[(one * 4) + 2] = at;
+            bones[(one * 4) + 3] = at;
+            weights[one * 4] = 255;
+        }
+
+        return new Part(mesh, bones, weights, place, dress.Skins);
     }
 
     /// <summary>The <c>skin</c> a SkinMesh block names, or empty where the file has none.</summary>
@@ -485,78 +539,6 @@ public static class MonsterModels
             foreach (AoEntry entry in block.Entries)
             {
                 if (string.Equals(entry.Key, Entry, StringComparison.Ordinal) && entry.Value.Length > 0)
-                {
-                    return entry.Value;
-                }
-            }
-        }
-
-        return string.Empty;
-    }
-
-    /// <summary>
-    /// An attachment's vertex bones, moved onto the parent's rig by the names they share.
-    /// </summary>
-    /// <remarks>
-    /// BYTES, AND THAT IS A REAL CEILING. A vertex's bone is one byte, so a parent bone past 255
-    /// cannot be pointed at - and silently wrapping round would rig a skirt to an eyelid. Where
-    /// the match lands out of range the piece keeps still instead, which a picture shows and a
-    /// wrapped index would hide.
-    /// </remarks>
-    private static byte[]? Boned(
-        Func<string, byte[]?> read,
-        AnimatedObject ao,
-        SkinnedMesh mesh,
-        AnimationSkeleton parent,
-        string socket)
-    {
-        int count = mesh.Positions.Length;
-        if (!parent.Ready || mesh.Bones.Length != count * 4)
-        {
-            return null;
-        }
-
-        AnimationSkeleton own = Read(read, Skeleton(ao), AnimationSkeleton.Read);
-        if (!own.Ready || own.Bones.Count == 0)
-        {
-            return null;
-        }
-
-        var where = new Dictionary<string, int>(parent.Bones.Count, StringComparer.OrdinalIgnoreCase);
-        for (var one = 0; one < parent.Bones.Count; one++)
-        {
-            where.TryAdd(parent.Bones[one].Name, one);
-        }
-
-        int hung = socket.Length > 0 && where.TryGetValue(socket, out int at) ? at : 0;
-
-        // ONE LOOKUP PER BONE OF THE PIECE, not per vertex: a skirt has thousands of vertices and
-        // a dozen bones, and the answer is the same for every vertex that shares one.
-        var onto = new byte[own.Bones.Count];
-        for (var one = 0; one < own.Bones.Count; one++)
-        {
-            int found = where.TryGetValue(own.Bones[one].Name, out int same) ? same : hung;
-            onto[one] = found is >= 0 and <= byte.MaxValue ? (byte)found : (byte)0;
-        }
-
-        var bones = new byte[count * 4];
-        for (var one = 0; one < bones.Length; one++)
-        {
-            byte was = mesh.Bones[one];
-            bones[one] = was < onto.Length ? onto[was] : (byte)hung;
-        }
-
-        return bones;
-    }
-
-    /// <summary>The <c>skeleton</c> a ClientAnimationController names, or empty.</summary>
-    private static string Skeleton(AnimatedObject ao)
-    {
-        foreach (AoStruct block in ao.Named(RigBlock))
-        {
-            foreach (AoEntry entry in block.Entries)
-            {
-                if (string.Equals(entry.Key, RigEntry, StringComparison.Ordinal) && entry.Value.Length > 0)
                 {
                     return entry.Value;
                 }
