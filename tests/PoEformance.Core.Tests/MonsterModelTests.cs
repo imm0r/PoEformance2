@@ -1094,6 +1094,58 @@ public class MonsterModelTests
     }
 
     /// <summary>
+    /// A "&lt;root&gt;" piece authored in a DIFFERENT rest pose is moved into the parent's.
+    /// </summary>
+    /// <remarks>
+    /// THE THING THREE FIXES IN A ROW ASSUMED, and Bahlak's dump finally showed. His feathers
+    /// and his body both name spine_1, chest and M_head, and rest them nowhere near each other:
+    ///
+    ///     spine_1_jntBnd   the piece (0,0,-29.1)     the body (0,-1.9,-179.7)
+    ///     chest_jntBnd     the piece (0,0,-87.4)     the body (0,-42.4,-221.6)
+    ///     M_head_jntBnd    the piece (0,-67,-197.6)  the body (0,-167.2,-254.2)
+    ///
+    /// Not even a constant offset - the piece's rig is straight and the body's is the crouched
+    /// owl. So renumbering the bones and drawing leaves the feathers standing in the PIECE's bind
+    /// pose while the body stands in its own, and the bundle hangs off him rather than on him.
+    ///
+    /// UNDO THE BIND IT WAS AUTHORED IN, APPLY THE BIND OF THE BONE IT MOVES TO. Here the piece
+    /// rests its chest ninety up and the body rests it two hundred up, so a vertex sitting on the
+    /// piece's chest has to travel the difference.
+    /// </remarks>
+    [Fact]
+    public void APieceAuthoredInADifferentRestPoseIsMovedIntoTheParents()
+    {
+        var install = Install();
+        install.Files["art/rig.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("chest_jntBnd", 255, 255, -200f)], []);
+
+        // The same two bones, and the piece rests its chest somewhere else entirely.
+        install.Files["art/cloak.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("chest_jntBnd", 255, 255, -90f)], []);
+
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/cloak.ao", socket: "<root>", skeleton: "art/rig.ast");
+        install.Files["art/cloak.ao"] = Ao(skin: "art/cloak.sm", skeleton: "art/cloak.ast");
+        install.Files["art/cloak.sm"] = Sm("art/cloak.smd", "art/paint.mat");
+
+        // A vertex at the piece's own chest height, weighted to that chest.
+        install.Files["art/cloak.smd"] = Packed.Mesh(
+        [
+            .. new[] { 0f, 1f, 2f, 3f }.Select(one =>
+                new Packed.Vertex(new Vector3(one, 0f, -90f), [1, 0, 0, 0], [255, 0, 0, 0])),
+        ]);
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+        Assert.Equal<byte>(1, said.Mesh.Bones[16]);
+
+        // Authored at ninety down against a piece chest at ninety down, so it sits ON that chest
+        // - and the body rests the same chest at two hundred down, which is where it belongs.
+        Assert.Equal(-200f, said.Mesh.Positions[4].Z, 3);
+    }
+
+    /// <summary>
     /// A piece that names no socket and shares no bone but the root stays where it is.
     /// </summary>
     /// <remarks>

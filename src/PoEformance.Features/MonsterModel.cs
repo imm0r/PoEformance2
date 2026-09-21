@@ -506,7 +506,7 @@ public static class MonsterModels
                 }
             }
 
-            if (Worn(read, ao, place, bone, paints, fallback, where, rooted) is { } part)
+            if (Worn(read, ao, place, bone, paints, fallback, where, rest, rooted) is { } part)
             {
                 parts.Add(part);
             }
@@ -622,6 +622,123 @@ public static class MonsterModels
     private const string Shift = "attached_object_translation";
 
     /// <summary>
+    /// What each of a piece's bones does to a vertex to put it in the PARENT's bind pose.
+    /// </summary>
+    /// <remarks>
+    /// THE TWO RIGS DO NOT CARRY THE SAME REST POSE, which is the thing three fixes in a row
+    /// assumed and Bahlak's dump finally showed. His feathers and his body both name spine_1,
+    /// chest and M_head, and rest them nowhere near each other:
+    ///
+    ///     spine_1_jntBnd   the piece (0,0,-29.1)      the body (0,-1.9,-179.7)
+    ///     chest_jntBnd     the piece (0,0,-87.4)      the body (0,-42.4,-221.6)
+    ///     M_head_jntBnd    the piece (0,-67,-197.6)   the body (0,-167.2,-254.2)
+    ///
+    /// Not even a constant offset. The piece's rig is straight - its spine steps a regular 29
+    /// units down z with no y at all - and the body's is the crouched owl. So renumbering the
+    /// bones and drawing leaves the feathers standing in the PIECE's bind pose while the body
+    /// stands in its own, which is a bundle hanging off him rather than on him.
+    ///
+    /// THE CORRECTION IS THE ONE EVERY SKINNING PIPELINE USES: undo the bind the vertex was
+    /// authored in, then apply the bind of the bone it is moving to. It is derived rather than
+    /// guessed, and it cannot break what already worked, because it REDUCES to what those cases
+    /// already did:
+    ///
+    ///   - where the two rigs agree, as Malgor's seaweed does, it is the identity;
+    ///   - where the piece's rig is the parent's subtree re-rooted on the socket, as the Fallen
+    ///     Knight's are, the parent's bind is the piece's bind times the socket's - so it
+    ///     cancels down to the socket's transform, which is exactly the old placement.
+    ///
+    /// A BONE WITH NO MATCH ANYWHERE UP ITS CHAIN keeps the old answer too: its piece-space is
+    /// taken as local to whatever it fell back to, which for a socketed piece is the socket and
+    /// for a "&lt;root&gt;" piece is the monster's root.
+    /// </remarks>
+    private static Matrix4x4[] Correcting(
+        SkeletonPose mine, SkeletonPose rest, int bones, byte[] onto, int[] anchor, bool rooted, int socket)
+    {
+        var into = new Matrix4x4[bones];
+
+        // A SOCKETED PIECE GOES TO ITS SOCKET AND NOWHERE ELSE. Where its rig really is the
+        // parent's subtree the arithmetic below gives exactly that anyway - the piece's own bind
+        // cancels against the parent's, leaving the socket's - so forcing it costs those pieces
+        // nothing and protects the ones whose rig only LOOKS like the parent's. The Frostborn
+        // Fiend's block of ice is three bones all resting at the origin, one of them called
+        // aux_position, which the parent also has somewhere up his body; corrected by name it
+        // would leave his fist for that bone, which is the 0.1.13 regression in a new shape.
+        if (!rooted)
+        {
+            Matrix4x4 put = socket < rest.BindModel.Count ? rest.BindModel[socket] : Matrix4x4.Identity;
+            Array.Fill(into, put);
+            return into;
+        }
+
+        for (var one = 0; one < bones; one++)
+        {
+            int at = onto[one] < rest.BindModel.Count ? onto[one] : 0;
+            Matrix4x4 there = at < rest.BindModel.Count ? rest.BindModel[at] : Matrix4x4.Identity;
+
+            into[one] = anchor[one] >= 0
+                && anchor[one] < mine.BindModel.Count
+                && Matrix4x4.Invert(mine.BindModel[anchor[one]], out Matrix4x4 back)
+                    ? back * there
+                    : there;
+        }
+
+        return into;
+    }
+
+    /// <summary>
+    /// A piece's geometry moved out of its own bind pose and into the parent's.
+    /// </summary>
+    /// <remarks>
+    /// BAKED ONCE, HERE, rather than handed to the renderer: the correction is per BONE and the
+    /// join takes one transform per piece, so the vertices are moved now and everything
+    /// downstream goes on working on a mesh that is already in the monster's space.
+    ///
+    /// BLENDED BY THE VERTEX'S OWN WEIGHTS, the same way a pose is - a vertex held half by the
+    /// chest and half by the neck is corrected half by each, and a seam between two bones stays
+    /// a seam rather than tearing.
+    /// </remarks>
+    private static SkinnedMesh Corrected(SkinnedMesh mesh, IReadOnlyList<Matrix4x4> into)
+    {
+        int count = mesh.Positions.Length;
+        if (into.Count == 0 || mesh.Bones.Length != count * 4 || mesh.Weights.Length != count * 4)
+        {
+            return mesh;
+        }
+
+        var positions = new Vector3[count];
+        var normals = new Vector3[count];
+        Vector3 least = new(float.MaxValue), most = new(float.MinValue);
+
+        for (var one = 0; one < count; one++)
+        {
+            Matrix4x4 sum = default;
+            var total = 0f;
+            for (var slot = 0; slot < 4; slot++)
+            {
+                byte weight = mesh.Weights[(one * 4) + slot];
+                byte bone = mesh.Bones[(one * 4) + slot];
+                if (weight == 0 || bone >= into.Count)
+                {
+                    continue;
+                }
+
+                sum += into[bone] * (weight / 255f);
+                total += weight / 255f;
+            }
+
+            Matrix4x4 put = total > 0.0001f ? sum * (1f / total) : Matrix4x4.Identity;
+            positions[one] = Vector3.Transform(mesh.Positions[one], put);
+            normals[one] = Vector3.Normalize(Vector3.TransformNormal(mesh.Normals[one], put));
+            least = Vector3.Min(least, positions[one]);
+            most = Vector3.Max(most, positions[one]);
+        }
+
+        return SkinnedMesh.Of(
+            positions, normals, mesh.Indices, least, most, mesh.Coordinates, mesh.Shapes);
+    }
+
+    /// <summary>
     /// Whether an attachment line names no socket at all - <c>&lt;root&gt;</c>, or nothing.
     /// </summary>
     /// <remarks>
@@ -690,6 +807,7 @@ public static class MonsterModels
         Paints paints,
         Mipmaps? fallback,
         IReadOnlyDictionary<string, int> where,
+        SkeletonPose rest,
         bool rooted)
     {
         string skin = Skin(ao);
@@ -716,9 +834,11 @@ public static class MonsterModels
         // TO - see Retargeted. What the attachment line decides is where the piece SITS: a
         // "<root>" piece is already in the monster's space and wants no transform, a socketed
         // one is in its socket's space and wants that bone's rest transform on it.
-        if (Retargeted(read, ao, where, mesh, rooted, bone) is { } map)
+        if (Retargeted(read, ao, where, rest, mesh, rooted, bone) is { } map)
         {
-            return new Part(mesh, map, null, rooted ? null : place, dress.Skins);
+            // NO PLACE: the correction already carries wherever the piece belongs, because a
+            // socketed piece's own bind cancels down to exactly its socket's transform.
+            return new Part(Corrected(mesh, map.Into), map.Bones, mesh.Weights, null, dress.Skins);
         }
 
         (byte[] bones, byte[] weights) = Bound(mesh.Positions.Length, bone);
@@ -772,10 +892,13 @@ public static class MonsterModels
     /// nothing but the root has no bones to be moved onto and stays where it is. Malgor's ship's
     /// wheel is that piece, and it is the one thing here still not settled.
     /// </remarks>
-    private static byte[]? Retargeted(
+    private readonly record struct Retarget(byte[] Bones, Matrix4x4[] Into);
+
+    private static Retarget? Retargeted(
         Func<string, byte[]?> read,
         AnimatedObject ao,
         IReadOnlyDictionary<string, int> where,
+        SkeletonPose rest,
         SkinnedMesh mesh,
         bool rooted,
         int socket)
@@ -803,13 +926,15 @@ public static class MonsterModels
         // Mapping them to nought is the one answer that is certainly wrong.
         if (SkeletonPose.Highest(mesh) >= own.Bones.Count)
         {
-            // ONLY WHERE NOTHING ELSE IS BEING DONE TO THE GEOMETRY. A socketed piece is moved by
-            // its socket's transform, and passing the parent's numbers through as well would
-            // apply that move twice - so there the old rigid binding is the safe answer.
-            return rooted ? mesh.Bones : null;
+            // A MESH INDEXED PAST ITS OWN RIG WAS NOT RIGGED TO IT, so the only rig its numbers
+            // can mean is the parent's - and then they are already right and want no correction.
+            // A socketed piece is moved by its socket as well, so there the old rigid binding
+            // stays: applying both would move it twice.
+            return rooted ? new Retarget(mesh.Bones, []) : null;
         }
 
         var onto = new byte[own.Bones.Count];
+        var anchor = new int[own.Bones.Count];
         var shared = 0;
         for (var one = 0; one < own.Bones.Count; one++)
         {
@@ -827,6 +952,7 @@ public static class MonsterModels
             // at (22.3,7,-157.9). Matching that root by NAME would send every vertex weighted to
             // it across to the monster's own root, which is the far end of him.
             onto[one] = (byte)(rooted ? 0 : socket);
+            anchor[one] = -1;
 
             int at = one;
             for (var hops = 0; at >= 0 && hops <= own.Bones.Count; hops++)
@@ -837,6 +963,7 @@ public static class MonsterModels
                     && found <= byte.MaxValue)
                 {
                     onto[one] = (byte)found;
+                    anchor[one] = at;
                     shared++;
                     break;
                 }
@@ -861,7 +988,7 @@ public static class MonsterModels
             bones[one] = said < onto.Length ? onto[said] : (byte)0;
         }
 
-        return bones;
+        return new Retarget(bones, Correcting(mine, rest, own.Bones.Count, onto, anchor, rooted, socket));
     }
 
     /// <summary>
