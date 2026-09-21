@@ -284,8 +284,9 @@ public static class ModelDump
         MeshManifest manifest = MeshManifest.Read(read(skin.Replace('\\', '/').Trim()));
         said.Append("  box ").Append(Box(manifest.Least)).Append("..").AppendLine(Box(manifest.Most));
 
-        Facts(said, "    ", SkinnedMesh.Read(read(manifest.Geometry.Replace('\\', '/').Trim())).Facts);
-        Rigged(read, said, bones, parent, over_, content);
+        SkinnedMesh geometry = SkinnedMesh.Read(read(manifest.Geometry.Replace('\\', '/').Trim()));
+        Facts(said, "    ", geometry.Facts);
+        Rigged(read, said, bones, parent, over_, SkeletonPose.Highest(geometry), content);
     }
 
     /// <summary>How many of a piece's own bones are printed. Enough to see whose names they are.</summary>
@@ -314,6 +315,7 @@ public static class ModelDump
         HashSet<string> bones,
         IReadOnlyDictionary<string, int> parent,
         IReadOnlyList<System.Numerics.Matrix4x4> over_,
+        int highest,
         byte[] content)
     {
         string path = string.Empty;
@@ -352,6 +354,20 @@ public static class ModelDump
 
         said.Append("    rig ").Append(Say(own.Bones.Count)).Append(" bones, ")
             .Append(Say(shared)).AppendLine(" of them names the parent rig also has");
+
+        // AND WHETHER THE PIECE'S MESH IS INDEXED BY THAT RIG AT ALL. A mesh whose highest
+        // weighted bone is past the rig's count was rigged to something else - and the only
+        // other rig in play is the parent's - so its numbers must not be put through the
+        // piece's table. Printed because a mesh half-mapped and half-dropped looks exactly like
+        // a piece in the wrong place.
+        if (highest >= 0)
+        {
+            said.Append("    mesh weights reach bone ").Append(Say(highest))
+                .Append(" of ").Append(Say(own.Bones.Count))
+                .AppendLine(highest >= own.Bones.Count
+                    ? "  [PAST this rig - it is the parent's numbering]"
+                    : "  [inside this rig]");
+        }
 
         SkeletonPose? pose = SkeletonPose.Of(own);
         IReadOnlyList<System.Numerics.Matrix4x4> rest = pose?.BindModel ?? [];
