@@ -214,10 +214,31 @@ public static class ModelDump
             return;
         }
 
-        string skin = Skin(AnimatedObject.Read(content));
+        AnimatedObject piece = AnimatedObject.Read(content);
+        string skin = Skin(piece);
         if (skin.Length == 0)
         {
-            said.AppendLine("  (no SkinMesh - an effect or a sound)");
+            // A RIGID PROP IS NOT AN EFFECT, and calling it one is what hid Malgor's cannon: it
+            // names a .fmt through FixedMesh, carries its own materials, and has no .sm at all.
+            string prop = Entryed(piece, "FixedMesh", "fixed_mesh");
+            if (prop.Length == 0)
+            {
+                said.AppendLine("  (no mesh - an effect or a sound)");
+                return;
+            }
+
+            FixedMesh fixture = FixedMesh.Read(read(prop.Replace('\\', '/').Trim()));
+            said.Append("  fixed mesh ").Append(prop[(prop.LastIndexOf('/') + 1)..]);
+            said.AppendLine(fixture.Ready
+                ? $"  {Say(fixture.Mesh.Shapes.Count)} shapes"
+                : $"  (did not read: {fixture.Why})");
+
+            foreach ((string shape, string material) in fixture.Named)
+            {
+                said.Append("    ").Append(shape).Append("  ->  ")
+                    .AppendLine(material.Length > 0 ? material : "(no material)");
+            }
+
             return;
         }
 
@@ -397,13 +418,16 @@ public static class ModelDump
     }
 
     /// <summary>The <c>skin</c> a SkinMesh block names, or empty where the file has none.</summary>
-    private static string Skin(AnimatedObject ao)
+    private static string Skin(AnimatedObject ao) => Entryed(ao, "SkinMesh", "skin");
+
+    /// <summary>One entry's value out of one kind of block, or empty where the file has none.</summary>
+    private static string Entryed(AnimatedObject ao, string block, string key)
     {
-        foreach (AoStruct block in ao.Named("SkinMesh"))
+        foreach (AoStruct one in ao.Named(block))
         {
-            foreach (AoEntry entry in block.Entries)
+            foreach (AoEntry entry in one.Entries)
             {
-                if (string.Equals(entry.Key, "skin", StringComparison.Ordinal) && entry.Value.Length > 0)
+                if (string.Equals(entry.Key, key, StringComparison.Ordinal) && entry.Value.Length > 0)
                 {
                     return entry.Value;
                 }

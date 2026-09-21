@@ -1607,6 +1607,15 @@ public sealed class MonsterPortrait
                     said += " · the .sm's counts spread over the shapes";
                 }
 
+                // AND WHETHER THE BODY ITSELF IS SEVERAL FILES. A SkinMesh block may name one
+                // manifest or seven, and while only the first was read Zar Wali the Bone Tyrant
+                // drew as two floating arms - which looks exactly like a monster that IS two
+                // arms. The count is the difference.
+                if (_model.Sections > 1)
+                {
+                    said += $" · body in {_model.Sections} sections";
+                }
+
                 // AND WHAT IT IS WEARING. A monster with no attachments, one whose pieces were
                 // switched off, and one whose pieces all failed to read are three different
                 // things that draw identically - so the count says which.

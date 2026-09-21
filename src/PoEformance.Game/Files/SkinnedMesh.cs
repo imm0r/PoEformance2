@@ -48,6 +48,33 @@ public readonly record struct MeshFacts(
     int NamesSaid,
     int NamesRead);
 
+/// <summary>
+/// One DOLm block, read whole - the geometry two different file types both wrap.
+/// </summary>
+/// <param name="Extents">Where each shape's indices start and how many are its own.</param>
+/// <param name="At">The first byte past the block, where the file's own sections continue.</param>
+/// <param name="Facts">What the block's header said. The outer file fills in the rest.</param>
+/// <param name="Why">Why nothing was read, or empty where something was.</param>
+internal readonly record struct MeshBlock(
+    Vector3[] Positions,
+    Vector3[] Normals,
+    Vector2[] Coordinates,
+    byte[] Bones,
+    byte[] Weights,
+    int[] Indices,
+    (int From, int Count)[] Extents,
+    int At,
+    MeshFacts Facts,
+    string Why)
+{
+    /// <summary>Nothing read, with the reason. Never a throw: a caller is drawing a picture.</summary>
+    internal static MeshBlock Stopped(string why)
+        => new([], [], [], [], [], [], [], 0, default, why);
+
+    /// <summary>Whether there is geometry in here.</summary>
+    internal bool Ready => Why.Length == 0;
+}
+
 /// <summary>One mesh going into <see cref="SkinnedMesh.Joined"/>.</summary>
 /// <param name="Mesh">The geometry. Null or unready is left out rather than refused.</param>
 /// <param name="Bones">
@@ -542,9 +569,52 @@ public sealed class SkinnedMesh
                 + " puts its geometry outside a DOLm block, which this does not read");
         }
 
-        if (!file[at..].StartsWith(Magic))
+        MeshBlock block = Block(file, at);
+        if (!block.Ready)
         {
-            return Failed("no DOLm block where the geometry should be");
+            return Failed(block.Why);
+        }
+
+        MeshShape[] named = Named(
+            file, block.At, shapes, block.Extents, block.Indices.Length, out int read);
+
+        return new SkinnedMesh
+        {
+            Positions = block.Positions,
+            Normals = block.Normals,
+            Coordinates = block.Coordinates,
+            Bones = block.Bones,
+            Weights = block.Weights,
+            Indices = block.Indices,
+            Shapes = named,
+            Least = least,
+            Most = most,
+            Facts = block.Facts with { Version = version, Shapes = shapes, NamesSaid = names, NamesRead = read },
+        };
+    }
+
+    /// <summary>
+    /// One DOLm block read whole: the first level of detail's geometry, and where the block ends.
+    /// </summary>
+    /// <remarks>
+    /// SHARED BECAUSE TWO FILE TYPES CARRY ONE. A monster's <c>.smd</c> wraps a DOLm block in a
+    /// header of its own, and a prop's <c>.fmt</c> - the cannon on Malgor's shoulder, a weapon in
+    /// a hand - wraps the SAME block in a different one. Reading it twice would mean fixing it
+    /// twice, and the four-byte error this file carried for months is the argument: it took a
+    /// monster's shape names coming out nearly right to find, and a second copy would still have
+    /// it.
+    ///
+    /// WHAT IT DOES NOT KNOW is where the block sits or what follows it. Both are the caller's,
+    /// because that is exactly what the two file types disagree about - the .smd puts a name
+    /// table after it, the .fmt puts a shape table and a string pool.
+    /// </remarks>
+    /// <param name="file">The whole file.</param>
+    /// <param name="at">Where the four <c>DOLm</c> bytes begin.</param>
+    internal static MeshBlock Block(ReadOnlySpan<byte> file, int at)
+    {
+        if (at < 0 || at + 13 > file.Length || !file[at..].StartsWith(Magic))
+        {
+            return MeshBlock.Stopped("no DOLm block where the geometry should be");
         }
 
         at += 4;
@@ -555,7 +625,7 @@ public sealed class SkinnedMesh
 
         if (lods == 0)
         {
-            return Failed("the mesh has no level of detail to read");
+            return MeshBlock.Stopped("the mesh has no level of detail to read");
         }
 
         // EVERY LEVEL OF DETAIL'S COUNTS COME FIRST, AS ONE TABLE, and only then the meshes
@@ -564,7 +634,7 @@ public sealed class SkinnedMesh
         // is rubbish - so the table is read whole even though only the first mesh is kept.
         if (at + (lods * 8) > file.Length)
         {
-            return Failed("the mesh says it is bigger than the file that holds it");
+            return MeshBlock.Stopped("the mesh says it is bigger than the file that holds it");
         }
 
         // KEPT UNSIGNED UNTIL THEY HAVE BEEN BOUNDED, which is not fussiness: these are numbers
@@ -580,7 +650,7 @@ public sealed class SkinnedMesh
         (uint triangles, uint vertices) = counts[0];
         if (triangles == 0 || vertices == 0)
         {
-            return Failed("the mesh is empty");
+            return MeshBlock.Stopped("the mesh is empty");
         }
 
         Shape shape = Shape.Of(format);
@@ -601,7 +671,7 @@ public sealed class SkinnedMesh
         needed += Trailing(format, corner, blockShapes);
         if (needed > file.Length)
         {
-            return Failed("the mesh says it is bigger than the file that holds it");
+            return MeshBlock.Stopped("the mesh says it is bigger than the file that holds it");
         }
 
         // Safe to narrow now: the size check above proved both fit inside the file.
@@ -623,7 +693,7 @@ public sealed class SkinnedMesh
 
             if (indices[one] >= points)
             {
-                return Failed("the mesh points at a vertex it does not have");
+                return MeshBlock.Stopped("the mesh points at a vertex it does not have");
             }
         }
 
@@ -673,25 +743,12 @@ public sealed class SkinnedMesh
         }
 
         past += Trailing(format, corner, blockShapes);
-        at = (int)past;                             // Bounded by the size check above.
 
-        MeshShape[] named = Named(file, at, shapes, extents, indices.Length, out int read);
-
-        return new SkinnedMesh
-        {
-            Positions = positions,
-            Normals = normals,
-            Coordinates = coordinates,
-            Bones = bones,
-            Weights = weights,
-            Indices = indices,
-            Shapes = named,
-            Least = least,
-            Most = most,
-            Facts = new MeshFacts(
-                version, corner, lods, format, shape.Stride, shapes, blockShapes,
-                faces, points, names, read),
-        };
+        return new MeshBlock(
+            positions, normals, coordinates, bones, weights, indices, extents,
+            (int)past,                              // Bounded by the size check above.
+            new MeshFacts(0, corner, lods, format, shape.Stride, 0, blockShapes, faces, points, 0, 0),
+            string.Empty);
     }
 
     /// <summary>

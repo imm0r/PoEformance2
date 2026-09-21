@@ -839,9 +839,17 @@ public class MonsterModelTests
         string? second = null,
         string? attach = null,
         string socket = "hip_jntBnd",
-        string? skeleton = null)
+        string? skeleton = null,
+        string? fixture = null,
+        string? also = null)
     {
         var said = new StringBuilder("version 3\n");
+        if (fixture is { Length: > 0 })
+        {
+            said.Append("client\n{\n\tFixedMesh\n\t{\n\t\tfixed_mesh = \"")
+                .Append(fixture).Append("\"\n\t}\n}\n");
+        }
+
         if (extends is { Length: > 0 })
         {
             said.Append("extends \"").Append(extends).Append("\"\n");
@@ -862,6 +870,11 @@ public class MonsterModelTests
         if (skin is { Length: > 0 })
         {
             said.Append("SkinMesh\n{\n\tskin = \"").Append(skin).Append("\"\n");
+            if (also is { Length: > 0 })
+            {
+                said.Append("\tskin = \"").Append(also).Append("\"\n");
+            }
+
             if (material is { Length: > 0 })
             {
                 said.Append("\t\tHipsShape = \"").Append(material).Append("\"\n");
@@ -880,6 +893,162 @@ public class MonsterModelTests
         }
 
         return Encoding.UTF8.GetBytes(said.ToString());
+    }
+
+    /// <summary>
+    /// A piece rigged to the parent's OWN bones is skinned to them, not pinned to one of them.
+    /// </summary>
+    /// <remarks>
+    /// THE BUG THIS PINS DOWN was invisible at rest and obvious the moment anything moved. Every
+    /// attached piece used to have all four of every vertex's bone slots overwritten with ONE
+    /// bone - the socket's - which for a piece socketed "&lt;root&gt;" is the rig root: the one
+    /// bone that does not follow the body. So Bahlak the Sky Seer's feather bundle stayed on the
+    /// floor while he rose, and Malgor the Nautilord's seaweed hung in the air behind him, and a
+    /// piece socketed to an arm looked perfect the whole time.
+    ///
+    /// MEASURED, NOT ASSUMED: the seaweed's own rig is 23 bones of which TWELVE carry the
+    /// parent's names and rest where the parent's rest, and the feathers' is 31 with eleven. A
+    /// prop shares only root_jntBnd. Here the piece is given the parent's own rig, so every bone
+    /// matches and the piece's own binding has to survive the join untouched.
+    /// </remarks>
+    [Fact]
+    public void APieceRiggedToTheParentsOwnBonesIsSkinnedToThemRatherThanPinnedToOne()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/cloak.ao", socket: "<root>", skeleton: "art/rig.ast");
+        install.Files["art/cloak.ao"] = Ao(skin: "art/cloak.sm", skeleton: "art/rig.ast");
+        install.Files["art/cloak.sm"] = Sm("art/cloak.smd", "art/paint.mat");
+        install.Files["art/cloak.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+
+        // The fixture binds every vertex to bone 1 alone. The piece's four vertices start at 4,
+        // so its first vertex's four slots are at 16 - and they still say what its file said.
+        Assert.Equal<byte>([1, 0, 0, 0], said.Mesh.Bones[16..20]);
+        Assert.Equal<byte>([255, 0, 0, 0], said.Mesh.Weights[16..20]);
+
+        // And it was not moved: a piece in the monster's space already needs no transform, so
+        // its vertices sit exactly where the body's do.
+        Assert.Equal(said.Mesh.Positions[0], said.Mesh.Positions[4]);
+    }
+
+    /// <summary>
+    /// A prop that shares nothing but the root is still pinned rigidly to its socket.
+    /// </summary>
+    /// <remarks>
+    /// THE OTHER HALF, AND THE ONE THAT WAS ALWAYS RIGHT. Malgor's anchor, beard and ship's wheel
+    /// each bring a rig of their own whose only shared name is root_jntBnd - which every rig in
+    /// the game has, so matching it means nothing. Each is modelled around its own origin and
+    /// belongs rigidly at its socket, and the fix above must not take that away from them.
+    /// </remarks>
+    [Fact]
+    public void APropSharingOnlyTheRootIsStillPinnedToItsSocket()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/horn.ao", socket: "chest_jntBnd", skeleton: "art/rig.ast");
+        install.Files["art/horn.ao"] = Ao(skin: "art/horn.sm");
+        install.Files["art/horn.sm"] = Sm("art/horn.smd", "art/paint.mat");
+        install.Files["art/horn.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+
+        // Every slot is the socket's bone, which is what makes a prop follow it and nothing else.
+        Assert.All(said.Mesh.Bones[16..20], one => Assert.Equal(said.Mesh.Bones[16], one));
+        Assert.NotEqual(0, said.Mesh.Bones[16]);
+    }
+
+    /// <summary>
+    /// A SkinMesh block naming several skins is a body in several files, and all of them are read.
+    /// </summary>
+    /// <remarks>
+    /// READ AS A FIELD FOR AS LONG AS IT EXISTED, and it is a list. Reported from the live client:
+    /// Zar Wali, the Bone Tyrant is a giant snake skeleton and the pane drew two floating arms -
+    /// his .ao names seven manifests in seven consecutive lines, GSSBArmA through GSSBTail, and
+    /// this walk took the first and stopped. The sections share one rig, so nothing is remapped
+    /// and nothing is placed; they are simply all there.
+    /// </remarks>
+    [Fact]
+    public void EverySkinASkinMeshBlockNamesIsReadAndNotJustTheFirst()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", also: "art/tail.sm", skeleton: "art/rig.ast");
+        install.Files["art/tail.sm"] = Sm("art/tail.smd", "art/paint.mat");
+        install.Files["art/tail.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(2, said.Sections);
+        Assert.Equal(4, said.Mesh.Triangles);
+        Assert.Equal(8, said.Mesh.Positions.Length);
+        Assert.All(said.Mesh.Indices, one => Assert.InRange(one, 0, said.Mesh.Positions.Length - 1));
+        Assert.Equal(said.Mesh.Shapes.Count, said.Skins.Count);
+    }
+
+    /// <summary>A section is not an accessory: switching the parts off must not behead a monster.</summary>
+    [Fact]
+    public void TheBodysOtherSectionsSurviveThePartsBeingSwitchedOff()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", also: "art/tail.sm", skeleton: "art/rig.ast");
+        install.Files["art/tail.sm"] = Sm("art/tail.smd", "art/paint.mat");
+        install.Files["art/tail.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"), wearing: false);
+
+        Assert.Equal(0, said.Parts);
+        Assert.Equal(4, said.Mesh.Triangles);
+    }
+
+    /// <summary>
+    /// A piece that is a rigid prop - a FixedMesh naming a <c>.fmt</c> - is joined on too.
+    /// </summary>
+    /// <remarks>
+    /// THE HALF OF THE ATTACHMENTS THE WALK USED TO THROW AWAY. An .ao hangs either a SkinMesh or
+    /// a FixedMesh, and asking only for the first meant every rigid prop in the game - Malgor,
+    /// the Nautilord's cannon among them, reported missing from the live client - came back as
+    /// "no SkinMesh" and was skipped. A .fmt brings no .sm and no rig, and it carries its own
+    /// material per shape, so the whole path underneath it is different and only the join is
+    /// shared. Counting the vertices is what says it really arrived.
+    /// </remarks>
+    [Fact]
+    public void APropIsJoinedOnEvenThoughItHasNoSkinAndNoManifest()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/cannon.ao", skeleton: "art/rig.ast");
+        install.Files["art/cannon.ao"] = Ao(fixture: "art/cannon.fmt");
+        install.Files["art/cannon.fmt"] = Packed.Fmt("art/painted.mat");
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+        Assert.Equal(4, said.Mesh.Triangles);
+        Assert.Equal(8, said.Mesh.Positions.Length);
+        Assert.All(said.Mesh.Indices, one => Assert.InRange(one, 0, said.Mesh.Positions.Length - 1));
+
+        // The prop's own shape name came out of its own string pool and rode the join.
+        Assert.Contains("BarrelShape", said.Mesh.Shapes.Select(one => one.Name), StringComparer.Ordinal);
+        Assert.Equal(said.Mesh.Shapes.Count, said.Skins.Count);
+    }
+
+    /// <summary>A prop switched off with the rest of the parts, like any other piece.</summary>
+    [Fact]
+    public void APropIsLeftOutWhenThePartsAreSwitchedOff()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/cannon.ao", skeleton: "art/rig.ast");
+        install.Files["art/cannon.ao"] = Ao(fixture: "art/cannon.fmt");
+        install.Files["art/cannon.fmt"] = Packed.Fmt("art/painted.mat");
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"), wearing: false);
+
+        Assert.Equal(0, said.Parts);
+        Assert.Equal(2, said.Mesh.Triangles);
     }
 
     private static byte[] Sm(string geometry, string material) => Encoding.UTF8.GetBytes(
