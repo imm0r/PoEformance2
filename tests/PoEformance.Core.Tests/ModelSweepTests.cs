@@ -109,6 +109,38 @@ public sealed class ModelSweepTests
     }
 
     /// <summary>
+    /// A piece whose box does not meet the monster's own is flagged apart.
+    /// </summary>
+    /// <remarks>
+    /// THE TEST THAT WAS MISSING, AND THE SWEEP IS WHAT NOTICED. The first version of this flag
+    /// held each piece up against <c>model.Mesh</c>'s box - the JOINED mesh, which already has
+    /// every piece in it. A piece is inside that box by construction, so the check could not
+    /// fail, and over 2792 real monsters it flagged not one. A check a wrong value passes is
+    /// worse than no check; a check NO value can fail is worse again, because the silence reads
+    /// as good news.
+    ///
+    /// So the reference is the monster WITHOUT what he is wearing, and this asserts both halves:
+    /// a piece parked a thousand units from him is named, and the one sitting on him is not.
+    /// </remarks>
+    [Fact]
+    public void APieceNowhereNearTheMonsterIsFlaggedApart()
+    {
+        Fake install = Dressed();
+
+        // A socket a thousand down, which is nowhere near a body modelled around the origin.
+        install.Files["art/rig.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("hip_jntBnd", 255, 255, -1000f)], []);
+
+        SweepResult said = Swept(install, "quiet.ao");
+
+        Assert.Contains("apart", said.Tally.Flags.Keys);
+
+        // And the monster whose piece sits on him is not named - the flag distinguishes, which
+        // is the half a vacuous check gets right for free.
+        Assert.DoesNotContain("apart", Swept(Dressed(), "quiet.ao").Tally.Flags.Keys);
+    }
+
+    /// <summary>
     /// A piece whose socket the monster's rig has no bone for is flagged dropped.
     /// </summary>
     /// <remarks>
@@ -356,8 +388,20 @@ public sealed class ModelSweepTests
             skin: "art/mesh.sm", attach: "art/cloak.ao", socket: "hip_jntBnd", skeleton: "art/rig.ast");
         install.Files["art/cloak.ao"] = Ao(skin: "art/cloak.sm", skeleton: "art/cloak.ast");
 
+        // A BODY WITH EXTENT, not a flat sheet: a piece is held up against the monster's own box
+        // and a monster who is one quad at one depth is apart from everything he wears. The first
+        // fixture here was exactly that, and it flagged the baseline.
         install.Files["art/mesh.sm"] = Sm("art/body.smd");
-        install.Files["art/body.smd"] = Packed.Mesh(Vertices(1));
+        install.Files["art/body.smd"] = Packed.Mesh(
+        [
+            new Packed.Vertex(new Vector3(-40f, -40f, 0f), [0, 0, 0, 0], [255, 0, 0, 0]),
+            new Packed.Vertex(new Vector3(40f, -40f, -60f), [0, 0, 0, 0], [255, 0, 0, 0]),
+            new Packed.Vertex(new Vector3(40f, 40f, -120f), [1, 0, 0, 0], [255, 0, 0, 0]),
+            new Packed.Vertex(new Vector3(-40f, 40f, -180f), [1, 0, 0, 0], [255, 0, 0, 0]),
+        ]);
+
+        // And the piece is authored around ITS own origin, so its socket - the hip, a hundred
+        // and fifty down - is what carries it onto him.
         install.Files["art/cloak.sm"] = Sm("art/cloak.smd");
         install.Files["art/cloak.smd"] = Packed.Mesh(Vertices(1));
         install.Files["art/paint.mat"] = Encoding.UTF8.GetBytes(
@@ -366,11 +410,11 @@ public sealed class ModelSweepTests
         return install;
     }
 
-    /// <summary>Four vertices on one bone, which is a mesh and is never drawn here.</summary>
+    /// <summary>Four vertices around the origin on one bone - a mesh, and never drawn here.</summary>
     private static Packed.Vertex[] Vertices(byte bone) =>
     [
-        .. new[] { 0f, 1f, 2f, 3f }.Select(one =>
-            new Packed.Vertex(new Vector3(one, 0f, -150f), [bone, 0, 0, 0], [255, 0, 0, 0])),
+        .. new[] { -10f, -3f, 3f, 10f }.Select(one =>
+            new Packed.Vertex(new Vector3(one, 0f, one), [bone, 0, 0, 0], [255, 0, 0, 0])),
     ];
 
     private static byte[] Sm(string geometry) => Encoding.UTF8.GetBytes(

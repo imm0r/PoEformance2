@@ -183,11 +183,12 @@ public static class ModelSweep
         var past = false;
         var unread = false;
 
-        // THE BODY'S OWN BOX comes off the joined mesh, which already has the pieces in it, so
-        // the pieces are compared against a box they helped make. That is on purpose and it is
-        // the conservative direction: a piece far from the body STRETCHES the box towards
-        // itself, so anything still disjoint from it is disjoint by a long way.
-        (Vector3 least, Vector3 most) = (model.Mesh.Least, model.Mesh.Most);
+        // THE MONSTER WITHOUT WHAT HE IS WEARING - see MonsterModel.BodyLeast. The JOINED box
+        // is the union of the body and every piece, so a piece held up against that one is
+        // inside it by construction and this test could never fail. It never did: the first run
+        // over 2792 monsters flagged not one, which is what a vacuous check looks like from the
+        // outside and is exactly the kind a sweep is supposed to catch.
+        (Vector3 least, Vector3 most) = (model.BodyLeast, model.BodyMost);
 
         foreach (PartFit one in model.Fitted)
         {
