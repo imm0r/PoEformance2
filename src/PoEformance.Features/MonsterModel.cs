@@ -810,10 +810,14 @@ public static class MonsterModels
         SkeletonPose rest,
         bool rooted)
     {
-        string skin = Skin(ao);
+        // THE PIECE AND EVERYTHING IT EXTENDS - see Whole. Gulzal's hammer is four lines and a
+        // parent, and reading the four lines alone left it on the floor.
+        List<AnimatedObject> chain = Whole(read, ao);
+
+        string skin = Skin(chain);
         if (skin.Length == 0)
         {
-            return Propped(read, ao, place, bone, paints, fallback);
+            return Propped(read, chain, place, bone, paints, fallback);
         }
 
         MeshManifest manifest = Read(read, skin, MeshManifest.Read);
@@ -834,7 +838,7 @@ public static class MonsterModels
         // TO - see Retargeted. What the attachment line decides is where the piece SITS: a
         // "<root>" piece is already in the monster's space and wants no transform, a socketed
         // one is in its socket's space and wants that bone's rest transform on it.
-        if (Retargeted(read, ao, where, rest, mesh, rooted, bone) is { } map)
+        if (Retargeted(read, chain, where, rest, mesh, rooted, bone) is { } map)
         {
             // NO PLACE: the correction already carries wherever the piece belongs, because a
             // socketed piece's own bind cancels down to exactly its socket's transform.
@@ -896,14 +900,14 @@ public static class MonsterModels
 
     private static Retarget? Retargeted(
         Func<string, byte[]?> read,
-        AnimatedObject ao,
+        IReadOnlyList<AnimatedObject> chain,
         IReadOnlyDictionary<string, int> where,
         SkeletonPose rest,
         SkinnedMesh mesh,
         bool rooted,
         int socket)
     {
-        string path = Entryed(ao, RigBlock, RigEntry);
+        string path = Entryed(chain, RigBlock, RigEntry);
         if (path.Length == 0 || mesh.Bones.Length != mesh.Positions.Length * 4)
         {
             return null;
@@ -934,7 +938,7 @@ public static class MonsterModels
         }
 
         // THE FILE'S OWN PAIRING FIRST, where it wrote one down - see Attaching.
-        Dictionary<string, string> named = Attaching(ao);
+        Dictionary<string, string> named = Attaching(chain);
 
         var onto = new byte[own.Bones.Count];
         var anchor = new int[own.Bones.Count];
@@ -1014,13 +1018,13 @@ public static class MonsterModels
     /// </remarks>
     private static Part? Propped(
         Func<string, byte[]?> read,
-        AnimatedObject ao,
+        IReadOnlyList<AnimatedObject> chain,
         Matrix4x4 place,
         int bone,
         Paints paints,
         Mipmaps? fallback)
     {
-        string path = Entryed(ao, PropBlock, PropEntry);
+        string path = Entryed(chain, PropBlock, PropEntry);
         if (path.Length == 0)
         {
             // An effect pack or a sound emitter. Ordinary, and nothing to draw.
@@ -1064,6 +1068,112 @@ public static class MonsterModels
         return (bones, weights);
     }
 
+    /// <summary>
+    /// A piece and everything it extends, nearest first.
+    /// </summary>
+    /// <remarks>
+    /// AN ATTACHMENT'S .ao EXTENDS ANOTHER JUST AS A MONSTER'S DOES, and reading only the file
+    /// the attachment line named is how Gulzal's hammer came to lie on the floor. Its whole file
+    /// is four lines - it extends the axe and swaps one skin for another - while the rig, the
+    /// bone pairing and everything else that says where it goes are in the axe's.
+    ///
+    /// The body's walk has followed extends from the start; the pieces' did not, which is the
+    /// kind of gap that only shows on the one monster built that way.
+    /// </remarks>
+    private static List<AnimatedObject> Whole(Func<string, byte[]?> read, AnimatedObject ao)
+    {
+        var chain = new List<AnimatedObject> { ao };
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var queue = new Queue<string>(ao.Extends);
+
+        while (queue.Count > 0 && chain.Count <= MostDeep * 2)
+        {
+            string path = queue.Dequeue();
+            if (path.Length == 0 || !seen.Add(path))
+            {
+                continue;
+            }
+
+            AnimatedObject over = Object(read, path);
+            if (!over.Ready)
+            {
+                continue;
+            }
+
+            chain.Add(over);
+            foreach (string up in over.Extends)
+            {
+                queue.Enqueue(up);
+            }
+        }
+
+        return chain;
+    }
+
+    /// <summary>
+    /// The skin a piece really wears, once what it inherits and what it drops are both counted.
+    /// </summary>
+    /// <remarks>
+    /// remove_skin IS WHY THE CHAIN CANNOT JUST BE UNIONED. Gulzal's hammer extends his axe and
+    /// says, in the same block, to take the axe's mesh away and put the hammer's on - so a walk
+    /// that added every skin it found would hang an axe off him as well.
+    /// </remarks>
+    private static string Skin(IReadOnlyList<AnimatedObject> chain)
+    {
+        var gone = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var kept = new List<string>();
+
+        foreach (AnimatedObject one in chain)
+        {
+            foreach (AoStruct block in one.Named(Block))
+            {
+                foreach (AoEntry entry in block.Entries)
+                {
+                    if (entry.Value.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    if (string.Equals(entry.Key, Dropped, StringComparison.Ordinal))
+                    {
+                        gone.Add(entry.Value);
+                    }
+                    else if (string.Equals(entry.Key, Entry, StringComparison.Ordinal))
+                    {
+                        kept.Add(entry.Value);
+                    }
+                }
+            }
+        }
+
+        foreach (string one in kept)
+        {
+            if (!gone.Contains(one))
+            {
+                return one;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>What a piece says to stop wearing out of whatever it extends.</summary>
+    private const string Dropped = "remove_skin";
+
+    /// <summary>One entry's value, taken from the nearest file in the chain that has it.</summary>
+    private static string Entryed(IReadOnlyList<AnimatedObject> chain, string block, string key)
+    {
+        foreach (AnimatedObject one in chain)
+        {
+            if (Entryed(one, block, key) is { Length: > 0 } said)
+            {
+                return said;
+            }
+        }
+
+        return string.Empty;
+    }
+
     /// <summary>The <c>skin</c> a SkinMesh block names, or empty where the file has none.</summary>
     private static string Skin(AnimatedObject ao) => Entryed(ao, Block, Entry);
 
@@ -1092,19 +1202,20 @@ public static class MonsterModels
     ///
     /// Empty where the file says nothing, and then the names are all there is to go on.
     /// </remarks>
-    private static Dictionary<string, string> Attaching(AnimatedObject ao)
+    private static Dictionary<string, string> Attaching(IReadOnlyList<AnimatedObject> chain)
     {
         var said = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        string[] theirs = Entryed(ao, RigBlock, Attachment)
+        string[] theirs = Entryed(chain, RigBlock, Attachment)
             .Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (theirs.Length < 2)
         {
             return said;
         }
 
-        // The last name is the BONE GROUP that carries the piece's own side of the pairing.
+        // The last name is the BONE GROUP that carries the piece's own side of the pairing,
+        // and it may sit in a file further up the chain than the line that named it.
         string group = theirs[^1];
-        foreach (AoStruct block in ao.Named(GroupBlock))
+        foreach (AoStruct block in chain.SelectMany(one => one.Named(GroupBlock)))
         {
             foreach (AoEntry entry in block.Entries)
             {

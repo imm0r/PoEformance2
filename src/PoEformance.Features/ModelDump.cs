@@ -253,13 +253,18 @@ public static class ModelDump
             return;
         }
 
-        AnimatedObject piece = AnimatedObject.Read(content);
-        string skin = Skin(piece);
+        // THE PIECE AND EVERYTHING IT EXTENDS. Gulzal's hammer is four lines and a parent, and
+        // a dump that read the four lines said it had no rig, no pairing and no materials - all
+        // three of which are in the axe it extends. A diagnostic that reads less than the walk
+        // does sends the next reader the wrong way.
+        List<AnimatedObject> chain = Whole(read, AnimatedObject.Read(content));
+        AnimatedObject piece = chain[0];
+        string skin = Skin(chain);
         if (skin.Length == 0)
         {
             // A RIGID PROP IS NOT AN EFFECT, and calling it one is what hid Malgor's cannon: it
             // names a .fmt through FixedMesh, carries its own materials, and has no .sm at all.
-            string prop = Entryed(piece, "FixedMesh", "fixed_mesh");
+            string prop = Entryed(chain, "FixedMesh", "fixed_mesh");
             if (prop.Length == 0)
             {
                 said.AppendLine("  (no mesh - an effect or a sound)");
@@ -286,7 +291,7 @@ public static class ModelDump
 
         SkinnedMesh geometry = SkinnedMesh.Read(read(manifest.Geometry.Replace('\\', '/').Trim()));
         Facts(said, "    ", geometry.Facts);
-        Rigged(read, said, bones, parent, over_, SkeletonPose.Highest(geometry), content);
+        Rigged(read, said, bones, parent, over_, SkeletonPose.Highest(geometry), chain);
     }
 
     /// <summary>How many of a piece's own bones are printed. Enough to see whose names they are.</summary>
@@ -316,10 +321,10 @@ public static class ModelDump
         IReadOnlyDictionary<string, int> parent,
         IReadOnlyList<System.Numerics.Matrix4x4> over_,
         int highest,
-        byte[] content)
+        IReadOnlyList<AnimatedObject> chain)
     {
         string path = string.Empty;
-        foreach (AoStruct block in AnimatedObject.Read(content).Named("ClientAnimationController"))
+        foreach (AoStruct block in chain.SelectMany(one => one.Named("ClientAnimationController")))
         {
             foreach (AoEntry entry in block.Entries)
             {
@@ -493,6 +498,89 @@ public static class ModelDump
         {
             Facts(said, "  ", SkinnedMesh.Read(read(geometry.Replace('\\', '/').Trim())).Facts);
         }
+    }
+
+    /// <summary>A piece and everything it extends, nearest first - the same walk MonsterModel does.</summary>
+    private static List<AnimatedObject> Whole(Func<string, byte[]?> read, AnimatedObject ao)
+    {
+        var chain = new List<AnimatedObject> { ao };
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var queue = new Queue<string>(ao.Extends);
+
+        while (queue.Count > 0 && chain.Count <= MostHops)
+        {
+            string path = queue.Dequeue();
+            if (path.Length == 0 || !seen.Add(path))
+            {
+                continue;
+            }
+
+            (string _, byte[]? over) = Find(read, path);
+            if (over is not { Length: > 0 })
+            {
+                continue;
+            }
+
+            AnimatedObject said = AnimatedObject.Read(over);
+            chain.Add(said);
+            foreach (string up in said.Extends)
+            {
+                queue.Enqueue(up);
+            }
+        }
+
+        return chain;
+    }
+
+    /// <summary>The skin a piece wears once what it inherits and what it drops are both counted.</summary>
+    private static string Skin(IReadOnlyList<AnimatedObject> chain)
+    {
+        var gone = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var kept = new List<string>();
+
+        foreach (AoStruct block in chain.SelectMany(one => one.Named("SkinMesh")))
+        {
+            foreach (AoEntry entry in block.Entries)
+            {
+                if (entry.Value.Length == 0)
+                {
+                    continue;
+                }
+
+                if (string.Equals(entry.Key, "remove_skin", StringComparison.Ordinal))
+                {
+                    gone.Add(entry.Value);
+                }
+                else if (string.Equals(entry.Key, "skin", StringComparison.Ordinal))
+                {
+                    kept.Add(entry.Value);
+                }
+            }
+        }
+
+        foreach (string one in kept)
+        {
+            if (!gone.Contains(one))
+            {
+                return one;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>One entry's value, taken from the nearest file in the chain that has it.</summary>
+    private static string Entryed(IReadOnlyList<AnimatedObject> chain, string block, string key)
+    {
+        foreach (AnimatedObject one in chain)
+        {
+            if (Entryed(one, block, key) is { Length: > 0 } said)
+            {
+                return said;
+            }
+        }
+
+        return string.Empty;
     }
 
     /// <summary>The <c>skin</c> a SkinMesh block names, or empty where the file has none.</summary>

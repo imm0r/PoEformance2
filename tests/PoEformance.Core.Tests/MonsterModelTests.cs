@@ -1200,6 +1200,65 @@ public class MonsterModelTests
     }
 
     /// <summary>
+    /// An attachment's .ao extends another, and everything it inherits counts.
+    /// </summary>
+    /// <remarks>
+    /// GULZAL'S HAMMER IS FOUR LINES AND A PARENT. Its whole file extends the axe and swaps one
+    /// skin for another; the rig, the bone pairing and the materials are all in the axe's. The
+    /// walk read the four lines alone, found no rig, and left the hammer lying on the floor -
+    /// the body's walk has followed extends from the start and the pieces' had not, which is the
+    /// kind of gap that shows on the one monster built that way.
+    ///
+    /// AND remove_skin IS WHY THE CHAIN CANNOT JUST BE UNIONED: added up, the hammer would come
+    /// with the axe hanging off him too.
+    /// </remarks>
+    [Fact]
+    public void APieceInheritsItsRigAndItsPairingFromWhateverItExtends()
+    {
+        var install = Install();
+        install.Files["art/rig.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("L_wrist_jntBnd", 255, 255, -120f)], []);
+        install.Files["art/weapon.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("phys_haft_jntBnd", 255, 255, 0f)], []);
+
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/hammer.ao", socket: "<root>", skeleton: "art/rig.ast");
+
+        // The parent carries the rig and the pairing, and a skin the child takes away again.
+        install.Files["art/axe.ao"] = Encoding.UTF8.GetBytes(
+            "version 3\nclient\n{\n"
+            + "\tClientAnimationController\n\t{\n"
+            + "\t\tskeleton = \"art/weapon.ast\"\n"
+            + "\t\tattachment_bones = \"L_wrist_jntBnd child_attach\"\n"
+            + "\t}\n"
+            + "\tBoneGroups\n\t{\n\t\tbone_group = \"child_attach false root_jntBnd\"\n\t}\n"
+            + "\tSkinMesh\n\t{\n\t\tskin = \"art/axe.sm\"\n\t}\n}\n");
+
+        // The child is four lines: it extends the parent and swaps the skin.
+        install.Files["art/hammer.ao"] = Encoding.UTF8.GetBytes(
+            "version 3\nextends \"art/axe\"\nclient\n{\n"
+            + "\tSkinMesh\n\t{\n"
+            + "\t\tremove_skin = \"art/axe.sm\"\n"
+            + "\t\tskin = \"art/hammer.sm\"\n"
+            + "\t}\n}\n");
+
+        install.Files["art/axe.sm"] = Sm("art/axe.smd", "art/paint.mat");
+        install.Files["art/axe.smd"] = Smd();
+        install.Files["art/hammer.sm"] = Sm("art/hammer.smd", "art/paint.mat");
+        install.Files["art/hammer.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        // One piece, not two: the axe was taken away by name, not merely overridden.
+        Assert.Equal(1, said.Parts);
+        Assert.Equal(4, said.Mesh.Triangles);
+
+        // And it inherited the pairing, so its root is the wrist and it travels there.
+        Assert.Equal<byte>(1, said.Mesh.Bones[16]);
+        Assert.Equal(-120f, said.Mesh.Positions[4].Z - said.Mesh.Positions[0].Z, 3);
+    }
+
+    /// <summary>
     /// A piece that names no socket and shares no bone but the root stays where it is.
     /// </summary>
     /// <remarks>
