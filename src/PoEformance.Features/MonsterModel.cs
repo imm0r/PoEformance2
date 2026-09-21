@@ -71,6 +71,26 @@ public sealed record MonsterModel(
     public IReadOnlyList<PartFit> Fitted { get; init; } = [];
 
     /// <summary>
+    /// The monster's own box, before anything he wears is joined onto him.
+    /// </summary>
+    /// <remarks>
+    /// BECAUSE <see cref="Mesh"/>'s BOX IS NO LONGER HIS ONCE THE PIECES ARE IN IT. The joined
+    /// box is the union of the body and every piece, so a piece held up against it is inside it
+    /// by construction and "is this piece anywhere near him" is a question that answers itself.
+    ///
+    /// That is not a hypothetical: the sweep's first run over 2792 monsters flagged NOTHING as
+    /// far from its body, which is what a check that cannot fail looks like from the outside. It
+    /// took a run over the whole table to notice, which is the argument for the sweep in one
+    /// sentence.
+    ///
+    /// SECTIONS COUNT AS BODY. A section is not an accessory - see <c>Sections</c>.
+    /// </remarks>
+    public Vector3 BodyLeast { get; init; }
+
+    /// <inheritdoc cref="BodyLeast"/>
+    public Vector3 BodyMost { get; init; }
+
+    /// <summary>
     /// How many materials the files NAMED: the .ao's own, and the mesh manifest's.
     /// </summary>
     /// <remarks>
@@ -324,6 +344,18 @@ public static class MonsterModels
             parts.AddRange(Dressing(counted, found.Files, rig, paints, skin, told));
         }
 
+        // THE MONSTER WITHOUT WHAT HE IS WEARING, taken BEFORE the join and kept - see
+        // MonsterModel.BodyLeast. Afterwards there is no way back to it: the joined box is the
+        // union of the body and every piece, so a piece measured against it is inside it by
+        // construction and any question of the form "is this piece anywhere near him" answers
+        // itself. Sections count as body, because a section is not an accessory.
+        Vector3 bare = mesh.Least, worn_ = mesh.Most;
+        for (var section = 0; section < sections; section++)
+        {
+            bare = Vector3.Min(bare, parts[section].Mesh.Least);
+            worn_ = Vector3.Max(worn_, parts[section].Mesh.Most);
+        }
+
         if (parts.Count > 0)
         {
             List<MeshJoin> join =
@@ -341,6 +373,8 @@ public static class MonsterModels
             Parts = parts.Count - sections,
             Sections = found.Meshes.Count,
             Fitted = told,
+            BodyLeast = bare,
+            BodyMost = worn_,
             Skins = dress.Skins,
             Materials = dress.Materials,
             NamedInAo = found.Materials.Count,
