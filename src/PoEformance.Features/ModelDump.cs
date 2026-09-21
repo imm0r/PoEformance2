@@ -76,6 +76,7 @@ public static class ModelDump
         // visited set is what stops a file that extends itself, the depth cap what stops a long
         // chain, and they catch different things: neither on its own is enough.
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var walked = new List<string>();
         var queue = new Queue<(string Path, int Depth)>();
         foreach (string one_ in named)
         {
@@ -100,6 +101,7 @@ public static class ModelDump
             }
 
             files++;
+            walked.Add(at);
             said.AppendLine(StatDescriptionFiles.Decode(content).TrimEnd());
 
             if (depth >= MostHops)
@@ -127,9 +129,9 @@ public static class ModelDump
             }
         }
 
-        Manifest(read, said, model);
+        Manifest(read, said, model, walked);
         Shapes(said, model);
-        Fitting(read, said, model, [.. seen]);
+        Fitting(read, said, model, walked);
         return said.ToString();
     }
 
@@ -212,18 +214,7 @@ public static class ModelDump
             return;
         }
 
-        string skin = string.Empty;
-        foreach (AoStruct block in AnimatedObject.Read(content).Named("SkinMesh"))
-        {
-            foreach (AoEntry entry in block.Entries)
-            {
-                if (string.Equals(entry.Key, "skin", StringComparison.Ordinal) && entry.Value.Length > 0)
-                {
-                    skin = entry.Value;
-                }
-            }
-        }
-
+        string skin = Skin(AnimatedObject.Read(content));
         if (skin.Length == 0)
         {
             said.AppendLine("  (no SkinMesh - an effect or a sound)");
@@ -232,6 +223,86 @@ public static class ModelDump
 
         MeshManifest manifest = MeshManifest.Read(read(skin.Replace('\\', '/').Trim()));
         said.Append("  box ").Append(Box(manifest.Least)).Append("..").AppendLine(Box(manifest.Most));
+
+        Facts(said, "    ", SkinnedMesh.Read(read(manifest.Geometry.Replace('\\', '/').Trim())).Facts);
+        Rigged(read, said, bones, content);
+    }
+
+    /// <summary>How many of a piece's own bones are printed. Enough to see whose names they are.</summary>
+    private const int MostBones = 24;
+
+    /// <summary>
+    /// A piece's OWN rig, beside the parent's: whose names its bones carry and where they rest.
+    /// </summary>
+    /// <remarks>
+    /// THE QUESTION TWO MONSTERS HAVE NOW ASKED. Bahlak's feather bundle and Malgor's ship's wheel
+    /// and seaweed are all socketed <c>&lt;root&gt;</c> - no bone of the parent to hang them from -
+    /// and all three come out at the monster's origin instead of on him. Every one of them brings
+    /// a rig of its own, and the seaweed's .ao goes further and lists PARENT bone names in
+    /// <c>attachment_bones</c>: <c>hip_jntBnd spine_1_jntBnd … R_arm_tentacle_jntBnd_1</c>.
+    ///
+    /// SO THE ANSWER IS IN THE PIECE'S OWN SKELETON, and this prints it rather than assuming it.
+    /// If its bones carry the parent's names, the piece is skinned to the parent's rig and belongs
+    /// in the monster's space through each bone's rest transform - which is a different fix from
+    /// the rigid socket the anchor and the beard get. If they carry names of their own, it is not,
+    /// and the answer is elsewhere. The two cases look identical in a picture and are told apart
+    /// here, in one file, without another build.
+    /// </remarks>
+    private static void Rigged(
+        Func<string, byte[]?> read, StringBuilder said, HashSet<string> bones, byte[] content)
+    {
+        string path = string.Empty;
+        foreach (AoStruct block in AnimatedObject.Read(content).Named("ClientAnimationController"))
+        {
+            foreach (AoEntry entry in block.Entries)
+            {
+                if (string.Equals(entry.Key, "skeleton", StringComparison.Ordinal) && entry.Value.Length > 0)
+                {
+                    path = entry.Value;
+                }
+            }
+        }
+
+        if (path.Length == 0)
+        {
+            said.AppendLine("    (no rig of its own)");
+            return;
+        }
+
+        AnimationSkeleton own = AnimationSkeleton.Read(read(path.Replace('\\', '/').Trim()));
+        if (!own.Ready)
+        {
+            said.Append("    rig ").Append(path).AppendLine(" (did not read)");
+            return;
+        }
+
+        var shared = 0;
+        foreach (SkeletonBone one in own.Bones)
+        {
+            if (bones.Contains(one.Name))
+            {
+                shared++;
+            }
+        }
+
+        said.Append("    rig ").Append(Say(own.Bones.Count)).Append(" bones, ")
+            .Append(Say(shared)).AppendLine(" of them names the parent rig also has");
+
+        IReadOnlyList<System.Numerics.Matrix4x4> rest =
+            SkeletonPose.Of(own)?.BindModel ?? [];
+
+        for (var one = 0; one < own.Bones.Count && one < MostBones; one++)
+        {
+            said.Append("      ").Append(Say(one)).Append(' ').Append(own.Bones[one].Name)
+                .Append(bones.Contains(own.Bones[one].Name) ? "  [shared]" : "  [its own]");
+
+            if (one < rest.Count)
+            {
+                said.Append("  rests at ").Append(Box(rest[one].Translation));
+            }
+
+            said.AppendLine();
+        }
     }
 
     private static string Box(System.Numerics.Vector3 at)
@@ -277,21 +348,94 @@ public static class ModelDump
     private static readonly string[] Hangs =
         ["ao", "fixed_ao", "attached_object", "attached_slaved_animation_object"];
 
-    /// <summary>The mesh manifest, verbatim - the file that names fewer materials than there are shapes.</summary>
-    private static void Manifest(Func<string, byte[]?> read, StringBuilder said, MonsterModel? model)
+    /// <summary>
+    /// The mesh manifest, verbatim, and then the geometry's own headers.
+    /// </summary>
+    /// <remarks>
+    /// THE .sm IS FOUND FROM THE .ao CHAIN, not from the model - which carries the .smd the
+    /// manifest NAMED and not the manifest itself, so this section printed a binary file as text
+    /// for as long as it existed. A dump whose own labels are wrong is worse than no dump.
+    ///
+    /// AND THE HEADERS BESIDE IT, because the manifest cannot say whether the reader walked the
+    /// geometry correctly and <see cref="MeshFacts"/> can: what the file says the shape names
+    /// weigh against what the reader found where it went looking is an invariant a wrong step
+    /// cannot satisfy by accident.
+    /// </remarks>
+    private static void Manifest(
+        Func<string, byte[]?> read, StringBuilder said, MonsterModel? model, IReadOnlyList<string> walked)
     {
-        string path = model?.Mesh_ ?? string.Empty;
-        if (path.Length == 0)
+        string manifest = string.Empty;
+        foreach (string one in walked)
+        {
+            (string _, byte[]? content) = Find(read, one);
+            if (content is { Length: > 0 } && Skin(AnimatedObject.Read(content)) is { Length: > 0 } named)
+            {
+                manifest = named;
+                break;
+            }
+        }
+
+        if (manifest.Length == 0)
         {
             said.AppendLine().AppendLine("=== .sm (none was named)");
+        }
+        else
+        {
+            said.AppendLine().Append("=== .sm ").AppendLine(manifest);
+            byte[]? content = read(manifest.Replace('\\', '/').Trim());
+            said.AppendLine(content is { Length: > 0 }
+                ? StatDescriptionFiles.Decode(content).TrimEnd()
+                : "(not in the install)");
+        }
+
+        string geometry = model?.Mesh_ ?? string.Empty;
+        said.AppendLine().Append("=== .smd ").AppendLine(geometry.Length > 0 ? geometry : "(none was named)");
+        if (geometry.Length > 0)
+        {
+            Facts(said, "  ", SkinnedMesh.Read(read(geometry.Replace('\\', '/').Trim())).Facts);
+        }
+    }
+
+    /// <summary>The <c>skin</c> a SkinMesh block names, or empty where the file has none.</summary>
+    private static string Skin(AnimatedObject ao)
+    {
+        foreach (AoStruct block in ao.Named("SkinMesh"))
+        {
+            foreach (AoEntry entry in block.Entries)
+            {
+                if (string.Equals(entry.Key, "skin", StringComparison.Ordinal) && entry.Value.Length > 0)
+                {
+                    return entry.Value;
+                }
+            }
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>What a mesh file's own headers said, and whether they agree with each other.</summary>
+    private static void Facts(StringBuilder said, string indent, MeshFacts facts)
+    {
+        if (facts.Vertices == 0)
+        {
+            said.Append(indent).AppendLine("(the geometry did not read)");
             return;
         }
 
-        said.AppendLine().Append("=== .sm ").AppendLine(path);
-        byte[]? content = read(path.Replace('\\', '/').Trim());
-        said.AppendLine(content is { Length: > 0 }
-            ? StatDescriptionFiles.Decode(content).TrimEnd()
-            : "(not in the install)");
+        said.Append(indent).Append("version ").Append(Say(facts.Version))
+            .Append(" · c0h ").Append(Say(facts.Corner))
+            .Append(" · ").Append(Say(facts.Details)).Append(" level(s) of detail")
+            .Append(" · format 0x").Append(facts.Format.ToString("X", CultureInfo.InvariantCulture))
+            .Append(" · stride ").Append(Say(facts.Stride)).AppendLine();
+
+        said.Append(indent).Append("shapes ").Append(Say(facts.Shapes))
+            .Append(" in the header, ").Append(Say(facts.BlockShapes)).Append(" in the block")
+            .Append(" · ").Append(Say(facts.Triangles)).Append(" triangles over ")
+            .Append(Say(facts.Vertices)).AppendLine(" vertices");
+
+        said.Append(indent).Append("names: ").Append(Say(facts.NamesSaid))
+            .Append(" bytes said, ").Append(Say(facts.NamesRead)).Append(" read")
+            .AppendLine(facts.NamesSaid == facts.NamesRead ? "  [agree]" : "  [DISAGREE - a step is wrong]");
     }
 
     /// <summary>
