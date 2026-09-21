@@ -167,6 +167,18 @@ public static class ModelDump
         var bones = new HashSet<string>(rig.Bones.Select(one => one.Name), StringComparer.OrdinalIgnoreCase);
         said.Append("parent rig: ").Append(Say(rig.Bones.Count)).AppendLine(" bones");
 
+        // THE MOUNTS THE MONSTER OFFERS. The game's own name for an attachment point is aux_ -
+        // Malgor's anchor hangs off aux_anchor_jntBnd and his cannon off aux_cannon_jntBnd - so
+        // this says in one line which of them a rig has. It is what answers "is this piece meant
+        // for a socket nobody wrote down", which a piece socketed "<root>" makes worth asking.
+        string[] mounts =
+        [
+            .. rig.Bones.Select(one => one.Name)
+                .Where(one => one.StartsWith("aux", StringComparison.OrdinalIgnoreCase)),
+        ];
+
+        said.Append("mounts: ").AppendLine(mounts.Length > 0 ? string.Join(", ", mounts) : "(none named aux_)");
+
         foreach (string one in walked)
         {
             (string _, byte[]? content) = Find(read, one);
@@ -185,7 +197,7 @@ public static class ModelDump
                         continue;
                     }
 
-                    Hung(read, said, bones, entry.Value.Trim());
+                    Hung(read, said, bones, entry);
                 }
             }
         }
@@ -193,8 +205,9 @@ public static class ModelDump
 
     /// <summary>One attachment line: its socket, whether the parent has that bone, and its box.</summary>
     private static void Hung(
-        Func<string, byte[]?> read, StringBuilder said, HashSet<string> bones, string value)
+        Func<string, byte[]?> read, StringBuilder said, HashSet<string> bones, AoEntry entry)
     {
+        string value = entry.Value.Trim();
         int space = value.IndexOf(' ', StringComparison.Ordinal);
         string socket = space < 0 ? string.Empty : value[..space];
         string path = space < 0 ? value : value[(space + 1)..].Trim();
@@ -206,6 +219,15 @@ public static class ModelDump
         said.Append("  ").Append(path[(path.LastIndexOf('/') + 1)..])
             .Append("  socket ").Append(socket.Length > 0 ? socket : "(none)")
             .Append(socket.Length > 0 && bones.Contains(socket) ? " [in the parent rig]" : " [NOT in the parent rig]");
+
+        // THE CHILDREN OF THE ATTACHMENT LINE, which move the piece off its socket and which the
+        // walk threw away until the Frostborn Fiend's block of ice turned up upside down on the
+        // floor. Printed as written, because the axis order of a rotation with two non-zero
+        // components is still unsettled and the next monster that has one settles it.
+        foreach (AoEntry child in entry.Children)
+        {
+            said.Append("  ").Append(child.Key).Append(" = \"").Append(child.Value).Append('"');
+        }
 
         (string _, byte[]? content) = Find(read, path);
         if (content is not { Length: > 0 })
@@ -309,13 +331,23 @@ public static class ModelDump
         said.Append("    rig ").Append(Say(own.Bones.Count)).Append(" bones, ")
             .Append(Say(shared)).AppendLine(" of them names the parent rig also has");
 
-        IReadOnlyList<System.Numerics.Matrix4x4> rest =
-            SkeletonPose.Of(own)?.BindModel ?? [];
+        SkeletonPose? pose = SkeletonPose.Of(own);
+        IReadOnlyList<System.Numerics.Matrix4x4> rest = pose?.BindModel ?? [];
+        IReadOnlyList<int> over = pose?.Parents ?? [];
 
         for (var one = 0; one < own.Bones.Count && one < MostBones; one++)
         {
             said.Append("      ").Append(Say(one)).Append(' ').Append(own.Bones[one].Name)
                 .Append(bones.Contains(own.Bones[one].Name) ? "  [shared]" : "  [its own]");
+
+            // THE PARENT'S NUMBER, because it is not always lower than the child's - a bone's
+            // ancestors are walked to find one the parent rig has, and a walk that assumed the
+            // order dropped Bahlak's head feathers on the rig root. Printed so the next reader
+            // can see the ordering rather than assume it.
+            if (one < over.Count)
+            {
+                said.Append("  under ").Append(over[one] >= 0 ? Say(over[one]) : "nothing");
+            }
 
             if (one < rest.Count)
             {

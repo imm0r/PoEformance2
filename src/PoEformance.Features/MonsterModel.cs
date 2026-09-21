@@ -472,9 +472,9 @@ public static class MonsterModels
         // at all. Bone 0 is the rig's root, so the piece still follows the monster.
         foreach (string one in files)
         {
-            foreach ((string socket, string path) in Hung(Object(read, one)))
+            foreach ((string socket, string path, Matrix4x4 local) in Hung(Object(read, one)))
             {
-                if (Socketed(socket, where, rest, Matrix4x4.Identity, 0, top: true) is { } put)
+                if (Socketed(socket, where, rest, Matrix4x4.Identity, 0, top: true, local) is { } put)
                 {
                     queue.Enqueue((path, put.Place, put.Bone, 1));
                 }
@@ -497,9 +497,9 @@ public static class MonsterModels
 
             if (depth < MostDeep)
             {
-                foreach ((string inner, string under) in Hung(ao))
+                foreach ((string inner, string under, Matrix4x4 local) in Hung(ao))
                 {
-                    if (Socketed(inner, where, rest, place, bone, top: false) is { } put)
+                    if (Socketed(inner, where, rest, place, bone, top: false, local) is { } put)
                     {
                         queue.Enqueue((under, put.Place, put.Bone, depth + 1));
                     }
@@ -545,20 +545,108 @@ public static class MonsterModels
         SkeletonPose rest,
         Matrix4x4 carrier,
         int bone,
-        bool top)
+        bool top,
+        Matrix4x4 local)
     {
         if (socket.Length == 0 || socket.StartsWith('<'))
         {
-            return (carrier, bone);
+            return (local * carrier, bone);
         }
 
         if (where.TryGetValue(socket, out int at) && at < rest.BindModel.Count)
         {
-            return (rest.BindModel[at], at);
+            return (local * rest.BindModel[at], at);
         }
 
-        return top ? null : (carrier, bone);
+        return top ? null : (local * carrier, bone);
     }
+
+    /// <summary>
+    /// The turn and the shift an attachment line asks for on top of its socket.
+    /// </summary>
+    /// <remarks>
+    /// TWO LINES THAT WERE BEING THROWN AWAY. An attached_object entry can carry children, and
+    /// the Frostborn Fiend's block of ice carries both:
+    ///
+    ///     attached_object = "R_Weapon …/QuadrillaArcticIceHeld.ao"
+    ///         attached_object_translation = "0 0 -55"
+    ///         attached_object_rotation = "-3.141 -0 0"
+    ///
+    /// That is half a turn about x and a shift of fifty-five, and without it the ice he is
+    /// holding stands upright on the floor beside him - which is what the pane drew.
+    ///
+    /// THE AXIS ORDER IS NOT SETTLED. The one sample in hand turns about a single axis, where
+    /// order cannot matter, and no open reader of this format reads these lines at all - so x
+    /// then y then z is what this applies and what the dump prints, and a monster that turns
+    /// about two axes at once is what would settle it. Radians, as written.
+    /// </remarks>
+    private static Matrix4x4 Local(AoEntry entry)
+    {
+        Matrix4x4 said = Matrix4x4.Identity;
+        foreach (AoEntry child in entry.Children)
+        {
+            if (string.Equals(child.Key, Turn, StringComparison.Ordinal) && Three(child.Value) is { } turn)
+            {
+                said *= Matrix4x4.CreateRotationX(turn.X)
+                    * Matrix4x4.CreateRotationY(turn.Y)
+                    * Matrix4x4.CreateRotationZ(turn.Z);
+            }
+            else if (string.Equals(child.Key, Shift, StringComparison.Ordinal) && Three(child.Value) is { } shift)
+            {
+                said *= Matrix4x4.CreateTranslation(shift);
+            }
+        }
+
+        return said;
+    }
+
+    /// <summary>Three numbers separated by spaces, or null where the line is not that.</summary>
+    private static Vector3? Three(string said)
+    {
+        string[] parts = said.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length == 3
+            && float.TryParse(parts[0], System.Globalization.NumberStyles.Float, Invariant, out float x)
+            && float.TryParse(parts[1], System.Globalization.NumberStyles.Float, Invariant, out float y)
+            && float.TryParse(parts[2], System.Globalization.NumberStyles.Float, Invariant, out float z)
+                ? new Vector3(x, y, z)
+                : null;
+    }
+
+    private static System.Globalization.CultureInfo Invariant
+        => System.Globalization.CultureInfo.InvariantCulture;
+
+    /// <summary>The children of an attachment line that move it off its socket.</summary>
+    private const string Turn = "attached_object_rotation";
+
+    /// <inheritdoc cref="Turn"/>
+    private const string Shift = "attached_object_translation";
+
+    /// <summary>
+    /// Whether a bone rests in the same place in the piece's rig as in the parent's.
+    /// </summary>
+    /// <remarks>
+    /// THE ORIGIN IS NOT EVIDENCE. Every rig has bones sitting at (0,0,0) - the root, and helpers
+    /// like aux_position - and two of them agreeing says only that both files start counting from
+    /// the same place. Counting those made the Frostborn Fiend's block of ice look like a skinned
+    /// cloak, took its socket's transform off, and stood it on the floor beside him.
+    ///
+    /// A UNIT OF TOLERANCE on a body two hundred units tall: the two rigs either carry the same
+    /// rest pose, in which case the numbers are the same ones, or they do not.
+    /// </remarks>
+    private static bool Agrees(SkeletonPose mine, SkeletonPose parent, int bone, int onto)
+    {
+        if (bone >= mine.BindModel.Count || onto >= parent.BindModel.Count)
+        {
+            return false;
+        }
+
+        Vector3 here = mine.BindModel[bone].Translation;
+        return here.LengthSquared() > Somewhere
+            && Vector3.DistanceSquared(here, parent.BindModel[onto].Translation) < Somewhere;
+    }
+
+    /// <summary>One unit, squared - the distance two rest poses may differ by and still be one.</summary>
+    private const float Somewhere = 1f;
 
     /// <summary>The socket and file of every .ao this one hangs off itself.</summary>
     /// <remarks>
@@ -566,7 +654,7 @@ public static class MonsterModels
     /// has - the trap that cost AoSurvey 2289 of its 3262 files. Split on the first space; the
     /// socket is a bone name of the parent's rig, or <c>&lt;root&gt;</c> for the piece's own.
     /// </remarks>
-    private static IEnumerable<(string Socket, string Path)> Hung(AnimatedObject ao)
+    private static IEnumerable<(string Socket, string Path, Matrix4x4 Local)> Hung(AnimatedObject ao)
     {
         foreach (AoStruct block in ao.Structs)
         {
@@ -582,7 +670,7 @@ public static class MonsterModels
                 string path = space < 0 ? said : said[(space + 1)..].Trim();
                 if (path.EndsWith(AnimatedObject.Suffix, StringComparison.OrdinalIgnoreCase))
                 {
-                    yield return (space < 0 ? string.Empty : said[..space], path);
+                    yield return (space < 0 ? string.Empty : said[..space], path, Local(entry));
                 }
             }
         }
@@ -632,7 +720,7 @@ public static class MonsterModels
         Dress dress = Dressed(read, mesh, [], manifest, fallback, string.Empty, paints);
 
         // TWO KINDS OF PIECE, AND THE PIECE'S OWN RIG SAYS WHICH - see Retargeted.
-        if (Retargeted(read, ao, where, mesh) is { } map)
+        if (Retargeted(read, ao, where, rest, mesh) is { } map)
         {
             return new Part(mesh, map, null, null, dress.Skins);
         }
@@ -676,11 +764,25 @@ public static class MonsterModels
     /// The unshared ones are all simulated - phys_skinned_M_skirt_2, phys_tri_seaweed_belt - so
     /// their nearest real ancestor is the spine or chest they hang off, which is where a tool
     /// that does not simulate cloth should hold them.
+    ///
+    /// A SHARED NAME IS NOT ENOUGH ON ITS OWN, and taking it as enough broke a monster that used
+    /// to be right. The Frostborn Fiend holds a block of ice whose rig is three bones -
+    /// root_jntBnd, weapon_jntBnd, aux_position - of which the parent also has TWO. It is
+    /// plainly a prop, held at R_Weapon, and counting that second name made it a skin: the
+    /// socket's transform came off and the ice stood upright on the floor beside him.
+    ///
+    /// SO THE TEST IS WHETHER THE BONES REST IN THE SAME PLACE, which is the question that was
+    /// meant all along - a piece modelled in the monster's space reproduces the monster's rest
+    /// pose, and one modelled in its own does not. The seaweed's hip_jntBnd is at
+    /// (0,18.7,-97.6) in BOTH rigs; the ice's aux_position is at the origin in its own and
+    /// somewhere on the body in the parent's. Bones resting at the origin are left out of the
+    /// count on both sides, because every rig has some and they agree by accident.
     /// </remarks>
     private static byte[]? Retargeted(
         Func<string, byte[]?> read,
         AnimatedObject ao,
         IReadOnlyDictionary<string, int> where,
+        SkeletonPose rest,
         SkinnedMesh mesh)
     {
         string path = Entryed(ao, RigBlock, RigEntry);
@@ -699,23 +801,31 @@ public static class MonsterModels
         var shared = 0;
         for (var one = 0; one < own.Bones.Count; one++)
         {
-            if (where.TryGetValue(own.Bones[one].Name, out int at) && at <= byte.MaxValue)
+            // UP THE CHAIN BY NAME, NOT BY NUMBER. A first attempt read the parent's answer out
+            // of the array on the reasoning that a parent is always earlier in the list, and it
+            // is not: SkeletonPose walks the child-and-sibling tree with a stack, so a bone's
+            // parent can perfectly well carry a HIGHER number. Bahlak's feathers are the case -
+            // phys_skinned_head_feathers_1 is bone 19 and hangs off M_head_jntBnd, bone 22 - and
+            // every bone that lost that race fell to the root instead. The root is the one bone
+            // that does not follow the body, so the piece came out stretched between the monster
+            // and the origin: a long black spike from his chest to the floor.
+            int at = one;
+            for (var hops = 0; at >= 0 && hops <= own.Bones.Count; hops++)
             {
-                onto[one] = (byte)at;
-
-                // THE ROOT DOES NOT COUNT. Every rig in the game has one and every prop shares
-                // it, so counting it would make a ship's wheel look like a skinned cloak.
-                if (one > 0)
+                if (where.TryGetValue(own.Bones[at].Name, out int found) && found <= byte.MaxValue)
                 {
-                    shared++;
+                    onto[one] = (byte)found;
+
+                    if (Agrees(mine, rest, at, found))
+                    {
+                        shared++;
+                    }
+
+                    break;
                 }
 
-                continue;
+                at = at < mine.Parents.Count ? mine.Parents[at] : -1;
             }
-
-            // Its parent is always earlier in the list, so its answer is already known.
-            int up = one < mine.Parents.Count ? mine.Parents[one] : -1;
-            onto[one] = up >= 0 && up < one ? onto[up] : (byte)0;
         }
 
         if (shared == 0)
