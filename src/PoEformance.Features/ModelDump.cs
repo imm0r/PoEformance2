@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using PoEformance.Game.Diagnostics;
 using PoEformance.Game.Entities;
 using PoEformance.Game.Files;
 
@@ -28,6 +29,11 @@ namespace PoEformance.Features;
 /// carries the materials is never read - which is itself one of the candidate explanations. It
 /// can only be ruled in or out by a walk that does not stop, and that is what runs here.
 ///
+/// AND EVERYTHING THE MONSTER HANGS OFF ITSELF. An attached_object names its own .ao with its
+/// own mesh, and MonsterModels reads the body alone - so Doryani's skirt, belt, necklace and
+/// five other pieces are in the game and not in the pane. Following them is how the files get to
+/// say whether each brings a skeleton of its own or is skinned to the parent's rig.
+///
 /// ON DEMAND ONLY, behind a button. It re-reads and decodes the .ao chain and the manifest, and
 /// nothing on the drawing path ever calls it.
 /// </remarks>
@@ -36,8 +42,17 @@ public static class ModelDump
     /// <summary>How far the extends chain is followed. The same cap the model walk uses.</summary>
     private const int MostHops = 8;
 
-    /// <summary>Most .ao files printed, however many the chain names. A guard, not a limit met in practice.</summary>
-    private const int MostFiles = 32;
+    /// <summary>
+    /// Most .ao files printed, however many the walk names.
+    /// </summary>
+    /// <remarks>
+    /// RAISED WHEN THE WALK LEARNED TO FOLLOW ATTACHMENTS. Doryani's body is three files and he
+    /// hangs nine more off it, each of which may extend a parent of its own - so a cap set for
+    /// an extends chain alone would cut the dump off in the middle of the thing it was opened
+    /// to answer. It is still a cap and not a hope: effects attach effects, and a walk with no
+    /// end is how a diagnostic becomes something nobody runs twice.
+    /// </remarks>
+    private const int MostFiles = 64;
 
     /// <summary>
     /// The text of every file behind one monster's model: the .ao chain, then the manifest.
@@ -87,12 +102,28 @@ public static class ModelDump
             files++;
             said.AppendLine(StatDescriptionFiles.Decode(content).TrimEnd());
 
-            if (depth < MostHops)
+            if (depth >= MostHops)
             {
-                foreach (string parent in AnimatedObject.Read(content).Extends)
-                {
-                    queue.Enqueue((parent, depth + 1));
-                }
+                continue;
+            }
+
+            AnimatedObject ao = AnimatedObject.Read(content);
+            foreach (string parent in ao.Extends)
+            {
+                queue.Enqueue((parent, depth + 1));
+            }
+
+            // AND WHAT IT HANGS OFF ITSELF. Reported from the live client: Doryani stands in the
+            // game in a skirt, a belt, a necklace and two shoulder danglers, and the model pane
+            // drew a bare-legged Doryani - because every one of those is an attached_object
+            // naming its OWN .ao with its own mesh, and MonsterModels reads the body alone.
+            // Following them here is what says whether each one brings a skeleton of its own
+            // (posed rigidly at the socket) or is skinned to the parent's rig, which is the
+            // question that decides how they get drawn - and it cannot be answered from the
+            // body's file.
+            foreach (string hung in Attached(ao))
+            {
+                queue.Enqueue((hung, depth + 1));
             }
         }
 
@@ -100,6 +131,44 @@ public static class ModelDump
         Shapes(said, model);
         return said.ToString();
     }
+
+    /// <summary>
+    /// The .ao files this one hangs off itself - armour, clothing, weapons, effects.
+    /// </summary>
+    /// <remarks>
+    /// THE FOUR KEYS <see cref="AoSurvey"/> ALREADY FOLLOWS, and its parsing with them: an
+    /// attachment's value is a SOCKET AND THEN A PATH inside one pair of quotes -
+    /// <c>"hip_jntBnd Metadata/Monsters/Doryani/TrueDoryani/attachments/Skirt.ao"</c> - so taken
+    /// whole it is a path no install has. That trap cost the first survey 2289 of its 3262 files
+    /// and is not worth falling into twice.
+    ///
+    /// THE SOCKET IS NOT KEPT HERE, only the file. The socket names a bone of the parent's rig
+    /// (<c>_jntBnd</c>, the same suffix the manifest's BoneGroups use) and it is what a renderer
+    /// would need; a dump only has to get the file on screen, and the line it came from is
+    /// printed above it in full anyway.
+    /// </remarks>
+    private static IEnumerable<string> Attached(AnimatedObject ao)
+    {
+        foreach (AoStruct block in ao.Structs)
+        {
+            foreach (AoEntry entry in block.Entries)
+            {
+                if (Array.IndexOf(Hangs, entry.Key) < 0)
+                {
+                    continue;
+                }
+
+                foreach (string one in AoSurvey.Referenced(entry))
+                {
+                    yield return one;
+                }
+            }
+        }
+    }
+
+    /// <summary>The entry keys whose value is another .ao. From the format diagram; see AoSurvey.</summary>
+    private static readonly string[] Hangs =
+        ["ao", "fixed_ao", "attached_object", "attached_slaved_animation_object"];
 
     /// <summary>The mesh manifest, verbatim - the file that names fewer materials than there are shapes.</summary>
     private static void Manifest(Func<string, byte[]?> read, StringBuilder said, MonsterModel? model)
