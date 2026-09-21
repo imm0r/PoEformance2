@@ -10,6 +10,15 @@ namespace PoEformance.Game.Files;
 /// <param name="Count">How many indices are its own. Always a multiple of three.</param>
 public readonly record struct MeshShape(string Name, int From, int Count);
 
+/// <summary>One mesh going into <see cref="SkinnedMesh.Joined"/>.</summary>
+/// <param name="Mesh">The geometry. Null or unready is left out rather than refused.</param>
+/// <param name="Bones">
+/// Four bone numbers per vertex to use INSTEAD of the mesh's own, already pointing at the rig
+/// the joined mesh will be posed with - or null to keep what the file said. An attachment is
+/// rigged to a skeleton of its own, so its numbers mean nothing against the parent's.
+/// </param>
+public readonly record struct MeshJoin(SkinnedMesh? Mesh, byte[]? Bones = null);
+
 /// <summary>
 /// A monster's geometry, out of the game's own <c>.smd</c> files.
 /// </summary>
@@ -183,6 +192,124 @@ public sealed class SkinnedMesh
             Weights = [],
             Indices = indices,
             Shapes = shapes is { Count: > 0 } ? shapes : [new MeshShape("shape 0", 0, indices.Length)],
+            Least = least,
+            Most = most,
+        };
+    }
+
+    /// <summary>
+    /// Several meshes as one, for a monster whose clothes are separate files.
+    /// </summary>
+    /// <remarks>
+    /// WHY MERGE RATHER THAN DRAW EACH IN TURN. A monster's skirt, belt and necklace are
+    /// <c>attached_object</c> entries naming their own .ao, mesh and rig - Doryani has nine, and
+    /// the model pane drew him bare-legged for as long as it read the body alone. Drawing them
+    /// would otherwise mean taking <see cref="MeshPicture"/> apart: it clears the canvas, fits
+    /// the camera and fills the depth buffer per call, all of which must happen ONCE across the
+    /// parts. Merging leaves the renderer, the per-shape palette and the pose untouched, and
+    /// everything downstream keeps working by construction rather than by a second code path.
+    ///
+    /// THE BONES ARE REMAPPED BY THE CALLER, not here. An attachment is rigged to a skeleton of
+    /// its own whose bones carry the PARENT'S names - <c>spine_1_jntBnd</c>, <c>chest_jntBnd</c> -
+    /// so a vertex's bone number means something different in each file. Handing the remapped
+    /// array in keeps this function about geometry and puts the naming question where the rig is
+    /// known; see MonsterModels.
+    ///
+    /// THE BOX IS THE UNION, which is what puts the camera round the whole dressed monster
+    /// rather than round the body with its skirt out of frame.
+    ///
+    /// A part with no bones of its own gets zeroes, and zero weights with them, so it holds still
+    /// under a pose instead of collapsing onto whatever bone 0 happens to be.
+    /// </remarks>
+    /// <param name="parts">The meshes to join, the body first. Empty gives <see cref="None"/>.</param>
+    public static SkinnedMesh Joined(IReadOnlyList<MeshJoin> parts)
+    {
+        ArgumentNullException.ThrowIfNull(parts);
+
+        var usable = new List<MeshJoin>(parts.Count);
+        var points = 0;
+        var indices = 0;
+        var shapes = 0;
+        foreach (MeshJoin part in parts)
+        {
+            if (part.Mesh is not { Ready: true } mesh)
+            {
+                continue;
+            }
+
+            usable.Add(part);
+            points += mesh.Positions.Length;
+            indices += mesh.Indices.Length;
+            shapes += mesh.Shapes.Count;
+        }
+
+        if (usable.Count == 0)
+        {
+            return None;
+        }
+
+        if (usable.Count == 1 && usable[0].Bones is null)
+        {
+            return usable[0].Mesh!;
+        }
+
+        var positions = new Vector3[points];
+        var normals = new Vector3[points];
+        var coordinates = new Vector2[points];
+        var bones = new byte[points * 4];
+        var weights = new byte[points * 4];
+        var joined = new int[indices];
+        var named = new List<MeshShape>(shapes);
+
+        Vector3 least = usable[0].Mesh!.Least;
+        Vector3 most = usable[0].Mesh!.Most;
+
+        var at = 0;
+        var wrote = 0;
+        foreach (MeshJoin part in usable)
+        {
+            SkinnedMesh mesh = part.Mesh!;
+            int count = mesh.Positions.Length;
+
+            mesh.Positions.CopyTo(positions.AsSpan(at));
+            mesh.Normals.CopyTo(normals.AsSpan(at));
+            mesh.Coordinates.CopyTo(coordinates.AsSpan(at));
+
+            // FOUR PER VERTEX, and only where the file really carried them: a mesh read without
+            // bones has empty arrays rather than short ones, and copying a short span here would
+            // be the crash a still picture never needed to risk.
+            byte[]? which = part.Bones ?? (mesh.Bones.Length == count * 4 ? mesh.Bones : null);
+            if (which is { } sure && sure.Length == count * 4 && mesh.Weights.Length == count * 4)
+            {
+                sure.CopyTo(bones.AsSpan(at * 4));
+                mesh.Weights.CopyTo(weights.AsSpan(at * 4));
+            }
+
+            foreach (MeshShape shape in mesh.Shapes)
+            {
+                named.Add(shape with { From = shape.From + wrote });
+            }
+
+            for (var one = 0; one < mesh.Indices.Length; one++)
+            {
+                joined[wrote + one] = mesh.Indices[one] + at;
+            }
+
+            least = Vector3.Min(least, mesh.Least);
+            most = Vector3.Max(most, mesh.Most);
+            at += count;
+            wrote += mesh.Indices.Length;
+        }
+
+        return new SkinnedMesh
+        {
+            Positions = positions,
+            Normals = normals,
+            Coordinates = coordinates,
+            Bones = bones,
+            Weights = weights,
+            Indices = joined,
+            Shapes = named,
             Least = least,
             Most = most,
         };

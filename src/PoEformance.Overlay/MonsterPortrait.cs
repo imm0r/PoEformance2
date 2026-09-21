@@ -409,6 +409,9 @@ public sealed class MonsterPortrait
     /// <summary>The monster's own name, as the table has it. The name field's prefill.</summary>
     private string _called = string.Empty;
 
+    /// <summary>Whether what is loaded was read WITH the monster's attachments. See Wanted.</summary>
+    private bool _dressed = true;
+
     /// <summary>The row the model was loaded for, kept for the file dump - it needs the .ao list.</summary>
     private MonsterVariety? _variety;
 
@@ -521,6 +524,20 @@ public sealed class MonsterPortrait
 
     /// <summary>Whether the floor the model stands on is drawn. On, because it is what makes a turn legible.</summary>
     public bool Ground { get; set; } = true;
+
+    /// <summary>
+    /// Whether the pieces the monster hangs off itself are read and drawn with it. On.
+    /// </summary>
+    /// <remarks>
+    /// ON, BECAUSE THE MONSTER IS WRONG WITHOUT THEM. Doryani in the game wears a skirt, a belt
+    /// and a necklace; the pane drew him bare-legged for as long as it read the body alone, and
+    /// an icon made from that is an icon of somebody else.
+    ///
+    /// A SWITCH AT ALL, BECAUSE THEY ARE NOT FREE. His nine pieces bring their own meshes, rigs
+    /// and sheets and the belt hangs three more under itself - two to three times the reads of
+    /// the body, paid on every click in a list somebody scrolls. See MonsterModels.Dressing.
+    /// </remarks>
+    public bool Parts { get; set; } = true;
 
     /// <summary>
     /// Called when one of the capture settings moved, so the choice is written down.
@@ -1589,6 +1606,18 @@ public sealed class MonsterPortrait
                 {
                     said += " · the .sm's counts spread over the shapes";
                 }
+
+                // AND WHAT IT IS WEARING. A monster with no attachments, one whose pieces were
+                // switched off, and one whose pieces all failed to read are three different
+                // things that draw identically - so the count says which.
+                if (_model.Parts > 0)
+                {
+                    said += $" · wearing {_model.Parts} part{(_model.Parts == 1 ? string.Empty : "s")}";
+                }
+                else if (!Parts)
+                {
+                    said += " · parts off";
+                }
             }
 
             if (_tracks is { Ready: true } tracks)
@@ -1735,7 +1764,10 @@ public sealed class MonsterPortrait
     /// <summary>Starts a load when the monster changed, and only then.</summary>
     private void Wanted(MonsterVariety? one, string path)
     {
-        if (string.Equals(path, _wanted, StringComparison.Ordinal))
+        // THE SWITCH IS PART OF WHAT WAS ASKED FOR, not a way of drawing what is already loaded:
+        // the pieces are read from the install, so turning them on has to go back for them. The
+        // model stays on screen while it reloads, which is what makes the toggle feel like one.
+        if (string.Equals(path, _wanted, StringComparison.Ordinal) && _dressed == Parts)
         {
             return;
         }
@@ -1774,7 +1806,9 @@ public sealed class MonsterPortrait
         // A load already running for the previous monster is left to finish and then ignored -
         // cancelling a handful of bundle reads costs more code than letting them land.
         Func<string, byte[]?> read = _install!;
-        _loading = Task.Run(() => MonsterModels.Of(read, one));
+        bool wearing = Parts;
+        _dressed = wearing;
+        _loading = Task.Run(() => MonsterModels.Of(read, one, wearing));
     }
 
     /// <summary>Takes a finished load, and re-renders when anything it depends on moved.</summary>
@@ -2098,6 +2132,18 @@ public sealed class MonsterPortrait
             Ground = ground;
             Changed?.Invoke();
         }
+
+        ImGui.SameLine();
+        bool parts = Parts;
+        if (ImGui.Checkbox("parts##monster-parts", ref parts))
+        {
+            Parts = parts;
+            Changed?.Invoke();
+        }
+
+        OverlayLayout.Hint(
+            "The skirt, belt, weapons and danglers a monster hangs off itself - each its own file."
+            + " Off reads the body alone, which is two to three times cheaper.");
 
         ImGui.SameLine();
         bool grey = Grey;
