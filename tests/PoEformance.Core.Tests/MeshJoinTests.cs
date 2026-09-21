@@ -85,6 +85,70 @@ public class MeshJoinTests
         Assert.Same(body, joined);
     }
 
+    /// <summary>
+    /// A piece is put where its socket is before it is joined on.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED, NOT ASSUMED. Every one of Doryani's thirteen pieces has a bounding box a few
+    /// tens of units across sitting on the origin, with the left and right shoulder pieces
+    /// mirrored in x rather than standing apart - so each is modelled in its OWN space and means
+    /// nothing in the monster's until the socket bone's rest transform is on it. Joined without
+    /// one they pile up at his feet, which is what the live client showed.
+    /// </remarks>
+    [Fact]
+    public void APieceIsMovedToWhereItsSocketIs()
+    {
+        SkinnedMesh body = Triangle(0f, "BodyShape");
+        SkinnedMesh piece = Triangle(0f, "SkirtShape");
+
+        SkinnedMesh joined = SkinnedMesh.Joined(
+            [new MeshJoin(body), new MeshJoin(piece, Place: Matrix4x4.CreateTranslation(0f, 0f, 50f))]);
+
+        // The body stays put and the piece is fifty up, though both were modelled at the origin.
+        Assert.Equal(new Vector3(0f, 0f, 0f), joined.Positions[0]);
+        Assert.Equal(new Vector3(0f, 0f, 50f), joined.Positions[3]);
+
+        // And the box grew to cover it, or the camera frames the body with the piece outside.
+        Assert.Equal(50f, joined.Most.Z);
+    }
+
+    /// <summary>
+    /// A turned piece keeps its box around its geometry, not around its old corners.
+    /// </summary>
+    /// <remarks>
+    /// A ROTATED BOX'S MIN AND MAX ARE NOT THE TRANSFORMS OF THE OLD MIN AND MAX. Taken that way
+    /// the box comes out smaller than the geometry inside it, and the camera cuts the piece off -
+    /// which is the kind of wrong that looks like a rendering bug rather than an arithmetic one.
+    /// </remarks>
+    [Fact]
+    public void ATurnedPieceKeepsABoxThatCoversIt()
+    {
+        SkinnedMesh piece = Triangle(0f, "SkirtShape");
+
+        SkinnedMesh joined = SkinnedMesh.Joined(
+            [new MeshJoin(Triangle(0f, "BodyShape")), new MeshJoin(piece, Place: Matrix4x4.CreateRotationZ(MathF.PI / 4f))]);
+
+        foreach (Vector3 one in joined.Positions)
+        {
+            Assert.InRange(one.X, joined.Least.X, joined.Most.X);
+            Assert.InRange(one.Y, joined.Least.Y, joined.Most.Y);
+            Assert.InRange(one.Z, joined.Least.Z, joined.Most.Z);
+        }
+    }
+
+    /// <summary>A translation must not tip the normals, which are directions and not places.</summary>
+    [Fact]
+    public void MovingAPieceLeavesItsNormalsAlone()
+    {
+        SkinnedMesh joined = SkinnedMesh.Joined(
+        [
+            new MeshJoin(Triangle(0f, "BodyShape")),
+            new MeshJoin(Triangle(0f, "SkirtShape"), Place: Matrix4x4.CreateTranslation(0f, 0f, 90f)),
+        ]);
+
+        Assert.Equal(Vector3.UnitZ, joined.Normals[3]);
+    }
+
     [Fact]
     public void NothingUsableGivesNothing()
         => Assert.Same(SkinnedMesh.None, SkinnedMesh.Joined([new MeshJoin(SkinnedMesh.None)]));

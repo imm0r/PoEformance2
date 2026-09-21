@@ -633,7 +633,7 @@ public class MonsterModelTests
     public void AnAttachedPieceIsJoinedOntoTheBody()
     {
         var install = Install();
-        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/skirt.ao");
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/skirt.ao", skeleton: "art/rig.ast");
         install.Files["art/skirt.ao"] = Ao(skin: "art/skirt.sm");
         install.Files["art/skirt.sm"] = Sm("art/skirt.smd", "art/paint.mat");
         install.Files["art/skirt.smd"] = Smd();
@@ -662,13 +662,39 @@ public class MonsterModelTests
     public void WithPartsOffTheBodyIsUnchanged()
     {
         var install = Install();
-        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/skirt.ao");
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/skirt.ao", skeleton: "art/rig.ast");
         install.Files["art/skirt.ao"] = Ao(skin: "art/skirt.sm");
         install.Files["art/skirt.sm"] = Sm("art/skirt.smd", "art/paint.mat");
         install.Files["art/skirt.smd"] = Smd();
 
         MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"), wearing: false);
 
+        Assert.Equal(0, said.Parts);
+        Assert.Equal(2, said.Mesh.Triangles);
+    }
+
+    /// <summary>
+    /// A monster with no readable rig wears nothing, on purpose.
+    /// </summary>
+    /// <remarks>
+    /// A PIECE IS MODELLED IN ITS OWN SPACE, so without the parent's rest pose there is nowhere
+    /// to put it - measured on Doryani, whose thirteen pieces all have boxes a few tens of units
+    /// across sitting on the origin. Joined anyway they pile up at his feet, which is a monster
+    /// that looks broken rather than one that looks undressed. So the pieces are skipped and the
+    /// body is drawn exactly as it always was.
+    /// </remarks>
+    [Fact]
+    public void WithoutARigTheresNowhereToPutAPieceSoNoneIsWorn()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/skirt.ao");
+        install.Files["art/skirt.ao"] = Ao(skin: "art/skirt.sm");
+        install.Files["art/skirt.sm"] = Sm("art/skirt.smd", "art/paint.mat");
+        install.Files["art/skirt.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.True(said.Ready);
         Assert.Equal(0, said.Parts);
         Assert.Equal(2, said.Mesh.Triangles);
     }
@@ -683,7 +709,7 @@ public class MonsterModelTests
     public void APieceThatDoesNotReadDoesNotCostTheBody()
     {
         var install = Install();
-        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/missing.ao");
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/missing.ao", skeleton: "art/rig.ast");
 
         MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
 
@@ -694,6 +720,27 @@ public class MonsterModelTests
 
     private static MonsterVariety Named(string path)
         => new(Name: "test", AoFiles: [path]);
+
+    /// <summary>
+    /// BasicSkeleton's rig, the same fixture AnimationSkeletonFromTheGameTests reads.
+    /// </summary>
+    /// <remarks>
+    /// A REAL RIG AND NOT A BUILT ONE, because what the dressing needs from it is a rest pose in
+    /// model space - and a hand-made skeleton would be testing the arithmetic against itself.
+    /// This one carries root_jntBnd, hip_jntBnd and chest_jntBnd, which is exactly the shape a
+    /// monster's attachments socket into.
+    /// </remarks>
+    private static byte[] Rig()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
+        {
+            dir = dir.Parent;
+        }
+
+        return File.ReadAllBytes(
+            Path.Combine(dir!.FullName, "tests", "fixtures", "basicskeleton-rig.headers.ast"));
+    }
 
     /// <summary>A stand-in install: the paths a walk may ask for, and their bytes.</summary>
     private sealed class Fake
@@ -713,6 +760,7 @@ public class MonsterModelTests
         install.Files["art/other.mat"] = Mat("art/skin.dds");
         install.Files["art/painted.mat"] = Mat("art/skin.dds");
         install.Files["art/skin.dds"] = [];
+        install.Files["art/rig.ast"] = Rig();
         return install;
     }
 
@@ -731,12 +779,19 @@ public class MonsterModelTests
         string? material = null,
         string? second = null,
         string? attach = null,
-        string socket = "hip_jntBnd")
+        string socket = "hip_jntBnd",
+        string? skeleton = null)
     {
         var said = new StringBuilder("version 3\n");
         if (extends is { Length: > 0 })
         {
             said.Append("extends \"").Append(extends).Append("\"\n");
+        }
+
+        if (skeleton is { Length: > 0 })
+        {
+            said.Append("client\n{\n\tClientAnimationController\n\t{\n\t\tskeleton = \"")
+                .Append(skeleton).Append("\"\n\t}\n}\n");
         }
 
         if (attach is { Length: > 0 })

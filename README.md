@@ -63,7 +63,7 @@ push to `main` auto-compiles on GitHub and updates the rolling release
 [`latest-dev`](https://github.com/imm0r/PoEformance2/releases/tag/latest-dev) with a
 ready-to-run, self-contained exe.
 
-**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.9 · 4659c18`
+**The overlay says which build it is**, on its own title bar beside the lock: `v0.1.10 · 4659c18`
 — the version, raised on every push, and the commit the publish workflow stamped into it. A build
 compiled locally reads `local`, because a version number on an unreleased build is a claim it
 cannot support. It is there because the alternative was comparing a screenshot against a merge
@@ -218,12 +218,17 @@ nothing else about them. They are read now and **joined into one mesh** rather t
 which leaves the renderer, the per-shape palette and the pose working by construction instead of
 through a second code path.
 
-What makes the join land in the right place is that the pieces share the parent's bone *names* —
-a skirt's own rig carries `spine_1_jntBnd` and `chest_jntBnd` — so each piece's vertex bones are
-matched onto the body's rig by name, and one pose then places and animates the lot. A bone with no
-match falls back to the socket the piece was hung from. They are not free: nine pieces bring nine
-meshes, rigs and sheets, and a belt hangs three more under itself, so the pane carries a `parts`
-switch and the line under the picture says `wearing 9 parts`.
+Where each piece goes is the socket its line names — `attached_object = "hip_jntBnd …/Skirt.ao"` —
+and that had to be measured rather than assumed. Every one of Doryani's thirteen has a bounding box
+a few tens of units across sitting on the origin, with the left and right shoulder pieces mirrored
+in x rather than standing apart: they are modelled in their *own* space, so a piece means nothing in
+the monster's until the socket bone's rest transform is on it. It is then bound rigidly to that one
+bone, which is what makes it follow an arm that lifts. A piece hung on another piece sockets into
+*its* rig rather than the body's — Doryani's dagger and mirror name bones of the belt — so an
+unknown socket falls back to wherever its carrier went. A monster with no readable rig wears
+nothing, because there is nowhere to put it and a pile of clothing at its feet is worse than none.
+They are not free: nine pieces bring nine meshes, rigs and sheets, and a belt hangs three more under
+itself, so the pane carries a `parts` switch and the line under the picture says `wearing 13 parts`.
 
 It also draws **where a monster is pointing**. Path of Exile 2 keeps no target pointer anywhere in
 memory — the game aims by *turning* an actor to an angle and firing once it is within a tolerance —
