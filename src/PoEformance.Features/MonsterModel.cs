@@ -933,6 +933,9 @@ public static class MonsterModels
             return rooted ? new Retarget(mesh.Bones, []) : null;
         }
 
+        // THE FILE'S OWN PAIRING FIRST, where it wrote one down - see Attaching.
+        Dictionary<string, string> named = Attaching(ao);
+
         var onto = new byte[own.Bones.Count];
         var anchor = new int[own.Bones.Count];
         var shared = 0;
@@ -957,9 +960,12 @@ public static class MonsterModels
             int at = one;
             for (var hops = 0; at >= 0 && hops <= own.Bones.Count; hops++)
             {
-                bool grown = at < mine.Parents.Count && mine.Parents[at] >= 0;
+                // A BONE THE FILE PAIRED IS ANSWERED WHATEVER ELSE IS TRUE OF IT, the piece's
+                // own rig root included - which is the one the pairing usually renames.
+                bool paired = named.TryGetValue(own.Bones[at].Name, out string? theirs);
+                bool grown = paired || (at < mine.Parents.Count && mine.Parents[at] >= 0);
                 if (grown
-                    && where.TryGetValue(own.Bones[at].Name, out int found)
+                    && where.TryGetValue(theirs ?? own.Bones[at].Name, out int found)
                     && found <= byte.MaxValue)
                 {
                     onto[one] = (byte)found;
@@ -1060,6 +1066,80 @@ public static class MonsterModels
 
     /// <summary>The <c>skin</c> a SkinMesh block names, or empty where the file has none.</summary>
     private static string Skin(AnimatedObject ao) => Entryed(ao, Block, Entry);
+
+    /// <summary>
+    /// Which of the PARENT's bones each of a piece's own bones is, where the file says so outright.
+    /// </summary>
+    /// <remarks>
+    /// THE GAME WRITES THE MAPPING DOWN, and matching by name was a workaround for not having
+    /// read it. Bahlak's feathers carry both halves of it:
+    ///
+    ///     attachment_bones = "hip_jntBnd   L_thigh_jntBnd … M_jaw_jntBnd child_attach"
+    ///     bone_group = "child_attach false root_jntBnd L_thigh_jntBnd … M_jaw_jntBnd"
+    ///
+    /// The lists are PARALLEL: attachment_bones names the parent's bones, the bone group it ends
+    /// with names the piece's, and the two run in step. Everything in the middle agrees - which
+    /// is why matching by name got most of the piece right - and the FIRST entry does not. The
+    /// piece's root_jntBnd is the parent's hip_jntBnd.
+    ///
+    /// WHICH IS THE WHOLE OF THE REMAINING BUG. The piece's phys_skinned_*_skirt_* chain hangs
+    /// off that root and off nothing else, so matched by name it went to the monster's root -
+    /// the ground between his feet - while the rest of the piece was corrected onto his body,
+    /// and the train came out as a beam between the two.
+    ///
+    /// MEASURED, TOO: the parent rests L_thigh_jntBnd at (23.6,18.4,-158.8) and the piece rests
+    /// it at (23.6,0,0), which is exactly its offset from a hip - not from the ground.
+    ///
+    /// Empty where the file says nothing, and then the names are all there is to go on.
+    /// </remarks>
+    private static Dictionary<string, string> Attaching(AnimatedObject ao)
+    {
+        var said = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        string[] theirs = Entryed(ao, RigBlock, Attachment)
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (theirs.Length < 2)
+        {
+            return said;
+        }
+
+        // The last name is the BONE GROUP that carries the piece's own side of the pairing.
+        string group = theirs[^1];
+        foreach (AoStruct block in ao.Named(GroupBlock))
+        {
+            foreach (AoEntry entry in block.Entries)
+            {
+                if (!string.Equals(entry.Key, GroupEntry, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                // "<name> <a flag nothing here reads> <bone> <bone> …"
+                string[] mine = entry.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (mine.Length < 3 || !string.Equals(mine[0], group, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                for (var one = 0; one + 2 < mine.Length && one < theirs.Length - 1; one++)
+                {
+                    said.TryAdd(mine[one + 2], theirs[one]);
+                }
+
+                return said;
+            }
+        }
+
+        return said;
+    }
+
+    /// <summary>Where a piece names the parent's bones its own stand for, and its side of it.</summary>
+    private const string Attachment = "attachment_bones";
+
+    /// <inheritdoc cref="Attachment"/>
+    private const string GroupBlock = "BoneGroups";
+
+    /// <inheritdoc cref="Attachment"/>
+    private const string GroupEntry = "bone_group";
 
     /// <summary>One entry's value out of one kind of block, or empty where the file has none.</summary>
     private static string Entryed(AnimatedObject ao, string block, string key)
