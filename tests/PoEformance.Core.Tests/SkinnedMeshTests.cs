@@ -195,6 +195,105 @@ public class SkinnedMeshTests
     }
 
     /// <summary>
+    /// The four bytes after the geometry belong to <c>c0h == 4</c> and to nothing else.
+    /// </summary>
+    /// <remarks>
+    /// FOUND IN THE GAME, NOT IN A SPEC. A monster's attached piece came back with shape names
+    /// that were NEARLY right - <c>athers_headpieceSh</c> where the file says
+    /// <c>feathers_headpieceShape</c>, then <c>apefeathers_neckSha</c> - and nearly right is what
+    /// made it expensive: the geometry was fine, so it read as a wrongly placed piece rather than
+    /// a wrongly stepped file. Four bytes taken that were not there meant the FIRST length word
+    /// read was the second shape's, and every name after it drifted further.
+    ///
+    /// The reference's dolm parser gates those four bytes on <c>c0h</c> being four. This is that
+    /// gate, and the file it is checked against is the one that has no such word.
+    /// </remarks>
+    [Fact]
+    public void AMeshWhoseCornerWordIsNotFourHasNothingToStepOverBeforeItsNames()
+    {
+        foreach (int corner in new[] { 1, 2, 3 })
+        {
+            SkinnedMesh mesh = SkinnedMesh.Read(Built(corner));
+
+            Assert.True(mesh.Ready);
+            Assert.Equal(["HipsShape", "SkullShape"], mesh.Shapes.Select(one => one.Name));
+        }
+    }
+
+    /// <summary>
+    /// A mesh with several levels of detail still reads - the first one, and its real names.
+    /// </summary>
+    /// <remarks>
+    /// THE COUNTS ARE ONE TABLE AND THE MESHES FOLLOW IT. A reader that takes the first pair and
+    /// walks straight into the geometry reads the SECOND detail's counts as the first shape's
+    /// extents, so nothing about the file survives - and the names, which sit past the last
+    /// detail, are gone with it. Only the first mesh is kept; every one of them is counted.
+    /// </remarks>
+    [Fact]
+    public void OnlyTheFirstLevelOfDetailIsKeptAndTheRestAreStillCounted()
+    {
+        SkinnedMesh mesh = SkinnedMesh.Read(Built(details: 3));
+
+        Assert.True(mesh.Ready);
+        Assert.Equal(4, mesh.Positions.Length);
+        Assert.Equal(2, mesh.Triangles);
+        Assert.Equal(["HipsShape", "SkullShape"], mesh.Shapes.Select(one => one.Name));
+    }
+
+    /// <summary>
+    /// The vertex format's seventh bit costs four bytes a vertex AND thirty-six a shape.
+    /// </summary>
+    /// <remarks>
+    /// BOTH, NOT EITHER. This reader had only the per-vertex half, which is enough for a file
+    /// that does not set the bit and silently short by thirty-six times the shape count for one
+    /// that does. The reference's dolm parser writes both, and where they land - the block after
+    /// the LAST level of detail, before the names - is what decides whether the names read.
+    /// </remarks>
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(4)]
+    public void TheSeventhBitOfTheVertexFormatCostsAVertexBlockAndAShapeBlock(int corner)
+    {
+        SkinnedMesh mesh = SkinnedMesh.Read(Built(corner, sixth: true));
+
+        Assert.True(mesh.Ready);
+        Assert.Equal(36, mesh.Facts.Stride);
+        Assert.Equal(["HipsShape", "SkullShape"], mesh.Shapes.Select(one => one.Name));
+
+        // The positions still fill the box, which a stride that had drifted would not manage.
+        foreach (Vector3 one in mesh.Positions)
+        {
+            Assert.InRange(one.X, mesh.Least.X, mesh.Most.X);
+            Assert.InRange(one.Z, mesh.Least.Z, mesh.Most.Z);
+        }
+    }
+
+    /// <summary>
+    /// The header says how many bytes of names there are, and the reader has to find that many.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE INVARIANT A WRONG STEP CANNOT SATISFY BY ACCIDENT, and the reason it is reported
+    /// rather than derived: the count is written at the top of the file, before anything the
+    /// reader walks, so the two agreeing means every step between them landed. It is what the
+    /// dump prints, and it is how the four-byte error above turned from a theory into a number.
+    /// </remarks>
+    [Fact]
+    public void WhatTheHeaderSaysTheNamesWeighIsWhatTheReaderFinds()
+    {
+        foreach (int corner in new[] { 1, 2, 4 })
+        {
+            foreach (bool sixth in new[] { false, true })
+            {
+                MeshFacts facts = SkinnedMesh.Read(Built(corner, sixth: sixth)).Facts;
+
+                Assert.Equal(facts.NamesSaid, facts.NamesRead);
+                Assert.Equal(corner, facts.Corner);
+            }
+        }
+    }
+
+    /// <summary>
     /// A file that is not a mesh says so rather than throwing, whatever is in it.
     /// </summary>
     /// <remarks>
@@ -293,12 +392,24 @@ public class SkinnedMeshTests
     /// bones and weights. Bits 4, 5 and 9 are set in it and add nothing; if the reader ever starts
     /// giving them a width, every assertion above fails at once rather than quietly.
     /// </remarks>
-    private static byte[] Built()
+    /// <param name="corner">
+    /// The DOLm <c>c0h</c> word. Only a four puts four bytes between the geometry and the names,
+    /// and taking them regardless is the error these tests exist to keep out.
+    /// </param>
+    /// <param name="details">
+    /// How many levels of detail. Their counts are written as ONE table before the first mesh and
+    /// the meshes follow it, so a reader that stops after the first walks into the second's counts.
+    /// </param>
+    /// <param name="sixth">
+    /// Whether the vertex format's seventh bit is set, which costs four bytes on every vertex AND
+    /// thirty-six per shape after the last level of detail.
+    /// </param>
+    private static byte[] Built(int corner = 4, int details = 1, bool sixth = false)
     {
         const int Vertices = 4;
         const int Triangles = 2;
-        const uint Format = 0x23C;
-        const int Stride = 32;
+        uint format = sixth ? 0x23Cu | (1u << 6) : 0x23Cu;
+        int stride = sixth ? 36 : 32;
 
         string[] names = ["HipsShape", "SkullShape"];
         var file = new List<byte>();
@@ -318,20 +429,16 @@ public class SkinnedMeshTests
         F32(-1f); F32(1f); F32(-2f); F32(2f); F32(-3f); F32(3f);
 
         file.AddRange("DOLm"u8);
-        U16(4);                     // "c0h"
-        U8(1);                      // one level of detail
+        U16(corner);                // "c0h"
+        U8(details);
         U16(names.Length);
-        U32(Format);
+        U32(format);
 
-        U32(Triangles);
-        U32(Vertices);
-
-        U32(0); U32(3);             // HipsShape:  indices 0..3
-        U32(3); U32(3);             // SkullShape: indices 3..6
-
-        foreach (int one in new[] { 0, 1, 2, 1, 2, 3 })
+        // EVERY DETAIL'S COUNTS FIRST, as one table, and only then the meshes.
+        for (var lod = 0; lod < details; lod++)
         {
-            U16(one);
+            U32(Triangles);
+            U32(Vertices);
         }
 
         Vector3[] places =
@@ -339,17 +446,44 @@ public class SkinnedMeshTests
             new(-1f, -2f, -3f), new(1f, 2f, 3f), new(0f, 0f, 0f), new(0.5f, 1f, 1.5f),
         ];
 
-        foreach (Vector3 place in places)
+        for (var lod = 0; lod < details; lod++)
         {
-            F32(place.X); F32(place.Y); F32(place.Z);
-            U8(0); U8(0); U8(127); U8(0);       // normal, pointing along z
-            U8(127); U8(0); U8(0); U8(0);       // tangent
-            F16(0.25f); F16(0.75f);             // texture coordinate
-            U8(1); U8(0); U8(0); U8(0);         // bones
-            U8(255); U8(0); U8(0); U8(0);       // weights, summing to 255
+            U32(0); U32(3);             // HipsShape:  indices 0..3
+            U32(3); U32(3);             // SkullShape: indices 3..6
+
+            foreach (int one in new[] { 0, 1, 2, 1, 2, 3 })
+            {
+                U16(one);
+            }
+
+            foreach (Vector3 place in places)
+            {
+                F32(place.X); F32(place.Y); F32(place.Z);
+                U8(0); U8(0); U8(127); U8(0);       // normal, pointing along z
+                U8(127); U8(0); U8(0); U8(0);       // tangent
+                F16(0.25f); F16(0.75f);             // texture coordinate
+                U8(1); U8(0); U8(0); U8(0);         // bones
+                U8(255); U8(0); U8(0); U8(0);       // weights, summing to 255
+                if (sixth)
+                {
+                    U32(0);                         // whatever the seventh bit adds per vertex
+                }
+            }
         }
 
-        U32(0);                     // the four bytes that follow the geometry when "c0h" is four
+        if (sixth)
+        {
+            file.AddRange(new byte[names.Length * 36]);
+            if (corner == 2)
+            {
+                file.AddRange(new byte[names.Length * 4]);
+            }
+        }
+
+        if (corner == 4)
+        {
+            U32(0);                 // the four bytes that follow the geometry when "c0h" is four
+        }
 
         foreach (string name in names)
         {
@@ -370,7 +504,11 @@ public class SkinnedMeshTests
         // The one check worth making here: the vertex buffer really is Vertices * Stride long, so
         // a reader that walks it at a different step runs into the name section rather than past
         // the end of the file - which is how the real file's stride was settled in the first place.
-        Assert.Equal(Vertices * Stride, file.Count - VertexBufferStarts - AfterVertices(names));
+        if (corner == 4 && details == 1 && !sixth)
+        {
+            Assert.Equal(Vertices * stride, file.Count - VertexBufferStarts - AfterVertices(names));
+        }
+
         return [.. file];
     }
 }

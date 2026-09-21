@@ -10,6 +10,44 @@ namespace PoEformance.Game.Files;
 /// <param name="Count">How many indices are its own. Always a multiple of three.</param>
 public readonly record struct MeshShape(string Name, int From, int Count);
 
+/// <summary>
+/// What a mesh file's own headers said, kept so a dump can answer "why" rather than "how many".
+/// </summary>
+/// <remarks>
+/// EVERY NUMBER HERE HAS COST TIME ONCE. The reader walks the file by these and nothing else, so
+/// when a mesh comes out wrong the first question is always which of them the file actually
+/// carried - and a screenshot of a drawn monster cannot answer it. They are read anyway; keeping
+/// them costs one struct per mesh and saves a rebuild per question.
+///
+/// <see cref="NamesSaid"/> BESIDE <see cref="NamesRead"/> IS THE SELF-CHECK. The header says how
+/// many bytes the name section takes, and the reader arrives at it after stepping over everything
+/// between; if the two disagree, the step was wrong. That is the one invariant in this file that a
+/// wrong offset cannot satisfy by accident, and it is how the four-byte error below was found.
+/// </remarks>
+/// <param name="Version">The file's version byte. Below three the geometry is not in a DOLm block.</param>
+/// <param name="Corner">The DOLm <c>c0h</c> word, 1 to 4. It decides what follows the geometry.</param>
+/// <param name="Details">How many levels of detail the block carries. Only the first is read.</param>
+/// <param name="Format">The vertex format word - a set of flags, not a number.</param>
+/// <param name="Stride">How many bytes one vertex works out to under that format.</param>
+/// <param name="Shapes">How many shape names the outer header says there are.</param>
+/// <param name="BlockShapes">How many shape extents the DOLm block carries.</param>
+/// <param name="Triangles">Triangles in the first level of detail.</param>
+/// <param name="Vertices">Vertices in the first level of detail.</param>
+/// <param name="NamesSaid">Bytes of names the outer header says the name section holds.</param>
+/// <param name="NamesRead">Bytes of names this reader found where it went looking for them.</param>
+public readonly record struct MeshFacts(
+    int Version,
+    int Corner,
+    int Details,
+    uint Format,
+    int Stride,
+    int Shapes,
+    int BlockShapes,
+    int Triangles,
+    int Vertices,
+    int NamesSaid,
+    int NamesRead);
+
 /// <summary>One mesh going into <see cref="SkinnedMesh.Joined"/>.</summary>
 /// <param name="Mesh">The geometry. Null or unready is left out rather than refused.</param>
 /// <param name="Bones">
@@ -61,8 +99,16 @@ public readonly record struct MeshJoin(
 /// without reading the skeleton: the bones and weights are kept for later rather than used here.
 /// See <see cref="Bones"/> and <see cref="Weights"/>.
 ///
-/// ONLY THE FIRST LOD IS READ. The files seen so far carry one, and a second would be a coarser
-/// copy of the same mesh - useful for drawing at a distance and not for a portrait.
+/// ONLY THE FIRST LOD IS KEPT, but every one of them is STEPPED OVER - a distinction that cost a
+/// fix. A coarser copy of the same mesh is useless in a portrait, and skipping it is not the same
+/// as pretending it is not in the file: the counts for all of them are written as one table before
+/// the first mesh, and the shape names sit past the last. A reader that stops after the first
+/// walks into the second's counts.
+///
+/// WHAT FOLLOWS THE GEOMETRY IS CONDITIONAL - see <see cref="Trailing"/>. Taking the four bytes
+/// after it unconditionally is what put this reader four bytes into the name table on every mesh
+/// whose <c>c0h</c> is not four, and that was found only because a monster's shape names came back
+/// nearly right rather than obviously wrong.
 /// </remarks>
 public sealed class SkinnedMesh
 {
@@ -106,6 +152,9 @@ public sealed class SkinnedMesh
 
     /// <summary>The far corner of that box.</summary>
     public Vector3 Most { get; private init; }
+
+    /// <summary>What the file's headers said, for a dump. Default where the mesh was assembled.</summary>
+    public MeshFacts Facts { get; private init; }
 
     /// <summary>Why nothing was read, or empty where something was.</summary>
     public string Why { get; private init; } = string.Empty;
@@ -478,7 +527,7 @@ public sealed class SkinnedMesh
         byte version = file[at++];
         at++;                                       // The outer vertex format; DOLm carries its own.
         int shapes = Read16(file, ref at);
-        at += 4;                                    // How many bytes the name section takes.
+        var names = (int)Read32(file, ref at);      // How many bytes the name section takes.
 
         var least = new Vector3(Float(file, at), Float(file, at + 8), Float(file, at + 16));
         var most = new Vector3(Float(file, at + 4), Float(file, at + 12), Float(file, at + 20));
@@ -499,7 +548,7 @@ public sealed class SkinnedMesh
         }
 
         at += 4;
-        at += 2;                                    // The "c0h" word - 1 to 4, meaning unknown.
+        int corner = Read16(file, ref at);           // The "c0h" word - 1 to 4, meaning unknown.
         int lods = file[at++];
         int blockShapes = Read16(file, ref at);
         uint format = Read32(file, ref at);
@@ -509,26 +558,47 @@ public sealed class SkinnedMesh
             return Failed("the mesh has no level of detail to read");
         }
 
+        // EVERY LEVEL OF DETAIL'S COUNTS COME FIRST, AS ONE TABLE, and only then the meshes
+        // themselves. A reader that takes one pair and walks straight into the geometry reads a
+        // two-detail file's SECOND pair as the first shape's extents, and everything after that
+        // is rubbish - so the table is read whole even though only the first mesh is kept.
+        if (at + (lods * 8) > file.Length)
+        {
+            return Failed("the mesh says it is bigger than the file that holds it");
+        }
+
         // KEPT UNSIGNED UNTIL THEY HAVE BEEN BOUNDED, which is not fussiness: these are numbers
         // out of a file, and casting four billion to an int gives a NEGATIVE count that sails
         // past a "> 0" check into a different branch entirely. The size check below is the one
         // that has to catch it, so nothing is narrowed before it runs.
-        uint triangles = Read32(file, ref at);
-        uint vertices = Read32(file, ref at);
+        var counts = new (uint Triangles, uint Vertices)[lods];
+        for (var one = 0; one < lods; one++)
+        {
+            counts[one] = (Read32(file, ref at), Read32(file, ref at));
+        }
+
+        (uint triangles, uint vertices) = counts[0];
         if (triangles == 0 || vertices == 0)
         {
             return Failed("the mesh is empty");
         }
 
         Shape shape = Shape.Of(format);
-        int width = vertices <= ushort.MaxValue ? 2 : 4;
+        int width = Width(vertices);
 
-        // BOUNDS FIRST, ARITHMETIC SECOND. Three counts out of the file multiply into the sizes
-        // below, and a file that lies about any of them would otherwise be read past its end.
-        long needed = (long)at
-            + ((long)blockShapes * 8)
-            + ((long)triangles * 3 * width)
-            + ((long)vertices * shape.Stride);
+        // BOUNDS FIRST, ARITHMETIC SECOND. Counts out of the file multiply into the sizes below,
+        // and a file that lies about any of them would otherwise be read past its end. Everything
+        // up to the name table is measured here, coarser details and the blocks after them
+        // included, so the one check covers every step this takes.
+        long needed = at;
+        foreach ((uint faces_, uint points_) in counts)
+        {
+            needed += ((long)blockShapes * 8)
+                + ((long)faces_ * 3 * Width(points_))
+                + ((long)points_ * shape.Stride);
+        }
+
+        needed += Trailing(format, corner, blockShapes);
         if (needed > file.Length)
         {
             return Failed("the mesh says it is bigger than the file that holds it");
@@ -590,6 +660,23 @@ public sealed class SkinnedMesh
 
         at += points * shape.Stride;
 
+        // THE COARSER DETAILS ARE STEPPED OVER, not read: each is the same mesh again with fewer
+        // triangles, useful at a distance and never in a portrait. They still have to be counted,
+        // because the shape names sit past the LAST of them.
+        long past = at;
+        for (var one = 1; one < lods; one++)
+        {
+            (uint faces_, uint points_) = counts[one];
+            past += ((long)blockShapes * 8)
+                + ((long)faces_ * 3 * Width(points_))
+                + ((long)points_ * shape.Stride);
+        }
+
+        past += Trailing(format, corner, blockShapes);
+        at = (int)past;                             // Bounded by the size check above.
+
+        MeshShape[] named = Named(file, at, shapes, extents, indices.Length, out int read);
+
         return new SkinnedMesh
         {
             Positions = positions,
@@ -598,11 +685,48 @@ public sealed class SkinnedMesh
             Bones = bones,
             Weights = weights,
             Indices = indices,
-            Shapes = Named(file, at, shapes, blockShapes, extents, indices.Length),
+            Shapes = named,
             Least = least,
             Most = most,
+            Facts = new MeshFacts(
+                version, corner, lods, format, shape.Stride, shapes, blockShapes,
+                faces, points, names, read),
         };
     }
+
+    /// <summary>
+    /// What DOLm writes between the last level of detail and the shape names.
+    /// </summary>
+    /// <remarks>
+    /// THE FOUR BYTES ARE NOT ALWAYS THERE, and taking them unconditionally is what put this
+    /// reader four bytes into the name table on every mesh whose <c>c0h</c> is not four. The
+    /// symptom was a monster whose shapes came back with names that were nearly right:
+    /// <c>athers_headpieceSh</c> for <c>feathers_headpieceShape</c>, because the first length word
+    /// read was the SECOND shape's, and each name after that drifted further. Nothing else broke -
+    /// the geometry was already in hand - so it looked like a wrong socket rather than a wrong
+    /// step, and was chased as one.
+    ///
+    /// THE SHAPE OF IT COMES FROM poe_data_tools' dolm parser, which gates all three blocks:
+    /// thirty-six bytes per shape when the format's seventh bit is set, four more per shape when
+    /// that bit is set AND <c>c0h</c> is two, and the four bytes only when <c>c0h</c> is four.
+    /// </remarks>
+    private static long Trailing(uint format, int corner, int blockShapes)
+    {
+        long past = 0;
+        if ((format >> 6 & 1) == 1)
+        {
+            past += (long)blockShapes * 36;
+            if (corner == 2)
+            {
+                past += (long)blockShapes * 4;
+            }
+        }
+
+        return corner == 4 ? past + 4 : past;
+    }
+
+    /// <summary>How wide one index is: two bytes while every vertex number fits in them.</summary>
+    private static int Width(uint vertices) => vertices < 0x10000 ? 2 : 4;
 
     /// <summary>
     /// The shape names, which sit past the geometry, paired with the extents read before it.
@@ -616,17 +740,12 @@ public sealed class SkinnedMesh
         ReadOnlySpan<byte> file,
         int at,
         int shapes,
-        int blockShapes,
         (int From, int Count)[] extents,
-        int indices)
+        int indices,
+        out int spent)
     {
         var named = new MeshShape[extents.Length];
-
-        // The four bytes between the geometry and the names, which the spec ties to the "c0h"
-        // word being four. Stepped over by measurement: on the file this was checked against they
-        // are what makes the name lengths land where the header says the name section begins.
-        at += 4;
-
+        int began = at;
         var lengths = new int[shapes];
         var read = true;
         for (var one = 0; one < shapes && read; one++)
@@ -659,6 +778,9 @@ public sealed class SkinnedMesh
             named[one] = new MeshShape(name, from, Math.Clamp(count, 0, indices - from));
         }
 
+        // How many bytes of NAMES were taken, the length words left out - which is what the outer
+        // header counts, so a caller can hold the two up against each other.
+        spent = read ? at - began - (shapes * 4) : 0;
         return named;
     }
 
