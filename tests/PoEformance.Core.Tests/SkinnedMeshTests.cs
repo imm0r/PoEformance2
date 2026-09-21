@@ -511,4 +511,183 @@ public class SkinnedMeshTests
 
         return [.. file];
     }
+
+    /// <summary>
+    /// A mesh of version one carries its geometry in the file, and reads.
+    /// </summary>
+    /// <remarks>
+    /// THE SWEEP IS WHAT MADE THIS WORTH DOING. Refused, these were 373 pieces on 115 monsters -
+    /// and the corpus could only say that once it carried the reader's own reason per piece,
+    /// which turned "113 monsters have something unreadable" into "one format, 373 times".
+    ///
+    /// THE HEADER IS LONGER BEFORE THE FORMAT BYTE than version three's - version, TRIANGLES,
+    /// VERTICES, format, shapes, where the newer file has version, format, shapes. Read as the
+    /// newer layout the triangle count's low bytes become the format and its high bytes the
+    /// shape count, and everything after is rubbish that still has the shape of a mesh.
+    /// </remarks>
+    [Fact]
+    public void AMeshOfVersionOneCarriesItsGeometryInTheFileItself()
+    {
+        Packed.Vertex[] points =
+        [
+            new(new Vector3(-5f, 0f, 1f), [3, 0, 0, 0], [255, 0, 0, 0]),
+            new(new Vector3(7f, 2f, -3f), [3, 0, 0, 0], [255, 0, 0, 0]),
+            new(new Vector3(0f, -4f, 9f), [3, 0, 0, 0], [255, 0, 0, 0]),
+            new(new Vector3(2f, 6f, -8f), [3, 0, 0, 0], [255, 0, 0, 0]),
+        ];
+
+        SkinnedMesh said = SkinnedMesh.Read(Packed.OldMesh(points));
+
+        Assert.True(said.Ready, said.Why);
+        Assert.Equal(1, said.Facts.Version);
+        Assert.Equal(4, said.Positions.Length);
+        Assert.Equal(2, said.Triangles);
+
+        // THE POSITIONS THEMSELVES, because a stride that is wrong by even four bytes still
+        // produces a mesh of the right SIZE - it just reads each vertex out of the middle of
+        // the one before it.
+        Assert.Equal(points.Length, said.Positions.Length);
+        for (var one = 0; one < points.Length; one++)
+        {
+            Assert.Equal(points[one].Place, said.Positions[one]);
+        }
+
+        // And the box the header wrote is the box the vertices fill - the same invariant the
+        // real BasicSkeleton file settled the newer format with.
+        Assert.Equal(new Vector3(-5f, -4f, -8f), said.Least);
+        Assert.Equal(new Vector3(7f, 6f, 9f), said.Most);
+
+        // The bones and weights are where the older vertex puts them, which is not where the
+        // DOLm one does: unconditional rather than gated on the format word.
+        Assert.Equal<byte>(3, said.Bones[0]);
+        Assert.Equal<byte>(255, said.Weights[0]);
+    }
+
+    /// <summary>
+    /// Version two writes one more word than version one, and only version two.
+    /// </summary>
+    /// <remarks>
+    /// THE REFERENCE GATES IT <c>cond(version == 2, le_u32)</c> and nothing here knows what it
+    /// is. Four bytes taken that are not there - or left that are - puts the shape table four
+    /// bytes out, and this project has already paid for that exact mistake once: the names came
+    /// back NEARLY right, which reads as a wrongly placed piece rather than a wrongly stepped
+    /// file.
+    ///
+    /// The two files below hold the SAME geometry, so anything but the same answer is the gate.
+    /// </remarks>
+    [Fact]
+    public void VersionTwoHasOneMoreWordBeforeItsShapesAndVersionOneDoesNot()
+    {
+        Packed.Vertex[] points =
+        [
+            new(new Vector3(1f, 2f, 3f), [1, 0, 0, 0], [255, 0, 0, 0]),
+            new(new Vector3(4f, 5f, 6f), [1, 0, 0, 0], [255, 0, 0, 0]),
+            new(new Vector3(7f, 8f, 9f), [1, 0, 0, 0], [255, 0, 0, 0]),
+        ];
+
+        SkinnedMesh one_ = SkinnedMesh.Read(Packed.OldMesh(points, version: 1));
+        SkinnedMesh two = SkinnedMesh.Read(Packed.OldMesh(points, version: 2));
+
+        Assert.True(two.Ready, two.Why);
+        Assert.Equal(2, two.Facts.Version);
+        Assert.Equal(one_.Positions, two.Positions);
+        Assert.Equal(
+            one_.Shapes.Select(shape => shape.Name),
+            two.Shapes.Select(shape => shape.Name));
+    }
+
+    /// <summary>
+    /// An older shape writes where it STARTS, so it runs to where the next one begins.
+    /// </summary>
+    /// <remarks>
+    /// VERSION THREE WRITES A START AND A COUNT; this writes one number. Read as a pair the
+    /// second shape would take the third's start as its own length, which is a mesh that draws
+    /// the right triangles in the wrong groups - and since the groups are what carry the
+    /// per-shape textures, the symptom is a monster painted with the wrong sheets rather than a
+    /// monster that fails to appear.
+    /// </remarks>
+    [Fact]
+    public void AnOlderShapeRunsToWhereTheNextOneBegins()
+    {
+        Packed.Vertex[] points =
+        [
+            .. Enumerable.Range(0, 8).Select(one =>
+                new Packed.Vertex(new Vector3(one, 0f, 0f), [0, 0, 0, 0], [255, 0, 0, 0])),
+        ];
+
+        // Six triangles over eight vertices, in three groups starting at 0, 2 and 5.
+        SkinnedMesh said = SkinnedMesh.Read(Packed.OldMesh(
+            points, shapes: [("HipsShape", 0), ("CloakShape", 2), ("HeadShape", 5)]));
+
+        Assert.True(said.Ready, said.Why);
+        Assert.Equal(["HipsShape", "CloakShape", "HeadShape"], said.Shapes.Select(one => one.Name));
+
+        Assert.Equal((0, 6), (said.Shapes[0].From, said.Shapes[0].Count));
+        Assert.Equal((6, 9), (said.Shapes[1].From, said.Shapes[1].Count));
+        Assert.Equal((15, 3), (said.Shapes[2].From, said.Shapes[2].Count));
+
+        // No gap and no overlap over the whole index buffer, which is the invariant the real
+        // file settled the newer format with.
+        Assert.Equal(said.Indices.Length, said.Shapes.Sum(one => one.Count));
+    }
+
+    /// <summary>
+    /// The older vertex gates two fields where the DOLm one gates four.
+    /// </summary>
+    /// <remarks>
+    /// A FORMAT WORD OF NOUGHT IS THE CASE THAT SEPARATES THEM. In a DOLm block that means no
+    /// texture coordinate and no bones - a 20-byte vertex. Here the reference writes all three
+    /// unconditionally and gates only skin extra and a second coordinate, so the same nought is
+    /// a 32-byte vertex. Twelve bytes short does not fail; it reads the next vertex's position
+    /// out of the middle of this one and produces confetti.
+    ///
+    /// Both bits set is the other end of it: 40 bytes, and a reader that ignores them runs eight
+    /// bytes further out of step with every vertex it takes.
+    /// </remarks>
+    [Theory]
+    [InlineData(0)]
+    [InlineData(2)]
+    [InlineData(1)]
+    [InlineData(3)]
+    public void TheOlderVertexGatesOnlySkinExtraAndASecondCoordinate(byte format)
+    {
+        Packed.Vertex[] points =
+        [
+            new(new Vector3(11f, 12f, 13f), [2, 0, 0, 0], [255, 0, 0, 0]),
+            new(new Vector3(21f, 22f, 23f), [2, 0, 0, 0], [255, 0, 0, 0]),
+            new(new Vector3(31f, 32f, 33f), [2, 0, 0, 0], [255, 0, 0, 0]),
+        ];
+
+        SkinnedMesh said = SkinnedMesh.Read(Packed.OldMesh(points, format: format));
+
+        Assert.True(said.Ready, said.Why);
+        Assert.Equal(points.Select(one => one.Place), said.Positions);
+        Assert.All(said.Bones.Where((_, at) => at % 4 == 0), one => Assert.Equal<byte>(2, one));
+    }
+
+    /// <summary>A file that lies about its counts is refused rather than read past its end.</summary>
+    /// <remarks>
+    /// THE SAME RULE THE NEWER PATH FOLLOWS. These counts come out of the file, which is to say
+    /// from anywhere, and they multiply into every size below them.
+    /// </remarks>
+    [Fact]
+    public void AnOlderMeshThatLiesAboutItsCountsIsRefused()
+    {
+        Packed.Vertex[] points =
+        [
+            new(new Vector3(1f, 1f, 1f), [0, 0, 0, 0], [255, 0, 0, 0]),
+            new(new Vector3(2f, 2f, 2f), [0, 0, 0, 0], [255, 0, 0, 0]),
+            new(new Vector3(3f, 3f, 3f), [0, 0, 0, 0], [255, 0, 0, 0]),
+        ];
+
+        byte[] file = Packed.OldMesh(points);
+
+        // The vertex count sits at offset 5, right after the version and the triangle count.
+        BinaryPrimitives.WriteUInt32LittleEndian(file.AsSpan(5), 40_000_000);
+
+        SkinnedMesh said = SkinnedMesh.Read(file);
+
+        Assert.False(said.Ready);
+        Assert.Contains("bigger than the file", said.Why, StringComparison.Ordinal);
+    }
 }

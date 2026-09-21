@@ -226,6 +226,118 @@ internal static class Packed
     /// Every vertex faces +z, and the triangles fan from the first vertex, which is enough to be
     /// a mesh and is never drawn by the tests that use this.
     /// </remarks>
+    /// <summary>
+    /// Writes a <c>.smd</c> of version one or two, whose geometry sits in the file itself.
+    /// </summary>
+    /// <remarks>
+    /// THE OLDER LAYOUT, WHICH IS NOT THE NEWER ONE WITH A PIECE MISSING. Its header carries two
+    /// counts before the format byte that version three does not, version two carries one more
+    /// word after the box than version one, a shape writes only where it STARTS, and the vertex
+    /// gates two fields where the DOLm one gates four. Every one of those is a place a reader can
+    /// come out plausible and wrong, which is the whole reason this builder exists beside
+    /// <see cref="Mesh"/> rather than sharing with it.
+    /// </remarks>
+    /// <param name="vertices">The geometry. Every vertex carries a coordinate, bones and weights.</param>
+    /// <param name="version">One or two; two writes the extra word the reference gates on it.</param>
+    /// <param name="shapes">Each shape's name and the TRIANGLE it starts at. One by default.</param>
+    /// <param name="format">
+    /// The vertex format byte. Bit 1 adds four bytes of skin extra and bit 0 a second texture
+    /// coordinate; nothing else in it changes the stride.
+    /// </param>
+    public static byte[] OldMesh(
+        Vertex[] vertices,
+        int version = 1,
+        (string Name, int Triangle)[]? shapes = null,
+        byte format = 0)
+    {
+        (string Name, int Triangle)[] parts = shapes ?? [("BodyShape", 0)];
+        int triangles = Math.Max(1, vertices.Length - 2);
+
+        using var stream = new MemoryStream();
+        using var write = new BinaryWriter(stream);
+
+        write.Write((byte)version);
+        write.Write((uint)triangles);
+        write.Write((uint)vertices.Length);
+        write.Write(format);
+        write.Write((ushort)parts.Length);
+        write.Write((uint)parts.Sum(one => one.Name.Length * 2));
+
+        Vector3 least = vertices.Length > 0 ? vertices[0].Place : Vector3.Zero;
+        Vector3 most = least;
+        foreach (Vertex one in vertices)
+        {
+            least = Vector3.Min(least, one.Place);
+            most = Vector3.Max(most, one.Place);
+        }
+
+        write.Write(least.X); write.Write(most.X);
+        write.Write(least.Y); write.Write(most.Y);
+        write.Write(least.Z); write.Write(most.Z);
+
+        // The word version two has and version one does not.
+        if (version == 2)
+        {
+            write.Write((uint)0);
+        }
+
+        // EVERY SHAPE'S LENGTH AND START AS ONE TABLE, and only then the names.
+        foreach ((string name, int triangle) in parts)
+        {
+            write.Write((uint)(name.Length * 2));
+            write.Write((uint)triangle);
+        }
+
+        foreach ((string name, int _) in parts)
+        {
+            write.Write(Encoding.Unicode.GetBytes(name));
+        }
+
+        for (var one = 0; one < triangles; one++)
+        {
+            write.Write((ushort)0);
+            write.Write((ushort)Math.Min(one + 1, vertices.Length - 1));
+            write.Write((ushort)Math.Min(one + 2, vertices.Length - 1));
+        }
+
+        foreach (Vertex one in vertices)
+        {
+            write.Write(one.Place.X); write.Write(one.Place.Y); write.Write(one.Place.Z);
+            write.Write((byte)0); write.Write((byte)0); write.Write((byte)127); write.Write((byte)0);
+            write.Write((byte)127); write.Write((byte)0); write.Write((byte)0); write.Write((byte)0);
+            write.Write(BitConverter.HalfToUInt16Bits((Half)0.25f));
+            write.Write(BitConverter.HalfToUInt16Bits((Half)0.75f));
+            for (var part = 0; part < 4; part++)
+            {
+                write.Write(part < one.Bones.Length ? one.Bones[part] : (byte)0);
+            }
+
+            for (var part = 0; part < 4; part++)
+            {
+                write.Write(part < one.Weights.Length ? one.Weights[part] : (byte)0);
+            }
+
+            if ((format >> 1 & 1) == 1)
+            {
+                write.Write((uint)0);
+            }
+
+            if ((format & 1) == 1)
+            {
+                write.Write((uint)0);
+            }
+        }
+
+        write.Write((uint)2);                       // tail version
+        for (var one = 0; one < 4; one++)
+        {
+            write.Write((uint)0);
+        }
+
+        write.Flush();
+        return stream.ToArray();
+    }
+
     public static byte[] Mesh(Vertex[] vertices)
     {
         const uint Format = 0x23C;
