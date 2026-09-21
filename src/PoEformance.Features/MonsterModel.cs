@@ -712,10 +712,13 @@ public static class MonsterModels
 
         Dress dress = Dressed(read, mesh, [], manifest, fallback, string.Empty, paints);
 
-        // TWO KINDS OF PIECE, AND THE ATTACHMENT LINE SAYS WHICH - see Retargeted.
-        if (rooted && Retargeted(read, ao, where, mesh) is { } map)
+        // EITHER WAY THE PIECE'S OWN RIG SAYS WHICH OF THE PARENT'S BONES EACH VERTEX BELONGS
+        // TO - see Retargeted. What the attachment line decides is where the piece SITS: a
+        // "<root>" piece is already in the monster's space and wants no transform, a socketed
+        // one is in its socket's space and wants that bone's rest transform on it.
+        if (Retargeted(read, ao, where, mesh, rooted, bone) is { } map)
         {
-            return new Part(mesh, map, null, null, dress.Skins);
+            return new Part(mesh, map, null, rooted ? null : place, dress.Skins);
         }
 
         (byte[] bones, byte[] weights) = Bound(mesh.Positions.Length, bone);
@@ -773,7 +776,9 @@ public static class MonsterModels
         Func<string, byte[]?> read,
         AnimatedObject ao,
         IReadOnlyDictionary<string, int> where,
-        SkinnedMesh mesh)
+        SkinnedMesh mesh,
+        bool rooted,
+        int socket)
     {
         string path = Entryed(ao, RigBlock, RigEntry);
         if (path.Length == 0 || mesh.Bones.Length != mesh.Positions.Length * 4)
@@ -785,6 +790,23 @@ public static class MonsterModels
         if (!own.Ready || SkeletonPose.Of(own) is not { } mine)
         {
             return null;
+        }
+
+        // A MESH THAT REACHES PAST ITS OWN RIG WAS NOT RIGGED TO IT, and putting its numbers
+        // through a table that short is how the last of Bahlak's feathers stayed on the floor:
+        // every bone the table did not cover fell to entry nought, the rig root, while the rest
+        // of the piece followed his chest - so the bundle came out stretched between the two.
+        //
+        // THE ONLY OTHER RIG IN PLAY IS THE PARENT'S, and a piece socketed "<root>" is already in
+        // the parent's space, so a mesh indexed past its own rig is a mesh indexed by the
+        // parent's: its numbers are already the right ones and want passing through untouched.
+        // Mapping them to nought is the one answer that is certainly wrong.
+        if (SkeletonPose.Highest(mesh) >= own.Bones.Count)
+        {
+            // ONLY WHERE NOTHING ELSE IS BEING DONE TO THE GEOMETRY. A socketed piece is moved by
+            // its socket's transform, and passing the parent's numbers through as well would
+            // apply that move twice - so there the old rigid binding is the safe answer.
+            return rooted ? mesh.Bones : null;
         }
 
         var onto = new byte[own.Bones.Count];
@@ -799,22 +821,23 @@ public static class MonsterModels
             // every bone that lost that race fell to the root instead. The root is the one bone
             // that does not follow the body, so the piece came out stretched between the monster
             // and the origin: a long black spike from his chest to the floor.
+            // THE PIECE'S OWN ROOT IS THE SOCKET, on a socketed piece, whatever it is called.
+            // Measured: the Fallen Knight's bicep fingers carry root_jntBnd AND L_shoulder_jntBnd
+            // and both rest at (0,0,0) - the piece's origin - while the parent rests its shoulder
+            // at (22.3,7,-157.9). Matching that root by NAME would send every vertex weighted to
+            // it across to the monster's own root, which is the far end of him.
+            onto[one] = (byte)(rooted ? 0 : socket);
+
             int at = one;
             for (var hops = 0; at >= 0 && hops <= own.Bones.Count; hops++)
             {
-                if (where.TryGetValue(own.Bones[at].Name, out int found) && found <= byte.MaxValue)
+                bool grown = at < mine.Parents.Count && mine.Parents[at] >= 0;
+                if (grown
+                    && where.TryGetValue(own.Bones[at].Name, out int found)
+                    && found <= byte.MaxValue)
                 {
                     onto[one] = (byte)found;
-
-                    // THE ROOT DOES NOT COUNT. Every rig has one and every piece shares it, so
-                    // counting it would make a ship's wheel look like a cloak. Asked as "has a
-                    // parent of its own" rather than "is not bone nought", because which NUMBER
-                    // the root carries is the file's business.
-                    if (at < mine.Parents.Count && mine.Parents[at] >= 0)
-                    {
-                        shared++;
-                    }
-
+                    shared++;
                     break;
                 }
 
@@ -822,7 +845,11 @@ public static class MonsterModels
             }
         }
 
-        if (shared == 0)
+        // A "<root>" PIECE WITH NOTHING SHARED HAS NOWHERE TO GO, so it is left where it is -
+        // Malgor's ship's wheel, and the one case here still unsettled. A SOCKETED piece always
+        // has somewhere: its socket, which is where it used to go wholesale, so the map can only
+        // improve on that and is always worth returning.
+        if (rooted && shared == 0)
         {
             return null;
         }

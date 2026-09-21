@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Buffers.Binary;
 using System.Text;
 using PoEformance.Features;
@@ -1024,6 +1025,72 @@ public class MonsterModelTests
         // rests - sixty down - rather than left in its own space at the origin.
         Assert.All(said.Mesh.Bones[16..20], one => Assert.Equal<byte>(1, one));
         Assert.Equal(-60f, said.Mesh.Positions[4].Z - said.Mesh.Positions[0].Z, 3);
+    }
+
+    /// <summary>
+    /// A socketed piece's rig is the parent's subtree, and its vertices follow the bone they name.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED, AND EXACTLY. The Fallen Knight's bicep fingers are socketed at
+    /// L_shoulder_jntBnd, and their own rig carries the parent's next three bones with the SOCKET
+    /// at its origin:
+    ///
+    ///     1 L_shoulder_jntBnd        rests at (0,0,0)       parent has (22.3,7,-157.9)
+    ///     2 L_shoulder_cTwist_jntBnd rests at (13.4,0,8.7)  parent has (35.7,7,-149.2)
+    ///
+    /// The differences are the same numbers. So a socketed piece is not a rigid prop at all: it
+    /// is the parent's subtree re-rooted on the socket, and binding every one of its vertices to
+    /// the socket alone means the half of it that belongs to an elbow does not bend with one.
+    ///
+    /// AT REST IT LOOKS IDENTICAL, which is why it lasted: a correct bone assignment and a wrong
+    /// one agree exactly while the pose is the bind pose, and differ the moment anything moves.
+    ///
+    /// THE PIECE'S OWN ROOT IS THE SOCKET, whatever it is called - it rests at the piece's origin
+    /// and matching it by name would send those vertices to the monster's own root instead.
+    /// </remarks>
+    [Fact]
+    public void ASocketedPiecesVerticesFollowTheBoneTheyNameAndNotJustItsSocket()
+    {
+        var install = Install();
+        install.Files["art/rig.ast"] = Packed.Skeleton(
+            [
+                ("root_jntBnd", 255, 1, 0f),
+                ("L_shoulder_jntBnd", 255, 2, -150f),
+                ("L_elbow_jntBnd", 255, 255, -40f),
+            ],
+            []);
+
+        // The piece's rig: the same subtree, with the socket at its own origin.
+        install.Files["art/hand.ast"] = Packed.Skeleton(
+            [
+                ("root_jntBnd", 255, 1, 0f),
+                ("L_shoulder_jntBnd", 255, 2, 0f),
+                ("L_elbow_jntBnd", 255, 255, -40f),
+            ],
+            []);
+
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/hand.ao", socket: "L_shoulder_jntBnd", skeleton: "art/rig.ast");
+        install.Files["art/hand.ao"] = Ao(skin: "art/hand.sm", skeleton: "art/hand.ast");
+        install.Files["art/hand.sm"] = Sm("art/hand.smd", "art/paint.mat");
+
+        // Every vertex weighted to the piece's ELBOW, which is not the socket.
+        install.Files["art/hand.smd"] = Packed.Mesh(
+        [
+            .. new[] { 0f, 1f, 2f, 3f }.Select(one =>
+                new Packed.Vertex(new Vector3(one, 0f, 0f), [2, 0, 0, 0], [255, 0, 0, 0])),
+        ]);
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+
+        // Bone 2 of the piece is bone 2 of the parent - the elbow - and not the socket at 1.
+        Assert.Equal<byte>(2, said.Mesh.Bones[16]);
+
+        // And it still sits at its socket: the piece's own vertices are at z nought in its own
+        // space, so the socket's rest transform is the whole of where they end up.
+        Assert.Equal(-150f, said.Mesh.Positions[4].Z, 3);
     }
 
     /// <summary>
