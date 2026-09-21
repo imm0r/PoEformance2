@@ -129,8 +129,115 @@ public static class ModelDump
 
         Manifest(read, said, model);
         Shapes(said, model);
+        Fitting(read, said, model, [.. seen]);
         return said.ToString();
     }
+
+    /// <summary>
+    /// Where each piece SITS, and whether its socket is a bone the parent's rig really has.
+    /// </summary>
+    /// <remarks>
+    /// THE QUESTION THE PICTURE ASKED. With the pieces joined on, Doryani's shoulder danglers came
+    /// out symmetrical about him and at knee height - right in x, wrong in y - and his skirt hung
+    /// far below his feet. Symmetric-but-sunken is the signature of a piece whose bones did not
+    /// match and fell back to the root, and it cannot be told apart from a piece modelled in its
+    /// own space by looking at it.
+    ///
+    /// SO BOTH HALVES ARE PRINTED. The socket, and whether the PARENT rig carries a bone of that
+    /// name at all - a socket the parent does not have means every vertex of that piece falls
+    /// back. And the piece's own bounding box beside the body's: a box around the origin says the
+    /// mesh is modelled in its own space and needs the socket's transform on it, while a box up at
+    /// shoulder height says it is already in the parent's space and only the bones are wrong.
+    ///
+    /// Those are different fixes, and this is the difference.
+    /// </remarks>
+    private static void Fitting(
+        Func<string, byte[]?> read, StringBuilder said, MonsterModel? model, IReadOnlyList<string> walked)
+    {
+        said.AppendLine().AppendLine("=== fitting");
+
+        if (model?.Rig is not { Ready: true } rig)
+        {
+            said.AppendLine("(the monster has no rig, so nothing here can be matched)");
+            return;
+        }
+
+        var bones = new HashSet<string>(rig.Bones.Select(one => one.Name), StringComparer.OrdinalIgnoreCase);
+        said.Append("parent rig: ").Append(Say(rig.Bones.Count)).AppendLine(" bones");
+
+        foreach (string one in walked)
+        {
+            (string _, byte[]? content) = Find(read, one);
+            if (content is not { Length: > 0 })
+            {
+                continue;
+            }
+
+            AnimatedObject ao = AnimatedObject.Read(content);
+            foreach (AoStruct block in ao.Structs)
+            {
+                foreach (AoEntry entry in block.Entries)
+                {
+                    if (Array.IndexOf(Hangs, entry.Key) < 0 || entry.Kind != AoValueKind.Quoted)
+                    {
+                        continue;
+                    }
+
+                    Hung(read, said, bones, entry.Value.Trim());
+                }
+            }
+        }
+    }
+
+    /// <summary>One attachment line: its socket, whether the parent has that bone, and its box.</summary>
+    private static void Hung(
+        Func<string, byte[]?> read, StringBuilder said, HashSet<string> bones, string value)
+    {
+        int space = value.IndexOf(' ', StringComparison.Ordinal);
+        string socket = space < 0 ? string.Empty : value[..space];
+        string path = space < 0 ? value : value[(space + 1)..].Trim();
+        if (!path.EndsWith(AnimatedObject.Suffix, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        said.Append("  ").Append(path[(path.LastIndexOf('/') + 1)..])
+            .Append("  socket ").Append(socket.Length > 0 ? socket : "(none)")
+            .Append(socket.Length > 0 && bones.Contains(socket) ? " [in the parent rig]" : " [NOT in the parent rig]");
+
+        (string _, byte[]? content) = Find(read, path);
+        if (content is not { Length: > 0 })
+        {
+            said.AppendLine("  (not in the install)");
+            return;
+        }
+
+        string skin = string.Empty;
+        foreach (AoStruct block in AnimatedObject.Read(content).Named("SkinMesh"))
+        {
+            foreach (AoEntry entry in block.Entries)
+            {
+                if (string.Equals(entry.Key, "skin", StringComparison.Ordinal) && entry.Value.Length > 0)
+                {
+                    skin = entry.Value;
+                }
+            }
+        }
+
+        if (skin.Length == 0)
+        {
+            said.AppendLine("  (no SkinMesh - an effect or a sound)");
+            return;
+        }
+
+        MeshManifest manifest = MeshManifest.Read(read(skin.Replace('\\', '/').Trim()));
+        said.Append("  box ").Append(Box(manifest.Least)).Append("..").AppendLine(Box(manifest.Most));
+    }
+
+    private static string Box(System.Numerics.Vector3 at)
+        => $"({at.X.ToString("0.#", CultureInfo.InvariantCulture)},"
+            + $"{at.Y.ToString("0.#", CultureInfo.InvariantCulture)},"
+            + $"{at.Z.ToString("0.#", CultureInfo.InvariantCulture)})";
 
     /// <summary>
     /// The .ao files this one hangs off itself - armour, clothing, weapons, effects.
