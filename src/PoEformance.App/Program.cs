@@ -320,6 +320,12 @@ internal static class Program
             RunPoseDump(stance);
         }
 
+        // And all of it at once, over every monster in the table. See RunModelDump.
+        if (options.DumpModels is { } sweep)
+        {
+            RunModelDump(sweep);
+        }
+
         // OUTSIDE the block above on purpose. Everything in it hangs off the game state, and
         // the loaded-file table does not: it hangs off FileRoot, so the tables are there at the
         // login screen, before any area exists. That is also what makes them worth having -
@@ -1276,6 +1282,144 @@ internal static class Program
         Console.WriteLine("  Read the fault count first: this reader has never seen a real .ao file.");
         Console.WriteLine("  Then \"referenced file types\" - a .dds there means a picture is reachable,");
         Console.WriteLine("  and \"animation names\" says whether the Stance column resolves to anything.");
+    }
+
+    /// <summary>
+    /// Walks every monster's model and writes what became of each of its pieces.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THIS IS FOR. Every attachment bug so far was found by somebody playing, seeing a boot
+    /// on the floor and asking - which finds the monsters somebody happens to fight. Four fixes
+    /// in a row each broke a monster the other had just fixed, because the case that would have
+    /// caught it was on a monster nobody had looked at. The files are all on disk; this reads
+    /// them. See <see cref="PoEformance.Features.ModelSweep"/> for what it counts and why.
+    ///
+    /// TWO THINGS COME OUT. A line of JSON per monster, which is the corpus - greppable, sortable,
+    /// diffable between two builds, and small enough to keep. And a full text dump, the same one
+    /// the model pane's files button writes, for the monsters the sweep flagged - which is the
+    /// part somebody actually reads.
+    ///
+    /// NEEDS THE INSTALL AND NOT THE GAME, like --aodump and --astdump.
+    /// </remarks>
+    /// <param name="match">A monster name or path to limit the sweep to, or empty for all of them.</param>
+    private static void RunModelDump(string match)
+    {
+        Console.WriteLine();
+        Console.WriteLine("monster models - every piece of every monster, out of the install's own files.");
+
+        PoEformance.Game.Files.GameFiles.OpenedFiles opened =
+            PoEformance.Game.Files.GameFiles.OpenOrSay(PoEformance.Game.Files.GameInstall.Find(null));
+        if (opened.Files is null)
+        {
+            Console.WriteLine($"  no install ({opened.Why}) - nothing to read.");
+            return;
+        }
+
+        PoEformance.Features.MonsterTables read = PoEformance.Features.MonsterTables.Read(
+            opened.Files,
+            PoEformance.Features.QuestTableLayouts.Load(FindDataFile("monster-tables.json")),
+            PoEformance.Game.Entities.MonsterVarieties.Load(FindDataFile("monster-varieties.json")));
+
+        foreach (string line in read.Say)
+        {
+            Console.WriteLine($"  {line}");
+        }
+
+        if (!read.FromGame)
+        {
+            Console.WriteLine("  the install's own monster table did not read, so no .ao paths are known.");
+            return;
+        }
+
+        string folder = Path.Combine(AppContext.BaseDirectory, "modeldump");
+        Directory.CreateDirectory(folder);
+        string corpus = Path.Combine(folder, "monster-fits.jsonl");
+
+        Console.WriteLine();
+        Console.WriteLine(match.Length > 0 ? $"  walking the monsters matching \"{match}\"." : "  walking every monster.");
+        Console.WriteLine($"  writing {corpus}");
+
+        byte[]? Read(string path) => opened.Files.Read(path);
+
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        PoEformance.Features.SweepResult said;
+
+        // STREAMED TO DISK RATHER THAN GATHERED, because the whole point is that this runs over
+        // thousands of monsters: a list of every line held until the end is the one part of this
+        // whose cost grows with the table.
+        using (var file = new StreamWriter(corpus, append: false))
+        {
+            StreamWriter writing = file;
+            said = PoEformance.Features.ModelSweep.Of(
+                Read,
+                read.Table,
+                match,
+                line => writing.WriteLine(line),
+                (at, many) => Console.WriteLine($"    {at} of {many}, {clock.Elapsed.TotalSeconds:0} s"));
+        }
+
+        Console.WriteLine();
+        Console.WriteLine($"  {said.Tally.Walked} monsters walked in {clock.Elapsed.TotalSeconds:0} s, "
+            + $"{said.Tally.Pieces} pieces between them.");
+        if (said.Tally.Nameless > 0)
+        {
+            Console.WriteLine($"  {said.Tally.Nameless} name no .ao file at all, so there was nothing to walk.");
+        }
+
+        Console.WriteLine($"  {said.Tally.Odd} carry at least one flag:");
+        foreach ((string flag, int many) in said.Tally.Flags.OrderByDescending(one => one.Value))
+        {
+            Console.WriteLine($"    {flag,-10} {many}");
+        }
+
+        // THE FLAGGED ONES IN FULL, and only those: the same dump the model pane's files button
+        // writes. Over the whole table that would be hundreds of megabytes and nobody reads it;
+        // over the flagged ones it is the file somebody opens.
+        var wrote = 0;
+        string dumps = Path.Combine(folder, "flagged");
+        Directory.CreateDirectory(dumps);
+        foreach (string path in said.Flagged)
+        {
+            PoEformance.Game.Entities.MonsterVariety? one = read.Table.Find(path);
+            if (one is null)
+            {
+                continue;
+            }
+
+            try
+            {
+                var model = PoEformance.Features.MonsterModels.Of(Read, one);
+                File.WriteAllText(
+                    Path.Combine(dumps, Stem(path) + ".files.txt"),
+                    PoEformance.Features.ModelDump.Of(Read, one, path, model));
+                wrote++;
+            }
+            catch (Exception fault) when (fault is IOException or UnauthorizedAccessException)
+            {
+                Console.WriteLine($"  could not write the dump for {path}: {fault.Message}");
+            }
+        }
+
+        Console.WriteLine();
+        Console.WriteLine($"  {wrote} full dumps under {dumps}");
+        Console.WriteLine();
+        Console.WriteLine("  The .jsonl is one monster per line, sorted by path, so two builds diff.");
+        Console.WriteLine("  \"fell\" is the flag that has meant a piece on the floor every time so far;");
+        Console.WriteLine("  \"apart\" is a rule of thumb and will name some monsters that are fine.");
+        Console.WriteLine("  No pictures were decoded, so this says nothing about a monster's colour.");
+    }
+
+    /// <summary>A metadata path as a file name: the last part, with nothing in it a folder minds.</summary>
+    private static string Stem(string path)
+    {
+        string last = path[(path.LastIndexOf('/') + 1)..];
+        Span<char> said = stackalloc char[last.Length];
+        for (var one = 0; one < last.Length; one++)
+        {
+            said[one] = Path.GetInvalidFileNameChars().Contains(last[one]) ? '_' : last[one];
+        }
+
+        return said.Length > 0 ? new string(said) : "monster";
     }
 
     /// <summary>
@@ -4136,6 +4280,7 @@ internal static class Program
         string? DumpAo,
         string? DumpAst,
         string? DumpPose,
+        string? DumpModels,
         bool ReadGlossary,
         bool ListTables,
         IReadOnlyList<string> Peek,
@@ -4153,7 +4298,7 @@ internal static class Program
             bool uiBrowser = false, questFlags = false, scanHeap = false, peekWatch = false;
             bool actionHunt = false, skillHunt = false, animDump = false, hoverHunt = false, mapHunt = false;
             bool sweep = false, groundTypeDump = false, glossary = false, listTables = false;
-            string? aoDump = null, astDump = null, poseDump = null;
+            string? aoDump = null, astDump = null, poseDump = null, modelDump = null;
             var inventorySweep = false;
             string tabName = string.Empty;
             List<string> peek = [];
@@ -4315,6 +4460,16 @@ internal static class Program
                             : string.Empty;
                         break;
 
+                    // The whole table at once: what every monster's model is made of and what
+                    // became of each of its pieces. Empty means all 2733 of them, which is the
+                    // point - the attachments that are wrong are wrong whether or not anybody
+                    // has walked past them. See RunModelDump.
+                    case "--modeldump":
+                        modelDump = i + 1 < args.Length && !args[i + 1].StartsWith("--", StringComparison.Ordinal)
+                            ? Value(ref i)
+                            : string.Empty;
+                        break;
+
                     // Regenerates data/animations.tsv from the game. Not a hunt - nothing is
                     // being searched for any more - so it stops the moment the row array's base
                     // is confirmed rather than sampling for as long as somebody plays.
@@ -4382,7 +4537,7 @@ internal static class Program
                 schema, replay, record, watch, verbose, overlay, config, autoFlask, probeFlasks, watchFlasks, probeKeys,
                 debug, uiBrowser, questFlags, scanHeap, actionHunt, skillHunt, hoverHunt, mapHunt, sweep,
                 inventorySweep, tabName, groundTypeDump, animDump, aoDump, astDump, poseDump,
-                glossary, listTables, peek, peekWatch, updateOutcome, updatedVersion);
+                modelDump, glossary, listTables, peek, peekWatch, updateOutcome, updatedVersion);
         }
     }
 }
