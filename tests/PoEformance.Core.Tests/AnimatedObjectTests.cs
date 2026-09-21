@@ -576,4 +576,112 @@ public class AnimatedObjectTests
 
         Assert.Equal(["metdata", "on_event", "animation", "0.35", "1,2", "blend"], keys);
     }
+    /// <summary>
+    /// An entry indented with a tab and spaces is a SIBLING, not the line above it's child.
+    /// </summary>
+    /// <remarks>
+    /// THE INCURSION FORGEMASTER'S HAMMER LAY ON THE FLOOR BETWEEN HIS FEET, and its own file
+    /// said where it belonged the whole time:
+    ///
+    ///     \t\t skeleton = "…/rig.ast"
+    ///     \t    attachment_bones = "L_wrist_jntBnd L_elbow_Twist_jntBnd_1 child_attach"
+    ///
+    /// Entries hang off one another BY COLUMN, and a tab counted as one character made the
+    /// second line three columns deeper than the first - so the pairing became a CHILD of the
+    /// skeleton entry and vanished from the struct's own entries, where everything looks for it.
+    /// The piece then matched no bone at all and was left at the monster's root.
+    ///
+    /// THE WIDTH IS MEASURED, NOT PICKED. Of 66455 entry lines across the install's .ao files,
+    /// 467 mix a tab with spaces, and every one is a tab and four spaces, a tab and eight, or one
+    /// tab-two-spaces-tab. At four columns all three land exactly on a tab stop, so the file's two
+    /// spellings of one depth agree - and held up against the entry line BEFORE each of them, 397
+    /// come out as siblings and 6 as children, which is the scheme the files are written in: four
+    /// spaces is one level. The keys carrying them are led by attachment_bones 45 times and
+    /// bone_group 44 - the two lines that carry a bone pairing.
+    ///
+    /// THE TWO PREFIXES HERE ARE THE ONES THAT MEASURE EIGHT, which is what a line of two tabs
+    /// measures, so they are that line's siblings. A tab and EIGHT spaces measures twelve and is
+    /// genuinely deeper - see the test below, which pins that half so this one cannot be widened
+    /// into flattening real nesting.
+    /// </remarks>
+    [Theory]
+    [InlineData("\t    ")]
+    [InlineData("\t  \t")]
+    public void AnEntryIndentedWithATabAndSpacesIsASiblingAndNotAChild(string indent)
+    {
+        string text = "version 3\nclient\n{\n"
+            + "\tClientAnimationController\n\t{\n"
+            + "\t\tskeleton = \"art/rig.ast\"\n"
+            + indent + "attachment_bones = \"L_wrist_jntBnd L_elbow_Twist_jntBnd_1 child_attach\"\n"
+            + "\t}\n}\n";
+
+        AnimatedObject said = AnimatedObject.Read(Encoding.UTF8.GetBytes(text));
+
+        Assert.True(said.Ready);
+
+        AoStruct block = Assert.Single(said.Named("ClientAnimationController"));
+        Assert.Equal(
+            ["skeleton", "attachment_bones"],
+            block.Entries.Select(one => one.Key));
+
+        // And it is nobody's child, which is the half that was wrong.
+        Assert.Empty(block.Entries[0].Children);
+    }
+
+    /// <summary>
+    /// A tab and EIGHT spaces is one level deeper still, which is what the files mean by it.
+    /// </summary>
+    /// <remarks>
+    /// FOUR SPACES IS ONE LEVEL in these files, so a tab and eight is twelve columns against a
+    /// tab and four's eight. Measured the same way as the width itself: of the 18 lines written
+    /// that way, 12 sit beside another of their own and 6 sit under a tab-and-four - never the
+    /// other way about. Pinned so the sibling rule above cannot be stretched into flattening
+    /// nesting the file meant.
+    /// </remarks>
+    [Fact]
+    public void ATabAndEightSpacesIsOneLevelDeeperStill()
+    {
+        string text = "version 3\nclient\n{\n"
+            + "\tClientAnimationController\n\t{\n"
+            + "\t    attached_object = \"R_Weapon art/ice.ao\"\n"
+            + "\t        attached_object_translation = \"0 0 -55\"\n"
+            + "\t}\n}\n";
+
+        AnimatedObject said = AnimatedObject.Read(Encoding.UTF8.GetBytes(text));
+
+        AoStruct block = Assert.Single(said.Named("ClientAnimationController"));
+        AoEntry hung = Assert.Single(block.Entries);
+
+        Assert.Equal("attached_object", hung.Key);
+        Assert.Equal("attached_object_translation", Assert.Single(hung.Children).Key);
+    }
+
+    /// <summary>
+    /// A line the file really does nest stays nested, which is what keeps the fix honest.
+    /// </summary>
+    /// <remarks>
+    /// NESTING IS REAL AND CARRIES MEANING: an attached_object's turn and shift are written under
+    /// it, and the Frostborn Fiend's block of ice stands upright on the floor without them. A
+    /// change to how columns are counted has to leave that alone, so this asserts the other side
+    /// of the same rule - deeper in TABS is still deeper.
+    /// </remarks>
+    [Fact]
+    public void ALineTheFileReallyNestsStaysNested()
+    {
+        string text = "version 3\nAttachedAnimatedObject\n{\n"
+            + "\tattached_object = \"R_Weapon art/ice.ao\"\n"
+            + "\t\tattached_object_translation = \"0 0 -55\"\n"
+            + "\t\tattached_object_rotation = \"-3.141 -0 0\"\n"
+            + "}\n";
+
+        AnimatedObject said = AnimatedObject.Read(Encoding.UTF8.GetBytes(text));
+
+        AoStruct block = Assert.Single(said.Named("AttachedAnimatedObject"));
+        AoEntry hung = Assert.Single(block.Entries);
+
+        Assert.Equal("attached_object", hung.Key);
+        Assert.Equal(
+            ["attached_object_translation", "attached_object_rotation"],
+            hung.Children.Select(one => one.Key));
+    }
 }
