@@ -936,6 +936,141 @@ public class MonsterModelTests
     }
 
     /// <summary>
+    /// A bone's parent can carry a HIGHER number than the bone, and the walk has to survive it.
+    /// </summary>
+    /// <remarks>
+    /// THE ASSUMPTION THAT COST A SECOND ROUND. Matching a piece's bones onto the parent's walks
+    /// up the piece's own tree looking for a name the parent has, and the first version read the
+    /// parent's answer straight out of the array - on the reasoning that a parent is always
+    /// earlier in the list. It is not: <see cref="SkeletonPose"/> builds the tree out of the
+    /// file's child-and-sibling links with a stack, and the numbers are the file's to choose.
+    /// Bahlak the Sky Seer's feathers are exactly that - phys_skinned_head_feathers_1 is bone 19
+    /// and hangs off M_head_jntBnd, bone 22.
+    ///
+    /// WHAT IT LOOKED LIKE: every bone that lost that race fell back to the rig root, which is
+    /// the one bone that does not follow the body, so the piece came out stretched between the
+    /// monster and the origin - a long black spike from his chest down to the floor. The rig
+    /// here is the smallest one that reproduces it: root, then a chest whose own child is the
+    /// bone numbered below it.
+    /// </remarks>
+    [Fact]
+    public void APieceWhoseBonesOutnumberTheirParentsStillFindsThemByName()
+    {
+        // The piece's rig: root(0) -> chest(2) -> feather(1). The feather's parent is NUMBERED
+        // above it, which is the whole point of the fixture.
+        byte[] piece = Packed.Skeleton(
+            [
+                ("root_jntBnd", 255, 2, 0f),
+                ("phys_feather_jntBnd", 255, 255, -100f),
+                ("chest_jntBnd", 255, 1, -90f),
+            ],
+            []);
+
+        var install = Install();
+        install.Files["art/rig.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("chest_jntBnd", 255, 255, -90f)], []);
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/cloak.ao", socket: "<root>", skeleton: "art/rig.ast");
+        install.Files["art/cloak.ao"] = Ao(skin: "art/cloak.sm", skeleton: "art/cloak.ast");
+        install.Files["art/cloak.ast"] = piece;
+        install.Files["art/cloak.sm"] = Sm("art/cloak.smd", "art/paint.mat");
+        install.Files["art/cloak.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+
+        // The fixture binds every vertex to the piece's bone 1 - the feather, whose name the
+        // parent does not have. Walking up reaches chest_jntBnd, which the parent has at 1. A
+        // walk that gave up would say 0, and 0 is the root the piece was stranded on.
+        Assert.Equal<byte>([1, 0, 0, 0], said.Mesh.Bones[16..20]);
+    }
+
+    /// <summary>
+    /// A shared bone NAME is not enough: the bones have to rest in the same place.
+    /// </summary>
+    /// <remarks>
+    /// THE REGRESSION THIS IS AGAINST, reported from the live client one version after the
+    /// retargeting went in. The Frostborn Fiend holds a block of ice whose rig is three bones -
+    /// root_jntBnd, weapon_jntBnd and aux_position - of which the parent rig also has TWO. It is
+    /// plainly a prop, socketed at R_Weapon, and counting that second shared name turned it into
+    /// a skin: the socket's transform came off and the ice stood upright on the floor beside him.
+    ///
+    /// BOTH OF ITS SHARED BONES REST AT THE ORIGIN, which is the tell. Every rig has some, and
+    /// two of them agreeing says only that both files start counting from the same place - so a
+    /// bone at the origin is left out of the count on both sides, and this piece falls back to
+    /// being what it is.
+    /// </remarks>
+    [Fact]
+    public void ASharedBoneNameAtTheOriginIsNotEvidenceThatAPieceIsSkinned()
+    {
+        // The ice's rig, as the game writes it: everything at the origin, and aux_position a
+        // name the parent happens to carry too.
+        byte[] piece = Packed.Skeleton(
+            [
+                ("root_jntBnd", 255, 1, 0f),
+                ("weapon_jntBnd", 2, 255, 0f),
+                ("aux_position", 255, 255, 0f),
+            ],
+            []);
+
+        var install = Install();
+        install.Files["art/rig.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("aux_position", 255, 2, -60f), ("chest_jntBnd", 255, 255, -30f)],
+            []);
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/ice.ao", socket: "aux_position", skeleton: "art/rig.ast");
+        install.Files["art/ice.ao"] = Ao(skin: "art/ice.sm", skeleton: "art/ice.ast");
+        install.Files["art/ice.ast"] = piece;
+        install.Files["art/ice.sm"] = Sm("art/ice.smd", "art/paint.mat");
+        install.Files["art/ice.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+
+        // Rigid at the socket: every slot is that one bone, and the piece was moved to where it
+        // rests - sixty down - rather than left in its own space at the origin.
+        Assert.All(said.Mesh.Bones[16..20], one => Assert.Equal<byte>(1, one));
+        Assert.Equal(-60f, said.Mesh.Positions[4].Z - said.Mesh.Positions[0].Z, 3);
+    }
+
+    /// <summary>
+    /// The turn and the shift an attachment line asks for are applied on top of its socket.
+    /// </summary>
+    /// <remarks>
+    /// TWO LINES THAT WERE BEING THROWN AWAY. An attached_object entry can carry children, and
+    /// the Frostborn Fiend's block of ice carries <c>attached_object_translation = "0 0 -55"</c>
+    /// and <c>attached_object_rotation = "-3.141 -0 0"</c> - half a turn about x and a shift of
+    /// fifty-five. Without them the ice he is holding stands upright on the floor beside him.
+    /// </remarks>
+    [Fact]
+    public void AnAttachmentsOwnTurnAndShiftRideOnTopOfItsSocket()
+    {
+        var install = Install();
+        install.Files["art/rig.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("hip_jntBnd", 255, 255, 0f)], []);
+        install.Files["body.ao"] = Encoding.UTF8.GetBytes(
+            "version 3\n"
+            + "client\n{\n\tClientAnimationController\n\t{\n\t\tskeleton = \"art/rig.ast\"\n\t}\n}\n"
+            + "AttachedAnimatedObject\n{\n"
+            + "\tattached_object = \"hip_jntBnd art/ice.ao\"\n"
+            + "\t\tattached_object_translation = \"0 0 -55\"\n"
+            + "}\n"
+            + "SkinMesh\n{\n\tskin = \"art/mesh.sm\"\n}\n");
+        install.Files["art/ice.ao"] = Ao(skin: "art/ice.sm");
+        install.Files["art/ice.sm"] = Sm("art/ice.smd", "art/paint.mat");
+        install.Files["art/ice.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+
+        // The socket rests at the origin, so the whole of the offset is the line's own shift.
+        Assert.Equal(-55f, said.Mesh.Positions[4].Z - said.Mesh.Positions[0].Z, 3);
+    }
+
+    /// <summary>
     /// A prop that shares nothing but the root is still pinned rigidly to its socket.
     /// </summary>
     /// <remarks>
