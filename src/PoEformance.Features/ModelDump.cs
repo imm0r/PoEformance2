@@ -179,6 +179,18 @@ public static class ModelDump
 
         said.Append("mounts: ").AppendLine(mounts.Length > 0 ? string.Join(", ", mounts) : "(none named aux_)");
 
+        // THE PARENT'S OWN REST POSE, so a piece's bones can be held up against it by name. Where
+        // the two rigs put a shared bone in the same place, the piece is modelled in the
+        // monster's space; where they do not, it is not - and that was decided three times by
+        // guessing before it was printed once.
+        var named_ = new Dictionary<string, int>(rig.Bones.Count, StringComparer.OrdinalIgnoreCase);
+        for (var one = 0; one < rig.Bones.Count; one++)
+        {
+            named_.TryAdd(rig.Bones[one].Name, one);
+        }
+
+        IReadOnlyList<System.Numerics.Matrix4x4> over_ = SkeletonPose.Of(rig)?.BindModel ?? [];
+
         foreach (string one in walked)
         {
             (string _, byte[]? content) = Find(read, one);
@@ -197,7 +209,7 @@ public static class ModelDump
                         continue;
                     }
 
-                    Hung(read, said, bones, entry);
+                    Hung(read, said, bones, named_, over_, entry);
                 }
             }
         }
@@ -205,7 +217,12 @@ public static class ModelDump
 
     /// <summary>One attachment line: its socket, whether the parent has that bone, and its box.</summary>
     private static void Hung(
-        Func<string, byte[]?> read, StringBuilder said, HashSet<string> bones, AoEntry entry)
+        Func<string, byte[]?> read,
+        StringBuilder said,
+        HashSet<string> bones,
+        IReadOnlyDictionary<string, int> parent,
+        IReadOnlyList<System.Numerics.Matrix4x4> over_,
+        AoEntry entry)
     {
         string value = entry.Value.Trim();
         int space = value.IndexOf(' ', StringComparison.Ordinal);
@@ -268,7 +285,7 @@ public static class ModelDump
         said.Append("  box ").Append(Box(manifest.Least)).Append("..").AppendLine(Box(manifest.Most));
 
         Facts(said, "    ", SkinnedMesh.Read(read(manifest.Geometry.Replace('\\', '/').Trim())).Facts);
-        Rigged(read, said, bones, content);
+        Rigged(read, said, bones, parent, over_, content);
     }
 
     /// <summary>How many of a piece's own bones are printed. Enough to see whose names they are.</summary>
@@ -292,7 +309,12 @@ public static class ModelDump
     /// here, in one file, without another build.
     /// </remarks>
     private static void Rigged(
-        Func<string, byte[]?> read, StringBuilder said, HashSet<string> bones, byte[] content)
+        Func<string, byte[]?> read,
+        StringBuilder said,
+        HashSet<string> bones,
+        IReadOnlyDictionary<string, int> parent,
+        IReadOnlyList<System.Numerics.Matrix4x4> over_,
+        byte[] content)
     {
         string path = string.Empty;
         foreach (AoStruct block in AnimatedObject.Read(content).Named("ClientAnimationController"))
@@ -352,6 +374,14 @@ public static class ModelDump
             if (one < rest.Count)
             {
                 said.Append("  rests at ").Append(Box(rest[one].Translation));
+            }
+
+            // AND WHERE THE PARENT RESTS THE SAME BONE, side by side. Whether the two rigs carry
+            // the same rest pose is the question every theory about these pieces turned on, and
+            // it was answered three times by guessing before it was ever printed.
+            if (parent.TryGetValue(own.Bones[one].Name, out int also) && also < over_.Count)
+            {
+                said.Append("  parent has ").Append(Box(over_[also].Translation));
             }
 
             said.AppendLine();

@@ -987,41 +987,32 @@ public class MonsterModelTests
     }
 
     /// <summary>
-    /// A shared bone NAME is not enough: the bones have to rest in the same place.
+    /// A piece that NAMES a socket is placed there, whatever its own rig happens to share.
     /// </summary>
     /// <remarks>
-    /// THE REGRESSION THIS IS AGAINST, reported from the live client one version after the
-    /// retargeting went in. The Frostborn Fiend holds a block of ice whose rig is three bones -
-    /// root_jntBnd, weapon_jntBnd and aux_position - of which the parent rig also has TWO. It is
-    /// plainly a prop, socketed at R_Weapon, and counting that second shared name turned it into
-    /// a skin: the socket's transform came off and the ice stood upright on the floor beside him.
+    /// THE ATTACHMENT LINE CARRIES THE ANSWER, and two goes at reading the piece's rig instead
+    /// each broke a monster the other fixed. Counting shared bone names turned the Frostborn
+    /// Fiend's block of ice - three bones, of which the parent rig has two - into a skinned cloak
+    /// and stood it upright on the floor beside him. Requiring the shared bones to rest in the
+    /// same place as the parent's then rejected Bahlak's feathers, which are the clearest skinned
+    /// piece there is, and dropped them on the floor in three flat clumps.
     ///
-    /// BOTH OF ITS SHARED BONES REST AT THE ORIGIN, which is the tell. Every rig has some, and
-    /// two of them agreeing says only that both files start counting from the same place - so a
-    /// bone at the origin is left out of the count on both sides, and this piece falls back to
-    /// being what it is.
+    /// A LINE THAT NAMES A BONE IS PLACING THE PIECE THERE - the anchor at aux_anchor_jntBnd, the
+    /// beard at head_jntBnd, the ice at R_Weapon. This fixture is the hardest version of that:
+    /// the piece's rig is the PARENT'S OWN, every name shared and every bone resting in the same
+    /// place, and it must still go to its socket because that is what the line says.
     /// </remarks>
     [Fact]
-    public void ASharedBoneNameAtTheOriginIsNotEvidenceThatAPieceIsSkinned()
+    public void APieceThatNamesASocketIsPlacedThereWhateverItsRigShares()
     {
-        // The ice's rig, as the game writes it: everything at the origin, and aux_position a
-        // name the parent happens to carry too.
-        byte[] piece = Packed.Skeleton(
-            [
-                ("root_jntBnd", 255, 1, 0f),
-                ("weapon_jntBnd", 2, 255, 0f),
-                ("aux_position", 255, 255, 0f),
-            ],
-            []);
+        byte[] rig = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("chest_jntBnd", 255, 255, -60f)], []);
 
         var install = Install();
-        install.Files["art/rig.ast"] = Packed.Skeleton(
-            [("root_jntBnd", 255, 1, 0f), ("aux_position", 255, 2, -60f), ("chest_jntBnd", 255, 255, -30f)],
-            []);
+        install.Files["art/rig.ast"] = rig;
         install.Files["body.ao"] = Ao(
-            skin: "art/mesh.sm", attach: "art/ice.ao", socket: "aux_position", skeleton: "art/rig.ast");
-        install.Files["art/ice.ao"] = Ao(skin: "art/ice.sm", skeleton: "art/ice.ast");
-        install.Files["art/ice.ast"] = piece;
+            skin: "art/mesh.sm", attach: "art/ice.ao", socket: "chest_jntBnd", skeleton: "art/rig.ast");
+        install.Files["art/ice.ao"] = Ao(skin: "art/ice.sm", skeleton: "art/rig.ast");
         install.Files["art/ice.sm"] = Sm("art/ice.smd", "art/paint.mat");
         install.Files["art/ice.smd"] = Smd();
 
@@ -1033,6 +1024,39 @@ public class MonsterModelTests
         // rests - sixty down - rather than left in its own space at the origin.
         Assert.All(said.Mesh.Bones[16..20], one => Assert.Equal<byte>(1, one));
         Assert.Equal(-60f, said.Mesh.Positions[4].Z - said.Mesh.Positions[0].Z, 3);
+    }
+
+    /// <summary>
+    /// A piece that names no socket and shares no bone but the root stays where it is.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE CASE STILL NOT SETTLED, pinned so it cannot change by accident. Malgor the
+    /// Nautilord's ship's wheel is socketed "&lt;root&gt;" - so nothing places it - and its rig is
+    /// ten bones of which the parent shares only root_jntBnd, so there is nothing to move it onto
+    /// either. It lands at the monster's origin. Whether that is where the game puts it is a
+    /// question for a picture; what this fixes is that nothing here invents an answer.
+    /// </remarks>
+    [Fact]
+    public void APieceWithNoSocketAndNoSharedBonesIsLeftAtTheOrigin()
+    {
+        byte[] piece = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("wheel_jntBnd", 255, 255, -40f)], []);
+
+        var install = Install();
+        install.Files["art/rig.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), ("chest_jntBnd", 255, 255, -60f)], []);
+        install.Files["body.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/wheel.ao", socket: "<root>", skeleton: "art/rig.ast");
+        install.Files["art/wheel.ao"] = Ao(skin: "art/wheel.sm", skeleton: "art/wheel.ast");
+        install.Files["art/wheel.ast"] = piece;
+        install.Files["art/wheel.sm"] = Sm("art/wheel.smd", "art/paint.mat");
+        install.Files["art/wheel.smd"] = Smd();
+
+        MonsterModel said = MonsterModels.Of(install.Read, Named("body.ao"));
+
+        Assert.Equal(1, said.Parts);
+        Assert.All(said.Mesh.Bones[16..20], one => Assert.Equal<byte>(0, one));
+        Assert.Equal(said.Mesh.Positions[0], said.Mesh.Positions[4]);
     }
 
     /// <summary>
