@@ -142,6 +142,18 @@ public sealed record MonsterModel(
     /// MonsterModels.Dressing.
     /// </remarks>
     public int Parts { get; init; }
+
+    /// <summary>
+    /// How many <c>.sm</c> files the body itself is, before anything worn over it.
+    /// </summary>
+    /// <remarks>
+    /// ONE IS ORDINARY AND SEVEN IS THE CASE THAT WAS BEING LOST. A SkinMesh block may name
+    /// several manifests, each a section of the same body on the same rig: Zar Wali, the Bone
+    /// Tyrant is arms, chest, head, neck and tail in seven files, and while only the first was
+    /// read the pane drew two floating arms. Shown under the picture because a monster drawn in
+    /// pieces and a monster that really IS two arms look the same.
+    /// </remarks>
+    public int Sections { get; init; } = 1;
 }
 
 /// <summary>
@@ -231,10 +243,10 @@ public static class MonsterModels
             return tally.Failed("no SkinMesh anywhere in the .ao files or what they extend");
         }
 
-        MeshManifest manifest = Read(counted, found.Mesh, MeshManifest.Read);
+        MeshManifest manifest = Read(counted, found.Meshes[0], MeshManifest.Read);
         if (!manifest.Ready)
         {
-            return tally.Failed($"the mesh manifest did not read: {found.Mesh}", found.Mesh);
+            return tally.Failed($"the mesh manifest did not read: {found.Meshes[0]}", found.Meshes[0]);
         }
 
         SkinnedMesh mesh = Read(counted, manifest.Geometry, SkinnedMesh.Read);
@@ -285,9 +297,16 @@ public static class MonsterModels
         // AND WHAT THE MONSTER WEARS. Doryani's skirt, belt, necklace and six more pieces are
         // attached_object entries naming their own .ao, mesh and rig - see Dressing. Joined into
         // one mesh so the renderer, the per-shape palette and the pose go on working unchanged.
-        List<Part> parts = wearing
-            ? Dressing(counted, found.Files, rig, paints, skin)
-            : [];
+        // THE BODY ITSELF CAN BE SEVERAL FILES, before anything is worn over it. Joined the same
+        // way, and always - a section is not an accessory and switching the parts off must not
+        // take half the monster with it. See Sections.
+        List<Part> parts = Sections(counted, found.Meshes, found.Materials, paints, skin);
+        int sections = parts.Count;
+
+        if (wearing)
+        {
+            parts.AddRange(Dressing(counted, found.Files, rig, paints, skin));
+        }
 
         if (parts.Count > 0)
         {
@@ -303,7 +322,8 @@ public static class MonsterModels
 
         return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint)
         {
-            Parts = parts.Count,
+            Parts = parts.Count - sections,
+            Sections = found.Meshes.Count,
             Skins = dress.Skins,
             Materials = dress.Materials,
             NamedInAo = found.Materials.Count,
@@ -348,6 +368,57 @@ public static class MonsterModels
     private const int MostParts = 48;
 
     /// <summary>
+    /// The body's other sections, where its SkinMesh block names more than one manifest.
+    /// </summary>
+    /// <remarks>
+    /// A SKIN BLOCK IS A LIST, NOT A FIELD, and reading it as a field cost a boss his whole body.
+    /// Reported from the live client: Zar Wali, the Bone Tyrant came out as two arms floating in
+    /// the air, painted from <c>GiantSnakeSkeletonBossArm_colour.dds</c> - and his .ao says why
+    /// in seven consecutive lines, <c>GSSBArmA</c> through <c>GSSBTail</c>, of which this walk
+    /// read the first.
+    ///
+    /// THEY ARE SECTIONS OF ONE BODY ON ONE RIG, which is what makes them cheap to join: each
+    /// carries its own vertex bones and they already index the SAME skeleton, so unlike a worn
+    /// piece there is nothing to remap and nowhere to put it. Its own manifest names its own
+    /// materials, so each section is dressed on its own and the palette comes out per shape as
+    /// before.
+    ///
+    /// NOT UNDER THE PARTS SWITCH. Turning attachments off is meant to undress a monster, not
+    /// to behead one.
+    /// </remarks>
+    private static List<Part> Sections(
+        Func<string, byte[]?> read,
+        IReadOnlyList<string> skins,
+        IReadOnlyList<(string Shape, string Material)> named,
+        Paints paints,
+        Mipmaps? fallback)
+    {
+        var parts = new List<Part>();
+        for (var one = 1; one < skins.Count && parts.Count < MostParts; one++)
+        {
+            MeshManifest manifest = Read(read, skins[one], MeshManifest.Read);
+            if (!manifest.Ready)
+            {
+                continue;
+            }
+
+            SkinnedMesh mesh = Read(read, manifest.Geometry, SkinnedMesh.Read);
+            if (!mesh.Ready)
+            {
+                continue;
+            }
+
+            Dress dress = Dressed(read, mesh, named, manifest, fallback, string.Empty, paints);
+
+            // NO BONES AND NO PLACE: the section's own vertex bones index the body's rig
+            // already, so handing null keeps them and the join leaves the geometry where it is.
+            parts.Add(new Part(mesh, null, null, null, dress.Skins));
+        }
+
+        return parts;
+    }
+
+    /// <summary>
     /// Everything the monster wears, read from the attachments its own files name.
     /// </summary>
     /// <remarks>
@@ -357,17 +428,15 @@ public static class MonsterModels
     /// body mesh. It is <c>attached_object = "hip_jntBnd …/attachments/Skirt.ao"</c>, with a mesh,
     /// a rig and an idle animation of its own, and the body's files say nothing else about it.
     ///
-    /// THE BONES ARE MATCHED BY NAME, which is the whole trick and is not a guess: the skirt's own
-    /// rig carries <c>root_jntBnd</c>, <c>spine_1_jntBnd</c>, <c>spine_2_jntBnd</c> and
-    /// <c>chest_jntBnd</c> - the parent's names - and its .ao names those same bones again in
-    /// <c>attachment_bones</c>. So a vertex that the file says belongs to the skirt's bone 3 is a
-    /// vertex belonging to whichever of the PARENT'S bones carries that bone's name, and posing
-    /// the joined mesh with the parent's pose then places and animates the piece together.
+    /// A PIECE IS EITHER A PROP OR A SKIN, and its own rig says which - see
+    /// <see cref="Retargeted"/>. A prop shares only <c>root_jntBnd</c> with the parent, is
+    /// modelled around its own origin, and goes rigidly at its socket. A skin carries the body's
+    /// own bone names, is already in the monster's space, and wants its bone NUMBERS translated
+    /// and no transform at all.
     ///
-    /// A BONE WITH NO MATCH FALLS BACK TO THE SOCKET the attachment was hung from, which is the
-    /// nearest thing the parent has to where the piece belongs; with no socket either it falls
-    /// back to bone 0, and a piece drawn at the root is at least visibly wrong rather than
-    /// invisibly absent.
+    /// GETTING THAT WRONG IS INVISIBLE AT REST, which is what made it expensive: a piece bound
+    /// rigidly to one bone stands in the right place until something moves, and then follows that
+    /// one bone while the body deforms around it.
     ///
     /// WHAT IT COSTS is the reason the pane has a switch for it. Doryani's body is 32 MB across
     /// 15 files; his nine pieces bring their own meshes, rigs and sheets, and the belt hangs three
@@ -437,7 +506,7 @@ public static class MonsterModels
                 }
             }
 
-            if (Worn(read, ao, place, bone, paints, fallback) is { } part)
+            if (Worn(read, ao, place, bone, paints, fallback, where, rest) is { } part)
             {
                 parts.Add(part);
             }
@@ -538,13 +607,14 @@ public static class MonsterModels
         Matrix4x4 place,
         int bone,
         Paints paints,
-        Mipmaps? fallback)
+        Mipmaps? fallback,
+        IReadOnlyDictionary<string, int> where,
+        SkeletonPose rest)
     {
         string skin = Skin(ao);
         if (skin.Length == 0)
         {
-            // An effect pack or a sound emitter. Ordinary, and nothing to draw.
-            return null;
+            return Propped(read, ao, place, bone, paints, fallback);
         }
 
         MeshManifest manifest = Read(read, skin, MeshManifest.Read);
@@ -561,10 +631,160 @@ public static class MonsterModels
 
         Dress dress = Dressed(read, mesh, [], manifest, fallback, string.Empty, paints);
 
-        // ONE BONE, ALL THE WEIGHT. The piece moves with the socket and nothing else, so every
-        // vertex names that bone four times over with the whole 255 on the first - which is what
-        // SkeletonPose.Move expects and what makes the piece follow an arm that lifts.
-        int count = mesh.Positions.Length;
+        // TWO KINDS OF PIECE, AND THE PIECE'S OWN RIG SAYS WHICH - see Retargeted.
+        if (Retargeted(read, ao, where, mesh) is { } map)
+        {
+            return new Part(mesh, map, null, null, dress.Skins);
+        }
+
+        (byte[] bones, byte[] weights) = Bound(mesh.Positions.Length, bone);
+        return new Part(mesh, bones, weights, place, dress.Skins);
+    }
+
+    /// <summary>
+    /// A piece's vertex bones moved onto the PARENT's rig, or null where it is a rigid prop.
+    /// </summary>
+    /// <remarks>
+    /// TWO KINDS OF ATTACHMENT WEAR THE SAME SPELLING, and the piece's own skeleton is what tells
+    /// them apart. Measured, on five pieces across two bosses:
+    ///
+    ///     Malgor's anchor    12 bones, one shared with the parent - root_jntBnd
+    ///     Malgor's beard      8 bones, one shared - root_jntBnd
+    ///     Malgor's ship wheel 10 bones, one shared - root_jntBnd
+    ///     Malgor's seaweed   23 bones, TWELVE shared - hip, spine_1, spine_2, chest, clavicles…
+    ///     Bahlak's feathers  31 bones, ELEVEN shared - spine_1, spine_2, chest, neck, head…
+    ///
+    /// A PROP SHARES ONLY THE ROOT, which every rig has and which therefore means nothing. Its
+    /// bones are its own - phys_tri_chain, jaw_jntBnd_1..8 - it is modelled around its own origin,
+    /// and it belongs rigidly at its socket. That is the case <see cref="Bound"/> handles and it
+    /// has been right all along.
+    ///
+    /// A SKINNED PIECE SHARES THE BODY'S OWN BONES, and its rig rests them where the body's rest:
+    /// the seaweed's hip_jntBnd at (0,18.7,-97.6), its chest at (0,26.3,-171.6). Its vertices are
+    /// ALREADY in the monster's space - the seaweed's box is y 40..131, draped over a spine that
+    /// sits at y 19..26 - so it wants no transform at all. What it wants is its bone NUMBERS
+    /// translated, because bone 9 in the piece's file is the parent's bone 47.
+    ///
+    /// WHY THAT WAS THE WHOLE BUG. Binding every vertex to one bone is harmless at rest and wrong
+    /// the moment anything moves: the body deforms and the piece rigidly follows a single bone.
+    /// For a socketed piece that bone is an arm or a head and it looks right; for a "&lt;root&gt;"
+    /// piece it is the RIG ROOT, which is the one bone that does not follow the body at all. So
+    /// Bahlak's feathers stayed on the floor while he rose, and Malgor's seaweed hung in the air
+    /// behind him - and only the "&lt;root&gt;" pieces ever did, which is exactly what was reported.
+    ///
+    /// A BONE THE PARENT DOES NOT HAVE goes to its nearest ancestor that the parent does have.
+    /// The unshared ones are all simulated - phys_skinned_M_skirt_2, phys_tri_seaweed_belt - so
+    /// their nearest real ancestor is the spine or chest they hang off, which is where a tool
+    /// that does not simulate cloth should hold them.
+    /// </remarks>
+    private static byte[]? Retargeted(
+        Func<string, byte[]?> read,
+        AnimatedObject ao,
+        IReadOnlyDictionary<string, int> where,
+        SkinnedMesh mesh)
+    {
+        string path = Entryed(ao, RigBlock, RigEntry);
+        if (path.Length == 0 || mesh.Bones.Length != mesh.Positions.Length * 4)
+        {
+            return null;
+        }
+
+        AnimationSkeleton own = Read(read, path, AnimationSkeleton.Read);
+        if (!own.Ready || SkeletonPose.Of(own) is not { } mine)
+        {
+            return null;
+        }
+
+        var onto = new byte[own.Bones.Count];
+        var shared = 0;
+        for (var one = 0; one < own.Bones.Count; one++)
+        {
+            if (where.TryGetValue(own.Bones[one].Name, out int at) && at <= byte.MaxValue)
+            {
+                onto[one] = (byte)at;
+
+                // THE ROOT DOES NOT COUNT. Every rig in the game has one and every prop shares
+                // it, so counting it would make a ship's wheel look like a skinned cloak.
+                if (one > 0)
+                {
+                    shared++;
+                }
+
+                continue;
+            }
+
+            // Its parent is always earlier in the list, so its answer is already known.
+            int up = one < mine.Parents.Count ? mine.Parents[one] : -1;
+            onto[one] = up >= 0 && up < one ? onto[up] : (byte)0;
+        }
+
+        if (shared == 0)
+        {
+            return null;
+        }
+
+        var bones = new byte[mesh.Bones.Length];
+        for (var one = 0; one < bones.Length; one++)
+        {
+            byte said = mesh.Bones[one];
+            bones[one] = said < onto.Length ? onto[said] : (byte)0;
+        }
+
+        return bones;
+    }
+
+    /// <summary>
+    /// A piece that is a rigid prop rather than a skin: a <c>FixedMesh</c> naming a <c>.fmt</c>.
+    /// </summary>
+    /// <remarks>
+    /// THE OTHER KIND OF ATTACHMENT, and the one the walk used to throw away. An .ao hangs either
+    /// a SkinMesh - a .sm and then a .smd - or a FixedMesh, which names a .fmt and nothing else;
+    /// asking only for the first meant every prop came back as "no SkinMesh" and was skipped.
+    /// Reported from the live client: Malgor, the Nautilord carries a cannon the pane never drew,
+    /// and his attachment's whole .ao is four lines with <c>fixed_mesh</c> in the middle of them.
+    ///
+    /// NO MANIFEST, BECAUSE A .fmt CARRIES ITS OWN MATERIALS - one .mat per shape, by name. That
+    /// is the same list the .ao's own material lines take, so it goes down the path that is
+    /// already there: <see cref="Dressed"/> matches a shape to a material by name first, and an
+    /// empty manifest simply has nothing to add underneath it.
+    /// </remarks>
+    private static Part? Propped(
+        Func<string, byte[]?> read,
+        AnimatedObject ao,
+        Matrix4x4 place,
+        int bone,
+        Paints paints,
+        Mipmaps? fallback)
+    {
+        string path = Entryed(ao, PropBlock, PropEntry);
+        if (path.Length == 0)
+        {
+            // An effect pack or a sound emitter. Ordinary, and nothing to draw.
+            return null;
+        }
+
+        FixedMesh prop = Read(read, path, FixedMesh.Read);
+        if (!prop.Ready)
+        {
+            return null;
+        }
+
+        Dress dress = Dressed(
+            read, prop.Mesh, prop.Named, MeshManifest.None, fallback, string.Empty, paints);
+        (byte[] bones, byte[] weights) = Bound(prop.Mesh.Positions.Length, bone);
+        return new Part(prop.Mesh, bones, weights, place, dress.Skins);
+    }
+
+    /// <summary>
+    /// One bone, all the weight - the skin a rigid piece gets.
+    /// </summary>
+    /// <remarks>
+    /// The piece moves with its socket and nothing else, so every vertex names that bone four
+    /// times over with the whole 255 on the first, which is what SkeletonPose.Move expects and
+    /// what makes the piece follow an arm that lifts.
+    /// </remarks>
+    private static (byte[] Bones, byte[] Weights) Bound(int count, int bone)
+    {
         var bones = new byte[count * 4];
         var weights = new byte[count * 4];
         var at = bone is >= 0 and <= byte.MaxValue ? (byte)bone : (byte)0;
@@ -577,17 +797,20 @@ public static class MonsterModels
             weights[one * 4] = 255;
         }
 
-        return new Part(mesh, bones, weights, place, dress.Skins);
+        return (bones, weights);
     }
 
     /// <summary>The <c>skin</c> a SkinMesh block names, or empty where the file has none.</summary>
-    private static string Skin(AnimatedObject ao)
+    private static string Skin(AnimatedObject ao) => Entryed(ao, Block, Entry);
+
+    /// <summary>One entry's value out of one kind of block, or empty where the file has none.</summary>
+    private static string Entryed(AnimatedObject ao, string block, string key)
     {
-        foreach (AoStruct block in ao.Named(Block))
+        foreach (AoStruct one in ao.Named(block))
         {
-            foreach (AoEntry entry in block.Entries)
+            foreach (AoEntry entry in one.Entries)
             {
-                if (string.Equals(entry.Key, Entry, StringComparison.Ordinal) && entry.Value.Length > 0)
+                if (string.Equals(entry.Key, key, StringComparison.Ordinal) && entry.Value.Length > 0)
                 {
                     return entry.Value;
                 }
@@ -596,6 +819,12 @@ public static class MonsterModels
 
         return string.Empty;
     }
+
+    /// <summary>The block a rigid prop's file is named in, and the entry inside it.</summary>
+    private const string PropBlock = "FixedMesh";
+
+    /// <summary>The entry inside <see cref="PropBlock"/> that names the <c>.fmt</c>.</summary>
+    private const string PropEntry = "fixed_mesh";
 
     /// <summary>Reads through another function and adds up what comes back.</summary>
     private sealed class Tally
@@ -1018,8 +1247,8 @@ public static class MonsterModels
     /// A depth-first walk would reach a base file before the monster's second .ao, and the nearer
     /// file is the one whose answer counts.
     /// </remarks>
-    private static (string Mesh, IReadOnlyList<(string Shape, string Material)> Materials, string Skeleton,
-        IReadOnlyList<string> Files)? Skinned(
+    private static (IReadOnlyList<string> Meshes, IReadOnlyList<(string Shape, string Material)> Materials,
+        string Skeleton, IReadOnlyList<string> Files)? Skinned(
         Func<string, byte[]?> read, IReadOnlyList<string> named)
     {
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -1041,10 +1270,10 @@ public static class MonsterModels
         // and the walk carries on past the first until it has both or runs out of files. They are
         // usually in the same .ao; a monster whose base supplies the rig and whose own file only
         // swaps the skin is the case that stopping at the skin would leave unable to move.
-        string? mesh = null;
+        var meshes = new List<string>();
         string? skeleton = null;
 
-        while (queue.Count > 0 && (mesh is null || skeleton is null))
+        while (queue.Count > 0 && (meshes.Count == 0 || skeleton is null))
         {
             (string path, int depth) = queue.Dequeue();
             if (path.Length == 0 || !seen.Add(path))
@@ -1060,7 +1289,7 @@ public static class MonsterModels
 
             walked.Add(path);
 
-            if (mesh is null)
+            if (meshes.Count == 0)
             {
                 foreach (AoStruct block in ao.Named(Block))
                 {
@@ -1090,11 +1319,16 @@ public static class MonsterModels
                             }
                         }
 
-                        mesh = entry.Value;
-                        break;
+                        // EVERY SKIN THE BLOCK NAMES, not the first. Reported from the live
+                        // client: Zar Wali, the Bone Tyrant is a giant snake skeleton and the
+                        // pane drew two floating arms, because his SkinMesh block names SEVEN
+                        // manifests - GSSBArmA, ArmB, ArmC, Chest, Head, Neck, Tail - and this
+                        // took the first and stopped. They are sections of one body on one rig,
+                        // so they are read and joined rather than chosen between.
+                        meshes.Add(entry.Value);
                     }
 
-                    if (mesh is not null)
+                    if (meshes.Count > 0)
                     {
                         break;
                     }
@@ -1133,7 +1367,7 @@ public static class MonsterModels
             }
         }
 
-        return mesh is null ? null : (mesh, materials, skeleton ?? string.Empty, walked);
+        return meshes.Count == 0 ? null : (meshes, materials, skeleton ?? string.Empty, walked);
     }
 
     /// <summary>

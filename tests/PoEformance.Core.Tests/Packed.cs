@@ -304,6 +304,72 @@ internal static class Packed
         return stream.ToArray();
     }
 
+    /// <summary>
+    /// Writes a version 9 <c>.fmt</c> - a rigid prop, with one shape naming its own material.
+    /// </summary>
+    /// <remarks>
+    /// THE OTHER KIND OF ATTACHMENT. A prop has no rig, no skin and no .sm beside it: the
+    /// materials are in the file, one per shape, as offsets into a string pool at the very end.
+    /// Two triangles over four vertices, the same size as the .smd fixture, so a test can tell
+    /// a joined prop from a joined skin by counting.
+    /// </remarks>
+    public static byte[] Fmt(string material, string shape = "BarrelShape")
+    {
+        const uint Format = 0x8;    // A texture coordinate and no skin - a prop has no bones.
+
+        using var stream = new MemoryStream();
+        using var write = new BinaryWriter(stream);
+
+        write.Write((byte)9);                       // version
+        write.Write((ushort)1);                     // one shape
+        write.Write((byte)0);                       // no pieces
+        write.Write((ushort)0);                     // and so no records under them
+        write.Write((byte)0);                       // no trailing records
+
+        write.Write(-1f); write.Write(1f);
+        write.Write(-1f); write.Write(1f);
+        write.Write(-1f); write.Write(1f);
+
+        write.Write("DOLm"u8);
+        write.Write((ushort)1);                     // "c0h" - not four, so nothing follows the geometry
+        write.Write((byte)1);                       // one level of detail
+        write.Write((ushort)1);                     // one shape
+        write.Write(Format);
+
+        write.Write((uint)2);                       // triangles
+        write.Write((uint)4);                       // vertices
+
+        write.Write((uint)0);
+        write.Write((uint)6);
+
+        foreach (int one in new[] { 0, 1, 2, 1, 2, 3 })
+        {
+            write.Write((ushort)one);
+        }
+
+        Vector3[] places = [new(-1f, -1f, -1f), new(1f, 1f, 1f), new(0f, 0f, 0f), new(0.5f, 0.5f, 0.5f)];
+        foreach (Vector3 place in places)
+        {
+            write.Write(place.X); write.Write(place.Y); write.Write(place.Z);
+            write.Write((byte)0); write.Write((byte)0); write.Write((byte)127); write.Write((byte)0);
+            write.Write((byte)127); write.Write((byte)0); write.Write((byte)0); write.Write((byte)0);
+            write.Write(BitConverter.HalfToUInt16Bits((Half)0.25f));
+            write.Write(BitConverter.HalfToUInt16Bits((Half)0.75f));
+        }
+
+        write.Write((uint)0);                       // the shape's name, at the front of the pool
+        write.Write((uint)(shape.Length + 1));      // and its material, right after it
+
+        write.Write((uint)(shape.Length + 1 + material.Length + 1));
+        write.Write(Encoding.Unicode.GetBytes(shape));
+        write.Write((ushort)0);
+        write.Write(Encoding.Unicode.GetBytes(material));
+        write.Write((ushort)0);
+
+        write.Flush();
+        return stream.ToArray();
+    }
+
     /// <summary>One file's place in the index.</summary>
     public sealed record Entry(string Path, int Bundle, int At, int Size);
 
