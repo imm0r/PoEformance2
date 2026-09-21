@@ -292,6 +292,13 @@ public static class ModelSweep
         said.Append(",\"parts\":").Append(Say(model.Parts));
         said.Append(",\"box\":").Append(Box(model.Mesh.Least, model.Mesh.Most));
 
+        // THE MONSTER WITHOUT WHAT HE WEARS, which is what "apart" is measured against. The
+        // joined box above is not: held up against THAT one every piece is inside by
+        // construction. The first corpus carried only the joined box, so it could not reproduce
+        // its own flag - a record that cannot check itself is the diagnostic reading less than
+        // the walk, one layer further out.
+        said.Append(",\"body\":").Append(Box(model.BodyLeast, model.BodyMost));
+
         if (odd.Count > 0)
         {
             said.Append(",\"odd\":[");
@@ -316,7 +323,10 @@ public static class ModelSweep
     private static string Fit(PartFit one)
     {
         var said = new StringBuilder(160);
-        said.Append("{\"file\":").Append(Quoted(Stem(one.File)));
+        // THE WHOLE PATH, not the file's own name. Two different Cape.ao hang off the Rusted
+        // Skeleton Soldier - one under Attachments/ and one under Attachments/Physics/ - and
+        // counted by stem they are one file with contradictory answers.
+        said.Append("{\"file\":").Append(Quoted(one.File));
         said.Append(",\"socket\":").Append(Quoted(one.Socket.Length > 0 ? one.Socket : "<root>"));
         said.Append(",\"place\":").Append(Quoted(one.Place.ToString()));
         said.Append(",\"kind\":").Append(Quoted(one.Kind.ToString()));
@@ -349,6 +359,11 @@ public static class ModelSweep
             said.Append(",\"past\":true");
         }
 
+        if (one.Why.Length > 0)
+        {
+            said.Append(",\"why\":").Append(Quoted(one.Why));
+        }
+
         if (one.Kind is not (PartKind.None or PartKind.Unread))
         {
             said.Append(",\"box\":").Append(Box(one.Least, one.Most));
@@ -356,10 +371,6 @@ public static class ModelSweep
 
         return said.Append('}').ToString();
     }
-
-    /// <summary>The file's own name, since the folder above it is in the monster's path already.</summary>
-    private static string Stem(string path)
-        => path.Length == 0 ? path : path[(path.LastIndexOf('/') + 1)..];
 
     /// <summary>A box as four-figure numbers - enough to see where something is, not a checksum.</summary>
     private static string Box(Vector3 least, Vector3 most)

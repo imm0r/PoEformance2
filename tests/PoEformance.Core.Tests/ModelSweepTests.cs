@@ -141,6 +141,67 @@ public sealed class ModelSweepTests
     }
 
     /// <summary>
+    /// A socket naming a mount the rig spells out in full finds it, and is not dropped.
+    /// </summary>
+    /// <remarks>
+    /// THE LARGEST THING THE FIRST SWEEP FOUND. 451 attachments name a socket their monster's
+    /// rig has no bone for and are dropped outright - and 220 of those name a mount the rig
+    /// plainly HAS under a longer spelling. Unanimously, over the whole table:
+    ///
+    ///     the line says        the rig carries               how many
+    ///     Head_Attachment      aux_Head_attachment                115
+    ///     R_Weapon             aux_R_Weapon_attachment             81
+    ///     L_Weapon             aux_L_Weapon_attachment             12
+    ///     Back                 aux_Back_attachment                 12
+    ///
+    /// What was being thrown away is helmets, headdresses and held weapons - VaalLivingSpear,
+    /// TwilightOrderSorcererStaff, Olroth_SwordHeld - on something close to a hundred and eighty
+    /// monsters, none of which anybody had reported, because a piece drawn nowhere looks exactly
+    /// like a monster that never had one.
+    ///
+    /// THE LITERAL NAME IS TRIED FIRST, so this can only reach pieces that are currently drawn
+    /// nowhere at all.
+    /// </remarks>
+    [Theory]
+    [InlineData("Head_Attachment", "aux_Head_attachment")]
+    [InlineData("R_Weapon", "aux_R_Weapon_attachment")]
+    [InlineData("Back", "aux_Back_attachment")]
+    public void ASocketNamingAMountTheRigSpellsOutInFullFindsIt(string socket, string bone)
+    {
+        Fake install = Dressed();
+        install.Files["art/rig.ast"] = Packed.Skeleton(
+            [("root_jntBnd", 255, 1, 0f), (bone, 255, 255, -150f)], []);
+        install.Files["held.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/cloak.ao", socket: socket, skeleton: "art/rig.ast");
+
+        SweepResult said = Swept(install, "held.ao");
+
+        Assert.DoesNotContain("dropped", said.Tally.Flags.Keys);
+        Assert.Contains("\"place\":\"Bone\"", Lines(install, "held.ao")[0]);
+    }
+
+    /// <summary>
+    /// A socket the rig has nothing of the sort for is still dropped.
+    /// </summary>
+    /// <remarks>
+    /// THE OTHER 185, and what makes the rule above checkable rather than a guess: halo_01,
+    /// core_light, aux_facelight, eye_L, FX_eye, spore_r_1..5 name nothing like a mount on their
+    /// own rigs. They are lights and effect points, they were right to be dropped, and they stay
+    /// dropped.
+    /// </remarks>
+    [Fact]
+    public void ASocketTheRigHasNothingOfTheSortForIsStillDropped()
+    {
+        Fake install = Dressed();
+        install.Files["lights.ao"] = Ao(
+            skin: "art/mesh.sm", attach: "art/cloak.ao", socket: "core_light", skeleton: "art/rig.ast");
+
+        SweepResult said = Swept(install, "lights.ao");
+
+        Assert.Contains("dropped", said.Tally.Flags.Keys);
+    }
+
+    /// <summary>
     /// A piece whose socket the monster's rig has no bone for is flagged dropped.
     /// </summary>
     /// <remarks>
