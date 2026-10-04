@@ -736,6 +736,9 @@ public class OverlaySettingsMergeTests
         Assert.Null(OverlaySettings.Default.TileColumnWidths);
         Assert.Null(OverlaySettings.Default.TilePanes);
         Assert.True(OverlaySettings.Default.TileRail);
+        Assert.Null(OverlaySettings.Default.EffectColumns);
+        Assert.Null(OverlaySettings.Default.EffectPanes);
+        Assert.True(OverlaySettings.Default.EffectRail);
     }
 
     /// <summary>
@@ -756,6 +759,8 @@ public class OverlaySettingsMergeTests
                     ItemRail = false,
                     TileColumns = ["name", "here"],
                     TileRail = false,
+                    EffectColumns = ["name", "folder"],
+                    EffectRail = false,
                 },
                 path));
 
@@ -767,6 +772,8 @@ public class OverlaySettingsMergeTests
             Assert.False(back.ItemRail);
             Assert.Equal(["name", "here"], back.TileColumns);
             Assert.False(back.TileRail);
+            Assert.Equal(["name", "folder"], back.EffectColumns);
+            Assert.False(back.EffectRail);
             Assert.Null(back.MonsterColumns);
             Assert.True(back.MonsterRail);
 

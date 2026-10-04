@@ -448,6 +448,7 @@ public sealed class MonsterPortrait
     private string _cost = string.Empty;
     private string _paint = string.Empty;
     private string _still = string.Empty;
+    private string _shaders = string.Empty;
     private string _count = string.Empty;
 
     /// <summary>The line for a model that stands in a pit, and the whole unit it was last built for.</summary>
@@ -526,6 +527,15 @@ public sealed class MonsterPortrait
     /// thread pool like the walk it replaces.
     /// </remarks>
     public Func<Func<string, byte[]?>, MonsterVariety, string, bool, MonsterModel>? Load { get; set; }
+
+    /// <summary>
+    /// Whether the line under the picture names the shader graphs the model's materials use.
+    /// </summary>
+    /// <remarks>
+    /// ON IN THE EFFECT BOOK, where it is the evidence for how a material blends - see
+    /// MaterialFile.Parents - and off elsewhere, where it would be one more line nobody asked for.
+    /// </remarks>
+    public bool ShowShaders { get; set; }
 
     /// <summary>Whether a picture could be drawn at all - an install and a renderer.</summary>
     public bool Possible => _install is not null && _upload is not null;
@@ -1204,6 +1214,11 @@ public sealed class MonsterPortrait
             _status.Add(_still);
         }
 
+        if (_shaders.Length > 0)
+        {
+            _status.Add(_shaders);
+        }
+
         if (_planted.Length > 0)
         {
             _status.Add(_planted);
@@ -1678,6 +1693,12 @@ public sealed class MonsterPortrait
 
         string still = _model.Move.Length > 0 ? _model.Move : _stillWhy;
         _still = still.Length > 0 ? "still: " + ImGuiText.Escape(still) : string.Empty;
+
+        _shaders = ShowShaders && _model.Shaders.Count > 0
+            ? "shaders: " + ImGuiText.Escape(string.Join(", ", _model.Shaders.Select(Tail)))
+            : string.Empty;
+
+        static string Tail(string path) => path[(path.LastIndexOf('/') + 1)..];
     }
 
     /// <summary>Starts on a different animation, from its first frame.</summary>
@@ -1799,6 +1820,7 @@ public sealed class MonsterPortrait
         _cost = string.Empty;
         _paint = string.Empty;
         _still = string.Empty;
+        _shaders = string.Empty;
         _count = string.Empty;
         _planted = string.Empty;
         _plantedAt = int.MinValue;

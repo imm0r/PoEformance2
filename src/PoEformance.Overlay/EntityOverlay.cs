@@ -447,6 +447,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         Capture(_monsterBook?.Model);
         Capture(_itemBook?.Model);
         Capture(_tileBook?.Model);
+        Capture(_effectBook?.Model);
 
         // No handover hole here, unlike the room layer above: the ground names need no route
         // planner, so the layer exists from the start and takes the settings directly.
@@ -523,6 +524,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 ? tilePanes
                 : basis.TilePanes,
             TileRail = _tileBook?.RailOpen ?? basis.TileRail,
+            EffectColumns = _effectBook?.Columns is { Count: > 0 } effectColumns
+                ? effectColumns
+                : basis.EffectColumns,
+            EffectColumnWidths = _effectBook?.ColumnWidths is { Count: > 0 } effectWidths
+                ? effectWidths
+                : basis.EffectColumnWidths,
+            EffectPanes = _effectBook?.Panes is { Count: > 0 } effectPanes
+                ? effectPanes
+                : basis.EffectPanes,
+            EffectRail = _effectBook?.RailOpen ?? basis.EffectRail,
             MonsterModel = _monsterBook?.ModelOpen ?? basis.MonsterModel,
             ModelGrey = _monsterBook?.Model?.Grey ?? basis.ModelGrey,
             ModelGreyFactor = _monsterBook?.Model?.GreyFactor ?? basis.ModelGreyFactor,
@@ -684,6 +695,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private MonsterBookWindow? _monsterBook;
     private ItemBookWindow? _itemBook;
     private TileBookWindow? _tileBook;
+    private EffectBookWindow? _effectBook;
     private PoiLayer? _poi;
     private RoomLayer? _rooms;
 
@@ -978,6 +990,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     private ItemVisuals _items = ItemVisuals.Empty;
+
+    /// <summary>Every effect with a model, for the effect book. The <see cref="Items"/> arrangement.</summary>
+    public EffectVisuals Effects
+    {
+        get => _effectVisuals;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _effectVisuals = value;
+        }
+    }
+
+    private EffectVisuals _effectVisuals = EffectVisuals.Empty;
 
     /// <summary>
     /// Every terrain tile definition the install has, for the tile book. Empty until its walk runs.
@@ -2546,6 +2571,46 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (visible)
         {
             _tools.Show("item-book");
+        }
+    }
+
+    /// <summary>
+    /// Adds the effect reference book - projectiles, animated effects and ground effects, and their models.
+    /// </summary>
+    /// <remarks>
+    /// THE ITEM BOOK'S ARRANGEMENT, with one addition to its pane: the line naming the shader graphs
+    /// the model's materials use, which is the evidence for how an effect blends. See
+    /// MonsterPortrait.ShowShaders.
+    /// </remarks>
+    public void AttachEffectBook(
+        IReadOnlyList<string>? columns = null,
+        bool rail = true,
+        bool visible = false,
+        Func<string, byte[]?>? readFile = null,
+        int modelSize = PictureLadder.Usual,
+        Func<ReadOnlyMemory<byte>, int, byte[]?>? unpack = null,
+        IReadOnlyDictionary<string, int>? columnWidths = null,
+        IReadOnlyDictionary<string, double>? panes = null)
+    {
+        var window = new EffectBookWindow(() => Effects)
+        {
+            Changed = () => SettingsChanged?.Invoke(),
+            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack)
+            {
+                ShowShaders = true,
+            },
+        };
+
+        window.Show(columns, rail, columnWidths, panes);
+        Capture(window.Model);
+        _effectBook = window;
+
+        _tools.Add(
+            94, "effect-book", "Effect Book", window.DrawTab,
+            page: Entities, pageLabel: EntitiesLabel);
+        if (visible)
+        {
+            _tools.Show("effect-book");
         }
     }
 
