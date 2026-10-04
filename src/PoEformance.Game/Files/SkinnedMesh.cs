@@ -804,7 +804,13 @@ public sealed class SkinnedMesh
     /// </remarks>
     /// <param name="file">The whole file.</param>
     /// <param name="at">Where the four <c>DOLm</c> bytes begin.</param>
-    internal static MeshBlock Block(ReadOnlySpan<byte> file, int at)
+    /// <param name="empty">
+    /// Whether a block with no triangles is an answer rather than a failure. A terrain tile's
+    /// <c>.tgm</c> carries two blocks back to back - the tile's props and walls, then its ground -
+    /// and either may hold nothing; the reader still has to step past an empty one to reach what
+    /// follows it. Off, an empty block is refused as it always was, so no mesh reader changes.
+    /// </param>
+    internal static MeshBlock Block(ReadOnlySpan<byte> file, int at, bool empty = false)
     {
         if (at < 0 || at + 13 > file.Length || !file[at..].StartsWith(Magic))
         {
@@ -819,7 +825,15 @@ public sealed class SkinnedMesh
 
         if (lods == 0)
         {
-            return MeshBlock.Stopped("the mesh has no level of detail to read");
+            // NO DETAILS MEANS NO FOUR-BYTE TAIL either: poe_data_tools gates that word on c0h 4
+            // AND at least one level, while the per-shape records after the meshes are not gated on
+            // the levels at all.
+            long bare = at + Trailing(format, corner == 4 ? 0 : corner, blockShapes);
+            return !empty
+                ? MeshBlock.Stopped("the mesh has no level of detail to read")
+                : bare > file.Length
+                    ? MeshBlock.Stopped("the mesh says it is bigger than the file that holds it")
+                    : Nothing((int)bare, corner, format, blockShapes, lods);
         }
 
         // EVERY LEVEL OF DETAIL'S COUNTS COME FIRST, AS ONE TABLE, and only then the meshes
@@ -842,12 +856,30 @@ public sealed class SkinnedMesh
         }
 
         (uint triangles, uint vertices) = counts[0];
+        Shape shape = Shape.Of(format);
         if (triangles == 0 || vertices == 0)
         {
-            return MeshBlock.Stopped("the mesh is empty");
+            if (!empty)
+            {
+                return MeshBlock.Stopped("the mesh is empty");
+            }
+
+            // STEPPED OVER WHOLE, every level's extents, indices and vertices, by the same sums the
+            // full read bounds itself with below - an empty first level says nothing about the rest.
+            long over = at;
+            foreach ((uint faces_, uint points_) in counts)
+            {
+                over += ((long)blockShapes * 8)
+                    + ((long)faces_ * 3 * Width(points_))
+                    + ((long)points_ * shape.Stride);
+            }
+
+            over += Trailing(format, corner, blockShapes);
+            return over > file.Length
+                ? MeshBlock.Stopped("the mesh says it is bigger than the file that holds it")
+                : Nothing((int)over, corner, format, blockShapes, lods);
         }
 
-        Shape shape = Shape.Of(format);
         int width = Width(vertices);
 
         // BOUNDS FIRST, ARITHMETIC SECOND. Counts out of the file multiply into the sizes below,
@@ -961,6 +993,18 @@ public sealed class SkinnedMesh
     /// thirty-six bytes per shape when the format's seventh bit is set, four more per shape when
     /// that bit is set AND <c>c0h</c> is two, and the four bytes only when <c>c0h</c> is four.
     /// </remarks>
+    /// <summary>A block that holds no geometry, read as far as where it ends.</summary>
+    /// <remarks>
+    /// THE LEVEL COUNT IS KEPT because a caller counts per-shape records after the block by it:
+    /// a <c>.tgm</c> writes one bounds record per shape of the FIRST level, and a block with no
+    /// levels has no shapes to bound however many its header names.
+    /// </remarks>
+    private static MeshBlock Nothing(int at, int corner, uint format, int blockShapes, int lods)
+        => new(
+            [], [], [], [], [], [], [], at,
+            new MeshFacts(0, corner, lods, format, Shape.Of(format).Stride, 0, blockShapes, 0, 0, 0, 0),
+            string.Empty);
+
     private static long Trailing(uint format, int corner, int blockShapes)
     {
         long past = 0;

@@ -481,4 +481,31 @@ public class BundleIndexTests
         Assert.Equal(2, index.Under(Packed.AsIs, "data/statdescriptions/", ".csd").Count);
         Assert.False(index.Named);
     }
+
+    [Fact]
+    public void ASESSIONThatAnnouncesTwoWalksKeepsThePathsForTheSecond()
+    {
+        // THE TILE BOOK'S WALK beside the atlas's: neither can ride on the other, so the session says
+        // two are coming and the path text stays until both have run - and not one walk longer.
+        BundleIndex index = WithNames(20);
+        index.ExpectWalks(2);
+
+        Assert.Equal(2, index.Under(Packed.AsIs, "data/statdescriptions/", ".csd").Count);
+        Assert.True(index.Named);
+
+        Assert.Single(index.Look(Packed.AsIs, ["AtlasIconContentBreach"]));
+        Assert.False(index.Named);
+        Assert.Empty(index.Look(Packed.AsIs, ["Bow"]));
+    }
+
+    [Fact]
+    public void ANDOneWalkCanKeepSeveralExtensions()
+    {
+        BundleIndex index = WithNames(20);
+
+        List<string> found = index.Names(Packed.AsIs, null, "data/statdescriptions/", [".csd", ".txt"]).Inside;
+
+        Assert.Equal(3, found.Count);
+        Assert.Contains("data/statdescriptions/notes.txt", found);
+    }
 }

@@ -238,6 +238,11 @@ public sealed class GameFiles
         IReadOnlyCollection<string>? wanted, string? folder, string? extension = null)
         => Index.Names(_decompress, wanted, folder, extension);
 
+    /// <summary>Every path in a folder ending in any of the extensions, in one walk.</summary>
+    /// <remarks>The walk's budget is the same as above - see <see cref="BundleIndex.ExpectWalks"/>.</remarks>
+    public List<string> Under(string? folder, IReadOnlyList<string> extensions)
+        => Index.Names(_decompress, null, folder, extensions).Inside;
+
     /// <summary>
     /// A bundle's chunk table, opened once and kept.
     /// </summary>

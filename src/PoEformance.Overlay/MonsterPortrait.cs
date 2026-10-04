@@ -515,6 +515,18 @@ public sealed class MonsterPortrait
         _sizes = new PictureLadder(most);
     }
 
+    /// <summary>
+    /// How a model is loaded, where it is not a monster's or an item's .ao walk.
+    /// </summary>
+    /// <remarks>
+    /// NULL FOR THE BOOKS THAT DRAW AN .ao, which is what the pane was built for. The tile book
+    /// draws a terrain tile instead - a .tdt, not an .ao - and everything after the load is the
+    /// same: the camera, the floor, the turning, the export. Handed the install, the variety the
+    /// caller drew with, the key it drew under and whether attachments are wanted; run on the
+    /// thread pool like the walk it replaces.
+    /// </remarks>
+    public Func<Func<string, byte[]?>, MonsterVariety, string, bool, MonsterModel>? Load { get; set; }
+
     /// <summary>Whether a picture could be drawn at all - an install and a renderer.</summary>
     public bool Possible => _install is not null && _upload is not null;
 
@@ -1842,7 +1854,10 @@ public sealed class MonsterPortrait
         Func<string, byte[]?> read = _install!;
         bool wearing = Parts;
         _dressed = wearing;
-        _loading = Task.Run(() => MonsterModels.Of(read, one, wearing));
+        Func<Func<string, byte[]?>, MonsterVariety, string, bool, MonsterModel>? load = Load;
+        _loading = load is null
+            ? Task.Run(() => MonsterModels.Of(read, one, wearing))
+            : Task.Run(() => load(read, one, path, wearing));
     }
 
     /// <summary>Takes a finished load, and re-renders when anything it depends on moved.</summary>
