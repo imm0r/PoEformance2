@@ -22,9 +22,9 @@ namespace PoEformance.Core.Tests;
 /// really called what the game calls it is settled by running --groundtypes on a machine with
 /// the game on it, and by nothing in here.
 /// </remarks>
-public class GroundTypeReadingTests
+public class GroundTypeReadingTests(GroundTypeWalk walks) : IClassFixture<GroundTypeWalk>
 {
-    private static string Fixture(string name)
+    internal static string Fixture(string name)
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
         while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
@@ -60,41 +60,16 @@ public class GroundTypeReadingTests
     /// sampled walk is precisely how it stayed hidden: the sweep capture was taken in a hideout
     /// whose decorations already existed, so no birth was ever recorded and the value looked
     /// constant on all 106 of them.
+    ///
+    /// WALKED ONCE PER CAPTURE for the whole class - see <see cref="GroundTypeWalk"/>.
     /// </remarks>
-    private static Dictionary<(uint Id, ulong Address), List<int>> TypesPerEntity(
+    private Dictionary<(uint Id, ulong Address), List<int>> TypesPerEntity(
         string fixture, out int readings, out int withType)
     {
-        using var replay = ReplayMemoryReader.Load(File.OpenRead(Fixture(fixture)));
-        var world = new WorldReader(replay, RealSessionTests.Schema());
-        ulong gameStates = replay.ResolvedStatics["GameStates"];
-
-        var perEntity = new Dictionary<(uint, ulong), List<int>>();
-        readings = 0;
-        withType = 0;
-
-        for (uint frame = 0; frame < replay.FrameCount; frame++)
-        {
-            replay.Seek(frame);
-            foreach (WorldEntity entity in world.Read(gameStates).Entities
-                         .Where(e => e.IsGroundEffect && !e.IsRemembered))
-            {
-                readings++;
-                if (entity.GroundType is not { } row)
-                {
-                    continue;
-                }
-
-                withType++;
-                if (!perEntity.TryGetValue((entity.Id, entity.Address), out List<int>? seen))
-                {
-                    perEntity[(entity.Id, entity.Address)] = seen = [];
-                }
-
-                seen.Add(row);
-            }
-        }
-
-        return perEntity;
+        GroundTypeWalk.Walk walk = walks.For(fixture);
+        readings = walk.Readings;
+        withType = walk.WithType;
+        return walk.PerEntity;
     }
 
     [Fact]
