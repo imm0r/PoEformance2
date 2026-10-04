@@ -168,6 +168,55 @@ public class EffectVisualsTests
         Assert.Equal(["Metadata/Effects/Graphs/AdditiveBlend.fxgraph", "Metadata/Effects/Graphs/Opaque.fxgraph"], model.Shaders);
     }
 
+    [Theory]
+    [InlineData("AdditiveBlend", MaterialBlend.Additive)]
+    [InlineData("Additive", MaterialBlend.Additive)]
+    [InlineData("AlphaBlend", MaterialBlend.Alpha)]
+    [InlineData("Transparent", MaterialBlend.Alpha)]
+    [InlineData("Opaque", MaterialBlend.Opaque)]
+    [InlineData("", MaterialBlend.Opaque)]
+    [InlineData(null, MaterialBlend.Opaque)]
+    public void THEBLENDWordIsReadByTheChosenRuleWithAdditiveAskedFirst(string? mode, MaterialBlend expected)
+        => Assert.Equal(expected, MaterialBlends.Of(mode));
+
+    [Fact]
+    public void AMATERIALSOwnBlendModeIsReadOffItsDefaultGraphAndAGraphFilesOffItsTop()
+    {
+        MaterialFile read = MaterialFile.Parse("""
+            {"version":4,"defaultgraph":{"version":3,"nodes":[],"overriden_blend_mode":"AdditiveBlend"},
+             "graphinstances":[{"parent":"Metadata/Effects/Graphs/Fire.fxgraph","custom_parameters":[{"name":"AlbedoTransparency_TEX","parameters":[{"path":"art/fire.dds"}]}]}]}
+            """);
+        Assert.Equal("AdditiveBlend", read.Blend);
+
+        Assert.Equal("AlphaBlend", MaterialFile.GraphBlend(Encoding.UTF8.GetBytes("""{"version":3,"links":[],"overriden_blend_mode":"AlphaBlend"}""")));
+        Assert.Equal(string.Empty, MaterialFile.GraphBlend(Encoding.UTF8.GetBytes("""{"version":3}""")));
+        Assert.Equal(string.Empty, MaterialFile.GraphBlend(Encoding.UTF8.GetBytes("not json")));
+    }
+
+    [Theory]
+    [InlineData(true, "AdditiveBlend")]
+    [InlineData(false, "AlphaBlend")]
+    public void AMODELSShapesCarryTheirMaterialsModeTheMaterialsOwnBeforeItsGraphs(bool own, string expected)
+    {
+        string material = own
+            ? """{"version":4,"defaultgraph":{"version":3,"overriden_blend_mode":"AdditiveBlend"},"graphinstances":[{"parent":"graphs/glow.fxgraph","custom_parameters":[{"name":"AlbedoTransparency_TEX","parameters":[{"path":"art/fire.dds"}]}]}]}"""
+            : """{"version":4,"defaultgraph":{"version":3},"graphinstances":[{"parent":"graphs/glow.fxgraph","custom_parameters":[{"name":"AlbedoTransparency_TEX","parameters":[{"path":"art/fire.dds"}]}]}]}""";
+
+        var files = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["fire.ao"] = Encoding.UTF8.GetBytes("version 3\nclient\n{\n\tFixedMesh\n\t{\n\t\tfixed_mesh = \"art/fire.fmt\"\n\t}\n}\n"),
+            ["art/fire.fmt"] = Packed.Fmt("art/fire.mat"),
+            ["art/fire.mat"] = Encoding.UTF8.GetBytes(material),
+            ["graphs/glow.fxgraph"] = Encoding.UTF8.GetBytes("""{"version":3,"overriden_blend_mode":"AlphaBlend"}"""),
+        };
+
+        MonsterModel model = MonsterModels.OfFiles(path => files.GetValueOrDefault(path), ["fire.ao"]);
+
+        Assert.True(model.Ready, model.Why);
+        Assert.Equal([expected], model.Modes);
+        Assert.Equal([MaterialBlends.Of(expected)], model.Blends);
+    }
+
     private static string[] Names(EffectBook book, string query)
     {
         QueryResult parsed = ColumnQuery.Parse(query);

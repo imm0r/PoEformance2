@@ -210,6 +210,35 @@ public static class MeshPicture
         /// </remarks>
         internal int[] Wears { get; private set; } = [];
 
+        /// <summary>How each triangle is put over what is behind it. See <see cref="MaterialBlend"/>.</summary>
+        internal MaterialBlend[] Blends { get; private set; } = [];
+
+        /// <summary>Which shape each triangle belongs to, where it is translucent - see <see cref="Stamps"/>.</summary>
+        internal int[] Owners { get; private set; } = [];
+
+        /// <summary>
+        /// Which translucent shape last blended into each pixel, so no shape blends into one twice.
+        /// </summary>
+        /// <remarks>
+        /// A PIXEL ON THE EDGE TWO TRIANGLES SHARE IS INSIDE BOTH - the inside test takes the edge - and
+        /// a solid surface drawn twice there is the same surface, while a translucent one is twice as
+        /// opaque: a seam of doubled colour down every diagonal, measured at 191 where 128 was asked
+        /// for. A fill rule would settle it on paper and lean on floating point agreeing exactly
+        /// across two triangles; remembering who blended last does not. Allocated the first time a
+        /// translucent drawing needs it.
+        /// </remarks>
+        internal int[] Stamps { get; private set; } = [];
+
+        internal void Stamped()
+        {
+            if (Stamps.Length != Size * Size)
+            {
+                Stamps = new int[Size * Size];
+            }
+
+            Array.Fill(Stamps, -1);
+        }
+
         internal void Fit(int vertices, int triangles)
         {
             if (Corners.Length < vertices)
@@ -224,6 +253,8 @@ public static class MeshPicture
                 Feet = new int[triangles];
                 Levels = new float[triangles];
                 Wears = new int[triangles];
+                Blends = new MaterialBlend[triangles];
+                Owners = new int[triangles];
             }
         }
     }
@@ -257,8 +288,9 @@ public static class MeshPicture
         Mipmaps? skin = null,
         float zoom = 1f,
         Vector2 pan = default,
-        IReadOnlyList<Mipmaps?>? skins = null)
-        => Of(mesh, new Canvas(size), turn, tilt, ink, skin, zoom, pan, skins);
+        IReadOnlyList<Mipmaps?>? skins = null,
+        IReadOnlyList<MaterialBlend>? blends = null)
+        => Of(mesh, new Canvas(size), turn, tilt, ink, skin, zoom, pan, skins, blends);
 
     /// <summary>
     /// Draws the mesh into a canvas the caller keeps, for anything that draws it more than once.
@@ -285,8 +317,9 @@ public static class MeshPicture
         Mipmaps? skin = null,
         float zoom = 1f,
         Vector2 pan = default,
-        IReadOnlyList<Mipmaps?>? skins = null)
-        => Of(mesh, canvas, mesh?.Positions ?? [], mesh?.Normals ?? [], turn, tilt, ink, skin, zoom, pan, skins);
+        IReadOnlyList<Mipmaps?>? skins = null,
+        IReadOnlyList<MaterialBlend>? blends = null)
+        => Of(mesh, canvas, mesh?.Positions ?? [], mesh?.Normals ?? [], turn, tilt, ink, skin, zoom, pan, skins, blends);
 
     /// <summary>
     /// Draws the mesh with its vertices somewhere other than the file put them - posed.
@@ -327,7 +360,8 @@ public static class MeshPicture
         Mipmaps? skin = null,
         float zoom = 1f,
         Vector2 pan = default,
-        IReadOnlyList<Mipmaps?>? skins = null)
+        IReadOnlyList<Mipmaps?>? skins = null,
+        IReadOnlyList<MaterialBlend>? blends = null)
     {
         ArgumentNullException.ThrowIfNull(canvas);
 
@@ -402,6 +436,11 @@ public static class MeshPicture
         int[] wears = canvas.Wears;
         int[] indices = mesh.Indices;
         Worn(mesh, palette, skins, usable, wears, triangles);
+        bool translucent = Blended(mesh, blends, canvas.Blends, canvas.Owners, triangles);
+        if (translucent)
+        {
+            canvas.Stamped();
+        }
         for (var one = 0; one < triangles; one++)
         {
             Vector3 a = corners[indices[one * 3]];
@@ -438,7 +477,7 @@ public static class MeshPicture
         // byte however many threads share it - the depth test never sees two threads at once.
         // More bands than threads, so a band the model does not reach costs nothing much and the
         // ones through its middle are shared out.
-        var drawing = new Drawing(canvas, mesh, triangles, lamp, ink, palette);
+        var drawing = new Drawing(canvas, mesh, triangles, lamp, ink, palette, translucent);
         const int height = 8;
         int bands = (size + height - 1) / height;
         if (canvas.Threads == 1)
@@ -542,6 +581,44 @@ public static class MeshPicture
     }
 
     /// <summary>
+    /// How every triangle blends, from the shape it belongs to - and whether any is not opaque.
+    /// </summary>
+    /// <remarks>
+    /// THE SAME RANGES <see cref="Worn"/> walks, and the same fallback: a triangle outside every
+    /// shape, or a list shorter than the shapes, is opaque - exactly what every drawing was before a
+    /// material could say otherwise. The answer lets a drawing with nothing translucent skip the
+    /// second pass altogether.
+    /// </remarks>
+    private static bool Blended(
+        SkinnedMesh mesh, IReadOnlyList<MaterialBlend>? blends, MaterialBlend[] into, int[] owners, int triangles)
+    {
+        Array.Fill(into, MaterialBlend.Opaque, 0, triangles);
+        if (blends is not { Count: > 0 })
+        {
+            return false;
+        }
+
+        var any = false;
+        for (var shape = 0; shape < mesh.Shapes.Count && shape < blends.Count; shape++)
+        {
+            MaterialBlend blend = blends[shape];
+            if (blend == MaterialBlend.Opaque)
+            {
+                continue;
+            }
+
+            MeshShape part = mesh.Shapes[shape];
+            int from = Math.Clamp(part.From / 3, 0, triangles);
+            int upto = Math.Clamp((part.From + part.Count) / 3, from, triangles);
+            Array.Fill(into, blend, from, upto - from);
+            Array.Fill(owners, shape, from, upto - from);
+            any |= upto > from;
+        }
+
+        return any;
+    }
+
+    /// <summary>
     /// Where the model's centre goes so that the point under the pointer stays put across a zoom.
     /// </summary>
     /// <param name="pan">The pan the picture was drawn with.</param>
@@ -625,9 +702,14 @@ public static class MeshPicture
         private readonly Vector3 _ink;
         private readonly Mipmaps?[] _palette;
         private readonly int[] _wears;
+        private readonly MaterialBlend[] _blends;
+        private readonly int[] _owners;
+        private readonly int[] _stamps;
+        private readonly bool _translucent;
 
         public Drawing(
-            Canvas canvas, SkinnedMesh mesh, int triangles, Vector3 lamp, Vector3 ink, Mipmaps?[] palette)
+            Canvas canvas, SkinnedMesh mesh, int triangles, Vector3 lamp, Vector3 ink, Mipmaps?[] palette,
+            bool translucent)
         {
             _pixels = canvas.Pixels;
             _depth = canvas.Depth;
@@ -644,14 +726,41 @@ public static class MeshPicture
             _ink = ink;
             _palette = palette;
             _wears = canvas.Wears;
+            _blends = canvas.Blends;
+            _owners = canvas.Owners;
+            _stamps = canvas.Stamps;
+            _translucent = translucent;
         }
 
         /// <summary>Draws every triangle's part that falls in the rows from <paramref name="top"/> up to <paramref name="end"/>.</summary>
+        /// <remarks>
+        /// TWO PASSES WHEN ANYTHING IS TRANSLUCENT: every opaque triangle first, writing depth, then
+        /// the translucent ones in the mesh's order, tested against that depth and writing none -
+        /// so a glow behind a wall stays hidden and two glows in front of it both show. Both passes
+        /// stay inside the band, so the picture is still the one-threaded one to the byte. The order
+        /// among translucent triangles is the file's rather than back to front; additive does not
+        /// care, and mixed shapes overlapping themselves are the one place it could show.
+        /// </remarks>
         public void Band(int top, int end)
         {
             for (var one = 0; one < _triangles; one++)
             {
-                if (_feet[one] < top || _tops[one] >= end)
+                if (_feet[one] < top || _tops[one] >= end || _blends[one] != MaterialBlend.Opaque)
+                {
+                    continue;
+                }
+
+                Rasterise(one, Math.Max(_tops[one], top), Math.Min(_feet[one], end - 1));
+            }
+
+            if (!_translucent)
+            {
+                return;
+            }
+
+            for (var one = 0; one < _triangles; one++)
+            {
+                if (_feet[one] < top || _tops[one] >= end || _blends[one] == MaterialBlend.Opaque)
                 {
                     continue;
                 }
@@ -692,6 +801,7 @@ public static class MeshPicture
 
             // THE TEXTURE THIS TRIANGLE'S SHAPE WEARS, not the model's. See Palette.
             Mipmaps? skin = _palette[_wears[one]];
+            MaterialBlend blend = _blends[one];
             bool skinned = skin is not null;
             Vector2 s0 = default;
             Vector2 s1 = default;
@@ -733,6 +843,21 @@ public static class MeshPicture
                         continue;
                     }
 
+                    if (blend != MaterialBlend.Opaque)
+                    {
+                        // ONCE PER SHAPE PER PIXEL - see Canvas.Stamps.
+                        int owner = _owners[one];
+                        if (_stamps[at] == owner)
+                        {
+                            continue;
+                        }
+
+                        _stamps[at] = owner;
+                        Spot spot_ = new(first, second, third);
+                        Over(at, blend, skinned ? Sample4(skin!, spot_.Of(s0, s1, s2), level) : new Vector4(_ink, 0.5f));
+                        continue;
+                    }
+
                     _depth[at] = away;
 
                     Vector3 normal = (first * f0) + (second * f1) + (third * f2);
@@ -764,6 +889,57 @@ public static class MeshPicture
                 }
             }
         }
+
+        /// <summary>
+        /// Puts one translucent pixel over what is already at <paramref name="at"/>.
+        /// </summary>
+        /// <remarks>
+        /// IN PREMULTIPLIED TERMS, because the picture is itself laid over a backdrop the overlay
+        /// draws and much of it is still empty: an additive glow over nothing has to come out as
+        /// light over whatever the backdrop is, not as a black square. Mixed: the source covers its
+        /// own alpha's worth. Additive: its colour, weighted by its alpha, is added, and the coverage
+        /// grows by the brightest channel of what was added - so a glow over the empty frame is as
+        /// opaque as it is bright. UNLIT, both: an effect's light is its own.
+        /// </remarks>
+        private void Over(int at, MaterialBlend blend, Vector4 source)
+        {
+            int p = at * 4;
+            float da = _pixels[p + 3] * (1f / 255f);
+            var dst = new Vector3(_pixels[p], _pixels[p + 1], _pixels[p + 2]) * (1f / 255f) * da;
+            float sa = Math.Clamp(source.W, 0f, 1f);
+            var colour = new Vector3(source.X, source.Y, source.Z);
+
+            Vector3 premultiplied;
+            float alpha;
+            if (blend == MaterialBlend.Additive)
+            {
+                Vector3 added = colour * sa;
+                premultiplied = dst + added;
+                alpha = MathF.Min(1f, da + MathF.Max(added.X, MathF.Max(added.Y, added.Z)));
+            }
+            else
+            {
+                premultiplied = (colour * sa) + (dst * (1f - sa));
+                alpha = sa + (da * (1f - sa));
+            }
+
+            if (alpha <= 0f)
+            {
+                return;
+            }
+
+            Vector3 straight = premultiplied / alpha;
+            _pixels[p] = Byte(straight.X);
+            _pixels[p + 1] = Byte(straight.Y);
+            _pixels[p + 2] = Byte(straight.Z);
+            _pixels[p + 3] = Byte(alpha);
+        }
+    }
+
+    /// <summary>The three barycentric weights of a pixel, and the coordinate they give.</summary>
+    private readonly record struct Spot(float First, float Second, float Third)
+    {
+        public Vector2 Of(Vector2 s0, Vector2 s1, Vector2 s2) => (First * s0) + (Second * s1) + (Third * s2);
     }
 
     /// <summary>
@@ -904,6 +1080,82 @@ public static class MeshPicture
             new Vector3(rgba[c], rgba[c + 1], rgba[c + 2]), new Vector3(rgba[d], rgba[d + 1], rgba[d + 2]), fx);
 
         return Vector3.Lerp(upper, lower, fy) * (1f / 255f);
+    }
+
+    /// <summary>
+    /// <see cref="Sample"/> with the texture's alpha - only translucent triangles pay for the fourth channel.
+    /// </summary>
+    private static Vector4 Sample4(Mipmaps skin, Vector2 spot, float level)
+    {
+        var lower = (int)level;
+        Vector4 colour = Texel4(skin[lower], spot);
+
+        float between = level - lower;
+        if (between > 0f && lower + 1 < skin.Count)
+        {
+            colour = Vector4.Lerp(colour, Texel4(skin[lower + 1], spot), between);
+        }
+
+        return colour;
+    }
+
+    /// <summary><see cref="Texel"/> with alpha: one level read bilinearly at a point, wrapping at every edge.</summary>
+    private static Vector4 Texel4(GamePicture level, Vector2 spot)
+    {
+        float u = spot.X - MathF.Floor(spot.X);
+        float v = spot.Y - MathF.Floor(spot.Y);
+        if (!(u < 1f))
+        {
+            u = 0f;
+        }
+
+        if (!(v < 1f))
+        {
+            v = 0f;
+        }
+
+        float x = (u * level.Width) - 0.5f;
+        float y = (v * level.Height) - 0.5f;
+        var x0 = (int)MathF.Floor(x);
+        var y0 = (int)MathF.Floor(y);
+        float fx = x - x0;
+        float fy = y - y0;
+        int x1 = x0 + 1;
+        int y1 = y0 + 1;
+        if (x0 < 0)
+        {
+            x0 += level.Width;
+        }
+
+        if (y0 < 0)
+        {
+            y0 += level.Height;
+        }
+
+        if (x1 >= level.Width)
+        {
+            x1 -= level.Width;
+        }
+
+        if (y1 >= level.Height)
+        {
+            y1 -= level.Height;
+        }
+
+        byte[] rgba = level.Rgba;
+        int a = ((y0 * level.Width) + x0) * 4;
+        int b = ((y0 * level.Width) + x1) * 4;
+        int c = ((y1 * level.Width) + x0) * 4;
+        int d = ((y1 * level.Width) + x1) * 4;
+
+        Vector4 upper = Vector4.Lerp(
+            new Vector4(rgba[a], rgba[a + 1], rgba[a + 2], rgba[a + 3]),
+            new Vector4(rgba[b], rgba[b + 1], rgba[b + 2], rgba[b + 3]), fx);
+        Vector4 lower = Vector4.Lerp(
+            new Vector4(rgba[c], rgba[c + 1], rgba[c + 2], rgba[c + 3]),
+            new Vector4(rgba[d], rgba[d + 1], rgba[d + 2], rgba[d + 3]), fx);
+
+        return Vector4.Lerp(upper, lower, fy) * (1f / 255f);
     }
 
     /// <summary>Twice the signed area of a triangle, flattened onto the screen.</summary>

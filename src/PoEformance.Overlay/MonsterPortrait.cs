@@ -449,6 +449,7 @@ public sealed class MonsterPortrait
     private string _paint = string.Empty;
     private string _still = string.Empty;
     private string _shaders = string.Empty;
+    private string _blend = string.Empty;
     private string _count = string.Empty;
 
     /// <summary>The line for a model that stands in a pit, and the whole unit it was last built for.</summary>
@@ -536,6 +537,17 @@ public sealed class MonsterPortrait
     /// MaterialFile.Parents - and off elsewhere, where it would be one more line nobody asked for.
     /// </remarks>
     public bool ShowShaders { get; set; }
+
+    /// <summary>
+    /// Whether materials that ask to blend are drawn translucent - mixed or added - rather than solid.
+    /// </summary>
+    /// <remarks>
+    /// ON IN THE EFFECT BOOK ONLY. What a blend mode's word means is a rule on words, not a
+    /// measurement - see MaterialBlends - and the monster book exports boss icons from what this
+    /// pane draws: a guess that turned part of a boss see-through would end up in the map's art.
+    /// The effect book is where it was asked for, and where a wrong guess costs a look and nothing more.
+    /// </remarks>
+    public bool Translucent { get; set; }
 
     /// <summary>Whether a picture could be drawn at all - an install and a renderer.</summary>
     public bool Possible => _install is not null && _upload is not null;
@@ -1219,6 +1231,11 @@ public sealed class MonsterPortrait
             _status.Add(_shaders);
         }
 
+        if (_blend.Length > 0)
+        {
+            _status.Add(_blend);
+        }
+
         if (_planted.Length > 0)
         {
             _status.Add(_planted);
@@ -1698,6 +1715,14 @@ public sealed class MonsterPortrait
             ? "shaders: " + ImGuiText.Escape(string.Join(", ", _model.Shaders.Select(Tail)))
             : string.Empty;
 
+        // THE RAW MODE AND WHAT IT IS TAKEN TO MEAN, side by side, and called a guess - the rule
+        // reading the word is chosen, not measured. See MaterialBlends.
+        string[] modes = [.. _model.Modes.Where(one => one.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase)];
+        _blend = ShowShaders && modes.Length > 0
+            ? "blend (guessed from the word): " + ImGuiText.Escape(string.Join(", ",
+                modes.Select(one => $"{one} -> {MaterialBlends.Of(one).ToString().ToLowerInvariant()}")))
+            : string.Empty;
+
         static string Tail(string path) => path[(path.LastIndexOf('/') + 1)..];
     }
 
@@ -1821,6 +1846,7 @@ public sealed class MonsterPortrait
         _paint = string.Empty;
         _still = string.Empty;
         _shaders = string.Empty;
+        _blend = string.Empty;
         _count = string.Empty;
         _planted = string.Empty;
         _plantedAt = int.MinValue;
@@ -2098,13 +2124,13 @@ public sealed class MonsterPortrait
                 lowest = Lowest(_posed);
                 drawn = MeshPicture.Of(
                     _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, default,
-                    _model.Skin, _zoom, _pan, _model.Skins);
+                    _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
             }
             else
             {
                 lowest = _model.Mesh.Most.Z;
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, _pan, _model.Skins);
+                    _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
             }
 
             _rate.Redrawn(ImGui.GetTime());
@@ -2508,10 +2534,10 @@ public sealed class MonsterPortrait
             _pose.Move(_model.Mesh, _posed, _posedNormals);
             return MeshPicture.Of(
                 _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, default,
-                _model.Skin, _zoom, _pan, _model.Skins);
+                _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
         }
 
-        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, default, _model.Skin, _zoom, _pan, _model.Skins);
+        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, default, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
     }
 
     /// <summary>
