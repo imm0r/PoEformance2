@@ -1007,12 +1007,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private IReadOnlyDictionary<string, int> TilesHere()
     {
         IReadOnlyList<TerrainRoom>? rooms = _snapshot.Terrain is TerrainGrid grid ? grid.Rooms : null;
-        if (ReferenceEquals(rooms, _tilesHereOf))
+        IReadOnlyList<string> loaded = LoadedFiles?.Invoke() ?? [];
+        if (ReferenceEquals(rooms, _tilesHereOf) && ReferenceEquals(loaded, _loadedOf))
         {
             return _tilesHere;
         }
 
         _tilesHereOf = rooms;
+        _loadedOf = loaded;
         var here = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         foreach (TerrainRoom room in rooms ?? [])
         {
@@ -1022,10 +1024,27 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
         }
 
+        // THE AREA'S ROOMS ARE THE FILES IT LOADED, not anything the tiles say - no tile reaches its
+        // room (see RoomFiles) - so a room is "here" once, whatever it built.
+        foreach (string path in loaded)
+        {
+            if (TileBook.IsRoom(path))
+            {
+                here.TryAdd(path, 1);
+            }
+        }
+
         _tilesHere = here;
         return here;
     }
 
+    /// <summary>
+    /// The files the current area loaded, by path - a new list per area. Where the tile book finds
+    /// the area's rooms. Null where nothing reads the loaded-file table.
+    /// </summary>
+    public Func<IReadOnlyList<string>>? LoadedFiles { get; set; }
+
+    private IReadOnlyList<string>? _loadedOf;
     private IReadOnlyList<TerrainRoom>? _tilesHereOf;
     private IReadOnlyDictionary<string, int> _tilesHere = new Dictionary<string, int>();
 
@@ -2552,7 +2571,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Changed = () => SettingsChanged?.Invoke(),
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
-                Load = static (read, _, path, _) => TileModels.Of(read, path),
+                Load = static (read, _, key, _) => TileBookWindow.Load(read, key),
             },
         };
 

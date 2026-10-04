@@ -8,13 +8,13 @@ using PoEformance.Game.Entities;
 namespace PoEformance.Overlay;
 
 /// <summary>
-/// The tile reference book: every terrain tile the install has, and the tile's geometry.
+/// The tile reference book: every terrain tile and room the install has, a tile's geometry and a room's doodads.
 /// </summary>
 /// <remarks>
 /// THE ITEM BOOK'S PARTS, with a tile in the pane instead of an item: the grid, the query grammar,
 /// the facet rail, the column chooser and the splits behave as they do there, and the picture is a
-/// <see cref="MonsterPortrait"/> of its own whose load is <see cref="TileModels.Of"/> rather than
-/// the .ao walk.
+/// <see cref="MonsterPortrait"/> of its own whose load is <see cref="Load"/> rather than the .ao
+/// walk: <see cref="TileModels.Of"/> for a tile, <see cref="RoomModels.Of"/> for a room.
 ///
 /// "ONLY THIS AREA" IS A TERM IN THE QUERY - <c>here:yes</c> - written and read back by the
 /// checkbox above the list, so the rail, the count and the text all agree on what is shown.
@@ -37,6 +37,7 @@ public sealed class TileBookWindow(Func<IReadOnlyList<string>> install, Func<IRe
     /// </remarks>
     private static readonly (string Label, string Field)[] Rails =
     [
+        ("Kind", "kind"),
         ("Sets", "set"),
         ("This area", "here"),
     ];
@@ -46,16 +47,22 @@ public sealed class TileBookWindow(Func<IReadOnlyList<string>> install, Func<IRe
     private const string ListPane = "list";
 
     /// <summary>What the box above the book is.</summary>
-    private const string Caption = "Search for any terrain tile";
+    private const string Caption = "Search for any terrain tile or room";
 
     /// <summary>What the box takes, said on hover.</summary>
-    private const string Grammar = "arena  ·  set:woods  ·  here:yes  ·  folder:areatransitions";
+    private const string Grammar = "arena  ·  kind:room  ·  set:woods  ·  here:yes  ·  folder:areatransitions";
 
     /// <summary>The box's background while the query does not read. The monster book's.</summary>
     private static readonly Vector4 Wrong = new(0.32f, 0.11f, 0.11f, 1f);
 
     /// <summary>The query term the "only this area" checkbox writes.</summary>
     private const string HereField = "here";
+
+    /// <summary>What separates a room's path from its unit in the key the portrait loads by.</summary>
+    private const char UnitMark = '|';
+
+    /// <summary>What a room's doodad positions are read as. See RoomModels - the file does not say.</summary>
+    private RoomUnit _unit = RoomUnit.Cells;
 
     private readonly PaneSplit _rail = new(0.18f, RailPane);
     private readonly PaneSplit _split = new(0.45f, ListPane);
@@ -605,26 +612,76 @@ public sealed class TileBookWindow(Func<IReadOnlyList<string>> install, Func<IRe
         _chosen = chosen >= 0 && chosen < _page.Paths.Length ? _page.Paths[chosen] : string.Empty;
     }
 
-    /// <summary>What the tile is and where it is used, then its geometry under it.</summary>
+    /// <summary>
+    /// What the portrait loads for a key: a tile's geometry, or a room's doodads in the chosen unit.
+    /// </summary>
+    /// <remarks>
+    /// THE UNIT RIDES IN THE KEY, so switching it is a different key and the portrait reloads -
+    /// the same way the item book's AOFile choice does - without the portrait knowing about rooms.
+    /// </remarks>
+    public static MonsterModel Load(Func<string, byte[]?> read, string key)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+
+        int mark = key.LastIndexOf(UnitMark);
+        if (mark < 0)
+        {
+            return TileModels.Of(read, key);
+        }
+
+        RoomUnit unit = Enum.TryParse(key[(mark + 1)..], out RoomUnit said) ? said : RoomUnit.Cells;
+        return RoomModels.Of(read, key[..mark], unit);
+    }
+
+    /// <summary>What the tile or room is and where it is used, then its geometry under it.</summary>
     private void Pane()
     {
         int row = _page.Row(_chosen);
         if (row < 0)
         {
-            ImGui.TextDisabled("Choose a tile on the left.");
+            ImGui.TextDisabled("Choose a tile or a room on the left.");
             return;
         }
 
+        bool room = TileBook.IsRoom(_chosen);
         (string set, string folder, string name) = TileBook.Split(_chosen);
         ImGui.TextUnformatted(name);
-        ImGui.TextDisabled(ImGuiText.Escape(folder.Length > 0 ? $"{set}  ·  {folder}" : set));
+        ImGui.TextDisabled(ImGuiText.Escape(
+            (room ? "room  ·  " : "tile  ·  ") + (folder.Length > 0 ? $"{set}  ·  {folder}" : set)));
 
         int placed = _page.Placed[row];
-        ImGui.TextDisabled(placed > 0
-            ? string.Create(CultureInfo.InvariantCulture, $"placed {placed} times in this area")
-            : "not placed in this area");
+        ImGui.TextDisabled(room
+            ? placed > 0 ? "loaded for this area" : "not loaded for this area"
+            : placed > 0
+                ? string.Create(CultureInfo.InvariantCulture, $"placed {placed} times in this area")
+                : "not placed in this area");
 
         ImGui.TextDisabled(ImGuiText.Escape(_chosen));
+
+        if (room)
+        {
+            // THE FILE DOES NOT SAY WHAT ITS POSITIONS COUNT, so the reading is a choice in plain
+            // sight - and the line under the picture says which one the doodads' reach supports.
+            ImGui.TextDisabled("Doodad positions in");
+            ImGui.SameLine();
+            if (ImGui.RadioButton("cells (23 per tile)", _unit == RoomUnit.Cells))
+            {
+                _unit = RoomUnit.Cells;
+            }
+
+            ImGui.SameLine();
+            if (ImGui.RadioButton("world units", _unit == RoomUnit.World))
+            {
+                _unit = RoomUnit.World;
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Neither reference says which unit a room's doodad positions are in."
+                    + " The line under the picture says whether any doodad lies past the room's edge when read as cells.");
+            }
+        }
+
         ImGui.Separator();
 
         if (Model is not { } model)
@@ -633,13 +690,14 @@ public sealed class TileBookWindow(Func<IReadOnlyList<string>> install, Func<IRe
             return;
         }
 
-        if (!string.Equals(_chosen, _subjectKey, StringComparison.Ordinal))
+        string key = room ? _chosen + UnitMark + _unit.ToString() : _chosen;
+        if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
-            _subjectKey = _chosen;
+            _subjectKey = key;
             _subject = new MonsterVariety(Name: name);
         }
 
-        Vector2 room = ImGui.GetContentRegionAvail();
-        model.Draw(_subject, _subjectKey, room.X, room.Y);
+        Vector2 room_ = ImGui.GetContentRegionAvail();
+        model.Draw(_subject, _subjectKey, room_.X, room_.Y);
     }
 }
