@@ -2598,6 +2598,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack)
             {
                 ShowShaders = true,
+                Translucent = true,
             },
         };
 

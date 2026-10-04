@@ -106,6 +106,7 @@ public static class RoomModels
         var models = new Dictionary<string, MonsterModel>(StringComparer.OrdinalIgnoreCase);
         var joins = new List<MeshJoin>();
         var skins = new List<Mipmaps?>();
+        var modes = new List<string>();
         float size = Size(unit);
         var triangles = 0;
         int placed = 0, missing = 0, capped = 0;
@@ -152,6 +153,7 @@ public static class RoomModels
             for (var shape = 0; shape < model.Mesh.Shapes.Count; shape++)
             {
                 skins.Add(shape < model.Skins.Count ? model.Skins[shape] : model.Skin);
+                modes.Add(shape < model.Modes.Count ? model.Modes[shape] : string.Empty);
             }
 
             triangles += model.Mesh.Triangles;
@@ -184,6 +186,7 @@ public static class RoomModels
         return new MonsterModel(joined, skins.FirstOrDefault(one => one is not null), path, string.Empty, string.Empty)
         {
             Skins = skins,
+            Modes = modes,
             BodyLeast = joined.Least,
             BodyMost = joined.Most,
             Parts = placed,
