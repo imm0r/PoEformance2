@@ -1,0 +1,109 @@
+name: Bake boss icons
+
+# THE OTHER HALF OF THE OVERLAY'S "send exports to be baked" BUTTON. The overlay puts the
+# model pane's 64-pixel cells and its boss-icons.json under assets/boss-exports/ on the
+# boss-icons branch; this bakes them into assets/icons.png, assets/icon-names-custom.tsv and
+# data/boss-icons.json with tools/IconBaker and opens the pull request.
+#
+# THE BRANCH BELONGS TO THIS WORKFLOW. Every run rebuilds it from main, takes the exports from
+# its old tip, bakes, and force-pushes - so it is always main plus exactly one bake commit, and
+# can never conflict with main, however long the pull request stays open. The push is a
+# --force-with-lease against the tip this run started from: an upload that lands while it runs
+# makes the push fail rather than vanish, and that upload starts its own run anyway.
+#
+# The bake runs against the repository as it stands, not against the sheet the uploading build
+# happened to ship with - which is why the overlay sends sources rather than a finished sheet.
+on:
+  push:
+    branches: [boss-icons]
+    paths: ["assets/boss-exports/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write       # push the bake commit to boss-icons
+  pull-requests: write  # open the pull request
+
+# One bake at a time, and none thrown away: a queued run bakes the newer uploads.
+concurrency:
+  group: bake-boss-icons
+  cancel-in-progress: false
+
+jobs:
+  bake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Start from main, with the exports from the branch
+        run: |
+          git fetch origin boss-icons
+          echo "TIP=$(git rev-parse origin/boss-icons)" >> "$GITHUB_ENV"
+          git checkout -B boss-icons origin/main
+          git checkout origin/boss-icons -- assets/boss-exports
+
+      - name: Bake
+        run: |
+          dotnet build tools/IconBaker --nologo
+          # The entries only when an export ever wrote any; IconBaker refuses a missing file.
+          entries=()
+          if [ -f assets/boss-exports/boss-icons.json ]; then
+            entries=(--entries assets/boss-exports/boss-icons.json)
+          else
+            entries=(--no-entries)
+          fi
+          dotnet run --project tools/IconBaker --no-build -- assets/boss-exports "${entries[@]}"
+
+      # CLAUDE.md: the version goes up by one patch with every push. This push changes what a
+      # build carries - the sheet is embedded - so it is no exception.
+      - name: Raise the version
+        run: |
+          python3 - <<'EOF'
+          import pathlib, re
+          path = pathlib.Path("src/PoEformance.Features/ToolVersion.cs")
+          text = path.read_text()
+          found = re.search(r'Number = "(\d+)\.(\d+)\.(\d+)"', text)
+          raised = f'Number = "{found[1]}.{found[2]}.{int(found[3]) + 1}"'
+          path.write_text(text.replace(found[0], raised, 1))
+          print(raised)
+          EOF
+
+      # Pushes made with the workflow's own token start no other workflow, so CI would never see
+      # this commit. It is checked here instead, before it is pushed.
+      - name: Build and test what was baked
+        run: |
+          dotnet build --nologo
+          dotnet test --nologo --no-build
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A assets data src/PoEformance.Features/ToolVersion.cs
+          if git diff --cached --quiet origin/main; then
+            echo "nothing differs from main - no commit"
+            exit 0
+          fi
+          git commit -m "Bake boss icons from the overlay's exports"
+          git push --force-with-lease="boss-icons:$TIP" origin boss-icons
+
+      # Needs "Allow GitHub Actions to create and approve pull requests" under
+      # Settings -> Actions -> General -> Workflow permissions. Without it this step fails with
+      # a message naming that setting; the bake commit above is pushed either way.
+      - name: Open the pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(gh pr list --head boss-icons --base main --state open --json number --jq length)" != "0" ]; then
+            echo "a pull request for boss-icons is already open"
+            exit 0
+          fi
+          gh pr create --base main --head boss-icons \
+            --title "Bake boss icons from the overlay's exports" \
+            --body "Baked by .github/workflows/bake-boss-icons.yml from assets/boss-exports, which the overlay's \"send exports to be baked\" button uploads. Each upload rebuilds this branch from main, so it never conflicts; merging ships the new cells in the next build." \
+            || { echo "::error::could not open the pull request - enable 'Allow GitHub Actions to create and approve pull requests' under Settings -> Actions -> General"; exit 1; }

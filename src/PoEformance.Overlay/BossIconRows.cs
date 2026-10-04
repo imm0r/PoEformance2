@@ -340,7 +340,7 @@ internal sealed class BossIconRows(
             BossIconState.Waiting =>
                 $"the art for {row.Family} exists but assets/icons.png has no cell for it yet."
                     + " exports are drawn on this machine already;"
-                    + " run tools/IconBaker on the exports folder to bake them in for good."
+                    + " press \"send exports to be baked\" below, or run tools/IconBaker, to bake them in for good."
                     + where,
             BossIconState.Skipped when row.Family.Length == 0 =>
                 "the game lists no boss for this map, so there is nothing to make."

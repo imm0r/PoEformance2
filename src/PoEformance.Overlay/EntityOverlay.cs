@@ -43,6 +43,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
     /// <summary>The endgame maps whose boss still has no picture. See BossIconRows.</summary>
     private readonly BossIconRows _bossPlan;
+
+    /// <summary>Sends the exports to the repository to be baked. See BossExportPanel.</summary>
+    private readonly BossExportPanel _bossExport;
     private ClientRect _tracked;
     private readonly TerrainLayer _terrain;
     private readonly IconCache _icons;
@@ -1523,6 +1526,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (EndgameMaps.Count > 0 && ImGui.CollapsingHeader("boss pictures still to make"))
         {
             _bossPlan.Draw();
+
+            // Under the list it empties: what is waiting there is what this sends.
+            ImGui.Spacing();
+            _bossExport.Draw();
         }
 
         ImGui.Separator();
@@ -1662,6 +1669,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // Both tables are set by whoever wires this up, in no fixed order against this
         // constructor, so the list reads them per draw rather than taking a copy of Empty.
         _bossPlan = new BossIconRows(() => _bossIcons, () => EndgameMaps, Called, Pose);
+
+        // Read per press, like the list: the table is replaced whenever it is loaded again.
+        _bossExport = new BossExportPanel(() => _bossIcons.Source);
 
         // The entry card takes its plates from the same cache the markers use, so a picture
         // that cannot be loaded is reported in one place and given up on once.
