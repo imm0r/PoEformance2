@@ -3171,8 +3171,9 @@ internal static class Program
             _ = Task.Run(() =>
             {
                 List<string> tiles = installed.Under(
-                    PoEformance.Features.TileBook.Root, [PoEformance.Game.Diagnostics.RoomFiles.TileExtension]);
-                Console.WriteLine($"tiles: {tiles.Count} tile definitions in the install");
+                    PoEformance.Features.TileBook.Root,
+                    [PoEformance.Game.Diagnostics.RoomFiles.TileExtension, PoEformance.Game.Files.RoomLayout.Extension]);
+                Console.WriteLine($"tiles: {tiles.Count} tile definitions and rooms in the install");
                 overlay.TileFiles = tiles;
             });
         }
@@ -3330,6 +3331,9 @@ internal static class Program
             unpack: installed is null ? null : installed.Unpack,
             columnWidths: settings.ItemColumnWidths,
             panes: settings.ItemPanes);
+        // The area's ROOMS come from what it loaded - no tile reaches its room - and the preload
+        // watch already holds that list, a new one per area.
+        overlay.LoadedFiles = () => preload.All;
         overlay.AttachTileBook(
             settings.TileColumns,
             settings.TileRail,

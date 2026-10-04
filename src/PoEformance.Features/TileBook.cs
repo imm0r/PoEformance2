@@ -3,13 +3,16 @@ using System.Globalization;
 namespace PoEformance.Features;
 
 /// <summary>
-/// Every terrain tile the install has, as the columns a grid draws and the text a search reads.
+/// Every terrain tile and room the install has, as the columns a grid draws and the text a search reads.
 /// </summary>
 /// <remarks>
 /// THE MONSTER AND ITEM BOOKS' SHAPE: the same grid, the same query grammar, the searchable text
 /// built once per table. Two sources go into it - the install's own list of <c>.tdt</c> files, and
 /// the tiles the game has placed in the area being stood in - and a tile in either is a row, so the
 /// area's tiles are listed even before (or without) the install's walk.
+///
+/// ROOMS ARE ROWS TOO - an <c>.arm</c> beside the <c>.tdt</c> files, told apart by the "kind" column -
+/// because they are found the same two ways: the install's walk, and what the area has loaded.
 ///
 /// "HERE" IS A COLUMN AND NOT A SEPARATE LIST, so "only this area" is one word in the query -
 /// <c>here:yes</c> - and the rail counts it like any other field. The book is rebuilt when the area
@@ -22,6 +25,12 @@ public sealed class TileBook : IQuerySource
 
     /// <summary>What the "here" column holds for a tile placed in the current area.</summary>
     public const string Here = "yes";
+
+    /// <summary>What the "kind" column holds for a tile definition.</summary>
+    public const string Tile = "tile";
+
+    /// <summary>What the "kind" column holds for a room.</summary>
+    public const string Room = "room";
 
     private const string Named = "What it is";
     private const string Area = "This area";
@@ -82,8 +91,8 @@ public sealed class TileBook : IQuerySource
     /// <summary>
     /// Works the two lists into one table. Never throws.
     /// </summary>
-    /// <param name="install">Every <c>.tdt</c> the install has, or empty where it has not been walked.</param>
-    /// <param name="placed">How many times each tile is placed in the current area, by path - or empty.</param>
+    /// <param name="install">Every <c>.tdt</c> and <c>.arm</c> the install has, or empty where it has not been walked.</param>
+    /// <param name="placed">How many times each tile or room is placed in the current area, by path - or empty.</param>
     public static TileBook Of(IReadOnlyList<string>? install, IReadOnlyDictionary<string, int>? placed)
     {
         var order = new List<string>((install?.Count ?? 0) + (placed?.Count ?? 0));
@@ -117,6 +126,7 @@ public sealed class TileBook : IQuerySource
         var placedRows = new int[count];
         var find = new string[count];
         var names = new string[count];
+        var kinds = new string[count];
         var sets = new string[count];
         var folders = new string[count];
         var heres = new string[count];
@@ -130,6 +140,7 @@ public sealed class TileBook : IQuerySource
 
             (string set, string folder, string name) = Split(path);
             names[at] = name;
+            kinds[at] = IsRoom(path) ? Room : Tile;
             sets[at] = set;
             folders[at] = folder;
 
@@ -140,12 +151,13 @@ public sealed class TileBook : IQuerySource
             placings[at] = times;
             placingsText[at] = times > 0 ? times.ToString(CultureInfo.InvariantCulture) : string.Empty;
 
-            find[at] = (times > 0 ? path + " here" : path).ToLowerInvariant();
+            find[at] = (path + " " + kinds[at] + (times > 0 ? " here" : string.Empty)).ToLowerInvariant();
         }
 
         (DataColumn Column, string Group, bool Shown)[] laid =
         [
             (DataColumn.Words("name", names), Named, true),
+            (DataColumn.Labels("kind", kinds), Named, true),
             (DataColumn.Labels("set", sets), Named, true),
             (DataColumn.Words("folder", folders), Named, true),
             (DataColumn.Labels("here", heres), Area, true),
@@ -194,7 +206,8 @@ public sealed class TileBook : IQuerySource
         string rest = path.StartsWith(Root, StringComparison.OrdinalIgnoreCase) ? path[Root.Length..] : path;
         int slash = rest.LastIndexOf('/');
         string name = slash >= 0 ? rest[(slash + 1)..] : rest;
-        if (name.EndsWith(".tdt", StringComparison.OrdinalIgnoreCase))
+        if (name.EndsWith(".tdt", StringComparison.OrdinalIgnoreCase)
+            || name.EndsWith(".arm", StringComparison.OrdinalIgnoreCase))
         {
             name = name[..^4];
         }
@@ -203,6 +216,9 @@ public sealed class TileBook : IQuerySource
         int first = dirs.IndexOf('/', StringComparison.Ordinal);
         return first >= 0 ? (dirs[..first], dirs[(first + 1)..], name) : (dirs, string.Empty, name);
     }
+
+    /// <summary>Whether a path is a room rather than a tile definition.</summary>
+    public static bool IsRoom(string path) => path.EndsWith(".arm", StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
     int IQuerySource.Rows => Count;
