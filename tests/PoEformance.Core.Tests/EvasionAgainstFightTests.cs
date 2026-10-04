@@ -20,11 +20,11 @@ namespace PoEformance.Core.Tests;
 /// the same one that settled the offsets, which is the point: the numbers it produces here are
 /// the ones the overlay would have drawn that evening.
 /// </remarks>
-public class EvasionAgainstFightTests
+public class EvasionAgainstFightTests(FightWalk walk) : IClassFixture<FightWalk>
 {
-    private const string Fixture = "session-2026-08-monsters.rec";
+    private const string Fixture = FightWalk.Fixture;
 
-    private static string FixturePath
+    internal static string FixturePath
     {
         get
         {
@@ -39,44 +39,24 @@ public class EvasionAgainstFightTests
         }
     }
 
-    /// <summary>Replays every frame through the planner. Cached - it walks the whole session.</summary>
-    private static readonly Lazy<(List<EvasionTick> Ticks, int Frames)> Session = new(() => Replay(
+    /// <summary>Every frame through the planner with everything on - the ticks the overlay would have drawn.</summary>
+    private (List<EvasionTick> Ticks, int Frames) Session => Replay(
         new EvasionSettings(
             Warn: new EvasionGate(true, ItemRarity.Normal),
             Act: new EvasionGate(true, ItemRarity.Normal),
             DangerRadius: 90f,
             CooldownMs: 1200,
             DodgeKey: 0x20,
-            OnlyDangerousAnimations: false)));
+            OnlyDangerousAnimations: false));
 
-    private static (List<EvasionTick> Ticks, int Frames) Replay(EvasionSettings settings)
-    {
-        var replay = ReplayMemoryReader.Load(File.OpenRead(FixturePath));
-        OffsetSchema schema = RealSessionTests.Schema();
-
-        // The reader must be asked for actions, exactly as the app asks when the feature is on.
-        var world = new WorldReader(replay, schema) { ReadActions = true };
-        var planner = new EvasionPlanner(settings);
-        ulong gameStates = replay.ResolvedStatics["GameStates"];
-
-        var ticks = new List<EvasionTick>();
-        for (uint frame = 0; frame < replay.FrameCount; frame++)
-        {
-            replay.Seek(frame);
-            WorldSnapshot snapshot = world.Read(gameStates);
-
-            // The recording's own clock, so the cooldown behaves as it did live rather than
-            // being handed a fresh millisecond per frame.
-            ticks.Add(planner.Evaluate(snapshot, AnimationNames.Empty, true, replay.FrameTimes[(int)frame]));
-        }
-
-        return (ticks, (int)replay.FrameCount);
-    }
+    /// <summary>The planner over the session read once by <see cref="FightWalk"/>; only the settings differ per test.</summary>
+    private (List<EvasionTick> Ticks, int Frames) Replay(EvasionSettings settings)
+        => (walk.Replay(settings), walk.Frames.Count);
 
     [Fact]
     public void TheRealFightProducesThreatsToDraw()
     {
-        (List<EvasionTick> ticks, int frames) = Session.Value;
+        (List<EvasionTick> ticks, int frames) = Session;
 
         int withThreats = ticks.Count(t => t.Draw.Count > 0);
         Assert.True(frames > 1_500, $"fixture has only {frames} frames");
@@ -97,7 +77,7 @@ public class EvasionAgainstFightTests
         // The half that presses a key. A session in which nothing is ever aimed at the player
         // would mean the radius is set where no real attack lands - a feature that draws
         // beautifully and never acts.
-        (List<EvasionTick> ticks, _) = Session.Value;
+        (List<EvasionTick> ticks, _) = Session;
 
         int aimed = ticks.Count(t => t.AimedCount > 0);
         int dodges = ticks.Count(t => t.Dodge);
@@ -116,7 +96,7 @@ public class EvasionAgainstFightTests
         // The setting the user asked for, measured on a real pack rather than asserted: raising
         // the floor to Rare has to leave strictly fewer threats than Normal does, or the gate is
         // not doing anything.
-        (List<EvasionTick> everything, _) = Session.Value;
+        (List<EvasionTick> everything, _) = Session;
         (List<EvasionTick> raresOnly, _) = Replay(new EvasionSettings(
             Warn: new EvasionGate(true, ItemRarity.Rare),
             Act: new EvasionGate(false),

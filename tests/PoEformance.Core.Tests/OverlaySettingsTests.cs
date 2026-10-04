@@ -728,5 +728,62 @@ public class OverlaySettingsMergeTests
     {
         Assert.Null(OverlaySettings.Default.MonsterColumnWidths);
         Assert.Null(OverlaySettings.Default.MonsterPanes);
+        Assert.Null(OverlaySettings.Default.ItemColumns);
+        Assert.Null(OverlaySettings.Default.ItemColumnWidths);
+        Assert.Null(OverlaySettings.Default.ItemPanes);
+        Assert.True(OverlaySettings.Default.ItemRail);
+        Assert.Null(OverlaySettings.Default.TileColumns);
+        Assert.Null(OverlaySettings.Default.TileColumnWidths);
+        Assert.Null(OverlaySettings.Default.TilePanes);
+        Assert.True(OverlaySettings.Default.TileRail);
+        Assert.Null(OverlaySettings.Default.EffectColumns);
+        Assert.Null(OverlaySettings.Default.EffectPanes);
+        Assert.True(OverlaySettings.Default.EffectRail);
+    }
+
+    /// <summary>
+    /// The item book's layout is kept under keys of its own, and survives the AOT serialiser.
+    /// </summary>
+    [Fact]
+    public void TheItemBooksLayoutSurvivesARestartApartFromTheMonsterBooks()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-itembook-{Guid.NewGuid():N}.json");
+        try
+        {
+            Assert.True(OverlaySettingsStore.Save(
+                OverlaySettings.Default with
+                {
+                    ItemColumns = ["name", "class", "art"],
+                    ItemColumnWidths = new Dictionary<string, int>(StringComparer.Ordinal) { ["name"] = 230 },
+                    ItemPanes = new Dictionary<string, double>(StringComparer.Ordinal) { ["rail"] = 0.15, ["list"] = 0.4 },
+                    ItemRail = false,
+                    TileColumns = ["name", "here"],
+                    TileRail = false,
+                    EffectColumns = ["name", "folder"],
+                    EffectRail = false,
+                },
+                path));
+
+            OverlaySettings back = OverlaySettingsStore.Load(path);
+
+            Assert.Equal(["name", "class", "art"], back.ItemColumns);
+            Assert.Equal(230, back.ItemColumnWidths!["name"]);
+            Assert.Equal(0.4, back.ItemPanes!["list"], 6);
+            Assert.False(back.ItemRail);
+            Assert.Equal(["name", "here"], back.TileColumns);
+            Assert.False(back.TileRail);
+            Assert.Equal(["name", "folder"], back.EffectColumns);
+            Assert.False(back.EffectRail);
+            Assert.Null(back.MonsterColumns);
+            Assert.True(back.MonsterRail);
+
+            string written = File.ReadAllText(path);
+            Assert.Contains("itemColumns", written, StringComparison.Ordinal);
+            Assert.Contains("itemRail", written, StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 }

@@ -448,6 +448,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // onto the pane whenever it turns up - see AttachMonsterBook.
         _modelWants = settings;
         Capture(_monsterBook?.Model);
+        Capture(_itemBook?.Model);
+        Capture(_tileBook?.Model);
+        Capture(_effectBook?.Model);
 
         // No handover hole here, unlike the room layer above: the ground names need no route
         // planner, so the layer exists from the start and takes the settings directly.
@@ -504,6 +507,36 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 ? panes
                 : basis.MonsterPanes,
             MonsterRail = _monsterBook?.RailOpen ?? basis.MonsterRail,
+            ItemColumns = _itemBook?.Columns is { Count: > 0 } itemColumns
+                ? itemColumns
+                : basis.ItemColumns,
+            ItemColumnWidths = _itemBook?.ColumnWidths is { Count: > 0 } itemWidths
+                ? itemWidths
+                : basis.ItemColumnWidths,
+            ItemPanes = _itemBook?.Panes is { Count: > 0 } itemPanes
+                ? itemPanes
+                : basis.ItemPanes,
+            ItemRail = _itemBook?.RailOpen ?? basis.ItemRail,
+            TileColumns = _tileBook?.Columns is { Count: > 0 } tileColumns
+                ? tileColumns
+                : basis.TileColumns,
+            TileColumnWidths = _tileBook?.ColumnWidths is { Count: > 0 } tileWidths
+                ? tileWidths
+                : basis.TileColumnWidths,
+            TilePanes = _tileBook?.Panes is { Count: > 0 } tilePanes
+                ? tilePanes
+                : basis.TilePanes,
+            TileRail = _tileBook?.RailOpen ?? basis.TileRail,
+            EffectColumns = _effectBook?.Columns is { Count: > 0 } effectColumns
+                ? effectColumns
+                : basis.EffectColumns,
+            EffectColumnWidths = _effectBook?.ColumnWidths is { Count: > 0 } effectWidths
+                ? effectWidths
+                : basis.EffectColumnWidths,
+            EffectPanes = _effectBook?.Panes is { Count: > 0 } effectPanes
+                ? effectPanes
+                : basis.EffectPanes,
+            EffectRail = _effectBook?.RailOpen ?? basis.EffectRail,
             MonsterModel = _monsterBook?.ModelOpen ?? basis.MonsterModel,
             ModelGrey = _monsterBook?.Model?.Grey ?? basis.ModelGrey,
             ModelGreyFactor = _monsterBook?.Model?.GreyFactor ?? basis.ModelGreyFactor,
@@ -663,6 +696,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
     /// <summary>Kept so the settings file can be told which columns it is showing.</summary>
     private MonsterBookWindow? _monsterBook;
+    private ItemBookWindow? _itemBook;
+    private TileBookWindow? _tileBook;
+    private EffectBookWindow? _effectBook;
     private PoiLayer? _poi;
     private RoomLayer? _rooms;
 
@@ -937,6 +973,108 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     private MonsterVarieties _monsters = MonsterVarieties.Empty;
+
+    /// <summary>
+    /// Every item the game has a model for, for the item book.
+    /// </summary>
+    /// <remarks>
+    /// The <see cref="Monsters"/> arrangement: set by whoever wires this up - here, once the
+    /// install's tables have been read on a background thread - and read through this property
+    /// each frame rather than captured, so a table that arrives after the book is attached is seen.
+    /// </remarks>
+    public ItemVisuals Items
+    {
+        get => _items;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _items = value;
+        }
+    }
+
+    private ItemVisuals _items = ItemVisuals.Empty;
+
+    /// <summary>Every effect with a model, for the effect book. The <see cref="Items"/> arrangement.</summary>
+    public EffectVisuals Effects
+    {
+        get => _effectVisuals;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _effectVisuals = value;
+        }
+    }
+
+    private EffectVisuals _effectVisuals = EffectVisuals.Empty;
+
+    /// <summary>
+    /// Every terrain tile definition the install has, for the tile book. Empty until its walk runs.
+    /// </summary>
+    /// <remarks>The <see cref="Items"/> arrangement: set once from a background walk, read each frame.</remarks>
+    public IReadOnlyList<string> TileFiles
+    {
+        get => _tileFiles;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _tileFiles = value;
+        }
+    }
+
+    private IReadOnlyList<string> _tileFiles = [];
+
+    /// <summary>
+    /// How many rooms of the current area each tile file builds, by path - a NEW dictionary only when
+    /// the area's terrain changes, which is what tells the tile book to rebuild.
+    /// </summary>
+    /// <remarks>
+    /// CACHED ON THE ROOM LIST'S IDENTITY. The terrain is read once per area and its room list is a
+    /// fixed object from then on, so asking per frame costs a reference compare; building the map per
+    /// frame would be an allocation per frame and would make the book rebuild sixty times a second.
+    /// </remarks>
+    private IReadOnlyDictionary<string, int> TilesHere()
+    {
+        IReadOnlyList<TerrainRoom>? rooms = _snapshot.Terrain is TerrainGrid grid ? grid.Rooms : null;
+        IReadOnlyList<string> loaded = LoadedFiles?.Invoke() ?? [];
+        if (ReferenceEquals(rooms, _tilesHereOf) && ReferenceEquals(loaded, _loadedOf))
+        {
+            return _tilesHere;
+        }
+
+        _tilesHereOf = rooms;
+        _loadedOf = loaded;
+        var here = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (TerrainRoom room in rooms ?? [])
+        {
+            if (room.Path.Length > 0)
+            {
+                here[room.Path] = room.Placements;
+            }
+        }
+
+        // THE AREA'S ROOMS ARE THE FILES IT LOADED, not anything the tiles say - no tile reaches its
+        // room (see RoomFiles) - so a room is "here" once, whatever it built.
+        foreach (string path in loaded)
+        {
+            if (TileBook.IsRoom(path))
+            {
+                here.TryAdd(path, 1);
+            }
+        }
+
+        _tilesHere = here;
+        return here;
+    }
+
+    /// <summary>
+    /// The files the current area loaded, by path - a new list per area. Where the tile book finds
+    /// the area's rooms. Null where nothing reads the loaded-file table.
+    /// </summary>
+    public Func<IReadOnlyList<string>>? LoadedFiles { get; set; }
+
+    private IReadOnlyList<string>? _loadedOf;
+    private IReadOnlyList<TerrainRoom>? _tilesHereOf;
+    private IReadOnlyDictionary<string, int> _tilesHere = new Dictionary<string, int>();
 
     /// <summary>
     /// Which boss picture belongs to which arena, for the arenas whose names do not say it.
@@ -2402,6 +2540,127 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (visible)
         {
             _tools.Show("monster-book");
+        }
+    }
+
+    /// <summary>
+    /// Adds the item reference book - every item with a 3D model, and the model.
+    /// </summary>
+    /// <remarks>
+    /// BESIDE THE MONSTER BOOK, and built the same way: the table through a callback because it
+    /// arrives late, and a model pane of its own because it holds its own model and textures - a
+    /// shared pane would reload one book's model every time the other tab was looked at.
+    ///
+    /// THE PANE TAKES THE MONSTER BOOK'S LOOK - greying, outline, light and backdrop - from the
+    /// settings file, so the two viewers draw alike. It does not write them back: the monster book
+    /// owns those settings, and two panes writing one setting would leave it to whichever moved last.
+    /// </remarks>
+    public void AttachItemBook(
+        IReadOnlyList<string>? columns = null,
+        bool rail = true,
+        bool visible = false,
+        Func<string, byte[]?>? readFile = null,
+        int modelSize = PictureLadder.Usual,
+        Func<ReadOnlyMemory<byte>, int, byte[]?>? unpack = null,
+        IReadOnlyDictionary<string, int>? columnWidths = null,
+        IReadOnlyDictionary<string, double>? panes = null)
+    {
+        var window = new ItemBookWindow(() => Items)
+        {
+            Changed = () => SettingsChanged?.Invoke(),
+            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack),
+        };
+
+        window.Show(columns, rail, columnWidths, panes);
+        Capture(window.Model);
+        _itemBook = window;
+
+        _tools.Add(
+            92, "item-book", "Item Book", window.DrawTab,
+            page: Entities, pageLabel: EntitiesLabel);
+        if (visible)
+        {
+            _tools.Show("item-book");
+        }
+    }
+
+    /// <summary>
+    /// Adds the effect reference book - projectiles, animated effects and ground effects, and their models.
+    /// </summary>
+    /// <remarks>
+    /// THE ITEM BOOK'S ARRANGEMENT, with one addition to its pane: the line naming the shader graphs
+    /// the model's materials use, which is the evidence for how an effect blends. See
+    /// MonsterPortrait.ShowShaders.
+    /// </remarks>
+    public void AttachEffectBook(
+        IReadOnlyList<string>? columns = null,
+        bool rail = true,
+        bool visible = false,
+        Func<string, byte[]?>? readFile = null,
+        int modelSize = PictureLadder.Usual,
+        Func<ReadOnlyMemory<byte>, int, byte[]?>? unpack = null,
+        IReadOnlyDictionary<string, int>? columnWidths = null,
+        IReadOnlyDictionary<string, double>? panes = null)
+    {
+        var window = new EffectBookWindow(() => Effects)
+        {
+            Changed = () => SettingsChanged?.Invoke(),
+            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack)
+            {
+                ShowShaders = true,
+                Translucent = true,
+            },
+        };
+
+        window.Show(columns, rail, columnWidths, panes);
+        Capture(window.Model);
+        _effectBook = window;
+
+        _tools.Add(
+            94, "effect-book", "Effect Book", window.DrawTab,
+            page: Entities, pageLabel: EntitiesLabel);
+        if (visible)
+        {
+            _tools.Show("effect-book");
+        }
+    }
+
+    /// <summary>
+    /// Adds the tile reference book - every terrain tile the install has, and the tile's geometry.
+    /// </summary>
+    /// <remarks>
+    /// THE ITEM BOOK'S ARRANGEMENT with two lists instead of one table: the install's tiles, set once
+    /// a background walk has run, and the current area's, read off the terrain the overlay already
+    /// holds. Its own pane, loading through <see cref="TileModels.Of"/>.
+    /// </remarks>
+    public void AttachTileBook(
+        IReadOnlyList<string>? columns = null,
+        bool rail = true,
+        bool visible = false,
+        Func<string, byte[]?>? readFile = null,
+        int modelSize = PictureLadder.Usual,
+        IReadOnlyDictionary<string, int>? columnWidths = null,
+        IReadOnlyDictionary<string, double>? panes = null)
+    {
+        var window = new TileBookWindow(() => TileFiles, TilesHere)
+        {
+            Changed = () => SettingsChanged?.Invoke(),
+            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
+            {
+                Load = static (read, _, key, _) => TileBookWindow.Load(read, key),
+            },
+        };
+
+        window.Show(columns, rail, columnWidths, panes);
+        Capture(window.Model);
+        _tileBook = window;
+
+        _tools.Add(
+            93, "tile-book", "Tile Book", window.DrawTab,
+            page: Entities, pageLabel: EntitiesLabel);
+        if (visible)
+        {
+            _tools.Show("tile-book");
         }
     }
 

@@ -544,6 +544,84 @@ public class MeshPictureTests
     }
 
     /// <summary>How many bytes differ, because a failure wants a count rather than two arrays.</summary>
+    /// <summary>
+    /// A glow in front of a solid surface adds to it; a glow behind one is hidden by it.
+    /// </summary>
+    /// <remarks>
+    /// THE TWO HALVES OF WHAT "TRANSLUCENT" HAS TO MEAN, and each one rules out a wrong renderer: one
+    /// that drew translucent shapes solid fails the first, one that let them through the depth buffer
+    /// fails the second. The surfaces are flat colours, so the claims are about channels, not shading.
+    /// </remarks>
+    [Fact]
+    public void ANADDITIVEShapeInFrontAddsToTheSolidOneAndOneBehindItIsHidden()
+    {
+        const int Size = 64;
+        Mipmaps red = Sheet(220, 0, 0);
+        Mipmaps green = Sheet(0, 200, 0);
+
+        GamePicture front = MeshPicture.Of(
+            Layered(), Size, skins: [red, green], blends: [MaterialBlend.Opaque, MaterialBlend.Additive]);
+        Assert.True(Channel(front, 0) > 50, $"the solid red behind should still show: {Channel(front, 0)}");
+        Assert.True(Channel(front, 1) > 150, $"the green glow in front should be added: {Channel(front, 1)}");
+
+        GamePicture behind = MeshPicture.Of(
+            Layered(), Size, skins: [green, red], blends: [MaterialBlend.Additive, MaterialBlend.Opaque]);
+        Assert.Equal(0, Channel(behind, 1));
+        Assert.True(Channel(behind, 0) > 50);
+    }
+
+    /// <summary>A mixed shape over nothing covers only as much as its texture's alpha says.</summary>
+    [Fact]
+    public void AMIXEDShapeOverTheEmptyFrameIsAsOpaqueAsItsTexture()
+    {
+        GamePicture drawn = MeshPicture.Of(
+            Layered(farToo: false), 64, skins: [Sheet(0, 0, 200, alpha: 128)], blends: [MaterialBlend.Alpha]);
+
+        Assert.InRange(Channel(drawn, 3), 120, 136);
+        Assert.InRange(Channel(drawn, 2), 190, 210);
+
+        // AND WITHOUT A BLEND LIST NOTHING CHANGES: the same shape is solid, as every model was.
+        Assert.Equal(255, Channel(MeshPicture.Of(Layered(farToo: false), 64, skins: [Sheet(0, 0, 200, alpha: 128)]), 3));
+    }
+
+    /// <summary>The second pass stays inside its band, so any number of threads draws the same bytes.</summary>
+    [Fact]
+    public void TRANSLUCENCYDrawsTheSamePictureOnAnyNumberOfThreads()
+    {
+        Mipmaps red = Sheet(220, 0, 0);
+        Mipmaps green = Sheet(0, 200, 0, alpha: 160);
+        MaterialBlend[] blends = [MaterialBlend.Alpha, MaterialBlend.Additive];
+
+        GamePicture one = MeshPicture.Of(Layered(), new MeshPicture.Canvas(96, threads: 1), skins: [red, green], blends: blends);
+        byte[] first = [.. one.Rgba];
+        GamePicture many = MeshPicture.Of(Layered(), new MeshPicture.Canvas(96, threads: 4), skins: [red, green], blends: blends);
+
+        Assert.Equal(0, Differing(first, many.Rgba));
+    }
+
+    /// <summary>
+    /// The far quad as one shape and the near one as another, both coordinated - or the near one alone.
+    /// </summary>
+    private static SkinnedMesh Layered(bool farToo = true)
+    {
+        var places = new List<Vector3>();
+        var indices = new List<int>();
+        if (farToo)
+        {
+            Quad(places, indices, near: false);
+        }
+
+        Quad(places, indices, near: true);
+        SkinnedMesh bare = Built(places, indices, Least, Most);
+
+        var spots = new Vector2[bare.Positions.Length];
+        Array.Fill(spots, new Vector2(0.5f, 0.5f));
+        MeshShape[] shapes = farToo
+            ? [new MeshShape("Far", 0, 6), new MeshShape("Near", 6, 6)]
+            : [new MeshShape("Near", 0, 6)];
+        return SkinnedMesh.Of(bare.Positions, bare.Normals, bare.Indices, Least, Most, spots, shapes);
+    }
+
     private static int Differing(byte[] one, byte[] other)
     {
         if (one.Length != other.Length)
@@ -567,7 +645,7 @@ public class MeshPictureTests
         => said.Rgba[((((said.Height / 2) * said.Width) + (said.Width / 2)) * 4) + part];
 
     /// <summary>A texture of one colour.</summary>
-    private static Mipmaps Sheet(byte red, byte green, byte blue)
+    private static Mipmaps Sheet(byte red, byte green, byte blue, byte alpha = 255)
     {
         var pixels = new byte[8 * 8 * 4];
         for (var one = 0; one < 8 * 8; one++)
@@ -575,7 +653,7 @@ public class MeshPictureTests
             pixels[(one * 4) + 0] = red;
             pixels[(one * 4) + 1] = green;
             pixels[(one * 4) + 2] = blue;
-            pixels[(one * 4) + 3] = 255;
+            pixels[(one * 4) + 3] = alpha;
         }
 
         return Levelled(new GamePicture(8, 8, pixels));

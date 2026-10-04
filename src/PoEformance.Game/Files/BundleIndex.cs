@@ -389,8 +389,44 @@ public sealed class BundleIndex
         IReadOnlyCollection<string>? wanted,
         string? folder,
         string? extension = null)
+        => Names(decompress, wanted, folder, [extension ?? string.Empty]);
+
+    /// <summary>
+    /// How many walks this session will ask for, so the path text is dropped after the last one.
+    /// </summary>
+    /// <remarks>
+    /// ONE BY DEFAULT, which is what every session asked for until the tile book: the atlas's walk
+    /// and nothing else. The tile book needs a walk of its own - every .tdt and .arm in the install
+    /// - and cannot ride on the atlas's, because that one runs when the atlas is first drawn and
+    /// gathers names the game supplies as it goes; asking it earlier would lose those. So whoever
+    /// wires the session up says how many walks are coming, and the blob stays until all of them
+    /// have run. A walk past the count still finds nothing, exactly as before.
+    /// </remarks>
+    /// <param name="walks">How many calls to <see cref="Names(Func{ReadOnlyMemory{byte}, int, byte[]}, IReadOnlyCollection{string}, string, string)"/> are coming.</param>
+    public void ExpectWalks(int walks) => Interlocked.Exchange(ref _walksLeft, Math.Max(1, walks));
+
+    /// <summary>How many walks may still read the path text. See <see cref="ExpectWalks"/>.</summary>
+    private int _walksLeft = 1;
+
+    /// <summary>
+    /// Both name questions at once, with a path kept when it ends in ANY of the extensions.
+    /// </summary>
+    /// <remarks>
+    /// SEVERAL EXTENSIONS, ONE WALK, for the same reason the two questions are one call: the walk
+    /// is the expense, and the tile book wants the .tdt and the .arm files of one folder.
+    /// </remarks>
+    /// <param name="decompress">How to undo Oodle - the same one the bundles are read with.</param>
+    /// <param name="wanted">Names without a folder or an extension, or null. Case does not matter.</param>
+    /// <param name="folder">A path prefix, e.g. <c>Metadata/Terrain/</c>, or null.</param>
+    /// <param name="extensions">What a path in that folder may end with. An empty one keeps every path.</param>
+    public WalkedNames Names(
+        Func<ReadOnlyMemory<byte>, int, byte[]?> decompress,
+        IReadOnlyCollection<string>? wanted,
+        string? folder,
+        IReadOnlyList<string> extensions)
     {
         ArgumentNullException.ThrowIfNull(decompress);
+        ArgumentNullException.ThrowIfNull(extensions);
 
         var found = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var inside = new List<string>();
@@ -424,7 +460,7 @@ public sealed class BundleIndex
 
         byte[] starts = string.IsNullOrWhiteSpace(folder)
             ? [] : System.Text.Encoding.UTF8.GetBytes(folder);
-        byte[] ends = System.Text.Encoding.UTF8.GetBytes(extension ?? string.Empty);
+        byte[][] ends = [.. extensions.Select(one => System.Text.Encoding.UTF8.GetBytes(one ?? string.Empty))];
 
         if (asked.Count == 0 && starts.Length == 0)
         {
@@ -447,20 +483,38 @@ public sealed class BundleIndex
             }
 
             if (starts.Length > 0
-                && path.Length >= starts.Length + ends.Length
+                && path.Length >= starts.Length
                 && path[..starts.Length].SequenceEqual(starts, CaseBlind)
-                && path[^ends.Length..].SequenceEqual(ends, CaseBlind))
+                && Ends(path, starts.Length, ends))
             {
                 inside.Add(System.Text.Encoding.UTF8.GetString(path));
             }
         });
 
-        // DROPPED, now that it has been read. Tens of megabytes of compressed path text that only
-        // a walk ever wanted, and a session gets one. Exchanged rather than assigned because the
-        // walk runs on a background thread while whatever reports the install's state reads Named
-        // from another.
-        Interlocked.Exchange(ref _named, []);
+        // DROPPED after the last walk the session announced - see ExpectWalks. Tens of megabytes of
+        // compressed path text that only a walk ever wanted. Exchanged rather than assigned because
+        // the walk runs on a background thread while whatever reports the install's state reads
+        // Named from another.
+        if (Interlocked.Decrement(ref _walksLeft) <= 0)
+        {
+            Interlocked.Exchange(ref _named, []);
+        }
+
         return new WalkedNames(found, inside);
+    }
+
+    /// <summary>Whether a path past its folder ends in one of the extensions.</summary>
+    private static bool Ends(ReadOnlySpan<byte> path, int folder, byte[][] ends)
+    {
+        foreach (byte[] end in ends)
+        {
+            if (path.Length >= folder + end.Length && path[^end.Length..].SequenceEqual(end, CaseBlind))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>Bytes compared as ASCII letters without regard to case, which is how paths differ.</summary>

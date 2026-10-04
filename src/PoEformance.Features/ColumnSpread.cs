@@ -101,15 +101,42 @@ public sealed class ColumnSpread
     /// <summary>The largest value in the column.</summary>
     public double Most => _sorted.Length > 0 ? _sorted[^1] : 0d;
 
-    /// <summary>Measures a column. The values are copied; the caller's array is left alone.</summary>
+    /// <summary>
+    /// Measures a column. The values are copied; the caller's array is left alone.
+    /// </summary>
+    /// <remarks>
+    /// NaN IS NO VALUE AND IS NOT MEASURED. A unique item has no drop level and a monster whose
+    /// type row did not resolve has no armour, and both used to be written as 0 - which put every
+    /// unique in the first bin of the drop histogram, sorted them under the level-1 items and
+    /// answered "drop&lt;10" with all of them. Blank is not zero; a NaN here is left out of the
+    /// sort, the scale, the bins and the ranges, and <see cref="Bar"/> draws nothing for it.
+    /// </remarks>
     public static ColumnSpread Of(ReadOnlySpan<double> values)
     {
-        if (values.Length == 0)
+        var real = 0;
+        foreach (double value in values)
+        {
+            if (!double.IsNaN(value))
+            {
+                real++;
+            }
+        }
+
+        if (real == 0)
         {
             return Empty;
         }
 
-        double[] sorted = values.ToArray();
+        var sorted = new double[real];
+        var kept = 0;
+        foreach (double value in values)
+        {
+            if (!double.IsNaN(value))
+            {
+                sorted[kept++] = value;
+            }
+        }
+
         Array.Sort(sorted);
 
         // A COLUMN WITH NO SPREAD EARNS NO BARS. Every row identical draws as a wall of full bars,
@@ -262,7 +289,7 @@ public sealed class ColumnSpread
     /// </remarks>
     public float Bar(double value)
     {
-        if (Scale <= 0d || value <= 0d)
+        if (Scale <= 0d || double.IsNaN(value) || value <= 0d)
         {
             return 0f;
         }

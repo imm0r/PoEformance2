@@ -179,6 +179,30 @@ public sealed record MonsterModel(
     public int Parts { get; init; }
 
     /// <summary>
+    /// The shader graphs the materials that were read name as their parent, distinct, in the order met.
+    /// </summary>
+    /// <remarks>
+    /// THE EVIDENCE FOR BLENDING, collected and not yet acted on: whether an additive or a
+    /// transparent material is told apart by its graph is what the first real effect shows - see
+    /// MaterialFile.Parents.
+    /// </remarks>
+    public IReadOnlyList<string> Shaders { get; init; } = [];
+
+    /// <summary>
+    /// Each shape's blend mode as its material spells it, in shape order - empty where it says none.
+    /// </summary>
+    /// <remarks>
+    /// THE RAW WORD, kept beside <see cref="Blends"/>, because what it is taken to mean is a rule on
+    /// words that the first real effect may prove wrong - see MaterialBlends.
+    /// </remarks>
+    public IReadOnlyList<string> Modes { get; init; } = [];
+
+    /// <summary>How each shape is drawn over what is behind it, from <see cref="Modes"/>.</summary>
+    public IReadOnlyList<MaterialBlend> Blends => _blends ??= [.. Modes.Select(MaterialBlends.Of)];
+
+    private MaterialBlend[]? _blends;
+
+    /// <summary>
     /// How many <c>.sm</c> files the body itself is, before anything worn over it.
     /// </summary>
     /// <remarks>
@@ -266,6 +290,47 @@ public static class MonsterModels
             };
         }
 
+        return OfFiles(read, named, wearing);
+    }
+
+    /// <summary>
+    /// Gathers the model an <c>.ao</c> describes, whoever named it, or says where the walk stopped.
+    /// </summary>
+    /// <remarks>
+    /// THE WALK NEVER NEEDED A MONSTER, only the .ao files one names - which is what lets the item
+    /// book draw a sword through exactly the reads that draw a boss. An item's art row names its
+    /// .ao the way MonsterVarieties.AOFiles does, and from there every hop is the same file format.
+    ///
+    /// A FIXED MESH CAN BE THE WHOLE MODEL, which a monster never is. See <see cref="Fixed"/>.
+    /// </remarks>
+    /// <param name="read">How to get a file out of the install, by path.</param>
+    /// <param name="named">The .ao files to start from, nearest first.</param>
+    /// <param name="wearing">Whether attached pieces are read and joined on - see the other overload.</param>
+    public static MonsterModel OfFiles(Func<string, byte[]?>? read, IReadOnlyList<string>? named, bool wearing = true)
+        => OfFiles(read, named, wearing, null);
+
+    /// <summary>
+    /// The same walk, with a material and texture cache that outlives it.
+    /// </summary>
+    /// <remarks>
+    /// FOR A ROOM, which loads one model per distinct doodad file and places each many times: two
+    /// doodads - a rock and a stump - that share a .mat and its .dds would otherwise decode that
+    /// sheet once each and hand the renderer two copies of one texture. The cache is per call by
+    /// default and nothing else changes.
+    /// </remarks>
+    internal static MonsterModel OfFiles(
+        Func<string, byte[]?>? read, IReadOnlyList<string>? named, bool wearing, Paints? shared)
+    {
+        if (read is null)
+        {
+            return MonsterModel.None with { Why = "no install to read" };
+        }
+
+        if (named is not { Count: > 0 })
+        {
+            return MonsterModel.None with { Why = "no .ao file to read" };
+        }
+
         // COUNTED AS THEY ARE READ, through the one function everything below reads with, so a
         // file the walk asks for is a file the count saw - the signpost a texture may sit behind
         // included, which GameArt follows on its own. A file that was not there comes back null
@@ -275,7 +340,8 @@ public static class MonsterModels
 
         if (Skinned(counted, named) is not { } found)
         {
-            return tally.Failed("no SkinMesh anywhere in the .ao files or what they extend");
+            return Fixed(counted, named, tally, shared)
+                ?? tally.Failed("no SkinMesh or FixedMesh anywhere in the .ao files or what they extend");
         }
 
         MeshManifest manifest = Read(counted, found.Meshes[0], MeshManifest.Read);
@@ -319,7 +385,7 @@ public static class MonsterModels
         // many materials name it. Without it the model's own skin and the shape wearing the
         // same material were two decodes of one 2048-square sheet - and two objects, which is
         // also two uploads to the renderer.
-        var paints = new Paints();
+        Paints paints = shared ?? new Paints();
         (Mipmaps? skin, string paint, string material) = Painted(counted, mesh, materials, paints);
 
         // AND ONE PER SHAPE, over the same reads: the walk above already decoded every material
@@ -364,8 +430,12 @@ public static class MonsterModels
                 .. parts.Select(one => new MeshJoin(one.Mesh, one.Bones, one.Weights, one.Place)),
             ];
             List<Mipmaps?> worn = [.. dress.Skins, .. parts.SelectMany(one => one.Skins)];
+
+            // THE MODES RIDE WITH THE SKINS, padded to each piece's own shape count so the two lists
+            // stay aligned however short a piece's came back.
+            List<string> modes = [.. Padded(dress.Modes, dress.Skins.Count), .. parts.SelectMany(one => Padded(one.Modes, one.Skins.Count))];
             mesh = SkinnedMesh.Joined(join);
-            dress = dress with { Skins = worn };
+            dress = dress with { Skins = worn, Modes = modes };
         }
 
         return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint)
@@ -376,6 +446,7 @@ public static class MonsterModels
             BodyLeast = bare,
             BodyMost = worn_,
             Skins = dress.Skins,
+            Modes = dress.Modes,
             Materials = dress.Materials,
             NamedInAo = found.Materials.Count,
             NamedInMesh = manifest.Materials.Count,
@@ -387,6 +458,111 @@ public static class MonsterModels
             Move = move,
             Bytes = tally.Bytes,
             Files = tally.Files,
+            Shaders = paints.Shaders,
+        };
+    }
+
+    /// <summary>
+    /// The model as a rigid prop, where the .ao chain names a <c>FixedMesh</c> and no skin at all.
+    /// </summary>
+    /// <remarks>
+    /// THE SHAPE A MONSTER NEVER HAS AND AN ITEM MAY. Every monster is a skin on a rig, so the walk
+    /// only ever asked for a SkinMesh and treated a FixedMesh as something hung off one - Malgor's
+    /// cannon. An item's .ao can be nothing but the prop, and asking only for a skin would report
+    /// every such item as having no model when its whole geometry is one .fmt away.
+    ///
+    /// ASKED ONLY AFTER THE SKIN WALK FOUND NOTHING, so a monster draws exactly as it did: the skin
+    /// is still the body wherever there is one, and this cannot change a single monster.
+    ///
+    /// NOT ANIMATED, AND SAID SO. A .fmt has no bones and no weights, and as the body there is no
+    /// socket to pin it to either - binding it to some bone of a skeleton the chain happens to name
+    /// would be choosing a bone nobody measured. It is drawn where the file puts it, and
+    /// <see cref="MonsterModel.Move"/> carries the reason it does not move.
+    /// </remarks>
+    private static MonsterModel? Fixed(
+        Func<string, byte[]?> read, IReadOnlyList<string> named, Tally tally, Paints? shared)
+    {
+        string path = string.Empty;
+        foreach (string one in named)
+        {
+            AnimatedObject ao = Object(read, one);
+            if (ao.Ready && Entryed(Whole(read, ao), PropBlock, PropEntry) is { Length: > 0 } found)
+            {
+                path = found;
+                break;
+            }
+        }
+
+        if (path.Length == 0)
+        {
+            return null;
+        }
+
+        FixedMesh prop = Read(read, path, FixedMesh.Read);
+        if (!prop.Ready)
+        {
+            return tally.Failed(
+                $"the fixed mesh did not read: {path}" + (prop.Why.Length > 0 ? $" - {prop.Why}" : string.Empty),
+                path);
+        }
+
+        // THE .fmt's OWN MATERIALS, one per shape, are the only ones there are: there is no
+        // manifest, and the same list Propped hands to the dressing serves the whole model here.
+        return Worn(read, prop.Mesh, prop.Named, paintTheRest: true, path,
+            "a fixed mesh is rigid - it has no bones to animate", shared) with
+        {
+            Bytes = tally.Bytes,
+            Files = tally.Files,
+        };
+    }
+
+    /// <summary>
+    /// A rigid mesh dressed in the materials a list gives its shapes - no rig, no pieces.
+    /// </summary>
+    /// <remarks>
+    /// THE PART OF THE WALK THAT NEVER NEEDED AN .ao: given a mesh and which material each shape
+    /// wears, the textures are found, decoded once each and handed out per shape. A fixed-mesh item
+    /// and a terrain tile both arrive here with that and nothing else.
+    /// </remarks>
+    /// <param name="read">How to get a file out of the install, by path.</param>
+    /// <param name="mesh">The geometry, its shapes named the way <paramref name="named"/> names them.</param>
+    /// <param name="named">Each shape's material, by the shape's name.</param>
+    /// <param name="paintTheRest">
+    /// Whether a shape with no material of its own wears the first colour found. Right for a prop,
+    /// whose unnamed shapes are part of the same object; wrong for a tile, whose unnamed shapes are
+    /// its ground and would come out in a wall's texture.
+    /// </param>
+    /// <param name="source">The file the model is read from, for the line under the picture.</param>
+    /// <param name="move">Why it does not move - see <see cref="MonsterModel.Move"/>.</param>
+    /// <param name="shared">A cache that outlives this model, or null for one of its own - see the internal OfFiles.</param>
+    internal static MonsterModel Worn(
+        Func<string, byte[]?> read,
+        SkinnedMesh mesh,
+        IReadOnlyList<(string Shape, string Material)> named,
+        bool paintTheRest,
+        string source,
+        string move,
+        Paints? shared = null)
+    {
+        List<string> materials = [.. named.Select(one => one.Material).Where(one => one.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase)];
+        Paints paints = shared ?? new Paints();
+        (Mipmaps? skin, string paint, string material) = Painted(read, mesh, materials, paints);
+        Dress dress = Dressed(
+            read, mesh, named, MeshManifest.None, paintTheRest ? skin : null, material, paints);
+
+        return new MonsterModel(mesh, skin, source, material, string.Empty, paint)
+        {
+            BodyLeast = mesh.Least,
+            BodyMost = mesh.Most,
+            Skins = dress.Skins,
+            Modes = dress.Modes,
+            Materials = dress.Materials,
+            NamedInAo = named.Count,
+            Runs = dress.Runs,
+            Textures = dress.Textures,
+            Guessed = dress.Guessed,
+            Move = move,
+            Shaders = paints.Shaders,
         };
     }
 
@@ -399,7 +575,8 @@ public static class MonsterModels
         byte[]? Bones,
         byte[]? Weights,
         Matrix4x4? Place,
-        IReadOnlyList<Mipmaps?> Skins);
+        IReadOnlyList<Mipmaps?> Skins,
+        IReadOnlyList<string> Modes);
 
     /// <summary>The entry keys whose value is another .ao. From the format diagram; see AoSurvey.</summary>
     private static readonly string[] Hangs =
@@ -463,7 +640,7 @@ public static class MonsterModels
 
             // NO BONES AND NO PLACE: the section's own vertex bones index the body's rig
             // already, so handing null keeps them and the join leaves the geometry where it is.
-            parts.Add(new Part(mesh, null, null, null, dress.Skins));
+            parts.Add(new Part(mesh, null, null, null, dress.Skins, dress.Modes));
         }
 
         return parts;
@@ -1148,12 +1325,12 @@ public static class MonsterModels
         {
             // NO PLACE: the correction already carries wherever the piece belongs, because a
             // socketed piece's own bind cancels down to exactly its socket's transform.
-            var worn = new Part(Corrected(mesh, map.Into), map.Bones, mesh.Weights, null, dress.Skins);
+            var worn = new Part(Corrected(mesh, map.Into), map.Bones, mesh.Weights, null, dress.Skins, dress.Modes);
             return (worn, map.Under, Told(hung, where, PartKind.Skin, counted, worn));
         }
 
         (byte[] bones, byte[] weights) = Bound(mesh.Positions.Length, bone);
-        var rigid = new Part(mesh, bones, weights, place, dress.Skins);
+        var rigid = new Part(mesh, bones, weights, place, dress.Skins, dress.Modes);
         return (rigid, body, Told(hung, where, PartKind.Rigid, counted, rigid));
     }
 
@@ -1464,7 +1641,7 @@ public static class MonsterModels
         Dress dress = Dressed(
             read, prop.Mesh, prop.Named, MeshManifest.None, fallback, string.Empty, paints);
         (byte[] bones, byte[] weights) = Bound(prop.Mesh.Positions.Length, bone);
-        return new Part(prop.Mesh, bones, weights, place, dress.Skins);
+        return new Part(prop.Mesh, bones, weights, place, dress.Skins, dress.Modes);
     }
 
     /// <summary>
@@ -1874,10 +2051,21 @@ public static class MonsterModels
         IReadOnlyList<string> spread = manifest.Spread(mesh.Shapes.Count);
         IReadOnlyList<string> paths = [.. manifest.Materials.Select(one => one.Path)];
 
+        // AND THE NAMES ONCE TOO. Matching each shape against the named list by scanning it is
+        // quadratic in the shapes, which a monster never notices and a terrain tile does: its
+        // list holds one entry per prop shape over up to 256 sub-tiles. First spelling wins, as
+        // the scan's first match did.
+        var byName = new Dictionary<string, string>(named.Count, StringComparer.OrdinalIgnoreCase);
+        foreach ((string called, string wears) in named)
+        {
+            byName.TryAdd(called, wears);
+        }
+
         var textures = new List<string>();
         var guessed = false;
 
         var skins = new Mipmaps?[mesh.Shapes.Count];
+        var modes = new string[mesh.Shapes.Count];
         var used = new List<string>();
         for (var shape = 0; shape < mesh.Shapes.Count; shape++)
         {
@@ -1885,12 +2073,15 @@ public static class MonsterModels
             // per shape - see MaterialFile.Graphs - so two shapes naming the same file are
             // two different textures and the cache has to tell them apart by the whole
             // string rather than by the file.
-            string wants = Wanted(mesh.Shapes[shape].Name, shape, mesh.Shapes.Count, named, spread, paths);
+            string wants = Wanted(mesh.Shapes[shape].Name, shape, mesh.Shapes.Count, named, byName, spread, paths);
             if (wants.Length == 0)
             {
                 skins[shape] = fallback;
+                modes[shape] = string.Empty;
                 continue;
             }
+
+            modes[shape] = paints.Mode(read, wants);
 
             (Mipmaps? worn, _, string texture, bool said) = Colour(read, mesh, wants, paints);
             if (worn is not null)
@@ -1915,7 +2106,7 @@ public static class MonsterModels
             used.Add(material);
         }
 
-        return new Dress(skins, used, textures, guessed) { Runs = spread.Count > 0 };
+        return new Dress(skins, used, textures, guessed) { Runs = spread.Count > 0, Modes = modes };
     }
 
     /// <summary>What the shapes ended up wearing, and how sure the walk is about it.</summary>
@@ -1931,6 +2122,9 @@ public static class MonsterModels
     {
         /// <summary>Whether the manifest's numbers added up and were used as runs of shapes.</summary>
         public bool Runs { get; init; }
+
+        /// <summary>Each shape's material blend mode, raw - see MonsterModel.Modes.</summary>
+        public IReadOnlyList<string> Modes { get; init; } = [];
     }
 
     /// <summary>
@@ -1963,15 +2157,13 @@ public static class MonsterModels
         int at,
         int shapes,
         IReadOnlyList<(string Shape, string Material)> named,
+        IReadOnlyDictionary<string, string> byName,
         IReadOnlyList<string> spread,
         IReadOnlyList<string> manifest)
     {
-        foreach ((string called, string material) in named)
+        if (byName.TryGetValue(shape, out string? material))
         {
-            if (string.Equals(called, shape, StringComparison.OrdinalIgnoreCase))
-            {
-                return material;
-            }
+            return material;
         }
 
         if (named.Count == shapes && at < named.Count)
@@ -2082,10 +2274,85 @@ public static class MonsterModels
                 named);
 
     /// <summary>What has already been read, so nothing is read or decoded twice.</summary>
-    private sealed class Paints
+    internal sealed class Paints
     {
         /// <summary>Material file by its path, with the selector taken off.</summary>
         public Dictionary<string, MaterialFile> Files { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Blend mode by material file, worked out once. See <see cref="Mode"/>.</summary>
+        private readonly Dictionary<string, string> _modes = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>A shader graph's own blend mode by its path, read once however many materials name it.</summary>
+        private readonly Dictionary<string, string> _graphs = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// The blend mode a material asks for, as it spells it, or empty.
+        /// </summary>
+        /// <remarks>
+        /// THE MATERIAL'S OWN WORD FIRST - its defaultgraph's overriden_blend_mode - and the graph it is
+        /// an instance of second: the first parent that names one. zao's reader puts the member on
+        /// both, and the nearer file is the one that overrides, as everywhere else in this walk.
+        /// </remarks>
+        public string Mode(Func<string, byte[]?> read, string material)
+        {
+            string file = MaterialFile.Bare(material);
+            if (_modes.TryGetValue(file, out string? known))
+            {
+                return known;
+            }
+
+            if (!Files.TryGetValue(file, out MaterialFile? paint))
+            {
+                paint = MaterialFile.Read(read(file.Replace('\\', '/').Trim()));
+                Files[file] = paint;
+            }
+
+            string mode = paint.Blend;
+            foreach (string parent in paint.Parents)
+            {
+                if (mode.Length > 0)
+                {
+                    break;
+                }
+
+                if (parent.Length == 0)
+                {
+                    continue;
+                }
+
+                if (!_graphs.TryGetValue(parent, out string? graph))
+                {
+                    graph = MaterialFile.GraphBlend(read(parent.Replace('\\', '/').Trim()));
+                    _graphs[parent] = graph;
+                }
+
+                mode = graph;
+            }
+
+            _modes[file] = mode;
+            return mode;
+        }
+
+        /// <summary>Every parent graph the read materials name, distinct. See MonsterModel.Shaders.</summary>
+        public IReadOnlyList<string> Shaders
+        {
+            get
+            {
+                var said = new List<string>();
+                foreach (MaterialFile file in Files.Values)
+                {
+                    foreach (string parent in file.Parents)
+                    {
+                        if (parent.Length > 0 && !said.Contains(parent, StringComparer.OrdinalIgnoreCase))
+                        {
+                            said.Add(parent);
+                        }
+                    }
+                }
+
+                return said;
+            }
+        }
 
         /// <summary>Decoded texture by its path, with null for one that would not read.</summary>
         public Dictionary<string, Mipmaps?> Skins { get; } = new(StringComparer.OrdinalIgnoreCase);
@@ -2272,6 +2539,15 @@ public static class MonsterModels
         return said.IndexOf('.', slash + 1) < 0
             ? AnimatedObject.Read(read(said + AnimatedObject.Suffix))
             : AnimatedObject.None;
+    }
+
+    /// <summary>A shape list cut or padded with empty entries to exactly <paramref name="count"/>.</summary>
+    private static IEnumerable<string> Padded(IReadOnlyList<string> modes, int count)
+    {
+        for (var one = 0; one < count; one++)
+        {
+            yield return one < modes.Count ? modes[one] : string.Empty;
+        }
     }
 
     private static T Read<T>(Func<string, byte[]?> read, string path, Func<byte[]?, T> into)

@@ -1543,6 +1543,62 @@ public class MonsterModelTests
         Assert.Equal(said.Mesh.Shapes.Count, said.Skins.Count);
     }
 
+    /// <summary>
+    /// An .ao that is nothing but a prop is drawn from its .fmt - the shape an item's model can take.
+    /// </summary>
+    /// <remarks>
+    /// THE ITEM BOOK'S CASE. Every monster is a skin on a rig, so the walk used to answer "no
+    /// SkinMesh" for any .ao without one; an item can be a single rigid mesh, and that answer would
+    /// turn its whole model away. Reached through an extends line on purpose, because the body's
+    /// own walk has always followed extends and the prop has to be found the same way.
+    /// </remarks>
+    [Fact]
+    public void ANITEMThatIsOnlyAPropIsDrawnFromItsFixedMeshAndSaysWhyItDoesNotMove()
+    {
+        var install = new Fake();
+        install.Files["sword.ao"] = Ao(extends: "art/swordbase");
+        install.Files["art/swordbase.ao"] = Ao(fixture: "art/sword.fmt");
+        install.Files["art/sword.fmt"] = Packed.Fmt("art/painted.mat");
+        install.Files["art/painted.mat"] = Mat("art/skin.dds");
+        install.Files["art/skin.dds"] = [];
+
+        MonsterModel said = MonsterModels.OfFiles(install.Read, ["sword.ao"]);
+
+        Assert.True(said.Ready, said.Why);
+        Assert.Equal(2, said.Mesh.Triangles);
+        Assert.Equal("art/sword.fmt", said.Mesh_);
+        Assert.Equal(said.Mesh.Shapes.Count, said.Skins.Count);
+        Assert.False(said.Moves);
+        Assert.Contains("fixed mesh", said.Move, StringComparison.Ordinal);
+    }
+
+    /// <summary>The skin still wins wherever there is one, so no monster changes.</summary>
+    [Fact]
+    public void ANDASkinStillWinsOverAPropWhereTheChainNamesBoth()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", fixture: "art/cannon.fmt");
+        install.Files["art/cannon.fmt"] = Packed.Fmt("art/painted.mat");
+
+        MonsterModel said = MonsterModels.OfFiles(install.Read, ["body.ao"]);
+
+        Assert.True(said.Ready, said.Why);
+        Assert.Equal("art/rig.smd", said.Mesh_);
+    }
+
+    /// <summary>Neither a skin nor a prop is said as both, so the reason names what was looked for.</summary>
+    [Fact]
+    public void ANDAnAoWithNeitherSaysItLookedForBoth()
+    {
+        var install = new Fake();
+        install.Files["empty.ao"] = Ao();
+
+        MonsterModel said = MonsterModels.OfFiles(install.Read, ["empty.ao"]);
+
+        Assert.False(said.Ready);
+        Assert.Contains("FixedMesh", said.Why, StringComparison.Ordinal);
+    }
+
     /// <summary>A prop switched off with the rest of the parts, like any other piece.</summary>
     [Fact]
     public void APropIsLeftOutWhenThePartsAreSwitchedOff()

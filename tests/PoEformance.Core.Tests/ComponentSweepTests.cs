@@ -22,9 +22,9 @@ namespace PoEformance.Core.Tests;
 ///  - the beam's far end must pick out entities where THE MIDPOINT OF THE SAME LINE does not.
 /// Landing near an entity is cheap in a fight. The control is the evidence.
 /// </remarks>
-public class ComponentSweepTests
+public class ComponentSweepTests(SweepWalk walk) : IClassFixture<SweepWalk>
 {
-    private static string Fixture(string name)
+    internal static string Fixture(string name)
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
         while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
@@ -54,38 +54,6 @@ public class ComponentSweepTests
         }
 
         return frames;
-    }
-
-    /// <summary>Each entity's readings in frame order, with the frame's timestamp in seconds.</summary>
-    private static Dictionary<uint, List<(double Seconds, byte[] Bytes)>> Tracks(
-        string fixture, string component, out double lastSecond)
-    {
-        using var replay = ReplayMemoryReader.Load(File.OpenRead(Fixture(fixture)));
-        OffsetSchema schema = RealSessionTests.Schema();
-        var sweep = new ComponentSweep(replay, schema);
-        ulong gameStates = replay.ResolvedStatics["GameStates"];
-
-        var tracks = new Dictionary<uint, List<(double, byte[])>>();
-        lastSecond = 0;
-        for (uint frame = 0; frame < replay.FrameCount; frame++)
-        {
-            replay.Seek(frame);
-            if (sweep.SampleFrame(gameStates, (int)frame) is not { } got)
-            {
-                continue;
-            }
-
-            double seconds = replay.FrameTimes[(int)frame] / 1000.0;
-            lastSecond = seconds;
-            foreach (ComponentObservation o in got.Seen.Where(o =>
-                string.Equals(o.Component, component, StringComparison.Ordinal)))
-            {
-                tracks.TryAdd(o.EntityId, []);
-                tracks[o.EntityId].Add((seconds, o.Bytes));
-            }
-        }
-
-        return tracks;
     }
 
     [Fact]
@@ -165,7 +133,7 @@ public class ComponentSweepTests
         OffsetSchema schema = RealSessionTests.Schema();
         int at = schema.Structs["GroundEffect"].OffsetOf("SecondsRemaining");
         Dictionary<uint, List<(double Seconds, byte[] Bytes)>> tracks =
-            Tracks("session-2026-08-sweep.rec", "GroundEffect", out double lastSecond);
+            walk.Tracks("GroundEffect", out double lastSecond);
 
         var errors = new List<double>();
         int expired = 0;
@@ -215,7 +183,7 @@ public class ComponentSweepTests
         StructDef beam = schema.Structs["Beam"];
         int source = beam.OffsetOf("SourceX"), target = beam.OffsetOf("TargetX");
 
-        List<SweepFrame> frames = Replay("session-2026-08-sweep.rec", step: 1);
+        List<SweepFrame> frames = walk.Frames;
         List<ComponentObservation> beams =
             [.. frames.SelectMany(f => f.Seen).Where(o => string.Equals(o.Component, "Beam", StringComparison.Ordinal))];
         Assert.True(beams.Count > 500, $"only {beams.Count} beam readings");
@@ -291,7 +259,7 @@ public class ComponentSweepTests
         foreach (string component in (string[])["LimitedLifespan", "DiesAfterTime"])
         {
             Dictionary<uint, List<(double Seconds, byte[] Bytes)>> tracks =
-                Tracks("session-2026-08-sweep.rec", component, out double lastSecond);
+                walk.Tracks(component, out double lastSecond);
 
             var expired = tracks.Values
                 .Where(t => t.Count >= 6 && t[^1].Seconds < lastSecond - 0.5)

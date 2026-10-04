@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using System.Reflection;
 using ImGuiNET;
@@ -94,9 +95,8 @@ public sealed class MonsterPortrait
     /// <summary>The id of the button that starts and stops the orbit.</summary>
     private const string OrbitId = "##monster-orbit";
 
-    /// <summary>The key the renderer holds the orbit button's art under.</summary>
-    /// <remarks>Beside the pictures' numbered keys, and never renumbered: one upload for the session.</remarks>
-    private const string OrbitKey = "poeformance.monster.orbit";
+    /// <summary>How many panes have been made, so each one's keys are its own.</summary>
+    private static int s_panes;
 
     /// <summary>The art on the orbit button, by the end of its manifest resource name.</summary>
     private const string OrbitArt = "3dMV_orbit.png";
@@ -292,6 +292,21 @@ public sealed class MonsterPortrait
     private string _key = string.Empty;
     private int _keys;
 
+    /// <summary>
+    /// What every key this pane hands the renderer starts with.
+    /// </summary>
+    /// <remarks>
+    /// ONE PER PANE, because the renderer caches by key and there is more than one pane: the
+    /// entity browser's strip, the monster book and the item book each own one, and each counted
+    /// its keys from zero. Two panes holding "poeformance.monster.3" at once get one texture
+    /// between them - AddOrGetImagePointer hands the second the first's picture - and the first
+    /// to let go of it frees it under the other.
+    /// </remarks>
+    private readonly string _prefix = $"poeformance.monster.{Interlocked.Increment(ref s_panes)}.";
+
+    /// <summary>The key the renderer holds the orbit button's art under. One upload per pane.</summary>
+    private string OrbitKey => _prefix + "orbit";
+
     private MeshPicture.Canvas? _canvas;
 
     /// <summary>The floor's lines for this frame, in a list kept so that no frame allocates one.</summary>
@@ -433,6 +448,8 @@ public sealed class MonsterPortrait
     private string _cost = string.Empty;
     private string _paint = string.Empty;
     private string _still = string.Empty;
+    private string _shaders = string.Empty;
+    private string _blend = string.Empty;
     private string _count = string.Empty;
 
     /// <summary>The line for a model that stands in a pit, and the whole unit it was last built for.</summary>
@@ -499,6 +516,38 @@ public sealed class MonsterPortrait
         _unpack = unpack;
         _sizes = new PictureLadder(most);
     }
+
+    /// <summary>
+    /// How a model is loaded, where it is not a monster's or an item's .ao walk.
+    /// </summary>
+    /// <remarks>
+    /// NULL FOR THE BOOKS THAT DRAW AN .ao, which is what the pane was built for. The tile book
+    /// draws a terrain tile instead - a .tdt, not an .ao - and everything after the load is the
+    /// same: the camera, the floor, the turning, the export. Handed the install, the variety the
+    /// caller drew with, the key it drew under and whether attachments are wanted; run on the
+    /// thread pool like the walk it replaces.
+    /// </remarks>
+    public Func<Func<string, byte[]?>, MonsterVariety, string, bool, MonsterModel>? Load { get; set; }
+
+    /// <summary>
+    /// Whether the line under the picture names the shader graphs the model's materials use.
+    /// </summary>
+    /// <remarks>
+    /// ON IN THE EFFECT BOOK, where it is the evidence for how a material blends - see
+    /// MaterialFile.Parents - and off elsewhere, where it would be one more line nobody asked for.
+    /// </remarks>
+    public bool ShowShaders { get; set; }
+
+    /// <summary>
+    /// Whether materials that ask to blend are drawn translucent - mixed or added - rather than solid.
+    /// </summary>
+    /// <remarks>
+    /// ON IN THE EFFECT BOOK ONLY. What a blend mode's word means is a rule on words, not a
+    /// measurement - see MaterialBlends - and the monster book exports boss icons from what this
+    /// pane draws: a guess that turned part of a boss see-through would end up in the map's art.
+    /// The effect book is where it was asked for, and where a wrong guess costs a look and nothing more.
+    /// </remarks>
+    public bool Translucent { get; set; }
 
     /// <summary>Whether a picture could be drawn at all - an install and a renderer.</summary>
     public bool Possible => _install is not null && _upload is not null;
@@ -1177,6 +1226,16 @@ public sealed class MonsterPortrait
             _status.Add(_still);
         }
 
+        if (_shaders.Length > 0)
+        {
+            _status.Add(_shaders);
+        }
+
+        if (_blend.Length > 0)
+        {
+            _status.Add(_blend);
+        }
+
         if (_planted.Length > 0)
         {
             _status.Add(_planted);
@@ -1651,6 +1710,20 @@ public sealed class MonsterPortrait
 
         string still = _model.Move.Length > 0 ? _model.Move : _stillWhy;
         _still = still.Length > 0 ? "still: " + ImGuiText.Escape(still) : string.Empty;
+
+        _shaders = ShowShaders && _model.Shaders.Count > 0
+            ? "shaders: " + ImGuiText.Escape(string.Join(", ", _model.Shaders.Select(Tail)))
+            : string.Empty;
+
+        // THE RAW MODE AND WHAT IT IS TAKEN TO MEAN, side by side, and called a guess - the rule
+        // reading the word is chosen, not measured. See MaterialBlends.
+        string[] modes = [.. _model.Modes.Where(one => one.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase)];
+        _blend = ShowShaders && modes.Length > 0
+            ? "blend (guessed from the word): " + ImGuiText.Escape(string.Join(", ",
+                modes.Select(one => $"{one} -> {MaterialBlends.Of(one).ToString().ToLowerInvariant()}")))
+            : string.Empty;
+
+        static string Tail(string path) => path[(path.LastIndexOf('/') + 1)..];
     }
 
     /// <summary>Starts on a different animation, from its first frame.</summary>
@@ -1772,6 +1845,8 @@ public sealed class MonsterPortrait
         _cost = string.Empty;
         _paint = string.Empty;
         _still = string.Empty;
+        _shaders = string.Empty;
+        _blend = string.Empty;
         _count = string.Empty;
         _planted = string.Empty;
         _plantedAt = int.MinValue;
@@ -1827,7 +1902,10 @@ public sealed class MonsterPortrait
         Func<string, byte[]?> read = _install!;
         bool wearing = Parts;
         _dressed = wearing;
-        _loading = Task.Run(() => MonsterModels.Of(read, one, wearing));
+        Func<Func<string, byte[]?>, MonsterVariety, string, bool, MonsterModel>? load = Load;
+        _loading = load is null
+            ? Task.Run(() => MonsterModels.Of(read, one, wearing))
+            : Task.Run(() => load(read, one, path, wearing));
     }
 
     /// <summary>Takes a finished load, and re-renders when anything it depends on moved.</summary>
@@ -2046,13 +2124,13 @@ public sealed class MonsterPortrait
                 lowest = Lowest(_posed);
                 drawn = MeshPicture.Of(
                     _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, default,
-                    _model.Skin, _zoom, _pan, _model.Skins);
+                    _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
             }
             else
             {
                 lowest = _model.Mesh.Most.Z;
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, _pan, _model.Skins);
+                    _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
             }
 
             _rate.Redrawn(ImGui.GetTime());
@@ -2077,7 +2155,7 @@ public sealed class MonsterPortrait
             // A NEW KEY EACH TIME, because the renderer caches by key and the pixels change on
             // every turn - reusing one hands back the picture from the first frame forever.
             Drop();
-            _key = $"poeformance.monster.{_keys++}";
+            _key = _prefix + _keys++.ToString(CultureInfo.InvariantCulture);
             _texture = _upload!(_key, image, false);
             Why = string.Empty;
         }
@@ -2456,10 +2534,10 @@ public sealed class MonsterPortrait
             _pose.Move(_model.Mesh, _posed, _posedNormals);
             return MeshPicture.Of(
                 _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, default,
-                _model.Skin, _zoom, _pan, _model.Skins);
+                _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
         }
 
-        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, default, _model.Skin, _zoom, _pan, _model.Skins);
+        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, default, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
     }
 
     /// <summary>
@@ -2520,8 +2598,8 @@ public sealed class MonsterPortrait
         using Image<Rgba32> shownGrey =
             Image.LoadPixelData<Rgba32>(Contiguous, grey, IconSheet.Tile, IconSheet.Tile);
 
-        _shotColourKey = $"poeformance.monster.shot.{_keys++}";
-        _shotGreyKey = $"poeformance.monster.shot.{_keys++}";
+        _shotColourKey = _prefix + "shot." + _keys++.ToString(CultureInfo.InvariantCulture);
+        _shotGreyKey = _prefix + "shot." + _keys++.ToString(CultureInfo.InvariantCulture);
         _shotColour = _upload(_shotColourKey, shownColour, false);
         _shotGrey = _upload(_shotGreyKey, shownGrey, false);
     }
