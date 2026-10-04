@@ -434,4 +434,102 @@ public sealed class UpdateInstallTests
             File.Delete(path);
         }
     }
+
+    /// <summary>A staged update over an installation, each with a data/boss-icons.json or not.</summary>
+    private static (UpdatePlan Plan, string Local, string Staged) Entries(string root, string? local, string? staged)
+    {
+        var plan = new UpdatePlan(
+            Path.Combine(root, "staging"), Path.Combine(root, "installed"), Path.Combine(root, "installed", "x.exe"), "v");
+        string localPath = Path.Combine(plan.Install, "data", "boss-icons.json");
+        string stagedPath = Path.Combine(plan.Staging, "data", "boss-icons.json");
+        Directory.CreateDirectory(Path.GetDirectoryName(localPath)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(stagedPath)!);
+        if (local is not null)
+        {
+            File.WriteAllText(localPath, local);
+        }
+
+        if (staged is not null)
+        {
+            File.WriteAllText(stagedPath, staged);
+        }
+
+        return (plan, localPath, stagedPath);
+    }
+
+    /// <summary>
+    /// The entries somebody wrote survive the update, and the release's new ones arrive with them.
+    /// </summary>
+    /// <remarks>
+    /// The swap copies data/ over wholesale; boss-icons.json is the one file in it the tool
+    /// writes. Before this, an update replaced an evening of posing with the shipped copy.
+    /// </remarks>
+    [Fact]
+    public void TheLocalBossEntriesAreFoldedIntoTheNewBuild()
+    {
+        string root = Path.Combine(Path.GetTempPath(), $"update-entries-{Guid.NewGuid():N}");
+        try
+        {
+            (UpdatePlan plan, _, string staged) = Entries(
+                root,
+                """{ "comment": ["old block"], "areas": { "MapBluff": "Mine", "MapShared": "LocalWins" }, "tiles": {} }""",
+                """{ "comment": ["new block"], "areas": { "MapBaked": "Theirs", "MapShared": "Shipped" }, "tiles": {} }""");
+
+            string said = UpdateInstaller.KeepEntries(plan);
+            Assert.Contains("kept 2 local entries", said, StringComparison.Ordinal);
+
+            BossIcons merged = BossIcons.Load(staged);
+            Assert.Equal("Mine", merged.FamilyFor("MapBluff"));
+            Assert.Equal("Theirs", merged.FamilyFor("MapBaked"));
+            Assert.Equal("LocalWins", merged.FamilyFor("MapShared"));
+
+            // The release's documentation of the format is the one that arrives.
+            string text = File.ReadAllText(staged);
+            Assert.Contains("new block", text, StringComparison.Ordinal);
+            Assert.DoesNotContain("old block", text, StringComparison.Ordinal);
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    /// <summary>A local file that does not parse is taken out of the swap, not overwritten.</summary>
+    [Fact]
+    public void ABrokenLocalFileIsLeftForSomebodyToMend()
+    {
+        string root = Path.Combine(Path.GetTempPath(), $"update-entries-{Guid.NewGuid():N}");
+        try
+        {
+            (UpdatePlan plan, string local, string staged) = Entries(
+                root, """{ "areas": { "MapBluff": """, """{ "areas": {}, "tiles": {} }""");
+
+            Assert.Contains("could not be read", UpdateInstaller.KeepEntries(plan), StringComparison.Ordinal);
+            Assert.False(File.Exists(staged));
+            Assert.Equal("""{ "areas": { "MapBluff": """, File.ReadAllText(local));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    /// <summary>Nothing written locally, nothing to keep: the release's copy goes in untouched.</summary>
+    [Fact]
+    public void WithNoLocalFileTheReleasesCopyIsUntouched()
+    {
+        string root = Path.Combine(Path.GetTempPath(), $"update-entries-{Guid.NewGuid():N}");
+        try
+        {
+            const string Shipped = """{ "areas": { "MapBaked": "Theirs" }, "tiles": {} }""";
+            (UpdatePlan plan, _, string staged) = Entries(root, null, Shipped);
+
+            Assert.Equal(string.Empty, UpdateInstaller.KeepEntries(plan));
+            Assert.Equal(Shipped, File.ReadAllText(staged));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
 }
