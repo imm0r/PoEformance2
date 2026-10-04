@@ -1,6 +1,6 @@
 {
-  "comment": "Column order of the three tables a unique item's NAME is joined out of, from poe-tool-dev/dat-schema (PoE2 entries; its CI republishes schema.min.json on every commit). Offsets are NOT stored - they are arithmetic over the widths in DatColumns, and recomputing them is what keeps this honest when a width is corrected; the interval rule that cost Mods a whole table is one such correction. THE JOIN: UniqueStashLayout carries a WordsKey and an ItemVisualIdentityKey, Words holds the unique's name as Text, and ItemVisualIdentity's Id is the key the game exposes on the item itself at Base+0x30 - which is why the name is reached this way round rather than from the metadata path, and why a German client still prices its uniques in English. IsAlternateArt breaks the tie where two layout rows name one art. WHAT IS NOT VERIFIED HERE, said plainly: none of these three is in the loader's file table, so unlike BaseItemTypes and Mods their row size cannot be checked against a running client. The check is the FILE's own row size, which a .dat declares by where it puts its separator, and it happens at runtime against a real install - LoadedTable.Agrees, and the readout says which way it went. The sizes these columns compute are UniqueStashLayout 83 (0x53), Words 64 (0x40), ItemVisualIdentity 968 (0x3C8).",
-  "source": "poe-tool-dev/dat-schema, release latest, read 2026-09-16",
+  "comment": "Column order of the three tables a unique item's NAME is joined out of, from poe-tool-dev/dat-schema (PoE2 entries; its CI republishes schema.min.json on every commit). Offsets are NOT stored - they are arithmetic over the widths in DatColumns, and recomputing them is what keeps this honest when a width is corrected; the interval rule that cost Mods a whole table is one such correction. THE JOIN: UniqueStashLayout carries a WordsKey and an ItemVisualIdentityKey, Words holds the unique's name as Text, and ItemVisualIdentity's Id is the key the game exposes on the item itself at Base+0x30 - which is why the name is reached this way round rather than from the metadata path, and why a German client still prices its uniques in English. IsAlternateArt breaks the tie where two layout rows name one art. WHAT IS NOT VERIFIED HERE, said plainly: none of these three is in the loader's file table, so unlike BaseItemTypes and Mods their row size cannot be checked against a running client. The check is the FILE's own row size, which a .dat declares by where it puts its separator, and it happens at runtime against a real install - LoadedTable.Agrees, and the readout says which way it went. The sizes these columns compute are UniqueStashLayout 83 (0x53), Words 64 (0x40), ItemVisualIdentity 968 (0x3C8). THE ITEM BOOK ADDS TWO MORE, BaseItemTypes and ItemClasses, from the same schema release: BaseItemTypes' ItemVisualIdentity column is the join from a base type to the .ao its model is in, and ItemClass is what the book groups by. BaseItemTypes computes 360 (0x168), which is byte for byte what the loader's own file table reports on a live 0.5.5 client - see BaseItemTypesRow in schema/poe2.offsets.json. ItemClasses computes 150 (0x96) and is NOT verified against the client: it is checked against the file's own row size at runtime like the other three, and ItemVisuals.Say reports which way it went.",
+  "source": "poe-tool-dev/dat-schema, release latest, read 2026-09-16 (UniqueStashLayout, Words, ItemVisualIdentity) and 2026-10-04 (BaseItemTypes, ItemClasses; schema createdAt 2026-09-15, and the three older tables compared unchanged)",
   "tables": {
     "UniqueStashLayout": [
       {
@@ -549,6 +549,320 @@
       },
       {
         "name": "column_89",
+        "type": "bool",
+        "array": false
+      }
+    ],
+    "BaseItemTypes": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "ItemClass",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Width",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Height",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Name",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "InheritsFrom",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "DropLevel",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "FlavourText",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Implicit_Mods",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "SizeOnGround",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "SoundEffect",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Tags",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "ModDomain",
+        "type": "enumrow",
+        "array": false
+      },
+      {
+        "name": "ItemVisualIdentity",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "HASH32",
+        "type": "u32",
+        "array": false
+      },
+      {
+        "name": "VendorRecipe_AchievementItems",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Inflection",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "Equip_AchievementItem",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "IsCorrupted",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "Identify_AchievementItems",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "IdentifyMagic_AchievementItems",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "FragmentBaseItemType",
+        "type": "row",
+        "array": false
+      },
+      {
+        "name": "column_22",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "UncutGemSoundEffect",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "ItemStance",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_25",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "Unmodifiable",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "Achievement",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "ShopTag",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_29",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_30",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_31",
+        "type": "array",
+        "array": true
+      },
+      {
+        "name": "column_32",
+        "type": "array",
+        "array": true
+      },
+      {
+        "name": "column_33",
+        "type": "array",
+        "array": true
+      }
+    ],
+    "ItemClasses": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "Name",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "ItemClassCategory",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "RemovedIfLeavesArea",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_4",
+        "type": "array",
+        "array": true
+      },
+      {
+        "name": "IdentifyAchievements",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "AllocateToMapOwner",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "AlwaysAllocate",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CanHaveVeiledMods",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "PickedUpQuest",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_10",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "AlwaysShow",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CanBeCorrupted",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CanHaveIncubators",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CanHaveInfluence",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CanBeDoubleCorrupted",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CanHaveAspects",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "ItemStance",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "CanScourge",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CanUpgradeRarity",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_20",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "ItemClassFlags",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "Unmodfiable",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CanBeFractured",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "EquipAchievement",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "UsableInMapDevice",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_26",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_27",
         "type": "bool",
         "array": false
       }

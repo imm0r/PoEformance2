@@ -266,6 +266,34 @@ public static class MonsterModels
             };
         }
 
+        return OfFiles(read, named, wearing);
+    }
+
+    /// <summary>
+    /// Gathers the model an <c>.ao</c> describes, whoever named it, or says where the walk stopped.
+    /// </summary>
+    /// <remarks>
+    /// THE WALK NEVER NEEDED A MONSTER, only the .ao files one names - which is what lets the item
+    /// book draw a sword through exactly the reads that draw a boss. An item's art row names its
+    /// .ao the way MonsterVarieties.AOFiles does, and from there every hop is the same file format.
+    ///
+    /// A FIXED MESH CAN BE THE WHOLE MODEL, which a monster never is. See <see cref="Fixed"/>.
+    /// </remarks>
+    /// <param name="read">How to get a file out of the install, by path.</param>
+    /// <param name="named">The .ao files to start from, nearest first.</param>
+    /// <param name="wearing">Whether attached pieces are read and joined on - see the other overload.</param>
+    public static MonsterModel OfFiles(Func<string, byte[]?>? read, IReadOnlyList<string>? named, bool wearing = true)
+    {
+        if (read is null)
+        {
+            return MonsterModel.None with { Why = "no install to read" };
+        }
+
+        if (named is not { Count: > 0 })
+        {
+            return MonsterModel.None with { Why = "no .ao file to read" };
+        }
+
         // COUNTED AS THEY ARE READ, through the one function everything below reads with, so a
         // file the walk asks for is a file the count saw - the signpost a texture may sit behind
         // included, which GameArt follows on its own. A file that was not there comes back null
@@ -275,7 +303,8 @@ public static class MonsterModels
 
         if (Skinned(counted, named) is not { } found)
         {
-            return tally.Failed("no SkinMesh anywhere in the .ao files or what they extend");
+            return Fixed(counted, named, tally)
+                ?? tally.Failed("no SkinMesh or FixedMesh anywhere in the .ao files or what they extend");
         }
 
         MeshManifest manifest = Read(counted, found.Meshes[0], MeshManifest.Read);
@@ -385,6 +414,72 @@ public static class MonsterModels
             Rig = rig,
             Rig_ = found.Skeleton,
             Move = move,
+            Bytes = tally.Bytes,
+            Files = tally.Files,
+        };
+    }
+
+    /// <summary>
+    /// The model as a rigid prop, where the .ao chain names a <c>FixedMesh</c> and no skin at all.
+    /// </summary>
+    /// <remarks>
+    /// THE SHAPE A MONSTER NEVER HAS AND AN ITEM MAY. Every monster is a skin on a rig, so the walk
+    /// only ever asked for a SkinMesh and treated a FixedMesh as something hung off one - Malgor's
+    /// cannon. An item's .ao can be nothing but the prop, and asking only for a skin would report
+    /// every such item as having no model when its whole geometry is one .fmt away.
+    ///
+    /// ASKED ONLY AFTER THE SKIN WALK FOUND NOTHING, so a monster draws exactly as it did: the skin
+    /// is still the body wherever there is one, and this cannot change a single monster.
+    ///
+    /// NOT ANIMATED, AND SAID SO. A .fmt has no bones and no weights, and as the body there is no
+    /// socket to pin it to either - binding it to some bone of a skeleton the chain happens to name
+    /// would be choosing a bone nobody measured. It is drawn where the file puts it, and
+    /// <see cref="MonsterModel.Move"/> carries the reason it does not move.
+    /// </remarks>
+    private static MonsterModel? Fixed(Func<string, byte[]?> read, IReadOnlyList<string> named, Tally tally)
+    {
+        string path = string.Empty;
+        foreach (string one in named)
+        {
+            AnimatedObject ao = Object(read, one);
+            if (ao.Ready && Entryed(Whole(read, ao), PropBlock, PropEntry) is { Length: > 0 } found)
+            {
+                path = found;
+                break;
+            }
+        }
+
+        if (path.Length == 0)
+        {
+            return null;
+        }
+
+        FixedMesh prop = Read(read, path, FixedMesh.Read);
+        if (!prop.Ready)
+        {
+            return tally.Failed(
+                $"the fixed mesh did not read: {path}" + (prop.Why.Length > 0 ? $" - {prop.Why}" : string.Empty),
+                path);
+        }
+
+        // THE .fmt's OWN MATERIALS, one per shape, are the only ones there are: there is no
+        // manifest, and the same list Propped hands to the dressing serves the whole model here.
+        List<string> materials = [.. prop.Named.Select(one => one.Material).Where(one => one.Length > 0)];
+        var paints = new Paints();
+        (Mipmaps? skin, string paint, string material) = Painted(read, prop.Mesh, materials, paints);
+        Dress dress = Dressed(read, prop.Mesh, prop.Named, MeshManifest.None, skin, material, paints);
+
+        return new MonsterModel(prop.Mesh, skin, path, material, string.Empty, paint)
+        {
+            BodyLeast = prop.Mesh.Least,
+            BodyMost = prop.Mesh.Most,
+            Skins = dress.Skins,
+            Materials = dress.Materials,
+            NamedInAo = prop.Named.Count,
+            Runs = dress.Runs,
+            Textures = dress.Textures,
+            Guessed = dress.Guessed,
+            Move = "a fixed mesh is rigid - it has no bones to animate",
             Bytes = tally.Bytes,
             Files = tally.Files,
         };
