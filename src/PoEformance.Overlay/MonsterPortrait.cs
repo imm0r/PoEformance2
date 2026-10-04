@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using System.Reflection;
 using ImGuiNET;
@@ -94,9 +95,8 @@ public sealed class MonsterPortrait
     /// <summary>The id of the button that starts and stops the orbit.</summary>
     private const string OrbitId = "##monster-orbit";
 
-    /// <summary>The key the renderer holds the orbit button's art under.</summary>
-    /// <remarks>Beside the pictures' numbered keys, and never renumbered: one upload for the session.</remarks>
-    private const string OrbitKey = "poeformance.monster.orbit";
+    /// <summary>How many panes have been made, so each one's keys are its own.</summary>
+    private static int s_panes;
 
     /// <summary>The art on the orbit button, by the end of its manifest resource name.</summary>
     private const string OrbitArt = "3dMV_orbit.png";
@@ -291,6 +291,21 @@ public sealed class MonsterPortrait
     private IntPtr _texture;
     private string _key = string.Empty;
     private int _keys;
+
+    /// <summary>
+    /// What every key this pane hands the renderer starts with.
+    /// </summary>
+    /// <remarks>
+    /// ONE PER PANE, because the renderer caches by key and there is more than one pane: the
+    /// entity browser's strip, the monster book and the item book each own one, and each counted
+    /// its keys from zero. Two panes holding "poeformance.monster.3" at once get one texture
+    /// between them - AddOrGetImagePointer hands the second the first's picture - and the first
+    /// to let go of it frees it under the other.
+    /// </remarks>
+    private readonly string _prefix = $"poeformance.monster.{Interlocked.Increment(ref s_panes)}.";
+
+    /// <summary>The key the renderer holds the orbit button's art under. One upload per pane.</summary>
+    private string OrbitKey => _prefix + "orbit";
 
     private MeshPicture.Canvas? _canvas;
 
@@ -2077,7 +2092,7 @@ public sealed class MonsterPortrait
             // A NEW KEY EACH TIME, because the renderer caches by key and the pixels change on
             // every turn - reusing one hands back the picture from the first frame forever.
             Drop();
-            _key = $"poeformance.monster.{_keys++}";
+            _key = _prefix + _keys++.ToString(CultureInfo.InvariantCulture);
             _texture = _upload!(_key, image, false);
             Why = string.Empty;
         }
@@ -2520,8 +2535,8 @@ public sealed class MonsterPortrait
         using Image<Rgba32> shownGrey =
             Image.LoadPixelData<Rgba32>(Contiguous, grey, IconSheet.Tile, IconSheet.Tile);
 
-        _shotColourKey = $"poeformance.monster.shot.{_keys++}";
-        _shotGreyKey = $"poeformance.monster.shot.{_keys++}";
+        _shotColourKey = _prefix + "shot." + _keys++.ToString(CultureInfo.InvariantCulture);
+        _shotGreyKey = _prefix + "shot." + _keys++.ToString(CultureInfo.InvariantCulture);
         _shotColour = _upload(_shotColourKey, shownColour, false);
         _shotGrey = _upload(_shotGreyKey, shownGrey, false);
     }

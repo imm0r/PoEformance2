@@ -445,6 +445,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // onto the pane whenever it turns up - see AttachMonsterBook.
         _modelWants = settings;
         Capture(_monsterBook?.Model);
+        Capture(_itemBook?.Model);
 
         // No handover hole here, unlike the room layer above: the ground names need no route
         // planner, so the layer exists from the start and takes the settings directly.
@@ -501,6 +502,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 ? panes
                 : basis.MonsterPanes,
             MonsterRail = _monsterBook?.RailOpen ?? basis.MonsterRail,
+            ItemColumns = _itemBook?.Columns is { Count: > 0 } itemColumns
+                ? itemColumns
+                : basis.ItemColumns,
+            ItemColumnWidths = _itemBook?.ColumnWidths is { Count: > 0 } itemWidths
+                ? itemWidths
+                : basis.ItemColumnWidths,
+            ItemPanes = _itemBook?.Panes is { Count: > 0 } itemPanes
+                ? itemPanes
+                : basis.ItemPanes,
+            ItemRail = _itemBook?.RailOpen ?? basis.ItemRail,
             MonsterModel = _monsterBook?.ModelOpen ?? basis.MonsterModel,
             ModelGrey = _monsterBook?.Model?.Grey ?? basis.ModelGrey,
             ModelGreyFactor = _monsterBook?.Model?.GreyFactor ?? basis.ModelGreyFactor,
@@ -660,6 +671,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
     /// <summary>Kept so the settings file can be told which columns it is showing.</summary>
     private MonsterBookWindow? _monsterBook;
+    private ItemBookWindow? _itemBook;
     private PoiLayer? _poi;
     private RoomLayer? _rooms;
 
@@ -934,6 +946,26 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     private MonsterVarieties _monsters = MonsterVarieties.Empty;
+
+    /// <summary>
+    /// Every item the game has a model for, for the item book.
+    /// </summary>
+    /// <remarks>
+    /// The <see cref="Monsters"/> arrangement: set by whoever wires this up - here, once the
+    /// install's tables have been read on a background thread - and read through this property
+    /// each frame rather than captured, so a table that arrives after the book is attached is seen.
+    /// </remarks>
+    public ItemVisuals Items
+    {
+        get => _items;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _items = value;
+        }
+    }
+
+    private ItemVisuals _items = ItemVisuals.Empty;
 
     /// <summary>
     /// Which boss picture belongs to which arena, for the arenas whose names do not say it.
@@ -2392,6 +2424,47 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (visible)
         {
             _tools.Show("monster-book");
+        }
+    }
+
+    /// <summary>
+    /// Adds the item reference book - every item with a 3D model, and the model.
+    /// </summary>
+    /// <remarks>
+    /// BESIDE THE MONSTER BOOK, and built the same way: the table through a callback because it
+    /// arrives late, and a model pane of its own because it holds its own model and textures - a
+    /// shared pane would reload one book's model every time the other tab was looked at.
+    ///
+    /// THE PANE TAKES THE MONSTER BOOK'S LOOK - greying, outline, light and backdrop - from the
+    /// settings file, so the two viewers draw alike. It does not write them back: the monster book
+    /// owns those settings, and two panes writing one setting would leave it to whichever moved last.
+    /// </remarks>
+    public void AttachItemBook(
+        IReadOnlyList<string>? columns = null,
+        bool rail = true,
+        bool visible = false,
+        Func<string, byte[]?>? readFile = null,
+        int modelSize = PictureLadder.Usual,
+        Func<ReadOnlyMemory<byte>, int, byte[]?>? unpack = null,
+        IReadOnlyDictionary<string, int>? columnWidths = null,
+        IReadOnlyDictionary<string, double>? panes = null)
+    {
+        var window = new ItemBookWindow(() => Items)
+        {
+            Changed = () => SettingsChanged?.Invoke(),
+            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack),
+        };
+
+        window.Show(columns, rail, columnWidths, panes);
+        Capture(window.Model);
+        _itemBook = window;
+
+        _tools.Add(
+            92, "item-book", "Item Book", window.DrawTab,
+            page: Entities, pageLabel: EntitiesLabel);
+        if (visible)
+        {
+            _tools.Show("item-book");
         }
     }
 

@@ -159,6 +159,14 @@ public sealed record OverlaySettings(
     // than clamped, so a hand-edited file cannot hide a pane - see PaneSplit.Restore.
     [property: JsonPropertyName("monsterPanes")] IReadOnlyDictionary<string, double>? MonsterPanes = null,
 
+    // The item book's four, for the same reasons as the monster book's above and kept apart from
+    // them: the two tables have different columns, and a rail somebody folds away in one book is
+    // not a statement about the other. See ItemBookWindow.
+    [property: JsonPropertyName("itemColumns")] IReadOnlyList<string>? ItemColumns = null,
+    [property: JsonPropertyName("itemColumnWidths")] IReadOnlyDictionary<string, int>? ItemColumnWidths = null,
+    [property: JsonPropertyName("itemPanes")] IReadOnlyDictionary<string, double>? ItemPanes = null,
+    [property: JsonPropertyName("itemRail")] bool ItemRail = true,
+
     // The model pane's capture settings, which are what turn a monster into icon art: whether it
     // is drawn greyed the way the game's Inactive icons are, how much of the colour's mean that
     // grey keeps, and what is painted behind it. KEPT because the factor goes into the FILE the

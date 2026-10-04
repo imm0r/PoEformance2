@@ -3144,6 +3144,28 @@ internal static class Program
                     overlay.Monsters = read.Table;
                 }
             });
+
+            // AND THE ITEM BOOK'S TABLE, on its own task for the same reason: five more .dat files,
+            // BaseItemTypes among them at five thousand rows of three hundred and sixty bytes. There
+            // is no shipped export to fall back on, so a failure leaves the book empty and saying why.
+            _ = Task.Run(() =>
+            {
+                PoEformance.Features.ItemVisuals items = PoEformance.Features.ItemVisuals.Read(
+                    installed,
+                    PoEformance.Features.QuestTableLayouts.Load(FindDataFile("item-tables.json")));
+
+                foreach (string line in items.Say)
+                {
+                    Console.WriteLine(line);
+                }
+
+                overlay.Items = items;
+            });
+        }
+        else
+        {
+            // So the book says there is no install rather than waiting for a table that never comes.
+            overlay.Items = PoEformance.Features.ItemVisuals.Read(null, null);
         }
 
         overlay.Costs = costs;
@@ -3286,6 +3308,14 @@ internal static class Program
             unpack: installed is null ? null : installed.Unpack,
             columnWidths: settings.MonsterColumnWidths,
             panes: settings.MonsterPanes);
+        overlay.AttachItemBook(
+            settings.ItemColumns,
+            settings.ItemRail,
+            readFile: installed is null ? null : installed.Read,
+            modelSize: settings.MonsterModelSize,
+            unpack: installed is null ? null : installed.Unpack,
+            columnWidths: settings.ItemColumnWidths,
+            panes: settings.ItemPanes);
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read
