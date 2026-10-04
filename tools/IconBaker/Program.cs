@@ -21,16 +21,28 @@ namespace PoEformance.Tools.IconBaker;
 /// saw on the map. A family already ours is painted over in place (a re-posed boss keeps its
 /// number); a family the game's own art carries is reported and left alone.
 ///
-/// WRITES NOTHING UNTIL IT KNOWS EVERYTHING FITS, and nothing at all when no pixel changed -
+/// AND THE ENTRIES THAT SAY WHERE THEY GO. The export also writes area, tile and name into
+/// data/boss-icons.json - the copy beside the executable that made it, not the repository's.
+/// That copy is found the way the tool found it (FindDataFile: data/ in the executable's folder
+/// or the nearest one above it) and merged into the repository's with
+/// <see cref="BossIcons.Merge"/>, so pictures and entries arrive in the same commit.
+///
+/// WRITES NOTHING UNTIL IT KNOWS EVERYTHING FITS, and nothing at all when nothing changed -
 /// re-running it over the same folder is a no-op, not a re-encode of a five-megabyte file.
 /// </remarks>
 internal static class Program
 {
     private const string Usage =
-        "usage: dotnet run --project tools/IconBaker -- <exports folder> [--dry-run] [--repo <path>]\n"
-        + "  <exports folder>  where the model pane wrote <Family>Active.png / <Family>Inactive.png\n"
-        + "  --dry-run         say what would change, write nothing\n"
-        + "  --repo <path>     the repository root, when not run from inside it";
+        "usage: dotnet run --project tools/IconBaker -- <exports folder> [options]\n"
+        + "  <exports folder>   where the model pane wrote <Family>Active.png / <Family>Inactive.png\n"
+        + "  --dry-run          say what would change, write nothing\n"
+        + "  --repo <path>      the repository root, when not run from inside it\n"
+        + "  --entries <path>   the boss-icons.json the tool wrote, when it is not in data/ beside\n"
+        + "                     the exports folder (found the way the tool finds it)\n"
+        + "  --no-entries       bake the pictures only, leave data/boss-icons.json alone";
+
+    /// <summary>The entries file, under data/ - the name the tool loads it by.</summary>
+    private const string EntriesFile = "boss-icons.json";
 
     /// <summary>The PNG the sheet is written back as: the format it shipped in, compressed hard.</summary>
     /// <remarks>
@@ -59,13 +71,17 @@ internal static class Program
     {
         string exports = string.Empty;
         string repository = string.Empty;
+        string entries = string.Empty;
         bool dry = false;
+        bool noEntries = false;
         for (int i = 0; i < args.Length; i++)
         {
             switch (args[i])
             {
                 case "--dry-run": dry = true; break;
+                case "--no-entries": noEntries = true; break;
                 case "--repo" when i + 1 < args.Length: repository = args[++i]; break;
+                case "--entries" when i + 1 < args.Length: entries = args[++i]; break;
                 case "-h" or "--help": Console.WriteLine(Usage); return 0;
                 default:
                     if (args[i].StartsWith("--", StringComparison.Ordinal) || exports.Length > 0)
@@ -98,9 +114,16 @@ internal static class Program
             return 1;
         }
 
+        if (entries.Length > 0 && !File.Exists(entries))
+        {
+            Console.Error.WriteLine($"no file at {entries}");
+            return 1;
+        }
+
         try
         {
-            return Bake(exports, repository, dry);
+            string from = noEntries ? string.Empty : entries.Length > 0 ? entries : Beside(exports);
+            return Bake(exports, repository, from, noEntries, dry);
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException
             or UnknownImageFormatException or InvalidImageContentException or ArgumentException)
@@ -110,7 +133,109 @@ internal static class Program
         }
     }
 
-    private static int Bake(string exports, string repository, bool dry)
+    /// <summary>
+    /// The pictures, then the entries - with both entry files read and checked first.
+    /// </summary>
+    /// <remarks>
+    /// THE CHECK COMES BEFORE THE SHEET IS WRITTEN, so a repository file that does not parse
+    /// stops the run with nothing changed rather than half of it baked. Saving the entries
+    /// comes after, so a sheet that could not be written never leaves entries pointing at
+    /// pictures the sheet does not have.
+    /// </remarks>
+    private static int Bake(string exports, string repository, string from, bool noEntries, bool dry)
+    {
+        string target = Path.Combine(repository, "data", EntriesFile);
+        BossIcons? theirs = null;
+        BossIcons? ours = null;
+
+        if (noEntries)
+        {
+            // Asked for, so nothing to say.
+        }
+        else if (from.Length == 0)
+        {
+            Console.WriteLine($"entries: no data/{EntriesFile} beside {exports} - pass --entries to name it");
+        }
+        else if (string.Equals(Path.GetFullPath(from), Path.GetFullPath(target), StringComparison.OrdinalIgnoreCase))
+        {
+            Console.WriteLine($"entries: the tool already writes the repository's own {EntriesFile}");
+        }
+        else
+        {
+            theirs = BossIcons.Load(from);
+            ours = BossIcons.Load(target);
+            if (theirs.Unreadable || ours.Unreadable)
+            {
+                Console.Error.WriteLine(
+                    $"stopped, nothing written: {(theirs.Unreadable ? from : target)} is there and could not be read");
+                return 2;
+            }
+        }
+
+        int baked = BakeSheet(exports, repository, dry);
+        if (baked != 0 || theirs is null || ours is null)
+        {
+            return baked;
+        }
+
+        List<BossIconChange> changes = ours.Merge(theirs);
+        foreach (BossIconChange change in changes)
+        {
+            string verb = change.Was.Length == 0 ? "add" : change.Now.Length == 0 ? "remove" : "change";
+            string value = change.Was.Length > 0 && change.Now.Length > 0
+                ? $"{change.Was} -> {change.Now}"
+                : change.Now.Length > 0 ? change.Now : change.Was;
+            Console.WriteLine($"  {verb,-7} {change.Section}: {change.Key} = {value}");
+        }
+
+        if (changes.Count == 0)
+        {
+            Console.WriteLine($"entries: nothing new in {from}");
+            return 0;
+        }
+
+        if (dry)
+        {
+            Console.WriteLine($"entries: {changes.Count} change(s) - dry run, nothing written");
+            return 0;
+        }
+
+        if (!ours.Save(out string said))
+        {
+            Console.Error.WriteLine($"entries: {said}");
+            return 2;
+        }
+
+        Console.WriteLine($"entries: {said} - commit {Path.GetRelativePath(repository, target)} too.");
+        return 0;
+    }
+
+    /// <summary>
+    /// The entries file the tool beside an exports folder wrote to, found the way it finds it.
+    /// </summary>
+    /// <remarks>
+    /// THE SAME WALK AS FindDataFile IN THE APP, and it has to be: the exports folder is
+    /// MonsterPortrait.Folder, AppContext.BaseDirectory/exports, and the file an export's entry
+    /// went into is the first data/boss-icons.json from that base directory upwards. Guessing a
+    /// fixed sibling instead would pick the wrong file on a development build, whose bin folder
+    /// has a data/ of its own.
+    /// </remarks>
+    private static string Beside(string exports)
+    {
+        DirectoryInfo? directory = new DirectoryInfo(Path.GetFullPath(exports)).Parent;
+        for (; directory is not null; directory = directory.Parent)
+        {
+            string candidate = Path.Combine(directory.FullName, "data", EntriesFile);
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    private static int BakeSheet(string exports, string repository, bool dry)
     {
         string assets = Path.Combine(repository, "assets");
         string sheetPath = Path.Combine(assets, IconSheet.Resource);
