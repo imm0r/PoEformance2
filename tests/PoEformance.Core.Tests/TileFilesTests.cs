@@ -466,12 +466,12 @@ public class TileFilesTests
         Assert.Equal(new Facet("Woods", 2), sets[0]);
     }
 
-    private static byte[] Mat(string texture)
+    internal static byte[] Mat(string texture)
         => Encoding.UTF8.GetBytes(
             $$"""{"graphinstances":[{"custom_parameters":[{"name":"AlbedoTransparency_TEX","parameters":[{"path":"{{texture}}"}]}]}]}""");
 
     /// <summary>A one-pixel uncompressed DDS - GameArtTests' layout.</summary>
-    private static byte[] Dds()
+    internal static byte[] Dds()
     {
         using var stream = new MemoryStream();
         using var write = new BinaryWriter(stream);

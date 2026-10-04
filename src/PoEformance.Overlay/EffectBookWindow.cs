@@ -41,6 +41,9 @@ public sealed class EffectBookWindow : BookWindow<EffectBook>
     /// <summary>Which of the effect's .ao files the pane shows - an index into its Files.</summary>
     private int _file;
 
+    /// <summary>Whose files that index is into, so a new effect starts at its first.</summary>
+    private string _fileOf = string.Empty;
+
     /// <summary>What the portrait is handed, made once per choice rather than once per frame.</summary>
     private MonsterVariety? _subject;
     private string _subjectKey = string.Empty;
@@ -100,7 +103,14 @@ public sealed class EffectBookWindow : BookWindow<EffectBook>
 
         // THE ROW'S FILES ARE ITS VARIANTS AND ITS STATES - several art versions of one projectile,
         // what it looks like stuck in a wall or bouncing - so the choice is offered rather than one
-        // picked for it. The index is clamped, since the next effect may have fewer.
+        // picked for it. PER EFFECT: "stuck" chosen on one projectile is not a choice about the
+        // next one, whose third file is something else, so a new effect opens on its first.
+        if (!string.Equals(_fileOf, one.Path, StringComparison.Ordinal))
+        {
+            _fileOf = one.Path;
+            _file = 0;
+        }
+
         _file = Math.Clamp(_file, 0, one.Files.Count - 1);
         if (one.Files.Count > 1)
         {

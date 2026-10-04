@@ -120,7 +120,10 @@ public static class RoomModels
         }
 
         // ONE LOAD PER MODEL, keyed by its file: a room places the same tree or rock dozens of times.
+        // AND ONE TEXTURE CACHE FOR ALL OF THEM, because two different doodads sharing a material -
+        // the rock and the stump on one sheet - are one decode and one upload, not one each.
         var models = new Dictionary<string, MonsterModel>(StringComparer.OrdinalIgnoreCase);
+        var paints = new MonsterModels.Paints();
         var joins = new List<MeshJoin>();
         var skins = new List<Mipmaps?>();
         var modes = new List<string>();
@@ -138,7 +141,7 @@ public static class RoomModels
 
             if (!models.TryGetValue(one.Ao, out MonsterModel? model))
             {
-                model = MonsterModels.OfFiles(Counted, [one.Ao]);
+                model = MonsterModels.OfFiles(Counted, [one.Ao], wearing: true, paints);
                 models[one.Ao] = model;
             }
 

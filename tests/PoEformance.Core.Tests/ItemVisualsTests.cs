@@ -213,6 +213,15 @@ public class ItemVisualsTests
         Assert.Equal(["Shortsword"], Names(book, "drop>3"));
         Assert.Equal(["Crude Bow", "Shortsword"], Names(book, "not unique"));
 
+        // A UNIQUE HAS NO DROP LEVEL, and "below 3" is not where it goes: as a 0 it used to be the
+        // first row of every low-level answer and the first bin of the histogram.
+        Assert.Equal(["Crude Bow"], Names(book, "drop<3"));
+        Assert.Equal(["Shortsword"], Names(book, "cells<=8 width<2"));
+        Assert.Equal(["Crude Bow", "Shortsword"], Names(book, "cells<=8"));
+        DataColumn drop = book.Store.Columns.Single(one => one.Name == "drop");
+        Assert.Equal(2, drop.Spread.Count);
+        Assert.True(double.IsNaN(drop.Number[book.Row("Unique/OneHandSwordUnique1")]));
+
         // AND BY THE .ao's NAME, which is what somebody holding a path from a dump types.
         Assert.Equal(["Redbeak"], Names(book, "sheathed"));
     }

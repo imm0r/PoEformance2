@@ -173,8 +173,10 @@ public static class TileModels
     /// </summary>
     private static (TileDefinition Definition, string Why) Defined(Func<string, byte[]?> read, string path)
     {
+        // IN THE SPELLING THE READ USES, so a loop written with backslashes is caught on its
+        // second hop rather than read eight more times before the hop count stops it.
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        string at = path;
+        string at = Slashed(path);
         for (var hop = 0; hop <= MostHops; hop++)
         {
             if (!seen.Add(at))
@@ -193,7 +195,7 @@ public static class TileModels
                 return (one, string.Empty);
             }
 
-            at = one.Inherits;
+            at = Slashed(one.Inherits);
         }
 
         return (TileDefinition.None, $"the tile's inheritance runs past {MostHops} files: {path}");
@@ -244,4 +246,6 @@ public static class TileModels
     }
 
     private static string Name(int shape) => shape.ToString(CultureInfo.InvariantCulture);
+
+    private static string Slashed(string path) => path.Replace('\\', '/').Trim();
 }

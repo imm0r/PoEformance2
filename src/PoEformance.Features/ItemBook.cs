@@ -88,16 +88,18 @@ public sealed class ItemBook : ColumnBook
             arts[at] = one.Art;
 
             // A UNIQUE'S LEVEL AND SIZE ARE BLANK, NOT ZERO: the layout row it comes from carries
-            // neither, and "level 0" would read as an item anybody can drop at the start.
-            drops[at] = one.DropLevel;
+            // neither, and "level 0" would read as an item anybody can drop at the start. The
+            // NUMBER is NaN for the same reason - as 0, every unique sat in the drop histogram's
+            // first bin, sorted under the level-1 items and answered "drop<10". See ColumnSpread.Of.
+            drops[at] = Figure(one.Unique, one.DropLevel);
             dropsText[at] = Blank(one.Unique, one.DropLevel);
-            cells[at] = one.Width * one.Height;
+            cells[at] = Figure(one.Unique, one.Width * one.Height);
             cellsText[at] = one.Unique
                 ? string.Empty
                 : string.Create(CultureInfo.InvariantCulture, $"{one.Width}x{one.Height}");
-            widths[at] = one.Width;
+            widths[at] = Figure(one.Unique, one.Width);
             widthsText[at] = Blank(one.Unique, one.Width);
-            heights[at] = one.Height;
+            heights[at] = Figure(one.Unique, one.Height);
             heightsText[at] = Blank(one.Unique, one.Height);
 
             models[at] = Tail(one.Model);
@@ -146,4 +148,6 @@ public sealed class ItemBook : ColumnBook
 
     private static string Blank(bool unique, int value)
         => unique ? string.Empty : value.ToString(CultureInfo.InvariantCulture);
+
+    private static double Figure(bool unique, int value) => unique ? double.NaN : value;
 }

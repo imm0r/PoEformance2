@@ -167,6 +167,37 @@ public class RoomLayoutTests
     };
 
     [Fact]
+    public void ANDTWODoodadsOnOneSheetShareOneDecodeOfIt()
+    {
+        // THE ROCK AND THE TREE WEAR ONE MATERIAL. Loaded with a cache per model, the sheet behind it
+        // was decoded once each and reached the renderer as two objects - two uploads of one texture.
+        Dictionary<string, byte[]> files = Install();
+        files["art/rock.mat"] = TileFilesTests.Mat("art/rock.dds");
+        files["art/rock.dds"] = TileFilesTests.Dds();
+
+        var handed = new List<string>();
+        byte[]? Read(string path)
+        {
+            byte[]? got = files.GetValueOrDefault(path);
+            if (got is not null)
+            {
+                handed.Add(path);
+            }
+
+            return got;
+        }
+
+        MonsterModel model = RoomModels.Of(Read, "Metadata/Terrain/Woods/Rooms/Clearing.arm", RoomUnit.World);
+
+        Assert.True(model.Ready, model.Why);
+        Assert.Equal(2, model.Skins.Count);
+        Assert.NotNull(model.Skins[0]);
+        Assert.Same(model.Skins[0], model.Skins[1]);
+        Assert.Equal(1, handed.Count(one => one == "art/rock.dds"));
+        Assert.Equal(1, handed.Count(one => one == "art/rock.mat"));
+    }
+
+    [Fact]
     public void AROOMSDoodadsAreJoinedWhereTheFilePutsThem()
     {
         Dictionary<string, byte[]> files = Install();

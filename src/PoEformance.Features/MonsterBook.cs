@@ -439,10 +439,14 @@ public sealed class MonsterBook : ColumnBook
         /// carry no armour, so zero is a real and common answer - while a monster whose type row
         /// does not resolve at all has no answer. Printed the same, the second would be read as the
         /// first on every row of a table that had lost its MonsterTypes.
+        ///
+        /// AND THE NUMBER SAYS SO TOO. Written as 0 it sorted, binned and answered "armour=0" as if
+        /// it were a measured nothing; as NaN the spread leaves it out and no range holds it. See
+        /// ColumnSpread.Of.
         /// </remarks>
         public void Percent(int row, int? value)
         {
-            _number[row] = value ?? 0;
+            _number[row] = value ?? double.NaN;
             _text[row] = value is { } got
                 ? got.ToString(CultureInfo.InvariantCulture) + "%"
                 : string.Empty;

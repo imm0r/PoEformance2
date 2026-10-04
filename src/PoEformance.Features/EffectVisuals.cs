@@ -137,7 +137,7 @@ public sealed class EffectVisuals
                 files.Add(new EffectFile("stuck", stuck));
             }
 
-            if (file.Text(row, bounceAt).Trim() is { Length: > 0 } bounce)
+            if (Slashed(file.Text(row, bounceAt)) is { Length: > 0 } bounce)
             {
                 files.Add(new EffectFile("bounce", bounce));
             }
@@ -166,7 +166,7 @@ public sealed class EffectVisuals
         DatFile file = table.File;
         for (var row = 0; row < file.Rows; row++)
         {
-            string ao = file.Text(row, aoAt).Trim();
+            string ao = Slashed(file.Text(row, aoAt));
             Add(into, Animated, file.Text(row, idAt).Trim(), ao.Length > 0 ? [new EffectFile("art", ao)] : []);
         }
 
@@ -242,6 +242,17 @@ public sealed class EffectVisuals
     /// <summary>A string-array column: eight bytes an element, each an offset into the variable section.</summary>
     private static IReadOnlyList<string> Texts(DatFile file, int row, int offset)
         => [.. file.References(row, offset, elementWidth: 8)
-            .Select(one => file.TextAt(one.First).Trim().Replace('\\', '/'))
+            .Select(one => Slashed(file.TextAt(one.First)))
             .Where(one => one.Length > 0)];
+
+    /// <summary>
+    /// A path as the install spells it: forward slashes, no stray whitespace.
+    /// </summary>
+    /// <remarks>
+    /// EVERY .ao COLUMN THROUGH THE SAME ONE, where the array columns were and the single ones were
+    /// not. Reading survives either slash - BundleIndex.Hash turns them round - but the book's
+    /// "model" and "folder" columns split on '/', so a backslash path showed the whole path as the
+    /// file's name and nothing as its folder, and the row's key spelt the same file two ways.
+    /// </remarks>
+    private static string Slashed(string path) => path.Trim().Replace('\\', '/');
 }
