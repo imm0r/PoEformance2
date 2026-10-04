@@ -56,8 +56,11 @@ public sealed class IconCache : IDisposable
     /// limit it arrived scaled to 745x4096 and its 64-pixel cells measured 53.2. Raised to the
     /// 8192 that every D3D11 feature level guarantees, which is the next real ceiling rather
     /// than one picked to fit today's file by a margin somebody has to notice again later.
+    ///
+    /// It is also how far the sheet may GROW when boss pictures are laid into it - see
+    /// IconSheetGrowth, which refuses to place past it rather than have the sheet shrunk here.
     /// </remarks>
-    public const int MaxSheetEdge = 8192;
+    public const int MaxSheetEdge = IconSheet.MaxEdge;
 
     /// <summary>
     /// Whether a picture is handed to the renderer as an sRGB texture. It is not, and the
@@ -112,6 +115,16 @@ public sealed class IconCache : IDisposable
     private Picture _sheet;
     private bool _sheetAsked;
 
+    // The sheet's texture key, its own counter, and a rebuild in flight. See SheetChanged().
+    private string _sheetKey = string.Empty;
+    private int _sheetBuilds;
+    private Task<SheetBuild?>? _sheetBuilding;
+    private volatile bool _sheetStale;
+    private List<string> _sheetProblems = [];
+
+    /// <summary>A sheet put together off the render thread, waiting to be uploaded on it.</summary>
+    private sealed record SheetBuild(Image<Rgba32> Image, List<(string Name, int Cell)> Live, List<string> Problems);
+
     /// <summary>
     /// How pictures are decoded, which is CONTIGUOUS and that is not a preference.
     /// </summary>
@@ -130,7 +143,7 @@ public sealed class IconCache : IDisposable
     /// A cloned configuration rather than the global default: the renderer loads its own images
     /// through that, and this is not the place to change how they are allocated.
     /// </remarks>
-    private static readonly Configuration Contiguous = Contiguously();
+    internal static readonly Configuration Contiguous = Contiguously();
 
     private static Configuration Contiguously()
     {
@@ -220,31 +233,173 @@ public sealed class IconCache : IDisposable
     /// </summary>
     /// <remarks>
     /// ONE CALL FOR THE WHOLE TOOL, so nothing can load the sheet at a second size limit and
-    /// end up with a grid that disagrees with everybody else's - the limit is part of the
-    /// cache key, so two callers asking differently get two textures.
+    /// end up with a grid that disagrees with everybody else's.
     ///
     /// HELD IN A FIELD rather than looked up, and that is not premature. This is asked once
-    /// PER MARKER PER FRAME - every entity dot and every landmark on the map - and the lookup
-    /// underneath it builds its cache key by interpolating a string. At a hundred markers and
-    /// sixty frames that is six thousand throwaway strings a second to arrive at the same
-    /// texture handle every time.
+    /// PER MARKER PER FRAME - every entity dot and every landmark on the map - and a lookup by
+    /// an interpolated key would be six thousand throwaway strings a second at a hundred
+    /// markers, to arrive at the same texture handle every time.
+    ///
+    /// THE EMBEDDED SHEET PLUS THE EXPORTS FOLDER. A boss posed in the model pane is laid into
+    /// this copy of the sheet the moment its files are written - see <see cref="ExportedIcons"/>
+    /// - so the marker wears it this session, and tools/IconBaker is what puts it into
+    /// assets/icons.png for every session after. The first ask builds synchronously, as the
+    /// plain sheet always did; a rebuild after an export happens on a worker and the old
+    /// texture is drawn until the new one is ready, so the click that wrote a picture costs no
+    /// frame.
     ///
     /// Empty when the resource did not ship, and every caller falls back to the built-in
-    /// shape for that, exactly as they did for a missing file. The empty answer is remembered
-    /// too - <see cref="BuiltIn"/> already refuses to go looking again, and this saves even
-    /// the call.
+    /// shape for that, exactly as they did for a missing file. A failed rebuild keeps the sheet
+    /// that was already drawing.
     /// </remarks>
     public Picture Sheet()
     {
         if (!_sheetAsked)
         {
             _sheetAsked = true;
-            _sheet = BuiltIn(IconSheet.Resource, MaxSheetEdge);
+            _sheetStale = false;
+            Swap(BuildSheet());
+        }
+        else if (_sheetBuilding is { IsCompleted: true } built)
+        {
+            _sheetBuilding = null;
+            Swap(built.IsCompletedSuccessfully ? built.Result : null);
+        }
+
+        if (_sheetStale && _sheetBuilding is null)
+        {
+            _sheetStale = false;
+            _sheetBuilding = Task.Run(BuildSheet);
         }
 
         return _sheet;
     }
 
+    /// <summary>
+    /// Says the exports folder has new pictures in it. Safe from any thread.
+    /// </summary>
+    /// <remarks>
+    /// A FLAG AND NOT A REBUILD, because the export finishes on a worker task and the texture
+    /// can only be made on the render thread. The next <see cref="Sheet"/> sees it and starts
+    /// the rebuild; several exports in a row while one is building collapse into one more.
+    /// </remarks>
+    public void SheetChanged() => _sheetStale = true;
+
+    /// <summary>The embedded sheet with the exports laid into it. Runs on a worker.</summary>
+    /// <remarks>
+    /// Touches nothing the render thread writes: the baked name tables are immutable, and the
+    /// live names this produces are handed back to be set by <see cref="Swap"/>.
+    /// </remarks>
+    private static SheetBuild? BuildSheet()
+    {
+        Image<Rgba32>? sheet = null;
+        try
+        {
+            sheet = Embedded(IconSheet.Resource);
+            if (sheet is null)
+            {
+                return null;
+            }
+
+            var live = new List<(string Name, int Cell)>();
+            var problems = new List<string>();
+            sheet = ExportedIcons.LayInto(sheet, MonsterPortrait.Folder, live, problems);
+            SheetBuild build = new(sheet, live, problems);
+            sheet = null;
+            return build;
+        }
+        catch (Exception exception) when (
+            exception is IOException or UnknownImageFormatException or InvalidImageContentException
+                or NotSupportedException or ArgumentException or UnauthorizedAccessException)
+        {
+            // A sheet that shipped broken is a build mistake; an export that cannot be read is
+            // reported per file by LayInto. Either way the markers keep their shapes.
+            return null;
+        }
+        finally
+        {
+            sheet?.Dispose();
+        }
+    }
+
+    /// <summary>Uploads a built sheet and lets the previous texture go. Render thread.</summary>
+    private void Swap(SheetBuild? build)
+    {
+        if (build is null)
+        {
+            return;
+        }
+
+        using (build.Image)
+        {
+            // The renderer's precondition, checked rather than discovered - see Upload.
+            if (!build.Image.DangerousTryGetSinglePixelMemory(out _))
+            {
+                _problems.Add(
+                    $"{IconSheet.Resource}: {build.Image.Width}x{build.Image.Height} did not decode into"
+                    + " one buffer, so it cannot be uploaded as a texture.");
+                return;
+            }
+
+            // A NEW KEY EVERY BUILD: the renderer caches by key, and reusing one would keep
+            // drawing the sheet from before the export.
+            string key = $"poeformance.sheet.{_sheetBuilds++}";
+            IntPtr texture = _upload(key, build.Image, Srgb);
+            if (texture == IntPtr.Zero)
+            {
+                return;
+            }
+
+            ReleaseSheet();
+            _sheetKey = key;
+            _sheet = new Picture(texture, build.Image.Width, build.Image.Height);
+        }
+
+        IconNames.Live(build.Live);
+
+        // Replaced, not added to: every rebuild reports the same unreadable export again.
+        _problems.RemoveAll(_sheetProblems.Contains);
+        _sheetProblems = build.Problems;
+        _problems.AddRange(_sheetProblems);
+    }
+
+    /// <summary>Gives the sheet's texture back to the renderer.</summary>
+    private void ReleaseSheet()
+    {
+        if (_sheetKey.Length == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            _release(_sheetKey);
+        }
+        catch (Exception exception) when (exception is InvalidOperationException or ObjectDisposedException)
+        {
+            // Shutting down, or the renderer already let it go.
+        }
+
+        _sheetKey = string.Empty;
+    }
+
+    /// <summary>
+    /// A picture that ships INSIDE the assembly, by the tail of its resource name.
+    /// </summary>
+    /// <remarks>
+    /// For the things the tool draws by default and does not want to have to install. A file
+    /// beside the executable can be deleted, missed by a copy, or lost when somebody unzips a
+    /// new build over an old folder - and the failure looks like the feature not working. A
+    /// manifest resource cannot be separated from the code that draws it, survives
+    /// single-file publishing and AOT alike, and needs no path for anybody to type.
+    ///
+    /// It does NOT replace the file path. A shipped plate is the default; the style entry's
+    /// icon still wins when it is set, which is what keeps "all of it can be changed" true.
+    ///
+    /// Matched on the END of the resource name, because the full one is built from the root
+    /// namespace and folder and would have to be repeated - and silently rewritten - every
+    /// time either moved.
+    /// </remarks>
     public Picture BuiltIn(string name, int maxEdge)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -280,25 +435,8 @@ public sealed class IconCache : IDisposable
     {
         try
         {
-            System.Reflection.Assembly assembly = typeof(IconCache).Assembly;
-            string? resource = Array.Find(
-                assembly.GetManifestResourceNames(),
-                candidate => candidate.EndsWith(name, StringComparison.OrdinalIgnoreCase));
-
-            if (resource is null)
-            {
-                return default;
-            }
-
-            using Stream? stream = assembly.GetManifestResourceStream(resource);
-            if (stream is null)
-            {
-                return default;
-            }
-
-            using Image<Rgba32> image =
-                Image.Load<Rgba32>(new DecoderOptions { Configuration = Contiguous }, stream);
-            return Upload(cached, image, maxEdge);
+            using Image<Rgba32>? image = Embedded(name);
+            return image is null ? default : Upload(cached, image, maxEdge);
         }
         catch (Exception exception) when (
             exception is IOException or UnknownImageFormatException or InvalidImageContentException
@@ -308,6 +446,25 @@ public sealed class IconCache : IDisposable
             // over. The caller draws its text form, exactly as it does for a missing file.
             return default;
         }
+    }
+
+    /// <summary>Decodes an embedded picture by the tail of its resource name, or null.</summary>
+    private static Image<Rgba32>? Embedded(string name)
+    {
+        System.Reflection.Assembly assembly = typeof(IconCache).Assembly;
+        string? resource = Array.Find(
+            assembly.GetManifestResourceNames(),
+            candidate => candidate.EndsWith(name, StringComparison.OrdinalIgnoreCase));
+
+        if (resource is null)
+        {
+            return null;
+        }
+
+        using Stream? stream = assembly.GetManifestResourceStream(resource);
+        return stream is null
+            ? null
+            : Image.Load<Rgba32>(new DecoderOptions { Configuration = Contiguous }, stream);
     }
 
     private Picture Load(string path, string file, int maxEdge)
@@ -392,14 +549,22 @@ public sealed class IconCache : IDisposable
         _problems.Clear();
 
         // The held sheet points at a texture that has just been released, so it has to go with
-        // them - kept, it would hand every marker a handle the renderer no longer knows.
+        // them - kept, it would hand every marker a handle the renderer no longer knows. A
+        // rebuild still in flight is dropped too; its picture is disposed whenever it lands.
         _sheet = default;
         _sheetAsked = false;
+        _sheetBuilding?.ContinueWith(
+            static done => done.Result?.Image.Dispose(),
+            CancellationToken.None,
+            TaskContinuationOptions.OnlyOnRanToCompletion,
+            TaskScheduler.Default);
+        _sheetBuilding = null;
         Files.Forget();
     }
 
     private void Release()
     {
+        ReleaseSheet();
         foreach (string key in _keys.Values)
         {
             try

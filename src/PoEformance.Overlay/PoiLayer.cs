@@ -63,6 +63,7 @@ public sealed class PoiLayer
     private readonly Dictionary<ulong, Mark> _art = [];
     private uint _artArea;
     private int _artRevision = -1;
+    private int _artNames = -1;
 
     /// <summary>Which kinds are marked. Everything that is a destination rather than a thing.</summary>
     /// <remarks>
@@ -294,10 +295,17 @@ public sealed class PoiLayer
             // OR WHILE THE TABLE DOES NOT, which is the other half of it now that the table can
             // be written from inside the tool: an entry filled in while standing in the arena
             // it is about has to reach the marker in front of the person writing it.
-            if (snapshot.AreaHash != _artArea || BossIcons.Revision != _artRevision)
+            //
+            // AND WHILE THE SHEET'S NAMES DO NOT. The entry is written on the click, but the
+            // exported picture reaches the sheet a moment later, when its rebuild lands - so
+            // the arena resolves once without art in between, and without this it would keep
+            // that answer until the next area.
+            if (snapshot.AreaHash != _artArea || BossIcons.Revision != _artRevision
+                || IconNames.Revision != _artNames)
             {
                 _artArea = snapshot.AreaHash;
                 _artRevision = BossIcons.Revision;
+                _artNames = IconNames.Revision;
                 _art.Clear();
             }
 

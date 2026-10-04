@@ -27,9 +27,9 @@ public class IconNameTableTests
         }
     }
 
-    private static (int Cell, string Name)[] Rows()
+    private static (int Cell, string Name)[] Rows(string table = PoEformance.Features.IconSheet.NameTable)
     {
-        string path = Path.Combine(RepositoryRoot, "assets", PoEformance.Features.IconSheet.NameTable);
+        string path = Path.Combine(RepositoryRoot, "assets", table);
         var rows = new List<(int, string)>();
         foreach (string line in File.ReadLines(path))
         {
@@ -46,21 +46,27 @@ public class IconNameTableTests
         return [.. rows];
     }
 
-    [Fact]
-    public void EveryNamedCellIsOnTheSheet()
+    /// <summary>The sheet's size, read from the PNG header rather than by decoding.</summary>
+    private static (int Width, int Height) SheetSize()
     {
-        // Read from the PNG header rather than by decoding, so this needs no image library.
         byte[] header = new byte[24];
         using (FileStream file = File.OpenRead(Path.Combine(RepositoryRoot, "assets", "icons.png")))
         {
             file.ReadExactly(header);
         }
 
-        int width = (header[16] << 24) | (header[17] << 16) | (header[18] << 8) | header[19];
-        int height = (header[20] << 24) | (header[21] << 16) | (header[22] << 8) | header[23];
+        return (
+            (header[16] << 24) | (header[17] << 16) | (header[18] << 8) | header[19],
+            (header[20] << 24) | (header[21] << 16) | (header[22] << 8) | header[23]);
+    }
+
+    [Fact]
+    public void EveryNamedCellIsOnTheSheet()
+    {
+        (int width, int height) = SheetSize();
         int places = PoEformance.Features.IconSheet.CountIn(width, height);
 
-        foreach ((int cell, string name) in Rows())
+        foreach ((int cell, string name) in Rows().Concat(Rows(PoEformance.Features.IconSheet.CustomNameTable)))
         {
             // COUNTED FROM ONE, the way a style file stores it. A zero here would mean "no
             // icon" to everything that reads a style, so a table starting at zero would name
@@ -167,5 +173,39 @@ public class IconNameTableTests
         // Not vacuous: a table that stopped naming pairs entirely would satisfy the loop above
         // without ever entering it, and that is exactly the regression this is here to catch.
         Assert.InRange(pairs, 100, 500);
+    }
+
+    /// <summary>
+    /// The two tables keep to their own rows: the game's above the line, ours below it.
+    /// </summary>
+    /// <remarks>
+    /// THE LINE IS WHAT KEEPS BOTH TABLES SAFE FROM EACH OTHER. scripts/name-icon-cells.py
+    /// rewrites the generated table whole, and tools/IconBaker rewrites the custom one; if
+    /// either could name a cell in the other's rows, a regeneration would quietly put two
+    /// names on one picture - and IconNames would keep whichever it happened to read last.
+    /// </remarks>
+    [Fact]
+    public void EachTableNamesOnlyItsOwnRows()
+    {
+        (int width, _) = SheetSize();
+        int firstOwn = (PoEformance.Features.IconSheet.OwnRow * PoEformance.Features.IconSheet.ColumnsIn(width)) + 1;
+
+        Assert.All(Rows(), row => Assert.InRange(row.Cell, 1, firstOwn - 1));
+        Assert.All(
+            Rows(PoEformance.Features.IconSheet.CustomNameTable),
+            row => Assert.True(row.Cell >= firstOwn, $"{row.Name} at {row.Cell} is in the game's rows"));
+    }
+
+    /// <summary>No cell and no name appears twice across both tables together.</summary>
+    /// <remarks>
+    /// Read backwards, the two tables are one lookup - a boss baked under a name the game
+    /// already uses would decide which picture an unrecognised marker draws by file order.
+    /// </remarks>
+    [Fact]
+    public void TheTwoTablesTogetherNameEveryCellAndNameOnce()
+    {
+        (int Cell, string Name)[] both = [.. Rows(), .. Rows(PoEformance.Features.IconSheet.CustomNameTable)];
+        Assert.Equal(both.Length, both.Select(r => r.Cell).Distinct().Count());
+        Assert.Equal(both.Length, both.Select(r => r.Name).Distinct(StringComparer.OrdinalIgnoreCase).Count());
     }
 }

@@ -36,8 +36,48 @@ public static class IconSheet
     /// </summary>
     public const string NameTable = "icon-names.tsv";
 
+    /// <summary>
+    /// The table naming the cells this project ADDED to the sheet, matched the same way.
+    /// </summary>
+    /// <remarks>
+    /// A FILE OF ITS OWN because <see cref="NameTable"/> is generated: scripts/name-icon-cells.py
+    /// rewrites it whole from the icons poe2db publishes, and a boss portrait rendered here is
+    /// in none of those - every name written into that table by hand would be gone the next time
+    /// the script ran. This one is written by tools/IconBaker and nothing else touches it.
+    /// </remarks>
+    public const string CustomNameTable = "icon-names-custom.tsv";
+
     /// <summary>One cell's edge, in sheet pixels. See the measurement in the type remarks.</summary>
     public const int Tile = 64;
+
+    /// <summary>
+    /// The first row that holds this project's art rather than the game's.
+    /// </summary>
+    /// <remarks>
+    /// MEASURED, ON THE SHEET AS IT SHIPPED BEFORE ANYTHING WAS ADDED: 77 rows, 1050 cells of
+    /// art, the last at cell 1059, and all 28 empty cells in the tail of row 77. Everything from
+    /// row 78 on - cell 1079 at fourteen columns - is a picture made here, named in
+    /// <see cref="CustomNameTable"/>.
+    ///
+    /// NEW ART STARTS ON A ROW OF ITS OWN, and the tail of row 77 stays empty on purpose. A
+    /// style file stores a cell NUMBER, so the only safe way to add to the sheet is past its
+    /// end; keeping the two kinds of art on separate rows also means the line between "the
+    /// game's" and "ours" is a row number anybody can see, rather than a cell somewhere in the
+    /// middle of a row that only a table knows about.
+    /// </remarks>
+    public const int OwnRow = 77;
+
+    /// <summary>
+    /// Tallest the sheet may grow, in pixels: the texture edge every D3D11 feature level
+    /// guarantees.
+    /// </summary>
+    /// <remarks>
+    /// A HARD LIMIT AND NOT A PREFERENCE. The sheet is uploaded as one texture, and the overlay
+    /// refuses to shrink it because its grid is addressed in pixels (see IconCache.MaxSheetEdge).
+    /// At 64 pixels a row that is 128 rows, 51 of them past <see cref="OwnRow"/> - 714 cells,
+    /// or 357 boss pairs, against the hundred or so the endgame actually has.
+    /// </remarks>
+    public const int MaxEdge = 8192;
 
     /// <summary>Columns in a sheet of a given pixel width. Never zero - it is a divisor.</summary>
     public static int ColumnsIn(float sheetWidth) => Math.Max(1, (int)(sheetWidth / Tile));
