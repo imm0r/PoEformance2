@@ -307,6 +307,19 @@ public static class MonsterModels
     /// <param name="named">The .ao files to start from, nearest first.</param>
     /// <param name="wearing">Whether attached pieces are read and joined on - see the other overload.</param>
     public static MonsterModel OfFiles(Func<string, byte[]?>? read, IReadOnlyList<string>? named, bool wearing = true)
+        => OfFiles(read, named, wearing, null);
+
+    /// <summary>
+    /// The same walk, with a material and texture cache that outlives it.
+    /// </summary>
+    /// <remarks>
+    /// FOR A ROOM, which loads one model per distinct doodad file and places each many times: two
+    /// doodads - a rock and a stump - that share a .mat and its .dds would otherwise decode that
+    /// sheet once each and hand the renderer two copies of one texture. The cache is per call by
+    /// default and nothing else changes.
+    /// </remarks>
+    internal static MonsterModel OfFiles(
+        Func<string, byte[]?>? read, IReadOnlyList<string>? named, bool wearing, Paints? shared)
     {
         if (read is null)
         {
@@ -327,7 +340,7 @@ public static class MonsterModels
 
         if (Skinned(counted, named) is not { } found)
         {
-            return Fixed(counted, named, tally)
+            return Fixed(counted, named, tally, shared)
                 ?? tally.Failed("no SkinMesh or FixedMesh anywhere in the .ao files or what they extend");
         }
 
@@ -372,7 +385,7 @@ public static class MonsterModels
         // many materials name it. Without it the model's own skin and the shape wearing the
         // same material were two decodes of one 2048-square sheet - and two objects, which is
         // also two uploads to the renderer.
-        var paints = new Paints();
+        Paints paints = shared ?? new Paints();
         (Mipmaps? skin, string paint, string material) = Painted(counted, mesh, materials, paints);
 
         // AND ONE PER SHAPE, over the same reads: the walk above already decoded every material
@@ -466,7 +479,8 @@ public static class MonsterModels
     /// would be choosing a bone nobody measured. It is drawn where the file puts it, and
     /// <see cref="MonsterModel.Move"/> carries the reason it does not move.
     /// </remarks>
-    private static MonsterModel? Fixed(Func<string, byte[]?> read, IReadOnlyList<string> named, Tally tally)
+    private static MonsterModel? Fixed(
+        Func<string, byte[]?> read, IReadOnlyList<string> named, Tally tally, Paints? shared)
     {
         string path = string.Empty;
         foreach (string one in named)
@@ -495,7 +509,7 @@ public static class MonsterModels
         // THE .fmt's OWN MATERIALS, one per shape, are the only ones there are: there is no
         // manifest, and the same list Propped hands to the dressing serves the whole model here.
         return Worn(read, prop.Mesh, prop.Named, paintTheRest: true, path,
-            "a fixed mesh is rigid - it has no bones to animate") with
+            "a fixed mesh is rigid - it has no bones to animate", shared) with
         {
             Bytes = tally.Bytes,
             Files = tally.Files,
@@ -520,16 +534,18 @@ public static class MonsterModels
     /// </param>
     /// <param name="source">The file the model is read from, for the line under the picture.</param>
     /// <param name="move">Why it does not move - see <see cref="MonsterModel.Move"/>.</param>
+    /// <param name="shared">A cache that outlives this model, or null for one of its own - see the internal OfFiles.</param>
     internal static MonsterModel Worn(
         Func<string, byte[]?> read,
         SkinnedMesh mesh,
         IReadOnlyList<(string Shape, string Material)> named,
         bool paintTheRest,
         string source,
-        string move)
+        string move,
+        Paints? shared = null)
     {
         List<string> materials = [.. named.Select(one => one.Material).Where(one => one.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase)];
-        var paints = new Paints();
+        Paints paints = shared ?? new Paints();
         (Mipmaps? skin, string paint, string material) = Painted(read, mesh, materials, paints);
         Dress dress = Dressed(
             read, mesh, named, MeshManifest.None, paintTheRest ? skin : null, material, paints);
@@ -2035,6 +2051,16 @@ public static class MonsterModels
         IReadOnlyList<string> spread = manifest.Spread(mesh.Shapes.Count);
         IReadOnlyList<string> paths = [.. manifest.Materials.Select(one => one.Path)];
 
+        // AND THE NAMES ONCE TOO. Matching each shape against the named list by scanning it is
+        // quadratic in the shapes, which a monster never notices and a terrain tile does: its
+        // list holds one entry per prop shape over up to 256 sub-tiles. First spelling wins, as
+        // the scan's first match did.
+        var byName = new Dictionary<string, string>(named.Count, StringComparer.OrdinalIgnoreCase);
+        foreach ((string called, string wears) in named)
+        {
+            byName.TryAdd(called, wears);
+        }
+
         var textures = new List<string>();
         var guessed = false;
 
@@ -2047,7 +2073,7 @@ public static class MonsterModels
             // per shape - see MaterialFile.Graphs - so two shapes naming the same file are
             // two different textures and the cache has to tell them apart by the whole
             // string rather than by the file.
-            string wants = Wanted(mesh.Shapes[shape].Name, shape, mesh.Shapes.Count, named, spread, paths);
+            string wants = Wanted(mesh.Shapes[shape].Name, shape, mesh.Shapes.Count, named, byName, spread, paths);
             if (wants.Length == 0)
             {
                 skins[shape] = fallback;
@@ -2131,15 +2157,13 @@ public static class MonsterModels
         int at,
         int shapes,
         IReadOnlyList<(string Shape, string Material)> named,
+        IReadOnlyDictionary<string, string> byName,
         IReadOnlyList<string> spread,
         IReadOnlyList<string> manifest)
     {
-        foreach ((string called, string material) in named)
+        if (byName.TryGetValue(shape, out string? material))
         {
-            if (string.Equals(called, shape, StringComparison.OrdinalIgnoreCase))
-            {
-                return material;
-            }
+            return material;
         }
 
         if (named.Count == shapes && at < named.Count)
@@ -2250,7 +2274,7 @@ public static class MonsterModels
                 named);
 
     /// <summary>What has already been read, so nothing is read or decoded twice.</summary>
-    private sealed class Paints
+    internal sealed class Paints
     {
         /// <summary>Material file by its path, with the selector taken off.</summary>
         public Dictionary<string, MaterialFile> Files { get; } = new(StringComparer.OrdinalIgnoreCase);

@@ -111,6 +111,9 @@ public class ColumnQueryTests
     [InlineData("(tag:undead or tag:beast) life>300")]
     [InlineData("crit=2")]
     [InlineData("tag:undead not skill:fire")]
+    [InlineData("tag:\"beast\"")]
+    [InlineData("class:\"One Hand Swords\" drop>3")]
+    [InlineData("not type:\"Zombie\" or tag:\"undead\"")]
     public void AQueryWritesBackOutAsItself(string text)
     {
         QueryResult first = ColumnQuery.Parse(text);
@@ -128,8 +131,9 @@ public class ColumnQueryTests
     [Fact]
     public void AFacetClickAddsATermAndClickingAgainTakesItBack()
     {
+        // IN QUOTES, because the rail counted exactly "undead" - see QueryTerm.Exact.
         string once = ColumnQuery.Toggle("life>200", "tag", "undead");
-        Assert.Equal("life>200 tag:undead", once);
+        Assert.Equal("life>200 tag:\"undead\"", once);
         Assert.True(ColumnQuery.Holds(ColumnQuery.Parse(once).Term, "tag", "undead"));
 
         string off = ColumnQuery.Toggle(once, "tag", "undead");
@@ -137,11 +141,17 @@ public class ColumnQueryTests
         Assert.False(ColumnQuery.Holds(ColumnQuery.Parse(off).Term, "tag", "undead"));
 
         // An empty box is where most clicks land, and it has to come out as a whole query.
-        Assert.Equal("tag:undead", ColumnQuery.Toggle("", "tag", "undead"));
+        Assert.Equal("tag:\"undead\"", ColumnQuery.Toggle("", "tag", "undead"));
+        Assert.Equal(string.Empty, ColumnQuery.Toggle("tag:\"undead\"", "tag", "undead"));
+
+        // A value somebody typed bare is in the box too, so the tick shows and a click takes it out
+        // rather than putting a quoted twin beside it.
+        Assert.True(ColumnQuery.Holds(ColumnQuery.Parse("tag:undead").Term, "tag", "undead"));
         Assert.Equal(string.Empty, ColumnQuery.Toggle("tag:undead", "tag", "undead"));
 
         // Spelt however the caller spells it, matched however the query spells it.
         Assert.True(ColumnQuery.Holds(ColumnQuery.Parse("TAG:Undead").Term, "tag", "undead"));
+        Assert.True(ColumnQuery.Holds(ColumnQuery.Parse("TAG:\"Undead\"").Term, "tag", "undead"));
     }
 
     [Fact]
@@ -182,7 +192,7 @@ public class ColumnQueryTests
         // ONLY THE TOP LEVEL IS EDITED. Reaching inside the brackets would change what was written
         // rather than adding to it - the click means "and also this".
         string added = ColumnQuery.Toggle("tag:undead or tag:beast", "tag", "caster");
-        Assert.Equal("(tag:undead or tag:beast) tag:caster", added);
+        Assert.Equal("(tag:undead or tag:beast) tag:\"caster\"", added);
 
         QueryResult parsed = ColumnQuery.Parse(added);
         Assert.True(parsed.Ok, parsed.Error);
@@ -205,20 +215,99 @@ public class ColumnQueryTests
 
         RowSet within = Assert.IsType<RowSet>(book.Matching(ColumnQuery.Parse("life>200").Term, out _));
 
+        // EVERY VALUE OF EVERY RAIL FIELD, not the top five: the top five tags happen not to be
+        // substrings of any other tag, which is how a click that matched by substring passed this
+        // test for as long as it only looked at them. "beast" is also in amphibian_beast,
+        // avian_beast and beast_onhit_audio, and the click used to bring all of those along.
         var facets = new List<Facet>();
-        book.Facets(within, "tag", facets, 5);
-        Assert.NotEmpty(facets);
-
-        foreach (Facet facet in facets)
+        foreach (string field in (string[])["tag", "type", "skill", "mod", "blood"])
         {
-            string clicked = ColumnQuery.Toggle("life>200", "tag", facet.Value);
-            QueryResult parsed = ColumnQuery.Parse(clicked);
-            Assert.True(parsed.Ok, $"'{clicked}' would not read back: {parsed.Error}");
+            book.Facets(within, field, facets);
+            Assert.NotEmpty(facets);
 
-            RowSet after = Assert.IsType<RowSet>(book.Matching(parsed.Term, out string error));
-            Assert.Equal(string.Empty, error);
-            Assert.Equal(facet.Count, after.Count);
+            foreach (Facet facet in facets)
+            {
+                string clicked = ColumnQuery.Toggle("life>200", field, facet.Value);
+                QueryResult parsed = ColumnQuery.Parse(clicked);
+                Assert.True(parsed.Ok, $"'{clicked}' would not read back: {parsed.Error}");
+
+                RowSet after = Assert.IsType<RowSet>(book.Matching(parsed.Term, out string error));
+                Assert.Equal(string.Empty, error);
+                Assert.True(
+                    facet.Count == after.Count,
+                    $"{field}:{facet.Value} - the rail said {facet.Count}, the click left {after.Count}");
+            }
         }
+    }
+
+    [Fact]
+    public void ABareValueIsAnywhereInItAndAQuotedValueIsTheWholeOfIt()
+    {
+        MonsterVarieties table = Shipped();
+        MonsterBook book = MonsterBook.Of(table, null);
+
+        // A TAG THAT IS INSIDE ANOTHER TAG, found in the table rather than assumed, so the test
+        // does not go stale on patch day. Over the current export "beast" is one of eighteen.
+        RowSet all = Assert.IsType<RowSet>(book.Matching(null, out _));
+        var tags = new List<Facet>();
+        book.Facets(all, "tag", tags);
+
+        string[] values = [.. tags.Select(one => one.Value.ToLowerInvariant())];
+        string inside = Assert.Single(
+            values.Where(one => values.Any(other => other != one && other.Contains(one, StringComparison.Ordinal)))
+                .OrderBy(one => one, StringComparer.Ordinal)
+                .Take(1));
+
+        int bare = Rows(book, $"tag:{inside}");
+        int whole = Rows(book, $"tag:\"{inside}\"");
+        int counted = tags.Single(one => string.Equals(one.Value, inside, StringComparison.OrdinalIgnoreCase)).Count;
+
+        Assert.Equal(counted, whole);
+        Assert.True(bare > whole, $"tag:{inside} should take in more than tag:\"{inside}\" - {bare} against {whole}");
+
+        // And the whole-value form agrees with walking the table.
+        Same(table, book, $"tag:\"{inside}\"", one => table.TagsOf(one).Any(tag => string.Equals(tag, inside, StringComparison.OrdinalIgnoreCase)));
+    }
+
+    [Fact]
+    public void AValueWithASpaceInItIsOneValueInQuotes()
+    {
+        // "One Hand Swords" is an item class. Bare, it is a value and two words; a click on it in
+        // the rail used to write exactly that, so the tick never showed and the second click added
+        // a second copy instead of taking the first away.
+        string clicked = ColumnQuery.Toggle("", "class", "One Hand Swords");
+        Assert.Equal("class:\"One Hand Swords\"", clicked);
+
+        QueryResult parsed = ColumnQuery.Parse(clicked);
+        Assert.True(parsed.Ok, parsed.Error);
+        Assert.Equal(QueryKind.Value, parsed.Term!.Kind);
+        Assert.Equal("One Hand Swords", parsed.Term.Text);
+        Assert.True(parsed.Term.Exact);
+        Assert.True(ColumnQuery.Holds(parsed.Term, "class", "One Hand Swords"));
+
+        Assert.Equal(string.Empty, ColumnQuery.Toggle(clicked, "class", "One Hand Swords"));
+
+        // Beside other terms, and inside brackets, it is still one value.
+        QueryResult mixed = ColumnQuery.Parse("drop>3 (class:\"One Hand Swords\" or class:\"Bows\") not unique");
+        Assert.True(mixed.Ok, mixed.Error);
+        Assert.Equal(QueryKind.All, mixed.Term!.Kind);
+        Assert.Equal(3, mixed.Term.Children.Count);
+    }
+
+    [Fact]
+    public void AQuoteThatIsNotClosedSaysSo()
+    {
+        QueryResult open = ColumnQuery.Parse("class:\"One Hand");
+        Assert.False(open.Ok);
+        Assert.Contains("quote", open.Error, StringComparison.OrdinalIgnoreCase);
+        Assert.True(open.Column > 0);
+
+        QueryResult empty = ColumnQuery.Parse("class:\"\"");
+        Assert.False(empty.Ok);
+        Assert.Contains("quotes", empty.Error, StringComparison.OrdinalIgnoreCase);
+
+        // Halfway through typing one is a broken query, and a click leaves it alone like any other.
+        Assert.Equal("class:\"One", ColumnQuery.Toggle("class:\"One", "kind", "unique"));
     }
 
     [Fact]
@@ -228,7 +317,10 @@ public class ColumnQueryTests
         // any other value - so the parser has to be able to read it back. Without '#' as part of a
         // word, the rail could offer something the box could not hold.
         string clicked = ColumnQuery.Toggle("", "mod", "#4211");
-        Assert.Equal("mod:#4211", clicked);
+        Assert.Equal("mod:\"#4211\"", clicked);
+
+        // And the bare spelling still reads, for whoever types it.
+        Assert.True(ColumnQuery.Parse("mod:#4211").Ok);
 
         QueryResult parsed = ColumnQuery.Parse(clicked);
         Assert.True(parsed.Ok, parsed.Error);

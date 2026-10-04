@@ -380,6 +380,39 @@ public class TileFilesTests
         Assert.Null(model.Skins[4]);
         Assert.Null(model.Skins[5]);
         Assert.False(model.Moves);
+
+    }
+
+    [Fact]
+    public void ANDATILECostsWhatItReadMaterialsAndTexturesIncluded()
+    {
+        // COUNTED AT THE READER. The .mat and .dds reads happen inside the dressing, which used to be
+        // handed the bare reader - so the line under the picture said a tile was a few kilobytes of
+        // geometry, while Bytes promises the material and the texture are in it.
+        Dictionary<string, byte[]> files = Install();
+        var handed = new List<string>();
+        long bytes = 0;
+        byte[]? Read(string path)
+        {
+            byte[]? got = files.GetValueOrDefault(path);
+            if (got is not null)
+            {
+                handed.Add(path);
+                bytes += got.Length;
+            }
+
+            return got;
+        }
+
+        MonsterModel model = TileModels.Of(Read, "Metadata/Terrain/Test/Arena.tdt");
+
+        Assert.True(model.Ready, model.Why);
+        Assert.Equal(handed.Count, model.Files);
+        Assert.Equal(bytes, model.Bytes);
+        Assert.Contains("Art/Textures/Wall.mat", handed);
+        Assert.Contains("Art/Textures/Floor.mat", handed);
+        Assert.Contains("Art/Textures/wall.dds", handed);
+        Assert.Contains("Art/Textures/floor.dds", handed);
     }
 
     [Fact]
@@ -433,12 +466,12 @@ public class TileFilesTests
         Assert.Equal(new Facet("Woods", 2), sets[0]);
     }
 
-    private static byte[] Mat(string texture)
+    internal static byte[] Mat(string texture)
         => Encoding.UTF8.GetBytes(
             $$"""{"graphinstances":[{"custom_parameters":[{"name":"AlbedoTransparency_TEX","parameters":[{"path":"{{texture}}"}]}]}]}""");
 
     /// <summary>A one-pixel uncompressed DDS - GameArtTests' layout.</summary>
-    private static byte[] Dds()
+    internal static byte[] Dds()
     {
         using var stream = new MemoryStream();
         using var write = new BinaryWriter(stream);

@@ -269,15 +269,19 @@ store rather than two stores to keep in step. The same trick, for the same reaso
 constraint: **hand-written, because Native AOT has no runtime code generation**, and this project
 ships AOT.
 
-Clicking `undead` in the rail appends `tag:undead` to the box. Editing the box re-ticks the rail.
-There is one filter.
+Clicking `undead` in the rail appends `tag:"undead"` to the box. Editing the box re-ticks the rail.
+There is one filter. The quotes are not decoration: the rail counted the rows holding exactly
+`undead`, and bare `tag:undead` is a substring that would also take in `undead_elite` - so the
+click writes the whole-value form, and the quotes also carry a value with a space in it, which an
+item class ("One Hand Swords") needs.
 
 ```
 query      := or
 or         := and ( ("or" | "||") and )*
 and        := term ( ("and" | "&&")? term )*        -- juxtaposition means and
 term       := ("not" | "!") term | "(" or ")" | predicate
-predicate  := field ":" value                        -- tag:undead, skill:*fire*, type:Undead
+predicate  := field ":" value                        -- tag:undead, skill:fire   (anywhere in the value)
+            | field ":" '"' text '"'                   -- tag:"beast"              (the whole value; what a click writes)
             | field compare number                   -- life > 120, skills >= 10
             | field number ".." number               -- life 120..260      (what a drag writes)
             | word                                   -- free text, exactly as today

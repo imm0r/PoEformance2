@@ -19,9 +19,9 @@ namespace PoEformance.Core.Tests;
 /// numbers - a countdown that predicts the delisting, a beam whose near end is the entity's own
 /// position - so they keep their meaning if the capture is ever re-made.
 /// </remarks>
-public class HazardReadingTests
+public class HazardReadingTests(HazardWalk walk) : IClassFixture<HazardWalk>
 {
-    private static string Fixture(string name)
+    internal static string Fixture(string name)
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
         while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
@@ -33,27 +33,8 @@ public class HazardReadingTests
         return Path.Combine(dir.FullName, "tests", "fixtures", name);
     }
 
-    /// <summary>Every snapshot of the sweep capture, with the frame's timestamp in seconds.</summary>
-    private static List<(double Seconds, WorldSnapshot Snapshot)> Snapshots(uint step = 5)
-    {
-        using var replay = ReplayMemoryReader.Load(File.OpenRead(Fixture("session-2026-08-sweep.rec")));
-        OffsetSchema schema = RealSessionTests.Schema();
-        var world = new WorldReader(replay, schema);
-        ulong gameStates = replay.ResolvedStatics["GameStates"];
-
-        var result = new List<(double, WorldSnapshot)>();
-        for (uint frame = 0; frame < replay.FrameCount; frame += step)
-        {
-            replay.Seek(frame);
-            WorldSnapshot snapshot = world.Read(gameStates);
-            if (snapshot.InGame)
-            {
-                result.Add((replay.FrameTimes[(int)frame] / 1000.0, snapshot));
-            }
-        }
-
-        return result;
-    }
+    /// <summary>Every snapshot of the sweep capture, with the frame's timestamp in seconds. Read once - see <see cref="HazardWalk"/>.</summary>
+    private List<(double Seconds, WorldSnapshot Snapshot)> Snapshots() => walk.Snapshots;
 
     [Fact]
     public void GroundEffectsReachTheSnapshotWithTheirCountdown()

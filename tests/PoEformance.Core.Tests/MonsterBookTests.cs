@@ -44,6 +44,28 @@ public class MonsterBookTests
     }
 
     [Fact]
+    public void ABlankIsNotAZeroAndIsNotMeasured()
+    {
+        // The two blanks are left out of everything: the scale, the bins, the ends, the bars.
+        ColumnSpread spread = ColumnSpread.Of([double.NaN, 10d, 20d, double.NaN, 30d, 40d]);
+
+        Assert.Equal(4, spread.Count);
+        Assert.Equal(10d, spread.Least);
+        Assert.Equal(40d, spread.Most);
+        Assert.Equal(4, spread.Bins.Sum());
+        Assert.Equal(0f, spread.Bar(double.NaN));
+
+        // And a column of nothing but blanks is a column of nothing.
+        Assert.Equal(0, ColumnSpread.Of([double.NaN, double.NaN]).Count);
+        Assert.Equal(0d, ColumnSpread.Of([double.NaN, double.NaN]).Scale);
+
+        // A blank is in no range, so a drag across the histogram never picks it up.
+        DataColumn column = DataColumn.Magnitudes("drop", string.Empty, [double.NaN, 5d, 50d], ["", "5", "50"]);
+        Assert.Equal(0f, column.Bar[0]);
+        Assert.True(column.Bar[2] > 0f);
+    }
+
+    [Fact]
     public void AColumnWithNoSpreadEarnsNoBars()
     {
         ColumnSpread spread = ColumnSpread.Of([7d, 7d, 7d]);

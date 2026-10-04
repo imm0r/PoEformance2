@@ -213,6 +213,15 @@ public class ItemVisualsTests
         Assert.Equal(["Shortsword"], Names(book, "drop>3"));
         Assert.Equal(["Crude Bow", "Shortsword"], Names(book, "not unique"));
 
+        // A UNIQUE HAS NO DROP LEVEL, and "below 3" is not where it goes: as a 0 it used to be the
+        // first row of every low-level answer and the first bin of the histogram.
+        Assert.Equal(["Crude Bow"], Names(book, "drop<3"));
+        Assert.Equal(["Shortsword"], Names(book, "cells<=8 width<2"));
+        Assert.Equal(["Crude Bow", "Shortsword"], Names(book, "cells<=8"));
+        DataColumn drop = book.Store.Columns.Single(one => one.Name == "drop");
+        Assert.Equal(2, drop.Spread.Count);
+        Assert.True(double.IsNaN(drop.Number[book.Row("Unique/OneHandSwordUnique1")]));
+
         // AND BY THE .ao's NAME, which is what somebody holding a path from a dump types.
         Assert.Equal(["Redbeak"], Names(book, "sheathed"));
     }
@@ -246,6 +255,36 @@ public class ItemVisualsTests
         book.Facets(uniques!, "class", classes);
         Assert.All(classes, one => Assert.Equal(0, one.Count));
         Assert.Contains(new Facet("Bows", 0), classes);
+    }
+
+    [Fact]
+    public void ACLICKOnAClassLeavesTheRowsTheRailCountedAndAnotherTakesItBack()
+    {
+        // THE CLASSES HAVE SPACES IN THEM - "One Hand Swords" - which is what made the item book
+        // the one that showed the rail writing a value the grammar could not hold as one.
+        QuestTableLayouts layouts = Layouts();
+        ItemBook book = ItemBook.Of(ItemVisuals.Read(Install(layouts), layouts));
+
+        RowSet all = Assert.IsType<RowSet>(book.Matching(ColumnQuery.Parse(string.Empty).Term, out _));
+        var classes = new List<Facet>();
+        book.Facets(all, "class", classes);
+        Assert.Contains(classes, one => one.Value == "One Hand Swords");
+
+        foreach (Facet facet in classes)
+        {
+            string clicked = ColumnQuery.Toggle(string.Empty, "class", facet.Value);
+            QueryResult parsed = ColumnQuery.Parse(clicked);
+            Assert.True(parsed.Ok, $"'{clicked}' would not read back: {parsed.Error}");
+            Assert.True(ColumnQuery.Holds(parsed.Term, "class", facet.Value), $"'{clicked}' does not tick {facet.Value}");
+
+            RowSet after = Assert.IsType<RowSet>(book.Matching(parsed.Term, out string why));
+            Assert.Equal(string.Empty, why);
+            Assert.Equal(facet.Count, after.Count);
+
+            Assert.Equal(string.Empty, ColumnQuery.Toggle(clicked, "class", facet.Value));
+        }
+
+        Assert.Equal(["Shortsword"], Names(book, "class:\"One Hand Swords\""));
     }
 
     [Fact]

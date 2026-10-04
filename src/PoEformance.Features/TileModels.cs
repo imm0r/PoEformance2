@@ -156,7 +156,11 @@ public static class TileModels
             : string.Create(CultureInfo.InvariantCulture,
                 $"{inexact} of {subTiles} sub-tiles did not end where their file does - the layout after the props is not fully understood");
 
-        return MonsterModels.Worn(read, joined, named, paintTheRest: false, path, move) with
+        // THROUGH THE SAME COUNTER AS EVERYTHING ABOVE IT, because the materials and the textures are
+        // most of what a tile costs to open - and Bytes promises to include them. Handed the bare
+        // reader, Worn's .mat and .dds reads went uncounted and the line under the picture said
+        // a tile was a few kilobytes of geometry.
+        return MonsterModels.Worn(Counted, joined, named, paintTheRest: false, path, move) with
         {
             Bytes = bytes,
             Files = files,
@@ -169,8 +173,10 @@ public static class TileModels
     /// </summary>
     private static (TileDefinition Definition, string Why) Defined(Func<string, byte[]?> read, string path)
     {
+        // IN THE SPELLING THE READ USES, so a loop written with backslashes is caught on its
+        // second hop rather than read eight more times before the hop count stops it.
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        string at = path;
+        string at = Slashed(path);
         for (var hop = 0; hop <= MostHops; hop++)
         {
             if (!seen.Add(at))
@@ -189,7 +195,7 @@ public static class TileModels
                 return (one, string.Empty);
             }
 
-            at = one.Inherits;
+            at = Slashed(one.Inherits);
         }
 
         return (TileDefinition.None, $"the tile's inheritance runs past {MostHops} files: {path}");
@@ -240,4 +246,6 @@ public static class TileModels
     }
 
     private static string Name(int shape) => shape.ToString(CultureInfo.InvariantCulture);
+
+    private static string Slashed(string path) => path.Replace('\\', '/').Trim();
 }

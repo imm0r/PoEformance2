@@ -318,6 +318,8 @@ public sealed class ItemVisuals
         return slash >= 0 && slash + 1 < path.Length ? path[(slash + 1)..] : path;
     }
 
+    private static string Slashed(string path) => path.Trim().Replace('\\', '/');
+
     /// <summary>
     /// ItemVisualIdentity's four columns this reads, each row's read at most once.
     /// </summary>
@@ -377,11 +379,12 @@ public sealed class ItemVisuals
                 return done;
             }
 
+            // FORWARD SLASHES, which the book's file columns split on - see EffectVisuals.Slashed.
             (string, string, string, string) made = (
                 _file.Text(row, _id),
-                _file.Text(row, _ao).Trim(),
-                _file.Text(row, _ao2).Trim(),
-                _file.Text(row, _icon));
+                Slashed(_file.Text(row, _ao)),
+                Slashed(_file.Text(row, _ao2)),
+                Slashed(_file.Text(row, _icon)));
             _read[row] = made;
             return made;
         }
