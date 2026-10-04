@@ -751,6 +751,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         pane.Icons = _bossIcons;
+        pane.Written = _icons.SheetChanged;
 
         // The map picked in the to-do list wins over the one being stood in: somebody working
         // through that list has the game in a hideout as often as in the map they are filling
@@ -2325,7 +2326,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // thumbnail; and sharing the book's instance would reload the model - six to sixteen
         // megabytes - on every switch between the two tabs. See MonsterPortrait.Circling.
         window.Model = new MonsterPortrait(
-            readFile, Upload, key => RemoveImage(key), PictureLadder.Smallest, unpack);
+            readFile, Upload, key => RemoveImage(key), PictureLadder.Smallest, unpack)
+        {
+            Written = _icons.SheetChanged,
+        };
 
         _tools.Add(
             90, "entities", "Entity Browser", () => window.DrawTab(_snapshot, _snapshot.Player),
@@ -3781,6 +3785,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // marker drawn its ordinary way, which is exactly what not setting an icon looks
             // like - so the setting appears to do nothing at all.
             foreach (string problem in _icons.Files.Problems)
+            {
+                Row("icon", problem, Bad);
+            }
+
+            // And what the tool itself could not make into a picture - an export of the wrong
+            // size, a sheet with no room left - which otherwise looks like an export that did
+            // nothing.
+            foreach (string problem in _icons.Problems)
             {
                 Row("icon", problem, Bad);
             }

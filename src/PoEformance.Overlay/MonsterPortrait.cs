@@ -561,6 +561,16 @@ public sealed class MonsterPortrait
     /// </remarks>
     public BossIcons? Icons { get; set; }
 
+    /// <summary>
+    /// Called once an export's files are all on disk, from the task that wrote them.
+    /// </summary>
+    /// <remarks>
+    /// What puts the new picture on the map in the same session: the icon sheet lays the
+    /// exports folder into its texture, and this is how it learns there is something new in
+    /// it - see IconCache.SheetChanged, which is safe to call from the writing task.
+    /// </remarks>
+    public Action? Written { get; set; }
+
     /// <summary>The area the player is in, for the area field's prefill. Empty when unknown.</summary>
     public Func<string>? AreaNow { get; set; }
 
@@ -2427,6 +2437,7 @@ public sealed class MonsterPortrait
                 Png(Path.Combine(folder, $"{stem}Inactive-{wide}.png"), greyFull, wide, tall);
 
                 _exported = $"wrote 4 files as {stem}Active/Inactive in {folder}";
+                Written?.Invoke();
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException
                 or NotSupportedException or ImageFormatException)

@@ -7,6 +7,9 @@
     <Project Path="src/PoEformance.Game/PoEformance.Game.csproj" />
     <Project Path="src/PoEformance.Overlay/PoEformance.Overlay.csproj" />
   </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/IconBaker/IconBaker.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/PoEformance.Core.Tests/PoEformance.Core.Tests.csproj" />
   </Folder>

@@ -1,3 +1,4 @@
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PoEformance.Game.World;
@@ -93,7 +94,8 @@ public sealed class BossIcons
         HashSet<string>? skipped = null,
         string[]? comment = null,
         string? log = null,
-        string source = "")
+        string source = "",
+        bool unreadable = false)
     {
         _byArea = byArea;
         _byTile = byTile;
@@ -102,6 +104,7 @@ public sealed class BossIcons
         _comment = comment ?? [];
         _log = log ?? LogPath;
         Source = source;
+        Unreadable = unreadable;
     }
 
     /// <summary>Nothing written down - which is the ordinary case, and not a broken install.</summary>
@@ -115,11 +118,12 @@ public sealed class BossIcons
     public static BossIcons Empty => Blank(null);
 
     /// <summary>An empty pair of tables, collecting into a log of its own.</summary>
-    private static BossIcons Blank(string? log, string source = "") => new(
+    private static BossIcons Blank(string? log, string source = "", bool unreadable = false) => new(
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase),
         log: log,
-        source: source);
+        source: source,
+        unreadable: unreadable);
 
     /// <summary>Where the arenas nothing could name are collected.</summary>
     public static string LogPath
@@ -136,6 +140,17 @@ public sealed class BossIcons
     /// place to put somebody's afternoon of work.
     /// </remarks>
     public string Source { get; }
+
+    /// <summary>
+    /// Whether the file was there and could not be read - as opposed to simply not existing.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="Load"/> answers both with an empty table, which is right for drawing and
+    /// wrong for writing: an empty table saved back over a file that only failed to PARSE is an
+    /// evening of entries replaced by nothing. Whoever is about to write asks this first - see
+    /// tools/IconBaker, which refuses to merge into a file it could not read.
+    /// </remarks>
+    public bool Unreadable { get; }
 
     /// <summary>How many pairs were written down.</summary>
     public int Count => _byArea.Count + _byTile.Count;
@@ -196,7 +211,7 @@ public sealed class BossIcons
 
             if (read is null)
             {
-                return Blank(log, path);
+                return Blank(log, path, unreadable: true);
             }
 
             var byArea = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -235,7 +250,7 @@ public sealed class BossIcons
         }
         catch (Exception exception) when (exception is IOException or JsonException or UnauthorizedAccessException)
         {
-            return Blank(log, path);
+            return Blank(log, path, unreadable: true);
         }
     }
 
@@ -527,6 +542,88 @@ public sealed class BossIcons
         return Save(out said);
     }
 
+    /// <summary>
+    /// Takes in what another copy of the file says, and lists every entry that changed here.
+    /// </summary>
+    /// <remarks>
+    /// WHY THERE ARE TWO COPIES AT ALL. The tool writes the file it loaded, and a built exe loads
+    /// the one beside it - data/ is copied next to the executable - so an evening of posing
+    /// fills the install's copy and leaves the repository's untouched. tools/IconBaker brings
+    /// the pictures across; this brings the entries that say which map they belong to, which
+    /// without it would have to be copied out of one JSON file into the other by hand.
+    ///
+    /// THE OTHER COPY WINS WHERE THE TWO DISAGREE, because it is the one somebody wrote by
+    /// pressing write in front of the model; every value it replaces is in the list, so a dry
+    /// run shows it before anything is saved. Nothing is ever REMOVED: a merge cannot tell an
+    /// entry the other copy deleted from one it never had, so removals are made in this file.
+    ///
+    /// SKIP FOLLOWS <see cref="Remember"/>: an area that receives an entry here comes off the
+    /// skip list, because the entry is the answer to "this one still needs doing". The rest of
+    /// the other copy's ticks are added.
+    ///
+    /// This copy's comment block is kept - it is the documentation of the format, and the copy
+    /// in the repository is the one that is maintained. Nothing is saved; call
+    /// <see cref="Save"/>.
+    /// </remarks>
+    public List<BossIconChange> Merge(BossIcons other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+
+        var changes = new List<BossIconChange>();
+        Take("areas", _byArea, other._byArea, changes);
+        Take("tiles", _byTile, other._byTile, changes);
+        Take("names", _named, other._named, changes);
+
+        var entered = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (BossIconChange change in changes)
+        {
+            if (change.Section == "areas")
+            {
+                entered.Add(change.Key);
+            }
+        }
+
+        foreach (string area in entered.Order(StringComparer.OrdinalIgnoreCase))
+        {
+            if (_skipped.Remove(area))
+            {
+                changes.Add(new BossIconChange("skip", area, "skip", string.Empty));
+            }
+        }
+
+        foreach (string area in other._skipped.Order(StringComparer.OrdinalIgnoreCase))
+        {
+            if (!entered.Contains(area) && _skipped.Add(area))
+            {
+                changes.Add(new BossIconChange("skip", area, string.Empty, "skip"));
+            }
+        }
+
+        if (changes.Count > 0)
+        {
+            _revision++;
+        }
+
+        return changes;
+    }
+
+    /// <summary>One section of another copy taken in, in key order, with what moved.</summary>
+    private static void Take(
+        string section, Dictionary<string, string> into, Dictionary<string, string> from, List<BossIconChange> changes)
+    {
+        foreach (string key in from.Keys.Order(StringComparer.OrdinalIgnoreCase))
+        {
+            string now = from[key];
+            if (into.TryGetValue(key, out string? was) && string.Equals(was, now, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            into[key] = now;
+            changes.Add(new BossIconChange(section, key, was ?? string.Empty, now));
+        }
+    }
+
     /// <summary>Ticks an area off as having no boss picture to make, or puts it back.</summary>
     public bool Skip(string areaId, bool skip, out string said)
     {
@@ -582,7 +679,9 @@ public sealed class BossIcons
             };
 
             string temporary = Source + ".writing";
-            File.WriteAllText(temporary, JsonSerializer.Serialize(file, BossIconJson.Default.BossIconFile));
+            // Ending in a newline, as the file in the repository does: without it every write
+            // adds "no newline at end of file" to a diff that should show one new boss.
+            File.WriteAllText(temporary, JsonSerializer.Serialize(file, BossIconJson.Writing.BossIconFile) + "\n");
             File.Move(temporary, Source, overwrite: true);
 
             said = $"wrote {Path.GetFileName(Source)}: {_byArea.Count} areas, {_byTile.Count} tiles";
@@ -817,6 +916,13 @@ public sealed class BossIcons
     }
 }
 
+/// <summary>One entry a <see cref="BossIcons.Merge"/> changed.</summary>
+/// <param name="Section">"areas", "tiles", "names" or "skip" - the file's own section names.</param>
+/// <param name="Key">The area id, tile path or family.</param>
+/// <param name="Was">The value it had, or empty when it is new.</param>
+/// <param name="Now">The value it has, or empty when it was taken off (a skip only).</param>
+public readonly record struct BossIconChange(string Section, string Key, string Was, string Now);
+
 /// <summary>
 /// The file's shape, including the comment block - which is READ so that it can be written back.
 /// </summary>
@@ -857,4 +963,27 @@ internal sealed class BossIconFile
     WriteIndented = true,
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 [JsonSerializable(typeof(BossIconFile))]
-internal sealed partial class BossIconJson : JsonSerializerContext;
+internal sealed partial class BossIconJson : JsonSerializerContext
+{
+    /// <summary>
+    /// The context the file is WRITTEN with: the same shape, without HTML-safe escaping.
+    /// </summary>
+    /// <remarks>
+    /// THE DEFAULT ENCODER WRITES AN APOSTROPHE AS \u0027, and the comment block is full of
+    /// them - 'areas', 'G4_3_1', 'SaphiraBoss'. Unnoticed while the tool only ever wrote the
+    /// copy beside the exe; tools/IconBaker writes the repository's, and the first bake would
+    /// have turned every quote in the format's documentation into an escape - a whole-file diff
+    /// for one boss, and a block nobody can read in a text editor any more. The file is never
+    /// embedded in HTML, which is the only thing that escaping is for. Quotes, backslashes and
+    /// control characters are still escaped, as JSON requires.
+    ///
+    /// Options of its own rather than a copy of Default's, which are already bound to that
+    /// context; still source-generated, so it loads under Native AOT like the reader.
+    /// </remarks>
+    public static BossIconJson Writing { get; } = new(new JsonSerializerOptions
+    {
+        WriteIndented = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    });
+}

@@ -501,4 +501,104 @@ public class BossIconTests
             Assert.DoesNotContain(family, sheet);
         }
     }
+
+    /// <summary>
+    /// The install's copy is merged into the repository's: new entries arrive, disagreements
+    /// are taken from the install and listed, nothing is removed, the repository's comment stays.
+    /// </summary>
+    /// <remarks>
+    /// The case tools/IconBaker exists for: an evening of posing fills the boss-icons.json beside
+    /// the exe, and the repository's copy has to end up with the same entries without anybody
+    /// copying JSON by hand. Saved and loaded again, for the reason the round-trip test gives.
+    /// </remarks>
+    [Fact]
+    public void AnotherCopyIsMergedInAndEveryChangeIsListed()
+    {
+        string ours = Path.Combine(Path.GetTempPath(), $"boss-icons-{Guid.NewGuid():N}.json");
+        string theirs = Path.Combine(Path.GetTempPath(), $"boss-icons-{Guid.NewGuid():N}.json");
+        File.WriteAllText(
+            ours,
+            """
+            { "comment": ["the repository's block"],
+              "areas": { "MapBluff": "OldBoss", "MapKept": "KeptBoss" },
+              "tiles": {},
+              "skip": ["MapGrimhaven", "MapHideout"] }
+            """);
+        File.WriteAllText(
+            theirs,
+            """
+            { "comment": ["the install's block"],
+              "areas": { "MapBluff": "NewBoss", "MapGrimhaven": "WifeMonsterMap", "MapKept": "KeptBoss" },
+              "tiles": { "Metadata/Terrain/Maps/Grimhaven/Feature/BossArena_01.tdt": "WifeMonsterMap" },
+              "names": { "WifeMonsterMap": "Saphira, The Dread Consort" },
+              "skip": ["MapPrecursorTowerDesert"] }
+            """);
+
+        try
+        {
+            BossIcons repository = BossIcons.Load(ours);
+            List<BossIconChange> changes = repository.Merge(BossIcons.Load(theirs));
+
+            Assert.Equal(
+            [
+                new BossIconChange("areas", "MapBluff", "OldBoss", "NewBoss"),
+                new BossIconChange("areas", "MapGrimhaven", string.Empty, "WifeMonsterMap"),
+                new BossIconChange("tiles", "Metadata/Terrain/Maps/Grimhaven/Feature/BossArena_01", string.Empty, "WifeMonsterMap"),
+                new BossIconChange("names", "WifeMonsterMap", string.Empty, "Saphira, The Dread Consort"),
+
+                // An area that receives an entry comes off the skip list, as Remember does.
+                new BossIconChange("skip", "MapGrimhaven", "skip", string.Empty),
+                new BossIconChange("skip", "MapPrecursorTowerDesert", string.Empty, "skip"),
+            ],
+            changes);
+
+            Assert.True(repository.Save(out _));
+            BossIcons again = BossIcons.Load(ours);
+
+            Assert.Equal("NewBoss", again.FamilyFor("MapBluff"));
+            Assert.Equal("KeptBoss", again.FamilyFor("MapKept"));
+            Assert.Equal("WifeMonsterMap", again.FamilyFor("MapGrimhaven"));
+            Assert.Equal("Saphira, The Dread Consort", again.NameOf("WifeMonsterMap"));
+            Assert.False(again.Skipped("MapGrimhaven"));
+            Assert.True(again.Skipped("MapHideout"));
+            Assert.True(again.Skipped("MapPrecursorTowerDesert"));
+
+            string written = File.ReadAllText(ours);
+            Assert.Contains("the repository's block", written, StringComparison.Ordinal);
+            Assert.DoesNotContain("the install's block", written, StringComparison.Ordinal);
+
+            // A second merge of the same copy changes nothing, so re-running the bake is a no-op.
+            Assert.Empty(again.Merge(BossIcons.Load(theirs)));
+        }
+        finally
+        {
+            File.Delete(ours);
+            File.Delete(theirs);
+        }
+    }
+
+    /// <summary>
+    /// A file that is there and does not parse says so; a file that is not there does not.
+    /// </summary>
+    /// <remarks>
+    /// Both load as an empty table, which is right for drawing. Merging into the broken one and
+    /// saving would replace somebody's entries with nothing, so the writer has to be able to
+    /// tell the two apart.
+    /// </remarks>
+    [Fact]
+    public void AFileThatDoesNotParseIsToldApartFromOneThatIsMissing()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"boss-icons-{Guid.NewGuid():N}.json");
+        File.WriteAllText(path, """{ "areas": { "MapBluff": """);
+
+        try
+        {
+            Assert.True(BossIcons.Load(path).Unreadable);
+            Assert.False(BossIcons.Load(Path.Combine(Path.GetTempPath(), $"no-such-{Guid.NewGuid():N}.json")).Unreadable);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
 }

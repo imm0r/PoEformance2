@@ -1,0 +1,6 @@
+# Names for the cells this project ADDED to assets/icons.png, one per line: cell<TAB>name.
+# Cells count from ONE, the way a style file stores them, and start at row 78 - the 77 rows
+# above are the game's art, named in icon-names.tsv.
+#
+# Written by tools/IconBaker from the model pane's exports. Kept out of icon-names.tsv
+# because scripts/name-icon-cells.py rewrites that file whole.

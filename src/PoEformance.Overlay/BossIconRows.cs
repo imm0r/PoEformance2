@@ -17,8 +17,8 @@ namespace PoEformance.Overlay;
 ///
 /// ON THE TAB AND NOT IN A WINDOW OF ITS OWN, because it is read between maps rather than
 /// during one, and because it belongs beside the switch it is about. The three states it
-/// separates are the three things somebody can do next: make the picture, paste the art into
-/// the sheet, or tick the row off as having no boss.
+/// separates are the three things somebody can do next: make the picture, bake the art into
+/// the sheet with tools/IconBaker, or tick the row off as having no boss.
 ///
 /// A ROW IS A CHOICE AND NOT A COMMAND. Clicking one only says "this is the map I am doing
 /// next", which the model pane's export reads to prefill its area field - see
@@ -45,6 +45,7 @@ internal sealed class BossIconRows(
     private bool _showDone;
     private bool _showQuiet;
     private int _revision = -1;
+    private int _names = -1;
     private int _missing = -1;
     private int _count = -1;
     private int _bosses;
@@ -65,7 +66,7 @@ internal sealed class BossIconRows(
         ImGuiText.Wrapped(
             OverlayInk.Quiet,
             $"{_rows.Count} endgame maps: {done} wear their boss's picture,"
-                + $" {waiting} {(waiting == 1 ? "has" : "have")} art waiting to go into the sheet,"
+                + $" {waiting} {(waiting == 1 ? "has" : "have")} art waiting to be baked into the sheet,"
                 + $" {skipped} have no boss, {open} still to do"
                 + $" - {_bosses} different bosses, which is what that many maps really costs.");
 
@@ -88,15 +89,21 @@ internal sealed class BossIconRows(
     /// Works the plan out again when something it is made of moved, and not per frame.
     /// </summary>
     /// <remarks>
-    /// Three things can move it: an entry was written, an arena was collected, or the game
-    /// taught the map table something. Each is counted rather than watched, because all three
-    /// are cheap integers beside the walk - 173 maps against the sheet's name table and the
-    /// collected log - that this would otherwise do sixty times a second.
+    /// Four things can move it: an entry was written, an arena was collected, the game taught
+    /// the map table something, or an export was laid into the sheet. Each is counted rather
+    /// than watched, because all four are cheap integers beside the walk - 173 maps against the
+    /// sheet's name table and the collected log - that this would otherwise do sixty times a
+    /// second.
+    ///
+    /// DONE MEANS BAKED. The marker wears an export from the moment it is written, but only
+    /// the cells that ship in assets/icons.png count here: a picture that exists in one
+    /// person's exports folder is still work for the repository, and Waiting is what says so.
     /// </remarks>
     private void Plan(BossIcons written)
     {
         AtlasMapNames table = maps();
-        if (written.Revision == _revision && written.MissingCount == _missing && table.Count == _count)
+        if (written.Revision == _revision && written.MissingCount == _missing && table.Count == _count
+            && IconNames.Revision == _names)
         {
             return;
         }
@@ -104,10 +111,11 @@ internal sealed class BossIconRows(
         _revision = written.Revision;
         _missing = written.MissingCount;
         _count = table.Count;
+        _names = IconNames.Revision;
 
         _rows.Clear();
         _rows.AddRange(BossIconPlan.Of(
-            table, written, name => IconNames.CellFor(name) > 0, named, Exported()));
+            table, written, name => IconNames.BakedCellFor(name) > 0, named, Exported()));
 
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (BossIconTask row in _rows)
@@ -125,10 +133,10 @@ internal sealed class BossIconRows(
     /// Which families already have art in the exports folder, as one listing rather than 173 asks.
     /// </summary>
     /// <remarks>
-    /// THE STEP BETWEEN MADE AND DRAWN is otherwise invisible. An exported icon does nothing
-    /// until its cell is in assets/icons.png, and an evening of posing produces a folder full
-    /// of pictures that the map still knows nothing about - so the row says "waiting" rather
-    /// than "to do", and the only thing left on it is a paste.
+    /// THE STEP BETWEEN MADE AND SHIPPED is otherwise invisible. An exported icon is drawn
+    /// from the exports folder on this machine only, until tools/IconBaker writes its cell into
+    /// assets/icons.png - so the row says "waiting" rather than "to do", and the only thing
+    /// left on it is the bake.
     ///
     /// The folder is read ONCE per rebuild, not per row: the plan is worked out when something
     /// moved, and a hundred and seventy File.Exists calls inside a draw is the kind of thing
@@ -142,11 +150,9 @@ internal sealed class BossIconRows(
             string folder = MonsterPortrait.Folder;
             if (Directory.Exists(folder))
             {
-                foreach (string file in Directory.EnumerateFiles(folder, "*" + BossIcons.ActiveSuffix + ".png"))
-                {
-                    string stem = Path.GetFileNameWithoutExtension(file);
-                    made.Add(stem[..^BossIcons.ActiveSuffix.Length]);
-                }
+                // The sheet's own reading of the folder, so "waiting" and "laid into the sheet"
+                // cannot disagree about which file is whose - see IconSheetGrowth.FamilyOf.
+                made.UnionWith(IconSheetGrowth.Families(Directory.EnumerateFiles(folder, "*.png")));
             }
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
@@ -332,8 +338,10 @@ internal sealed class BossIconRows(
             BossIconState.Done =>
                 $"{row.Family} - the marker wears this picture.{where}",
             BossIconState.Waiting =>
-                $"the art for {row.Family} exists but the sheet has no cell under that name:"
-                    + $" paste it into assets/icons.png and name the cell there.{where}",
+                $"the art for {row.Family} exists but assets/icons.png has no cell for it yet."
+                    + " exports are drawn on this machine already;"
+                    + " run tools/IconBaker on the exports folder to bake them in for good."
+                    + where,
             BossIconState.Skipped when row.Family.Length == 0 =>
                 "the game lists no boss for this map, so there is nothing to make."
                     + " write an entry for it by hand if that is wrong.",

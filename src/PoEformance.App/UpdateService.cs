@@ -265,6 +265,14 @@ internal sealed class UpdateService : IDisposable
 
         try
         {
+            // The one file in the build that the tool itself writes, folded into the new copy
+            // now - after this nothing writes it again. See UpdateInstaller.KeepEntries.
+            string kept = UpdateInstaller.KeepEntries(plan);
+            if (kept.Length > 0)
+            {
+                Console.WriteLine($"update  {kept}");
+            }
+
             string script = UpdateScript.Text(
                 plan,
                 Environment.ProcessId,

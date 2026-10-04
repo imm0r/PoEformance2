@@ -8,7 +8,10 @@ public enum BossIconState
     /// <summary>A boss is known and nothing has been made of it yet. The work.</summary>
     Open,
 
-    /// <summary>The art exists - written down, or exported - and the sheet has no cell for it.</summary>
+    /// <summary>
+    /// The art exists - written down, or exported - and the shipped sheet has no cell for it
+    /// yet. An export is already drawn live from the exports folder; what is left is the bake.
+    /// </summary>
     Waiting,
 
     /// <summary>A picture resolves for this map. The marker wears it.</summary>
@@ -86,16 +89,17 @@ public static class BossIconPlan
     /// Every endgame map with where it stands, in the order they should be worked through.
     /// </summary>
     /// <remarks>
-    /// THE SHEET IS THE ARBITER of whether something is done, exactly as it is when a marker is
-    /// drawn - the caller passes the same lookup PoiLayer uses, so a row says "done" when and
-    /// only when the marker really would wear a picture. A written entry whose art has not been
-    /// laid into icons.png yet is a state of its own (<see cref="BossIconState.Waiting"/>)
-    /// rather than either of the two it sits between: the pictures exist, the entry exists, and
-    /// what is left is a paste into the sheet.
+    /// THE SHIPPED SHEET IS THE ARBITER of whether something is done - the caller passes the
+    /// lookup of the name tables that travel with assets/icons.png, so a row says "done" when
+    /// and only when every build would wear the picture. A written entry whose art is not baked
+    /// into icons.png yet is a state of its own (<see cref="BossIconState.Waiting"/>) rather
+    /// than either of the two it sits between: the pictures exist, the entry exists, and what
+    /// is left is tools/IconBaker. An export is drawn live before that, which is why
+    /// <paramref name="carried"/> must not count the cells laid in from the exports folder.
     /// </remarks>
     /// <param name="maps">The endgame maps, from AtlasMapNames - the file's own list.</param>
     /// <param name="icons">What has been written down, ticked off, and what the game says stands where.</param>
-    /// <param name="carried">Whether the sheet holds a cell under a name. IconNames.CellFor.</param>
+    /// <param name="carried">Whether the shipped sheet holds a cell under a name. IconNames.BakedCellFor.</param>
     /// <param name="named">What a monster's path is called in the game, or empty. MonsterVarieties.</param>
     /// <param name="exported">Whether art for a family has been written to the exports folder.</param>
     public static List<BossIconTask> Of(
@@ -230,8 +234,8 @@ public static class BossIconPlan
             // unnoticed. Then every unresolved row is Open, the way it was before the column.
             : family.Length == 0 && icons.KnowsBosses ? BossIconState.Skipped
 
-            // The art exists and the sheet does not have it yet: written down, or sitting in
-            // the exports folder waiting to be pasted into assets/icons.png.
+            // The art exists and the shipped sheet does not have it yet: written down, or
+            // sitting in the exports folder waiting to be baked into assets/icons.png.
             : written.Length > 0 || exported?.Invoke(family) == true ? BossIconState.Waiting
             : BossIconState.Open;
 

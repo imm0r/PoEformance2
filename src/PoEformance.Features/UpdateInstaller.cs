@@ -251,6 +251,86 @@ public sealed class UpdateInstaller : IDisposable
         }
     }
 
+    /// <summary>
+    /// Folds the installation's boss-icons.json into the new build's copy, so the swap keeps it.
+    /// </summary>
+    /// <remarks>
+    /// WHY THIS FILE AND NO OTHER. data/ is copied over wholesale, and that is right for every
+    /// table in it but this one: it is the one the TOOL WRITES - every boss posed in the model
+    /// pane puts its area, tile and name here - so an update used to replace an evening of
+    /// entries with whatever the release shipped. Excluding it from the copy would keep them
+    /// and lose the other half: entries baked into the repository by anybody else, and changes
+    /// to the comment block that documents the format, would never reach this installation.
+    /// So the two are merged with <see cref="BossIcons.Merge"/>, the same rule tools/IconBaker
+    /// uses, and the local copy wins where they disagree - it is what this person wrote.
+    ///
+    /// AT THE LAST MOMENT, from the apply step and not when the build is unpacked: the download
+    /// can sit ready for an hour while somebody keeps posing, and an entry written in that hour
+    /// must survive too. After this the process exits, so nothing writes the file again.
+    ///
+    /// A LOCAL FILE THAT DOES NOT PARSE IS LEFT WHERE IT IS. Its entries cannot be merged, and
+    /// copying the release's over it would make them unrecoverable; the new build's copy is
+    /// dropped from staging instead, so the swap does not touch it and it can be mended by hand.
+    /// Never throws - the update matters more than this file.
+    /// </remarks>
+    /// <returns>What happened, in a sentence, or empty when there was nothing to keep.</returns>
+    public static string KeepEntries(UpdatePlan plan)
+    {
+        ArgumentNullException.ThrowIfNull(plan);
+
+        string local = Path.Combine(plan.Install, "data", EntriesFile);
+        string staged = Path.Combine(plan.Staging, "data", EntriesFile);
+        if (!File.Exists(local) || !File.Exists(staged))
+        {
+            // Nothing written yet, or a build that no longer ships the file - in which case the
+            // swap does not touch the local one anyway.
+            return string.Empty;
+        }
+
+        try
+        {
+            BossIcons mine = BossIcons.Load(local);
+            BossIcons shipped = BossIcons.Load(staged);
+            if (mine.Unreadable || shipped.Unreadable)
+            {
+                File.Delete(staged);
+                return $"kept data/{EntriesFile} as it was - "
+                    + $"{(mine.Unreadable ? "it" : "the new build's copy")} could not be read";
+            }
+
+            List<BossIconChange> changes = shipped.Merge(mine);
+            if (changes.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            return shipped.Save(out string said)
+                ? $"kept {changes.Count} local entr{(changes.Count == 1 ? "y" : "ies")} in data/{EntriesFile}"
+                : Dropped(staged, said);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            return Dropped(staged, exception.Message);
+        }
+    }
+
+    /// <summary>The file the tool writes its boss entries into, under data/.</summary>
+    private const string EntriesFile = "boss-icons.json";
+
+    /// <summary>Takes the new copy out of the swap when the merge could not be saved.</summary>
+    private static string Dropped(string staged, string why)
+    {
+        try
+        {
+            File.Delete(staged);
+            return $"kept data/{EntriesFile} as it was - the merge failed: {why}";
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            return $"data/{EntriesFile} may be replaced by the release's copy: {why}; {exception.Message}";
+        }
+    }
+
     private bool Stop(string why)
     {
         Step = UpdateStep.Failed;

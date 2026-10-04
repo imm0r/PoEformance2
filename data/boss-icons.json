@@ -59,7 +59,11 @@
     "Monster Book's model pane, press PNG, fill in the area, tile and name in the window that",
     "opens with the pictures, and press write: the four PNGs go to exports/ and the entry comes",
     "here. This comment block is read and written back, so it survives that - do not remove it",
-    "thinking it is decoration."
+    "thinking it is decoration.",
+    "",
+    "A BUILT EXE WRITES ITS OWN COPY - the data/ beside it, not this one. tools/IconBaker merges",
+    "that copy in here together with the pictures it bakes into assets/icons.png, so both arrive",
+    "in one commit: dotnet run --project tools/IconBaker -- <the exe's exports folder>."
   ],
   "areas": {},
   "tiles": {}

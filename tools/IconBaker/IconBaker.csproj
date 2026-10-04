@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Bakes the model pane's exported boss pictures into assets/icons.png and names them in
+    assets/icon-names-custom.tsv. A repository tool, not part of the shipped app: it writes the
+    project's art, so it runs where the repository is checked out.
+
+      dotnet run (project tools/IconBaker), then the exports folder; see Program.Usage
+
+    It places by IconSheetGrowth in Features, the same rule the overlay uses when it draws
+    exports live, so a cell number seen in the overlay is the one the baked sheet will have.
+    In the solution so CI keeps it compiling against that rule.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- The version the overlay pins, for the same advisories. -->
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PoEformance.Features\PoEformance.Features.csproj" />
+  </ItemGroup>
+</Project>

@@ -69,6 +69,15 @@ except ImportError:
 TILE = 64
 """The sheet's cell size. See IconSheet in PoEformance.Features for how it was measured."""
 
+OWN_ROW = 77
+"""The first row of art made HERE rather than by the game - IconSheet.OwnRow.
+
+Rows from this one on hold boss portraits rendered by the model pane and baked in by
+tools/IconBaker, named in assets/icon-names-custom.tsv. None of them is in the icon set
+this script matches against, so they are left out of the walk entirely: a portrait that
+happened to sit within NEAR of some published icon would otherwise be named after it here,
+and the cell would carry two names, one in each table."""
+
 COMPARE = 16
 """Both sides are shrunk to this before comparing. Enough to tell 1050 icons apart."""
 
@@ -82,7 +91,7 @@ CLEAR = 1.8
 def cells(sheet):
     """Every cell holding art, as (index-from-one, image)."""
     across = sheet.width // TILE
-    for row in range(sheet.height // TILE):
+    for row in range(min(sheet.height // TILE, OWN_ROW)):
         for column in range(across):
             box = sheet.crop((column * TILE, row * TILE, (column + 1) * TILE, (row + 1) * TILE))
             if box.getchannel("A").getbbox() is not None:
