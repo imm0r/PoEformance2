@@ -446,6 +446,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _modelWants = settings;
         Capture(_monsterBook?.Model);
         Capture(_itemBook?.Model);
+        Capture(_tileBook?.Model);
 
         // No handover hole here, unlike the room layer above: the ground names need no route
         // planner, so the layer exists from the start and takes the settings directly.
@@ -512,6 +513,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 ? itemPanes
                 : basis.ItemPanes,
             ItemRail = _itemBook?.RailOpen ?? basis.ItemRail,
+            TileColumns = _tileBook?.Columns is { Count: > 0 } tileColumns
+                ? tileColumns
+                : basis.TileColumns,
+            TileColumnWidths = _tileBook?.ColumnWidths is { Count: > 0 } tileWidths
+                ? tileWidths
+                : basis.TileColumnWidths,
+            TilePanes = _tileBook?.Panes is { Count: > 0 } tilePanes
+                ? tilePanes
+                : basis.TilePanes,
+            TileRail = _tileBook?.RailOpen ?? basis.TileRail,
             MonsterModel = _monsterBook?.ModelOpen ?? basis.MonsterModel,
             ModelGrey = _monsterBook?.Model?.Grey ?? basis.ModelGrey,
             ModelGreyFactor = _monsterBook?.Model?.GreyFactor ?? basis.ModelGreyFactor,
@@ -672,6 +683,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>Kept so the settings file can be told which columns it is showing.</summary>
     private MonsterBookWindow? _monsterBook;
     private ItemBookWindow? _itemBook;
+    private TileBookWindow? _tileBook;
     private PoiLayer? _poi;
     private RoomLayer? _rooms;
 
@@ -966,6 +978,56 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     private ItemVisuals _items = ItemVisuals.Empty;
+
+    /// <summary>
+    /// Every terrain tile definition the install has, for the tile book. Empty until its walk runs.
+    /// </summary>
+    /// <remarks>The <see cref="Items"/> arrangement: set once from a background walk, read each frame.</remarks>
+    public IReadOnlyList<string> TileFiles
+    {
+        get => _tileFiles;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _tileFiles = value;
+        }
+    }
+
+    private IReadOnlyList<string> _tileFiles = [];
+
+    /// <summary>
+    /// How many rooms of the current area each tile file builds, by path - a NEW dictionary only when
+    /// the area's terrain changes, which is what tells the tile book to rebuild.
+    /// </summary>
+    /// <remarks>
+    /// CACHED ON THE ROOM LIST'S IDENTITY. The terrain is read once per area and its room list is a
+    /// fixed object from then on, so asking per frame costs a reference compare; building the map per
+    /// frame would be an allocation per frame and would make the book rebuild sixty times a second.
+    /// </remarks>
+    private IReadOnlyDictionary<string, int> TilesHere()
+    {
+        IReadOnlyList<TerrainRoom>? rooms = _snapshot.Terrain is TerrainGrid grid ? grid.Rooms : null;
+        if (ReferenceEquals(rooms, _tilesHereOf))
+        {
+            return _tilesHere;
+        }
+
+        _tilesHereOf = rooms;
+        var here = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (TerrainRoom room in rooms ?? [])
+        {
+            if (room.Path.Length > 0)
+            {
+                here[room.Path] = room.Placements;
+            }
+        }
+
+        _tilesHere = here;
+        return here;
+    }
+
+    private IReadOnlyList<TerrainRoom>? _tilesHereOf;
+    private IReadOnlyDictionary<string, int> _tilesHere = new Dictionary<string, int>();
 
     /// <summary>
     /// Which boss picture belongs to which arena, for the arenas whose names do not say it.
@@ -2465,6 +2527,45 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (visible)
         {
             _tools.Show("item-book");
+        }
+    }
+
+    /// <summary>
+    /// Adds the tile reference book - every terrain tile the install has, and the tile's geometry.
+    /// </summary>
+    /// <remarks>
+    /// THE ITEM BOOK'S ARRANGEMENT with two lists instead of one table: the install's tiles, set once
+    /// a background walk has run, and the current area's, read off the terrain the overlay already
+    /// holds. Its own pane, loading through <see cref="TileModels.Of"/>.
+    /// </remarks>
+    public void AttachTileBook(
+        IReadOnlyList<string>? columns = null,
+        bool rail = true,
+        bool visible = false,
+        Func<string, byte[]?>? readFile = null,
+        int modelSize = PictureLadder.Usual,
+        IReadOnlyDictionary<string, int>? columnWidths = null,
+        IReadOnlyDictionary<string, double>? panes = null)
+    {
+        var window = new TileBookWindow(() => TileFiles, TilesHere)
+        {
+            Changed = () => SettingsChanged?.Invoke(),
+            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
+            {
+                Load = static (read, _, path, _) => TileModels.Of(read, path),
+            },
+        };
+
+        window.Show(columns, rail, columnWidths, panes);
+        Capture(window.Model);
+        _tileBook = window;
+
+        _tools.Add(
+            93, "tile-book", "Tile Book", window.DrawTab,
+            page: Entities, pageLabel: EntitiesLabel);
+        if (visible)
+        {
+            _tools.Show("tile-book");
         }
     }
 

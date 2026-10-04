@@ -3161,6 +3161,20 @@ internal static class Program
 
                 overlay.Items = items;
             });
+
+            // AND THE TILE BOOK'S LIST, which is a WALK of the index rather than a table: every .tdt
+            // under Metadata/Terrain. The index spells its paths out once and drops them, and the
+            // atlas's walk must stay the one that runs whenever the atlas is first drawn - it gathers
+            // names the game supplies as it goes - so the index is told two walks are coming and
+            // keeps the path text until both have run. See BundleIndex.ExpectWalks.
+            installed.Index.ExpectWalks(2);
+            _ = Task.Run(() =>
+            {
+                List<string> tiles = installed.Under(
+                    PoEformance.Features.TileBook.Root, [PoEformance.Game.Diagnostics.RoomFiles.TileExtension]);
+                Console.WriteLine($"tiles: {tiles.Count} tile definitions in the install");
+                overlay.TileFiles = tiles;
+            });
         }
         else
         {
@@ -3316,6 +3330,13 @@ internal static class Program
             unpack: installed is null ? null : installed.Unpack,
             columnWidths: settings.ItemColumnWidths,
             panes: settings.ItemPanes);
+        overlay.AttachTileBook(
+            settings.TileColumns,
+            settings.TileRail,
+            readFile: installed is null ? null : installed.Read,
+            modelSize: settings.MonsterModelSize,
+            columnWidths: settings.TileColumnWidths,
+            panes: settings.TilePanes);
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read

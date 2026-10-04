@@ -464,24 +464,57 @@ public static class MonsterModels
 
         // THE .fmt's OWN MATERIALS, one per shape, are the only ones there are: there is no
         // manifest, and the same list Propped hands to the dressing serves the whole model here.
-        List<string> materials = [.. prop.Named.Select(one => one.Material).Where(one => one.Length > 0)];
-        var paints = new Paints();
-        (Mipmaps? skin, string paint, string material) = Painted(read, prop.Mesh, materials, paints);
-        Dress dress = Dressed(read, prop.Mesh, prop.Named, MeshManifest.None, skin, material, paints);
-
-        return new MonsterModel(prop.Mesh, skin, path, material, string.Empty, paint)
+        return Worn(read, prop.Mesh, prop.Named, paintTheRest: true, path,
+            "a fixed mesh is rigid - it has no bones to animate") with
         {
-            BodyLeast = prop.Mesh.Least,
-            BodyMost = prop.Mesh.Most,
+            Bytes = tally.Bytes,
+            Files = tally.Files,
+        };
+    }
+
+    /// <summary>
+    /// A rigid mesh dressed in the materials a list gives its shapes - no rig, no pieces.
+    /// </summary>
+    /// <remarks>
+    /// THE PART OF THE WALK THAT NEVER NEEDED AN .ao: given a mesh and which material each shape
+    /// wears, the textures are found, decoded once each and handed out per shape. A fixed-mesh item
+    /// and a terrain tile both arrive here with that and nothing else.
+    /// </remarks>
+    /// <param name="read">How to get a file out of the install, by path.</param>
+    /// <param name="mesh">The geometry, its shapes named the way <paramref name="named"/> names them.</param>
+    /// <param name="named">Each shape's material, by the shape's name.</param>
+    /// <param name="paintTheRest">
+    /// Whether a shape with no material of its own wears the first colour found. Right for a prop,
+    /// whose unnamed shapes are part of the same object; wrong for a tile, whose unnamed shapes are
+    /// its ground and would come out in a wall's texture.
+    /// </param>
+    /// <param name="source">The file the model is read from, for the line under the picture.</param>
+    /// <param name="move">Why it does not move - see <see cref="MonsterModel.Move"/>.</param>
+    internal static MonsterModel Worn(
+        Func<string, byte[]?> read,
+        SkinnedMesh mesh,
+        IReadOnlyList<(string Shape, string Material)> named,
+        bool paintTheRest,
+        string source,
+        string move)
+    {
+        List<string> materials = [.. named.Select(one => one.Material).Where(one => one.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase)];
+        var paints = new Paints();
+        (Mipmaps? skin, string paint, string material) = Painted(read, mesh, materials, paints);
+        Dress dress = Dressed(
+            read, mesh, named, MeshManifest.None, paintTheRest ? skin : null, material, paints);
+
+        return new MonsterModel(mesh, skin, source, material, string.Empty, paint)
+        {
+            BodyLeast = mesh.Least,
+            BodyMost = mesh.Most,
             Skins = dress.Skins,
             Materials = dress.Materials,
-            NamedInAo = prop.Named.Count,
+            NamedInAo = named.Count,
             Runs = dress.Runs,
             Textures = dress.Textures,
             Guessed = dress.Guessed,
-            Move = "a fixed mesh is rigid - it has no bones to animate",
-            Bytes = tally.Bytes,
-            Files = tally.Files,
+            Move = move,
         };
     }
 
