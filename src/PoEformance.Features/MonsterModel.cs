@@ -179,6 +179,16 @@ public sealed record MonsterModel(
     public int Parts { get; init; }
 
     /// <summary>
+    /// The shader graphs the materials that were read name as their parent, distinct, in the order met.
+    /// </summary>
+    /// <remarks>
+    /// THE EVIDENCE FOR BLENDING, collected and not yet acted on: whether an additive or a
+    /// transparent material is told apart by its graph is what the first real effect shows - see
+    /// MaterialFile.Parents.
+    /// </remarks>
+    public IReadOnlyList<string> Shaders { get; init; } = [];
+
+    /// <summary>
     /// How many <c>.sm</c> files the body itself is, before anything worn over it.
     /// </summary>
     /// <remarks>
@@ -416,6 +426,7 @@ public static class MonsterModels
             Move = move,
             Bytes = tally.Bytes,
             Files = tally.Files,
+            Shaders = paints.Shaders,
         };
     }
 
@@ -515,6 +526,7 @@ public static class MonsterModels
             Textures = dress.Textures,
             Guessed = dress.Guessed,
             Move = move,
+            Shaders = paints.Shaders,
         };
     }
 
@@ -2214,6 +2226,27 @@ public static class MonsterModels
     {
         /// <summary>Material file by its path, with the selector taken off.</summary>
         public Dictionary<string, MaterialFile> Files { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>Every parent graph the read materials name, distinct. See MonsterModel.Shaders.</summary>
+        public IReadOnlyList<string> Shaders
+        {
+            get
+            {
+                var said = new List<string>();
+                foreach (MaterialFile file in Files.Values)
+                {
+                    foreach (string parent in file.Parents)
+                    {
+                        if (parent.Length > 0 && !said.Contains(parent, StringComparer.OrdinalIgnoreCase))
+                        {
+                            said.Add(parent);
+                        }
+                    }
+                }
+
+                return said;
+            }
+        }
 
         /// <summary>Decoded texture by its path, with null for one that would not read.</summary>
         public Dictionary<string, Mipmaps?> Skins { get; } = new(StringComparer.OrdinalIgnoreCase);

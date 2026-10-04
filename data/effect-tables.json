@@ -1,0 +1,409 @@
+{
+  "comment": "Column order of the tables the effect book reads, from poe-tool-dev/dat-schema (PoE2 entries). Offsets are NOT stored - they are arithmetic over the widths in DatColumns. THE JOIN: Projectiles carries its own AOFiles (an array - a projectile may have several art variants), Stuck_AOFile (an array) and Bounce_AOFile; MiscAnimated carries one AOFile; GroundEffects carries an AOFile array and names its type through GroundEffectTypesKey -> GroundEffectTypes.Id. The .ao each names is drawn by the same walk a monster's is. WHAT IS NOT VERIFIED: none of these row sizes has been checked against a running client. Each is checked against the FILE's own row size at runtime - LoadedTable.Agrees - and EffectVisuals.Say reports which way it went. Computed sizes: Projectiles 368, MiscAnimated 44, GroundEffects 235, GroundEffectTypes 64.",
+  "source": "poe-tool-dev/dat-schema, release latest (schema createdAt 2026-09-15), read 2026-10-04",
+  "tables": {
+    "Projectiles": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "AOFiles",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "LoopAnimationIds",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "ImpactAnimationIds",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "ProjectileSpeed",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "UseTargetLocation",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CollisionRadius",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "RandomizeVisualRotationOnSpawn",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_8",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "InheritsFrom",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "MiscAnimated",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "CollisionCandidateRadius",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "ApplyProjectileSpeedToAuxiliarySpeed",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "AuxiliarySpeedCannotBeBelowBase",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "Stuck_AOFile",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "Bounce_AOFile",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_16",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_17",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_18",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_19",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "MiscAnimatedFlash",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "MiscAnimatedArrowNova",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_22",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_23",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "VisualScaleMinPercent",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "VisualScaleMaxPercent",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "MiscEffectPackArtVariation",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "FizzleAnimationNames",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "InheritOwnerVisualScale",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "CollisionBehaviourFlags",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_30",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "MiscAnimatedBounce",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "MiscAnimatedImpact",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "DamageEffect1",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_34",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_35",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "DamageEffect2",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_37",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "BounceOverride",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_39",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_40",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_41",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_42",
+        "type": "bool",
+        "array": false
+      }
+    ],
+    "MiscAnimated": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "AOFile",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "PreloadGroupsKeys",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "EffectCategory",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_4",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "HASH32",
+        "type": "u32",
+        "array": false
+      }
+    ],
+    "GroundEffects": [
+      {
+        "name": "GroundEffectTypesKey",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_1",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_2",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "BuffVisual1",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_4",
+        "type": "f32",
+        "array": false
+      },
+      {
+        "name": "column_5",
+        "type": "i32",
+        "array": true
+      },
+      {
+        "name": "column_6",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "AOFile",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "column_8",
+        "type": "string",
+        "array": true
+      },
+      {
+        "name": "EndEffect",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "BuffVisual2",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "MiscObject1",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "MiscObject2",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_13",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_14",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_15",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_16",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_17",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "BuffVisual3",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_19",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_20",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_21",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_22",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "Animation",
+        "type": "foreignrow",
+        "array": false
+      }
+    ],
+    "GroundEffectTypes": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_1",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_2",
+        "type": "f32",
+        "array": false
+      },
+      {
+        "name": "Stat",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "BuffDefinition1",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "BuffDefinition2",
+        "type": "foreignrow",
+        "array": false
+      }
+    ]
+  }
+}

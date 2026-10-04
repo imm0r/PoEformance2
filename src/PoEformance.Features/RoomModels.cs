@@ -188,6 +188,7 @@ public static class RoomModels
             BodyMost = joined.Most,
             Parts = placed,
             Move = string.Join("; ", said),
+            Shaders = [.. models.Values.SelectMany(one => one.Shaders).Distinct(StringComparer.OrdinalIgnoreCase)],
         };
     }
 }

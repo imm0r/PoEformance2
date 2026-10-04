@@ -3162,6 +3162,21 @@ internal static class Program
                 overlay.Items = items;
             });
 
+            // AND THE EFFECT BOOK'S, on its own task for the same reason - four more .dat files.
+            _ = Task.Run(() =>
+            {
+                PoEformance.Features.EffectVisuals effects = PoEformance.Features.EffectVisuals.Read(
+                    installed,
+                    PoEformance.Features.QuestTableLayouts.Load(FindDataFile("effect-tables.json")));
+
+                foreach (string line in effects.Say)
+                {
+                    Console.WriteLine(line);
+                }
+
+                overlay.Effects = effects;
+            });
+
             // AND THE TILE BOOK'S LIST, which is a WALK of the index rather than a table: every .tdt
             // under Metadata/Terrain. The index spells its paths out once and drops them, and the
             // atlas's walk must stay the one that runs whenever the atlas is first drawn - it gathers
@@ -3181,6 +3196,7 @@ internal static class Program
         {
             // So the book says there is no install rather than waiting for a table that never comes.
             overlay.Items = PoEformance.Features.ItemVisuals.Read(null, null);
+            overlay.Effects = PoEformance.Features.EffectVisuals.Read(null, null);
         }
 
         overlay.Costs = costs;
@@ -3334,6 +3350,14 @@ internal static class Program
         // The area's ROOMS come from what it loaded - no tile reaches its room - and the preload
         // watch already holds that list, a new one per area.
         overlay.LoadedFiles = () => preload.All;
+        overlay.AttachEffectBook(
+            settings.EffectColumns,
+            settings.EffectRail,
+            readFile: installed is null ? null : installed.Read,
+            modelSize: settings.MonsterModelSize,
+            unpack: installed is null ? null : installed.Unpack,
+            columnWidths: settings.EffectColumnWidths,
+            panes: settings.EffectPanes);
         overlay.AttachTileBook(
             settings.TileColumns,
             settings.TileRail,

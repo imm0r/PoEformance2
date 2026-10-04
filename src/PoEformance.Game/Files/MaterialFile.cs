@@ -43,7 +43,19 @@ public sealed class MaterialFile
         Textures = [];
         Slots = new Dictionary<string, string>(StringComparer.Ordinal);
         Graphs = [];
+        Parents = [];
     }
+
+    /// <summary>
+    /// Each graph instance's <c>parent</c> - the shader graph it is an instance of - in file order.
+    /// </summary>
+    /// <remarks>
+    /// READ BECAUSE IT IS WHERE A MATERIAL WOULD SAY HOW IT BLENDS, and nothing else in the file is
+    /// known to. annalithic's <c>Mat.cs</c> reads the same member on every instance. Whether the
+    /// game's additive and transparent materials are told apart by it is what a real effect shows
+    /// first - the model pane prints these - and the renderer does not act on it until it has.
+    /// </remarks>
+    public IReadOnlyList<string> Parents { get; private init; }
 
     /// <summary>Every texture the file lists, in the order it lists them.</summary>
     public IReadOnlyList<MaterialTexture> Textures { get; private init; }
@@ -230,6 +242,7 @@ public sealed class MaterialFile
         var textures = new List<MaterialTexture>();
         var slots = new Dictionary<string, string>(StringComparer.Ordinal);
         var graphs = new List<IReadOnlyDictionary<string, string>>();
+        var parents = new List<string>();
 
         try
         {
@@ -243,7 +256,7 @@ public sealed class MaterialFile
                     CommentHandling = JsonCommentHandling.Skip,
                 });
 
-            Walk(ref reader, textures, slots, graphs);
+            Walk(ref reader, textures, slots, graphs, parents);
         }
         catch (JsonException)
         {
@@ -255,7 +268,7 @@ public sealed class MaterialFile
 
         return textures.Count == 0 && slots.Count == 0
             ? None
-            : new MaterialFile { Textures = textures, Slots = slots, Graphs = graphs };
+            : new MaterialFile { Textures = textures, Slots = slots, Graphs = graphs, Parents = parents };
     }
 
     /// <summary>The top-level object, taking the two members that name files.</summary>
@@ -263,7 +276,8 @@ public sealed class MaterialFile
         ref Utf8JsonReader reader,
         List<MaterialTexture> textures,
         Dictionary<string, string> slots,
-        List<IReadOnlyDictionary<string, string>> graphs)
+        List<IReadOnlyDictionary<string, string>> graphs,
+        List<string> parents)
     {
         if (!reader.Read() || reader.TokenType != JsonTokenType.StartObject)
         {
@@ -287,7 +301,7 @@ public sealed class MaterialFile
             if (reader.ValueTextEquals("graphinstances"u8))
             {
                 reader.Read();
-                Slotted(ref reader, slots, graphs);
+                Slotted(ref reader, slots, graphs, parents);
                 continue;
             }
 
@@ -359,7 +373,8 @@ public sealed class MaterialFile
     private static void Slotted(
         ref Utf8JsonReader reader,
         Dictionary<string, string> slots,
-        List<IReadOnlyDictionary<string, string>> graphs)
+        List<IReadOnlyDictionary<string, string>> graphs,
+        List<string> parents)
     {
         if (reader.TokenType != JsonTokenType.StartArray)
         {
@@ -380,6 +395,7 @@ public sealed class MaterialFile
             // no selector to go on. Every instance is kept, including an empty one, because
             // the number counts graphs and not graphs-that-had-something-in-them.
             var graph = new Dictionary<string, string>(StringComparer.Ordinal);
+            var named = string.Empty;
 
             while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
             {
@@ -389,6 +405,7 @@ public sealed class MaterialFile
                 }
 
                 bool wanted = reader.ValueTextEquals("custom_parameters"u8);
+                bool parent = reader.ValueTextEquals("parent"u8);
                 reader.Read();
 
                 if (wanted)
@@ -397,10 +414,17 @@ public sealed class MaterialFile
                     continue;
                 }
 
+                if (parent && reader.TokenType == JsonTokenType.String)
+                {
+                    named = reader.GetString() ?? string.Empty;
+                    continue;
+                }
+
                 reader.Skip();
             }
 
             graphs.Add(graph);
+            parents.Add(named);
             foreach ((string slot, string path) in graph)
             {
                 slots.TryAdd(slot, path);

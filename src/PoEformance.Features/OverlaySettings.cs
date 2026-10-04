@@ -173,6 +173,12 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("tilePanes")] IReadOnlyDictionary<string, double>? TilePanes = null,
     [property: JsonPropertyName("tileRail")] bool TileRail = true,
 
+    // And the effect book's, kept apart for the same reason. See EffectBookWindow.
+    [property: JsonPropertyName("effectColumns")] IReadOnlyList<string>? EffectColumns = null,
+    [property: JsonPropertyName("effectColumnWidths")] IReadOnlyDictionary<string, int>? EffectColumnWidths = null,
+    [property: JsonPropertyName("effectPanes")] IReadOnlyDictionary<string, double>? EffectPanes = null,
+    [property: JsonPropertyName("effectRail")] bool EffectRail = true,
+
     // The model pane's capture settings, which are what turn a monster into icon art: whether it
     // is drawn greyed the way the game's Inactive icons are, how much of the colour's mean that
     // grey keeps, and what is painted behind it. KEPT because the factor goes into the FILE the
