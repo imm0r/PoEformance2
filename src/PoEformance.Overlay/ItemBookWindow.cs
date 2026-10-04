@@ -12,21 +12,41 @@ namespace PoEformance.Overlay;
 /// The item reference book: every item the game has a 3D model for, and the model itself.
 /// </summary>
 /// <remarks>
-/// THE MONSTER BOOK'S LIST AND THE MONSTER BOOK'S PANE. The grid, the query grammar and the
-/// pane split are the same parts; the model is drawn by a <see cref="MonsterPortrait"/> of its own,
-/// because an item's .ao is the same file format as a monster's and the portrait only ever needed
-/// the .ao paths - see MonsterModels.Of. The item is handed to it as a variety carrying nothing but
-/// a name and that one path, which is everything the portrait reads off one.
+/// THE MONSTER BOOK'S PARTS. The grid, the query grammar, the facet rail, the column chooser and
+/// the pane splits behave as they do there; the model is drawn by a <see cref="MonsterPortrait"/>
+/// of its own, because an item's .ao is the same file format as a monster's and the portrait only
+/// ever needed the .ao paths - see MonsterModels.OfFiles. The item is handed to it as a variety
+/// carrying nothing but a name and that one path, which is everything the portrait reads off one.
 ///
-/// NO FACET RAIL AND NO COLUMN CHOOSER, yet. Six columns fit, and the questions worth a rail - which
-/// class, base or unique - are one word in the query. Both are the monster book's and can follow
-/// when the list grows columns worth choosing between.
+/// THE LAYOUT IS WRITTEN DOWN like the monster book's - which columns, how wide, where the panes
+/// split and whether the rail is open - under settings of its own, because the two tables have
+/// different columns.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class ItemBookWindow(Func<ItemVisuals> table)
 {
     /// <summary>How long a query may be. The monster book's limit, for the same reason.</summary>
     private const uint QueryLength = 256;
+
+    /// <summary>How many of a field's values the rail offers. The monster book's dozen.</summary>
+    private const int MostFacets = 12;
+
+    /// <summary>
+    /// The fields the rail offers, and what it calls them.
+    /// </summary>
+    /// <remarks>
+    /// THE TWO WITH A HANDFUL OF ANSWERS. An item has one class and is base or unique, and those are
+    /// the questions a click answers; names and file names have thousands of values and are typed.
+    /// </remarks>
+    private static readonly (string Label, string Field)[] Rails =
+    [
+        ("Classes", "class"),
+        ("Kind", "kind"),
+    ];
+
+    /// <summary>What each boundary is known by - to ImGui, and in the settings file.</summary>
+    private const string RailPane = "rail";
+    private const string ListPane = "list";
 
     /// <summary>What the box above the book is.</summary>
     private const string Caption = "Search for any item with a model";
@@ -40,8 +60,12 @@ public sealed class ItemBookWindow(Func<ItemVisuals> table)
     /// <summary>A unique's row is in the game's own unique colour.</summary>
     private static readonly Vector4 UniqueInk = OverlayInk.Rarity(ItemRarity.Unique);
 
-    private readonly PaneSplit _split = new(0.42f, "item-list");
+    private readonly PaneSplit _rail = new(0.18f, RailPane);
+    private readonly PaneSplit _split = new(0.45f, ListPane);
     private readonly DataGrid _grid = new();
+
+    /// <summary>What each of the rail's fields holds within the rows that are left.</summary>
+    private readonly Dictionary<string, List<Facet>> _facets = new(StringComparer.Ordinal);
 
     private readonly List<int> _shown = [];
     private readonly List<int> _columns = [];
@@ -50,10 +74,19 @@ public sealed class ItemBookWindow(Func<ItemVisuals> table)
     private ItemVisuals _of = ItemVisuals.Empty;
     private ItemBook _page = ItemBook.Empty;
 
+    /// <summary>Which columns are on, one per column of the store.</summary>
+    private bool[] _visible = [];
+
+    /// <summary>The columns somebody chose, by name, or null for the book's own starting set.</summary>
+    private IReadOnlyList<string>? _wanted;
+
+    private bool _railOpen = true;
+
     private string _query = string.Empty;
     private QueryTerm? _term;
     private string _error = string.Empty;
     private bool _refilter = true;
+    private RowSet? _matched;
 
     private string _chosen = string.Empty;
     private int _chosenRow = -1;
@@ -75,6 +108,58 @@ public sealed class ItemBookWindow(Func<ItemVisuals> table)
 
     /// <summary>Draws the item's model, or null where the overlay did not wire one up.</summary>
     public MonsterPortrait? Model { get; set; }
+
+    /// <summary>Called when anything the settings file keeps has moved.</summary>
+    public Action? Changed { get; set; }
+
+    /// <summary>The columns that are on, by name, in the store's order - what the settings keep.</summary>
+    public IReadOnlyList<string> Columns => [.. _columns.Select(one => _page.Store.Columns[one].Name)];
+
+    /// <summary>How wide each dragged column is, by name.</summary>
+    public IReadOnlyDictionary<string, int> ColumnWidths => _grid.Widths;
+
+    /// <summary>Where the two boundaries sit.</summary>
+    public IReadOnlyDictionary<string, double> Panes => new Dictionary<string, double>(StringComparer.Ordinal)
+    {
+        [RailPane] = _rail.Share,
+        [ListPane] = _split.Share,
+    };
+
+    /// <summary>Whether the facet rail has a pane of its own.</summary>
+    public bool RailOpen => _railOpen;
+
+    /// <summary>Takes what the settings file said about the layout, and wires the writes back.</summary>
+    public void Show(
+        IReadOnlyList<string>? columns,
+        bool? rail = null,
+        IReadOnlyDictionary<string, int>? widths = null,
+        IReadOnlyDictionary<string, double>? panes = null)
+    {
+        _wanted = columns is { Count: > 0 } ? columns : null;
+        _railOpen = rail ?? _railOpen;
+        _grid.Restore(widths);
+
+        if (panes is not null)
+        {
+            if (panes.TryGetValue(RailPane, out double railShare))
+            {
+                _rail.Restore(railShare);
+            }
+
+            if (panes.TryGetValue(ListPane, out double listShare))
+            {
+                _split.Restore(listShare);
+            }
+        }
+
+        _grid.Settled = Moved;
+        _rail.Settled = Moved;
+        _split.Settled = Moved;
+
+        Layout();
+    }
+
+    private void Moved() => Changed?.Invoke();
 
     /// <summary>The tab's contents, in the monospaced face the monster book is drawn in.</summary>
     public void DrawTab()
@@ -107,6 +192,19 @@ public sealed class ItemBookWindow(Func<ItemVisuals> table)
         Filter();
 
         float tall = MathF.Max(1f, ImGui.GetContentRegionAvail().Y);
+
+        if (_railOpen)
+        {
+            float rail = _rail.Left();
+            if (ImGui.BeginChild("##item-rail", new Vector2(rail, tall), ImGuiChildFlags.Borders))
+            {
+                Rail();
+            }
+
+            ImGui.EndChild();
+
+            _rail.Bar(tall);
+        }
 
         float left = _split.Left();
         if (ImGui.BeginChild("##item-list", new Vector2(left, tall), ImGuiChildFlags.Borders))
@@ -144,25 +242,48 @@ public sealed class ItemBookWindow(Func<ItemVisuals> table)
         _page = ItemBook.Of(all);
         _chosenRow = _page.Row(_chosen);
         _ranges.Clear();
+        Layout();
+    }
 
-        _columns.Clear();
-        for (var at = 0; at < _page.Store.Columns.Length; at++)
+    /// <summary>Which columns are on: what was chosen by name, or the book's own starting set.</summary>
+    private void Layout()
+    {
+        DataColumn[] all = _page.Store.Columns;
+        _visible = new bool[all.Length];
+
+        for (var at = 0; at < all.Length; at++)
         {
-            _columns.Add(at);
+            _visible[at] = _wanted is null ? _page.Shown[at] : _wanted.Contains(all[at].Name);
+        }
+
+        // THE FIRST COLUMN IS NOT OPTIONAL: it carries the row's selectable.
+        if (all.Length > 0)
+        {
+            _visible[0] = true;
+        }
+
+        Rebuild();
+        _refilter = true;
+        Filter();
+    }
+
+    private void Rebuild()
+    {
+        _columns.Clear();
+        for (var at = 0; at < _visible.Length; at++)
+        {
+            if (_visible[at])
+            {
+                _columns.Add(at);
+            }
         }
 
         _grid.Resort();
-        _refilter = true;
-        Filter();
     }
 
     private void Header(ItemVisuals all)
     {
         ImGui.TextDisabled(Caption);
-
-        string count = $"{_shown.Count.ToString(CultureInfo.InvariantCulture)} of "
-            + $"{all.Count.ToString(CultureInfo.InvariantCulture)} items";
-        float reserve = ImGui.CalcTextSize(count).X + ImGui.GetStyle().ItemSpacing.X;
 
         bool wrong = _error.Length > 0;
         if (wrong)
@@ -170,7 +291,7 @@ public sealed class ItemBookWindow(Func<ItemVisuals> table)
             ImGui.PushStyleColor(ImGuiCol.FrameBg, Wrong);
         }
 
-        if (OverlayLayout.Search("###item-find", string.Empty, ref _query, QueryLength, reserve))
+        if (OverlayLayout.Search("###item-find", string.Empty, ref _query, QueryLength))
         {
             _refilter = true;
         }
@@ -188,8 +309,45 @@ public sealed class ItemBookWindow(Func<ItemVisuals> table)
             ImGui.SetTooltip(wrong ? _error : Grammar);
         }
 
+        if (ImGui.Button("Facets"))
+        {
+            _railOpen = !_railOpen;
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                _railOpen
+                    ? "Fold the facet rail away. Nothing is lost - what it clicked is in the query."
+                    : "Show the facet rail: what the rows that are left are made of.");
+        }
+
         ImGui.SameLine();
-        ImGui.TextDisabled(count);
+        if (ImGui.Button("Columns"))
+        {
+            ImGui.OpenPopup("##item-columns");
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                $"Which of the {_page.Store.Columns.Length} columns the table shows."
+                + " Drag across a column's histogram to filter by it; right-click one to undo that.");
+        }
+
+        Chooser();
+
+        ImGui.SameLine();
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextDisabled(
+            $"{_shown.Count.ToString(CultureInfo.InvariantCulture)} of "
+            + $"{all.Count.ToString(CultureInfo.InvariantCulture)} items");
+
+        if (wrong)
+        {
+            ImGui.TextColored(OverlayInk.Warn, ImGuiText.Escape(_error));
+        }
     }
 
     private void Filter()
@@ -219,6 +377,7 @@ public sealed class ItemBookWindow(Func<ItemVisuals> table)
             return;
         }
 
+        _matched = rows;
         rows.CopyTo(_shown);
         _grid.Resort();
 
@@ -230,6 +389,171 @@ public sealed class ItemBookWindow(Func<ItemVisuals> table)
             {
                 _ranges.Add(new ColumnRange(at, range.Least, range.Most));
             }
+        }
+
+        Counted();
+    }
+
+    /// <summary>
+    /// Counts every value of every field the rail offers, against the rows that are left.
+    /// </summary>
+    /// <remarks>
+    /// ONLY WHEN THE FILTER MOVES, never per frame, and into lists that are kept - a keystroke
+    /// re-counts rather than re-allocates.
+    /// </remarks>
+    private void Counted()
+    {
+        if (_matched is null)
+        {
+            return;
+        }
+
+        foreach ((_, string field) in Rails)
+        {
+            if (!_facets.TryGetValue(field, out List<Facet>? into))
+            {
+                into = [];
+                _facets[field] = into;
+            }
+
+            _page.Facets(_matched, field, into, MostFacets);
+        }
+    }
+
+    /// <summary>
+    /// The facet rail: what the rows that are left are made of, and a click to narrow them.
+    /// </summary>
+    /// <remarks>
+    /// THE MONSTER BOOK'S RAIL. Nothing is stored here - a click writes the value into the query
+    /// and the tick beside it is read back out of the query, so editing the text by hand moves the
+    /// ticks. A zero is shown dim rather than hidden.
+    /// </remarks>
+    private void Rail()
+    {
+        if (_matched is null)
+        {
+            ImGui.TextDisabled("Nothing counted yet.");
+            return;
+        }
+
+        foreach ((string label, string field) in Rails)
+        {
+            if (!_facets.TryGetValue(field, out List<Facet>? facets) || facets.Count == 0)
+            {
+                continue;
+            }
+
+            if (!OverlayLayout.Subsection(label, openByDefault: true))
+            {
+                continue;
+            }
+
+            ImGui.Indent();
+
+            try
+            {
+                foreach (Facet facet in facets)
+                {
+                    Value(field, facet);
+                }
+            }
+            finally
+            {
+                ImGui.Unindent();
+            }
+        }
+    }
+
+    private void Value(string field, Facet facet)
+    {
+        bool on = ColumnQuery.Holds(_term, field, facet.Value);
+        string count = facet.Count.ToString(CultureInfo.InvariantCulture);
+
+        float room = ImGui.GetContentRegionAvail().X;
+        float wide = ImGui.CalcTextSize(count).X + ImGui.GetStyle().ItemSpacing.X;
+        bool quiet = facet.Count == 0 && !on;
+
+        // BY VALUE AND NOT BY POSITION: the rail is re-ordered on every keystroke.
+        ImGui.PushID(facet.Value);
+
+        try
+        {
+            if (quiet)
+            {
+                ImGui.PushStyleColor(ImGuiCol.Text, OverlayInk.Quiet);
+            }
+
+            if (ImGui.Selectable(
+                    facet.Value,
+                    on,
+                    ImGuiSelectableFlags.None,
+                    new Vector2(MathF.Max(1f, room - wide), 0f)))
+            {
+                _query = ColumnQuery.Toggle(_query, field, facet.Value);
+                _refilter = true;
+            }
+
+            if (quiet)
+            {
+                ImGui.PopStyleColor();
+            }
+
+            ImGui.SameLine();
+            ImGui.TextDisabled(count);
+        }
+        finally
+        {
+            ImGui.PopID();
+        }
+    }
+
+    /// <summary>Which columns show, grouped the way somebody would look for them.</summary>
+    private void Chooser()
+    {
+        if (!ImGui.BeginPopup("##item-columns"))
+        {
+            return;
+        }
+
+        try
+        {
+            DataColumn[] all = _page.Store.Columns;
+            string group = string.Empty;
+
+            for (var at = 0; at < all.Length; at++)
+            {
+                // The book lays its columns out group by group, so a heading is wherever it changes.
+                if (!string.Equals(_page.Groups[at], group, StringComparison.Ordinal))
+                {
+                    if (group.Length > 0)
+                    {
+                        ImGui.Separator();
+                    }
+
+                    group = _page.Groups[at];
+                    ImGui.TextDisabled(group);
+                }
+
+                // THE FIRST COLUMN IS SHOWN AS FIXED rather than as a checkbox that refuses to clear.
+                if (at == 0)
+                {
+                    ImGui.TextDisabled($"{all[at].Name} (always)");
+                    continue;
+                }
+
+                bool on = _visible[at];
+                if (ImGui.Checkbox(all[at].Name, ref on))
+                {
+                    _visible[at] = on;
+                    Rebuild();
+                    _wanted = Columns;
+                    Changed?.Invoke();
+                }
+            }
+        }
+        finally
+        {
+            ImGui.EndPopup();
         }
     }
 

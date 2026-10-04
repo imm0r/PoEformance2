@@ -502,6 +502,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 ? panes
                 : basis.MonsterPanes,
             MonsterRail = _monsterBook?.RailOpen ?? basis.MonsterRail,
+            ItemColumns = _itemBook?.Columns is { Count: > 0 } itemColumns
+                ? itemColumns
+                : basis.ItemColumns,
+            ItemColumnWidths = _itemBook?.ColumnWidths is { Count: > 0 } itemWidths
+                ? itemWidths
+                : basis.ItemColumnWidths,
+            ItemPanes = _itemBook?.Panes is { Count: > 0 } itemPanes
+                ? itemPanes
+                : basis.ItemPanes,
+            ItemRail = _itemBook?.RailOpen ?? basis.ItemRail,
             MonsterModel = _monsterBook?.ModelOpen ?? basis.MonsterModel,
             ModelGrey = _monsterBook?.Model?.Grey ?? basis.ModelGrey,
             ModelGreyFactor = _monsterBook?.Model?.GreyFactor ?? basis.ModelGreyFactor,
@@ -2430,16 +2440,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// owns those settings, and two panes writing one setting would leave it to whichever moved last.
     /// </remarks>
     public void AttachItemBook(
+        IReadOnlyList<string>? columns = null,
+        bool rail = true,
         bool visible = false,
         Func<string, byte[]?>? readFile = null,
         int modelSize = PictureLadder.Usual,
-        Func<ReadOnlyMemory<byte>, int, byte[]?>? unpack = null)
+        Func<ReadOnlyMemory<byte>, int, byte[]?>? unpack = null,
+        IReadOnlyDictionary<string, int>? columnWidths = null,
+        IReadOnlyDictionary<string, double>? panes = null)
     {
         var window = new ItemBookWindow(() => Items)
         {
+            Changed = () => SettingsChanged?.Invoke(),
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack),
         };
 
+        window.Show(columns, rail, columnWidths, panes);
         Capture(window.Model);
         _itemBook = window;
 

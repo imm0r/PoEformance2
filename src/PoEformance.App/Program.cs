@@ -3309,9 +3309,13 @@ internal static class Program
             columnWidths: settings.MonsterColumnWidths,
             panes: settings.MonsterPanes);
         overlay.AttachItemBook(
+            settings.ItemColumns,
+            settings.ItemRail,
             readFile: installed is null ? null : installed.Read,
             modelSize: settings.MonsterModelSize,
-            unpack: installed is null ? null : installed.Unpack);
+            unpack: installed is null ? null : installed.Unpack,
+            columnWidths: settings.ItemColumnWidths,
+            panes: settings.ItemPanes);
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read

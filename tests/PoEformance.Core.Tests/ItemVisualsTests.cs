@@ -227,6 +227,47 @@ public class ItemVisualsTests
         Assert.NotEmpty(why);
     }
 
+    [Fact]
+    public void THERAILCountsEachClassAndKindAgainstTheRowsThatAreLeft()
+    {
+        QuestTableLayouts layouts = Layouts();
+        ItemBook book = ItemBook.Of(ItemVisuals.Read(Install(layouts), layouts));
+
+        RowSet? all = book.Matching(ColumnQuery.Parse(string.Empty).Term, out _);
+        Assert.NotNull(all);
+
+        var kinds = new List<Facet>();
+        book.Facets(all!, "kind", kinds);
+        Assert.Equal([new Facet("base", 2), new Facet("unique", 1)], kinds);
+
+        // NARROWED, AND A ZERO KEPT: with only uniques left there are no bows, and that is said.
+        RowSet? uniques = book.Matching(ColumnQuery.Parse("kind:unique").Term, out _);
+        var classes = new List<Facet>();
+        book.Facets(uniques!, "class", classes);
+        Assert.All(classes, one => Assert.Equal(0, one.Count));
+        Assert.Contains(new Facet("Bows", 0), classes);
+    }
+
+    [Fact]
+    public void THECHOOSEROffersEveryColumnUnderAHeadingAndStartsWithAFew()
+    {
+        QuestTableLayouts layouts = Layouts();
+        ItemBook book = ItemBook.Of(ItemVisuals.Read(Install(layouts), layouts));
+        DataColumn[] columns = book.Store.Columns;
+
+        Assert.Equal(columns.Length, book.Groups.Length);
+        Assert.Equal(columns.Length, book.Shown.Length);
+        Assert.True(book.Shown[0]);
+        Assert.Contains(false, book.Shown);
+
+        string[] off = [.. columns.Where((_, at) => !book.Shown[at]).Select(one => one.Name)];
+        Assert.Contains("art", off);
+        Assert.Contains("ao2", off);
+
+        // AND A COLUMN THAT STARTS OFF IS STILL A FIELD A QUERY CAN NAME.
+        Assert.Equal(["Redbeak"], Names(book, "ao2:sheathed"));
+    }
+
     private static string[] Names(ItemBook book, string query)
     {
         QueryResult parsed = ColumnQuery.Parse(query);
