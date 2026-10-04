@@ -249,6 +249,36 @@ public class ItemVisualsTests
     }
 
     [Fact]
+    public void ACLICKOnAClassLeavesTheRowsTheRailCountedAndAnotherTakesItBack()
+    {
+        // THE CLASSES HAVE SPACES IN THEM - "One Hand Swords" - which is what made the item book
+        // the one that showed the rail writing a value the grammar could not hold as one.
+        QuestTableLayouts layouts = Layouts();
+        ItemBook book = ItemBook.Of(ItemVisuals.Read(Install(layouts), layouts));
+
+        RowSet all = Assert.IsType<RowSet>(book.Matching(ColumnQuery.Parse(string.Empty).Term, out _));
+        var classes = new List<Facet>();
+        book.Facets(all, "class", classes);
+        Assert.Contains(classes, one => one.Value == "One Hand Swords");
+
+        foreach (Facet facet in classes)
+        {
+            string clicked = ColumnQuery.Toggle(string.Empty, "class", facet.Value);
+            QueryResult parsed = ColumnQuery.Parse(clicked);
+            Assert.True(parsed.Ok, $"'{clicked}' would not read back: {parsed.Error}");
+            Assert.True(ColumnQuery.Holds(parsed.Term, "class", facet.Value), $"'{clicked}' does not tick {facet.Value}");
+
+            RowSet after = Assert.IsType<RowSet>(book.Matching(parsed.Term, out string why));
+            Assert.Equal(string.Empty, why);
+            Assert.Equal(facet.Count, after.Count);
+
+            Assert.Equal(string.Empty, ColumnQuery.Toggle(clicked, "class", facet.Value));
+        }
+
+        Assert.Equal(["Shortsword"], Names(book, "class:\"One Hand Swords\""));
+    }
+
+    [Fact]
     public void THECHOOSEROffersEveryColumnUnderAHeadingAndStartsWithAFew()
     {
         QuestTableLayouts layouts = Layouts();

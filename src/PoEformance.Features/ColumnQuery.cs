@@ -37,6 +37,18 @@ public sealed record QueryTerm
     /// <summary>The word it is looking for, on <see cref="QueryKind.Word"/> and Value.</summary>
     public string Text { get; init; } = string.Empty;
 
+    /// <summary>
+    /// Whether a <see cref="QueryKind.Value"/> has to be the whole of what the field holds.
+    /// </summary>
+    /// <remarks>
+    /// WRITTEN AS QUOTES - <c>tag:"beast"</c> - and this is what a click in the facet rail writes.
+    /// The rail counted the rows holding exactly that value, so the term it leaves behind has to
+    /// match exactly that value; bare <c>tag:beast</c> is a substring and would take in
+    /// amphibian_beast as well. The quotes also carry a value with a space in it, which an item
+    /// class - "One Hand Swords" - needs and a bare word cannot hold.
+    /// </remarks>
+    public bool Exact { get; init; }
+
     /// <summary>The bottom of the range, on <see cref="QueryKind.Number"/>.</summary>
     public double Least { get; init; }
 
@@ -97,8 +109,11 @@ public interface IQuerySource
     /// <summary>The rows whose searchable text holds this word.</summary>
     void Words(string word, RowSet into);
 
-    /// <summary>The rows where this field holds this value, or false where there is no such field.</summary>
-    bool Value(string field, string value, RowSet into);
+    /// <summary>
+    /// The rows where this field holds this value - the whole of it where <paramref name="exact"/>,
+    /// else anywhere in it - or false where there is no such field.
+    /// </summary>
+    bool Value(string field, string value, bool exact, RowSet into);
 
     /// <summary>The rows where this field is in this range, or false where there is no such field.</summary>
     bool Number(string field, double least, double most, RowSet into);
@@ -122,7 +137,8 @@ public interface IQuerySource
 ///     or         := and ( ("or" | "||") and )*
 ///     and        := term ( ("and" | "&amp;&amp;")? term )*      -- juxtaposition means and
 ///     term       := ("not" | "!") term | "(" or ")" | predicate
-///     predicate  := field ":" value                    -- tag:undead, skill:fire
+///     predicate  := field ":" value                    -- tag:undead, skill:fire (anywhere in the value)
+///                 | field ":" '"' text '"'               -- tag:"beast", class:"One Hand Swords" (the whole value)
 ///                 | field compare number               -- life &gt; 120
 ///                 | field number ".." number           -- life 120..260, what a drag writes
 ///                 | word                               -- free text, as it always was
@@ -204,7 +220,8 @@ public static class ColumnQuery
         }
         else
         {
-            terms.Add(new QueryTerm { Kind = QueryKind.Value, Field = key, Text = value });
+            // EXACT, because the rail counted exactly this value - see QueryTerm.Exact.
+            terms.Add(new QueryTerm { Kind = QueryKind.Value, Field = key, Text = value, Exact = true });
         }
 
         return Rebuild(terms);
@@ -250,7 +267,15 @@ public static class ColumnQuery
         return Rebuild(terms);
     }
 
-    /// <summary>Whether a term sitting at the top of the query says exactly this.</summary>
+    /// <summary>
+    /// Whether a term sitting at the top of the query names this field and value.
+    /// </summary>
+    /// <remarks>
+    /// QUOTED OR NOT. The tick in the rail answers "is this value in the box", and a value somebody
+    /// typed bare is in the box as surely as one a click put there in quotes - so a hand-typed
+    /// <c>kind:unique</c> ticks "unique", and clicking it again takes that term out rather than
+    /// adding a second one beside it.
+    /// </remarks>
     public static bool Holds(QueryTerm? term, string field, string value)
     {
         string key = Field(field);
@@ -344,7 +369,7 @@ public static class ColumnQuery
 
             case QueryKind.Value:
                 into.None();
-                if (!source.Value(term.Field, term.Text, into))
+                if (!source.Value(term.Field, term.Text, term.Exact, into))
                 {
                     error = $"There is no column called '{term.Field}'.";
                     return false;
@@ -466,7 +491,16 @@ public static class ColumnQuery
                 return;
 
             case QueryKind.Value:
-                text.Append(term.Field).Append(':').Append(term.Text);
+                text.Append(term.Field).Append(':');
+                if (term.Exact)
+                {
+                    text.Append('"').Append(term.Text).Append('"');
+                }
+                else
+                {
+                    text.Append(term.Text);
+                }
+
                 return;
 
             case QueryKind.Number:
@@ -552,6 +586,9 @@ public static class ColumnQuery
 
     private sealed class Parser(string text)
     {
+        /// <summary>What wraps an exact value. See <see cref="QueryTerm.Exact"/>.</summary>
+        private const char Quote = '"';
+
         private readonly string _text = text;
         private int _at;
 
@@ -687,6 +724,27 @@ public static class ColumnQuery
             if (_at < _text.Length && _text[_at] == ':')
             {
                 _at++;
+                Space();
+
+                // QUOTED IS EXACT, and may hold anything but a quote - a space included, which is
+                // what lets "One Hand Swords" be one value rather than a value and two words.
+                if (_at < _text.Length && _text[_at] == Quote)
+                {
+                    int open = _at;
+                    int close = _text.IndexOf(Quote, open + 1);
+                    if (close < 0)
+                    {
+                        return QueryResult.Failure($"'{word}:' is missing its closing quote.", _text.Length + 1);
+                    }
+
+                    _at = close + 1;
+                    string quoted = _text[(open + 1)..close].Trim();
+                    return quoted.Length == 0
+                        ? QueryResult.Failure($"'{word}:' has nothing between its quotes.", open + 1)
+                        : QueryResult.Success(
+                            new QueryTerm { Kind = QueryKind.Value, Field = word, Text = quoted, Exact = true });
+                }
+
                 string value = Name();
                 return value.Length == 0
                     ? QueryResult.Failure($"'{word}:' has nothing after it.", _at + 1)

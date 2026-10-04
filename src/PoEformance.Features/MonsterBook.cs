@@ -27,7 +27,7 @@ namespace PoEformance.Features;
 /// background walk well after start-up - which is why <see cref="Of"/> takes them and why the
 /// caller rebuilds when they change.
 /// </remarks>
-public sealed class MonsterBook : IQuerySource
+public sealed class MonsterBook : ColumnBook
 {
     /// <summary>The headings the column chooser groups the columns under.</summary>
     private const string Named = "What it is";
@@ -35,11 +35,6 @@ public sealed class MonsterBook : IQuerySource
     private const string Defence = "Defence";
     private const string Reach = "Reach";
     private const string Carries = "What it carries";
-
-    private readonly string[] _find;
-    private readonly Dictionary<string, int> _rows;
-    private readonly Dictionary<string, Held> _held;
-    private readonly Dictionary<string, int> _numbers;
 
     private MonsterBook(
         ColumnStore store,
@@ -51,58 +46,17 @@ public sealed class MonsterBook : IQuerySource
         bool[] shown,
         Dictionary<string, Held> held,
         Dictionary<string, int> numbers)
+        : base(store, paths, find, rows, groups, shown, held, numbers)
     {
-        Store = store;
-        Paths = paths;
         Boss = boss;
-        Groups = groups;
-        Shown = shown;
-        _find = find;
-        _rows = rows;
-        _held = held;
-        _numbers = numbers;
-
-        Fields = [.. held.Keys.Order(StringComparer.Ordinal), .. numbers.Keys.Order(StringComparer.Ordinal)];
     }
 
     /// <summary>A book with no monsters in it.</summary>
     public static MonsterBook Empty { get; } = new(
         ColumnStore.Empty, [], [], [], [], [], [], [], []);
 
-    /// <summary>
-    /// Every field a query may name, for whatever offers them to somebody typing.
-    /// </summary>
-    /// <remarks>
-    /// SPELT THE WAY A QUERY SPELLS THEM - lower case, no spaces - which is not always how the
-    /// column header says it: a column called "atk spd" is asked for as "atkspd", because a space
-    /// separates two terms and always will.
-    /// </remarks>
-    public IReadOnlyList<string> Fields { get; }
-
-    /// <summary>The columns, in the order they are drawn.</summary>
-    public ColumnStore Store { get; }
-
-    /// <summary>Each row's metadata path - the table's own key, and what an entity carries.</summary>
-    public string[] Paths { get; }
-
     /// <summary>Which rows the game gives the boss health bar to. True on 363 rows of the export.</summary>
     public bool[] Boss { get; }
-
-    /// <summary>Which heading each column is offered under, for the chooser. One per column.</summary>
-    public string[] Groups { get; }
-
-    /// <summary>
-    /// Which columns a table starts with, before anybody has chosen. One per column.
-    /// </summary>
-    /// <remarks>
-    /// THE SIX THE WINDOW ALWAYS HAD. Twenty-nine columns are available and a table that opened
-    /// with all of them would be unreadable and would answer nothing - the point of the chooser is
-    /// that somebody adds the two they are asking about today, not that everything is on at once.
-    /// </remarks>
-    public bool[] Shown { get; }
-
-    /// <summary>How many monsters it holds.</summary>
-    public int Count => Paths.Length;
 
     /// <summary>
     /// How the modifier lines in this table divide up between worded and not.
@@ -307,28 +261,9 @@ public sealed class MonsterBook : IQuerySource
 
         var numbers = new Dictionary<string, int>(StringComparer.Ordinal);
 
-        // EVERY COLUMN BECOMES A FIELD, off the finished store rather than out of a second list to
-        // keep in step: a column of words is something to match, a column of numbers is something
-        // to compare, and a column added next year is both without anybody remembering to say so.
-        for (var column = 0; column < store.Columns.Length; column++)
-        {
-            DataColumn one = store.Columns[column];
-            string key = ColumnQuery.Field(one.Name);
-
-            if (one.Number.Length > 0)
-            {
-                numbers[key] = column;
-                continue;
-            }
-
-            var gather = new Gather(count);
-            for (var row = 0; row < count; row++)
-            {
-                gather.Add(row, one.Text[row]);
-            }
-
-            held[key] = gather.Done();
-        }
+        // EVERY COLUMN BECOMES A FIELD as well - words to match, numbers to compare - and the
+        // three multi-valued ones above are kept as they are: see ColumnBook.Index.
+        Index(store, held, numbers);
 
         return new MonsterBook(
             store,
@@ -345,143 +280,8 @@ public sealed class MonsterBook : IQuerySource
         };
     }
 
-    /// <summary>How many rows there are. What <see cref="IQuerySource"/> means by it.</summary>
-    int IQuerySource.Rows => Count;
-
-    /// <summary>The rows whose searchable text holds this word.</summary>
-    public void Words(string word, RowSet into)
-    {
-        ArgumentNullException.ThrowIfNull(into);
-
-        string looking = (word ?? string.Empty).ToLowerInvariant();
-        if (looking.Length == 0)
-        {
-            into.All();
-            return;
-        }
-
-        for (var row = 0; row < _find.Length; row++)
-        {
-            if (_find[row].Contains(looking, StringComparison.Ordinal))
-            {
-                into.Add(row);
-            }
-        }
-    }
-
     /// <summary>
-    /// The rows where a field holds a value, or false where there is no such field.
-    /// </summary>
-    /// <remarks>
-    /// MATCHED AS A SUBSTRING AND NOT EXACTLY, which is a decision about who is typing. The values
-    /// in these fields are the game's own ids - MeleeAtAnimationSpeed, MonsterAttackBlock30Bypass15
-    /// - and nobody knows them by heart; "skill:fire" finding every skill with fire in its name is
-    /// the useful reading, and the facet rail is where an exact value gets clicked rather than
-    /// typed. Several values matching is a union: they are all "this field holding that".
-    /// </remarks>
-    public bool Value(string field, string value, RowSet into)
-    {
-        ArgumentNullException.ThrowIfNull(into);
-
-        if (!_held.TryGetValue(ColumnQuery.Field(field ?? string.Empty), out Held? held))
-        {
-            return false;
-        }
-
-        string looking = (value ?? string.Empty).ToLowerInvariant();
-
-        for (var at = 0; at < held.Lower.Length; at++)
-        {
-            if (held.Lower[at].Contains(looking, StringComparison.Ordinal))
-            {
-                into.Or(held.Rows[at]);
-            }
-        }
-
-        return true;
-    }
-
-    /// <summary>The rows where a field's number is in a range, or false where there is none.</summary>
-    public bool Number(string field, double least, double most, RowSet into)
-    {
-        ArgumentNullException.ThrowIfNull(into);
-
-        if (!_numbers.TryGetValue(ColumnQuery.Field(field ?? string.Empty), out int column))
-        {
-            return false;
-        }
-
-        double[] numbers = Store.Columns[column].Number;
-        for (var row = 0; row < numbers.Length; row++)
-        {
-            if (numbers[row] >= least && numbers[row] <= most)
-            {
-                into.Add(row);
-            }
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// The rows a query matches.
-    /// </summary>
-    /// <remarks>
-    /// A SET PER CALL, which is 344 bytes over this table and is the simple thing: a keystroke makes
-    /// one, counts the facets against it and drops it. What must not be made per call is one per
-    /// facet VALUE, and that is what <see cref="RowSet.CountAnd"/> is for.
-    /// </remarks>
-    /// <returns>Null where the query names something this table has not got, and says what.</returns>
-    public RowSet? Matching(QueryTerm? query, out string error)
-    {
-        var rows = new RowSet(Count);
-        return ColumnQuery.Run(query, this, rows, out error) ? rows : null;
-    }
-
-    /// <summary>
-    /// What a field holds within a set of rows, and how many rows each of its values covers.
-    /// </summary>
-    /// <remarks>
-    /// COUNTED AGAINST THE WHOLE CURRENT FILTER rather than against everything except this field's
-    /// own part of it. The two readings differ: the other one lets somebody pick several values of
-    /// one field as alternatives, and this one reads every click as a further narrowing. This is the
-    /// one that matches the grammar - two terms side by side mean BOTH - and a rail that narrowed
-    /// while the text it writes widened would be two filters wearing one coat.
-    ///
-    /// SO A ZERO IS WORTH SHOWING, dim. "There are no casters left in this set" is an answer, and a
-    /// rail that hides what it cannot offer makes it look like the field does not exist.
-    /// </remarks>
-    public void Facets(RowSet within, string field, List<Facet> into, int most = 0)
-    {
-        ArgumentNullException.ThrowIfNull(within);
-        ArgumentNullException.ThrowIfNull(into);
-        into.Clear();
-
-        if (!_held.TryGetValue(ColumnQuery.Field(field ?? string.Empty), out Held? held))
-        {
-            return;
-        }
-
-        for (var at = 0; at < held.Values.Length; at++)
-        {
-            into.Add(new Facet(held.Values[at], within.CountAnd(held.Rows[at])));
-        }
-
-        // MOST FIRST, because a rail shows a dozen of the five thousand skills and the useful dozen
-        // is the one the rows in front of somebody actually carry. Ties break on the name, so the
-        // order does not shuffle about as the filter moves.
-        into.Sort(static (left, right) => right.Count != left.Count
-            ? right.Count.CompareTo(left.Count)
-            : string.Compare(left.Value, right.Value, StringComparison.OrdinalIgnoreCase));
-
-        if (most > 0 && into.Count > most)
-        {
-            into.RemoveRange(most, into.Count - most);
-        }
-    }
-
-    /// <summary>
-    /// Which row a path is, or -1 where the table does not hold it.
+    /// The spelling a path is looked up in.
     /// </summary>
     /// <remarks>
     /// KEYED THE WAY THE TABLE IS KEYED, which is not a detail: MonsterVarieties normalises a path
@@ -490,10 +290,7 @@ public sealed class MonsterBook : IQuerySource
     /// stricter would miss rows the table plainly contains, and the symptom would read as a monster
     /// missing from the book rather than as a spelling this method refused.
     /// </remarks>
-    public int Row(string? path)
-        => MonsterVarieties.Same(path) is { Length: > 0 } key && _rows.TryGetValue(key, out int row)
-            ? row
-            : -1;
+    protected override string Key(string? path) => MonsterVarieties.Same(path);
 
     /// <summary>
     /// Walks a monster's three modifier columns, counting every row and naming the ones it can.
@@ -602,44 +399,6 @@ public sealed class MonsterBook : IQuerySource
 
     private static string Numbered(int row) => "#" + row.ToString(CultureInfo.InvariantCulture);
 
-    /// <summary>Every value a field holds, and which rows hold each of them.</summary>
-    /// <param name="Values">The values as the table spells them, for showing.</param>
-    /// <param name="Lower">The same, lowercased once, for matching.</param>
-    /// <param name="Rows">Which rows carry each value.</param>
-    private sealed record Held(string[] Values, string[] Lower, RowSet[] Rows);
-
-    /// <summary>Collects a field's values while the table is walked.</summary>
-    private sealed class Gather(int rows)
-    {
-        private readonly Dictionary<string, int> _ids = new(StringComparer.OrdinalIgnoreCase);
-        private readonly List<string> _values = [];
-        private readonly List<RowSet> _rows = [];
-
-        public void Add(int row, string? value)
-        {
-            if (value is not { Length: > 0 })
-            {
-                return;
-            }
-
-            if (!_ids.TryGetValue(value, out int id))
-            {
-                id = _values.Count;
-                _ids[value] = id;
-                _values.Add(value);
-                _rows.Add(new RowSet(rows));
-            }
-
-            _rows[id].Add(row);
-        }
-
-        public Held Done()
-            => new(
-                [.. _values],
-                [.. _values.Select(one => one.ToLowerInvariant())],
-                [.. _rows]);
-    }
-
     /// <summary>
     /// One column being filled in, so that the build loop reads as a list of facts.
     /// </summary>
@@ -703,12 +462,5 @@ public sealed class MonsterBook : IQuerySource
             ColumnShape.Row => DataColumn.RowNumbers(label, _number, _text),
             _ => DataColumn.Magnitudes(label, unit, _number, _text),
         };
-    }
-
-    /// <summary>The last part of a metadata path, for the many monsters the game never names.</summary>
-    private static string Tail(string path)
-    {
-        int slash = path.LastIndexOf('/');
-        return slash >= 0 && slash + 1 < path.Length ? path[(slash + 1)..] : path;
     }
 }
