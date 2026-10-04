@@ -63,7 +63,9 @@
     "",
     "A BUILT EXE WRITES ITS OWN COPY - the data/ beside it, not this one. tools/IconBaker merges",
     "that copy in here together with the pictures it bakes into assets/icons.png, so both arrive",
-    "in one commit: dotnet run --project tools/IconBaker -- <the exe's exports folder>."
+    "in one commit: dotnet run --project tools/IconBaker -- <the exe's exports folder>. Or",
+    "press 'send exports to be baked' under the boss list in the overlay: it uploads both to the",
+    "boss-icons branch, and .github/workflows/bake-boss-icons.yml bakes them and opens a PR."
   ],
   "areas": {},
   "tiles": {}
