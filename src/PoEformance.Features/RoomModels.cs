@@ -91,15 +91,32 @@ public static class RoomModels
             return MonsterModel.None with { Why = "no room to read" };
         }
 
-        RoomLayout room = RoomLayout.Read(read(path.Replace('\\', '/').Trim()));
+        // COUNTED, as a tile's and a monster's files are: a room is the heaviest thing the book
+        // opens - every distinct doodad's .ao walk, materials and textures - and the line under
+        // the picture should say so rather than read as nothing.
+        long bytes = 0;
+        var files = 0;
+        byte[]? Counted(string one)
+        {
+            byte[]? got = read(one.Replace('\\', '/').Trim());
+            if (got is not null)
+            {
+                bytes += got.Length;
+                files++;
+            }
+
+            return got;
+        }
+
+        RoomLayout room = RoomLayout.Read(Counted(path));
         if (!room.Ready)
         {
-            return MonsterModel.None with { Why = $"the room did not read: {path} - {room.Why}" };
+            return MonsterModel.None with { Why = $"the room did not read: {path} - {room.Why}", Bytes = bytes, Files = files };
         }
 
         if (room.Doodads.Count == 0)
         {
-            return MonsterModel.None with { Why = $"the room places no doodads: {path}" };
+            return MonsterModel.None with { Why = $"the room places no doodads: {path}", Bytes = bytes, Files = files };
         }
 
         // ONE LOAD PER MODEL, keyed by its file: a room places the same tree or rock dozens of times.
@@ -121,7 +138,7 @@ public static class RoomModels
 
             if (!models.TryGetValue(one.Ao, out MonsterModel? model))
             {
-                model = MonsterModels.OfFiles(read, [one.Ao]);
+                model = MonsterModels.OfFiles(Counted, [one.Ao]);
                 models[one.Ao] = model;
             }
 
@@ -168,6 +185,8 @@ public static class RoomModels
                 Why = firstMissing.Length > 0
                     ? $"none of the room's doodads drew; the first: {firstMissing}"
                     : $"the room's doodads hold no geometry: {path}",
+                Bytes = bytes,
+                Files = files,
             };
         }
 
@@ -190,6 +209,8 @@ public static class RoomModels
             BodyLeast = joined.Least,
             BodyMost = joined.Most,
             Parts = placed,
+            Bytes = bytes,
+            Files = files,
             Move = string.Join("; ", said),
             Shaders = [.. models.Values.SelectMany(one => one.Shaders).Distinct(StringComparer.OrdinalIgnoreCase)],
         };

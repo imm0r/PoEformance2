@@ -116,11 +116,46 @@ public class RoomLayoutTests
     [Fact]
     public void ANDAFileThatEndsEarlySaysWhere()
     {
-        RoomLayout room = RoomLayout.Parse("version 31\n2\n\"a\"\n");
+        RoomLayout room = RoomLayout.Parse("version 31\n1\n\"a\"\n");
 
         Assert.False(room.Ready);
         Assert.Contains("ends early", room.Why, StringComparison.Ordinal);
         Assert.False(RoomLayout.Parse("not a room").Ready);
+    }
+
+    [Theory]
+    [InlineData("version 31\n-3\n", "the string count")]
+    [InlineData("version 31\n2147483647\n", "the string count")]
+    [InlineData("version 31\n0\n5 3\n-1 -1\n\"tag\"\n0\nk 2 1\n", "doubled")]
+    [InlineData("version 31\n0\n5 3\n1500000000\n\"tag\"\n0\nk 2 1\n", "doubled")]
+    public void ANDACountTheFileCannotHoldIsRefusedRatherThanThrown(string text, string said)
+    {
+        // "-3" IS A WHOLE NUMBER, and a count near two billion doubles to a negative one. Both used to
+        // land the line index before the start of the array, where the end-of-file check did not
+        // look, and the read threw past a method that says it never does.
+        RoomLayout room = RoomLayout.Parse(text);
+
+        Assert.False(room.Ready);
+        Assert.Contains(said, room.Why, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ANDADoodadWithANegativeCountIsRefusedRatherThanThrown()
+    {
+        string pairs = Version36.Replace("4 6 1 0.1 0.2 3.14", "4 6 -1 0.1 0.2 3.14", StringComparison.Ordinal);
+        RoomLayout room = RoomLayout.Parse(pairs);
+        Assert.False(room.Ready);
+        Assert.Contains("pairs", room.Why, StringComparison.Ordinal);
+
+        string floats = Version31.Replace("1 0 1 1 7.5 2 \"Metadata/Doodads/Rock.ao\"", "1 0 1 -2 7.5 2 \"Metadata/Doodads/Rock.ao\"", StringComparison.Ordinal);
+        room = RoomLayout.Parse(floats);
+        Assert.False(room.Ready);
+        Assert.Contains("floats", room.Why, StringComparison.Ordinal);
+
+        string group = Version31.Replace("k 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 n\n2\n", "k 2 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 n\n-2\n", StringComparison.Ordinal);
+        room = RoomLayout.Parse(group);
+        Assert.False(room.Ready);
+        Assert.Contains("group", room.Why, StringComparison.Ordinal);
     }
 
     private static Dictionary<string, byte[]> Install() => new(StringComparer.OrdinalIgnoreCase)
@@ -147,6 +182,40 @@ public class RoomLayoutTests
         // THE TREE STANDS AT x 30 IN WORLD UNITS - its prop spans x -1 to 1, unscaled and unturned.
         Assert.Equal(31f, model.Mesh.Most.X, 3);
         Assert.Contains("doodads reach x 30, y 20", model.Move, StringComparison.Ordinal);
+
+    }
+
+    [Fact]
+    public void ANDAROOMCostsWhatItRead()
+    {
+        // COUNTED AT THE READER, so the number under the picture is what the install was asked for
+        // and gave - the room, the doodads' .ao files and the meshes behind them - and a file asked
+        // for and not there (the .mat here) is not a file.
+        Dictionary<string, byte[]> files = Install();
+        var handed = new List<string>();
+        long bytes = 0;
+        byte[]? Read(string path)
+        {
+            byte[]? got = files.GetValueOrDefault(path);
+            if (got is not null)
+            {
+                handed.Add(path);
+                bytes += got.Length;
+            }
+
+            return got;
+        }
+
+        MonsterModel model = RoomModels.Of(Read, "Metadata/Terrain/Woods/Rooms/Clearing.arm", RoomUnit.World);
+
+        Assert.True(model.Ready, model.Why);
+        Assert.Equal(handed.Count, model.Files);
+        Assert.Equal(bytes, model.Bytes);
+        Assert.Contains("Metadata/Terrain/Woods/Rooms/Clearing.arm", handed);
+        Assert.Contains("Metadata/Doodads/Rock.ao", handed);
+        Assert.Contains("Metadata/Doodads/Tree.ao", handed);
+        Assert.Contains("art/rock.fmt", handed);
+        Assert.True(model.Files >= 4, $"{model.Files} files");
     }
 
     [Fact]

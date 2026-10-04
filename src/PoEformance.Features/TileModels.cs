@@ -156,7 +156,11 @@ public static class TileModels
             : string.Create(CultureInfo.InvariantCulture,
                 $"{inexact} of {subTiles} sub-tiles did not end where their file does - the layout after the props is not fully understood");
 
-        return MonsterModels.Worn(read, joined, named, paintTheRest: false, path, move) with
+        // THROUGH THE SAME COUNTER AS EVERYTHING ABOVE IT, because the materials and the textures are
+        // most of what a tile costs to open - and Bytes promises to include them. Handed the bare
+        // reader, Worn's .mat and .dds reads went uncounted and the line under the picture said
+        // a tile was a few kilobytes of geometry.
+        return MonsterModels.Worn(Counted, joined, named, paintTheRest: false, path, move) with
         {
             Bytes = bytes,
             Files = files,

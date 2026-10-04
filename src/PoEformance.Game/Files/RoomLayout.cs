@@ -110,11 +110,10 @@ public sealed class RoomLayout
     private static RoomLayout Body(string[] lines, ref int at, int version)
     {
         // The strings: a count, then that many quoted lines. Nothing here needs them by index.
-        int strings = Whole(Line(lines, ref at), 0, "the string count");
-        at += strings;
+        Skip(lines, ref at, Whole(Line(lines, ref at), 0, "the string count"), "the string count");
 
         Line(lines, ref at);                                         // Dimensions.
-        int thingies = 0;
+        long thingies = 0;
         foreach (string word in Words(Line(lines, ref at)))
         {
             thingies += Whole(word, "the numbers before the tag");
@@ -137,7 +136,7 @@ public sealed class RoomLayout
             throw new FormatException($"the room says it is {width}x{height} tiles");
         }
 
-        at += thingies * 2;
+        Skip(lines, ref at, thingies * 2, "the numbers before the tag, doubled");
 
         int groups = version switch
         {
@@ -157,7 +156,7 @@ public sealed class RoomLayout
             Line(lines, ref at);
         }
 
-        at += height;                                                // The slot grid.
+        Skip(lines, ref at, height, "the slot grid");
 
         var doodads = new List<RoomDoodad>();
         foreach (string line in Group(lines, ref at, version))
@@ -175,6 +174,11 @@ public sealed class RoomLayout
         if (version < 32)
         {
             int count = Whole(Line(lines, ref at), 0, "a group's count");
+            if (count < 0)
+            {
+                throw new FormatException($"a group's count reads {count}");
+            }
+
             for (var one = 0; one < count; one++)
             {
                 kept.Add(Line(lines, ref at));
@@ -220,8 +224,8 @@ public sealed class RoomLayout
         // call moves it, and the count's own word is lost. The field check below caught exactly that.
         if (version >= 34)
         {
-            int pairs = Whole(Next(numbers, ref at), "a doodad's pair count");
-            at += pairs * 2;
+            long pairs = Whole(Next(numbers, ref at), "a doodad's pair count");
+            Skip(numbers, ref at, pairs * 2, "a doodad's pairs");
         }
 
         float turn = Real(Next(numbers, ref at), "a doodad's angle");
@@ -237,7 +241,7 @@ public sealed class RoomLayout
         }
 
         int floats = Whole(Next(numbers, ref at), "a doodad's float count");
-        at += floats;
+        Skip(numbers, ref at, floats, "a doodad's floats");
         float scale = Real(Next(numbers, ref at), "a doodad's scale");
 
         if (at != numbers.Length)
@@ -276,6 +280,28 @@ public sealed class RoomLayout
 
     private static string Next(string[] words, ref int at)
         => at < words.Length ? words[at++] : throw new FormatException("a line ends early");
+
+    /// <summary>
+    /// Steps over a counted run of lines or words, refusing a count the file cannot hold.
+    /// </summary>
+    /// <remarks>
+    /// THE COUNTS ARE READ OUT OF THE FILE AND ADDED TO AN INDEX, and a file is allowed to be
+    /// wrong: "-3" is a whole number to the parser above, and a count near two billion is one
+    /// whose double wraps negative. Either way the index lands before the start of the array, where
+    /// the end-of-file check does not look, and the read throws something this class promised not
+    /// to. Checked here against what is actually left, as a <see cref="FormatException"/> like every
+    /// other fault in the file, with the count that caused it in the message.
+    /// </remarks>
+    private static void Skip(string[] over, ref int at, long count, string what)
+    {
+        if (count < 0 || count > over.Length - at)
+        {
+            throw new FormatException(
+                $"{what} is {count.ToString(CultureInfo.InvariantCulture)}, and only {over.Length - at} remain");
+        }
+
+        at += (int)count;
+    }
 
     private static string[] Words(string line) => line.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
 

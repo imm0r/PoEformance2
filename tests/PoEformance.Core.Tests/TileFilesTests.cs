@@ -380,6 +380,39 @@ public class TileFilesTests
         Assert.Null(model.Skins[4]);
         Assert.Null(model.Skins[5]);
         Assert.False(model.Moves);
+
+    }
+
+    [Fact]
+    public void ANDATILECostsWhatItReadMaterialsAndTexturesIncluded()
+    {
+        // COUNTED AT THE READER. The .mat and .dds reads happen inside the dressing, which used to be
+        // handed the bare reader - so the line under the picture said a tile was a few kilobytes of
+        // geometry, while Bytes promises the material and the texture are in it.
+        Dictionary<string, byte[]> files = Install();
+        var handed = new List<string>();
+        long bytes = 0;
+        byte[]? Read(string path)
+        {
+            byte[]? got = files.GetValueOrDefault(path);
+            if (got is not null)
+            {
+                handed.Add(path);
+                bytes += got.Length;
+            }
+
+            return got;
+        }
+
+        MonsterModel model = TileModels.Of(Read, "Metadata/Terrain/Test/Arena.tdt");
+
+        Assert.True(model.Ready, model.Why);
+        Assert.Equal(handed.Count, model.Files);
+        Assert.Equal(bytes, model.Bytes);
+        Assert.Contains("Art/Textures/Wall.mat", handed);
+        Assert.Contains("Art/Textures/Floor.mat", handed);
+        Assert.Contains("Art/Textures/wall.dds", handed);
+        Assert.Contains("Art/Textures/floor.dds", handed);
     }
 
     [Fact]
