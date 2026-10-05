@@ -2556,19 +2556,27 @@ public static class MonsterModels
         /// <summary>What each material's graphs came to, by material file.</summary>
         private readonly Dictionary<string, Shade> _shades = new(StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>What compiling each material's graphs came to, by material file - before any texture is read.</summary>
+        private readonly Dictionary<string, (ShadeCompile Compiled, IReadOnlyList<string> Inputs)> _compiled = new(StringComparer.OrdinalIgnoreCase);
+
         /// <summary>
-        /// What one material's graphs compute for its colour - see MonsterModels.Shaded.
+        /// One material's graphs compiled, with the Input nodes they name - the textures not yet read.
         /// </summary>
-        public Shade Shade(Func<string, byte[]?> read, string material)
+        /// <remarks>
+        /// THE INPUTS ARE FOR THE DUMP, which asks of a ground material where its coordinates come
+        /// from: a ground mesh carries none, so whether its graphs read <c>InputUV</c> or
+        /// <c>InputWorldPos</c> is the question. Named in the order the graphs list them.
+        /// </remarks>
+        public (ShadeCompile Compiled, IReadOnlyList<string> Inputs) Compiled(Func<string, byte[]?> read, string material)
         {
             string file = MaterialFile.Bare(material);
-            if (_shades.TryGetValue(file, out Shade known))
+            if (_compiled.TryGetValue(file, out (ShadeCompile, IReadOnlyList<string>) known))
             {
                 return known;
             }
 
             var chain = new List<(ShaderInstance, ShaderGraph)>();
-            var skipped = new List<string>();
+            var inputs = new List<string>();
             foreach (ShaderInstance instance in ShaderGraph.Instances(read(file.Replace('\\', '/').Trim())))
             {
                 if (instance.Parent.Length == 0)
@@ -2586,10 +2594,33 @@ public static class MonsterModels
                 // A GRAPH WITH NO NODES - ForceAlpha is a blend mode and nothing else - has nothing
                 // to compile, and is not missing.
                 chain.Add((instance, graph));
+                foreach (ShaderNode node in graph.Nodes)
+                {
+                    if (node.Type.StartsWith("Input", StringComparison.Ordinal) && !inputs.Contains(node.Type, StringComparer.Ordinal))
+                    {
+                        inputs.Add(node.Type);
+                    }
+                }
             }
 
-            ShadeCompile compiled = ShadeProgram.Compile(chain);
-            skipped.AddRange(compiled.Skipped);
+            (ShadeCompile, IReadOnlyList<string>) compiled = (ShadeProgram.Compile(chain), inputs);
+            _compiled[file] = compiled;
+            return compiled;
+        }
+
+        /// <summary>
+        /// What one material's graphs compute for its colour - see MonsterModels.Shaded.
+        /// </summary>
+        public Shade Shade(Func<string, byte[]?> read, string material)
+        {
+            string file = MaterialFile.Bare(material);
+            if (_shades.TryGetValue(file, out Shade known))
+            {
+                return known;
+            }
+
+            ShadeCompile compiled = Compiled(read, material).Compiled;
+            var skipped = new List<string>(compiled.Skipped);
 
             Shade shade;
             if (compiled.Program is not { } program)

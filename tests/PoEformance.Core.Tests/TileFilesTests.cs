@@ -548,42 +548,95 @@ public class TileFilesTests
     }
 
     /// <summary>
-    /// The dump's ground section: corners, their types, the mask, and the tilesets that list the tile.
+    /// The dump's ground section: corners, their types, the mask, and what the tilesets using the tile draw its ground with.
     /// </summary>
     /// <remarks>
-    /// One tileset lists the tile and one does not; only the first is opened, and its MaterialsList
-    /// is printed as it is - the file whose format is the question.
+    /// Three tilesets: one names the tile, one does not, and one names a tile of the same FILE name in
+    /// another folder - listed and not opened, since its ground is not this tile's. Of the opened
+    /// one's MaterialsList only the group the corner type selects and the unnamed group are printed,
+    /// of its overrides only the line touching this tile, and every ground material they offer is
+    /// printed with the Input its graph takes its coordinates from.
     /// </remarks>
     [Fact]
-    public void THEDUMPPrintsTheGroundChainAndFindsTheTilesetsUsingTheTile()
+    public void THEDUMPPrintsTheGroundChainAndWhatTheTilesetsUsingTheTileDrawItsGroundWith()
     {
         Dictionary<string, byte[]> files = Install();
         files["Metadata/Terrain/Test/Arena.tdt"] = Tdt(grounds: true);
-        files["Metadata/Terrain/Test/sand.gt"] = Encoding.Unicode.GetBytes("version 1\r\nSandFill\r\n");
+        files["Metadata/Terrain/Test/sand.gt"] = Encoding.Unicode.GetBytes("SandFill\r\n1 1 0 0\r\n");
         files["Art/Models/Terrain/Test/Arena_mask.dds"] = Dds();
         files["Metadata/Terrain/Test/desert.tsi"] = Encoding.Unicode.GetBytes(
-            "version 7\r\nTileSet \"desert.tst\"\r\nMaterialsList \"desert.mtd\"\r\n");
+            "version 3\r\nTileSet \"desert.tst\"\r\nMaterialsList \"desert.mtd\"\r\nTileMaterialOverrides \"desert.tmo\"\r\n");
         files["Metadata/Terrain/Test/desert.tst"] = Encoding.Unicode.GetBytes("\"Metadata/Terrain/Test/Arena.tdt\" 1\r\n");
-        files["Metadata/Terrain/Test/desert.mtd"] = Encoding.Unicode.GetBytes("\"sand.gt\" \"Art/Textures/Floor.mat\"\r\n");
-        files["Metadata/Terrain/Woods/woods.tsi"] = Encoding.Unicode.GetBytes("version 7\r\nTileSet \"woods.tst\"\r\n");
+        files["Metadata/Terrain/Test/desert.mtd"] = Encoding.Unicode.GetBytes(
+            """
+            version 5
+            1 0
+            "Art/Textures/Ground/Dirt.mat"
+            // SAND
+            "SandFill" 2 0
+            "Art\Textures\Ground\Sand.mat"
+            "Art/Textures/Ground/Dune.mat"
+            60 40 16
+            "RockFill" 1 0
+            "Art/Textures/Ground/Rock.mat"
+            """);
+        files["Metadata/Terrain/Test/desert.tmo"] = Encoding.Unicode.GetBytes(
+            "version 1\r\n\"Art/Textures/Wall.mat\" \"Art/Textures/Prism.mat\"\r\n\"Art/Textures/Elsewhere.mat\" \"Art/Textures/Prism.mat\"\r\n");
+        files["Art/Textures/Ground/Sand.mat"] = Encoding.UTF8.GetBytes(
+            """{"graphinstances":[{"parent":"Metadata/Ground.fxgraph","custom_parameters":[{"name":"Colour","parameters":[{"path":"Art/Textures/floor.dds","srgb":true}]}]}]}""");
+        files["Metadata/Ground.fxgraph"] = Encoding.UTF8.GetBytes(
+            """
+            {"nodes":[
+              {"type":"InputWorldPos","index":0,"stage":"Texturing"},
+              {"type":"SampleTexture","index":0,"parameters":[{"srgb":true},{}],"custom_parameter":"Colour"},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing"}],
+             "links":[
+              {"src":{"type":"InputWorldPos","index":0,"stage":"Texturing","variable":"output","swizzle":"xy"},"dst":{"type":"SampleTexture","index":0,"variable":"uv"}},
+              {"src":{"type":"SampleTexture","index":0,"variable":"rgba"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing","variable":"input"}}]}
+            """);
+        files["Metadata/Terrain/Woods/woods.tsi"] = Encoding.Unicode.GetBytes("version 3\r\nTileSet \"woods.tst\"\r\n");
         files["Metadata/Terrain/Woods/woods.tst"] = Encoding.Unicode.GetBytes("\"Metadata/Terrain/Woods/Tree.tdt\" 1\r\n");
+        files["Metadata/Terrain/Other/other.tsi"] = Encoding.Unicode.GetBytes("version 3\r\nTileSet \"other.tst\"\r\n");
+        files["Metadata/Terrain/Other/other.tst"] = Encoding.Unicode.GetBytes("\"Metadata/Terrain/Other/Arena.tdt\" 1\r\n");
 
         Func<string, byte[]?> read = path => files.GetValueOrDefault(path);
         MonsterModel model = TileModels.Of(read, "Metadata/Terrain/Test/Arena.tdt");
         string dump = ModelDump.OfTile(
             read, "Metadata/Terrain/Test/Arena.tdt", model,
-            ["Metadata/Terrain/Woods/woods.tsi", "Metadata/Terrain/Test/desert.tsi"]);
+            ["Metadata/Terrain/Other/other.tsi", "Metadata/Terrain/Woods/woods.tsi", "Metadata/Terrain/Test/desert.tsi"]);
 
         Assert.Contains("  down-left: Metadata/Terrain/Test/sand.gt", dump, StringComparison.Ordinal);
         Assert.Contains("  up-left: -", dump, StringComparison.Ordinal);
-        Assert.Contains("SandFill", dump, StringComparison.Ordinal);
         Assert.Contains("=== ground mask Art/Models/Terrain/Test/Arena_mask.dds", dump, StringComparison.Ordinal);
         Assert.Contains("=== ground mesh of Art/Models/Terrain/Test/Arena.tgt", dump, StringComparison.Ordinal);
+
+        // EXACT FIRST, the same file name elsewhere listed and left shut.
+        Assert.Contains("searched 3 tilesets; 1 name this tile, 1 only a tile of the same file name in another folder", dump, StringComparison.Ordinal);
+        Assert.Contains("  Metadata/Terrain/Other/other.tsi (same file name, another folder - not opened)", dump, StringComparison.Ordinal);
         Assert.Contains("=== .tsi Metadata/Terrain/Test/desert.tsi", dump, StringComparison.Ordinal);
+        Assert.DoesNotContain("=== .tsi Metadata/Terrain/Other/other.tsi", dump, StringComparison.Ordinal);
         Assert.DoesNotContain("=== .tsi Metadata/Terrain/Woods/woods.tsi", dump, StringComparison.Ordinal);
+
+        // THE CORNER TYPE'S GROUP BY ITS NAME, and the unnamed one - not the group no corner selects.
         Assert.Contains("=== MaterialsList Metadata/Terrain/Test/desert.mtd", dump, StringComparison.Ordinal);
-        Assert.Contains("\"sand.gt\" \"Art/Textures/Floor.mat\"", dump, StringComparison.Ordinal);
-        Assert.Contains("searched 2 tilesets; 1 use this tile", dump, StringComparison.Ordinal);
+        Assert.Contains("version 5 · 3 groups: (unnamed), \"SandFill\", \"RockFill\"", dump, StringComparison.Ordinal);
+        Assert.Contains("  \"SandFill\" at 2 corners: 2 choices · weights 60 40 · then 16", dump, StringComparison.Ordinal);
+        Assert.Contains("      Art/Textures/Ground/Sand.mat", dump, StringComparison.Ordinal);
+        Assert.Contains("  the unnamed group: 1 choice", dump, StringComparison.Ordinal);
+        Assert.DoesNotContain("Rock.mat", dump, StringComparison.Ordinal);
+
+        Assert.Contains("2 overrides, 1 of this tile's materials or its ground's:", dump, StringComparison.Ordinal);
+        Assert.Contains("  Art/Textures/Wall.mat -> Art/Textures/Prism.mat", dump, StringComparison.Ordinal);
+        Assert.DoesNotContain("Elsewhere.mat", dump, StringComparison.Ordinal);
+
+        // AND THE GROUND MATERIALS, once each, with where their coordinates come from.
+        Assert.Contains("=== ground materials (3)", dump, StringComparison.Ordinal);
+        Assert.Contains("=== ground .mat Art/Textures/Ground/Sand.mat", dump, StringComparison.Ordinal);
+        Assert.Contains("offered by: Test \"SandFill\"", dump, StringComparison.Ordinal);
+        Assert.Contains("offered by: Test (unnamed)", dump, StringComparison.Ordinal);
+        Assert.Contains("graphs name: InputWorldPos", dump, StringComparison.Ordinal);
+        Assert.Contains("=== graph Metadata/Ground.fxgraph", dump, StringComparison.Ordinal);
+        Assert.Contains("=== ground texture Art/Textures/floor.dds (read as sRGB)", dump, StringComparison.Ordinal);
     }
 
     [Fact]
