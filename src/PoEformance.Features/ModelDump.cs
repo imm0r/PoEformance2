@@ -191,10 +191,10 @@ public static class ModelDump
         // that texture as colour and got green and magenta, and which textures the graph blends by
         // it - and how - is written nowhere but the graph. One level deep: a graph's own parents
         // are printed only where some material names them too.
-        seen.Clear();
+        var printed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (string graph in graphs)
         {
-            if (graph.Length == 0 || !seen.Add(graph))
+            if (graph.Length == 0 || !printed.Add(graph))
             {
                 continue;
             }
@@ -257,15 +257,18 @@ public static class ModelDump
                 .Append("	graphs ").AppendLine(one < model.Shades.Count && model.Shades[one] is not null ? "program" : "-");
         }
 
-        Ground(read, path, tilesets, said);
+        Ground(read, path, tilesets, materials, printed, said);
         return said.ToString();
     }
 
     /// <summary>Most of one text file printed, so a large list cannot bury the rest of the dump.</summary>
     private const int MostText = 48 * 1024;
 
-    /// <summary>Most tilesets printed in full; the rest that use the tile are only named.</summary>
-    private const int MostTilesets = 3;
+    /// <summary>Most tilesets printed; the rest that name the tile are only listed.</summary>
+    private const int MostTilesets = 12;
+
+    /// <summary>Most ground materials printed with their graphs and textures.</summary>
+    private const int MostGroundMaterials = 32;
 
     /// <summary>
     /// Everything that could say what a tile's GROUND is drawn with, raw.
@@ -280,14 +283,21 @@ public static class ModelDump
     ///     the .tdt's four corner ground types (.gt), and each .gt's text
     ///     the .tgt's GroundMask, with its format and channels
     ///     the ground mesh: whether it has coordinates, and their range
-    ///     the tilesets (.tsi) whose .tst lists this tile, with their MaterialsList (.mtd),
-    ///     TileMaterialOverrides (.tmo) and BlendMaskOverride - the files annalithic's Tsi.cs
-    ///     names and does not open
+    ///     the tilesets (.tsi) whose .tst lists this tile, with what their MaterialsList (.mtd)
+    ///     maps the corner types to, their TileMaterialOverrides (.tmo) and BlendMaskOverride -
+    ///     the files annalithic's Tsi.cs names and does not open
+    ///     the ground materials those lists name, with their graphs and textures
     ///
     /// FOUND BY READING EVERY TILESET, because nothing points from a tile to the areas that use it.
     /// Hundreds of small files, once, behind the button - which is why the dump runs off the frame.
     /// </remarks>
-    private static void Ground(Func<string, byte[]?> read, string path, IReadOnlyList<string>? tilesets, StringBuilder said)
+    private static void Ground(
+        Func<string, byte[]?> read,
+        string path,
+        IReadOnlyList<string>? tilesets,
+        IReadOnlyList<string> worn,
+        HashSet<string> printed,
+        StringBuilder said)
     {
         said.AppendLine().AppendLine("=== ground");
 
@@ -320,10 +330,20 @@ public static class ModelDump
             said.Append("  ").Append(corners[corner]).Append(": ").AppendLine(type.Length > 0 ? type : "-");
         }
 
+        // THE NAME IS THE KEY a tileset's MaterialsList looks the ground up by, so each corner's
+        // type is carried on by name, with how many corners it covers.
+        var names = new List<(string Name, int Corners)>();
         foreach (string type in definition.Grounds.Where(one => one.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase))
         {
             said.AppendLine().Append("=== .gt ").AppendLine(type);
-            said.AppendLine(Text(read, type));
+            string? text = Raw(read, type);
+            said.AppendLine(text is null ? "(not in the install)" : Trimmed(text));
+
+            string name = GroundType.NameOf(text);
+            if (name.Length > 0)
+            {
+                names.Add((name, definition.Grounds.Count(one => string.Equals(one, type, StringComparison.OrdinalIgnoreCase))));
+            }
         }
 
         foreach (string template in definition.Templates)
@@ -357,7 +377,7 @@ public static class ModelDump
             }
         }
 
-        Tilesets(read, at, tilesets, said);
+        Tilesets(read, at, tilesets, names, worn, printed, said);
     }
 
     /// <summary>A ground mesh in one line: its size, and where its coordinates and positions lie.</summary>
@@ -393,9 +413,31 @@ public static class ModelDump
     }
 
     /// <summary>
-    /// The tilesets whose tile list names this tile, each with the files it hands the ground.
+    /// The tilesets whose tile list names this tile, what each draws this tile's ground with, and those materials.
     /// </summary>
-    private static void Tilesets(Func<string, byte[]?> read, string tile, IReadOnlyList<string>? tilesets, StringBuilder said)
+    /// <remarks>
+    /// EXACT FIRST. A tile list names tiles by path, and a FILE NAME alone is not this tile: two
+    /// tilesets naming <c>Desert/AntNest/Stromatolite/CliffCvM_Stroma1.tdt</c> were printed for
+    /// <c>Desert/Stromatolite/</c>'s tile, and their clay was nearly taken for its ground. Those are
+    /// now only listed, and every tileset naming the tile itself is opened.
+    ///
+    /// ONLY WHAT TOUCHES THIS TILE: of each MaterialsList the groups this tile's corner types select,
+    /// and the group with no name; of each override list the lines that replace one of this tile's
+    /// materials or one of those ground materials. The whole files buried the answer last time.
+    ///
+    /// AND THEN THE GROUND MATERIALS THEMSELVES, once each, the way the props' are printed above:
+    /// the material, the graphs not already printed, the Input nodes those graphs name, what the
+    /// program compiles to, and every texture it reads with its channels. A ground mesh has no
+    /// texture coordinates, so which Input a ground graph takes its coordinates from is the question.
+    /// </remarks>
+    private static void Tilesets(
+        Func<string, byte[]?> read,
+        string tile,
+        IReadOnlyList<string>? tilesets,
+        IReadOnlyList<(string Name, int Corners)> names,
+        IReadOnlyList<string> worn,
+        HashSet<string> printed,
+        StringBuilder said)
     {
         said.AppendLine().AppendLine("=== tilesets that use this tile");
         if (tilesets is not { Count: > 0 })
@@ -407,8 +449,8 @@ public static class ModelDump
         string file = tile[(tile.LastIndexOf('/') + 1)..];
         string tail = tile.StartsWith("metadata/terrain/", StringComparison.OrdinalIgnoreCase) ? tile["metadata/terrain/".Length..] : tile;
         var lists = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
-        var found = new List<string>();
-        var shown = 0;
+        var exact = new List<(string Tsi, string Text, string Tst, string Listed)>();
+        var alike = new List<string>();
 
         foreach (string tsi in tilesets)
         {
@@ -430,45 +472,248 @@ public static class ModelDump
                 continue;
             }
 
-            bool exact = listed.Contains(tail, StringComparison.OrdinalIgnoreCase);
-            found.Add(tsi + (exact ? string.Empty : " (same file name, folder not confirmed)"));
-            if (shown++ >= MostTilesets)
+            if (listed.Contains(tail, StringComparison.OrdinalIgnoreCase))
             {
-                continue;
+                exact.Add((tsi, text, tst, listed));
             }
+            else
+            {
+                alike.Add(tsi);
+            }
+        }
 
+        said.Append("searched ").Append(Say(tilesets.Count)).Append(" tilesets; ")
+            .Append(Say(exact.Count)).Append(" name this tile, ")
+            .Append(Say(alike.Count)).AppendLine(" only a tile of the same file name in another folder");
+        foreach ((string tsi, _, _, _) in exact)
+        {
+            said.Append("  ").AppendLine(tsi);
+        }
+
+        foreach (string tsi in alike)
+        {
+            said.Append("  ").Append(tsi).AppendLine(" (same file name, another folder - not opened)");
+        }
+
+        var tileWears = new HashSet<string>(
+            worn.Select(MaterialFile.Bare).Where(one => one.Length > 0).Select(Slashed), StringComparer.OrdinalIgnoreCase);
+        var grounds = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        var order = new List<string>();
+
+        foreach ((string tsi, string text, string tst, string listed) in exact.Take(MostTilesets))
+        {
+            string where = Short(tsi);
             said.AppendLine().Append("=== .tsi ").AppendLine(tsi);
             said.AppendLine(Trimmed(text));
-            said.Append("--- ").Append(tst).AppendLine(exact ? " names the tile:" : " names a tile of the same file name:");
-            foreach (string line in listed.Split('\n').Where(one => one.Contains(file, StringComparison.OrdinalIgnoreCase)).Take(5))
+            said.Append("--- ").Append(tst).AppendLine(" names the tile:");
+            foreach (string line in listed.Split('\n').Where(one => one.Contains(tail, StringComparison.OrdinalIgnoreCase)).Take(5))
             {
                 said.Append("  ").AppendLine(line.Trim());
             }
 
-            foreach (string key in (string[])["MaterialsList", "TileMaterialOverrides", "FillTiles"])
+            var mine = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (Keyed(text, "MaterialsList") is { Length: > 0 } named)
             {
-                if (Keyed(text, key) is { Length: > 0 } named)
+                string mtd = Beside(tsi, named);
+                GroundMaterials list = GroundMaterials.Read(read(Slashed(mtd)));
+                said.AppendLine().Append("=== MaterialsList ").AppendLine(mtd);
+                if (list.Groups.Count == 0)
                 {
-                    string where = Beside(tsi, named);
-                    said.AppendLine().Append("=== ").Append(key).Append(' ').AppendLine(where);
-                    said.AppendLine(Text(read, where));
+                    said.Append("(did not read: ").Append(list.Why).AppendLine(")");
+                    said.AppendLine(Text(read, mtd));
+                }
+                else
+                {
+                    said.Append("version ").Append(Say(list.Version)).Append(" · ").Append(Say(list.Groups.Count)).Append(" groups: ")
+                        .AppendLine(string.Join(", ", list.Groups.Select(one => one.Name.Length > 0 ? "\"" + one.Name + "\"" : "(unnamed)")));
+                    if (!list.Ready)
+                    {
+                        said.Append("(stopped reading at ").Append(list.Why).AppendLine(")");
+                    }
+
+                    void Offered(GroundGroup group, string label)
+                    {
+                        said.Append("  ").Append(label).Append(": ");
+                        Group(group, said);
+                        foreach (GroundChoice choice in group.Choices.Concat(group.Extras))
+                        {
+                            mine.Add(choice.Material);
+                            if (!grounds.TryGetValue(choice.Material, out List<string>? users))
+                            {
+                                users = [];
+                                grounds[choice.Material] = users;
+                                order.Add(choice.Material);
+                            }
+
+                            users.Add(where + " " + (group.Name.Length > 0 ? "\"" + group.Name + "\"" : "(unnamed)"));
+                        }
+                    }
+
+                    foreach ((string name, int corners) in names)
+                    {
+                        string label = "\"" + name + "\" at " + Say(corners) + (corners == 1 ? " corner" : " corners");
+                        if (list.Named(name) is { } group)
+                        {
+                            Offered(group, label);
+                        }
+                        else
+                        {
+                            said.Append("  ").Append(label).AppendLine(": not listed");
+                        }
+                    }
+
+                    if (list.Named(string.Empty) is { } unnamed)
+                    {
+                        Offered(unnamed, "the unnamed group");
+                    }
+                }
+            }
+
+            if (Keyed(text, "TileMaterialOverrides") is { Length: > 0 } overriding)
+            {
+                string tmo = Beside(tsi, overriding);
+                IReadOnlyList<MaterialOverride> swaps = MaterialOverrides.Read(read(Slashed(tmo)));
+                var touching = swaps.Where(one => tileWears.Contains(Slashed(one.From)) || mine.Contains(Slashed(one.From))).ToList();
+                said.AppendLine().Append("=== TileMaterialOverrides ").AppendLine(tmo);
+                said.Append(Say(swaps.Count)).Append(" overrides, ").Append(Say(touching.Count))
+                    .AppendLine(" of this tile's materials or its ground's:");
+                foreach (MaterialOverride swap in touching)
+                {
+                    said.Append("  ").Append(swap.From).Append(" -> ").AppendLine(swap.To);
                 }
             }
 
             if (Keyed(text, "BlendMaskOverride") is { Length: > 0 } blend)
             {
-                string where = Beside(tsi, blend);
-                said.AppendLine().Append("=== BlendMaskOverride ").AppendLine(where);
-                Picture(read, where, said);
+                string mask = Beside(tsi, blend);
+                said.AppendLine().Append("=== BlendMaskOverride ").AppendLine(mask);
+                Picture(read, mask, said);
             }
         }
 
-        said.AppendLine().Append("searched ").Append(Say(tilesets.Count)).Append(" tilesets; ")
-            .Append(Say(found.Count)).AppendLine(" use this tile");
-        foreach (string one in found)
+        GroundMaterialsOf(read, order, grounds, printed, said);
+    }
+
+    /// <summary>A MaterialsList group in a few lines: its choices, weights, and the numbers nobody has named.</summary>
+    private static void Group(GroundGroup group, StringBuilder said)
+    {
+        said.Append(Say(group.Choices.Count)).Append(group.Choices.Count == 1 ? " choice" : " choices");
+        if (group.Weights.Count > 0)
         {
-            said.Append("  ").AppendLine(one);
+            said.Append(" · weights ").Append(string.Join(' ', group.Weights.Select(Say))).Append(" · then ").Append(Say(group.Trailing));
         }
+
+        said.AppendLine();
+        Chosen(group.Choices, said);
+        if (group.Extras.Count > 0)
+        {
+            said.Append("    ").Append(Say(group.Extras.Count)).Append(" extra after ")
+                .Append(Say(group.ExtraNumber)).Append(' ').AppendLine(group.ExtraFlag ? "1" : "0");
+            Chosen(group.Extras, said);
+        }
+    }
+
+    private static void Chosen(IReadOnlyList<GroundChoice> choices, StringBuilder said)
+    {
+        foreach (GroundChoice choice in choices)
+        {
+            said.Append("      ").Append(choice.Material);
+            foreach (string layer in choice.Layers)
+            {
+                said.Append(" + ").Append(layer);
+            }
+
+            said.AppendLine();
+        }
+    }
+
+    /// <summary>
+    /// Every ground material the tilesets offer this tile, once each: the material, its graphs, what they compile to, and the textures read.
+    /// </summary>
+    private static void GroundMaterialsOf(
+        Func<string, byte[]?> read,
+        IReadOnlyList<string> order,
+        Dictionary<string, List<string>> grounds,
+        HashSet<string> printed,
+        StringBuilder said)
+    {
+        if (order.Count == 0)
+        {
+            return;
+        }
+
+        said.AppendLine().Append("=== ground materials (").Append(Say(order.Count)).AppendLine(")");
+        var paints = new MonsterModels.Paints();
+        var pictured = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (string material in order.Take(MostGroundMaterials))
+        {
+            said.AppendLine().Append("=== ground .mat ").AppendLine(material);
+            said.Append("offered by: ").AppendLine(string.Join(", ", grounds[material]));
+            byte[]? content = read(Slashed(material));
+            if (content is not { Length: > 0 })
+            {
+                said.AppendLine("(not in the install)");
+                continue;
+            }
+
+            said.AppendLine(Trimmed(StatDescriptionFiles.Decode(content)));
+            (ShadeCompile compiled, IReadOnlyList<string> inputs) = paints.Compiled(read, material);
+            said.Append("graphs name: ").AppendLine(inputs.Count > 0 ? string.Join(", ", inputs) : "no Input node");
+            said.Append("program: ").AppendLine(compiled.Program switch
+            {
+                null => "none - " + (compiled.Skipped.Count > 0 ? string.Join("; ", compiled.Skipped) : "no graph compiled"),
+                { Plain: >= 0 } plain => "a plain read of " + plain.Textures[plain.Plain].Path,
+                { } program => Say(program.Textures.Count) + " textures read"
+                    + (compiled.Skipped.Count > 0 ? " · left out: " + string.Join("; ", compiled.Skipped) : string.Empty),
+            });
+
+            foreach (string graph in MaterialFile.Read(content).Parents)
+            {
+                if (graph.Length == 0 || !printed.Add(graph))
+                {
+                    continue;
+                }
+
+                said.AppendLine().Append("=== graph ").AppendLine(graph);
+                byte[]? text = read(Slashed(graph));
+                said.AppendLine(text is { Length: > 0 } ? StatDescriptionFiles.Decode(text).TrimEnd() : "(not in the install)");
+            }
+
+            if (compiled.Program is not { } shading)
+            {
+                continue;
+            }
+
+            foreach (ShadeTexture texture in shading.Textures)
+            {
+                if (!pictured.Add(texture.Path))
+                {
+                    continue;
+                }
+
+                said.AppendLine().Append("=== ground texture ").Append(texture.Path)
+                    .AppendLine(texture.Srgb ? " (read as sRGB)" : " (read as linear)");
+                Picture(read, texture.Path, said);
+            }
+        }
+
+        if (order.Count > MostGroundMaterials)
+        {
+            said.AppendLine().Append(Say(order.Count - MostGroundMaterials)).AppendLine(" more ground materials not printed");
+        }
+    }
+
+    /// <summary>A tileset's path without the parts every one shares: <c>maps/swarm</c> for <c>metadata/terrain/maps/swarm/master.tsi</c>.</summary>
+    private static string Short(string tsi)
+    {
+        string path = Slashed(tsi);
+        if (path.StartsWith("metadata/terrain/", StringComparison.OrdinalIgnoreCase))
+        {
+            path = path["metadata/terrain/".Length..];
+        }
+
+        int slash = path.LastIndexOf('/');
+        return slash > 0 ? path[..slash] : path;
     }
 
     /// <summary>A texture's header and what the decoder made of its channels.</summary>
