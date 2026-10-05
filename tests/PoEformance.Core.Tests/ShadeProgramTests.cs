@@ -269,6 +269,29 @@ public class ShadeProgramTests
         Assert.Equal(["InputVertexColor in BasicColour", "MaskedContactFade in MaskedContactFade"], compiled.Skipped);
     }
 
+    /// <summary>
+    /// A ground material from the install: PBRGroundBN's colour at half the coordinates, its alpha the One node.
+    /// </summary>
+    /// <remarks>
+    /// EVERY GROUND MATERIAL THE DESERT TILESETS OFFER is an instance of PBRGroundBN, and before
+    /// <c>One</c> was known not one of them compiled - the dump said "One in PBRGroundBN" seven times.
+    /// The height and normal halves of the graph write channels this reader does not follow, so
+    /// nothing is left out of the colour.
+    /// </remarks>
+    [Fact]
+    public void ANDTHESANDFromTheInstallIsItsColourAtHalfTheCoordinates()
+    {
+        ShadeCompile compiled = Real("Art/Textures/Environment/desert/Shore/Ground/G_VST_Sand01.mat");
+
+        Assert.NotNull(compiled.Program);
+        Assert.Empty(compiled.Skipped);
+        Assert.Equal(-1, compiled.Program.Plain);
+        Assert.Equal(["Metadata/Materials/Ground/PBRGroundBN.fxgraph"], compiled.Program.Graphs);
+        Assert.Equal(
+            [new ShadeTexture("Art/Textures/Environment/desert/Shore/Ground/G_VST_Sand01_colour_BC7.dds", true)],
+            compiled.Program.Textures);
+    }
+
     // ---- the graphs ----
 
     /// <summary>OffsetUVTiling, as the game ships it.</summary>

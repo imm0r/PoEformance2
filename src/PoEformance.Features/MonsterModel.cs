@@ -252,6 +252,12 @@ public sealed record MonsterModel(
     /// <summary>How many of a tile's black-wall shapes were left out. See TileModels.BlackWall.</summary>
     public int Walls { get; init; }
 
+    /// <summary>How many of a tile's own materials its tileset swapped for others. See TileModels.Of.</summary>
+    public int Swapped { get; init; }
+
+    /// <summary>The tileset a tile was drawn as, or empty for the tile's own materials.</summary>
+    public string Tileset { get; init; } = string.Empty;
+
     /// <summary>
     /// Each shape's colour as its material's shader graphs compute it, or null where the plain texture stands.
     /// </summary>

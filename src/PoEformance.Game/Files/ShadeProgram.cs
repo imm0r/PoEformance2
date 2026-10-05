@@ -805,6 +805,11 @@ public sealed class ShadeProgram
                 case "Zero":
                     return build.Constant(Vector4.Zero);
 
+                // PBRGroundBN's alpha - every ground material in the desert tilesets - and a scalar
+                // broadcast like every other constant here.
+                case "One":
+                    return build.Constant(Vector4.One);
+
                 case "MultiplyConst":
                 case "MultiplyConst2":
                 case "MultiplyConst3":

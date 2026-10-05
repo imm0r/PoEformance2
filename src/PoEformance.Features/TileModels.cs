@@ -64,8 +64,20 @@ public static class TileModels
     /// really has, and from any angle but the game's a black slab in front of the tile.
     /// </param>
     /// <param name="shaded">Whether each material's shader graphs are read - see MonsterModels.Shaded.</param>
+    /// <param name="swaps">
+    /// The materials a tileset swaps on the tiles it places - see TilesetIndex.Overrides - or null for
+    /// the tile's own. EVERY DESERT TILESET placing <c>cliffcvm_stroma1</c> swaps all nine of its cliff
+    /// and ledge materials, so the tile's own are what no area of the game shows.
+    /// </param>
+    /// <param name="tileset">The tileset the swaps are from, for the line under the picture.</param>
     public static MonsterModel Of(
-        Func<string, byte[]?>? read, string? path, bool ground = true, bool walls = true, bool shaded = false)
+        Func<string, byte[]?>? read,
+        string? path,
+        bool ground = true,
+        bool walls = true,
+        bool shaded = false,
+        IReadOnlyDictionary<string, string>? swaps = null,
+        string tileset = "")
     {
         if (read is null)
         {
@@ -105,6 +117,7 @@ public static class TileModels
         var joins = new List<MeshJoin>();
         var grounds = new List<MeshJoin>();
         var named = new List<(string Shape, string Material)>();
+        var swapped = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var said = new List<string>();
         int inexact = 0;
         int subTiles = 0;
@@ -143,7 +156,7 @@ public static class TileModels
                     if (part.Props.Ready)
                     {
                         joins.Add(new MeshJoin(part.Props, null, null, place));
-                        Runs(layout, layout.RunsOf(x, y), part.Props.Shapes.Count, named);
+                        Runs(layout, layout.RunsOf(x, y), part.Props.Shapes.Count, named, swaps, swapped);
                     }
 
                     if (ground && part.Ground.Ready)
@@ -187,6 +200,8 @@ public static class TileModels
             Files = files,
             Parts = subTiles,
             Kind = ModelKind.Tile,
+            Swapped = swapped.Count,
+            Tileset = swaps is null ? string.Empty : tileset,
         };
 
         // THE WALLS GO BEFORE THE GRAPHS ARE READ, so a material only the walls wear is not compiled
@@ -300,6 +315,8 @@ public static class TileModels
             ShapeMaterials = materials,
             ShapeTextures = painted,
             Walls = count - kept,
+            Swapped = model.Swapped,
+            Tileset = model.Tileset,
         };
     }
 
@@ -342,14 +359,29 @@ public static class TileModels
     /// <remarks>
     /// SHAPES THE RUNS DO NOT REACH GET NO MATERIAL rather than the last one: a count that came up
     /// short is something to see, and stretching the last run over it would hide it.
+    ///
+    /// A TILESET'S SWAP HAPPENS HERE, before anything reads the material, so the dressing, the
+    /// graphs and the dump all see the material the area draws - and the tile's own is named only
+    /// in the count of what was swapped.
     /// </remarks>
     private static void Runs(
-        TileTemplate layout, IReadOnlyList<TileRun> runs, int shapes, List<(string Shape, string Material)> into)
+        TileTemplate layout,
+        IReadOnlyList<TileRun> runs,
+        int shapes,
+        List<(string Shape, string Material)> into,
+        IReadOnlyDictionary<string, string>? swaps,
+        HashSet<string> swapped)
     {
         var given = 0;
         foreach (TileRun run in runs)
         {
             string material = run.Material >= 0 ? layout.Materials[run.Material] : string.Empty;
+            if (swaps is not null && material.Length > 0 && swaps.TryGetValue(Slashed(MaterialFile.Bare(material)), out string? swap))
+            {
+                swapped.Add(material);
+                material = swap;
+            }
+
             for (var one = 0; one < run.Shapes && given < shapes; one++)
             {
                 into.Add((Name(into.Count), material));

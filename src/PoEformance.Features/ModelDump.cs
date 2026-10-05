@@ -148,15 +148,28 @@ public static class ModelDump
     /// <param name="read">How to get a file out of the install, by path.</param>
     /// <param name="path">The tile's .tdt.</param>
     /// <param name="model">The model already gathered, for the shapes and what each one wears.</param>
-    /// <param name="tilesets">Every <c>.tsi</c> the install has, to find the tilesets that use this tile - see <see cref="Ground"/>.</param>
+    /// <param name="tilesets">Which tilesets place which tile - see <see cref="Ground"/>.</param>
+    /// <param name="shaders">The install's shader sources, for where the engine makes a ground's coordinates - see <see cref="Shaders"/>.</param>
     public static string OfTile(
-        Func<string, byte[]?>? read, string path, MonsterModel? model, IReadOnlyList<string>? tilesets = null)
+        Func<string, byte[]?>? read,
+        string path,
+        MonsterModel? model,
+        TilesetIndex? tilesets = null,
+        IReadOnlyList<string>? shaders = null)
     {
         var said = new StringBuilder();
         said.Append("tile: ").AppendLine(path);
         if (read is null || model is null)
         {
             return said.AppendLine("nothing to read: no install, or no model").ToString();
+        }
+
+        // DRAWN AS A TILESET, the materials below are the ones it swapped in - say so first, or the
+        // .mat section reads as the tile's own.
+        if (model.Tileset.Length > 0)
+        {
+            said.Append("drawn as tileset ").Append(model.Tileset).Append(": ").Append(Say(model.Swapped))
+                .AppendLine(" of the tile's materials swapped - the materials below are the swapped-in ones");
         }
 
         IReadOnlyList<MeshShape> shapes = model.Mesh.Shapes;
@@ -257,7 +270,8 @@ public static class ModelDump
                 .Append("	graphs ").AppendLine(one < model.Shades.Count && model.Shades[one] is not null ? "program" : "-");
         }
 
-        Ground(read, path, tilesets, materials, printed, said);
+        Ground(read, path, tilesets, printed, said);
+        Shaders(read, shaders, said);
         return said.ToString();
     }
 
@@ -294,8 +308,7 @@ public static class ModelDump
     private static void Ground(
         Func<string, byte[]?> read,
         string path,
-        IReadOnlyList<string>? tilesets,
-        IReadOnlyList<string> worn,
+        TilesetIndex? tilesets,
         HashSet<string> printed,
         StringBuilder said)
     {
@@ -346,6 +359,9 @@ public static class ModelDump
             }
         }
 
+        // THE TILE'S OWN MATERIALS, from its templates, for the override lists below: the model's are
+        // the ones a chosen tileset swapped in, and an override names what it swaps out.
+        var own = new List<string>();
         foreach (string template in definition.Templates)
         {
             byte[]? raw = read(Slashed(template));
@@ -358,6 +374,7 @@ public static class ModelDump
                 continue;
             }
 
+            own.AddRange(layout.Materials);
             if (layout.GroundMask.Length > 0)
             {
                 said.AppendLine().Append("=== ground mask ").AppendLine(layout.GroundMask);
@@ -377,7 +394,9 @@ public static class ModelDump
             }
         }
 
-        Tilesets(read, at, tilesets, names, worn, printed, said);
+        // THE TILE AS ASKED FOR, not the definition it inherits from: a tile list names the tile it
+        // places, and a parent definition is another tile as far as the list is concerned.
+        Tilesets(read, Slashed(path), tilesets, names, own, printed, said);
     }
 
     /// <summary>A ground mesh in one line: its size, and where its coordinates and positions lie.</summary>
@@ -416,10 +435,10 @@ public static class ModelDump
     /// The tilesets whose tile list names this tile, what each draws this tile's ground with, and those materials.
     /// </summary>
     /// <remarks>
-    /// EXACT FIRST. A tile list names tiles by path, and a FILE NAME alone is not this tile: two
+    /// BY THE WHOLE PATH, from <see cref="TilesetIndex"/>. A FILE NAME alone is not this tile: two
     /// tilesets naming <c>Desert/AntNest/Stromatolite/CliffCvM_Stroma1.tdt</c> were printed for
     /// <c>Desert/Stromatolite/</c>'s tile, and their clay was nearly taken for its ground. Those are
-    /// now only listed, and every tileset naming the tile itself is opened.
+    /// only listed; every tileset placing the tile itself - through an included list too - is opened.
     ///
     /// ONLY WHAT TOUCHES THIS TILE: of each MaterialsList the groups this tile's corner types select,
     /// and the group with no name; of each override list the lines that replace one of this tile's
@@ -433,66 +452,35 @@ public static class ModelDump
     private static void Tilesets(
         Func<string, byte[]?> read,
         string tile,
-        IReadOnlyList<string>? tilesets,
+        TilesetIndex? tilesets,
         IReadOnlyList<(string Name, int Corners)> names,
         IReadOnlyList<string> worn,
         HashSet<string> printed,
         StringBuilder said)
     {
         said.AppendLine().AppendLine("=== tilesets that use this tile");
-        if (tilesets is not { Count: > 0 })
+        if (tilesets is not { Searched: > 0 })
         {
-            said.AppendLine("(no tilesets listed - the install walk collected no .tsi under Metadata/Terrain)");
+            said.AppendLine("(no tilesets read - the install walk collected no .tsi under Metadata/Terrain, or it has not run yet)");
             return;
         }
 
-        string file = tile[(tile.LastIndexOf('/') + 1)..];
-        string tail = tile.StartsWith("metadata/terrain/", StringComparison.OrdinalIgnoreCase) ? tile["metadata/terrain/".Length..] : tile;
-        var lists = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
-        var exact = new List<(string Tsi, string Text, string Tst, string Listed)>();
-        var alike = new List<string>();
-
-        foreach (string tsi in tilesets)
-        {
-            string? text = Raw(read, tsi);
-            if (text is null || Keyed(text, "TileSet") is not { Length: > 0 } set)
-            {
-                continue;
-            }
-
-            string tst = Beside(tsi, set);
-            if (!lists.TryGetValue(tst, out string? listed))
-            {
-                listed = Raw(read, tst);
-                lists[tst] = listed;
-            }
-
-            if (listed is null || !listed.Contains(file, StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            if (listed.Contains(tail, StringComparison.OrdinalIgnoreCase))
-            {
-                exact.Add((tsi, text, tst, listed));
-            }
-            else
-            {
-                alike.Add(tsi);
-            }
-        }
-
-        said.Append("searched ").Append(Say(tilesets.Count)).Append(" tilesets; ")
-            .Append(Say(exact.Count)).Append(" name this tile, ")
-            .Append(Say(alike.Count)).AppendLine(" only a tile of the same file name in another folder");
-        foreach ((string tsi, _, _, _) in exact)
+        IReadOnlyList<string> placing = tilesets.Of(tile);
+        IReadOnlyList<(string Tile, IReadOnlyList<string> Tilesets)> alike = tilesets.Alike(tile);
+        said.Append("searched ").Append(Say(tilesets.Searched)).Append(" tilesets; ")
+            .Append(Say(placing.Count)).Append(" place this tile, ")
+            .Append(Say(alike.Sum(one => one.Tilesets.Count))).AppendLine(" a tile of the same file name in another folder");
+        foreach (string tsi in placing)
         {
             said.Append("  ").AppendLine(tsi);
         }
 
-        foreach (string tsi in alike)
+        foreach ((string other, IReadOnlyList<string> sets) in alike)
         {
-            said.Append("  ").Append(tsi).AppendLine(" (same file name, another folder - not opened)");
+            foreach (string tsi in sets)
+            {
+                said.Append("  ").Append(tsi).Append(" (places ").Append(other).AppendLine(" - another tile, not opened)");
+            }
         }
 
         var tileWears = new HashSet<string>(
@@ -500,21 +488,17 @@ public static class ModelDump
         var grounds = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
         var order = new List<string>();
 
-        foreach ((string tsi, string text, string tst, string listed) in exact.Take(MostTilesets))
+        foreach (string tsi in placing.Take(MostTilesets))
         {
-            string where = Short(tsi);
+            string where = TilesetIndex.Short(tsi);
+            string text = Raw(read, tsi) ?? string.Empty;
             said.AppendLine().Append("=== .tsi ").AppendLine(tsi);
             said.AppendLine(Trimmed(text));
-            said.Append("--- ").Append(tst).AppendLine(" names the tile:");
-            foreach (string line in listed.Split('\n').Where(one => one.Contains(tail, StringComparison.OrdinalIgnoreCase)).Take(5))
-            {
-                said.Append("  ").AppendLine(line.Trim());
-            }
 
             var mine = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            if (Keyed(text, "MaterialsList") is { Length: > 0 } named)
+            if (TilesetFile.Value(text, "MaterialsList") is { Length: > 0 } named)
             {
-                string mtd = Beside(tsi, named);
+                string mtd = TilesetFile.Beside(tsi, named);
                 GroundMaterials list = GroundMaterials.Read(read(Slashed(mtd)));
                 said.AppendLine().Append("=== MaterialsList ").AppendLine(mtd);
                 if (list.Groups.Count == 0)
@@ -569,9 +553,9 @@ public static class ModelDump
                 }
             }
 
-            if (Keyed(text, "TileMaterialOverrides") is { Length: > 0 } overriding)
+            if (TilesetFile.Value(text, "TileMaterialOverrides") is { Length: > 0 } overriding)
             {
-                string tmo = Beside(tsi, overriding);
+                string tmo = TilesetFile.Beside(tsi, overriding);
                 IReadOnlyList<MaterialOverride> swaps = MaterialOverrides.Read(read(Slashed(tmo)));
                 var touching = swaps.Where(one => tileWears.Contains(Slashed(one.From)) || mine.Contains(Slashed(one.From))).ToList();
                 said.AppendLine().Append("=== TileMaterialOverrides ").AppendLine(tmo);
@@ -583,9 +567,9 @@ public static class ModelDump
                 }
             }
 
-            if (Keyed(text, "BlendMaskOverride") is { Length: > 0 } blend)
+            if (TilesetFile.Value(text, "BlendMaskOverride") is { Length: > 0 } blend)
             {
-                string mask = Beside(tsi, blend);
+                string mask = TilesetFile.Beside(tsi, blend);
                 said.AppendLine().Append("=== BlendMaskOverride ").AppendLine(mask);
                 Picture(read, mask, said);
             }
@@ -703,17 +687,129 @@ public static class ModelDump
         }
     }
 
-    /// <summary>A tileset's path without the parts every one shares: <c>maps/swarm</c> for <c>metadata/terrain/maps/swarm/master.tsi</c>.</summary>
-    private static string Short(string tsi)
+    /// <summary>Most shader sources printed whole because their path names the ground or the terrain.</summary>
+    private const int MostShaderFiles = 12;
+
+    /// <summary>Most lines naming the ground or the terrain quoted from the other shader sources.</summary>
+    private const int MostShaderLines = 240;
+
+    /// <summary>Most characters of one quoted shader line.</summary>
+    private const int MostShaderLine = 220;
+
+    /// <summary>Most shader sources whose text is searched.</summary>
+    private const int MostShaderSearched = 6000;
+
+    /// <summary>What a shader source's path or line must name to be printed.</summary>
+    private static readonly string[] GroundWords = ["ground", "terrain"];
+
+    /// <summary>
+    /// The install's shader sources that could say how the engine makes a ground's coordinates.
+    /// </summary>
+    /// <remarks>
+    /// THE GROUND'S GRAPHS READ <c>InputUV</c> AND ITS MESH HAS NONE: every ground material in the
+    /// desert tilesets is a PBRGroundBN instance sampling at <c>InputUV * 0.5</c>, while the .tgm's
+    /// ground block carries positions, normals and tangents only. So the engine makes the
+    /// coordinates, and no file read so far says how - which scale, from which axes. If it is
+    /// written anywhere it is in the shader sources, so they are listed and searched:
+    ///
+    ///     how many the install walk found, by folder - whether the install ships any at all
+    ///     every one whose PATH names the ground or the terrain, whole
+    ///     every LINE naming either in the rest, with its file and line number
+    ///
+    /// Not a reading of any shader language - a search, so a reader can find the place. An empty
+    /// list is an answer too: then the rule lives only in compiled shaders.
+    /// </remarks>
+    private static void Shaders(Func<string, byte[]?> read, IReadOnlyList<string>? shaders, StringBuilder said)
     {
-        string path = Slashed(tsi);
-        if (path.StartsWith("metadata/terrain/", StringComparison.OrdinalIgnoreCase))
+        said.AppendLine().AppendLine("=== shader sources - where the engine could make a ground's coordinates");
+        if (shaders is not { Count: > 0 })
         {
-            path = path["metadata/terrain/".Length..];
+            said.AppendLine("(the install walk found none: nothing under Shaders/ and no .ffx, .hlsl, .hlsli or .fxh anywhere - or it has not run yet)");
+            return;
         }
 
-        int slash = path.LastIndexOf('/');
-        return slash > 0 ? path[..slash] : path;
+        said.Append(Say(shaders.Count)).AppendLine(" files, by folder:");
+        foreach (IGrouping<string, string> folder in shaders
+            .GroupBy(Folder, StringComparer.OrdinalIgnoreCase)
+            .OrderByDescending(one => one.Count())
+            .ThenBy(one => one.Key, StringComparer.OrdinalIgnoreCase)
+            .Take(48))
+        {
+            said.Append("  ").Append(folder.Key).Append("  ").AppendLine(Say(folder.Count()));
+        }
+
+        var named = shaders.Where(one => GroundWords.Any(word => one.Contains(word, StringComparison.OrdinalIgnoreCase))).ToList();
+        said.Append(Say(named.Count)).AppendLine(" name the ground or the terrain in their path");
+        foreach (string one in named.Take(MostShaderFiles))
+        {
+            said.AppendLine().Append("=== shader source ").AppendLine(one);
+            said.AppendLine(Text(read, one));
+        }
+
+        if (named.Count > MostShaderFiles)
+        {
+            said.Append(Say(named.Count - MostShaderFiles)).AppendLine(" more not printed:");
+            foreach (string one in named.Skip(MostShaderFiles))
+            {
+                said.Append("  ").AppendLine(one);
+            }
+        }
+
+        // THE REST SEARCHED BY LINE, because a ground's coordinates may be made in a file named for
+        // something else - a vertex layout, a common include.
+        said.AppendLine().AppendLine("=== shader lines naming the ground or the terrain, in the files above not printed whole");
+        var quoted = 0;
+        var searched = 0;
+        var printedWhole = new HashSet<string>(named.Take(MostShaderFiles), StringComparer.OrdinalIgnoreCase);
+        foreach (string one in shaders)
+        {
+            if (printedWhole.Contains(one))
+            {
+                continue;
+            }
+
+            if (searched >= MostShaderSearched || quoted >= MostShaderLines)
+            {
+                break;
+            }
+
+            searched++;
+
+            if (Raw(read, one) is not { } text)
+            {
+                continue;
+            }
+
+            var number = 0;
+            foreach (string line in text.Split('\n'))
+            {
+                number++;
+                if (!GroundWords.Any(word => line.Contains(word, StringComparison.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+
+                string trimmed = line.Trim();
+                said.Append("  ").Append(one).Append(':').Append(Say(number)).Append(": ")
+                    .AppendLine(trimmed.Length > MostShaderLine ? trimmed[..MostShaderLine] + " ..." : trimmed);
+                if (++quoted >= MostShaderLines)
+                {
+                    break;
+                }
+            }
+        }
+
+        said.Append("searched ").Append(Say(searched)).Append(" files, quoted ")
+            .Append(Say(quoted)).AppendLine(quoted >= MostShaderLines ? " lines (stopped at the limit)" : " lines");
+    }
+
+    /// <summary>A path's first two folders, the grouping the shader list is counted by.</summary>
+    private static string Folder(string path)
+    {
+        string slashed = Slashed(path);
+        int first = slashed.IndexOf('/');
+        int second = first >= 0 ? slashed.IndexOf('/', first + 1) : -1;
+        return second > 0 ? slashed[..second] : first > 0 ? slashed[..first] : "(top level)";
     }
 
     /// <summary>A texture's header and what the decoder made of its channels.</summary>
@@ -722,39 +818,6 @@ public static class ModelDump
         byte[]? raw = GameArt.ReadRaw(read, path);
         said.AppendLine(Header(raw));
         said.Append(Channels(Mipmaps.Of(GameArt.Decode(raw))));
-    }
-
-    /// <summary>A key's value on its own line - <c>Key "value"</c> - unquoted, or null.</summary>
-    private static string? Keyed(string text, string key)
-    {
-        foreach (string line in text.Split('\n'))
-        {
-            string trimmed = line.Trim();
-            if (trimmed.StartsWith(key, StringComparison.Ordinal)
-                && trimmed.Length > key.Length && char.IsWhiteSpace(trimmed[key.Length]))
-            {
-                return trimmed[key.Length..].Trim().Trim('"').Replace('\\', '/');
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// A path a file names, resolved: a full one as it is, a bare name beside the file naming it.
-    /// </summary>
-    /// <remarks>annalithic's Tsi.cs resolves its lists beside the .tsi; a value starting at Metadata/ or Art/ is already whole.</remarks>
-    private static string Beside(string owner, string named)
-    {
-        string value = Slashed(named);
-        if (value.StartsWith("Metadata/", StringComparison.OrdinalIgnoreCase)
-            || value.StartsWith("Art/", StringComparison.OrdinalIgnoreCase))
-        {
-            return value;
-        }
-
-        int slash = owner.LastIndexOf('/');
-        return slash >= 0 ? owner[..(slash + 1)] + value : value;
     }
 
     private static string? Raw(Func<string, byte[]?> read, string path)

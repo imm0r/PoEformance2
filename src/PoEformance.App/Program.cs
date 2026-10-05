@@ -518,6 +518,12 @@ internal static class Program
     /// <summary>A tileset's extension - see the tile walk in the install setup.</summary>
     private const string TilesetExtension = ".tsi";
 
+    /// <summary>Where the install keeps its shader sources, if it ships any - every path under it is kept.</summary>
+    private const string ShaderFolder = "Shaders/";
+
+    /// <summary>What a shader source is called wherever it is - the tile dump searches them for the ground's coordinates.</summary>
+    private static readonly string[] ShaderExtensions = [".ffx", ".hlsl", ".hlsli", ".fxh"];
+
     /// <summary>How often <c>--peekwatch</c> re-reads the addresses it is watching.</summary>
     /// <remarks>
     /// Ten times a second, which is fast enough that a hover and its release land in
@@ -3191,13 +3197,24 @@ internal static class Program
                 // AND THE TILESETS (.tsi) IN THE SAME WALK, for the tile dump's ground section: nothing
                 // points from a tile to the areas that use it, so the dump reads every tileset's list.
                 // One more extension costs nothing beside assembling four million paths.
-                List<string> found = installed.Under(
-                    PoEformance.Features.TileBook.Root,
-                    [PoEformance.Game.Diagnostics.RoomFiles.TileExtension, PoEformance.Game.Files.RoomLayout.Extension, TilesetExtension]);
-                List<string> tiles = [.. found.Where(one => !one.EndsWith(TilesetExtension, StringComparison.OrdinalIgnoreCase))];
-                List<string> sets = [.. found.Where(one => one.EndsWith(TilesetExtension, StringComparison.OrdinalIgnoreCase))];
-                Console.WriteLine($"tiles: {tiles.Count} tile definitions and rooms, {sets.Count} tilesets in the install");
+                //
+                // AND THE SHADER SOURCES, for the question the ground left: its graphs read InputUV and
+                // its mesh has none, so the engine makes the coordinates, and if that is written down
+                // anywhere it is a shader source - under Shaders/, or anywhere by its extension.
+                List<string>[] found = installed.Under(
+                [
+                    new PoEformance.Game.Files.BundleIndex.WalkPlace(
+                        PoEformance.Features.TileBook.Root,
+                        [PoEformance.Game.Diagnostics.RoomFiles.TileExtension, PoEformance.Game.Files.RoomLayout.Extension, TilesetExtension]),
+                    new PoEformance.Game.Files.BundleIndex.WalkPlace(ShaderFolder, [string.Empty]),
+                    new PoEformance.Game.Files.BundleIndex.WalkPlace(string.Empty, ShaderExtensions),
+                ]);
+                List<string> tiles = [.. found[0].Where(one => !one.EndsWith(TilesetExtension, StringComparison.OrdinalIgnoreCase))];
+                List<string> sets = [.. found[0].Where(one => one.EndsWith(TilesetExtension, StringComparison.OrdinalIgnoreCase))];
+                List<string> shaders = [.. found[1].Concat(found[2]).Distinct(StringComparer.OrdinalIgnoreCase)];
+                Console.WriteLine($"tiles: {tiles.Count} tile definitions and rooms, {sets.Count} tilesets, {shaders.Count} shader sources in the install");
                 overlay.TileSets = sets;
+                overlay.ShaderFiles = shaders;
                 overlay.TileFiles = tiles;
             });
         }

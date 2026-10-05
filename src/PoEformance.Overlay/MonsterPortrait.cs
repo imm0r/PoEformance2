@@ -563,9 +563,12 @@ public sealed class MonsterPortrait
     public bool Shaded { get; set; }
 
     /// <summary>
-    /// Every tileset the install has, for a tile's dump to find the areas that use it - see ModelDump.OfTile.
+    /// Which tilesets place which tile, for a tile's dump to find the areas that use it - see ModelDump.OfTile.
     /// </summary>
-    public Func<IReadOnlyList<string>>? Tilesets { get; set; }
+    public TilesetCatalog? Tilesets { get; set; }
+
+    /// <summary>The install's shader sources, for a tile's dump to search - see ModelDump.OfTile.</summary>
+    public Func<IReadOnlyList<string>>? Shaders { get; set; }
 
     /// <summary>
     /// The colour a shape with no texture is drawn in, or default for the pale warm grey every book began with.
@@ -1705,6 +1708,12 @@ public sealed class MonsterPortrait
                     {
                         said += $" · {_model.Walls} black wall shape{(_model.Walls == 1 ? string.Empty : "s")} left out";
                     }
+
+                    // DRAWN AS A TILESET, how much of what is on screen is the tileset's and not the tile's.
+                    if (_model.Tileset.Length > 0)
+                    {
+                        said += $" · drawn as {_model.Tileset}: {_model.Swapped} of the tile's materials swapped";
+                    }
                 }
                 else if (_model.Mesh.Shapes.Count > _model.Materials.Count)
                 {
@@ -2422,9 +2431,10 @@ public sealed class MonsterPortrait
         MonsterModel model = _model;
         string tile = _wanted.Split('|')[0];
         Func<string, byte[]?>? install = _install;
-        IReadOnlyList<string> sets = Tilesets?.Invoke() ?? [];
+        TilesetCatalog? catalog = Tilesets;
+        IReadOnlyList<string> shaders = Shaders?.Invoke() ?? [];
         _dumped = "writing " + at + " - reading every tileset, this takes a moment";
-        _ = Task.Run(() => Write(at, () => ModelDump.OfTile(install, tile, model, sets)));
+        _ = Task.Run(() => Write(at, () => ModelDump.OfTile(install, tile, model, catalog?.Wait(), shaders)));
     }
 
     /// <summary>Writes a dump and says where, or why not, under the buttons.</summary>
@@ -2758,7 +2768,12 @@ public sealed class MonsterPortrait
     /// carry one and it would end up in the middle of "…_Active".
     /// </remarks>
     private static string Stem(string path)
-        => BossIcons.FamilyOfPath(path) is { Length: > 0 } named ? named : "monster";
+    {
+        // A BOOK'S KEY MAY CARRY WORDS after the mark - a tile's ground choice, the tileset it is
+        // drawn as, whose path would otherwise name every dump "mastertsi" - so the stem is the part before.
+        int mark = path.IndexOf('|', StringComparison.Ordinal);
+        return BossIcons.FamilyOfPath(mark >= 0 ? path[..mark] : path) is { Length: > 0 } named ? named : "monster";
+    }
 
     /// <summary>
     /// Paints what is behind the model.
