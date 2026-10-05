@@ -1026,6 +1026,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private IReadOnlyList<string> _tileFiles = [];
 
     /// <summary>
+    /// Every tileset (<c>.tsi</c>) the install has, for the tile dump's search for the areas a tile is used in.
+    /// </summary>
+    /// <remarks>Set by the same walk as <see cref="TileFiles"/>; empty until it runs.</remarks>
+    public IReadOnlyList<string> TileSets
+    {
+        get => _tileSets;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _tileSets = value;
+        }
+    }
+
+    private IReadOnlyList<string> _tileSets = [];
+
+    /// <summary>
     /// How many rooms of the current area each tile file builds, by path - a NEW dictionary only when
     /// the area's terrain changes, which is what tells the tile book to rebuild.
     /// </summary>
@@ -2755,6 +2771,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Load = static (read, _, key, _) => TileBookWindow.Load(read, key),
                 Ink = TileBookWindow.GroundInk,
                 Shaded = true,
+                Tilesets = () => TileSets,
             },
         };
 

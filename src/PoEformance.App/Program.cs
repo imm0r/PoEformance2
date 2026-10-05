@@ -515,6 +515,9 @@ internal static class Program
     /// </remarks>
     private const int QuestFlagIntervalMs = 1000;
 
+    /// <summary>A tileset's extension - see the tile walk in the install setup.</summary>
+    private const string TilesetExtension = ".tsi";
+
     /// <summary>How often <c>--peekwatch</c> re-reads the addresses it is watching.</summary>
     /// <remarks>
     /// Ten times a second, which is fast enough that a hover and its release land in
@@ -3185,10 +3188,16 @@ internal static class Program
             installed.Index.ExpectWalks(2);
             _ = Task.Run(() =>
             {
-                List<string> tiles = installed.Under(
+                // AND THE TILESETS (.tsi) IN THE SAME WALK, for the tile dump's ground section: nothing
+                // points from a tile to the areas that use it, so the dump reads every tileset's list.
+                // One more extension costs nothing beside assembling four million paths.
+                List<string> found = installed.Under(
                     PoEformance.Features.TileBook.Root,
-                    [PoEformance.Game.Diagnostics.RoomFiles.TileExtension, PoEformance.Game.Files.RoomLayout.Extension]);
-                Console.WriteLine($"tiles: {tiles.Count} tile definitions and rooms in the install");
+                    [PoEformance.Game.Diagnostics.RoomFiles.TileExtension, PoEformance.Game.Files.RoomLayout.Extension, TilesetExtension]);
+                List<string> tiles = [.. found.Where(one => !one.EndsWith(TilesetExtension, StringComparison.OrdinalIgnoreCase))];
+                List<string> sets = [.. found.Where(one => one.EndsWith(TilesetExtension, StringComparison.OrdinalIgnoreCase))];
+                Console.WriteLine($"tiles: {tiles.Count} tile definitions and rooms, {sets.Count} tilesets in the install");
+                overlay.TileSets = sets;
                 overlay.TileFiles = tiles;
             });
         }
