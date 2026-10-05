@@ -41,6 +41,16 @@ public static class TileModels
     public const int MostSubTiles = 256;
 
     /// <summary>
+    /// What the colour texture of a tile's black walls is called.
+    /// </summary>
+    /// <remarks>
+    /// THE NAME IS THE ONLY MARK THERE IS: the walls are ordinary prop shapes in the .tgm, wearing
+    /// an ordinary material whose colour map is <c>blacknofog.dds</c>. They hang down from a cliff's
+    /// edge to close the gap under it, which the game's camera never looks into and this pane does.
+    /// </remarks>
+    public const string BlackWall = "blacknofog";
+
+    /// <summary>
     /// Gathers the model for one tile, or says where the walk stopped. Never throws.
     /// </summary>
     /// <param name="read">How to get a file out of the install, by path.</param>
@@ -49,7 +59,11 @@ public static class TileModels
     /// Whether the ground block is drawn under the props. It is unpainted - see the remarks - and
     /// where it rises around a prop it hides the part of the tile somebody opened it to look at.
     /// </param>
-    public static MonsterModel Of(Func<string, byte[]?>? read, string? path, bool ground = true)
+    /// <param name="walls">
+    /// Whether the shapes painted with <see cref="BlackWall"/> are drawn. They are geometry the game
+    /// really has, and from any angle but the game's a black slab in front of the tile.
+    /// </param>
+    public static MonsterModel Of(Func<string, byte[]?>? read, string? path, bool ground = true, bool walls = true)
     {
         if (read is null)
         {
@@ -164,12 +178,122 @@ public static class TileModels
         // most of what a tile costs to open - and Bytes promises to include them. Handed the bare
         // reader, Worn's .mat and .dds reads went uncounted and the line under the picture said
         // a tile was a few kilobytes of geometry.
-        return MonsterModels.Worn(Counted, joined, named, paintTheRest: false, path, move) with
+        MonsterModel model = MonsterModels.Worn(Counted, joined, named, paintTheRest: false, path, move) with
         {
             Bytes = bytes,
             Files = files,
             Parts = subTiles,
             Kind = ModelKind.Tile,
+        };
+
+        return walls ? model : Unwalled(model);
+    }
+
+    /// <summary>
+    /// The model without the shapes whose colour texture is <see cref="BlackWall"/>.
+    /// </summary>
+    /// <remarks>
+    /// AFTER THE DRESSING, because the texture is what marks a wall and only the dressing reads it.
+    /// The vertices stay where they are - a few unused ones cost nothing - and the box is worked out
+    /// again from the triangles that remain, because the walls hang furthest down and the floor and
+    /// the framing are placed from the box.
+    /// </remarks>
+    private static MonsterModel Unwalled(MonsterModel model)
+    {
+        SkinnedMesh mesh = model.Mesh;
+        IReadOnlyList<string> textures = model.ShapeTextures;
+        int count = mesh.Shapes.Count;
+        if (textures.Count != count || model.Skins.Count != count || model.Modes.Count != count)
+        {
+            return model;
+        }
+
+        var keep = new bool[count];
+        int kept = 0;
+        int indices = 0;
+        for (var shape = 0; shape < count; shape++)
+        {
+            keep[shape] = !textures[shape].Contains(BlackWall, StringComparison.OrdinalIgnoreCase);
+            if (keep[shape])
+            {
+                kept++;
+                indices += mesh.Shapes[shape].Count;
+            }
+        }
+
+        if (kept == count || kept == 0)
+        {
+            return model;
+        }
+
+        var into = new int[indices];
+        var shapes = new MeshShape[kept];
+        var skins = new Mipmaps?[kept];
+        var modes = new string[kept];
+        var materials = new string[kept];
+        var painted = new string[kept];
+        Vector3[] positions = mesh.Positions;
+        var least = new Vector3(float.MaxValue);
+        var most = new Vector3(float.MinValue);
+        int at = 0;
+        int next = 0;
+        for (var shape = 0; shape < count; shape++)
+        {
+            if (!keep[shape])
+            {
+                continue;
+            }
+
+            MeshShape part = mesh.Shapes[shape];
+            int from = Math.Clamp(part.From, 0, mesh.Indices.Length);
+            int length = Math.Clamp(part.Count, 0, mesh.Indices.Length - from);
+            Array.Copy(mesh.Indices, from, into, at, length);
+            for (int one = at; one < at + length; one++)
+            {
+                Vector3 point = positions[into[one]];
+                least = Vector3.Min(least, point);
+                most = Vector3.Max(most, point);
+            }
+
+            shapes[next] = part with { From = at, Count = length };
+            skins[next] = model.Skins[shape];
+            modes[next] = model.Modes[shape];
+            materials[next] = shape < model.ShapeMaterials.Count ? model.ShapeMaterials[shape] : string.Empty;
+            painted[next] = textures[shape];
+            at += length;
+            next++;
+        }
+
+        if (at == 0)
+        {
+            return model;
+        }
+
+        SkinnedMesh unwalled = SkinnedMesh.Of(
+            positions, mesh.Normals, at == into.Length ? into : into[..at], least, most, mesh.Coordinates, shapes);
+
+        // A FRESH RECORD RATHER THAN with, because MonsterModel keeps its blends worked out
+        // from Modes in a field of its own, and with copies the field along with everything else.
+        return new MonsterModel(unwalled, model.Skin, model.Mesh_, model.Material, model.Why, model.Paint)
+        {
+            Skins = skins,
+            Modes = modes,
+            Materials = model.Materials,
+            BodyLeast = least,
+            BodyMost = most,
+            NamedInAo = model.NamedInAo,
+            Runs = model.Runs,
+            Textures = model.Textures,
+            Guessed = model.Guessed,
+            Move = model.Move,
+            Bytes = model.Bytes,
+            Files = model.Files,
+            Parts = model.Parts,
+            Shaders = model.Shaders,
+            Kind = model.Kind,
+            ShapeMaterials = materials,
+            ShapeTextures = painted,
+            Walls = count - kept,
         };
     }
 

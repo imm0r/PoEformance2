@@ -136,6 +136,125 @@ public static class ModelDump
     }
 
     /// <summary>
+    /// The materials and textures behind a rigid model - a terrain tile - shape by shape.
+    /// </summary>
+    /// <remarks>
+    /// A TILE HAS NO .ao CHAIN TO PRINT, and what is asked of it is a different question: why a
+    /// shape comes out in a colour no desert has. The answer is in three places a picture cannot
+    /// show - which material the shape wears, which texture the material's slots hand over as the
+    /// colour map, and what block format that texture is - so all three are printed: every
+    /// material verbatim, every texture's DDS header, and one line per shape joining them.
+    /// </remarks>
+    /// <param name="read">How to get a file out of the install, by path.</param>
+    /// <param name="path">The tile's .tdt.</param>
+    /// <param name="model">The model already gathered, for the shapes and what each one wears.</param>
+    public static string OfTile(Func<string, byte[]?>? read, string path, MonsterModel? model)
+    {
+        var said = new StringBuilder();
+        said.Append("tile: ").AppendLine(path);
+        if (read is null || model is null)
+        {
+            return said.AppendLine("nothing to read: no install, or no model").ToString();
+        }
+
+        IReadOnlyList<MeshShape> shapes = model.Mesh.Shapes;
+        IReadOnlyList<string> materials = model.ShapeMaterials;
+        IReadOnlyList<string> textures = model.ShapeTextures;
+
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (string material in materials)
+        {
+            string file = MaterialFile.Bare(material);
+            if (file.Length == 0 || !seen.Add(file))
+            {
+                continue;
+            }
+
+            said.AppendLine().Append("=== .mat ").AppendLine(file);
+            byte[]? content = read(file.Replace('\\', '/').Trim());
+            said.AppendLine(content is { Length: > 0 } ? StatDescriptionFiles.Decode(content).TrimEnd() : "(not in the install)");
+        }
+
+        seen.Clear();
+        foreach (string texture in textures)
+        {
+            if (texture.Length == 0 || !seen.Add(texture))
+            {
+                continue;
+            }
+
+            said.AppendLine().Append("=== texture ").AppendLine(texture);
+            said.AppendLine(Header(GameArt.ReadRaw(read, texture)));
+        }
+
+        said.AppendLine().Append("=== shapes (").Append(Say(shapes.Count)).AppendLine(")");
+        IReadOnlyList<string> modes = model.Modes;
+        for (var one = 0; one < shapes.Count; one++)
+        {
+            MeshShape shape = shapes[one];
+            said.Append(Say(one))
+                .Append("	from ").Append(Say(shape.From))
+                .Append("	count ").Append(Say(shape.Count))
+                .Append("	mat ").Append(one < materials.Count && materials[one].Length > 0 ? materials[one] : "-")
+                .Append("	tex ").Append(one < textures.Count && textures[one].Length > 0 ? textures[one] : "-")
+                .Append("	blend ").AppendLine(one < modes.Count && modes[one].Length > 0 ? modes[one] : "-");
+        }
+
+        return said.ToString();
+    }
+
+    /// <summary>
+    /// What a DDS file's header says: its size, its levels and its block format.
+    /// </summary>
+    /// <remarks>
+    /// THE FORMAT IS THE PART WORTH HAVING. A texture decoded in the wrong format - or a two-channel
+    /// map taken for a colour one - is a shape in colours nobody painted, and only the header says
+    /// which of the two it is. Read straight off the bytes, because the decoder keeps none of it.
+    /// </remarks>
+    private static string Header(byte[]? dds)
+    {
+        const int Least = 128;
+        if (dds is null || dds.Length < Least)
+        {
+            return "(not in the install, or too short to be a DDS)";
+        }
+
+        if (dds[0] != (byte)'D' || dds[1] != (byte)'D' || dds[2] != (byte)'S' || dds[3] != (byte)' ')
+        {
+            return "(not a DDS)";
+        }
+
+        int height = BitConverter.ToInt32(dds, 12);
+        int width = BitConverter.ToInt32(dds, 16);
+        int levels = BitConverter.ToInt32(dds, 28);
+        uint flags = BitConverter.ToUInt32(dds, 80);
+        string fourCc = Encoding.ASCII.GetString(dds, 84, 4).TrimEnd('\0');
+        var line = new StringBuilder();
+        line.Append(Say(width)).Append('x').Append(Say(height))
+            .Append(" · ").Append(Say(levels)).Append(" levels")
+            .Append(" · pixel format flags 0x").Append(flags.ToString("X", CultureInfo.InvariantCulture));
+
+        if ((flags & 0x4) != 0)
+        {
+            line.Append(" · fourCC ").Append(fourCc);
+            if (fourCc == "DX10" && dds.Length >= Least + 4)
+            {
+                line.Append(" · DXGI format ").Append(Say(BitConverter.ToInt32(dds, Least)));
+            }
+        }
+        else
+        {
+            line.Append(" · ").Append(Say(BitConverter.ToInt32(dds, 88))).Append(" bits")
+                .Append(" · masks r 0x").Append(BitConverter.ToUInt32(dds, 92).ToString("X8", CultureInfo.InvariantCulture))
+                .Append(" g 0x").Append(BitConverter.ToUInt32(dds, 96).ToString("X8", CultureInfo.InvariantCulture))
+                .Append(" b 0x").Append(BitConverter.ToUInt32(dds, 100).ToString("X8", CultureInfo.InvariantCulture))
+                .Append(" a 0x").Append(BitConverter.ToUInt32(dds, 104).ToString("X8", CultureInfo.InvariantCulture));
+        }
+
+        return line.ToString();
+    }
+
+    /// <summary>
     /// Where each piece SITS, and whether its socket is a bone the parent's rig really has.
     /// </summary>
     /// <remarks>
