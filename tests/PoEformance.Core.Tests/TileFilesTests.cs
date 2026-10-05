@@ -511,6 +511,15 @@ public class TileFilesTests
         Assert.All([1, 2, 3], shape => Assert.NotNull(model.Shades[shape]));
         Assert.Same(model.Shades[1], model.Shades[3]);
         Assert.NotNull(model.Skins[0]);
+
+        // THE DUMP NAMES WHAT THE PROGRAM READS, how, and what the decoder made of every channel:
+        // the one texel is blue 10, green 20, red 30 and alpha 255, written blue first.
+        string dump = ModelDump.OfTile(path => files.GetValueOrDefault(path), "Metadata/Terrain/Test/Arena.tdt", model);
+        Assert.Contains("=== program texture Art/Textures/floor.dds (read as linear)", dump, StringComparison.Ordinal);
+        Assert.Contains("=== program texture Art/Textures/wall.dds (read as sRGB)", dump, StringComparison.Ordinal);
+        Assert.Contains("  r: 30 30 30 30 30 · 30.0", dump, StringComparison.Ordinal);
+        Assert.Contains("  a: 255 255 255 255 255 · 255.0", dump, StringComparison.Ordinal);
+        Assert.Contains("graphs program", dump, StringComparison.Ordinal);
     }
 
     [Fact]
