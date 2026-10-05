@@ -436,6 +436,25 @@ public class TileFilesTests
         Assert.Contains("tex Art/Textures/blacknofog.dds", dump, StringComparison.Ordinal);
     }
 
+    /// <summary>The dump prints the graphs a tile's materials name, once each, after the materials.</summary>
+    [Fact]
+    public void ANDTheDumpPrintsTheGraphsTheMaterialsName()
+    {
+        Dictionary<string, byte[]> files = Install();
+        const string Graph = "Metadata/Materials/Environment/Ledge_Blend.fxgraph";
+        files["Art/Textures/Floor.mat"] = Encoding.UTF8.GetBytes(
+            $$"""{"graphinstances":[{"parent":"{{Graph}}","custom_parameters":[{"name":"AlbedoTransparency_TEX","parameters":[{"path":"Art/Textures/floor.dds"}]}]}]}""");
+        files[Graph] = Encoding.UTF8.GetBytes("{\"nodes\":[\"mask\"]}");
+
+        Func<string, byte[]?> read = path => files.GetValueOrDefault(path);
+        string dump = ModelDump.OfTile(read, "Metadata/Terrain/Test/Arena.tdt", TileModels.Of(read, "Metadata/Terrain/Test/Arena.tdt"));
+
+        int at = dump.IndexOf("=== graph " + Graph, StringComparison.Ordinal);
+        Assert.True(at > dump.IndexOf("=== .mat Art/Textures/Floor.mat", StringComparison.Ordinal), dump);
+        Assert.Equal(at, dump.LastIndexOf("=== graph " + Graph, StringComparison.Ordinal));
+        Assert.Contains("{\"nodes\":[\"mask\"]}", dump, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void ANDATILECostsWhatItReadMaterialsAndTexturesIncluded()
     {

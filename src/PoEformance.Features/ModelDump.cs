@@ -162,6 +162,7 @@ public static class ModelDump
         IReadOnlyList<string> textures = model.ShapeTextures;
 
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var graphs = new List<string>();
         foreach (string material in materials)
         {
             string file = MaterialFile.Bare(material);
@@ -172,6 +173,32 @@ public static class ModelDump
 
             said.AppendLine().Append("=== .mat ").AppendLine(file);
             byte[]? content = read(file.Replace('\\', '/').Trim());
+            if (content is not { Length: > 0 })
+            {
+                said.AppendLine("(not in the install)");
+                continue;
+            }
+
+            said.AppendLine(StatDescriptionFiles.Decode(content).TrimEnd());
+            graphs.AddRange(MaterialFile.Read(content).Parents);
+        }
+
+        // AND THE GRAPHS THE MATERIALS NAME, verbatim, once each. A material only hands a graph its
+        // inputs; what the graph does with them is in the graph. The stromatolite ledge was the case:
+        // its .mat gives StromatoliteLedge_Blend a texture in a slot called Meshmap, the pane drew
+        // that texture as colour and got green and magenta, and which textures the graph blends by
+        // it - and how - is written nowhere but the graph. One level deep: a graph's own parents
+        // are printed only where some material names them too.
+        seen.Clear();
+        foreach (string graph in graphs)
+        {
+            if (graph.Length == 0 || !seen.Add(graph))
+            {
+                continue;
+            }
+
+            said.AppendLine().Append("=== graph ").AppendLine(graph);
+            byte[]? content = read(graph.Replace('\\', '/').Trim());
             said.AppendLine(content is { Length: > 0 } ? StatDescriptionFiles.Decode(content).TrimEnd() : "(not in the install)");
         }
 
