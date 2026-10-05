@@ -384,3 +384,120 @@ public static class MaterialOverrides
         return value;
     }
 }
+
+/// <summary>
+/// A tileset (<c>.tsi</c>): the files an area's terrain is built from, one per key.
+/// </summary>
+/// <remarks>
+/// A LINE PER KEY - <c>TileSet "tiles.tst"</c>, <c>MaterialsList "materials.mtd"</c>,
+/// <c>TileMaterialOverrides "material_overrides.tmo"</c> - with the value quoted or not. A bare name
+/// is a file BESIDE the tileset, which is how annalithic's Tsi.cs resolves them; a value starting at
+/// <c>Metadata/</c> or <c>Art/</c> is already whole.
+/// </remarks>
+public static class TilesetFile
+{
+    /// <summary>What a tileset's file name ends with.</summary>
+    public const string Extension = ".tsi";
+
+    /// <summary>A key's value on its own line, unquoted and with forward slashes, or null.</summary>
+    public static string? Value(string? text, string key)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+        if (string.IsNullOrEmpty(text))
+        {
+            return null;
+        }
+
+        foreach (string line in text.Split('\n'))
+        {
+            string trimmed = line.Trim();
+            if (trimmed.StartsWith(key, StringComparison.Ordinal)
+                && trimmed.Length > key.Length && char.IsWhiteSpace(trimmed[key.Length]))
+            {
+                return trimmed[key.Length..].Trim().Trim('"').Replace('\\', '/');
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>A path a file names, resolved: a whole one as it is, a bare name beside the file naming it.</summary>
+    public static string Beside(string owner, string named)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+        ArgumentNullException.ThrowIfNull(named);
+        string value = named.Replace('\\', '/').Trim();
+        if (value.StartsWith("Metadata/", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("Art/", StringComparison.OrdinalIgnoreCase))
+        {
+            return value;
+        }
+
+        int slash = owner.LastIndexOf('/');
+        return slash >= 0 ? owner[..(slash + 1)] + value : value;
+    }
+}
+
+/// <summary>
+/// A tileset's tile list (<c>.tst</c>): the tiles it may place, and the other lists it takes in whole.
+/// </summary>
+/// <remarks>
+/// poe_data_tools' <c>tst</c> grammar: lines, <c>//</c> ones skipped; first any number of
+/// <c>include "other.tst"</c>, then a line per tile - an optional weight, the quoted <c>.tdt</c>, and
+/// words naming its rotations. AN INCLUDED LIST IS PART OF THIS ONE, so a tileset can place a tile
+/// its own file never names; reading the lists by searching their text missed exactly those.
+/// </remarks>
+public sealed record TileList(IReadOnlyList<string> Includes, IReadOnlyList<string> Tiles)
+{
+    /// <summary>What a tile list's file name ends with.</summary>
+    public const string Extension = ".tst";
+
+    /// <summary>Nothing read.</summary>
+    public static TileList None { get; } = new([], []);
+
+    /// <summary>Reads a file's bytes, through the game's shared text decode. Never throws.</summary>
+    public static TileList Read(byte[]? content)
+        => content is not { Length: > 0 } ? None : Parse(StatDescriptionFiles.Decode(content));
+
+    /// <summary>Reads the text. Public so the format can be tested without an install.</summary>
+    public static TileList Parse(string? text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return None;
+        }
+
+        var includes = new List<string>();
+        var tiles = new List<string>();
+        foreach (string line in text.Split('\n'))
+        {
+            ReadOnlySpan<char> rest = line.AsSpan().Trim();
+            if (rest.IsEmpty || rest.StartsWith("//", StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            int open = rest.IndexOf('"');
+            int close = open >= 0 ? rest[(open + 1)..].IndexOf('"') : -1;
+            if (close < 0)
+            {
+                continue;
+            }
+
+            string quoted = rest.Slice(open + 1, close).ToString().Replace('\\', '/');
+            if (rest.StartsWith("include", StringComparison.Ordinal))
+            {
+                if (quoted.EndsWith(Extension, StringComparison.OrdinalIgnoreCase))
+                {
+                    includes.Add(quoted);
+                }
+            }
+            else if (quoted.EndsWith(".tdt", StringComparison.OrdinalIgnoreCase))
+            {
+                tiles.Add(quoted);
+            }
+        }
+
+        return new TileList(includes, tiles);
+    }
+}

@@ -1042,6 +1042,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private IReadOnlyList<string> _tileSets = [];
 
     /// <summary>
+    /// The install's shader sources, for the tile dump's search for where a ground's coordinates are made.
+    /// </summary>
+    /// <remarks>Set by the same walk as <see cref="TileFiles"/>; empty until it runs, and empty if the install ships none.</remarks>
+    public IReadOnlyList<string> ShaderFiles
+    {
+        get => _shaderFiles;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _shaderFiles = value;
+        }
+    }
+
+    private IReadOnlyList<string> _shaderFiles = [];
+
+    /// <summary>
     /// How many rooms of the current area each tile file builds, by path - a NEW dictionary only when
     /// the area's terrain changes, which is what tells the tile book to rebuild.
     /// </summary>
@@ -2763,15 +2779,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         IReadOnlyDictionary<string, int>? columnWidths = null,
         IReadOnlyDictionary<string, double>? panes = null)
     {
+        // ONE INDEX OF WHICH TILESETS PLACE WHICH TILE, built off the frame on first ask: the pane's
+        // tileset choice and the dump both read it, and building it twice would read every tileset twice.
+        var catalog = new TilesetCatalog(readFile, () => TileSets);
         var window = new TileBookWindow(() => TileFiles, TilesHere)
         {
             Changed = () => SettingsChanged?.Invoke(),
+            Tilesets = catalog,
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
                 Load = static (read, _, key, _) => TileBookWindow.Load(read, key),
                 Ink = TileBookWindow.GroundInk,
                 Shaded = true,
-                Tilesets = () => TileSets,
+                Tilesets = catalog,
+                Shaders = () => ShaderFiles,
             },
         };
 

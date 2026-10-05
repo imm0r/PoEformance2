@@ -425,14 +425,53 @@ public sealed class BundleIndex
         string? folder,
         IReadOnlyList<string> extensions)
     {
-        ArgumentNullException.ThrowIfNull(decompress);
         ArgumentNullException.ThrowIfNull(extensions);
+        WalkPlace[] places = string.IsNullOrWhiteSpace(folder) ? [] : [new WalkPlace(folder, extensions)];
+        (Dictionary<string, string> found, List<string>[] inside) = Walked(decompress, wanted, places);
+        return new WalkedNames(found, inside.Length > 0 ? inside[0] : []);
+    }
+
+    /// <summary>One place a walk keeps paths from: a folder, and what a kept path may end with.</summary>
+    /// <param name="Folder">A path prefix, e.g. <c>Shaders/</c>. EMPTY MEANS ANYWHERE, and then an extension is required.</param>
+    /// <param name="Extensions">What a kept path may end with. An empty one keeps every path in the folder.</param>
+    public readonly record struct WalkPlace(string Folder, IReadOnlyList<string> Extensions);
+
+    /// <summary>
+    /// Every path in each of several places, in one walk - a list per place, in the order asked.
+    /// </summary>
+    /// <remarks>
+    /// THE TILE BOOK'S WALK WANTS TWO TREES: its tiles under <c>Metadata/Terrain/</c>, and the shader
+    /// sources a tile's ground dump searches, which are under <c>Shaders/</c> or anywhere by their
+    /// extension. A second walk would find nothing - the path text is dropped after the walks the
+    /// session announced - so the places are one call. A place ANYWHERE must name an extension: an
+    /// empty folder with an empty extension would keep all four million paths, and is skipped.
+    /// </remarks>
+    /// <param name="decompress">How to undo Oodle - the same one the bundles are read with.</param>
+    /// <param name="places">Where paths are kept from.</param>
+    public List<string>[] Places(Func<ReadOnlyMemory<byte>, int, byte[]?> decompress, IReadOnlyList<WalkPlace> places)
+    {
+        ArgumentNullException.ThrowIfNull(places);
+        return Walked(decompress, null, places).Inside;
+    }
+
+    /// <summary>The walk itself: the wanted names, and the paths in each place.</summary>
+    private (Dictionary<string, string> Found, List<string>[] Inside) Walked(
+        Func<ReadOnlyMemory<byte>, int, byte[]?> decompress,
+        IReadOnlyCollection<string>? wanted,
+        IReadOnlyList<WalkPlace> places)
+    {
+        ArgumentNullException.ThrowIfNull(decompress);
 
         var found = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        var inside = new List<string>();
+        var inside = new List<string>[places.Count];
+        for (var one = 0; one < inside.Length; one++)
+        {
+            inside[one] = [];
+        }
+
         if (!Named)
         {
-            return new WalkedNames(found, inside);
+            return (found, inside);
         }
 
         // What is being looked for, by the hash of its name, so a path can be tested without
@@ -458,13 +497,29 @@ public sealed class BundleIndex
             }
         }
 
-        byte[] starts = string.IsNullOrWhiteSpace(folder)
-            ? [] : System.Text.Encoding.UTF8.GetBytes(folder);
-        byte[][] ends = [.. extensions.Select(one => System.Text.Encoding.UTF8.GetBytes(one ?? string.Empty))];
-
-        if (asked.Count == 0 && starts.Length == 0)
+        var starts = new byte[places.Count][];
+        var ends = new byte[places.Count][][];
+        var live = new bool[places.Count];
+        var anyPlace = false;
+        for (var one = 0; one < places.Count; one++)
         {
-            return new WalkedNames(found, inside);
+            WalkPlace place = places[one];
+            starts[one] = string.IsNullOrWhiteSpace(place.Folder) ? [] : System.Text.Encoding.UTF8.GetBytes(place.Folder);
+            ends[one] = [.. (place.Extensions ?? []).Select(end => System.Text.Encoding.UTF8.GetBytes(end ?? string.Empty))];
+
+            // ANYWHERE KEEPS ONLY WHAT AN EXTENSION NAMES - an empty one there would match every path.
+            if (starts[one].Length == 0)
+            {
+                ends[one] = [.. ends[one].Where(end => end.Length > 0)];
+            }
+
+            live[one] = starts[one].Length > 0 || ends[one].Length > 0;
+            anyPlace |= live[one];
+        }
+
+        if (asked.Count == 0 && !anyPlace)
+        {
+            return (found, inside);
         }
 
         byte[] packed = Volatile.Read(ref _named);
@@ -472,7 +527,7 @@ public sealed class BundleIndex
         byte[]? paths = blob?.Read(decompress);
         if (paths is null)
         {
-            return new WalkedNames(found, inside);
+            return (found, inside);
         }
 
         Walk(paths, path =>
@@ -482,12 +537,16 @@ public sealed class BundleIndex
                 Keep(path, asked, found);
             }
 
-            if (starts.Length > 0
-                && path.Length >= starts.Length
-                && path[..starts.Length].SequenceEqual(starts, CaseBlind)
-                && Ends(path, starts.Length, ends))
+            for (var one = 0; one < starts.Length; one++)
             {
-                inside.Add(System.Text.Encoding.UTF8.GetString(path));
+                byte[] start = starts[one];
+                if (live[one]
+                    && path.Length >= start.Length
+                    && path[..start.Length].SequenceEqual(start, CaseBlind)
+                    && Ends(path, start.Length, ends[one]))
+                {
+                    inside[one].Add(System.Text.Encoding.UTF8.GetString(path));
+                }
             }
         });
 
@@ -500,7 +559,7 @@ public sealed class BundleIndex
             Interlocked.Exchange(ref _named, []);
         }
 
-        return new WalkedNames(found, inside);
+        return (found, inside);
     }
 
     /// <summary>Whether a path past its folder ends in one of the extensions.</summary>

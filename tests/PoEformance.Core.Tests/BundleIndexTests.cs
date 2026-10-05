@@ -508,4 +508,36 @@ public class BundleIndexTests
         Assert.Equal(3, found.Count);
         Assert.Contains("data/statdescriptions/notes.txt", found);
     }
+
+    /// <summary>
+    /// One walk keeps paths from several places - a folder, and anywhere by extension - a list per place.
+    /// </summary>
+    /// <remarks>
+    /// THE TILE BOOK'S WALK: its tiles under one folder and the shader sources wherever they are. An
+    /// empty folder means anywhere, and there only a named extension keeps a path - an empty one
+    /// would keep all of them - so the third place, anywhere with nothing named, keeps nothing.
+    /// </remarks>
+    [Fact]
+    public void ANDOneWalkCanKeepSeveralPlacesAndAnywhereByExtension()
+    {
+        BundleIndex index = WithNames(20);
+
+        List<string>[] found = index.Places(
+            Packed.AsIs,
+            [
+                new BundleIndex.WalkPlace("art/2ditems/", [""]),
+                new BundleIndex.WalkPlace(string.Empty, [".csd"]),
+                new BundleIndex.WalkPlace(string.Empty, [""]),
+            ]);
+
+        Assert.Equal(3, found.Length);
+        Assert.Equal(["art/2ditems/weapons/bow.dds", "art/2ditems/weapons/quiver.dds"], found[0]);
+        Assert.Equal(
+            ["data/statdescriptions/stat_descriptions.csd", "data/statdescriptions/skills/skill_stat_descriptions.csd"],
+            found[1]);
+        Assert.Empty(found[2]);
+
+        // AND IT IS ONE WALK, spent like any other.
+        Assert.False(index.Named);
+    }
 }

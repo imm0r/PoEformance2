@@ -243,6 +243,10 @@ public sealed class GameFiles
     public List<string> Under(string? folder, IReadOnlyList<string> extensions)
         => Index.Names(_decompress, null, folder, extensions).Inside;
 
+    /// <summary>Every path in each of several places, in one walk - see <see cref="BundleIndex.Places"/>.</summary>
+    public List<string>[] Under(IReadOnlyList<BundleIndex.WalkPlace> places)
+        => Index.Places(_decompress, places);
+
     /// <summary>
     /// A bundle's chunk table, opened once and kept.
     /// </summary>

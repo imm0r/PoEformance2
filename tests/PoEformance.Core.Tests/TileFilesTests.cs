@@ -603,7 +603,7 @@ public class TileFilesTests
         MonsterModel model = TileModels.Of(read, "Metadata/Terrain/Test/Arena.tdt");
         string dump = ModelDump.OfTile(
             read, "Metadata/Terrain/Test/Arena.tdt", model,
-            ["Metadata/Terrain/Other/other.tsi", "Metadata/Terrain/Woods/woods.tsi", "Metadata/Terrain/Test/desert.tsi"]);
+            TilesetIndex.Build(read, ["Metadata/Terrain/Other/other.tsi", "Metadata/Terrain/Woods/woods.tsi", "Metadata/Terrain/Test/desert.tsi"]));
 
         Assert.Contains("  down-left: Metadata/Terrain/Test/sand.gt", dump, StringComparison.Ordinal);
         Assert.Contains("  up-left: -", dump, StringComparison.Ordinal);
@@ -611,8 +611,8 @@ public class TileFilesTests
         Assert.Contains("=== ground mesh of Art/Models/Terrain/Test/Arena.tgt", dump, StringComparison.Ordinal);
 
         // EXACT FIRST, the same file name elsewhere listed and left shut.
-        Assert.Contains("searched 3 tilesets; 1 name this tile, 1 only a tile of the same file name in another folder", dump, StringComparison.Ordinal);
-        Assert.Contains("  Metadata/Terrain/Other/other.tsi (same file name, another folder - not opened)", dump, StringComparison.Ordinal);
+        Assert.Contains("searched 3 tilesets; 1 place this tile, 1 a tile of the same file name in another folder", dump, StringComparison.Ordinal);
+        Assert.Contains("  Metadata/Terrain/Other/other.tsi (places metadata/terrain/other/arena.tdt - another tile, not opened)", dump, StringComparison.Ordinal);
         Assert.Contains("=== .tsi Metadata/Terrain/Test/desert.tsi", dump, StringComparison.Ordinal);
         Assert.DoesNotContain("=== .tsi Metadata/Terrain/Other/other.tsi", dump, StringComparison.Ordinal);
         Assert.DoesNotContain("=== .tsi Metadata/Terrain/Woods/woods.tsi", dump, StringComparison.Ordinal);
@@ -637,6 +637,74 @@ public class TileFilesTests
         Assert.Contains("graphs name: InputWorldPos", dump, StringComparison.Ordinal);
         Assert.Contains("=== graph Metadata/Ground.fxgraph", dump, StringComparison.Ordinal);
         Assert.Contains("=== ground texture Art/Textures/floor.dds (read as sRGB)", dump, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A tile drawn as a tileset wears the materials it swaps in, and says how many - the dump first of all.
+    /// </summary>
+    /// <remarks>
+    /// The wall's material is swapped for a prism, the floor's is left: the swapped shape is painted
+    /// from the prism's texture, the count says one, and the dump says the materials it prints are
+    /// the swapped-in ones before printing them.
+    /// </remarks>
+    [Fact]
+    public void ATILEDrawnAsATilesetWearsTheMaterialsItSwapsIn()
+    {
+        Dictionary<string, byte[]> files = Install();
+        files["Art/Textures/Prism.mat"] = Mat("Art/Textures/prism.dds");
+        files["Art/Textures/prism.dds"] = Dds();
+        Func<string, byte[]?> read = path => files.GetValueOrDefault(path);
+        var swaps = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { ["art/textures/wall.mat"] = "Art/Textures/Prism.mat" };
+
+        MonsterModel own = TileModels.Of(read, "Metadata/Terrain/Test/Arena.tdt");
+        MonsterModel drawn = TileModels.Of(read, "Metadata/Terrain/Test/Arena.tdt", swaps: swaps, tileset: "maps/desert");
+
+        Assert.True(drawn.Ready, drawn.Why);
+        Assert.Equal(0, own.Swapped);
+        Assert.Equal(string.Empty, own.Tileset);
+        Assert.Equal("Art/Textures/Wall.mat", own.ShapeMaterials[0]);
+
+        Assert.Equal(1, drawn.Swapped);
+        Assert.Equal("maps/desert", drawn.Tileset);
+        Assert.Equal("Art/Textures/Prism.mat", drawn.ShapeMaterials[0]);
+        Assert.Equal("Art/Textures/prism.dds", drawn.ShapeTextures[0]);
+        Assert.Equal("Art/Textures/Floor.mat", drawn.ShapeMaterials[1]);
+
+        string dump = ModelDump.OfTile(read, "Metadata/Terrain/Test/Arena.tdt", drawn);
+        Assert.StartsWith(
+            "tile: Metadata/Terrain/Test/Arena.tdt" + Environment.NewLine
+                + "drawn as tileset maps/desert: 1 of the tile's materials swapped",
+            dump, StringComparison.Ordinal);
+        Assert.Contains("=== .mat Art/Textures/Prism.mat", dump, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The dump's shader section: the sources by folder, those whose path names the ground whole, and the lines naming it elsewhere.
+    /// </summary>
+    [Fact]
+    public void THEDUMPSearchesTheShaderSourcesForTheGround()
+    {
+        Dictionary<string, byte[]> files = Install();
+        files["Shaders/Renderer/Ground.ffx"] = Encoding.UTF8.GetBytes("fragment ground\nfloat2 uv = world_pos.xy * scale;\n");
+        files["Shaders/Common/Util.hlsl"] = Encoding.Unicode.GetBytes("\uFEFFfloat a;\r\n// Terrain coordinates\r\nfloat b;\r\n");
+        Func<string, byte[]?> read = path => files.GetValueOrDefault(path);
+        MonsterModel model = TileModels.Of(read, "Metadata/Terrain/Test/Arena.tdt");
+
+        string dump = ModelDump.OfTile(
+            read, "Metadata/Terrain/Test/Arena.tdt", model, null,
+            ["Shaders/Renderer/Ground.ffx", "Shaders/Common/Util.hlsl", "Shaders/Common/Missing.hlsl"]);
+
+        Assert.Contains("3 files, by folder:", dump, StringComparison.Ordinal);
+        Assert.Contains("  Shaders/Common  2", dump, StringComparison.Ordinal);
+        Assert.Contains("  Shaders/Renderer  1", dump, StringComparison.Ordinal);
+        Assert.Contains("1 name the ground or the terrain in their path", dump, StringComparison.Ordinal);
+        Assert.Contains("=== shader source Shaders/Renderer/Ground.ffx", dump, StringComparison.Ordinal);
+        Assert.Contains("float2 uv = world_pos.xy * scale;", dump, StringComparison.Ordinal);
+        Assert.Contains("  Shaders/Common/Util.hlsl:2: // Terrain coordinates", dump, StringComparison.Ordinal);
+        Assert.Contains("searched 2 files, quoted 1 lines", dump, StringComparison.Ordinal);
+
+        string none = ModelDump.OfTile(read, "Metadata/Terrain/Test/Arena.tdt", model);
+        Assert.Contains("(the install walk found none:", none, StringComparison.Ordinal);
     }
 
     [Fact]

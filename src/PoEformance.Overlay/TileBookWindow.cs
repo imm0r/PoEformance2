@@ -38,17 +38,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>The query term the "only this area" checkbox writes.</summary>
     private const string HereField = "here";
 
-    /// <summary>What separates a room's path from its unit, or a tile's from <see cref="Bare"/>, in the key the portrait loads by.</summary>
-    private const char UnitMark = '|';
-
-    /// <summary>The word in a tile's key when its ground is left out.</summary>
-    private const string Bare = "bare";
-
-    /// <summary>The word in a tile's key when its black walls are left out. See TileModels.BlackWall.</summary>
-    private const string Unwalled = "unwalled";
-
-    /// <summary>What separates the words after a tile's <see cref="UnitMark"/>.</summary>
-    private const char WordMark = '+';
+    /// <summary>What separates a room's path from its unit in the key the portrait loads by - the tile key's mark. See TileKey.</summary>
+    private const char UnitMark = TileKey.Mark;
 
     /// <summary>The colour the unpainted ground is drawn in: a dark, flat grey that stays behind the props.</summary>
     public static readonly Vector3 GroundInk = new(0.34f, 0.34f, 0.35f);
@@ -64,6 +55,15 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
     /// <summary>Whether a tile is drawn with its black walls. See TileModels.BlackWall.</summary>
     private bool _walls = true;
+
+    /// <summary>
+    /// The tileset a tile is drawn as, or empty for the tile's own materials.
+    /// </summary>
+    /// <remarks>
+    /// KEPT ACROSS TILES, and used only where the chosen tile is one the tileset places - so a look
+    /// through one area's tiles stays in that area, and a tile it does not place is drawn as itself.
+    /// </remarks>
+    private string _tileset = string.Empty;
 
     /// <summary>The two lists the book was built from, compared by reference to notice a new one.</summary>
     private IReadOnlyList<string>? _installed;
@@ -82,6 +82,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         _install = install;
         _placed = placed;
     }
+
+    /// <summary>Which tilesets place which tile, for the "drawn as" choice. Null leaves the choice out.</summary>
+    public TilesetCatalog? Tilesets { get; init; }
 
     /// <inheritdoc/>
     protected override string Caption => "Search for any terrain tile or room";
@@ -140,52 +143,32 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <remarks>
     /// THE UNIT RIDES IN THE KEY, so switching it is a different key and the portrait reloads -
     /// the same way the item book's drop or held choice does - without the portrait knowing about
-    /// rooms. A tile's choices ride the same way: <see cref="Bare"/> after the mark leaves its ground
-    /// out and <see cref="Unwalled"/> its black walls, joined by <see cref="WordMark"/> when both.
+    /// rooms. A tile's choices ride the same way - see <see cref="TileKey"/> - and the load reads the
+    /// named tileset's overrides itself, so the key is the whole of what is drawn and two tilesets
+    /// are two keys.
     /// </remarks>
     public static MonsterModel Load(Func<string, byte[]?> read, string key)
     {
         ArgumentNullException.ThrowIfNull(key);
 
-        int mark = key.LastIndexOf(UnitMark);
-        if (mark < 0)
-        {
-            return TileModels.Of(read, key, shaded: true);
-        }
-
-        string path = key[..mark];
+        int mark = key.IndexOf(UnitMark, StringComparison.Ordinal);
+        string path = mark < 0 ? key : key[..mark];
         if (!TileBook.IsRoom(path))
         {
-            ReadOnlySpan<char> words = key.AsSpan(mark + 1);
-            return TileModels.Of(read, path, ground: !Has(words, Bare), walls: !Has(words, Unwalled), shaded: true);
+            TileKey tile = TileKey.Read(key);
+            return TileModels.Of(
+                read,
+                tile.Path,
+                ground: tile.Ground,
+                walls: tile.Walls,
+                shaded: true,
+                swaps: tile.Tileset.Length > 0 ? TilesetIndex.Overrides(read, tile.Tileset) : null,
+                tileset: tile.Tileset.Length > 0 ? TilesetIndex.Short(tile.Tileset) : string.Empty);
         }
 
-        RoomUnit unit = Enum.TryParse(key[(mark + 1)..], out RoomUnit said) ? said : RoomUnit.Cells;
+        RoomUnit unit = mark >= 0 && Enum.TryParse(key[(mark + 1)..], out RoomUnit said) ? said : RoomUnit.Cells;
         return RoomModels.Of(read, path, unit, shaded: true);
-
-        static bool Has(ReadOnlySpan<char> words, string word)
-        {
-            foreach (Range one in words.Split(WordMark))
-            {
-                if (words[one].Equals(word, StringComparison.Ordinal))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
-
-    /// <summary>The key a tile is loaded under: its path, then the words for what is left out.</summary>
-    private string TileKey(string path)
-        => (_ground, _walls) switch
-        {
-            (true, true) => path,
-            (false, true) => path + UnitMark + Bare,
-            (true, false) => path + UnitMark + Unwalled,
-            _ => path + UnitMark + Bare + WordMark + Unwalled,
-        };
 
     /// <summary>What the tile or room is and where it is used, then its geometry under it.</summary>
     protected override void Pane()
@@ -241,7 +224,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             ImGui.Checkbox("ground", ref _ground);
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip("The tile's ground block, drawn plain - nothing says which ground texture an area lays on it."
+                ImGui.SetTooltip("The tile's ground block, drawn plain. A tileset's MaterialsList names the ground textures - the dump lists them -"
+                    + " but the ground has no texture coordinates, and how the engine makes them is not yet known."
                     + " Off shows the props alone, where the ground rises around them.");
             }
 
@@ -252,6 +236,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 ImGui.SetTooltip("The shapes painted with blacknofog.dds: walls hanging from a cliff's edge to close the gap under it."
                     + " The game's camera never looks behind them; off leaves them out.");
             }
+
+            DrawnAs(chosen);
         }
 
         ImGui.Separator();
@@ -262,7 +248,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             return;
         }
 
-        string key = room ? chosen + UnitMark + _unit.ToString() : TileKey(chosen);
+        string key = room ? chosen + UnitMark + _unit.ToString() : new TileKey(chosen, _ground, _walls, Placing(chosen)).ToString();
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
             _subjectKey = key;
@@ -271,5 +257,92 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
         Vector2 avail = ImGui.GetContentRegionAvail();
         model.Draw(_subject, _subjectKey, avail.X, avail.Y);
+    }
+
+    /// <summary>The chosen tileset where it places this tile, or empty - see <see cref="_tileset"/>.</summary>
+    private string Placing(string tile)
+    {
+        if (_tileset.Length == 0 || Tilesets?.Ready is not { } index)
+        {
+            return string.Empty;
+        }
+
+        foreach (string one in index.Of(tile))
+        {
+            if (string.Equals(one, _tileset, StringComparison.OrdinalIgnoreCase))
+            {
+                return one;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// The "drawn as" choice: the tile's own materials, or those of a tileset that places it.
+    /// </summary>
+    /// <remarks>
+    /// ONLY TILESETS THAT PLACE THIS TILE, by its whole path - see TilesetIndex - because a tileset's
+    /// overrides name the materials of the tiles it places, and offering one that never places the
+    /// tile would offer a choice that changes nothing.
+    /// </remarks>
+    private void DrawnAs(string tile)
+    {
+        if (Tilesets is not { } catalog)
+        {
+            return;
+        }
+
+        ImGui.TextDisabled("drawn as");
+        ImGui.SameLine();
+        if (catalog.Ready is not { } index)
+        {
+            ImGui.TextDisabled(catalog.Reading ? "reading every tileset..." : "no tilesets yet - the install's list is read shortly after start-up");
+            return;
+        }
+
+        IReadOnlyList<string> placing = index.Of(tile);
+        if (placing.Count == 0)
+        {
+            ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture,
+                $"the tile's own materials - none of {index.Searched} tilesets places it"));
+            return;
+        }
+
+        const string Own = "the tile's own materials";
+        string current = Placing(tile);
+        ImGui.SetNextItemWidth(Math.Min(ImGui.GetContentRegionAvail().X, 360f));
+        if (ImGui.BeginCombo("##drawnas", current.Length > 0 ? TilesetIndex.Short(current) : Own))
+        {
+            if (ImGui.Selectable(Own, current.Length == 0))
+            {
+                _tileset = string.Empty;
+            }
+
+            foreach (string one in placing)
+            {
+                if (ImGui.Selectable(TilesetIndex.Short(one) + "##" + one, string.Equals(one, current, StringComparison.OrdinalIgnoreCase)))
+                {
+                    _tileset = one;
+                }
+
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(ImGuiText.Escape(one));
+                }
+            }
+
+            ImGui.EndCombo();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("The tilesets that place this tile. Each swaps some of the tile's materials for its own"
+                + " (its TileMaterialOverrides) - the desert tilesets swap every cliff and ledge."
+                + " The ground stays plain: which texture a tileset lays on it is listed in the dump, not yet drawn.");
+        }
+
+        ImGui.SameLine();
+        ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture, $"{placing.Count} of {index.Searched} tilesets place it"));
     }
 }

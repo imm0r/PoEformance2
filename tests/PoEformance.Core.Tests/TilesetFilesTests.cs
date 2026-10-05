@@ -1,3 +1,5 @@
+using System.Text;
+using PoEformance.Features;
 using PoEformance.Game.Files;
 
 namespace PoEformance.Core.Tests;
@@ -163,5 +165,106 @@ public class TilesetFilesTests
         Assert.Equal("DesertDune", GroundType.NameOf("\r\n  DesertDune  \r\n0 1 0 0"));
         Assert.Equal(string.Empty, GroundType.NameOf(null));
         Assert.Equal(string.Empty, GroundType.Name(null));
+    }
+
+    [Fact]
+    public void ATILELISTNamesItsIncludesAndItsTilesWhateverIsAroundThem()
+    {
+        TileList list = TileList.Parse(
+            """
+            // DESERT
+            include "shared.tst"
+            include "Metadata\Terrain\Common\common.tst"
+            10 "Metadata/Terrain/Desert/A.tdt" r90 r180
+            "Metadata\Terrain\Desert\B.tdt"
+            5"Metadata/Terrain/Desert/C.tdt"
+            "Metadata/Terrain/Desert/Room.arm"
+            """);
+
+        Assert.Equal(["shared.tst", "Metadata/Terrain/Common/common.tst"], list.Includes);
+        Assert.Equal(["Metadata/Terrain/Desert/A.tdt", "Metadata/Terrain/Desert/B.tdt", "Metadata/Terrain/Desert/C.tdt"], list.Tiles);
+        Assert.Empty(TileList.Read(null).Tiles);
+    }
+
+    [Fact]
+    public void ATILESETNamesItsFilesByKeyAndABareNameLivesBesideIt()
+    {
+        const string Text = "version 3\r\nTileSet\t\t\"tiles.tst\"\r\nTileSetExtra \"no\"\r\nMaterialsList Metadata\\Terrain\\x.mtd\r\n";
+
+        Assert.Equal("tiles.tst", TilesetFile.Value(Text, "TileSet"));
+        Assert.Equal("Metadata/Terrain/x.mtd", TilesetFile.Value(Text, "MaterialsList"));
+        Assert.Null(TilesetFile.Value(Text, "TileMaterialOverrides"));
+        Assert.Equal("metadata/terrain/maps/swarm/tiles.tst", TilesetFile.Beside("metadata/terrain/maps/swarm/master.tsi", "tiles.tst"));
+        Assert.Equal("Metadata/Terrain/x.mtd", TilesetFile.Beside("metadata/terrain/maps/swarm/master.tsi", "Metadata/Terrain/x.mtd"));
+    }
+
+    /// <summary>
+    /// The index files each tile against the tilesets that place it - by its whole path, includes followed.
+    /// </summary>
+    /// <remarks>
+    /// The desert's list takes in a shared one, which takes the desert's back in - a loop that must
+    /// end. The hive places a tile of the same FILE NAME in another folder, which is another tile,
+    /// and names the desert's tile twice, which is still one tileset. A tileset with no tile list is
+    /// not counted as searched.
+    /// </remarks>
+    [Fact]
+    public void THEINDEXFilesEachTileAgainstTheTilesetsThatPlaceItByItsWholePath()
+    {
+        var files = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["metadata/terrain/maps/desert/master.tsi"] = Encoding.Unicode.GetBytes(
+                "version 3\r\nTileSet \"tiles.tst\"\r\nTileMaterialOverrides \"swaps.tmo\"\r\n"),
+            ["metadata/terrain/maps/desert/tiles.tst"] = Encoding.Unicode.GetBytes(
+                "include \"shared.tst\"\r\n\"Metadata/Terrain/Desert/Cliff.tdt\"\r\n"),
+            ["metadata/terrain/maps/desert/shared.tst"] = Encoding.Unicode.GetBytes(
+                "include \"tiles.tst\"\r\n\"Metadata/Terrain/Desert/Shared.tdt\"\r\n"),
+            ["metadata/terrain/maps/desert/swaps.tmo"] = Encoding.Unicode.GetBytes(
+                "version 1\r\n\"Art/Rock.mat\" \"Art/Vastiri/Rock.mat\"\r\n\"Art/Rock.mat\" \"Art/Later.mat\"\r\n"),
+            ["metadata/terrain/maps/hive/master.tsi"] = Encoding.Unicode.GetBytes(
+                "version 3\r\nTileSet \"Metadata/Terrain/Maps/Hive/tiles.tst\"\r\n"),
+            ["Metadata/Terrain/Maps/Hive/tiles.tst"] = Encoding.Unicode.GetBytes(
+                "\"Metadata/Terrain/AntNest/Cliff.tdt\"\r\n\"Metadata/Terrain/Desert/Cliff.tdt\"\r\n10 \"Metadata/Terrain/Desert/Cliff.tdt\"\r\n"),
+            ["metadata/terrain/maps/empty/master.tsi"] = Encoding.Unicode.GetBytes("version 3\r\n"),
+        };
+        Func<string, byte[]?> read = path => files.GetValueOrDefault(path);
+
+        TilesetIndex index = TilesetIndex.Build(
+            read, ["metadata/terrain/maps/desert/master.tsi", "metadata/terrain/maps/hive/master.tsi", "metadata/terrain/maps/empty/master.tsi"]);
+
+        Assert.Equal(2, index.Searched);
+        Assert.Equal(
+            ["metadata/terrain/maps/desert/master.tsi", "metadata/terrain/maps/hive/master.tsi"],
+            index.Of("metadata/terrain/desert/cliff.tdt"));
+        Assert.Equal(["metadata/terrain/maps/desert/master.tsi"], index.Of("Metadata\\Terrain\\Desert\\Shared.tdt"));
+        Assert.Empty(index.Of("Metadata/Terrain/Desert/Nowhere.tdt"));
+
+        (string tile, IReadOnlyList<string> sets) = Assert.Single(index.Alike("Metadata/Terrain/Desert/Cliff.tdt"));
+        Assert.Equal("metadata/terrain/antnest/cliff.tdt", tile);
+        Assert.Equal(["metadata/terrain/maps/hive/master.tsi"], sets);
+
+        // THE FIRST LINE FOR A MATERIAL STANDS, and a tileset without a list swaps nothing.
+        IReadOnlyDictionary<string, string> swaps = TilesetIndex.Overrides(read, "metadata/terrain/maps/desert/master.tsi");
+        Assert.Equal("Art/Vastiri/Rock.mat", Assert.Single(swaps).Value);
+        Assert.Equal("Art/Vastiri/Rock.mat", swaps["art/rock.mat"]);
+        Assert.Empty(TilesetIndex.Overrides(read, "metadata/terrain/maps/hive/master.tsi"));
+
+        Assert.Equal("maps/desert", TilesetIndex.Short("metadata/terrain/maps/desert/master.tsi"));
+        Assert.Same(TilesetIndex.Empty, TilesetIndex.Build(read, []));
+    }
+
+    [Fact]
+    public void ATILEKEYCarriesEveryChoiceAndReadsBackTheSame()
+    {
+        Assert.Equal("Metadata/Terrain/A.tdt", new TileKey("Metadata/Terrain/A.tdt").ToString());
+        Assert.Equal("Metadata/Terrain/A.tdt|bare", new TileKey("Metadata/Terrain/A.tdt", Ground: false).ToString());
+
+        var every = new TileKey("Metadata/Terrain/A.tdt", Ground: false, Walls: false, Tileset: "metadata/terrain/maps/crimsonshores/master.tsi");
+        string key = every.ToString();
+        Assert.Equal("Metadata/Terrain/A.tdt|bare+unwalled+set=metadata/terrain/maps/crimsonshores/master.tsi", key);
+        Assert.Equal(every, TileKey.Read(key));
+
+        var only = new TileKey("Metadata/Terrain/A.tdt", Tileset: "metadata/terrain/maps/aridplains/master.tsi");
+        Assert.Equal(only, TileKey.Read(only.ToString()));
+        Assert.Equal(new TileKey("Metadata/Terrain/A.tdt"), TileKey.Read("Metadata/Terrain/A.tdt"));
     }
 }
