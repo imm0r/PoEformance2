@@ -1572,6 +1572,30 @@ public class MonsterModelTests
         Assert.Contains("fixed mesh", said.Move, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// A .fmt named outright, with no .ao in front of it, is the whole model.
+    /// </summary>
+    /// <remarks>
+    /// AN ITEM'S HELD MODEL CAN BE ONE: the Lumen Mace's AOFile2 is WoodenClub.fmt, and read as an
+    /// .ao it found neither a SkinMesh nor a FixedMesh.
+    /// </remarks>
+    [Fact]
+    public void ANDAFixedMeshNamedOutrightIsDrawnWithoutAnAo()
+    {
+        var install = new Fake();
+        install.Files["art/club.fmt"] = Packed.Fmt("art/painted.mat");
+        install.Files["art/painted.mat"] = Mat("art/skin.dds");
+        install.Files["art/skin.dds"] = [];
+
+        MonsterModel said = MonsterModels.OfFiles(install.Read, ["art/club.fmt"]);
+
+        Assert.True(said.Ready, said.Why);
+        Assert.Equal(2, said.Mesh.Triangles);
+        Assert.Equal("art/club.fmt", said.Mesh_);
+        Assert.False(said.Moves);
+        Assert.True(said.Files >= 2, $"the .fmt and its .mat are counted: {said.Files}");
+    }
+
     /// <summary>The skin still wins wherever there is one, so no monster changes.</summary>
     [Fact]
     public void ANDASkinStillWinsOverAPropWhereTheChainNamesBoth()

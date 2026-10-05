@@ -549,6 +549,16 @@ public sealed class MonsterPortrait
     /// </remarks>
     public bool Translucent { get; set; }
 
+    /// <summary>
+    /// The colour a shape with no texture is drawn in, or default for the pale warm grey every book began with.
+    /// </summary>
+    /// <remarks>
+    /// THE TILE BOOK'S GROUND IS THE CASE: it is unpainted on purpose, and in the warm grey it read as
+    /// the brightest thing in the picture - a slab louder than the props standing on it. A darker
+    /// grey says "nothing to see here" in the one place that is true.
+    /// </remarks>
+    public Vector3 Ink { get; set; }
+
     /// <summary>Whether a picture could be drawn at all - an install and a renderer.</summary>
     public bool Possible => _install is not null && _upload is not null;
 
@@ -1661,7 +1671,14 @@ public sealed class MonsterPortrait
                 // which is ordinary, or a monster whose per-shape materials were not matched -
                 // and the picture is identical either way. The counts are the only thing that
                 // tells them apart, so they are printed exactly where the question arises.
-                if (_model.Mesh.Shapes.Count > _model.Materials.Count)
+                if (_model.Kind == ModelKind.Tile)
+                {
+                    // A TILE'S UNNAMED SHAPES ARE ITS GROUND, left plain on purpose - TileModels -
+                    // so the count says how much of the picture that is, not how a .sm matched.
+                    int ground = _model.Mesh.Shapes.Count - _model.NamedInAo;
+                    said += ground > 0 ? $" · {ground} ground shapes left plain" : " · no ground drawn";
+                }
+                else if (_model.Mesh.Shapes.Count > _model.Materials.Count)
                 {
                     said += $" · named: {_model.NamedInAo} in the .ao, {_model.NamedInMesh} in the .sm";
                 }
@@ -1688,7 +1705,11 @@ public sealed class MonsterPortrait
                 // AND WHAT IT IS WEARING. A monster with no attachments, one whose pieces were
                 // switched off, and one whose pieces all failed to read are three different
                 // things that draw identically - so the count says which.
-                if (_model.Parts > 0)
+                if (_model.Kind == ModelKind.Tile)
+                {
+                    said += $" · {_model.Parts} sub-tile{(_model.Parts == 1 ? string.Empty : "s")}";
+                }
+                else if (_model.Parts > 0)
                 {
                     said += $" · wearing {_model.Parts} part{(_model.Parts == 1 ? string.Empty : "s")}";
                 }
@@ -2123,14 +2144,14 @@ public sealed class MonsterPortrait
                 _pose.Move(_model.Mesh, _posed, _posedNormals);
                 lowest = Lowest(_posed);
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, default,
+                    _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, Ink,
                     _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
             }
             else
             {
                 lowest = _model.Mesh.Most.Z;
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _turn, _tilt, default, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
+                    _model.Mesh, Canvas(size), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
             }
 
             _rate.Redrawn(ImGui.GetTime());
@@ -2533,11 +2554,11 @@ public sealed class MonsterPortrait
             _pose.Take(_tracks, _frame);
             _pose.Move(_model.Mesh, _posed, _posedNormals);
             return MeshPicture.Of(
-                _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, default,
+                _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, Ink,
                 _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
         }
 
-        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, default, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
+        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
     }
 
     /// <summary>

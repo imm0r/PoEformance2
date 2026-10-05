@@ -76,6 +76,16 @@ public static class MeshPicture
     public const float Furthest = 6f;
 
     /// <summary>
+    /// The texture alpha below which a cut-out material's pixel is dropped. See <see cref="MaterialBlend.Cutout"/>.
+    /// </summary>
+    /// <remarks>
+    /// HALFWAY, BECAUSE NOTHING SAYS OTHERWISE. The game's reference value lives in its shader, which
+    /// no reference reads; half is what a texture authored for a test splits on, its edges being
+    /// the only pixels anywhere near it.
+    /// </remarks>
+    public const float CutoutAlpha = 0.5f;
+
+    /// <summary>
     /// The view a picture is drawn from: where a point of the model lands on it.
     /// </summary>
     /// <param name="View">The model's space turned and tilted, with its up along the picture's y.</param>
@@ -611,6 +621,14 @@ public static class MeshPicture
             int from = Math.Clamp(part.From / 3, 0, triangles);
             int upto = Math.Clamp((part.From + part.Count) / 3, from, triangles);
             Array.Fill(into, blend, from, upto - from);
+
+            // A CUT-OUT SHAPE IS SOLID WHERE IT IS DRAWN, so it needs neither an owner nor the
+            // second pass - it rides in the first with the opaque ones.
+            if (blend == MaterialBlend.Cutout)
+            {
+                continue;
+            }
+
             Array.Fill(owners, shape, from, upto - from);
             any |= upto > from;
         }
@@ -745,7 +763,7 @@ public static class MeshPicture
         {
             for (var one = 0; one < _triangles; one++)
             {
-                if (_feet[one] < top || _tops[one] >= end || _blends[one] != MaterialBlend.Opaque)
+                if (_feet[one] < top || _tops[one] >= end || Translucent(_blends[one]))
                 {
                     continue;
                 }
@@ -760,7 +778,7 @@ public static class MeshPicture
 
             for (var one = 0; one < _triangles; one++)
             {
-                if (_feet[one] < top || _tops[one] >= end || _blends[one] == MaterialBlend.Opaque)
+                if (_feet[one] < top || _tops[one] >= end || !Translucent(_blends[one]))
                 {
                     continue;
                 }
@@ -843,7 +861,7 @@ public static class MeshPicture
                         continue;
                     }
 
-                    if (blend != MaterialBlend.Opaque)
+                    if (Translucent(blend))
                     {
                         // ONCE PER SHAPE PER PIXEL - see Canvas.Stamps.
                         int owner = _owners[one];
@@ -856,6 +874,32 @@ public static class MeshPicture
                         Spot spot_ = new(first, second, third);
                         Over(at, blend, skinned ? Sample4(skin!, spot_.Of(s0, s1, s2), level) : new Vector4(_ink, 0.5f));
                         continue;
+                    }
+
+                    Vector3 colour = _ink;
+                    if (skinned)
+                    {
+                        // AFFINE INTERPOLATION IS EXACT HERE. The projection is orthographic, so a
+                        // coordinate across the triangle really is linear in screen space - the
+                        // perspective correction a game renderer needs would be dividing by a w
+                        // that is always one.
+                        Vector2 spot = (first * s0) + (second * s1) + (third * s2);
+                        if (blend == MaterialBlend.Cutout)
+                        {
+                            // BEFORE DEPTH IS WRITTEN, so what a dropped pixel leaves open shows
+                            // whatever is behind it rather than a hole in the shape of a leaf.
+                            Vector4 texel = Sample4(skin!, spot, level);
+                            if (texel.W < CutoutAlpha)
+                            {
+                                continue;
+                            }
+
+                            colour = new Vector3(texel.X, texel.Y, texel.Z);
+                        }
+                        else
+                        {
+                            colour = Sample(skin!, spot, level);
+                        }
                     }
 
                     _depth[at] = away;
@@ -871,17 +915,6 @@ public static class MeshPicture
                     float lit = MathF.Abs(Vector3.Dot(normal, _lamp));
                     float shade = 0.22f + (0.78f * lit);
 
-                    Vector3 colour = _ink;
-                    if (skinned)
-                    {
-                        // AFFINE INTERPOLATION IS EXACT HERE. The projection is orthographic, so a
-                        // coordinate across the triangle really is linear in screen space - the
-                        // perspective correction a game renderer needs would be dividing by a w
-                        // that is always one.
-                        Vector2 spot = (first * s0) + (second * s1) + (third * s2);
-                        colour = Sample(skin!, spot, level);
-                    }
-
                     _pixels[at * 4] = Byte(colour.X * shade);
                     _pixels[(at * 4) + 1] = Byte(colour.Y * shade);
                     _pixels[(at * 4) + 2] = Byte(colour.Z * shade);
@@ -889,6 +922,9 @@ public static class MeshPicture
                 }
             }
         }
+
+        /// <summary>Whether a triangle is drawn in the second pass - mixed or added, not solid or cut out.</summary>
+        private static bool Translucent(MaterialBlend blend) => blend is MaterialBlend.Alpha or MaterialBlend.Additive;
 
         /// <summary>
         /// Puts one translucent pixel over what is already at <paramref name="at"/>.
@@ -1083,7 +1119,7 @@ public static class MeshPicture
     }
 
     /// <summary>
-    /// <see cref="Sample"/> with the texture's alpha - only translucent triangles pay for the fourth channel.
+    /// <see cref="Sample"/> with the texture's alpha - only translucent and cut-out triangles pay for the fourth channel.
     /// </summary>
     private static Vector4 Sample4(Mipmaps skin, Vector2 spot, float level)
     {

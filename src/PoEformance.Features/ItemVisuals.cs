@@ -62,10 +62,10 @@ public sealed record ItemVisual(
 /// layouts are vendored from poe-tool-dev/dat-schema in data/item-tables.json and checked against
 /// each FILE's own row size at runtime; <see cref="Say"/> reports which way it went per table.
 ///
-/// BOTH AOFile AND AOFile2 ARE KEPT, AND NEITHER IS CALLED "THE" MODEL. The schema names the two
-/// columns and says nothing about what separates them, and no item .ao has been read against the
-/// game yet to settle it. Choosing one here would be a guess presented as a fact; the window
-/// offers both where both are filled, and the model walk says what it found in each.
+/// BOTH AOFile AND AOFile2 ARE KEPT: the item lying on the ground and the item in a hand. The schema
+/// names the columns and nothing more; the files settle it - AOFile names ...Drop.ao and AOFile2
+/// ...Held.ao, or a .fmt outright (the Lumen Mace's is WoodenClub.fmt) - so the window calls them
+/// "drop" and "held" and offers both where both are filled.
 ///
 /// ROWS WITHOUT ANY .ao ARE LEFT OUT and counted: currency, gems and the like have an icon and no
 /// model, and a book of models that listed them would be mostly rows that draw nothing.

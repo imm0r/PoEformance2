@@ -46,7 +46,7 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
     private ItemVisuals _of = ItemVisuals.Empty;
     private ItemBook _page = ItemBook.Empty;
 
-    /// <summary>Whether the pane shows AOFile2 rather than the first file. See ItemVisuals.</summary>
+    /// <summary>Whether the pane shows the held model (AOFile2) rather than the dropped one (AOFile). See ItemVisuals.</summary>
     private bool _second;
 
     /// <summary>
@@ -124,19 +124,20 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
                 CultureInfo.InvariantCulture,
                 $"{(one.Class.Length > 0 ? one.Class : "no class")}  ·  drop {one.DropLevel}  ·  {one.Width}x{one.Height}")));
 
-        // WHICH .ao IS SHOWN IS A CHOICE AND SAID AS ONE: the table has two columns for it and
-        // nothing yet says what separates them - see ItemVisuals. Only offered where both are filled.
+        // WHICH MODEL IS SHOWN IS A CHOICE AND SAID AS ONE: AOFile is the item lying on the ground -
+        // its files end in Drop.ao - and AOFile2 the item in a hand, ending in Held.ao or naming a
+        // .fmt outright. Only offered where both are filled.
         bool both = one.Ao.Length > 0 && one.Ao2.Length > 0;
         bool second = both ? _second : one.Ao.Length == 0;
         if (both)
         {
-            if (ImGui.RadioButton("AOFile", !_second))
+            if (ImGui.RadioButton("drop", !_second))
             {
                 _second = false;
             }
 
             ImGui.SameLine();
-            if (ImGui.RadioButton("AOFile2", _second))
+            if (ImGui.RadioButton("held", _second))
             {
                 _second = true;
             }
@@ -145,7 +146,7 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
         }
 
         string ao = second ? one.Ao2 : one.Ao;
-        ImGui.TextDisabled(ImGuiText.Escape((second ? "AOFile2  " : "AOFile   ") + ao));
+        ImGui.TextDisabled(ImGuiText.Escape((second ? "held  " : "drop  ") + ao));
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(ImGuiText.Escape($"{one.Path}\nart {one.Art}\nicon {one.Icon}"));

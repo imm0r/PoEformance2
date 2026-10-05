@@ -212,6 +212,7 @@ public static class RoomModels
             BodyLeast = joined.Least,
             BodyMost = joined.Most,
             Parts = placed,
+            Kind = ModelKind.Room,
             Bytes = bytes,
             Files = files,
             Move = string.Join("; ", said),

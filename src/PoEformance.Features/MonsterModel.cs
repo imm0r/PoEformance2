@@ -4,6 +4,19 @@ using PoEformance.Game.Files;
 
 namespace PoEformance.Features;
 
+/// <summary>What a model was read from, which decides what the line under its picture calls its pieces.</summary>
+public enum ModelKind : byte
+{
+    /// <summary>An .ao walk - a monster, an item, an effect. Its pieces are what it wears.</summary>
+    Ao,
+
+    /// <summary>A terrain tile. Its pieces are sub-tiles, and its unnamed shapes are ground.</summary>
+    Tile,
+
+    /// <summary>A room. Its pieces are the doodads placed in it.</summary>
+    Room,
+}
+
 /// <summary>
 /// A monster's model, gathered from the five files it takes to draw one.
 /// </summary>
@@ -213,6 +226,15 @@ public sealed record MonsterModel(
     /// pieces and a monster that really IS two arms look the same.
     /// </remarks>
     public int Sections { get; init; } = 1;
+
+    /// <summary>
+    /// What the model was read from. See <see cref="ModelKind"/>.
+    /// </summary>
+    /// <remarks>
+    /// THE LINE UNDER THE PICTURE WAS WRITTEN FOR MONSTERS: a tile reported "named: 45 in the .ao,
+    /// 0 in the .sm" and "wearing 9 parts" when it has neither file and its parts are sub-tiles.
+    /// </remarks>
+    public ModelKind Kind { get; init; }
 }
 
 /// <summary>
@@ -337,6 +359,13 @@ public static class MonsterModels
         // and counts for nothing.
         var tally = new Tally(read);
         Func<string, byte[]?> counted = tally.Read;
+
+        // A .fmt NAMED OUTRIGHT is the whole model, with no .ao in front of it: an item's AOFile2
+        // may be one - the Lumen Mace's is WoodenClub.fmt - and reading it as an .ao found nothing.
+        if (named[0].EndsWith(".fmt", StringComparison.OrdinalIgnoreCase))
+        {
+            return Prop(counted, named[0].Trim(), tally, shared);
+        }
 
         if (Skinned(counted, named) is not { } found)
         {
@@ -493,11 +522,12 @@ public static class MonsterModels
             }
         }
 
-        if (path.Length == 0)
-        {
-            return null;
-        }
+        return path.Length == 0 ? null : Prop(read, path, tally, shared);
+    }
 
+    /// <summary>A <c>.fmt</c> as the whole model, dressed in its own materials - see <see cref="Fixed"/>.</summary>
+    private static MonsterModel Prop(Func<string, byte[]?> read, string path, Tally tally, Paints? shared)
+    {
         FixedMesh prop = Read(read, path, FixedMesh.Read);
         if (!prop.Ready)
         {

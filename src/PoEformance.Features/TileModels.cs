@@ -45,7 +45,11 @@ public static class TileModels
     /// </summary>
     /// <param name="read">How to get a file out of the install, by path.</param>
     /// <param name="path">The tile's <c>.tdt</c>, as the game or the install names it.</param>
-    public static MonsterModel Of(Func<string, byte[]?>? read, string? path)
+    /// <param name="ground">
+    /// Whether the ground block is drawn under the props. It is unpainted - see the remarks - and
+    /// where it rises around a prop it hides the part of the tile somebody opened it to look at.
+    /// </param>
+    public static MonsterModel Of(Func<string, byte[]?>? read, string? path, bool ground = true)
     {
         if (read is null)
         {
@@ -126,7 +130,7 @@ public static class TileModels
                         Runs(layout, layout.RunsOf(x, y), part.Props.Shapes.Count, named);
                     }
 
-                    if (part.Ground.Ready)
+                    if (ground && part.Ground.Ready)
                     {
                         grounds.Add(new MeshJoin(part.Ground, null, null, place));
                     }
@@ -165,6 +169,7 @@ public static class TileModels
             Bytes = bytes,
             Files = files,
             Parts = subTiles,
+            Kind = ModelKind.Tile,
         };
     }
 

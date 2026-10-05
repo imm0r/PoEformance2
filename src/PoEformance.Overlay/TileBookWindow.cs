@@ -38,14 +38,23 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>The query term the "only this area" checkbox writes.</summary>
     private const string HereField = "here";
 
-    /// <summary>What separates a room's path from its unit in the key the portrait loads by.</summary>
+    /// <summary>What separates a room's path from its unit, or a tile's from <see cref="Bare"/>, in the key the portrait loads by.</summary>
     private const char UnitMark = '|';
+
+    /// <summary>What a tile's key ends in when its ground is left out.</summary>
+    private const string Bare = "bare";
+
+    /// <summary>The colour the unpainted ground is drawn in: a dark, flat grey that stays behind the props.</summary>
+    public static readonly Vector3 GroundInk = new(0.34f, 0.34f, 0.35f);
 
     private readonly Func<IReadOnlyList<string>> _install;
     private readonly Func<IReadOnlyDictionary<string, int>> _placed;
 
     /// <summary>What a room's doodad positions are read as. See RoomModels - the file does not say.</summary>
     private RoomUnit _unit = RoomUnit.Cells;
+
+    /// <summary>Whether a tile is drawn with its ground block. See TileModels.Of.</summary>
+    private bool _ground = true;
 
     /// <summary>The two lists the book was built from, compared by reference to notice a new one.</summary>
     private IReadOnlyList<string>? _installed;
@@ -121,7 +130,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// </summary>
     /// <remarks>
     /// THE UNIT RIDES IN THE KEY, so switching it is a different key and the portrait reloads -
-    /// the same way the item book's AOFile choice does - without the portrait knowing about rooms.
+    /// the same way the item book's drop or held choice does - without the portrait knowing about
+    /// rooms. A tile's ground rides the same way: <see cref="Bare"/> after the mark leaves it out.
     /// </remarks>
     public static MonsterModel Load(Func<string, byte[]?> read, string key)
     {
@@ -131,6 +141,11 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         if (mark < 0)
         {
             return TileModels.Of(read, key);
+        }
+
+        if (key.AsSpan(mark + 1).Equals(Bare, StringComparison.Ordinal))
+        {
+            return TileModels.Of(read, key[..mark], ground: false);
         }
 
         RoomUnit unit = Enum.TryParse(key[(mark + 1)..], out RoomUnit said) ? said : RoomUnit.Cells;
@@ -186,6 +201,15 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                     + " The line under the picture says whether any doodad lies past the room's edge when read as cells.");
             }
         }
+        else
+        {
+            ImGui.Checkbox("ground", ref _ground);
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("The tile's ground block, drawn plain - nothing says which ground texture an area lays on it."
+                    + " Off shows the props alone, where the ground rises around them.");
+            }
+        }
 
         ImGui.Separator();
 
@@ -195,7 +219,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             return;
         }
 
-        string key = room ? chosen + UnitMark + _unit.ToString() : chosen;
+        string key = room ? chosen + UnitMark + _unit.ToString() : _ground ? chosen : chosen + UnitMark + Bare;
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
             _subjectKey = key;
