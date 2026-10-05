@@ -170,6 +170,15 @@ public sealed class WindowChrome
     /// </remarks>
     private readonly Dictionary<string, (double X, double Y, int PivotX, int PivotY)> _standing = [];
 
+    private string? _focusedId;
+
+    /// <summary>Where the window ImGui has focused is, in overlay pixels, or null when none is.</summary>
+    /// <remarks>
+    /// Only windows that call <see cref="Measure"/> are seen - every window with chrome does.
+    /// One frame behind, like the rectangles beside it, which no keypress can tell apart.
+    /// </remarks>
+    public (Vector2 At, Vector2 Size)? Focused { get; private set; }
+
     /// <summary>Remembers where this window is, for the frame that has to decide about it.</summary>
     /// <remarks>
     /// Called between <c>Begin</c> and <c>End</c>, where ImGui will answer for the current
@@ -193,6 +202,20 @@ public sealed class WindowChrome
         Vector2 at = ImGui.GetWindowPos();
         Vector2 size = ImGui.GetWindowSize();
         _seen[id] = (at, size);
+
+        // Which of our windows holds ImGui focus, for the screenshot key. Cleared by the SAME
+        // window that set it once it loses focus, because "nobody is focused" is not an event
+        // anything announces - ImGui just stops answering yes.
+        if (ImGui.IsWindowFocused(ImGuiFocusedFlags.RootAndChildWindows))
+        {
+            _focusedId = id;
+            Focused = (at, size);
+        }
+        else if (_focusedId == id)
+        {
+            _focusedId = null;
+            Focused = null;
+        }
 
         // NOT ON THE FRAME THE WINDOW APPEARS. ImGui hides a new window for one frame to
         // measure it - Begin still returns true, so this still runs - sizes it to its content

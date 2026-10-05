@@ -236,7 +236,12 @@ public sealed record OverlaySettings(
     // IT ALSO SETS THE MEMORY CEILING indirectly, through the size the picture rests at: the
     // canvas is pixels and depth together, 8 MB at 1024 and 32 MB at 2048, held only while a
     // pane that big is open.
-    [property: JsonPropertyName("monsterModelSize")] int MonsterModelSize = PictureLadder.Usual)
+    [property: JsonPropertyName("monsterModelSize")] int MonsterModelSize = PictureLadder.Usual,
+
+    // The key that copies a picture of the overlay to the clipboard, as a Windows virtual-key
+    // code. ZERO MEANS "NOT SET" like every number here, and resolves to Delete in the overlay:
+    // the default lives in code so a release can move it for everybody who never chose one.
+    [property: JsonPropertyName("screenshotKey")] int ScreenshotKey = 0)
 {
     /// <summary>How the tool's own windows look. The defaults until somebody says otherwise.</summary>
     /// <remarks>
