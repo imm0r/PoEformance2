@@ -1596,6 +1596,45 @@ public class MonsterModelTests
         Assert.True(said.Files >= 2, $"the .fmt and its .mat are counted: {said.Files}");
     }
 
+    /// <summary>
+    /// Every shape of the joined mesh knows its material, the worn pieces' included, and its graphs can colour it.
+    /// </summary>
+    /// <remarks>
+    /// THE LIST THE SHADER GRAPHS ARE READ FROM - see MonsterModels.Shaded - so it must line up with
+    /// the joined shapes exactly, or a piece would be coloured by the body's material. The prop's
+    /// material is an instance of a graph whose colour is a constant: it gets a program, and the
+    /// body's - no graph at all - keeps its plain skin. Off, nothing is read and nothing changes.
+    /// </remarks>
+    [Fact]
+    public void ANDEVERYJoinedShapeKnowsItsMaterialAndItsGraphsCanColourIt()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/cannon.ao", skeleton: "art/rig.ast");
+        install.Files["art/cannon.ao"] = Ao(fixture: "art/cannon.fmt");
+        install.Files["art/cannon.fmt"] = Packed.Fmt("art/painted.mat");
+        install.Files["art/painted.mat"] = System.Text.Encoding.UTF8.GetBytes(
+            """{"graphinstances":[{"parent":"Metadata/Tint.fxgraph","custom_parameters":[{"name":"AlbedoTransparency_TEX","parameters":[{"path":"art/skin.dds"}]}]}]}""");
+        install.Files["Metadata/Tint.fxgraph"] = System.Text.Encoding.UTF8.GetBytes(
+            """
+            {"nodes":[{"type":"ConstantPixel3","index":0,"parameters":[{"value":[0.2,0.1,0.05]}]},{"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[{"src":{"type":"ConstantPixel3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+            """);
+
+        MonsterModel plain = MonsterModels.Of(install.Read, Named("body.ao"));
+        Assert.Equal(plain.Mesh.Shapes.Count, plain.ShapeMaterials.Count);
+        Assert.Contains("art/painted.mat", plain.ShapeMaterials, StringComparer.Ordinal);
+        Assert.Empty(plain.Shades);
+
+        MonsterModel shaded = MonsterModels.Of(install.Read, Named("body.ao"), shaded: true);
+        Assert.Equal(shaded.Mesh.Shapes.Count, shaded.Shades.Count);
+        Assert.Equal(1, shaded.ShadedBy);
+        int prop = shaded.ShapeMaterials.ToList().IndexOf("art/painted.mat");
+        Assert.NotNull(shaded.Shades[prop]);
+        Assert.True(shaded.Shades[prop]!.Bound);
+        Assert.Null(shaded.Shades[0]);
+        Assert.True(shaded.Files > plain.Files, "the graph's file is counted");
+    }
+
     /// <summary>The skin still wins wherever there is one, so no monster changes.</summary>
     [Fact]
     public void ANDASkinStillWinsOverAPropWhereTheChainNamesBoth()

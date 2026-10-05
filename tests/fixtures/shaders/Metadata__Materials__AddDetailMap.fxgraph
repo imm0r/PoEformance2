@@ -1,0 +1,236 @@
+{
+    "version": 3,
+    "overriden_lighting_model": "SpecGlossPbrMaterial",
+    "description": "WARNING: THIS IS A LEGACY GRAPH, PLEASE DO NOT USE OR COPY IT. USE `Metadata/Materials/DetailMap/DetailMap_Normal.fxgraph` INSTEAD",
+    "nodes": [
+        {
+            "type": "InputTbnNormal",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                714.0,
+                20.0
+            ]
+        },
+        {
+            "type": "InputUV",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                714.0,
+                20.0
+            ]
+        },
+        {
+            "type": "ConstantPixel2",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": [
+                        10.0,
+                        10.0
+                    ]
+                }
+            ],
+            "custom_parameter": "DetailMap_TILEAMOUNT",
+            "ui_position": [
+                638.0,
+                259.0
+            ]
+        },
+        {
+            "type": "Multiply2",
+            "index": 0,
+            "ui_position": [
+                938.0,
+                193.0
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 1,
+            "parameters": [
+                {
+                    "srgb": false
+                },
+                {
+                    "value": "SamplerDynamicWrap"
+                }
+            ],
+            "custom_parameter": "DetailNormal_TEX",
+            "ui_position": [
+                1112.0,
+                200.0
+            ]
+        },
+        {
+            "type": "NormalTexToTbn",
+            "index": 1,
+            "parameters": [
+                {}
+            ],
+            "ui_position": [
+                1439.0,
+                193.0
+            ]
+        },
+        {
+            "type": "CombineTbnNormals",
+            "index": 0,
+            "parameters": [
+                {},
+                {}
+            ],
+            "custom_parameter": "Normal_SCALE",
+            "ui_position": [
+                1802.0,
+                61.0
+            ]
+        },
+        {
+            "type": "TbnNormal",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                2277.0,
+                62.0
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 0,
+                "variable": "b",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 0,
+                "variable": "b",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply2",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 1,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 1,
+                "variable": "rgba",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "NormalTexToTbn",
+                "index": 1,
+                "variable": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 1,
+                "variable": "rgba",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "NormalTexToTbn",
+                "index": 1,
+                "variable": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "CombineTbnNormals",
+                "index": 0,
+                "variable": "tbn_normal1",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "NormalTexToTbn",
+                "index": 1,
+                "variable": "tbn_normal"
+            },
+            "dst": {
+                "type": "CombineTbnNormals",
+                "index": 0,
+                "variable": "tbn_normal2"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "CombineTbnNormals",
+                "index": 0,
+                "variable": "tbn_normal1",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "CombineTbnNormals",
+                "index": 0,
+                "variable": "tbn_normal"
+            },
+            "dst": {
+                "type": "TbnNormal",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input"
+            }
+        }
+    ]
+}

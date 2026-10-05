@@ -1,0 +1,1394 @@
+{
+    "version": 3,
+    "textures": [
+        {
+            "filename": "Art/Textures/Environment/desert/Shore/Rocks_tmdlcgao_normal_BC7.dds",
+            "format": "BC7",
+            "sources": [
+                {
+                    "filename": "Textures/Environment/desert/Shore/Rocks_tmdlcgao_normal.png"
+                }
+            ],
+            "count": 1
+        },
+        {
+            "filename": "Art/Textures/masks/GrundgeMask02_Uncompressed.dds",
+            "format": "Uncompressed",
+            "sources": [
+                {
+                    "filename": "Textures/masks/GrundgeMask02.png"
+                }
+            ],
+            "count": 1
+        },
+        {
+            "filename": "Art/Textures/Environment/desert/Shore/StoneSurface_sbhi3ip0_normal_DXT5.dds",
+            "format": "BC7",
+            "sources": [
+                {
+                    "filename": "Textures/Environment/desert/Shore/StoneSurface_sbhi3ip0_normal.png"
+                }
+            ],
+            "count": 1
+        },
+        {
+            "filename": "Art/Textures/Environment/desert/Shore/Rocks_tmdlcgao_colour.dds",
+            "format": "BC1",
+            "sources": [
+                {
+                    "filename": "Textures/Environment/desert/Shore/Rocks_tmdlcgao_colour.png"
+                }
+            ],
+            "count": 1
+        },
+        {
+            "filename": "Art/Textures/Environment/desert/Shore/StoneSurface_sbhi3ip0_colour.dds",
+            "format": "BC1",
+            "sources": [
+                {
+                    "filename": "Textures/Environment/desert/Shore/StoneSurface_sbhi3ip0_colour.png"
+                }
+            ],
+            "count": 1
+        }
+    ],
+    "shader_group": [
+        "Material"
+    ],
+    "overriden_lighting_model": "SpecGlossPbrMaterial",
+    "nodes": [
+        {
+            "type": "InputWorldPos",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                1084.7139892578126,
+                167.71424865722657
+            ]
+        },
+        {
+            "type": "WorldPos",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                4022.6318359375,
+                208.18612670898438
+            ]
+        },
+        {
+            "type": "InputUV",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                1084.7139892578126,
+                167.71424865722657
+            ]
+        },
+        {
+            "type": "UV",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                4022.6318359375,
+                208.18612670898438
+            ]
+        },
+        {
+            "type": "ConstantBool",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": true
+                }
+            ],
+            "ui_position": [
+                3756.360595703125,
+                575.4047241210938
+            ]
+        },
+        {
+            "type": "ConstantPixel3",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": [
+                        0.6796119809150696,
+                        0.33548200130462649,
+                        0.23093600571155549
+                    ]
+                }
+            ],
+            "custom_parameter": "DustColour",
+            "ui_position": [
+                3200.4091796875,
+                -221.97653198242188
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 6,
+            "parameters": [
+                {
+                    "format": "BC1",
+                    "srgb": false
+                },
+                {}
+            ],
+            "custom_parameter": "Meshmap",
+            "ui_position": [
+                1944.4493408203126,
+                89.42208099365235
+            ]
+        },
+        {
+            "type": "ConstantPixel2",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": [
+                        0.0,
+                        1.0
+                    ]
+                }
+            ],
+            "ui_position": [
+                2503.088134765625,
+                97.84502410888672
+            ]
+        },
+        {
+            "type": "ConstantPixel2",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": [
+                        0.6499999761581421,
+                        1.5
+                    ]
+                }
+            ],
+            "ui_position": [
+                2505.409423828125,
+                190.5236053466797
+            ]
+        },
+        {
+            "type": "FitRangeFromInput",
+            "index": 0,
+            "ui_position": [
+                2830.636962890625,
+                82.68269348144531
+            ]
+        },
+        {
+            "type": "MultiplyConst2",
+            "index": 3,
+            "parameters": [
+                {
+                    "value": 12.0
+                }
+            ],
+            "custom_parameter": "EdgeTexture_Tiling",
+            "ui_position": [
+                1580.2547607421876,
+                1085.2696533203126
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 3,
+            "parameters": [
+                {
+                    "path": "Art/Textures/Environment/desert/Shore/StoneSurface_sbhi3ip0_colour.dds",
+                    "format": "BC1",
+                    "srgb": true
+                },
+                {}
+            ],
+            "ui_position": [
+                1949.00048828125,
+                1001.4283447265625
+            ]
+        },
+        {
+            "type": "MultiplyConst2",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 5.0
+                }
+            ],
+            "custom_parameter": "InnerTexture_Tiling",
+            "ui_position": [
+                1580.2791748046876,
+                673.4933471679688
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 0,
+            "parameters": [
+                {
+                    "path": "Art/Textures/Environment/desert/Shore/Rocks_tmdlcgao_colour.dds",
+                    "format": "BC1",
+                    "srgb": true
+                },
+                {}
+            ],
+            "ui_position": [
+                1938.1434326171876,
+                555.428466796875
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 0,
+            "ui_position": [
+                2427.9287109375,
+                786.5555419921875
+            ]
+        },
+        {
+            "type": "Lerp3",
+            "index": 0,
+            "ui_position": [
+                2605.465087890625,
+                542.0307006835938
+            ]
+        },
+        {
+            "type": "Multiply3",
+            "index": 0,
+            "ui_position": [
+                3219.1591796875,
+                93.02354431152344
+            ]
+        },
+        {
+            "type": "MultiplyConst2",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": 0.0010000000474974514
+                }
+            ],
+            "ui_position": [
+                1473.7855224609376,
+                -205.39288330078126
+            ]
+        },
+        {
+            "type": "MultiplyConst2",
+            "index": 2,
+            "parameters": [
+                {
+                    "value": 0.7533000111579895
+                }
+            ],
+            "custom_parameter": "Mask_Tiling",
+            "ui_position": [
+                1511.356689453125,
+                -98.53571319580078
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 2,
+            "parameters": [
+                {
+                    "path": "Art/Textures/masks/GrundgeMask02_Uncompressed.dds",
+                    "format": "Uncompressed",
+                    "srgb": false
+                },
+                {}
+            ],
+            "ui_position": [
+                1837.595458984375,
+                -231.91668701171876
+            ]
+        },
+        {
+            "type": "ConstantPixel2",
+            "index": 3,
+            "parameters": [
+                {
+                    "value": [
+                        0.0,
+                        1.0
+                    ]
+                }
+            ],
+            "ui_position": [
+                2179.159423828125,
+                -93.22640991210938
+            ]
+        },
+        {
+            "type": "ConstantPixel2",
+            "index": 2,
+            "parameters": [
+                {
+                    "value": [
+                        0.0,
+                        1.8911999464035035
+                    ]
+                }
+            ],
+            "ui_position": [
+                2176.659423828125,
+                -8.226424217224121
+            ]
+        },
+        {
+            "type": "FitRangeFromInput",
+            "index": 1,
+            "ui_position": [
+                2464.159423828125,
+                -103.22640991210938
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 0,
+            "ui_position": [
+                2842.91015625,
+                -154.47650146484376
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 1,
+            "ui_position": [
+                3226.6591796875,
+                -15.7264404296875
+            ]
+        },
+        {
+            "type": "Lerp3",
+            "index": 2,
+            "ui_position": [
+                3465.409423828125,
+                -61.9764404296875
+            ]
+        },
+        {
+            "type": "AlbedoColor",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                4022.6318359375,
+                208.18612670898438
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 5,
+            "parameters": [
+                {
+                    "format": "BC1",
+                    "srgb": false
+                },
+                {}
+            ],
+            "custom_parameter": "Meshmap_normal",
+            "ui_position": [
+                1615.77490234375,
+                423.0418701171875
+            ]
+        },
+        {
+            "type": "NormalTexToTbn",
+            "index": 2,
+            "parameters": [
+                {
+                    "value": 1.100000023841858
+                }
+            ],
+            "ui_position": [
+                2882.700439453125,
+                402.8480224609375
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 4,
+            "parameters": [
+                {
+                    "path": "Art/Textures/Environment/desert/Shore/StoneSurface_sbhi3ip0_normal_DXT5.dds",
+                    "srgb": false
+                },
+                {}
+            ],
+            "ui_position": [
+                1949.00048828125,
+                1208.428466796875
+            ]
+        },
+        {
+            "type": "NormalTexToTbn",
+            "index": 1,
+            "parameters": [
+                {}
+            ],
+            "ui_position": [
+                2330.63427734375,
+                1027.0748291015626
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 1,
+            "parameters": [
+                {
+                    "path": "Art/Textures/Environment/desert/Shore/Rocks_tmdlcgao_normal_BC7.dds",
+                    "srgb": false
+                },
+                {}
+            ],
+            "ui_position": [
+                1944.00048828125,
+                779.4283447265625
+            ]
+        },
+        {
+            "type": "NormalTexToTbn",
+            "index": 0,
+            "parameters": [
+                {}
+            ],
+            "ui_position": [
+                2330.179443359375,
+                938.0243530273438
+            ]
+        },
+        {
+            "type": "Lerp3",
+            "index": 1,
+            "ui_position": [
+                3040.451171875,
+                642.1118774414063
+            ]
+        },
+        {
+            "type": "CombineTbnNormals",
+            "index": 0,
+            "parameters": [
+                {},
+                {
+                    "value": 1.25
+                }
+            ],
+            "custom_parameter": "NormalIntensity",
+            "ui_position": [
+                3266.48876953125,
+                337.74261474609377
+            ]
+        },
+        {
+            "type": "TbnNormal",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                4022.6318359375,
+                208.18612670898438
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 0,
+            "ui_position": [
+                3047.42919921875,
+                800.738037109375
+            ]
+        },
+        {
+            "type": "Glossiness",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                4022.6318359375,
+                208.18612670898438
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 1,
+            "ui_position": [
+                3057.607666015625,
+                1068.5953369140626
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 0,
+            "ui_position": [
+                3429.392578125,
+                500.65472412109377
+            ]
+        },
+        {
+            "type": "InputIndirectColor",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                1084.7139892578126,
+                167.71424865722657
+            ]
+        },
+        {
+            "type": "IndirectColor",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                4022.6318359375,
+                208.18612670898438
+            ]
+        },
+        {
+            "type": "InputAlbedoColor",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                1084.7139892578126,
+                167.71424865722657
+            ]
+        },
+        {
+            "type": "InputTbnNormal",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                1084.7139892578126,
+                167.71424865722657
+            ]
+        },
+        {
+            "type": "InputGlossiness",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                1084.7139892578126,
+                167.71424865722657
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "z"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "UV",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 6,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 6,
+                "variable": "rgba",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "in_min"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "in_max"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 1,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "out_min"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 1,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "out_max"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 3,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 0,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 6,
+                "variable": "rgba",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 3,
+                "variable": "rgba",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 0,
+                "variable": "rgba",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 1,
+                "variable": "a",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 1,
+                "variable": "a",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 2,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 6,
+                "variable": "rgba",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 1,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 3,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 1,
+                "variable": "in_min"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 3,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 1,
+                "variable": "in_max"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 2,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 1,
+                "variable": "out_min"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 2,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 1,
+                "variable": "out_max"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 2,
+                "variable": "rgba",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 1,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantBool",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 5,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 5,
+                "variable": "rgba",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "NormalTexToTbn",
+                "index": 2,
+                "variable": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 5,
+                "variable": "rgba",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "NormalTexToTbn",
+                "index": 2,
+                "variable": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 4,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 4,
+                "variable": "rgba",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "NormalTexToTbn",
+                "index": 1,
+                "variable": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 4,
+                "variable": "rgba",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "NormalTexToTbn",
+                "index": 1,
+                "variable": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 1,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 1,
+                "variable": "rgba",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "NormalTexToTbn",
+                "index": 0,
+                "variable": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 1,
+                "variable": "rgba",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "NormalTexToTbn",
+                "index": 0,
+                "variable": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "NormalTexToTbn",
+                "index": 1,
+                "variable": "tbn_normal"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "NormalTexToTbn",
+                "index": 0,
+                "variable": "tbn_normal"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "NormalTexToTbn",
+                "index": 2,
+                "variable": "tbn_normal"
+            },
+            "dst": {
+                "type": "CombineTbnNormals",
+                "index": 0,
+                "variable": "tbn_normal1"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "CombineTbnNormals",
+                "index": 0,
+                "variable": "tbn_normal2"
+            }
+        },
+        {
+            "src": {
+                "type": "CombineTbnNormals",
+                "index": 0,
+                "variable": "tbn_normal"
+            },
+            "dst": {
+                "type": "TbnNormal",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 4,
+                "variable": "rgba",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 1,
+                "variable": "rgba",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Glossiness",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 4,
+                "variable": "rgba",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 1,
+                "variable": "rgba",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 5,
+                "variable": "rgba",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        }
+    ]
+}

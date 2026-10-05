@@ -2669,7 +2669,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         var window = new ItemBookWindow(() => Items)
         {
             Changed = () => SettingsChanged?.Invoke(),
-            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack),
+            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack)
+            {
+                Shaded = true,
+            },
         };
 
         window.Show(columns, rail, columnWidths, panes);
@@ -2710,6 +2713,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             {
                 ShowShaders = true,
                 Translucent = true,
+                Shaded = true,
             },
         };
 
@@ -2750,6 +2754,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             {
                 Load = static (read, _, key, _) => TileBookWindow.Load(read, key),
                 Ink = TileBookWindow.GroundInk,
+                Shaded = true,
             },
         };
 

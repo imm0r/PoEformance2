@@ -455,6 +455,64 @@ public class TileFilesTests
         Assert.Contains("{\"nodes\":[\"mask\"]}", dump, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// A tile asked for its graphs colours the shapes whose graphs say more than a texture, and names what it left out.
+    /// </summary>
+    /// <remarks>
+    /// THE FLOOR IS GIVEN THE LEDGE'S SHAPE OF MATERIAL: a graph that mixes by a mask, and after it
+    /// one whose colour needs a node nobody has read. The mix stands, the other is named, and the
+    /// wall - an ordinary colour map - keeps its plain skin.
+    /// </remarks>
+    [Fact]
+    public void ANDATileAskedForItsGraphsIsColouredByThemAndSaysWhatItLeftOut()
+    {
+        Dictionary<string, byte[]> files = Install();
+        files["Art/Textures/Floor.mat"] = Encoding.UTF8.GetBytes(
+            """
+            {"graphinstances":[
+              {"parent":"Metadata/Ledge.fxgraph","custom_parameters":[{"name":"Meshmap","parameters":[{"path":"Art/Textures/floor.dds","srgb":false}]}]},
+              {"parent":"Metadata/Effects/Graphs/General/MaskedContactFade.fxgraph"}]}
+            """);
+        files["Metadata/Ledge.fxgraph"] = Encoding.UTF8.GetBytes(
+            """
+            {"nodes":[
+              {"type":"InputUV","index":0,"stage":"Texturing"},
+              {"type":"SampleTexture","index":6,"parameters":[{"format":"BC1","srgb":false},{}],"custom_parameter":"Meshmap"},
+              {"type":"SampleTexture","index":0,"parameters":[{"path":"Art/Textures/wall.dds","srgb":true},{}]},
+              {"type":"Lerp3","index":0},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing"}],
+             "links":[
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing","variable":"output"},"dst":{"type":"SampleTexture","index":6,"variable":"uv"}},
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing","variable":"output"},"dst":{"type":"SampleTexture","index":0,"variable":"uv"}},
+              {"src":{"type":"SampleTexture","index":6,"variable":"rgba"},"dst":{"type":"Lerp3","index":0,"variable":"a"}},
+              {"src":{"type":"SampleTexture","index":0,"variable":"rgba"},"dst":{"type":"Lerp3","index":0,"variable":"b"}},
+              {"src":{"type":"SampleTexture","index":6,"variable":"rgba","swizzle":"y"},"dst":{"type":"Lerp3","index":0,"variable":"alpha"}},
+              {"src":{"type":"Lerp3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing","variable":"input"}}]}
+            """);
+        files["Metadata/Effects/Graphs/General/MaskedContactFade.fxgraph"] = Encoding.UTF8.GetBytes(
+            """
+            {"nodes":[
+              {"type":"InputAlbedoColor","index":0,"stage":"PreLighting"},
+              {"type":"MaskedContactFade","index":0},
+              {"type":"AlbedoColor","index":0,"stage":"PreLighting"}],
+             "links":[
+              {"src":{"type":"InputAlbedoColor","index":0,"stage":"PreLighting","variable":"output"},"dst":{"type":"MaskedContactFade","index":0,"variable":"in_albedo"}},
+              {"src":{"type":"MaskedContactFade","index":0,"variable":"out_albedo"},"dst":{"type":"AlbedoColor","index":0,"stage":"PreLighting","variable":"input"}}]}
+            """);
+
+        MonsterModel model = TileModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Test/Arena.tdt", ground: false, shaded: true);
+
+        Assert.True(model.Ready, model.Why);
+        Assert.Equal(1, model.ShadedBy);
+        Assert.Equal(["MaskedContactFade in MaskedContactFade"], model.Unshaded);
+
+        // c1r1 is "wall, floor" and c2r1 "floor, floor": the floor's three shapes run the program.
+        Assert.Null(model.Shades[0]);
+        Assert.All([1, 2, 3], shape => Assert.NotNull(model.Shades[shape]));
+        Assert.Same(model.Shades[1], model.Shades[3]);
+        Assert.NotNull(model.Skins[0]);
+    }
+
     [Fact]
     public void ANDATILECostsWhatItReadMaterialsAndTexturesIncluded()
     {

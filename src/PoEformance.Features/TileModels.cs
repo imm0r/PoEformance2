@@ -63,7 +63,9 @@ public static class TileModels
     /// Whether the shapes painted with <see cref="BlackWall"/> are drawn. They are geometry the game
     /// really has, and from any angle but the game's a black slab in front of the tile.
     /// </param>
-    public static MonsterModel Of(Func<string, byte[]?>? read, string? path, bool ground = true, bool walls = true)
+    /// <param name="shaded">Whether each material's shader graphs are read - see MonsterModels.Shaded.</param>
+    public static MonsterModel Of(
+        Func<string, byte[]?>? read, string? path, bool ground = true, bool walls = true, bool shaded = false)
     {
         if (read is null)
         {
@@ -178,7 +180,8 @@ public static class TileModels
         // most of what a tile costs to open - and Bytes promises to include them. Handed the bare
         // reader, Worn's .mat and .dds reads went uncounted and the line under the picture said
         // a tile was a few kilobytes of geometry.
-        MonsterModel model = MonsterModels.Worn(Counted, joined, named, paintTheRest: false, path, move) with
+        var paints = new MonsterModels.Paints();
+        MonsterModel model = MonsterModels.Worn(Counted, joined, named, paintTheRest: false, path, move, paints) with
         {
             Bytes = bytes,
             Files = files,
@@ -186,7 +189,10 @@ public static class TileModels
             Kind = ModelKind.Tile,
         };
 
-        return walls ? model : Unwalled(model);
+        // THE WALLS GO BEFORE THE GRAPHS ARE READ, so a material only the walls wear is not compiled
+        // for nothing.
+        model = walls ? model : Unwalled(model);
+        return shaded ? MonsterModels.Shaded(Counted, model, paints) : model;
     }
 
     /// <summary>
