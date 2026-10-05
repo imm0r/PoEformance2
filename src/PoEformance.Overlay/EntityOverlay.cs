@@ -382,6 +382,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _healthBars.OnlyWhenHurt = settings.HealthBarsOnlyWhenHurt;
         HideBehindPanels = settings.HideBehindPanels;
         HideWindowsBehindPanels = settings.HideWindowsBehindPanels;
+        ScreenshotKey = settings.ScreenshotKey;
         KeepOut = settings.MapKeepOutOrDefault;
         _projectiles.Enabled = settings.ShowProjectiles;
         _projectiles.ShowTrails = settings.ProjectileTrails;
@@ -492,6 +493,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             HealthBarsOnlyWhenHurt = _healthBars.OnlyWhenHurt,
             HideBehindPanels = HideBehindPanels,
             HideWindowsBehindPanels = HideWindowsBehindPanels,
+            ScreenshotKey = ScreenshotKey,
             MapKeepOut = KeepOut,
 
             // FROM THE WINDOW WHERE THERE IS ONE, and from the file where there is not: a build
@@ -1778,6 +1780,105 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <see cref="WindowChrome.Covered"/>, which also records the ways back.
     /// </remarks>
     public bool HideWindowsBehindPanels { get; set; } = true;
+
+    /// <summary>Delete - what the screenshot key is until somebody chooses another.</summary>
+    private const int DefaultScreenshotKey = 0x2E;
+
+    /// <summary>The screenshot key as a virtual-key code; zero means "not chosen" and reads as Delete.</summary>
+    public int ScreenshotKey { get; set; }
+
+    private int ScreenshotKeyOrDefault => ScreenshotKey == 0 ? DefaultScreenshotKey : ScreenshotKey;
+
+    private bool _shotWasDown;
+    private bool _shotListening;
+    private long _shotToastUntil;
+    private bool _shotToastOk;
+
+    /// <summary>
+    /// The screenshot key: the focused window of the tool, or with Ctrl the whole overlay.
+    /// </summary>
+    /// <remarks>
+    /// OBSERVED, NEVER SWALLOWED - the game still gets the key, which is why this only runs while
+    /// the game or the tool is in front (the caller sits behind that gate) and not while a text
+    /// box wants the key: Delete there means "delete a letter".
+    ///
+    /// The rectangle is taken HERE, on the render thread, where ImGui can be asked; the copy runs
+    /// on the pool because a screen grab plus a clipboard open is a hitch nobody wants mid-fight.
+    /// With no focused window the whole overlay is taken instead of nothing, since a key that
+    /// silently does nothing reads as broken.
+    /// </remarks>
+    private void PollScreenshot(long now)
+    {
+        bool down = !_shotListening && ScreenInput.IsDown(ScreenshotKeyOrDefault);
+        bool pressed = down && !_shotWasDown;
+        _shotWasDown = down;
+
+        if (pressed && !ImGui.GetIO().WantTextInput && _tracked.IsValid)
+        {
+            bool whole = ScreenInput.IsDown(0x11) || Chrome.Focused is null;
+            ClientRect area = _tracked;
+
+            if (!whole && Chrome.Focused is (Vector2 at, Vector2 size))
+            {
+                int left = Math.Max(0, (int)MathF.Floor(at.X));
+                int top = Math.Max(0, (int)MathF.Floor(at.Y));
+                int right = Math.Min(area.Width, (int)MathF.Ceiling(at.X + size.X));
+                int bottom = Math.Min(area.Height, (int)MathF.Ceiling(at.Y + size.Y));
+                area = new ClientRect(area.X + left, area.Y + top, right - left, bottom - top);
+            }
+
+            _ = Task.Run(() =>
+            {
+                bool ok = ScreenCapture.CopyToClipboard(area.X, area.Y, area.Width, area.Height);
+                _shotToastOk = ok;
+                Volatile.Write(ref _shotToastUntil, Environment.TickCount64 + 1500);
+            });
+        }
+
+        if (now < Volatile.Read(ref _shotToastUntil))
+        {
+            ImGui.GetForegroundDrawList().AddText(
+                new Vector2(12, 12),
+                _shotToastOk ? 0xFFFFFFFFu : 0xFF5050FFu,
+                _shotToastOk ? "Screenshot copied" : "Screenshot failed");
+        }
+    }
+
+    /// <summary>The Appearance row that shows and rebinds the screenshot key.</summary>
+    private void DrawScreenshotControls()
+    {
+        OverlayLayout.Group("Screenshot");
+
+        if (_shotListening)
+        {
+            ImGui.Button("Press a key...  (Esc cancels)");
+            for (int key = 8; key < 255; key++)
+            {
+                // Mouse buttons and the generic modifiers are not keys somebody binds: the click
+                // that opened this is still down, and Ctrl is the "whole overlay" modifier.
+                if (key is 0x01 or 0x02 or 0x04 or 0x05 or 0x06 or (>= 0x10 and <= 0x12) or (>= 0xA0 and <= 0xA5)
+                    || !ScreenInput.IsDown(key))
+                {
+                    continue;
+                }
+
+                if (key != 0x1B)
+                {
+                    ScreenshotKey = key;
+                    SettingsChanged?.Invoke();
+                }
+
+                _shotListening = false;
+                break;
+            }
+        }
+        else if (ImGui.Button($"{(ConsoleKey)ScreenshotKeyOrDefault}##shotkey"))
+        {
+            _shotListening = true;
+        }
+
+        OverlayLayout.Hint("Copies the focused window of the tool to the clipboard. With Ctrl: the whole overlay.");
+    }
 
     /// <summary>
     /// Where the game's own interface sits, so the map overlay keeps off it.
@@ -3190,6 +3291,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
+        PollScreenshot(Environment.TickCount64);
+
         // Before the marker gate, and outside it: the watcher decides for itself where it is
         // quiet, and its own rule is towns rather than "wherever markers are drawn".
         if (_snapshot.InGame)
@@ -4574,6 +4677,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         OverlayLayout.Hint("Only the windows actually lying on top of the open panel.");
+
+        DrawScreenshotControls();
 
         _keepOut.DrawControls();
     }
