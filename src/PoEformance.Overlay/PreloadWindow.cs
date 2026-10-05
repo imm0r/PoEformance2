@@ -178,13 +178,14 @@ public sealed class PreloadWindow
 
             if (_saved.Length > 0)
             {
-                ImGuiText.Wrapped(DimText, _saved);
+                PathLink.Line(DimText, _saved);
             }
         }
 
+        // THE DIAGNOSTICS' LINES - "rooms written to ..." among them - with any file they wrote a link.
         foreach (string line in _watch.Sweep)
         {
-            ImGui.TextColored(DimText, line);
+            PathLink.Line(DimText, line);
         }
 
         // Titled rules between the halves, like the alerts tab: the findings and the raw

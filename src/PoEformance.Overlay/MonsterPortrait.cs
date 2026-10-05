@@ -1344,7 +1344,7 @@ public sealed class MonsterPortrait
 
             ImGui.Separator();
             Entry();
-            ImGuiText.Wrapped(OverlayInk.Quiet, _exported);
+            PathLink.Line(OverlayInk.Quiet, _exported);
             if (_remembered.Length > 0)
             {
                 ImGuiText.Wrapped(OverlayInk.Quiet, _remembered);
@@ -1627,9 +1627,10 @@ public sealed class MonsterPortrait
         }
 
         ImGui.PushStyleColor(ImGuiCol.Text, OverlayInk.Quiet);
+        // A LINE NAMING A FILE THE PANE WROTE - the export - makes the file a link. See PathLink.
         foreach (string line in _status)
         {
-            ImGui.TextWrapped(line);
+            PathLink.Line(line);
         }
 
         ImGui.PopStyleColor();
@@ -2388,7 +2389,7 @@ public sealed class MonsterPortrait
 
         if (_dumped.Length > 0)
         {
-            ImGui.TextUnformatted(ImGuiText.Escape(_dumped));
+            PathLink.Line(_dumped);
         }
     }
 
