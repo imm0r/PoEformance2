@@ -563,6 +563,11 @@ public sealed class MonsterPortrait
     public bool Shaded { get; set; }
 
     /// <summary>
+    /// Every tileset the install has, for a tile's dump to find the areas that use it - see ModelDump.OfTile.
+    /// </summary>
+    public Func<IReadOnlyList<string>>? Tilesets { get; set; }
+
+    /// <summary>
     /// The colour a shape with no texture is drawn in, or default for the pale warm grey every book began with.
     /// </summary>
     /// <remarks>
@@ -2402,14 +2407,32 @@ public sealed class MonsterPortrait
     /// </remarks>
     private void Dump()
     {
+        string at = Path.Combine(Folder, Stem(_wanted) + ".files.txt");
+        if (_model.Kind != ModelKind.Tile)
+        {
+            Write(at, () => ModelDump.Of(_install, _variety, _wanted, _model));
+            return;
+        }
+
+        // A TILE'S DUMP READS EVERY TILESET in the install to find the ones using it - hundreds of
+        // small files - so it is written off the frame, and says so while it is. The model and the
+        // key are taken now, so a click on another tile meanwhile cannot change what is written.
+        // A TILE'S KEY CARRIES WHAT IS LEFT OUT after the mark - see TileBookWindow.Load.
+        MonsterModel model = _model;
+        string tile = _wanted.Split('|')[0];
+        Func<string, byte[]?>? install = _install;
+        IReadOnlyList<string> sets = Tilesets?.Invoke() ?? [];
+        _dumped = "writing " + at + " - reading every tileset, this takes a moment";
+        _ = Task.Run(() => Write(at, () => ModelDump.OfTile(install, tile, model, sets)));
+    }
+
+    /// <summary>Writes a dump and says where, or why not, under the buttons.</summary>
+    private void Write(string at, Func<string> text)
+    {
         try
         {
             Directory.CreateDirectory(Folder);
-            string at = Path.Combine(Folder, Stem(_wanted) + ".files.txt");
-            // A TILE'S KEY CARRIES WHAT IS LEFT OUT after the mark - see TileBookWindow.Load.
-            File.WriteAllText(at, _model.Kind == ModelKind.Tile
-                ? ModelDump.OfTile(_install, _wanted.Split('|')[0], _model)
-                : ModelDump.Of(_install, _variety, _wanted, _model));
+            File.WriteAllText(at, text());
             _dumped = "wrote " + at;
         }
         catch (Exception fault) when (fault is IOException or UnauthorizedAccessException)

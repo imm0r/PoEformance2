@@ -22,11 +22,11 @@ public class TileFilesTests
 {
     /// <summary>A version 7 definition: a string table, then the references and the size.</summary>
     private static byte[] Tdt(string inherits = "", string template = "Art/Models/Terrain/Test/Arena.tgt",
-        int width = 2, int height = 1, int version = 7)
+        int width = 2, int height = 1, int version = 7, bool grounds = false)
     {
         // THE TABLE STARTS WITH AN EMPTY STRING, so offset zero means "nothing" the way the game's
         // own files use it, and every other offset lands where a string begins.
-        string[] strings = ["", inherits, template, "arena_tag", "edge"];
+        string[] strings = ["", inherits, template, "arena_tag", "edge", "Metadata/Terrain/Test/sand.gt", "Metadata/Terrain/Test/rock.gt"];
         var starts = new uint[strings.Length];
         var table = new List<byte>();
         for (var one = 0; one < strings.Length; one++)
@@ -65,6 +65,18 @@ public class TileFilesTests
 
         write.Write((sbyte)width);
         write.Write((sbyte)height);
+        if (grounds)
+        {
+            // Down-left, down-right, up-right, up-left - and the last one a step into a word, which
+            // must read as nothing rather than as the tail of a path.
+            write.Write(starts[5]);
+            write.Write(starts[5]);
+            write.Write(starts[6]);
+            write.Write(starts[6] + 3);
+            write.Write(new byte[48]);
+            return stream.ToArray();
+        }
+
         write.Write(new byte[64]);              // Ground types, offsets and the rest - not read.
         return stream.ToArray();
     }
@@ -520,6 +532,58 @@ public class TileFilesTests
         Assert.Contains("  r: 30 30 30 30 30 · 30.0", dump, StringComparison.Ordinal);
         Assert.Contains("  a: 255 255 255 255 255 · 255.0", dump, StringComparison.Ordinal);
         Assert.Contains("graphs program", dump, StringComparison.Ordinal);
+    }
+
+    /// <summary>A definition's four corner ground types are read where annalithic reads them, and only whole.</summary>
+    [Fact]
+    public void ADEFINITIONReadsItsCornerGroundTypesAndRefusesAHalfWord()
+    {
+        TileDefinition plain = TileDefinition.Read(Tdt());
+        Assert.True(plain.Ready, plain.Why);
+        Assert.Equal(["", "", "", ""], plain.Grounds);
+
+        TileDefinition grounded = TileDefinition.Read(Tdt(grounds: true));
+        Assert.True(grounded.Ready, grounded.Why);
+        Assert.Equal(["Metadata/Terrain/Test/sand.gt", "Metadata/Terrain/Test/sand.gt", "Metadata/Terrain/Test/rock.gt", ""], grounded.Grounds);
+    }
+
+    /// <summary>
+    /// The dump's ground section: corners, their types, the mask, and the tilesets that list the tile.
+    /// </summary>
+    /// <remarks>
+    /// One tileset lists the tile and one does not; only the first is opened, and its MaterialsList
+    /// is printed as it is - the file whose format is the question.
+    /// </remarks>
+    [Fact]
+    public void THEDUMPPrintsTheGroundChainAndFindsTheTilesetsUsingTheTile()
+    {
+        Dictionary<string, byte[]> files = Install();
+        files["Metadata/Terrain/Test/Arena.tdt"] = Tdt(grounds: true);
+        files["Metadata/Terrain/Test/sand.gt"] = Encoding.Unicode.GetBytes("version 1\r\nSandFill\r\n");
+        files["Art/Models/Terrain/Test/Arena_mask.dds"] = Dds();
+        files["Metadata/Terrain/Test/desert.tsi"] = Encoding.Unicode.GetBytes(
+            "version 7\r\nTileSet \"desert.tst\"\r\nMaterialsList \"desert.mtd\"\r\n");
+        files["Metadata/Terrain/Test/desert.tst"] = Encoding.Unicode.GetBytes("\"Metadata/Terrain/Test/Arena.tdt\" 1\r\n");
+        files["Metadata/Terrain/Test/desert.mtd"] = Encoding.Unicode.GetBytes("\"sand.gt\" \"Art/Textures/Floor.mat\"\r\n");
+        files["Metadata/Terrain/Woods/woods.tsi"] = Encoding.Unicode.GetBytes("version 7\r\nTileSet \"woods.tst\"\r\n");
+        files["Metadata/Terrain/Woods/woods.tst"] = Encoding.Unicode.GetBytes("\"Metadata/Terrain/Woods/Tree.tdt\" 1\r\n");
+
+        Func<string, byte[]?> read = path => files.GetValueOrDefault(path);
+        MonsterModel model = TileModels.Of(read, "Metadata/Terrain/Test/Arena.tdt");
+        string dump = ModelDump.OfTile(
+            read, "Metadata/Terrain/Test/Arena.tdt", model,
+            ["Metadata/Terrain/Woods/woods.tsi", "Metadata/Terrain/Test/desert.tsi"]);
+
+        Assert.Contains("  down-left: Metadata/Terrain/Test/sand.gt", dump, StringComparison.Ordinal);
+        Assert.Contains("  up-left: -", dump, StringComparison.Ordinal);
+        Assert.Contains("SandFill", dump, StringComparison.Ordinal);
+        Assert.Contains("=== ground mask Art/Models/Terrain/Test/Arena_mask.dds", dump, StringComparison.Ordinal);
+        Assert.Contains("=== ground mesh of Art/Models/Terrain/Test/Arena.tgt", dump, StringComparison.Ordinal);
+        Assert.Contains("=== .tsi Metadata/Terrain/Test/desert.tsi", dump, StringComparison.Ordinal);
+        Assert.DoesNotContain("=== .tsi Metadata/Terrain/Woods/woods.tsi", dump, StringComparison.Ordinal);
+        Assert.Contains("=== MaterialsList Metadata/Terrain/Test/desert.mtd", dump, StringComparison.Ordinal);
+        Assert.Contains("\"sand.gt\" \"Art/Textures/Floor.mat\"", dump, StringComparison.Ordinal);
+        Assert.Contains("searched 2 tilesets; 1 use this tile", dump, StringComparison.Ordinal);
     }
 
     [Fact]

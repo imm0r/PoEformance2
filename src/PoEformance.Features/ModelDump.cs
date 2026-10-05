@@ -148,7 +148,9 @@ public static class ModelDump
     /// <param name="read">How to get a file out of the install, by path.</param>
     /// <param name="path">The tile's .tdt.</param>
     /// <param name="model">The model already gathered, for the shapes and what each one wears.</param>
-    public static string OfTile(Func<string, byte[]?>? read, string path, MonsterModel? model)
+    /// <param name="tilesets">Every <c>.tsi</c> the install has, to find the tilesets that use this tile - see <see cref="Ground"/>.</param>
+    public static string OfTile(
+        Func<string, byte[]?>? read, string path, MonsterModel? model, IReadOnlyList<string>? tilesets = null)
     {
         var said = new StringBuilder();
         said.Append("tile: ").AppendLine(path);
@@ -255,8 +257,273 @@ public static class ModelDump
                 .Append("	graphs ").AppendLine(one < model.Shades.Count && model.Shades[one] is not null ? "program" : "-");
         }
 
+        Ground(read, path, tilesets, said);
         return said.ToString();
     }
+
+    /// <summary>Most of one text file printed, so a large list cannot bury the rest of the dump.</summary>
+    private const int MostText = 48 * 1024;
+
+    /// <summary>Most tilesets printed in full; the rest that use the tile are only named.</summary>
+    private const int MostTilesets = 3;
+
+    /// <summary>
+    /// Everything that could say what a tile's GROUND is drawn with, raw.
+    /// </summary>
+    /// <remarks>
+    /// THE GROUND IS THE HALF OF A TILE THIS CANNOT YET PAINT. The props carry their materials; the
+    /// ground block carries none, and on a desert map it is the sand that covers most of a tile -
+    /// which is why the picture is all rock where the game shows dunes. No reference paints it:
+    /// annalithic's terrain importer colours each corner's ground type at random. So every file on
+    /// the way is printed as it is, for a reader to find the link in:
+    ///
+    ///     the .tdt's four corner ground types (.gt), and each .gt's text
+    ///     the .tgt's GroundMask, with its format and channels
+    ///     the ground mesh: whether it has coordinates, and their range
+    ///     the tilesets (.tsi) whose .tst lists this tile, with their MaterialsList (.mtd),
+    ///     TileMaterialOverrides (.tmo) and BlendMaskOverride - the files annalithic's Tsi.cs
+    ///     names and does not open
+    ///
+    /// FOUND BY READING EVERY TILESET, because nothing points from a tile to the areas that use it.
+    /// Hundreds of small files, once, behind the button - which is why the dump runs off the frame.
+    /// </remarks>
+    private static void Ground(Func<string, byte[]?> read, string path, IReadOnlyList<string>? tilesets, StringBuilder said)
+    {
+        said.AppendLine().AppendLine("=== ground");
+
+        string at = Slashed(path);
+        TileDefinition definition = TileDefinition.None;
+        var hops = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        while (hops.Add(at) && hops.Count <= MostHops)
+        {
+            definition = TileDefinition.Read(read(at));
+            if (!definition.Ready)
+            {
+                said.Append("the definition did not read: ").Append(at).Append(" - ").AppendLine(definition.Why);
+                return;
+            }
+
+            if (definition.Inherits.Length == 0)
+            {
+                break;
+            }
+
+            said.Append(at).Append(" inherits ").AppendLine(definition.Inherits);
+            at = Slashed(definition.Inherits);
+        }
+
+        string[] corners = ["down-left", "down-right", "up-right", "up-left"];
+        said.Append("corners of ").Append(at).Append(" (version ").Append(Say(definition.Version)).AppendLine("):");
+        for (var corner = 0; corner < corners.Length; corner++)
+        {
+            string type = corner < definition.Grounds.Count ? definition.Grounds[corner] : string.Empty;
+            said.Append("  ").Append(corners[corner]).Append(": ").AppendLine(type.Length > 0 ? type : "-");
+        }
+
+        foreach (string type in definition.Grounds.Where(one => one.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            said.AppendLine().Append("=== .gt ").AppendLine(type);
+            said.AppendLine(Text(read, type));
+        }
+
+        foreach (string template in definition.Templates)
+        {
+            byte[]? raw = read(Slashed(template));
+            said.AppendLine().Append("=== .tgt ").AppendLine(template);
+            said.AppendLine(raw is { Length: > 0 } ? Trimmed(StatDescriptionFiles.Decode(raw)) : "(not in the install)");
+
+            TileTemplate layout = TileTemplate.Read(raw);
+            if (!layout.Ready)
+            {
+                continue;
+            }
+
+            if (layout.GroundMask.Length > 0)
+            {
+                said.AppendLine().Append("=== ground mask ").AppendLine(layout.GroundMask);
+                Picture(read, layout.GroundMask, said);
+            }
+
+            said.AppendLine().Append("=== ground mesh of ").AppendLine(template);
+            for (var y = 1; y <= layout.Height; y++)
+            {
+                for (var x = 1; x <= layout.Width; x++)
+                {
+                    string mesh = layout.MeshOf(x, y);
+                    TileMesh part = TileMesh.Read(read(Slashed(mesh)));
+                    said.Append("  c").Append(Say(x)).Append('r').Append(Say(y)).Append(": ")
+                        .AppendLine(part.Ready ? Spread(part.Ground) : "(did not read: " + part.Why + ")");
+                }
+            }
+        }
+
+        Tilesets(read, at, tilesets, said);
+    }
+
+    /// <summary>A ground mesh in one line: its size, and where its coordinates and positions lie.</summary>
+    private static string Spread(SkinnedMesh mesh)
+    {
+        if (!mesh.Ready)
+        {
+            return "no ground";
+        }
+
+        var line = new StringBuilder();
+        line.Append(Say(mesh.Positions.Length)).Append(" vertices · ").Append(Say(mesh.Triangles)).Append(" triangles · x ")
+            .Append(Number(mesh.Least.X)).Append("..").Append(Number(mesh.Most.X)).Append(" y ")
+            .Append(Number(mesh.Least.Y)).Append("..").Append(Number(mesh.Most.Y)).Append(" z ")
+            .Append(Number(mesh.Least.Z)).Append("..").Append(Number(mesh.Most.Z));
+
+        if (!mesh.Coordinated || mesh.Coordinates.Length == 0)
+        {
+            return line.Append(" · no texture coordinates").ToString();
+        }
+
+        float uLeast = float.MaxValue, uMost = float.MinValue, vLeast = float.MaxValue, vMost = float.MinValue;
+        foreach (System.Numerics.Vector2 spot in mesh.Coordinates)
+        {
+            uLeast = MathF.Min(uLeast, spot.X);
+            uMost = MathF.Max(uMost, spot.X);
+            vLeast = MathF.Min(vLeast, spot.Y);
+            vMost = MathF.Max(vMost, spot.Y);
+        }
+
+        return line.Append(" · u ").Append(Number(uLeast)).Append("..").Append(Number(uMost))
+            .Append(" v ").Append(Number(vLeast)).Append("..").Append(Number(vMost)).ToString();
+    }
+
+    /// <summary>
+    /// The tilesets whose tile list names this tile, each with the files it hands the ground.
+    /// </summary>
+    private static void Tilesets(Func<string, byte[]?> read, string tile, IReadOnlyList<string>? tilesets, StringBuilder said)
+    {
+        said.AppendLine().AppendLine("=== tilesets that use this tile");
+        if (tilesets is not { Count: > 0 })
+        {
+            said.AppendLine("(no tilesets listed - the install walk collected no .tsi under Metadata/Terrain)");
+            return;
+        }
+
+        string file = tile[(tile.LastIndexOf('/') + 1)..];
+        string tail = tile.StartsWith("metadata/terrain/", StringComparison.OrdinalIgnoreCase) ? tile["metadata/terrain/".Length..] : tile;
+        var lists = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+        var found = new List<string>();
+        var shown = 0;
+
+        foreach (string tsi in tilesets)
+        {
+            string? text = Raw(read, tsi);
+            if (text is null || Keyed(text, "TileSet") is not { Length: > 0 } set)
+            {
+                continue;
+            }
+
+            string tst = Beside(tsi, set);
+            if (!lists.TryGetValue(tst, out string? listed))
+            {
+                listed = Raw(read, tst);
+                lists[tst] = listed;
+            }
+
+            if (listed is null || !listed.Contains(file, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            bool exact = listed.Contains(tail, StringComparison.OrdinalIgnoreCase);
+            found.Add(tsi + (exact ? string.Empty : " (same file name, folder not confirmed)"));
+            if (shown++ >= MostTilesets)
+            {
+                continue;
+            }
+
+            said.AppendLine().Append("=== .tsi ").AppendLine(tsi);
+            said.AppendLine(Trimmed(text));
+            said.Append("--- ").Append(tst).AppendLine(exact ? " names the tile:" : " names a tile of the same file name:");
+            foreach (string line in listed.Split('\n').Where(one => one.Contains(file, StringComparison.OrdinalIgnoreCase)).Take(5))
+            {
+                said.Append("  ").AppendLine(line.Trim());
+            }
+
+            foreach (string key in (string[])["MaterialsList", "TileMaterialOverrides", "FillTiles"])
+            {
+                if (Keyed(text, key) is { Length: > 0 } named)
+                {
+                    string where = Beside(tsi, named);
+                    said.AppendLine().Append("=== ").Append(key).Append(' ').AppendLine(where);
+                    said.AppendLine(Text(read, where));
+                }
+            }
+
+            if (Keyed(text, "BlendMaskOverride") is { Length: > 0 } blend)
+            {
+                string where = Beside(tsi, blend);
+                said.AppendLine().Append("=== BlendMaskOverride ").AppendLine(where);
+                Picture(read, where, said);
+            }
+        }
+
+        said.AppendLine().Append("searched ").Append(Say(tilesets.Count)).Append(" tilesets; ")
+            .Append(Say(found.Count)).AppendLine(" use this tile");
+        foreach (string one in found)
+        {
+            said.Append("  ").AppendLine(one);
+        }
+    }
+
+    /// <summary>A texture's header and what the decoder made of its channels.</summary>
+    private static void Picture(Func<string, byte[]?> read, string path, StringBuilder said)
+    {
+        byte[]? raw = GameArt.ReadRaw(read, path);
+        said.AppendLine(Header(raw));
+        said.Append(Channels(Mipmaps.Of(GameArt.Decode(raw))));
+    }
+
+    /// <summary>A key's value on its own line - <c>Key "value"</c> - unquoted, or null.</summary>
+    private static string? Keyed(string text, string key)
+    {
+        foreach (string line in text.Split('\n'))
+        {
+            string trimmed = line.Trim();
+            if (trimmed.StartsWith(key, StringComparison.Ordinal)
+                && trimmed.Length > key.Length && char.IsWhiteSpace(trimmed[key.Length]))
+            {
+                return trimmed[key.Length..].Trim().Trim('"').Replace('\\', '/');
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// A path a file names, resolved: a full one as it is, a bare name beside the file naming it.
+    /// </summary>
+    /// <remarks>annalithic's Tsi.cs resolves its lists beside the .tsi; a value starting at Metadata/ or Art/ is already whole.</remarks>
+    private static string Beside(string owner, string named)
+    {
+        string value = Slashed(named);
+        if (value.StartsWith("Metadata/", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("Art/", StringComparison.OrdinalIgnoreCase))
+        {
+            return value;
+        }
+
+        int slash = owner.LastIndexOf('/');
+        return slash >= 0 ? owner[..(slash + 1)] + value : value;
+    }
+
+    private static string? Raw(Func<string, byte[]?> read, string path)
+        => read(Slashed(path)) is { Length: > 0 } bytes ? StatDescriptionFiles.Decode(bytes) : null;
+
+    private static string Text(Func<string, byte[]?> read, string path)
+        => Raw(read, path) is { } text ? Trimmed(text) : "(not in the install)";
+
+    private static string Trimmed(string text)
+        => text.Length > MostText ? text[..MostText].TrimEnd() + Environment.NewLine + "(cut off)" : text.TrimEnd();
+
+    private static string Slashed(string path) => path.Replace('\\', '/').Trim();
+
+    private static string Number(float value) => value.ToString("0.###", CultureInfo.InvariantCulture);
 
     /// <summary>
     /// What a DDS file's header says: its size, its levels and its block format.

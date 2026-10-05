@@ -46,6 +46,18 @@ public sealed class TileDefinition
     /// <summary>Tiles down.</summary>
     public int Height { get; private init; }
 
+    /// <summary>
+    /// The ground type at each corner, as <c>.gt</c> paths: down-left, down-right, up-right, up-left. Empty where unsaid.
+    /// </summary>
+    /// <remarks>
+    /// annalithic's Tdt.cs ORDER AND PLACE - four string references straight after the size - and
+    /// the same self-check as every other field here: an offset that does not start a string, or a
+    /// string that is not a <c>.gt</c>, reads as empty rather than as a word from the middle of the
+    /// table. The terrain's per-corner byte in memory indexes the same kind of list - see
+    /// TileCornerData in the offsets schema.
+    /// </remarks>
+    public IReadOnlyList<string> Grounds { get; private init; } = [];
+
     /// <summary>Why nothing was read, or empty.</summary>
     public string Why { get; private init; } = string.Empty;
 
@@ -111,11 +123,26 @@ public sealed class TileDefinition
         {
             width = BinaryPrimitives.ReadInt32LittleEndian(file[at..]);
             height = BinaryPrimitives.ReadInt32LittleEndian(file[(at + 4)..]);
+            at += 8;
         }
         else
         {
             width = (sbyte)file[at];
             height = (sbyte)file[at + 1];
+            at += 2;
+        }
+
+        // THE CORNER GROUND TYPES, only where the file is the layout annalithic reads (a version past
+        // 3, whose size is two bytes) and only while there are bytes for them.
+        string[] grounds = [];
+        if (version > 3 && at + 16 <= file.Length)
+        {
+            grounds = new string[4];
+            for (var corner = 0; corner < 4; corner++)
+            {
+                string type = table.Ref(Next(file, ref at));
+                grounds[corner] = type.EndsWith(".gt", StringComparison.OrdinalIgnoreCase) ? type : string.Empty;
+            }
         }
 
         if (width is < 1 or > 64 || height is < 1 or > 64)
@@ -147,6 +174,7 @@ public sealed class TileDefinition
             Tag = tag,
             Width = width,
             Height = height,
+            Grounds = grounds,
         };
     }
 
@@ -245,6 +273,9 @@ public sealed class TileTemplate
     /// <summary>The path every sub-tile's mesh name is built from.</summary>
     public string MeshRoot { get; private init; } = string.Empty;
 
+    /// <summary>The <c>GroundMask</c> texture the template names, or empty. Not yet drawn with - see ModelDump.</summary>
+    public string GroundMask { get; private init; } = string.Empty;
+
     /// <summary>The materials, in the order the runs index them.</summary>
     public IReadOnlyList<string> Materials { get; private init; } = [];
 
@@ -309,7 +340,7 @@ public sealed class TileTemplate
             return new TileTemplate { Version = version, Why = "no TileMeshRoot line" };
         }
 
-        Keyword(lines, ref at, "GroundMask", out _);
+        string mask = Keyword(lines, ref at, "GroundMask", out rest) ? Quoted(rest) ?? string.Empty : string.Empty;
 
         var materials = new List<string>();
         if (Keyword(lines, ref at, "NormalMaterials", out rest)
@@ -354,6 +385,7 @@ public sealed class TileTemplate
             Width = width,
             Height = height,
             MeshRoot = root.Replace('\\', '/'),
+            GroundMask = mask.Replace('\\', '/'),
             Materials = materials,
             Runs = runs,
         };
