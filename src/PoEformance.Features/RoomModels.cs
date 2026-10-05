@@ -79,7 +79,8 @@ public static class RoomModels
     /// <param name="read">How to get a file out of the install, by path.</param>
     /// <param name="path">The room's <c>.arm</c>.</param>
     /// <param name="unit">What the positions are counted in.</param>
-    public static MonsterModel Of(Func<string, byte[]?>? read, string? path, RoomUnit unit)
+    /// <param name="shaded">Whether each material's shader graphs are read - see MonsterModels.Shaded.</param>
+    public static MonsterModel Of(Func<string, byte[]?>? read, string? path, RoomUnit unit, bool shaded = false)
     {
         if (read is null)
         {
@@ -127,6 +128,7 @@ public static class RoomModels
         var joins = new List<MeshJoin>();
         var skins = new List<Mipmaps?>();
         var modes = new List<string>();
+        var wearing = new List<string>();
         float size = Size(unit);
         var triangles = 0;
         int placed = 0, missing = 0, capped = 0;
@@ -174,6 +176,7 @@ public static class RoomModels
             {
                 skins.Add(shape < model.Skins.Count ? model.Skins[shape] : model.Skin);
                 modes.Add(shape < model.Modes.Count ? model.Modes[shape] : string.Empty);
+                wearing.Add(shape < model.ShapeMaterials.Count ? model.ShapeMaterials[shape] : string.Empty);
             }
 
             triangles += model.Mesh.Triangles;
@@ -205,10 +208,11 @@ public static class RoomModels
                 $"{capped} more left out to keep it turnable - {MostDoodads} doodads or {MostTriangles} triangles"));
         }
 
-        return new MonsterModel(joined, skins.FirstOrDefault(one => one is not null), path, string.Empty, string.Empty)
+        var laid = new MonsterModel(joined, skins.FirstOrDefault(one => one is not null), path, string.Empty, string.Empty)
         {
             Skins = skins,
             Modes = modes,
+            ShapeMaterials = wearing,
             BodyLeast = joined.Least,
             BodyMost = joined.Most,
             Parts = placed,
@@ -218,5 +222,9 @@ public static class RoomModels
             Move = string.Join("; ", said),
             Shaders = [.. models.Values.SelectMany(one => one.Shaders).Distinct(StringComparer.OrdinalIgnoreCase)],
         };
+
+        // THE GRAPHS ONCE, OVER THE JOINED ROOM: every doodad's materials are in the one list, and a
+        // material two doodads share is compiled once through the shared cache.
+        return shaded ? MonsterModels.Shaded(Counted, laid, paints) : laid;
     }
 }

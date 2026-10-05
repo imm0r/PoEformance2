@@ -240,9 +240,9 @@ public sealed record MonsterModel(
     /// Each shape's material as its source names it, graph number and all - empty where it names none.
     /// </summary>
     /// <remarks>
-    /// FILLED FOR A RIGID MODEL - a prop, a tile - where the shapes are the mesh's own; a monster's
-    /// worn pieces are joined after the body and are not in it. For the dump, and for a tile
-    /// leaving out the shapes a texture marks - see TileModels.
+    /// FOR EVERY SHAPE OF THE JOINED MESH, a monster's worn pieces included, in the order the join
+    /// lays them down. For the dump, for a tile leaving out the shapes a texture marks - see
+    /// TileModels - and for reading each shape's shader graphs - see MonsterModels.Shaded.
     /// </remarks>
     public IReadOnlyList<string> ShapeMaterials { get; init; } = [];
 
@@ -251,6 +251,28 @@ public sealed record MonsterModel(
 
     /// <summary>How many of a tile's black-wall shapes were left out. See TileModels.BlackWall.</summary>
     public int Walls { get; init; }
+
+    /// <summary>
+    /// Each shape's colour as its material's shader graphs compute it, or null where the plain texture stands.
+    /// </summary>
+    /// <remarks>
+    /// EMPTY UNLESS ASKED FOR - see MonsterModels.Shaded. A program carries its textures with it, so
+    /// a shape with one is drawn from those and not from <see cref="Skins"/>.
+    /// </remarks>
+    public IReadOnlyList<ShadeProgram?> Shades { get; init; } = [];
+
+    /// <summary>How many distinct materials are drawn from their graphs rather than from one texture.</summary>
+    public int ShadedBy { get; init; }
+
+    /// <summary>
+    /// Every graph whose colour was left out, as "node in graph", distinct - for the line under the picture.
+    /// </summary>
+    /// <remarks>
+    /// THE OTHER HALF OF NOT GUESSING. A node this does not understand costs that graph's colour and
+    /// nothing else; saying which node, in which graph, is what makes the picture's gap a question
+    /// with an address rather than a wrong colour nobody can explain.
+    /// </remarks>
+    public IReadOnlyList<string> Unshaded { get; init; } = [];
 }
 
 /// <summary>
@@ -313,7 +335,11 @@ public static class MonsterModels
     /// the body this returned before there was a choice - see <see cref="Dressing"/> for what it
     /// costs, which is the reason there is one.
     /// </param>
-    public static MonsterModel Of(Func<string, byte[]?>? read, MonsterVariety? one, bool wearing = true)
+    /// <param name="shaded">
+    /// Whether each shape's material's shader graphs are read and compiled - see <see cref="Shaded"/>.
+    /// Off gives exactly the model this returned before graphs were read.
+    /// </param>
+    public static MonsterModel Of(Func<string, byte[]?>? read, MonsterVariety? one, bool wearing = true, bool shaded = false)
     {
         if (read is null)
         {
@@ -328,8 +354,104 @@ public static class MonsterModels
             };
         }
 
-        return OfFiles(read, named, wearing);
+        if (!shaded)
+        {
+            return OfFiles(read, named, wearing);
+        }
+
+        var paints = new Paints();
+        return Shaded(read, OfFiles(read, named, wearing, paints), paints);
     }
+
+    /// <summary>
+    /// The model with each shape's colour worked out from its material's shader graphs, where they say more than a texture.
+    /// </summary>
+    /// <remarks>
+    /// AFTER THE WALK, OVER WHAT IT FOUND: every shape's material is in
+    /// <see cref="MonsterModel.ShapeMaterials"/>, so this is one pass over a list, whichever walk
+    /// made the model - a monster, an item, a tile, a room. Through the walk's own cache, so a
+    /// texture the graphs read and a skin already decoded are one decode.
+    ///
+    /// THREE OUTCOMES PER MATERIAL. Its colour is one plain texture read - the ordinary material -
+    /// and that texture is the shape's skin, which is what it was already in every case looked at.
+    /// Its colour is anything more and could be compiled, and the shape gets the program. Or no
+    /// graph's colour could be evaluated, and the shape is drawn exactly as before. Whatever was left
+    /// out is named in <see cref="MonsterModel.Unshaded"/>. A material named with a graph number -
+    /// <c>Boss.mat:1</c> - is left as it is: what the number selects among graphs is established
+    /// for the colour slot and nothing more.
+    /// </remarks>
+    internal static MonsterModel Shaded(Func<string, byte[]?> read, MonsterModel model, Paints paints)
+    {
+        int count = model.Mesh.Shapes.Count;
+        IReadOnlyList<string> wearing = model.ShapeMaterials;
+        if (!model.Ready || count == 0 || wearing.Count != count)
+        {
+            return model;
+        }
+
+        long bytes = 0;
+        var files = 0;
+        byte[]? Counted(string one)
+        {
+            byte[]? got = read(one);
+            if (got is not null)
+            {
+                bytes += got.Length;
+                files++;
+            }
+
+            return got;
+        }
+
+        var shades = new ShadeProgram?[count];
+        Mipmaps?[]? skins = null;
+        var drawn = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var unshaded = new List<string>();
+        for (var shape = 0; shape < count; shape++)
+        {
+            string material = wearing[shape];
+            if (material.Length == 0 || MaterialFile.SelectorOf(material) >= 0)
+            {
+                continue;
+            }
+
+            Shade shade = paints.Shade(Counted, material);
+            foreach (string why in shade.Skipped)
+            {
+                if (!unshaded.Contains(why, StringComparer.Ordinal))
+                {
+                    unshaded.Add(why);
+                }
+            }
+
+            if (shade.Program is { } program)
+            {
+                shades[shape] = program;
+                drawn.Add(MaterialFile.Bare(material));
+                continue;
+            }
+
+            Mipmaps? had = shape < model.Skins.Count ? model.Skins[shape] : model.Skin;
+            if (shade.Plain is { } plain && !ReferenceEquals(plain, had))
+            {
+                skins ??= [.. Enumerable.Range(0, count).Select(one => one < model.Skins.Count ? model.Skins[one] : model.Skin)];
+                skins[shape] = plain;
+            }
+        }
+
+        return model with
+        {
+            Shades = shades,
+            Skins = skins ?? model.Skins,
+            ShadedBy = drawn.Count,
+            Unshaded = unshaded,
+            Bytes = model.Bytes + bytes,
+            Files = model.Files + files,
+        };
+    }
+
+    /// <summary>What one material's graphs came to: a program, a plain texture, or neither - and what was left out.</summary>
+    internal readonly record struct Shade(ShadeProgram? Program, Mipmaps? Plain, IReadOnlyList<string> Skipped);
 
     /// <summary>
     /// Gathers the model an <c>.ao</c> describes, whoever named it, or says where the walk stopped.
@@ -479,8 +601,9 @@ public static class MonsterModels
             // THE MODES RIDE WITH THE SKINS, padded to each piece's own shape count so the two lists
             // stay aligned however short a piece's came back.
             List<string> modes = [.. Padded(dress.Modes, dress.Skins.Count), .. parts.SelectMany(one => Padded(one.Modes, one.Skins.Count))];
+            List<string> wears = [.. Padded(dress.ShapeMaterials, dress.Skins.Count), .. parts.SelectMany(one => Padded(one.Wearing, one.Skins.Count))];
             mesh = SkinnedMesh.Joined(join);
-            dress = dress with { Skins = worn, Modes = modes };
+            dress = dress with { Skins = worn, Modes = modes, ShapeMaterials = wears };
         }
 
         return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint)
@@ -504,6 +627,7 @@ public static class MonsterModels
             Bytes = tally.Bytes,
             Files = tally.Files,
             Shaders = paints.Shaders,
+            ShapeMaterials = dress.ShapeMaterials,
         };
     }
 
@@ -624,7 +748,11 @@ public static class MonsterModels
         byte[]? Weights,
         Matrix4x4? Place,
         IReadOnlyList<Mipmaps?> Skins,
-        IReadOnlyList<string> Modes);
+        IReadOnlyList<string> Modes)
+    {
+        /// <summary>Each of its shapes' materials as written - see MonsterModel.ShapeMaterials.</summary>
+        public IReadOnlyList<string> Wearing { get; init; } = [];
+    }
 
     /// <summary>The entry keys whose value is another .ao. From the format diagram; see AoSurvey.</summary>
     private static readonly string[] Hangs =
@@ -688,7 +816,7 @@ public static class MonsterModels
 
             // NO BONES AND NO PLACE: the section's own vertex bones index the body's rig
             // already, so handing null keeps them and the join leaves the geometry where it is.
-            parts.Add(new Part(mesh, null, null, null, dress.Skins, dress.Modes));
+            parts.Add(new Part(mesh, null, null, null, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials });
         }
 
         return parts;
@@ -1373,12 +1501,12 @@ public static class MonsterModels
         {
             // NO PLACE: the correction already carries wherever the piece belongs, because a
             // socketed piece's own bind cancels down to exactly its socket's transform.
-            var worn = new Part(Corrected(mesh, map.Into), map.Bones, mesh.Weights, null, dress.Skins, dress.Modes);
+            var worn = new Part(Corrected(mesh, map.Into), map.Bones, mesh.Weights, null, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials };
             return (worn, map.Under, Told(hung, where, PartKind.Skin, counted, worn));
         }
 
         (byte[] bones, byte[] weights) = Bound(mesh.Positions.Length, bone);
-        var rigid = new Part(mesh, bones, weights, place, dress.Skins, dress.Modes);
+        var rigid = new Part(mesh, bones, weights, place, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials };
         return (rigid, body, Told(hung, where, PartKind.Rigid, counted, rigid));
     }
 
@@ -1689,7 +1817,7 @@ public static class MonsterModels
         Dress dress = Dressed(
             read, prop.Mesh, prop.Named, MeshManifest.None, fallback, string.Empty, paints);
         (byte[] bones, byte[] weights) = Bound(prop.Mesh.Positions.Length, bone);
-        return new Part(prop.Mesh, bones, weights, place, dress.Skins, dress.Modes);
+        return new Part(prop.Mesh, bones, weights, place, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials };
     }
 
     /// <summary>
@@ -2421,6 +2549,90 @@ public static class MonsterModels
 
         /// <summary>Decoded texture by its path, with null for one that would not read.</summary>
         public Dictionary<string, Mipmaps?> Skins { get; } = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>A shader graph by its path, read once however many materials are instances of it.</summary>
+        private readonly Dictionary<string, ShaderGraph> _graphFiles = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>What each material's graphs came to, by material file.</summary>
+        private readonly Dictionary<string, Shade> _shades = new(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// What one material's graphs compute for its colour - see MonsterModels.Shaded.
+        /// </summary>
+        public Shade Shade(Func<string, byte[]?> read, string material)
+        {
+            string file = MaterialFile.Bare(material);
+            if (_shades.TryGetValue(file, out Shade known))
+            {
+                return known;
+            }
+
+            var chain = new List<(ShaderInstance, ShaderGraph)>();
+            var skipped = new List<string>();
+            foreach (ShaderInstance instance in ShaderGraph.Instances(read(file.Replace('\\', '/').Trim())))
+            {
+                if (instance.Parent.Length == 0)
+                {
+                    continue;
+                }
+
+                string parent = instance.Parent.Replace('\\', '/').Trim();
+                if (!_graphFiles.TryGetValue(parent, out ShaderGraph? graph))
+                {
+                    graph = ShaderGraph.Read(read(parent));
+                    _graphFiles[parent] = graph;
+                }
+
+                // A GRAPH WITH NO NODES - ForceAlpha is a blend mode and nothing else - has nothing
+                // to compile, and is not missing.
+                chain.Add((instance, graph));
+            }
+
+            ShadeCompile compiled = ShadeProgram.Compile(chain);
+            skipped.AddRange(compiled.Skipped);
+
+            Shade shade;
+            if (compiled.Program is not { } program)
+            {
+                shade = new Shade(null, null, skipped);
+            }
+            else
+            {
+                var sheets = new Mipmaps?[program.Textures.Count];
+                for (var one = 0; one < sheets.Length; one++)
+                {
+                    sheets[one] = Sheet(read, program.Textures[one].Path);
+                    if (sheets[one] is null)
+                    {
+                        skipped.Add($"a texture that did not read: {program.Textures[one].Path}");
+                    }
+                }
+
+                shade = Array.Exists(sheets, one => one is null)
+                    ? new Shade(null, null, skipped)
+                    : program.Plain >= 0
+                        ? new Shade(null, sheets[program.Plain], skipped)
+                        : new Shade(program.With(sheets), null, skipped);
+            }
+
+            _shades[file] = shade;
+            return shade;
+        }
+
+        /// <summary>A texture decoded with its levels, through the same cache as the skins.</summary>
+        private Mipmaps? Sheet(Func<string, byte[]?> read, string texture)
+        {
+            if (Skins.TryGetValue(texture, out Mipmaps? kept))
+            {
+                return kept;
+            }
+
+            Mipmaps? sheet = GameArt.ReadRaw(read, texture) is { Length: > 0 } bytes
+                ? Mipmaps.Of(GameArt.Decode(bytes))
+                : null;
+            Skins[texture] = sheet;
+            return sheet;
+        }
     }
 
     /// <summary>

@@ -239,6 +239,68 @@ public static class MeshPicture
         /// </remarks>
         internal int[] Stamps { get; private set; } = [];
 
+        /// <summary>Which shade program each triangle runs, as an index into the drawing's list, or -1 for none.</summary>
+        internal int[] Shades { get; private set; } = [];
+
+        /// <summary>The level each of a shaded triangle's texture reads takes, a fixed stride per triangle.</summary>
+        internal float[] ShadeLevels { get; private set; } = [];
+
+        /// <summary>Where each vertex is in the model's own space, for a shade program that reads positions.</summary>
+        internal Vector3[] Places { get; private set; } = [];
+
+        /// <summary>Which way each vertex faces in the model's own space, for one that reads normals.</summary>
+        internal Vector3[] Turns { get; private set; } = [];
+
+        /// <summary>Room for every shaded triangle's levels.</summary>
+        internal void Levelled(int levels)
+        {
+            if (ShadeLevels.Length < levels)
+            {
+                ShadeLevels = new float[levels];
+            }
+        }
+
+        /// <summary>
+        /// The model-space vertices as an array a band can read, for a drawing with shade programs.
+        /// </summary>
+        /// <remarks>
+        /// THE MESH'S OWN ARRAY WHERE THAT IS WHAT WAS HANDED IN - a model standing still - and a copy
+        /// only for a pose, which arrives as a span and must outlive the call for the bands' sake.
+        /// Never the mesh's array as the copy's buffer: the next pose would be written into the mesh.
+        /// </remarks>
+        internal Vector3[] Placed(ReadOnlySpan<Vector3> positions, Vector3[] own)
+        {
+            if (positions == own)
+            {
+                return own;
+            }
+
+            if (Places.Length < positions.Length)
+            {
+                Places = new Vector3[positions.Length];
+            }
+
+            positions.CopyTo(Places);
+            return Places;
+        }
+
+        /// <summary>The same for the normals. See <see cref="Placed"/>.</summary>
+        internal Vector3[] Turned(ReadOnlySpan<Vector3> normals, Vector3[] own)
+        {
+            if (normals == own)
+            {
+                return own;
+            }
+
+            if (Turns.Length < normals.Length)
+            {
+                Turns = new Vector3[normals.Length];
+            }
+
+            normals.CopyTo(Turns);
+            return Turns;
+        }
+
         internal void Stamped()
         {
             if (Stamps.Length != Size * Size)
@@ -265,6 +327,7 @@ public static class MeshPicture
                 Wears = new int[triangles];
                 Blends = new MaterialBlend[triangles];
                 Owners = new int[triangles];
+                Shades = new int[triangles];
             }
         }
     }
@@ -299,8 +362,9 @@ public static class MeshPicture
         float zoom = 1f,
         Vector2 pan = default,
         IReadOnlyList<Mipmaps?>? skins = null,
-        IReadOnlyList<MaterialBlend>? blends = null)
-        => Of(mesh, new Canvas(size), turn, tilt, ink, skin, zoom, pan, skins, blends);
+        IReadOnlyList<MaterialBlend>? blends = null,
+        IReadOnlyList<ShadeProgram?>? shades = null)
+        => Of(mesh, new Canvas(size), turn, tilt, ink, skin, zoom, pan, skins, blends, shades);
 
     /// <summary>
     /// Draws the mesh into a canvas the caller keeps, for anything that draws it more than once.
@@ -328,8 +392,9 @@ public static class MeshPicture
         float zoom = 1f,
         Vector2 pan = default,
         IReadOnlyList<Mipmaps?>? skins = null,
-        IReadOnlyList<MaterialBlend>? blends = null)
-        => Of(mesh, canvas, mesh?.Positions ?? [], mesh?.Normals ?? [], turn, tilt, ink, skin, zoom, pan, skins, blends);
+        IReadOnlyList<MaterialBlend>? blends = null,
+        IReadOnlyList<ShadeProgram?>? shades = null)
+        => Of(mesh, canvas, mesh?.Positions ?? [], mesh?.Normals ?? [], turn, tilt, ink, skin, zoom, pan, skins, blends, shades);
 
     /// <summary>
     /// Draws the mesh with its vertices somewhere other than the file put them - posed.
@@ -371,7 +436,8 @@ public static class MeshPicture
         float zoom = 1f,
         Vector2 pan = default,
         IReadOnlyList<Mipmaps?>? skins = null,
-        IReadOnlyList<MaterialBlend>? blends = null)
+        IReadOnlyList<MaterialBlend>? blends = null,
+        IReadOnlyList<ShadeProgram?>? shades = null)
     {
         ArgumentNullException.ThrowIfNull(canvas);
 
@@ -451,6 +517,34 @@ public static class MeshPicture
         {
             canvas.Stamped();
         }
+
+        // AND WHICH TRIANGLES RUN A SHADE PROGRAM - see ShadeProgram. Most models have none, and then
+        // nothing below changes by so much as a branch per pixel.
+        ShadeProgram[] programs = Programmed(mesh, shades, canvas.Shades, triangles);
+        int stride = 0;
+        foreach (ShadeProgram one in programs)
+        {
+            stride = Math.Max(stride, one.Samples);
+        }
+
+        bool shaded = programs.Length > 0;
+        Vector3[] places = [];
+        Vector3[] turns = [];
+        if (shaded)
+        {
+            canvas.Levelled(triangles * stride);
+            places = canvas.Placed(positions, mesh.Positions);
+            turns = canvas.Turned(normals, mesh.Normals);
+        }
+
+        int[] shadeOf = canvas.Shades;
+        float[] shadeLevels = canvas.ShadeLevels;
+        Span<Vector4> scratch = shaded ? stackalloc Vector4[ShadeProgram.MostRegisters] : default;
+        Span<Vector2> spots = shaded ? stackalloc Vector2[Math.Max(1, stride) * 3] : default;
+        Span<Vector2> cornerSpots = shaded ? stackalloc Vector2[3] : default;
+        Span<Vector3> cornerPlaces = shaded ? stackalloc Vector3[3] : default;
+        Span<Vector3> cornerTurns = shaded ? stackalloc Vector3[3] : default;
+        ShadeProgram? preset = null;
         for (var one = 0; one < triangles; one++)
         {
             Vector3 a = corners[indices[one * 3]];
@@ -480,6 +574,30 @@ public static class MeshPicture
                     mesh.Coordinates[indices[(one * 3) + 1]],
                     mesh.Coordinates[indices[(one * 3) + 2]],
                     area, worn);
+
+            // A SHADED TRIANGLE'S READS EACH TAKE A LEVEL OF THEIR OWN: a rock texture tiled twelve
+            // times over the shape steps across twelve times the texels its mask does.
+            if (shaded && shadeOf[one] >= 0)
+            {
+                ShadeProgram program = programs[shadeOf[one]];
+                if (!ReferenceEquals(program, preset))
+                {
+                    program.Preset(scratch);
+                    preset = program;
+                }
+
+                for (var corner = 0; corner < 3; corner++)
+                {
+                    int vertex = indices[(one * 3) + corner];
+                    cornerSpots[corner] = mesh.Coordinates[vertex];
+                    cornerPlaces[corner] = positions[vertex];
+                    cornerTurns[corner] = normals[vertex];
+                }
+
+                program.Levels(
+                    scratch, cornerSpots, cornerPlaces, cornerTurns, a, b, c, area,
+                    spots, shadeLevels.AsSpan(one * stride, program.Samples));
+            }
         }
 
         // IN BANDS OF ROWS, EACH ON ITS OWN THREAD. A pixel belongs to one band and the triangles
@@ -487,7 +605,7 @@ public static class MeshPicture
         // byte however many threads share it - the depth test never sees two threads at once.
         // More bands than threads, so a band the model does not reach costs nothing much and the
         // ones through its middle are shared out.
-        var drawing = new Drawing(canvas, mesh, triangles, lamp, ink, palette, translucent);
+        var drawing = new Drawing(canvas, mesh, triangles, lamp, ink, palette, translucent, programs, stride, places, turns);
         const int height = 8;
         int bands = (size + height - 1) / height;
         if (canvas.Threads == 1)
@@ -588,6 +706,47 @@ public static class MeshPicture
                 wears[one] = at;
             }
         }
+    }
+
+    /// <summary>
+    /// Which shade program every triangle runs, from the shape it belongs to, and the distinct programs.
+    /// </summary>
+    /// <remarks>
+    /// THE SAME RANGES <see cref="Worn"/> walks. A program missing a texture is not drawn with - its
+    /// shape keeps its plain skin - and a mesh with no coordinates runs none, having nothing for a
+    /// program's reads to read at.
+    /// </remarks>
+    private static ShadeProgram[] Programmed(
+        SkinnedMesh mesh, IReadOnlyList<ShadeProgram?>? shades, int[] into, int triangles)
+    {
+        Array.Fill(into, -1, 0, triangles);
+        if (shades is not { Count: > 0 } || !mesh.Coordinated)
+        {
+            return [];
+        }
+
+        var found = new List<ShadeProgram>();
+        for (var shape = 0; shape < mesh.Shapes.Count && shape < shades.Count; shape++)
+        {
+            if (shades[shape] is not { Bound: true } program || program.Registers > ShadeProgram.MostRegisters)
+            {
+                continue;
+            }
+
+            int at = found.IndexOf(program);
+            if (at < 0)
+            {
+                at = found.Count;
+                found.Add(program);
+            }
+
+            MeshShape part = mesh.Shapes[shape];
+            int from = Math.Clamp(part.From / 3, 0, triangles);
+            int upto = Math.Clamp((part.From + part.Count) / 3, from, triangles);
+            Array.Fill(into, at, from, upto - from);
+        }
+
+        return [.. found];
     }
 
     /// <summary>
@@ -724,11 +883,23 @@ public static class MeshPicture
         private readonly int[] _owners;
         private readonly int[] _stamps;
         private readonly bool _translucent;
+        private readonly ShadeProgram[] _programs;
+        private readonly int[] _shades;
+        private readonly float[] _shadeLevels;
+        private readonly int _stride;
+        private readonly Vector3[] _places;
+        private readonly Vector3[] _turns;
 
         public Drawing(
             Canvas canvas, SkinnedMesh mesh, int triangles, Vector3 lamp, Vector3 ink, Mipmaps?[] palette,
-            bool translucent)
+            bool translucent, ShadeProgram[] programs, int stride, Vector3[] places, Vector3[] turns)
         {
+            _programs = programs;
+            _shades = canvas.Shades;
+            _shadeLevels = canvas.ShadeLevels;
+            _stride = stride;
+            _places = places;
+            _turns = turns;
             _pixels = canvas.Pixels;
             _depth = canvas.Depth;
             _size = canvas.Size;
@@ -821,10 +992,31 @@ public static class MeshPicture
             Mipmaps? skin = _palette[_wears[one]];
             MaterialBlend blend = _blends[one];
             bool skinned = skin is not null;
+
+            // A SHADE PROGRAM WHERE THE TRIANGLE HAS ONE AND IS SOLID: a translucent or cut-out
+            // shape is drawn by its texture's own alpha, which a program's colour does not carry.
+            int shadeAt = _programs.Length > 0 ? _shades[one] : -1;
+            ShadeProgram? program = shadeAt >= 0 && blend == MaterialBlend.Opaque ? _programs[shadeAt] : null;
+            Span<Vector4> registers = program is null ? default : stackalloc Vector4[program.Registers];
+            ReadOnlySpan<float> shadeLevels = program is null
+                ? default
+                : new ReadOnlySpan<float>(_shadeLevels, one * _stride, program.Samples);
+            program?.Preset(registers);
+            Vector3 p0 = default, p1 = default, p2 = default, n0 = default, n1 = default, n2 = default;
+            if (program is not null)
+            {
+                p0 = _places[i0];
+                p1 = _places[i1];
+                p2 = _places[i2];
+                n0 = _turns[i0];
+                n1 = _turns[i1];
+                n2 = _turns[i2];
+            }
+
             Vector2 s0 = default;
             Vector2 s1 = default;
             Vector2 s2 = default;
-            if (skinned)
+            if (skinned || program is not null)
             {
                 s0 = _coordinates[i0];
                 s1 = _coordinates[i1];
@@ -877,7 +1069,16 @@ public static class MeshPicture
                     }
 
                     Vector3 colour = _ink;
-                    if (skinned)
+                    if (program is not null)
+                    {
+                        colour = program.Colour(
+                            registers,
+                            (first * s0) + (second * s1) + (third * s2),
+                            (first * p0) + (second * p1) + (third * p2),
+                            (first * n0) + (second * n1) + (third * n2),
+                            shadeLevels);
+                    }
+                    else if (skinned)
                     {
                         // AFFINE INTERPOLATION IS EXACT HERE. The projection is orthographic, so a
                         // coordinate across the triangle really is linear in screen space - the
@@ -992,7 +1193,7 @@ public static class MeshPicture
     /// level that suits the short step is grain along the long one. Blur along the short step is
     /// the price, and it is the cheaper of the two.
     /// </remarks>
-    private static float Level(
+    internal static float Level(
         Vector3 c0, Vector3 c1, Vector3 c2, Vector2 s0, Vector2 s1, Vector2 s2, float area, Mipmaps skin)
     {
         // The two edges out of the first corner, on the screen and on the skin.
@@ -1121,7 +1322,7 @@ public static class MeshPicture
     /// <summary>
     /// <see cref="Sample"/> with the texture's alpha - only translucent and cut-out triangles pay for the fourth channel.
     /// </summary>
-    private static Vector4 Sample4(Mipmaps skin, Vector2 spot, float level)
+    internal static Vector4 Sample4(Mipmaps skin, Vector2 spot, float level)
     {
         var lower = (int)level;
         Vector4 colour = Texel4(skin[lower], spot);

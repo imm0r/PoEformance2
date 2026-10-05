@@ -1,0 +1,270 @@
+{
+    "version": 3,
+    "shader_group": [
+        "Material"
+    ],
+    "nodes": [
+        {
+            "type": "InputVertexColor",
+            "index": 0,
+            "stage": "VertexInit",
+            "ui_position": [
+                800.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "VertexColor",
+            "index": 0,
+            "stage": "VertexInit",
+            "ui_position": [
+                1300.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "InputUV",
+            "index": 0,
+            "stage": "Texturing_Init",
+            "ui_position": [
+                902.25,
+                21.5
+            ]
+        },
+        {
+            "type": "UV",
+            "index": 0,
+            "stage": "Texturing_Init",
+            "ui_position": [
+                1928.0,
+                20.0
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 0,
+            "parameters": [
+                {
+                    "srgb": true
+                },
+                {}
+            ],
+            "custom_parameter": "base_color_texture",
+            "ui_position": [
+                1189.75,
+                -178.5
+            ]
+        },
+        {
+            "type": "Dummy4",
+            "index": 0,
+            "ui_position": [
+                1490.0,
+                -156.0
+            ]
+        },
+        {
+            "type": "Multiply4",
+            "index": 0,
+            "ui_position": [
+                1701.0,
+                -177.5
+            ]
+        },
+        {
+            "type": "AlbedoColor",
+            "index": 0,
+            "stage": "Texturing_Init",
+            "ui_position": [
+                1928.0,
+                20.0
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 5.0
+                }
+            ],
+            "custom_parameter": "specular_exponent",
+            "ui_position": [
+                1189.75,
+                101.25
+            ]
+        },
+        {
+            "type": "SpecularPower",
+            "index": 0,
+            "stage": "Texturing_Init",
+            "ui_position": [
+                1928.0,
+                20.0
+            ]
+        },
+        {
+            "type": "Zero",
+            "index": 0,
+            "ui_position": [
+                1190.0,
+                190.0
+            ]
+        },
+        {
+            "type": "SpecularColor",
+            "index": 0,
+            "stage": "Texturing_Init",
+            "ui_position": [
+                1928.0,
+                20.0
+            ]
+        },
+        {
+            "type": "InputAlbedoColor",
+            "index": 0,
+            "stage": "Texturing_Init",
+            "ui_position": [
+                902.25,
+                21.5
+            ]
+        },
+        {
+            "type": "InputSpecularPower",
+            "index": 0,
+            "stage": "Texturing_Init",
+            "ui_position": [
+                902.25,
+                21.5
+            ]
+        },
+        {
+            "type": "InputSpecularColor",
+            "index": 0,
+            "stage": "Texturing_Init",
+            "ui_position": [
+                902.25,
+                21.5
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputVertexColor",
+                "index": 0,
+                "stage": "VertexInit",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "VertexColor",
+                "index": 0,
+                "stage": "VertexInit",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "UV",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 0,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexColor",
+                "index": 0,
+                "stage": "VertexInit",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy4",
+                "index": 0,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 0,
+                "variable": "rgba"
+            },
+            "dst": {
+                "type": "Multiply4",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy4",
+                "index": 0,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Multiply4",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply4",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SpecularPower",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Zero",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SpecularColor",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "input"
+            }
+        }
+    ]
+}

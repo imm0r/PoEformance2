@@ -1,0 +1,215 @@
+{
+    "version": 3,
+    "shader_group": [
+        "Material"
+    ],
+    "render_state_overwrite": {
+        "stencil": {
+            "enable": true,
+            "ref": 8,
+            "compare": "notequal",
+            "pass": "keep",
+            "z_fail": "keep"
+        }
+    },    
+    "overriden_blend_mode": "AlphaBlend",
+    "nodes": [
+        {
+            "type": "InputWorldPos",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1300.0,
+                20.0
+            ]
+        },
+        {
+            "type": "WorldPos",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1934.0,
+                21.0
+            ]
+        },
+        {
+            "type": "InputUV",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1300.0,
+                20.0
+            ]
+        },
+        {
+            "type": "UV",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1934.0,
+                21.0
+            ]
+        },
+        {
+            "type": "InputAlbedoColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                800.0,
+                20.0
+            ]
+        },
+        {
+            "type": "InputWorldNormal",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1300.0,
+                20.0
+            ]
+        },
+        {
+            "type": "MaskedContactFade",
+            "index": 0,
+            "parameters": [
+                {
+                    "srgb": true
+                },
+                {},
+                {}
+            ],
+            "custom_parameter": "params",
+            "ui_position": [
+                1513.0,
+                -69.0
+            ]
+        },
+        {
+            "type": "AlbedoColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1934.0,
+                21.0
+            ]
+        },
+        {
+            "type": "WorldNormal",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1934.0,
+                21.0
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "UV",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MaskedContactFade",
+                "index": 0,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MaskedContactFade",
+                "index": 0,
+                "variable": "world_pos"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MaskedContactFade",
+                "index": 0,
+                "variable": "in_albedo"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MaskedContactFade",
+                "index": 0,
+                "variable": "world_normal"
+            }
+        },
+        {
+            "src": {
+                "type": "MaskedContactFade",
+                "index": 0,
+                "variable": "out_albedo"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "WorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        }
+    ]
+}

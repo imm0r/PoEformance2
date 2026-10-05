@@ -150,18 +150,18 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         int mark = key.LastIndexOf(UnitMark);
         if (mark < 0)
         {
-            return TileModels.Of(read, key);
+            return TileModels.Of(read, key, shaded: true);
         }
 
         string path = key[..mark];
         if (!TileBook.IsRoom(path))
         {
             ReadOnlySpan<char> words = key.AsSpan(mark + 1);
-            return TileModels.Of(read, path, ground: !Has(words, Bare), walls: !Has(words, Unwalled));
+            return TileModels.Of(read, path, ground: !Has(words, Bare), walls: !Has(words, Unwalled), shaded: true);
         }
 
         RoomUnit unit = Enum.TryParse(key[(mark + 1)..], out RoomUnit said) ? said : RoomUnit.Cells;
-        return RoomModels.Of(read, path, unit);
+        return RoomModels.Of(read, path, unit, shaded: true);
 
         static bool Has(ReadOnlySpan<char> words, string word)
         {

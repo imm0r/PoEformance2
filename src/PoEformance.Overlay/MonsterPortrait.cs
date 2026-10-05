@@ -450,6 +450,7 @@ public sealed class MonsterPortrait
     private string _still = string.Empty;
     private string _shaders = string.Empty;
     private string _blend = string.Empty;
+    private string _graphs = string.Empty;
     private string _count = string.Empty;
 
     /// <summary>The line for a model that stands in a pit, and the whole unit it was last built for.</summary>
@@ -548,6 +549,18 @@ public sealed class MonsterPortrait
     /// The effect book is where it was asked for, and where a wrong guess costs a look and nothing more.
     /// </remarks>
     public bool Translucent { get; set; }
+
+    /// <summary>
+    /// Whether a material's colour is worked out from its shader graphs where they say more than a texture.
+    /// </summary>
+    /// <remarks>
+    /// ON IN THE TILE, ITEM AND EFFECT BOOKS, off in the monster book. Not because it is a guess -
+    /// ShadeProgram evaluates only the nodes whose meaning is plain and names the rest - but because
+    /// the monster book exports boss icons from what this pane draws, and those are already in the
+    /// map's art: a change to how a boss is coloured should be a choice made for that book, not a
+    /// side effect of a terrain fix. A pane with its own Load reads this to decide what to load.
+    /// </remarks>
+    public bool Shaded { get; set; }
 
     /// <summary>
     /// The colour a shape with no texture is drawn in, or default for the pale warm grey every book began with.
@@ -1246,6 +1259,11 @@ public sealed class MonsterPortrait
             _status.Add(_blend);
         }
 
+        if (_graphs.Length > 0)
+        {
+            _status.Add(_graphs);
+        }
+
         if (_planted.Length > 0)
         {
             _status.Add(_planted);
@@ -1748,6 +1766,18 @@ public sealed class MonsterPortrait
                 modes.Select(one => $"{one} -> {MaterialBlends.Of(one).ToString().ToLowerInvariant()}")))
             : string.Empty;
 
+        // WHICH MATERIALS ARE DRAWN FROM THEIR GRAPHS, AND WHAT WAS LEFT OUT - see ShadeProgram. The
+        // second half is the one that matters: a colour this could not evaluate is drawn as before,
+        // and the node that stopped it is named here rather than guessed at.
+        _graphs = Shaded && (_model.ShadedBy > 0 || _model.Unshaded.Count > 0)
+            ? ImGuiText.Escape(
+                $"graphs: {_model.ShadedBy} material{(_model.ShadedBy == 1 ? string.Empty : "s")} coloured by their shader graphs"
+                + (_model.Unshaded.Count > 0
+                    ? " · not evaluated: " + string.Join(", ", _model.Unshaded.Take(Named))
+                        + (_model.Unshaded.Count > Named ? $" and {_model.Unshaded.Count - Named} more" : string.Empty)
+                    : string.Empty))
+            : string.Empty;
+
         static string Tail(string path) => path[(path.LastIndexOf('/') + 1)..];
     }
 
@@ -1872,6 +1902,7 @@ public sealed class MonsterPortrait
         _still = string.Empty;
         _shaders = string.Empty;
         _blend = string.Empty;
+        _graphs = string.Empty;
         _count = string.Empty;
         _planted = string.Empty;
         _plantedAt = int.MinValue;
@@ -1927,9 +1958,10 @@ public sealed class MonsterPortrait
         Func<string, byte[]?> read = _install!;
         bool wearing = Parts;
         _dressed = wearing;
+        bool shaded = Shaded;
         Func<Func<string, byte[]?>, MonsterVariety, string, bool, MonsterModel>? load = Load;
         _loading = load is null
-            ? Task.Run(() => MonsterModels.Of(read, one, wearing))
+            ? Task.Run(() => MonsterModels.Of(read, one, wearing, shaded))
             : Task.Run(() => load(read, one, path, wearing));
     }
 
@@ -2149,13 +2181,13 @@ public sealed class MonsterPortrait
                 lowest = Lowest(_posed);
                 drawn = MeshPicture.Of(
                     _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, Ink,
-                    _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
+                    _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null, Shaded ? _model.Shades : null);
             }
             else
             {
                 lowest = _model.Mesh.Most.Z;
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
+                    _model.Mesh, Canvas(size), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null, Shaded ? _model.Shades : null);
             }
 
             _rate.Redrawn(ImGui.GetTime());
@@ -2562,10 +2594,10 @@ public sealed class MonsterPortrait
             _pose.Move(_model.Mesh, _posed, _posedNormals);
             return MeshPicture.Of(
                 _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, Ink,
-                _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
+                _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null, Shaded ? _model.Shades : null);
         }
 
-        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null);
+        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null, Shaded ? _model.Shades : null);
     }
 
     /// <summary>
