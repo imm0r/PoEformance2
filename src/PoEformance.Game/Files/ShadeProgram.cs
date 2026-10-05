@@ -139,6 +139,9 @@ public sealed class ShadeProgram
     /// <summary>The graphs whose colour the program carries, by path.</summary>
     public IReadOnlyList<string> Graphs { get; }
 
+    /// <summary>The decoded textures, one per entry of <see cref="Textures"/> - null where not yet bound.</summary>
+    public IReadOnlyList<Mipmaps?> Sheets => _sheets;
+
     /// <summary>Whether every texture is in hand, which a program must be before it is drawn with.</summary>
     public bool Bound => Array.TrueForAll(_sheets, one => one is not null);
 

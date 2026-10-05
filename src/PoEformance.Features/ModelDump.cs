@@ -214,6 +214,33 @@ public static class ModelDump
             said.AppendLine(Header(GameArt.ReadRaw(read, texture)));
         }
 
+        // AND THE TEXTURES THE SHADE PROGRAMS READ, which no shape names: a blend graph's own rock
+        // textures and masks. Each with its header and what the decoder made of every channel -
+        // the questions a program's colour turns on are "is this alpha real" and "where does this
+        // mask's blue sit", and both are numbers, not a look at the picture.
+        seen.Clear();
+        foreach (ShadeProgram? program in model.Shades)
+        {
+            if (program is null)
+            {
+                continue;
+            }
+
+            for (var one = 0; one < program.Textures.Count; one++)
+            {
+                ShadeTexture texture = program.Textures[one];
+                if (!seen.Add(texture.Path))
+                {
+                    continue;
+                }
+
+                said.AppendLine().Append("=== program texture ").Append(texture.Path)
+                    .AppendLine(texture.Srgb ? " (read as sRGB)" : " (read as linear)");
+                said.AppendLine(Header(GameArt.ReadRaw(read, texture.Path)));
+                said.Append(Channels(one < program.Sheets.Count ? program.Sheets[one] : null));
+            }
+        }
+
         said.AppendLine().Append("=== shapes (").Append(Say(shapes.Count)).AppendLine(")");
         IReadOnlyList<string> modes = model.Modes;
         for (var one = 0; one < shapes.Count; one++)
@@ -224,7 +251,8 @@ public static class ModelDump
                 .Append("	count ").Append(Say(shape.Count))
                 .Append("	mat ").Append(one < materials.Count && materials[one].Length > 0 ? materials[one] : "-")
                 .Append("	tex ").Append(one < textures.Count && textures[one].Length > 0 ? textures[one] : "-")
-                .Append("	blend ").AppendLine(one < modes.Count && modes[one].Length > 0 ? modes[one] : "-");
+                .Append("	blend ").Append(one < modes.Count && modes[one].Length > 0 ? modes[one] : "-")
+                .Append("	graphs ").AppendLine(one < model.Shades.Count && model.Shades[one] is not null ? "program" : "-");
         }
 
         return said.ToString();
@@ -266,7 +294,12 @@ public static class ModelDump
             line.Append(" · fourCC ").Append(fourCc);
             if (fourCc == "DX10" && dds.Length >= Least + 4)
             {
-                line.Append(" · DXGI format ").Append(Say(BitConverter.ToInt32(dds, Least)));
+                int format = BitConverter.ToInt32(dds, Least);
+                line.Append(" · DXGI format ").Append(Say(format));
+                if (Dxgi(format) is { Length: > 0 } name)
+                {
+                    line.Append(" (").Append(name).Append(')');
+                }
             }
         }
         else
@@ -279,6 +312,107 @@ public static class ModelDump
         }
 
         return line.ToString();
+    }
+
+    /// <summary>
+    /// The DXGI formats textures come in, by number - the ones that settle whether a channel is there.
+    /// </summary>
+    /// <remarks>
+    /// THE NUMBERS ARE DIRECTX'S OWN, from its DXGI_FORMAT enumeration. Only the ones a texture of
+    /// this game has turned up in, or whose alpha is the question - with or without an X, one channel
+    /// or four. Anything else prints as its number alone.
+    /// </remarks>
+    private static string Dxgi(int format) => format switch
+    {
+        2 => "R32G32B32A32_FLOAT",
+        10 => "R16G16B16A16_FLOAT",
+        28 => "R8G8B8A8_UNORM",
+        29 => "R8G8B8A8_UNORM_SRGB",
+        49 => "R8G8_UNORM",
+        61 => "R8_UNORM",
+        65 => "A8_UNORM",
+        71 => "BC1_UNORM",
+        72 => "BC1_UNORM_SRGB",
+        74 => "BC2_UNORM",
+        77 => "BC3_UNORM",
+        78 => "BC3_UNORM_SRGB",
+        80 => "BC4_UNORM",
+        83 => "BC5_UNORM",
+        87 => "B8G8R8A8_UNORM",
+        88 => "B8G8R8X8_UNORM",
+        91 => "B8G8R8A8_UNORM_SRGB",
+        95 => "BC6H_UF16",
+        98 => "BC7_UNORM",
+        99 => "BC7_UNORM_SRGB",
+        _ => string.Empty,
+    };
+
+    /// <summary>
+    /// What the decoder made of each channel of a texture's full-size level: lowest, a tenth of the
+    /// way up, the middle, nine tenths, highest, and the mean - as bytes, 0 to 255.
+    /// </summary>
+    /// <remarks>
+    /// AS THE DECODER HANDS THEM OVER, before any sRGB is undone, because that is the thing in
+    /// question: an alpha of 255 everywhere is either a texture without alpha or a decoder that
+    /// dropped it, and the header beside it says which. Spread as well as range, because a mask
+    /// that is 255 on one texel and 0 on the rest has the same lowest and highest as one that is
+    /// half and half.
+    /// </remarks>
+    private static string Channels(Mipmaps? sheet)
+    {
+        if (sheet is null)
+        {
+            return "(not decoded)" + Environment.NewLine;
+        }
+
+        GamePicture top = sheet.Top;
+        byte[] rgba = top.Rgba;
+        int texels = top.Width * top.Height;
+        var counts = new int[4 * 256];
+        var sums = new long[4];
+        for (var at = 0; at < texels; at++)
+        {
+            int from = at * 4;
+            for (var part = 0; part < 4; part++)
+            {
+                byte value = rgba[from + part];
+                counts[(part * 256) + value]++;
+                sums[part] += value;
+            }
+        }
+
+        var said = new StringBuilder();
+        said.Append(Say(top.Width)).Append('x').Append(Say(top.Height)).AppendLine(" decoded · channel: lowest p10 median p90 highest · mean");
+        ReadOnlySpan<char> names = "rgba";
+        for (var part = 0; part < 4; part++)
+        {
+            ReadOnlySpan<int> channel = counts.AsSpan(part * 256, 256);
+            said.Append("  ").Append(names[part]).Append(": ")
+                .Append(Say(Rank(channel, 0))).Append(' ')
+                .Append(Say(Rank(channel, texels / 10))).Append(' ')
+                .Append(Say(Rank(channel, texels / 2))).Append(' ')
+                .Append(Say(Rank(channel, (texels * 9) / 10))).Append(' ')
+                .Append(Say(Rank(channel, texels - 1)))
+                .Append(" · ").AppendLine((sums[part] / (double)Math.Max(1, texels)).ToString("F1", CultureInfo.InvariantCulture));
+        }
+
+        return said.ToString();
+
+        // THE VALUE AT ONE RANK OF THE SORTED CHANNEL, off its histogram.
+        static int Rank(ReadOnlySpan<int> channel, int rank)
+        {
+            var below = 0;
+            for (var value = 0; value < channel.Length; value++)
+            {
+                below += channel[value];
+                if (below > rank)
+                {
+                    return value;
+                }
+            }
+
+            return channel.Length - 1;
+        }
     }
 
     /// <summary>
