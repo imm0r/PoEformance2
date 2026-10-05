@@ -399,6 +399,43 @@ public class TileFilesTests
         Assert.Equal(model.Mesh.Shapes.Count, model.NamedInAo);
     }
 
+    /// <summary>
+    /// The shapes painted black-no-fog go when asked, and the rest keep their own textures and order.
+    /// </summary>
+    /// <remarks>
+    /// c1r1 wears "wall, floor" and c2r1 "floor, floor"; with the wall's texture renamed blacknofog
+    /// the first shape is the one wall, and the dump's per-shape lines say which file each wears.
+    /// </remarks>
+    [Fact]
+    public void ANDATilesBlackWallsGoWhenAskedAndTheRestStay()
+    {
+        Dictionary<string, byte[]> files = Install();
+        files["Art/Textures/Wall.mat"] = Mat("Art/Textures/blacknofog.dds");
+        files["Art/Textures/blacknofog.dds"] = Dds();
+
+        MonsterModel all = TileModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Test/Arena.tdt", ground: false);
+        Assert.True(all.Ready, all.Why);
+        Assert.Equal(4, all.Mesh.Shapes.Count);
+        Assert.Equal("Art/Textures/blacknofog.dds", all.ShapeTextures[0]);
+        Assert.Equal(0, all.Walls);
+
+        MonsterModel bare = TileModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Test/Arena.tdt", ground: false, walls: false);
+        Assert.True(bare.Ready, bare.Why);
+        Assert.Equal(1, bare.Walls);
+        Assert.Equal(3, bare.Mesh.Shapes.Count);
+        Assert.Equal(6, bare.Mesh.Triangles);
+        Assert.Equal(3, bare.Skins.Count);
+        Assert.Equal(3, bare.Modes.Count);
+        Assert.All(bare.ShapeTextures, one => Assert.Equal("Art/Textures/floor.dds", one));
+        Assert.Equal(0, bare.Mesh.Shapes[0].From);
+        Assert.Equal(bare.Mesh.Indices.Length, bare.Mesh.Shapes[^1].From + bare.Mesh.Shapes[^1].Count);
+
+        string dump = ModelDump.OfTile(path => files.GetValueOrDefault(path), "Metadata/Terrain/Test/Arena.tdt", all);
+        Assert.Contains("=== .mat Art/Textures/Wall.mat", dump, StringComparison.Ordinal);
+        Assert.Contains("=== texture Art/Textures/blacknofog.dds", dump, StringComparison.Ordinal);
+        Assert.Contains("tex Art/Textures/blacknofog.dds", dump, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void ANDATILECostsWhatItReadMaterialsAndTexturesIncluded()
     {

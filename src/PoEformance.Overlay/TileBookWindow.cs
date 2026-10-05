@@ -41,8 +41,14 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>What separates a room's path from its unit, or a tile's from <see cref="Bare"/>, in the key the portrait loads by.</summary>
     private const char UnitMark = '|';
 
-    /// <summary>What a tile's key ends in when its ground is left out.</summary>
+    /// <summary>The word in a tile's key when its ground is left out.</summary>
     private const string Bare = "bare";
+
+    /// <summary>The word in a tile's key when its black walls are left out. See TileModels.BlackWall.</summary>
+    private const string Unwalled = "unwalled";
+
+    /// <summary>What separates the words after a tile's <see cref="UnitMark"/>.</summary>
+    private const char WordMark = '+';
 
     /// <summary>The colour the unpainted ground is drawn in: a dark, flat grey that stays behind the props.</summary>
     public static readonly Vector3 GroundInk = new(0.34f, 0.34f, 0.35f);
@@ -55,6 +61,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
     /// <summary>Whether a tile is drawn with its ground block. See TileModels.Of.</summary>
     private bool _ground = true;
+
+    /// <summary>Whether a tile is drawn with its black walls. See TileModels.BlackWall.</summary>
+    private bool _walls = true;
 
     /// <summary>The two lists the book was built from, compared by reference to notice a new one.</summary>
     private IReadOnlyList<string>? _installed;
@@ -131,7 +140,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <remarks>
     /// THE UNIT RIDES IN THE KEY, so switching it is a different key and the portrait reloads -
     /// the same way the item book's drop or held choice does - without the portrait knowing about
-    /// rooms. A tile's ground rides the same way: <see cref="Bare"/> after the mark leaves it out.
+    /// rooms. A tile's choices ride the same way: <see cref="Bare"/> after the mark leaves its ground
+    /// out and <see cref="Unwalled"/> its black walls, joined by <see cref="WordMark"/> when both.
     /// </remarks>
     public static MonsterModel Load(Func<string, byte[]?> read, string key)
     {
@@ -143,14 +153,39 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             return TileModels.Of(read, key);
         }
 
-        if (key.AsSpan(mark + 1).Equals(Bare, StringComparison.Ordinal))
+        string path = key[..mark];
+        if (!TileBook.IsRoom(path))
         {
-            return TileModels.Of(read, key[..mark], ground: false);
+            ReadOnlySpan<char> words = key.AsSpan(mark + 1);
+            return TileModels.Of(read, path, ground: !Has(words, Bare), walls: !Has(words, Unwalled));
         }
 
         RoomUnit unit = Enum.TryParse(key[(mark + 1)..], out RoomUnit said) ? said : RoomUnit.Cells;
-        return RoomModels.Of(read, key[..mark], unit);
+        return RoomModels.Of(read, path, unit);
+
+        static bool Has(ReadOnlySpan<char> words, string word)
+        {
+            foreach (Range one in words.Split(WordMark))
+            {
+                if (words[one].Equals(word, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
+
+    /// <summary>The key a tile is loaded under: its path, then the words for what is left out.</summary>
+    private string TileKey(string path)
+        => (_ground, _walls) switch
+        {
+            (true, true) => path,
+            (false, true) => path + UnitMark + Bare,
+            (true, false) => path + UnitMark + Unwalled,
+            _ => path + UnitMark + Bare + WordMark + Unwalled,
+        };
 
     /// <summary>What the tile or room is and where it is used, then its geometry under it.</summary>
     protected override void Pane()
@@ -209,6 +244,14 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 ImGui.SetTooltip("The tile's ground block, drawn plain - nothing says which ground texture an area lays on it."
                     + " Off shows the props alone, where the ground rises around them.");
             }
+
+            ImGui.SameLine();
+            ImGui.Checkbox("black walls", ref _walls);
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("The shapes painted with blacknofog.dds: walls hanging from a cliff's edge to close the gap under it."
+                    + " The game's camera never looks behind them; off leaves them out.");
+            }
         }
 
         ImGui.Separator();
@@ -219,7 +262,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             return;
         }
 
-        string key = room ? chosen + UnitMark + _unit.ToString() : _ground ? chosen : chosen + UnitMark + Bare;
+        string key = room ? chosen + UnitMark + _unit.ToString() : TileKey(chosen);
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
             _subjectKey = key;

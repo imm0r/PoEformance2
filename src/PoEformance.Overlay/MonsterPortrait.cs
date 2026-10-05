@@ -1677,6 +1677,10 @@ public sealed class MonsterPortrait
                     // so the count says how much of the picture that is, not how a .sm matched.
                     int ground = _model.Mesh.Shapes.Count - _model.NamedInAo;
                     said += ground > 0 ? $" · {ground} ground shapes left plain" : " · no ground drawn";
+                    if (_model.Walls > 0)
+                    {
+                        said += $" · {_model.Walls} black wall shape{(_model.Walls == 1 ? string.Empty : "s")} left out";
+                    }
                 }
                 else if (_model.Mesh.Shapes.Count > _model.Materials.Count)
                 {
@@ -2370,7 +2374,10 @@ public sealed class MonsterPortrait
         {
             Directory.CreateDirectory(Folder);
             string at = Path.Combine(Folder, Stem(_wanted) + ".files.txt");
-            File.WriteAllText(at, ModelDump.Of(_install, _variety, _wanted, _model));
+            // A TILE'S KEY CARRIES WHAT IS LEFT OUT after the mark - see TileBookWindow.Load.
+            File.WriteAllText(at, _model.Kind == ModelKind.Tile
+                ? ModelDump.OfTile(_install, _wanted.Split('|')[0], _model)
+                : ModelDump.Of(_install, _variety, _wanted, _model));
             _dumped = "wrote " + at;
         }
         catch (Exception fault) when (fault is IOException or UnauthorizedAccessException)

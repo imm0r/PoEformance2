@@ -235,6 +235,22 @@ public sealed record MonsterModel(
     /// 0 in the .sm" and "wearing 9 parts" when it has neither file and its parts are sub-tiles.
     /// </remarks>
     public ModelKind Kind { get; init; }
+
+    /// <summary>
+    /// Each shape's material as its source names it, graph number and all - empty where it names none.
+    /// </summary>
+    /// <remarks>
+    /// FILLED FOR A RIGID MODEL - a prop, a tile - where the shapes are the mesh's own; a monster's
+    /// worn pieces are joined after the body and are not in it. For the dump, and for a tile
+    /// leaving out the shapes a texture marks - see TileModels.
+    /// </remarks>
+    public IReadOnlyList<string> ShapeMaterials { get; init; } = [];
+
+    /// <summary>Each shape's colour texture, by path - empty where none was found. See <see cref="ShapeMaterials"/>.</summary>
+    public IReadOnlyList<string> ShapeTextures { get; init; } = [];
+
+    /// <summary>How many of a tile's black-wall shapes were left out. See TileModels.BlackWall.</summary>
+    public int Walls { get; init; }
 }
 
 /// <summary>
@@ -593,6 +609,8 @@ public static class MonsterModels
             Guessed = dress.Guessed,
             Move = move,
             Shaders = paints.Shaders,
+            ShapeMaterials = dress.ShapeMaterials,
+            ShapeTextures = dress.ShapeTextures,
         };
     }
 
@@ -2096,6 +2114,8 @@ public static class MonsterModels
 
         var skins = new Mipmaps?[mesh.Shapes.Count];
         var modes = new string[mesh.Shapes.Count];
+        var wearing = new string[mesh.Shapes.Count];
+        var painted = new string[mesh.Shapes.Count];
         var used = new List<string>();
         for (var shape = 0; shape < mesh.Shapes.Count; shape++)
         {
@@ -2104,6 +2124,8 @@ public static class MonsterModels
             // two different textures and the cache has to tell them apart by the whole
             // string rather than by the file.
             string wants = Wanted(mesh.Shapes[shape].Name, shape, mesh.Shapes.Count, named, byName, spread, paths);
+            wearing[shape] = wants;
+            painted[shape] = string.Empty;
             if (wants.Length == 0)
             {
                 skins[shape] = fallback;
@@ -2114,6 +2136,7 @@ public static class MonsterModels
             modes[shape] = paints.Mode(read, wants);
 
             (Mipmaps? worn, _, string texture, bool said) = Colour(read, mesh, wants, paints);
+            painted[shape] = worn is not null ? texture : string.Empty;
             if (worn is not null)
             {
                 guessed |= !said;
@@ -2136,7 +2159,13 @@ public static class MonsterModels
             used.Add(material);
         }
 
-        return new Dress(skins, used, textures, guessed) { Runs = spread.Count > 0, Modes = modes };
+        return new Dress(skins, used, textures, guessed)
+        {
+            Runs = spread.Count > 0,
+            Modes = modes,
+            ShapeMaterials = wearing,
+            ShapeTextures = painted,
+        };
     }
 
     /// <summary>What the shapes ended up wearing, and how sure the walk is about it.</summary>
@@ -2155,6 +2184,12 @@ public static class MonsterModels
 
         /// <summary>Each shape's material blend mode, raw - see MonsterModel.Modes.</summary>
         public IReadOnlyList<string> Modes { get; init; } = [];
+
+        /// <summary>Each shape's material as written - see MonsterModel.ShapeMaterials.</summary>
+        public IReadOnlyList<string> ShapeMaterials { get; init; } = [];
+
+        /// <summary>Each shape's colour texture - see MonsterModel.ShapeTextures.</summary>
+        public IReadOnlyList<string> ShapeTextures { get; init; } = [];
     }
 
     /// <summary>
