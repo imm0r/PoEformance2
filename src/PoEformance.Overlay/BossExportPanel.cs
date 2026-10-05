@@ -59,7 +59,7 @@ internal sealed class BossExportPanel(Func<string> entries)
         string said = _said;
         if (said.Length > 0)
         {
-            ImGuiText.Wrapped(OverlayInk.Quiet, said);
+            PathLink.Line(OverlayInk.Quiet, said);
         }
     }
 

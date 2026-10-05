@@ -149,7 +149,7 @@ public sealed class RitualWindow
         ImGui.Indent(step);
         try
         {
-            ImGuiText.Wrapped(ink, ImGuiText.Escape(text));
+            PathLink.Line(ink, text);
         }
         finally
         {

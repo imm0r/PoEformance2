@@ -259,7 +259,7 @@ public sealed class MapDataWindow
         }
 
         ImGui.SameLine();
-        ImGuiText.Wrapped(
+        PathLink.Line(
             _saved.Length > 0 ? GoodText : DimText,
             _saved.Length > 0 ? _saved : "writes every row beside the exe, for checking outside the overlay");
     }
