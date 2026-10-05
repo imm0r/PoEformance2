@@ -383,6 +383,22 @@ public class TileFilesTests
 
     }
 
+    /// <summary>Without its ground a tile is its props alone - every shape painted, and still a tile.</summary>
+    [Fact]
+    public void ANDATileDrawnWithoutItsGroundIsItsPropsAlone()
+    {
+        Dictionary<string, byte[]> files = Install();
+        MonsterModel model = TileModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Test/Arena.tdt", ground: false);
+
+        Assert.True(model.Ready, model.Why);
+        Assert.Equal(ModelKind.Tile, model.Kind);
+        Assert.Equal(2, model.Parts);
+        Assert.Equal(8, model.Mesh.Triangles);
+        Assert.Equal(4, model.Skins.Count);
+        Assert.All(model.Skins, one => Assert.NotNull(one));
+        Assert.Equal(model.Mesh.Shapes.Count, model.NamedInAo);
+    }
+
     [Fact]
     public void ANDATILECostsWhatItReadMaterialsAndTexturesIncluded()
     {

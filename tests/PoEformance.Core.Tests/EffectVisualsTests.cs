@@ -172,6 +172,8 @@ public class EffectVisualsTests
     [InlineData("AdditiveBlend", MaterialBlend.Additive)]
     [InlineData("Additive", MaterialBlend.Additive)]
     [InlineData("AlphaBlend", MaterialBlend.Alpha)]
+    [InlineData("AlphaTestWithShadow", MaterialBlend.Cutout)]
+    [InlineData("AlphaTest", MaterialBlend.Cutout)]
     [InlineData("Transparent", MaterialBlend.Alpha)]
     [InlineData("Opaque", MaterialBlend.Opaque)]
     [InlineData("", MaterialBlend.Opaque)]

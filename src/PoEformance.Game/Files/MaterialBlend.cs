@@ -11,6 +11,15 @@ public enum MaterialBlend : byte
 
     /// <summary>Added to what is behind it - glow, fire, lightning.</summary>
     Additive,
+
+    /// <summary>
+    /// Solid where the texture's alpha is high enough and absent where it is not - leaves, hair, chains.
+    /// </summary>
+    /// <remarks>
+    /// NOT TRANSLUCENT: a pixel is either the material's, written to depth like any opaque one, or
+    /// nothing at all. Drawn in the opaque pass for that reason.
+    /// </remarks>
+    Cutout,
 }
 
 /// <summary>
@@ -21,8 +30,8 @@ public enum MaterialBlend : byte
 /// reads <c>overriden_blend_mode</c> - a string - off a material's <c>defaultgraph</c> and off any
 /// <c>.fxgraph</c>, and nothing in any reference lists its values. So the reading here is a RULE ON
 /// WORDS, chosen in so many words by the person this tool is for and labelled as a guess wherever it
-/// shows: a value naming "add" is additive, one naming alpha, blend or transparency is mixed, anything
-/// else is opaque. The raw value is always kept beside it, so the first real effect says whether the
+/// shows: a value naming "add" is additive, one naming an alpha test is cut out, one naming alpha,
+/// blend or transparency is mixed, anything else is opaque. The raw value is always kept beside it, so the first real effect says whether the
 /// rule holds - and one that does not is a line in this method rather than a new idea somewhere else.
 /// </remarks>
 public static class MaterialBlends
@@ -40,6 +49,15 @@ public static class MaterialBlends
         if (mode.Contains("add", StringComparison.OrdinalIgnoreCase))
         {
             return MaterialBlend.Additive;
+        }
+
+        // AN ALPHA TEST IS ASKED BEFORE ALPHA, because it carries that word and means the opposite of
+        // mixing. The first real value seen was "AlphaTestWithShadow", on a material whose graph is
+        // ForceAlphaTestWithShadow.fxgraph - a test that keeps or drops a pixel, and casts a shadow,
+        // which nothing see-through does.
+        if (mode.Contains("alphatest", StringComparison.OrdinalIgnoreCase))
+        {
+            return MaterialBlend.Cutout;
         }
 
         return mode.Contains("alpha", StringComparison.OrdinalIgnoreCase)

@@ -2749,6 +2749,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
                 Load = static (read, _, key, _) => TileBookWindow.Load(read, key),
+                Ink = TileBookWindow.GroundInk,
             },
         };
 

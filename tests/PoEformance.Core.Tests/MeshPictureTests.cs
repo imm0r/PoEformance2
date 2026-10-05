@@ -584,6 +584,31 @@ public class MeshPictureTests
         Assert.Equal(255, Channel(MeshPicture.Of(Layered(farToo: false), 64, skins: [Sheet(0, 0, 200, alpha: 128)]), 3));
     }
 
+    /// <summary>
+    /// A cut-out shape drops what its texture says is clear, shows what is behind it, and is solid where it draws.
+    /// </summary>
+    /// <remarks>
+    /// THE TWO HALVES OF AN ALPHA TEST: a renderer that mixed instead of cutting fails the first by a
+    /// blend of red and blue, and one that wrote depth before the test fails it by a hole where the
+    /// far red should show. Solid where kept is the difference from <see cref="MaterialBlend.Alpha"/>.
+    /// </remarks>
+    [Fact]
+    public void ACUTOUTShapeDropsItsClearPixelsAndIsSolidWhereItKeepsThem()
+    {
+        const int Size = 64;
+        Mipmaps red = Sheet(220, 0, 0);
+        MaterialBlend[] blends = [MaterialBlend.Opaque, MaterialBlend.Cutout];
+
+        GamePicture clear = MeshPicture.Of(Layered(), Size, skins: [red, Sheet(0, 0, 200, alpha: 40)], blends: blends);
+        Assert.True(Channel(clear, 0) > 50, $"the red behind should show through: {Channel(clear, 0)}");
+        Assert.Equal(0, Channel(clear, 2));
+
+        GamePicture kept = MeshPicture.Of(Layered(), Size, skins: [red, Sheet(0, 0, 200, alpha: 220)], blends: blends);
+        Assert.Equal(0, Channel(kept, 0));
+        Assert.True(Channel(kept, 2) > 50, $"the kept blue should cover the red: {Channel(kept, 2)}");
+        Assert.Equal(255, Channel(kept, 3));
+    }
+
     /// <summary>The second pass stays inside its band, so any number of threads draws the same bytes.</summary>
     [Fact]
     public void TRANSLUCENCYDrawsTheSamePictureOnAnyNumberOfThreads()
