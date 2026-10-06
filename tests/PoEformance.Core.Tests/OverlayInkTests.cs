@@ -42,6 +42,7 @@ public class OverlayInkTests
     [
         ("Ink", OverlayInk.Ink),
         ("Quiet", OverlayInk.Quiet),
+        ("Aside", OverlayInk.Aside),
         ("Measured", OverlayInk.Measured),
         ("Name", OverlayInk.Name),
         ("Reference", OverlayInk.Reference),
@@ -101,6 +102,20 @@ public class OverlayInkTests
             float contrast = OverlayInk.Contrast(ink, OverlayInk.Selected);
             Assert.True(contrast >= 4.5f, $"{name} is only {contrast:F2}:1 on a picked row");
         }
+    }
+
+    [Fact]
+    public void AnAsideIsQuieterThanQuiet_ButStillAnInk()
+    {
+        // The one ink allowed to sit under Quiet, and the two halves of that permission: it IS
+        // under it, or the italic alone has to carry "this is an aside"; and it still clears the
+        // tool's own floor above, so greyer never becomes gone.
+        Assert.True(
+            OverlayInk.Luminance(OverlayInk.Aside) < OverlayInk.Luminance(OverlayInk.Quiet),
+            "the aside ink is no quieter than Quiet");
+        Assert.True(
+            (OverlayInk.Quiet - OverlayInk.Aside).Length() > 0.05f,
+            "the aside ink is too small a step from Quiet to be seen");
     }
 
     [Fact]

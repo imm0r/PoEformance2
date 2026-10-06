@@ -397,14 +397,19 @@ public static class OverlayLayout
     {
         ArgumentNullException.ThrowIfNull(text);
 
+        // Italic, in the aside ink: set upright in the same quiet grey as a label it read as
+        // one more row of the list it sits under. The face falls back to the body one on a
+        // machine without the family's italic file.
         float step = Step();
         ImGui.Indent(step);
+        OverlayFonts.PushAside();
         try
         {
-            ImGuiText.Wrapped(OverlayInk.Quiet, text);
+            ImGuiText.Wrapped(OverlayInk.Aside, text);
         }
         finally
         {
+            OverlayFonts.PopAside();
             ImGui.Unindent(step);
         }
     }
