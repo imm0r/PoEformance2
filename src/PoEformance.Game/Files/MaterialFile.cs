@@ -277,7 +277,11 @@ public sealed class MaterialFile
             return None;
         }
 
-        return textures.Count == 0 && slots.Count == 0
+        // A MATERIAL WITH NO TEXTURE CAN STILL SAY EVERYTHING ABOUT A SHAPE: black_shadowonlyc.mat names
+        // three graphs and not one texture, and its graphs are what say the shape is never drawn - so
+        // what it names is kept. Dropped as "nothing read", the ship in Port's boss room wore it as
+        // black slabs across its hull.
+        return textures.Count == 0 && slots.Count == 0 && parents.Count == 0 && blend.Length == 0
             ? None
             : new MaterialFile { Textures = textures, Slots = slots, Graphs = graphs, Parents = parents, Blend = blend };
     }

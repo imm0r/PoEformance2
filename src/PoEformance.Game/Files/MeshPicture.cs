@@ -804,8 +804,8 @@ public static class MeshPicture
             Array.Fill(into, blend, from, upto - from);
 
             // A CUT-OUT SHAPE IS SOLID WHERE IT IS DRAWN, so it needs neither an owner nor the
-            // second pass - it rides in the first with the opaque ones.
-            if (blend == MaterialBlend.Cutout)
+            // second pass - it rides in the first with the opaque ones. A shadow-only one is not drawn.
+            if (blend is MaterialBlend.Cutout or MaterialBlend.ShadowOnly)
             {
                 continue;
             }
@@ -958,7 +958,7 @@ public static class MeshPicture
         {
             for (var one = 0; one < _triangles; one++)
             {
-                if (_feet[one] < top || _tops[one] >= end || Translucent(_blends[one]))
+                if (_feet[one] < top || _tops[one] >= end || Translucent(_blends[one]) || _blends[one] == MaterialBlend.ShadowOnly)
                 {
                     continue;
                 }

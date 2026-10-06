@@ -20,6 +20,16 @@ public enum MaterialBlend : byte
     /// nothing at all. Drawn in the opaque pass for that reason.
     /// </remarks>
     Cutout,
+
+    /// <summary>
+    /// Not drawn at all: the shape only casts a shadow.
+    /// </summary>
+    /// <remarks>
+    /// black_shadowonlyc.mat is an instance of ForceOpaqueShadowOnly.fxgraph, beside its sibling
+    /// ForceOpaqueNoShadow.fxgraph whose mode reads "OpaqueNoShadow". A shadow caster has no colour
+    /// of its own to show, so the picture leaves it out rather than painting it black.
+    /// </remarks>
+    ShadowOnly,
 }
 
 /// <summary>
@@ -42,6 +52,13 @@ public static class MaterialBlends
         if (string.IsNullOrWhiteSpace(mode))
         {
             return MaterialBlend.Opaque;
+        }
+
+        // A SHADOW ONLY IS ASKED BEFORE EVERYTHING, since it says the shape is not drawn whatever else
+        // its name carries.
+        if (mode.Contains("shadowonly", StringComparison.OrdinalIgnoreCase))
+        {
+            return MaterialBlend.ShadowOnly;
         }
 
         // ADDITIVE IS ASKED FIRST, because the game could well spell it "AdditiveBlend" - and that

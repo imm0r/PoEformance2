@@ -609,6 +609,21 @@ public class MeshPictureTests
         Assert.Equal(255, Channel(kept, 3));
     }
 
+    /// <summary>A shadow-only shape is not drawn: what is behind it shows, untouched.</summary>
+    [Fact]
+    public void ASHADOWONLYShapeIsNotDrawn()
+    {
+        const int Size = 64;
+        MaterialBlend[] blends = [MaterialBlend.Opaque, MaterialBlend.ShadowOnly];
+
+        GamePicture picture = MeshPicture.Of(Layered(), Size, skins: [Sheet(220, 0, 0), Sheet(0, 0, 200)], blends: blends);
+        GamePicture behind = MeshPicture.Of(Layered(), Size, skins: [Sheet(220, 0, 0), Sheet(0, 0, 200)], blends: [MaterialBlend.Opaque, MaterialBlend.Cutout]);
+
+        Assert.True(Channel(picture, 0) > 50, $"the red behind should show: {Channel(picture, 0)}");
+        Assert.Equal(0, Channel(picture, 2));
+        Assert.True(Channel(behind, 2) > 50, "the same shape drawn is blue, so the test can tell");
+    }
+
     /// <summary>
     /// A cut-out shape with a program takes its colour from the program and its edge from its texture's alpha.
     /// </summary>
