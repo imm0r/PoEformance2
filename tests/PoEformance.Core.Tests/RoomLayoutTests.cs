@@ -229,6 +229,36 @@ public class RoomLayoutTests
     }
 
     [Fact]
+    public void THEDOODADCapIsTheCallersAndSaysWhatItLeftOut()
+    {
+        Dictionary<string, byte[]> files = Install();
+        const string path = "Metadata/Terrain/Woods/Rooms/Clearing.arm";
+
+        MonsterModel one = RoomModels.Of(p => files.GetValueOrDefault(p), path, doodads: 1);
+        Assert.True(one.Ready, one.Why);
+        Assert.Equal(1, one.Parts);
+        Assert.Contains("1 more left out to keep it turnable - 1 doodads or 1000 triangles", one.Move, StringComparison.Ordinal);
+
+        // Zero is the usual, which places both.
+        Assert.Equal(2, RoomModels.Of(p => files.GetValueOrDefault(p), path, doodads: 0).Parts);
+    }
+
+    [Fact]
+    public void ARoomKeyCarriesItsCapAndTheUsualOneWritesTheBarePath()
+    {
+        const string path = "Metadata/Terrain/Maps/Port/Rooms/Unique/boss_01.arm";
+
+        Assert.Equal(path, new RoomKey(path).ToString());
+        Assert.Equal(path + "|doodads=800", new RoomKey(path, 800).ToString());
+        Assert.Equal(new RoomKey(path, 800), RoomKey.Read(path + "|doodads=800"));
+        Assert.Equal(new RoomKey(path), RoomKey.Read(path));
+
+        // Outside the slider's ends, or not a number: the usual.
+        Assert.Equal(RoomModels.UsualDoodads, RoomKey.Read(path + "|doodads=99999").Doodads);
+        Assert.Equal(RoomModels.UsualDoodads, RoomKey.Read(path + "|doodads=lots").Doodads);
+    }
+
+    [Fact]
     public void ARoomThatDidNotLoadIsStillDumpedWithItsOwnFile()
     {
         // "the room places no doodads" is a claim about the file, so the dump of such a room is the

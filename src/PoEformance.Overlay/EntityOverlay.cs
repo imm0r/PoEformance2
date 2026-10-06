@@ -529,6 +529,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 ? tilePanes
                 : basis.TilePanes,
             TileRail = _tileBook?.RailOpen ?? basis.TileRail,
+            RoomDoodads = _tileBook is { } tiles
+                ? tiles.Doodads == RoomModels.UsualDoodads ? 0 : tiles.Doodads
+                : basis.RoomDoodads,
             EffectColumns = _effectBook?.Columns is { Count: > 0 } effectColumns
                 ? effectColumns
                 : basis.EffectColumns,
@@ -2860,7 +2863,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         Func<string, byte[]?>? readFile = null,
         int modelSize = PictureLadder.Usual,
         IReadOnlyDictionary<string, int>? columnWidths = null,
-        IReadOnlyDictionary<string, double>? panes = null)
+        IReadOnlyDictionary<string, double>? panes = null,
+        int roomDoodads = 0)
     {
         // ONE INDEX OF WHICH TILESETS PLACE WHICH TILE, built off the frame on first ask: the pane's
         // tileset choice and the dump both read it, and building it twice would read every tileset twice.
@@ -2871,6 +2875,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Tilesets = catalog,
             Needs = new AreaNeeds(readFile, catalog),
             Laid = LaidHere,
+            Doodads = roomDoodads,
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
                 Load = static (read, _, key, _) => TileBookWindow.Load(read, key),
