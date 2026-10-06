@@ -37,8 +37,9 @@ namespace PoEformance.Overlay;
 /// cap as well, and on a 1200 px pane that was a monster drawn at 512 and stretched - the blur
 /// the live client reported once the floor's own staircase was gone. Stop it and the next frame
 /// is drawn at whatever size the pane is, cap or no cap. How many pictures a second that comes
-/// to is shown in the pane's own row (<see cref="RedrawRate"/>), because it is the number that
-/// says whether the cap is the right one for this machine.
+/// to is shown in the pane's own row, or in the picture's corner where there is no row
+/// (<see cref="RedrawRate"/>), because it is the number that says whether the cap is the right
+/// one for this machine.
 ///
 /// THE KEYFRAMES ARE UNPACKED ON A TASK, ONE ANIMATION AT A TIME. A bundled rig holds twelve
 /// megabytes of them; the animation being played is a few tens of kilobytes of that, and Oodle
@@ -551,6 +552,53 @@ public sealed class MonsterPortrait
     public bool Translucent { get; set; }
 
     /// <summary>
+    /// Whether cut-out and shadow-only materials are honoured where <see cref="Translucent"/> is off.
+    /// </summary>
+    /// <remarks>
+    /// NEITHER IS TRANSLUCENCY, and the tile book needs both: a shadow caster such as
+    /// black_shadowonlyc.mat is never seen in the game, and drawn solid it laid black slabs across
+    /// the ship in Port's boss room. Without this the book drew every shape solid, because the blend
+    /// list reached the picture only where translucency was on - which is why the shadow-only fix
+    /// did nothing there at first. Mixed and added shapes stay solid, as <see cref="Translucent"/> says.
+    /// </remarks>
+    public bool Masked { get; set; }
+
+    /// <summary>
+    /// The blends handed to the picture: all of them, the solid-or-absent ones only, or none.
+    /// </summary>
+    private IReadOnlyList<MaterialBlend>? Blends()
+    {
+        if (Translucent)
+        {
+            return _model.Blends;
+        }
+
+        if (!Masked)
+        {
+            return null;
+        }
+
+        // Worked out once per model: the picture asks on every redraw, and a drag is many of those.
+        if (!ReferenceEquals(_maskedOf, _model))
+        {
+            _maskedOf = _model;
+            IReadOnlyList<MaterialBlend> all = _model.Blends;
+            var kept = new MaterialBlend[all.Count];
+            for (var one = 0; one < kept.Length; one++)
+            {
+                kept[one] = all[one] is MaterialBlend.Cutout or MaterialBlend.ShadowOnly ? all[one] : MaterialBlend.Opaque;
+            }
+
+            _masked = kept;
+        }
+
+        return _masked;
+    }
+
+    private MonsterModel? _maskedOf;
+    private IReadOnlyList<MaterialBlend>? _masked;
+
+    /// <summary>
     /// Whether a material's colour is worked out from its shader graphs where they say more than a texture.
     /// </summary>
     /// <remarks>
@@ -878,10 +926,54 @@ public sealed class MonsterPortrait
         }
 
         Overlays(corner, side);
+
+        // THE RATE ON THE PICTURE where there is no animation row to carry it - a tile, a room, an
+        // item, a monster without a rig. Those are exactly the pictures the doodad cap and the size
+        // ladder are set for, and the row only exists where there is something to play.
+        if (_pose is null || !_model.Moves)
+        {
+            Rate(draw, corner);
+        }
+
         ImGui.SetCursorScreenPos(below);
         Shots();
         Status();
     }
+
+    /// <summary>The redraw rate as the pane shows it, made again only when the number changes - it is asked every frame.</summary>
+    private string RateText()
+    {
+        int now = (int)Math.Round(_rate.At(ImGui.GetTime()));
+        if (now != _rateShown || _rateText.Length == 0)
+        {
+            _rateShown = now;
+            _rateText = now.ToString(CultureInfo.InvariantCulture) + " fps";
+        }
+
+        return _rateText;
+    }
+
+    private int _rateShown = -1;
+    private string _rateText = string.Empty;
+
+    /// <summary>
+    /// The redraw rate in the picture's top left corner, over a shadow so it reads on any backdrop.
+    /// </summary>
+    /// <remarks>
+    /// The top right holds the orbit button and the middle the animation's progress, so the left
+    /// corner is the one free. Drawn, not laid out, so it takes no line from the pane.
+    /// </remarks>
+    private void Rate(ImDrawListPtr draw, Vector2 corner)
+    {
+        float inset = ImGui.GetStyle().ItemSpacing.X;
+        string rate = RateText();
+        var at = new Vector2(corner.X + inset, corner.Y + inset);
+        draw.AddText(at + Vector2.One, RateShadow, rate);
+        draw.AddText(at, ImGui.GetColorU32(ImGuiCol.TextDisabled), rate);
+    }
+
+    /// <summary>The rate's shadow: black, mostly opaque.</summary>
+    private const uint RateShadow = 0xC0000000;
 
     /// <summary>
     /// Carries the camera on one step of its lap, where the orbit is running.
@@ -968,6 +1060,10 @@ public sealed class MonsterPortrait
         Vector2 corner = ImGui.GetItemRectMin();
         Paint(draw, corner, ImGui.GetItemRectMax());
         draw.AddImage(_texture, corner, ImGui.GetItemRectMax());
+
+        // THE SAME RATE AS THE BOOK'S PANE, since this one turns all the time and is where a slow
+        // machine shows first.
+        Rate(draw, corner);
     }
 
     /// <summary>The smallest a turning picture is drawn. Below this a monster is a smudge.</summary>
@@ -1038,7 +1134,7 @@ public sealed class MonsterPortrait
         ImGui.SameLine();
         float left = MathF.Max(ImGui.GetCursorScreenPos().X, row.X + side - (reserved + style.ItemSpacing.X + button));
 
-        string rate = $"{_rate.At(ImGui.GetTime()):F0} fps";
+        string rate = RateText();
         ImGui.SetCursorScreenPos(new Vector2(left + reserved - ImGui.CalcTextSize(rate).X, row.Y));
         ImGui.AlignTextToFramePadding();
         ImGui.TextDisabled(rate);
@@ -2223,13 +2319,13 @@ public sealed class MonsterPortrait
                 lowest = Lowest(_posed);
                 drawn = MeshPicture.Of(
                     _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, Ink,
-                    _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null, Shaded ? _model.Shades : null);
+                    _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
             }
             else
             {
                 lowest = _model.Mesh.Most.Z;
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null, Shaded ? _model.Shades : null);
+                    _model.Mesh, Canvas(size), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
             }
 
             _rate.Redrawn(ImGui.GetTime());
@@ -2739,10 +2835,10 @@ public sealed class MonsterPortrait
             _pose.Move(_model.Mesh, _posed, _posedNormals);
             return MeshPicture.Of(
                 _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, Ink,
-                _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null, Shaded ? _model.Shades : null);
+                _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
         }
 
-        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Translucent ? _model.Blends : null, Shaded ? _model.Shades : null);
+        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
     }
 
     /// <summary>

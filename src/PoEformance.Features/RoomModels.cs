@@ -142,6 +142,7 @@ public static class RoomModels
         var skins = new List<Mipmaps?>();
         var modes = new List<string>();
         var wearing = new List<string>();
+        var textures = new List<string>();
         float size = CellSize;
         var triangles = 0;
         int placed = 0, missing = 0, capped = 0;
@@ -192,6 +193,7 @@ public static class RoomModels
                 skins.Add(shape < model.Skins.Count ? model.Skins[shape] : model.Skin);
                 modes.Add(shape < model.Modes.Count ? model.Modes[shape] : string.Empty);
                 wearing.Add(shape < model.ShapeMaterials.Count ? model.ShapeMaterials[shape] : string.Empty);
+                textures.Add(shape < model.ShapeTextures.Count ? model.ShapeTextures[shape] : string.Empty);
             }
 
             triangles += model.Mesh.Triangles;
@@ -228,6 +230,10 @@ public static class RoomModels
             Skins = skins,
             Modes = modes,
             ShapeMaterials = wearing,
+
+            // CARRIED LIKE THE MATERIALS, so the dump's "tex" column names each doodad's colour map;
+            // left out, every room shape read "tex -" whether it was textured or not.
+            ShapeTextures = textures,
             BodyLeast = joined.Least,
             BodyMost = joined.Most,
             Parts = placed,

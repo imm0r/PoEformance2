@@ -195,6 +195,9 @@ public class RoomLayoutTests
         Assert.Same(model.Skins[0], model.Skins[1]);
         Assert.Equal(1, handed.Count(one => one == "art/rock.dds"));
         Assert.Equal(1, handed.Count(one => one == "art/rock.mat"));
+
+        // AND EACH SHAPE'S COLOUR MAP IS CARRIED, so the dump names it rather than "tex -".
+        Assert.Equal(["art/rock.dds", "art/rock.dds"], model.ShapeTextures);
     }
 
     [Fact]
