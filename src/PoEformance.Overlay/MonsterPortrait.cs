@@ -570,6 +570,12 @@ public sealed class MonsterPortrait
     /// <summary>The install's shader sources, for a tile's dump to search - see ModelDump.OfTile.</summary>
     public Func<IReadOnlyList<string>>? Shaders { get; set; }
 
+    /// <summary>Every material the install has, for the graph survey - see GraphSurvey. Null leaves its button out.</summary>
+    public Func<IReadOnlyList<string>>? Materials { get; set; }
+
+    /// <summary>Whether a graph survey is running, so a second press does not start another.</summary>
+    private int _surveying;
+
     /// <summary>
     /// The colour a shape with no texture is drawn in, or default for the pale warm grey every book began with.
     /// </summary>
@@ -2396,6 +2402,21 @@ public sealed class MonsterPortrait
             ImGui.SetTooltip(DumpSaid);
         }
 
+        if (Materials is not null)
+        {
+            ImGui.SameLine();
+            if (ImGui.Button("graphs##monster-survey"))
+            {
+                Survey();
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Reads every material in the install and writes which graph nodes keep the most of them"
+                    + " from being coloured by their graphs, ranked - " + GraphSurvey.File + " beside the dumps. Takes a while.");
+            }
+        }
+
         if (_dumped.Length > 0)
         {
             PathLink.Line(_dumped);
@@ -2447,6 +2468,45 @@ public sealed class MonsterPortrait
 
             Write(at, () => ModelDump.OfTile(install, tile, model, catalog?.Wait(), shaders),
                 beside.Length > 0 ? $" - and the {shaders.Count} shader sources beside it, in {ModelDump.ShaderFile}" : string.Empty);
+        });
+    }
+
+    /// <summary>
+    /// Writes the graph survey beside the dumps, off the frame, and says how far it has got while it runs.
+    /// </summary>
+    private void Survey()
+    {
+        IReadOnlyList<string> materials = Materials?.Invoke() ?? [];
+        if (materials.Count == 0)
+        {
+            _dumped = "no materials listed yet - the install's list is read shortly after start-up";
+            return;
+        }
+
+        if (Interlocked.Exchange(ref _surveying, 1) == 1)
+        {
+            return;
+        }
+
+        string at = Path.Combine(Folder, GraphSurvey.File);
+        Func<string, byte[]?>? install = _install;
+        _dumped = "surveying the graphs of " + materials.Count + " materials";
+        _ = Task.Run(() =>
+        {
+            // A SURVEY THAT DIED WOULD OTHERWISE LEAVE "surveying..." UP FOREVER - a faulted task
+            // nobody observes - so whatever stops it is said, with its type, in the same line.
+            try
+            {
+                Write(at, () => GraphSurvey.Of(install, materials, step => _dumped = "surveying graphs: " + step));
+            }
+            catch (Exception fault)
+            {
+                _dumped = $"the graph survey failed - {fault.GetType().Name}: {fault.Message}";
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _surveying, 0);
+            }
         });
     }
 

@@ -1058,6 +1058,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private IReadOnlyList<string> _shaderFiles = [];
 
     /// <summary>
+    /// Every material (<c>.mat</c>) the install has, for the graph survey.
+    /// </summary>
+    /// <remarks>Set by the same walk as <see cref="TileFiles"/>; empty until it runs.</remarks>
+    public IReadOnlyList<string> MaterialFiles
+    {
+        get => _materialFiles;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _materialFiles = value;
+        }
+    }
+
+    private IReadOnlyList<string> _materialFiles = [];
+
+    /// <summary>
     /// How many rooms of the current area each tile file builds, by path - a NEW dictionary only when
     /// the area's terrain changes, which is what tells the tile book to rebuild.
     /// </summary>
@@ -2793,6 +2809,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Shaded = true,
                 Tilesets = catalog,
                 Shaders = () => ShaderFiles,
+                Materials = () => MaterialFiles,
             },
         };
 

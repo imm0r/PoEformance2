@@ -77,6 +77,33 @@ public class BundleFileTests
         Assert.Equal(3, unpacked.Count);
     }
 
+    /// <summary>
+    /// Reads landing in the chunk the read before them unpacked reuse it - the graph survey's case, every material in turn.
+    /// </summary>
+    [Fact]
+    public void ANDARunOfReadsInOneChunkUnpacksItOnce()
+    {
+        byte[] content = Counting(1000);
+        BundleFile? bundle = BundleFile.Open(Packed.Bundle(content, chunkSize: 100));
+
+        var unpacked = 0;
+        byte[]? Watch(ReadOnlyMemory<byte> packed, int size)
+        {
+            unpacked++;
+            return Packed.AsIs(packed, size);
+        }
+
+        Assert.Equal(content[410..420], bundle!.Read(410, 10, Watch));
+        Assert.Equal(content[430..450], bundle.Read(430, 20, Watch));
+        Assert.Equal(content[480..500], bundle.Read(480, 20, Watch));
+        Assert.Equal(1, unpacked);
+
+        // ANOTHER CHUNK IS UNPACKED, and becomes the one kept.
+        Assert.Equal(content[510..520], bundle.Read(510, 10, Watch));
+        Assert.Equal(content[490..495], bundle.Read(490, 5, Watch));
+        Assert.Equal(3, unpacked);
+    }
+
     [Fact]
     public void ANDTheLastChunkIsAsShortAsWhatIsLeft()
     {

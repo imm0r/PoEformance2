@@ -49,6 +49,39 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 /// </remarks>
 public sealed class ShadeProgram
 {
+    /// <summary>
+    /// The node types the compiler evaluates.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE LIST, checked before the compiler's switch: a type missing here is refused even if the
+    /// switch has a case for it, so a node added to one and not the other fails its own test rather
+    /// than leaving the graph survey (see <see cref="Knows"/>) reporting it missing after it works.
+    /// </remarks>
+    private static readonly System.Collections.Frozen.FrozenSet<string> Evaluated = System.Collections.Frozen.FrozenSet.ToFrozenSet(
+        [
+            "ConstantPixel", "ConstantPixel2", "ConstantPixel3", "ConstantPixel4",
+            "ConstantFloat", "ConstantFloat2", "ConstantFloat3", "ConstantFloat4",
+            "ConstantBool", "ConstantPixelBool", "Zero", "One",
+            "MultiplyConst", "MultiplyConst2", "MultiplyConst3", "MultiplyConst4",
+            "Add", "Add2", "Add3", "Add4",
+            "Subtract", "Subtract2", "Subtract3", "Subtract4",
+            "Multiply", "Multiply2", "Multiply3", "Multiply4",
+            "Power", "Negate", "OneMinus", "Saturate", "Normalize3", "Dummy4",
+            "Lerp", "Lerp2", "Lerp3", "Lerp4",
+            "FitRangeFromInput", "SampleTexture", "SampleInputTexture", "SampleInputTextureLod",
+        ],
+        StringComparer.Ordinal);
+
+    /// <summary>
+    /// Whether a graph node of this type is something the compiler can evaluate - for the graph survey.
+    /// </summary>
+    /// <remarks>
+    /// The readers of the values it tracks count, and so does <c>InputTexture</c>, which is never
+    /// compiled on its own but read through the <c>SampleInputTexture</c> it feeds.
+    /// </remarks>
+    public static bool Knows(string type)
+        => type is not null && (Evaluated.Contains(type) || ReadBy(type) is not null || type == "InputTexture");
+
     /// <summary>The stages a colour is assembled across, in the order they run.</summary>
     /// <remarks>
     /// THE ORDER IS THE NAMES': coordinates are set up before textures are read with them, and the
@@ -786,6 +819,11 @@ public sealed class ShadeProgram
                 return seen.TryGetValue(channel, out int register)
                     ? register
                     : Fail($"{node.Type} before any graph wrote it");
+            }
+
+            if (!Evaluated.Contains(node.Type))
+            {
+                return Fail(node.Type);
             }
 
             switch (node.Type)
