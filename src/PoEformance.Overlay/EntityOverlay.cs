@@ -2874,6 +2874,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Changed = () => SettingsChanged?.Invoke(),
             Tilesets = catalog,
             Needs = new AreaNeeds(readFile, catalog),
+            Clocks = new TileClockCatalog(readFile, () => TileFiles),
             Laid = LaidHere,
             Doodads = roomDoodads,
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)

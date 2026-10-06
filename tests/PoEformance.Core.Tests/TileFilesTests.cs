@@ -615,6 +615,23 @@ public class TileFilesTests
         var rows = new List<int>();
         found!.CopyTo(rows);
         Assert.Equal([book.Row("Metadata/Terrain/Test/Arena.tdt")], rows);
+
+        // AND ACROSS THE WHOLE INSTALL, from the definitions, templates and graphs alone - no area, no
+        // geometry. A tile not placed anywhere is found; a room is passed over.
+        var walked = 0;
+        IReadOnlySet<string> anywhere = TileClocks.Of(
+            path => files.GetValueOrDefault(path),
+            ["Metadata/Terrain/Test/Arena.tdt", "Metadata/Terrain/Test/Gone.tdt", "Metadata/Terrain/Test/Rooms/r.arm"],
+            () => walked++);
+        Assert.Equal(["Metadata/Terrain/Test/Arena.tdt"], anywhere);
+        Assert.Equal(3, walked);
+
+        TileBook everywhere = TileBook.Of(["Metadata/Terrain/Test/Arena.tdt", "Metadata/Terrain/Test/Other.tdt"], null, clockedAnywhere: anywhere);
+        RowSet? far = everywhere.Matching(ColumnQuery.Parse("clock:yes").Term, out why);
+        Assert.True(far is not null, why);
+        rows.Clear();
+        far!.CopyTo(rows);
+        Assert.Equal([everywhere.Row("Metadata/Terrain/Test/Arena.tdt")], rows);
     }
 
     /// <summary>A definition's four corner ground types are read where annalithic reads them, and only whole.</summary>

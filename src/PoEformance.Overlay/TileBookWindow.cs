@@ -85,6 +85,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     private IReadOnlyList<string>? _installed;
     private IReadOnlyDictionary<string, int>? _placedOf;
     private IReadOnlyDictionary<string, string>? _needsOf;
+    private IReadOnlySet<string>? _clocksOf;
     private TileBook _page = TileBook.Empty;
 
     /// <summary>What the portrait is handed - a name to show and the tile's path as the key - made once per choice.</summary>
@@ -105,6 +106,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
     /// <summary>What each placed tile needs that the compiler has not got, read off the frame for the "needs" column. Null leaves the column empty.</summary>
     public AreaNeeds? Needs { get; init; }
+
+    /// <summary>Which tiles of the whole install run with the clock, read in the background for clock:yes. Null leaves the install out of it.</summary>
+    public TileClockCatalog? Clocks { get; init; }
 
     /// <summary>
     /// The ways each tile was laid in the current area, by path, one bit per TileOrientation.Placement. Null leaves the choice out.
@@ -153,12 +157,15 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         // book is built again when they do - a reference compare per frame until then.
         AreaReading? reading = Needs?.Ready(placings, _tileset);
         IReadOnlyDictionary<string, string>? needs = reading?.Needs;
-        if (!ReferenceEquals(_installed, installed) || !ReferenceEquals(_placedOf, placings) || !ReferenceEquals(_needsOf, needs))
+        IReadOnlySet<string>? clocks = Clocks?.Ready;
+        if (!ReferenceEquals(_installed, installed) || !ReferenceEquals(_placedOf, placings) || !ReferenceEquals(_needsOf, needs)
+            || !ReferenceEquals(_clocksOf, clocks))
         {
             _installed = installed;
             _placedOf = placings;
             _needsOf = needs;
-            _page = TileBook.Of(installed, placings, needs, reading?.Clocked);
+            _clocksOf = clocks;
+            _page = TileBook.Of(installed, placings, needs, reading?.Clocked, clocks);
         }
 
         return _page;
@@ -179,6 +186,19 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         if (ImGui.Checkbox("Only this area", ref only))
         {
             Toggle(HereField, TileBook.Here);
+        }
+
+        if (Clocks is { Reading: true } clocking)
+        {
+            (int done, int of) = clocking.Progress;
+            ImGui.SameLine();
+            ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture, $"clock: {done} of {of} read"));
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Reading every tile of the install - its templates' materials and their shader graphs, no geometry -"
+                    + " to fill the \"clock\" column for all of them: clock:yes finds the tiles whose picture runs with the game's clock."
+                    + " Rooms are answered only where the current area places them.");
+            }
         }
 
         if (Needs is { Reading: true } reading)

@@ -369,7 +369,7 @@ public static class TileModels
     /// <summary>
     /// The definition that carries the templates, following inheritance - or why there is none.
     /// </summary>
-    private static (TileDefinition Definition, string Why) Defined(Func<string, byte[]?> read, string path)
+    internal static (TileDefinition Definition, string Why) Defined(Func<string, byte[]?> read, string path)
     {
         // IN THE SPELLING THE READ USES, so a loop written with backslashes is caught on its
         // second hop rather than read eight more times before the hop count stops it.

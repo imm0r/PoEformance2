@@ -68,11 +68,13 @@ public sealed class TileBook : ColumnBook
     /// <param name="placed">How many times each tile or room is placed in the current area, by path - or empty.</param>
     /// <param name="needs">What each placed tile or room needs that the shade compiler has not got, by path - see <see cref="AreaNeeds"/> - or null before it is read.</param>
     /// <param name="clocked">Which placed tiles and rooms wear a material whose graphs read the game's clock, by path - see <see cref="AreaReading.Clocked"/> - or null before it is read.</param>
+    /// <param name="clockedAnywhere">Which tiles of the whole install do - see <see cref="TileClocks"/> - or null before it is read.</param>
     public static TileBook Of(
         IReadOnlyList<string>? install,
         IReadOnlyDictionary<string, int>? placed,
         IReadOnlyDictionary<string, string>? needs = null,
-        IReadOnlyDictionary<string, string>? clocked = null)
+        IReadOnlyDictionary<string, string>? clocked = null,
+        IReadOnlySet<string>? clockedAnywhere = null)
     {
         var order = new List<string>((install?.Count ?? 0) + (placed?.Count ?? 0));
         var rows = new Dictionary<string, int>(order.Capacity, StringComparer.OrdinalIgnoreCase);
@@ -132,7 +134,9 @@ public sealed class TileBook : ColumnBook
             placings[at] = times;
             placingsText[at] = times > 0 ? times.ToString(CultureInfo.InvariantCulture) : string.Empty;
             needed[at] = needs is not null && needs.TryGetValue(path, out string? need) ? need : string.Empty;
-            clocks[at] = clocked is not null && clocked.ContainsKey(path) ? Here : string.Empty;
+            clocks[at] = (clocked is not null && clocked.ContainsKey(path)) || (clockedAnywhere is not null && clockedAnywhere.Contains(path))
+                ? Here
+                : string.Empty;
 
             // THE PATH AND THE KIND, AND NOT THE WORD "here": that one is a column, asked for as
             // here:yes, and written into the free text it would also answer a bare "here" with
@@ -154,7 +158,8 @@ public sealed class TileBook : ColumnBook
             (DataColumn.Words("needs", needed), Area, false),
 
             // AND WHICH RUN WITH THE CLOCK - a material whose graphs read Time - so clock:yes finds the
-            // tiles whose picture moves, to compare with the game.
+            // tiles whose picture moves, to compare with the game: every tile of the install, from
+            // TileClocks, and the area's rooms and tileset-drawn tiles from its own reading.
             (DataColumn.Labels("clock", clocks), Area, false),
         ];
 
