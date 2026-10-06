@@ -198,6 +198,12 @@ public static class MeshPicture
         /// <summary>How many threads a drawing into this canvas may use.</summary>
         public int Threads { get; }
 
+        /// <summary>
+        /// The game's clock for the next drawing, in seconds - what a shade program's <c>Time</c> reads. See ShadeProgram.Clock.
+        /// </summary>
+        /// <remarks>On the canvas because it is the caller's, like the frame an animation is drawn at: set it, then draw.</remarks>
+        public float Time { get; set; }
+
         internal byte[] Pixels { get; }
 
         internal float[] Depth { get; }
@@ -583,7 +589,7 @@ public static class MeshPicture
                 ShadeProgram program = programs[shadeOf[one]];
                 if (!ReferenceEquals(program, preset))
                 {
-                    program.Preset(scratch);
+                    program.Preset(scratch, canvas.Time);
                     preset = program;
                 }
 
@@ -906,6 +912,7 @@ public static class MeshPicture
         private readonly int[] _stamps;
         private readonly bool _translucent;
         private readonly ShadeProgram[] _programs;
+        private readonly float _time;
         private readonly int[] _shades;
         private readonly float[] _shadeLevels;
         private readonly int _stride;
@@ -917,6 +924,7 @@ public static class MeshPicture
             Canvas canvas, SkinnedMesh mesh, int triangles, Vector3 lamp, Vector3 ink, Mipmaps?[] palette,
             bool translucent, ShadeProgram[] programs, int stride, Vector3[] places, Vector3[] turns)
         {
+            _time = canvas.Time;
             _programs = programs;
             _shades = canvas.Shades;
             _shadeLevels = canvas.ShadeLevels;
@@ -1028,7 +1036,7 @@ public static class MeshPicture
             ReadOnlySpan<float> shadeLevels = program is null
                 ? default
                 : new ReadOnlySpan<float>(_shadeLevels, one * _stride, program.Samples);
-            program?.Preset(registers);
+            program?.Preset(registers, _time);
             Vector3 p0 = default, p1 = default, p2 = default, n0 = default, n1 = default, n2 = default;
             Vector4 v0 = default, v1 = default, v2 = default;
             bool tinted = program is { UsesVertexColour: true };
