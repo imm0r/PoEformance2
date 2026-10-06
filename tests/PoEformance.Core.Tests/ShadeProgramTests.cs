@@ -377,6 +377,66 @@ public class ShadeProgramTests
             """,
             0.5f, 0f, 0.5f);
 
+    /// <summary>
+    /// CheapSmoothstep is HLSL's smoothstep: the cubic between two edges, and equal edges as a graphics card makes of them.
+    /// </summary>
+    /// <remarks>Above equal edges one, at them nought - nought by nought is not a number, and saturate makes it nought.</remarks>
+    [Fact]
+    public void CHEAPSMOOTHSTEPIsHLSLsSmoothstep()
+        => AssertColour(Coordinates(
+            """
+              {"type":"ConstantFloat","index":0,"parameters":[{"value":0.2}]},
+              {"type":"ConstantFloat","index":1,"parameters":[{"value":0.6}]},
+              {"type":"ConstantFloat","index":2,"parameters":[{"value":0.5}]},
+              {"type":"ConstantFloat","index":3,"parameters":[{"value":0.7}]},
+              {"type":"CheapSmoothstep","index":0},
+              {"type":"CheapSmoothstep","index":1},
+              {"type":"CheapSmoothstep","index":2},
+            """,
+            """
+              {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"CheapSmoothstep","index":0,"variable":"min_value"}},
+              {"src":{"type":"ConstantFloat","index":1,"variable":"output"},"dst":{"type":"CheapSmoothstep","index":0,"variable":"max_value"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"CheapSmoothstep","index":0,"variable":"value"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"CheapSmoothstep","index":1,"variable":"min_value"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"CheapSmoothstep","index":1,"variable":"max_value"}},
+              {"src":{"type":"ConstantFloat","index":3,"variable":"output"},"dst":{"type":"CheapSmoothstep","index":1,"variable":"value"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"CheapSmoothstep","index":2,"variable":"min_value"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"CheapSmoothstep","index":2,"variable":"max_value"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"CheapSmoothstep","index":2,"variable":"value"}},
+            """,
+            "CheapSmoothstep"),
+            0.84375f, 1f, 0f);
+
+    /// <summary>If takes its greater, lesser or equal input as a stands to b.</summary>
+    [Fact]
+    public void IFTakesTheBranchAStandsInToB()
+    {
+        string Branch(int index, int a) =>
+            $$$"""
+              {"src":{"type":"ConstantFloat","index":{{{a}}},"variable":"output"},"dst":{"type":"If","index":{{{index}}},"variable":"a"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"If","index":{{{index}}},"variable":"b"}},
+              {"src":{"type":"ConstantFloat","index":3,"variable":"output"},"dst":{"type":"If","index":{{{index}}},"variable":"greater"}},
+              {"src":{"type":"ConstantFloat","index":4,"variable":"output"},"dst":{"type":"If","index":{{{index}}},"variable":"equals"}},
+              {"src":{"type":"ConstantFloat","index":5,"variable":"output"},"dst":{"type":"If","index":{{{index}}},"variable":"lesser"}},
+            """;
+
+        AssertColour(Coordinates(
+            """
+              {"type":"ConstantFloat","index":0,"parameters":[{"value":0.7}]},
+              {"type":"ConstantFloat","index":1,"parameters":[{"value":0.3}]},
+              {"type":"ConstantFloat","index":2,"parameters":[{"value":0.5}]},
+              {"type":"ConstantFloat","index":3,"parameters":[{"value":0.9}]},
+              {"type":"ConstantFloat","index":4,"parameters":[{"value":0.4}]},
+              {"type":"ConstantFloat","index":5,"parameters":[{"value":0.2}]},
+              {"type":"If","index":0},
+              {"type":"If","index":1},
+              {"type":"If","index":2},
+            """,
+            Branch(0, 0) + Branch(1, 1) + Branch(2, 2),
+            "If"),
+            0.9f, 0.2f, 0.4f);
+    }
+
     /// <summary>FitRangeFromInput divides an empty input range by one, as the node does, rather than giving the bottom of the output.</summary>
     [Fact]
     public void FITRANGEDividesAnEmptyRangeByOne()
@@ -586,6 +646,23 @@ public class ShadeProgramTests
     }
 
     // ---- the graphs ----
+
+    /// <summary>
+    /// Three float nodes of one type, #0, #1 and #2, put into the colour's x, y and z by CoordsToFloat3 - with the graph's other nodes and links.
+    /// </summary>
+    private static string Coordinates(string nodes, string links, string type) =>
+        $$$"""
+        {"nodes":[
+        {{{nodes}}}
+          {"type":"CoordsToFloat3","index":0},
+          {{{Albedo}}}],
+         "links":[
+        {{{links}}}
+          {"src":{"type":"{{{type}}}","index":0,"variable":"output"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"x"}},
+          {"src":{"type":"{{{type}}}","index":1,"variable":"output"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"y"}},
+          {"src":{"type":"{{{type}}}","index":2,"variable":"output"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"z"}},
+          {"src":{"type":"CoordsToFloat3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
+        """;
 
     /// <summary>RemapHue of (0.8, 0.2, 0.1) with the given parameters, straight into the colour.</summary>
     private static string RemapHue(string parameters) =>

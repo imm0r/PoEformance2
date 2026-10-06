@@ -144,7 +144,7 @@ public sealed class ShadeProgram
             "Normalize2", "Normalize3", "Normalize4",
             "DotProduct2", "DotProduct3", "DotProduct4", "Length3", "Luminance", "GrayScale",
             "Lerp", "Lerp2", "Lerp3", "Lerp4",
-            "SmoothStep", "FitRange", "FitRangeFromInput", "RemapHue", "RemapHueInput",
+            "SmoothStep", "CheapSmoothstep", "If", "FitRange", "FitRangeFromInput", "RemapHue", "RemapHueInput",
             "SelectFloat", "SelectFloat2", "SelectFloat3", "SelectFloat4", "SelectBool", "SelectUInt", "SelectChannel",
             "GreaterThan", "LessThan", "EqualsUInt", "GreaterThanUInt", "LessThanUInt", "And", "Or", "Not",
             "Float2ToCoords", "Float3ToCoords", "Float4ToCoords", "CoordsToFloat2", "CoordsToFloat3", "CoordsToFloat4",
@@ -227,6 +227,8 @@ public sealed class ShadeProgram
         Lerp,
         Fit,
         SmoothStep,
+        Hermite,
+        If,
         Select,
         Compare,
         Pick,
@@ -728,6 +730,20 @@ public sealed class ShadeProgram
                     r[step.To] = new Vector4(Smoothed(r[step.A].X, r[step.B].X, r[step.C].X));
                     break;
 
+                case Op.Hermite:
+                    r[step.To] = new Vector4(Hermite(r[step.A].X, r[step.B].X, r[step.C].X));
+                    break;
+
+                case Op.If:
+                {
+                    // NOT A NUMBER IS NEITHER GREATER NOR LESSER, so it takes the equal branch, as the node's
+                    // if / else if / else does.
+                    float a = r[step.A].X;
+                    float b = r[step.B].X;
+                    r[step.To] = new Vector4(a > b ? r[step.C].X : a < b ? r[step.E].X : r[step.D].X);
+                    break;
+                }
+
                 case Op.Select:
                     r[step.To] = r[step.C].X != 0f ? r[step.B] : r[step.A];
                     break;
@@ -1074,6 +1090,18 @@ public sealed class ShadeProgram
 
         // THE NODE'S OWN GUARD: "handling edge case of pow(0, 0) returning NaN".
         return float.IsNaN(said) ? center : said;
+    }
+
+    /// <summary>CheapSmoothstep's: HLSL's own smoothstep, the cubic between two edges.</summary>
+    /// <remarks>
+    /// <c>t = saturate((x - min) / (max - min)); t * t * (3 - 2 * t)</c>, as HLSL defines it. Equal
+    /// edges divide by nothing, and saturate makes of that what a graphics card does: one above the
+    /// edge, nought below it and nought at it, where nought by nought is not a number.
+    /// </remarks>
+    private static float Hermite(float low, float high, float value)
+    {
+        float t = Saturated((value - low) / (high - low));
+        return t * t * (3f - (2f * t));
     }
 
     /// <summary>
@@ -1872,6 +1900,20 @@ public sealed class ShadeProgram
                     return Port(node, "center") is { } center && Port(node, "steepness") is { } steepness
                         && Port(node, "in_value") is { } smoothed
                         ? build.Emit(Op.SmoothStep, center, steepness, smoothed)
+                        : null;
+
+                case "CheapSmoothstep":
+                    return Port(node, "min_value") is { } edge0 && Port(node, "max_value") is { } edge1
+                        && Port(node, "value") is { } stepped
+                        ? build.Emit(Op.Hermite, edge0, edge1, stepped)
+                        : null;
+
+                // a > b gives greater, a < b lesser, anything else equals - the ports in Step's C, D and E.
+                case "If":
+                    return Port(node, "a") is { } left && Port(node, "b") is { } right
+                        && Port(node, "greater") is { } greater && Port(node, "equals") is { } equals
+                        && Port(node, "lesser") is { } lesser
+                        ? build.Emit(Op.If, left, right, greater, equals, lesser)
                         : null;
 
                 case "FitRangeFromInput":
