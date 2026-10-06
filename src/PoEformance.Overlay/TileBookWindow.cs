@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using ImGuiNET;
 using PoEformance.Features;
 using PoEformance.Game.Entities;
+using PoEformance.Game.World;
 
 namespace PoEformance.Overlay;
 
@@ -59,6 +60,14 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// </remarks>
     private string _tileset = string.Empty;
 
+    /// <summary>
+    /// The placement a tile is turned to, or -1 for the file's own orientation - see TileOrientation.Placement.
+    /// </summary>
+    /// <remarks>
+    /// KEPT ACROSS TILES like the tileset, and used only where the chosen tile was laid that way here.
+    /// </remarks>
+    private int _laid = -1;
+
     /// <summary>The lists the book was built from, compared by reference to notice a new one.</summary>
     private IReadOnlyList<string>? _installed;
     private IReadOnlyDictionary<string, int>? _placedOf;
@@ -83,6 +92,11 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
     /// <summary>What each placed tile needs that the compiler has not got, read off the frame for the "needs" column. Null leaves the column empty.</summary>
     public AreaNeeds? Needs { get; init; }
+
+    /// <summary>
+    /// The ways each tile was laid in the current area, by path, one bit per TileOrientation.Placement. Null leaves the choice out.
+    /// </summary>
+    public Func<IReadOnlyDictionary<string, byte>>? Laid { get; init; }
 
     /// <inheritdoc/>
     protected override string Caption => "Search for any terrain tile or room";
@@ -176,7 +190,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 walls: tile.Walls,
                 shaded: true,
                 swaps: tile.Tileset.Length > 0 ? TilesetIndex.Overrides(read, tile.Tileset) : null,
-                tileset: tile.Tileset.Length > 0 ? TilesetIndex.Short(tile.Tileset) : string.Empty);
+                tileset: tile.Tileset.Length > 0 ? TilesetIndex.Short(tile.Tileset) : string.Empty,
+                laid: TileOrientation.OfPlacement(tile.Laid));
         }
 
         return RoomModels.Of(read, key, shaded: true);
@@ -227,6 +242,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             }
 
             DrawnAs(chosen);
+            LaidAs(chosen);
         }
 
         ImGui.Separator();
@@ -237,7 +253,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             return;
         }
 
-        string key = room ? chosen : new TileKey(chosen, _ground, _walls, Placing(chosen)).ToString();
+        string key = room ? chosen : new TileKey(chosen, _ground, _walls, Placing(chosen), Laying(chosen)).ToString();
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
             _subjectKey = key;
@@ -265,6 +281,79 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         return string.Empty;
+    }
+
+    /// <summary>The ways the current area laid a tile, one bit per placement - zero where it did not, or the tables were not read.</summary>
+    private byte LaidHere(string tile) => Laid?.Invoke().GetValueOrDefault(tile) ?? 0;
+
+    /// <summary>The chosen placement where the area laid this tile that way, or -1 - see <see cref="_laid"/>.</summary>
+    private int Laying(string tile) => _laid >= 0 && (LaidHere(tile) & (1 << _laid)) != 0 ? _laid : -1;
+
+    /// <summary>
+    /// The "laid as" choice: the tile as its file holds it, or turned the way the current area laid it.
+    /// </summary>
+    /// <remarks>
+    /// ONLY THE WAYS THIS AREA LAID IT, read off each tile's RotationSelector through the engine's own
+    /// tables - the decode the heights already read the ground through, so a turn offered here is one
+    /// the game made, not one this could make. A ROOM HAS NO SUCH CHOICE: no tile names its room, so
+    /// nothing in memory says where or how a room was laid - see RoomFiles.
+    /// </remarks>
+    private void LaidAs(string tile)
+    {
+        if (Laid is null)
+        {
+            return;
+        }
+
+        ImGui.TextDisabled("laid as");
+        ImGui.SameLine();
+        byte laid = LaidHere(tile);
+        if (laid == 0)
+        {
+            int row = Page.Row(tile);
+            ImGui.TextDisabled(row >= 0 && Page.Placed[row] > 0
+                ? "the file's own orientation - how this area laid it was not read (the rotation tables were not found)"
+                : "the file's own orientation - not placed in this area");
+            return;
+        }
+
+        const string Own = "as in the file";
+        int current = Laying(tile);
+        ImGui.SetNextItemWidth(Math.Min(ImGui.GetContentRegionAvail().X, 260f));
+        if (ImGui.BeginCombo("##laidas", current >= 0 ? "as here: " + TileOrientation.OfPlacement(current) : Own))
+        {
+            if (ImGui.Selectable(Own, current < 0))
+            {
+                _laid = -1;
+            }
+
+            for (int placement = 0; placement < 8; placement++)
+            {
+                if ((laid & (1 << placement)) == 0)
+                {
+                    continue;
+                }
+
+                string name = "as here: " + TileOrientation.OfPlacement(placement);
+                if (ImGui.Selectable(name + "##laid" + placement.ToString(CultureInfo.InvariantCulture), placement == current))
+                {
+                    _laid = placement;
+                }
+            }
+
+            ImGui.EndCombo();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("How this area laid the tile down, from each placed tile's RotationSelector through the engine's own tables -"
+                + " the same decode the map's ground heights are read through. Turns are counter-clockwise in the file's own X and Y,"
+                + " a mirror flips X first. Rooms have no such choice: nothing in memory says how a room was laid.");
+        }
+
+        int ways = System.Numerics.BitOperations.PopCount(laid);
+        ImGui.SameLine();
+        ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture, $"laid {ways} way{(ways == 1 ? string.Empty : "s")} here"));
     }
 
     /// <summary>

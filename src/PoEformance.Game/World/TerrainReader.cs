@@ -994,7 +994,7 @@ public sealed class TerrainReader
     /// and a flood fill, once per area. Reading them on demand instead would mean the switch
     /// did nothing until the next zone - a setting that appears not to work.
     /// </remarks>
-    private void ReadTilePaths(byte[] tiles, long count, long tilesX)
+    private void ReadTilePaths(byte[] tiles, long count, long tilesX, TileOrientation[]? orientations)
     {
         _probeTile = -1;
         _probeName = string.Empty;
@@ -1013,6 +1013,10 @@ public sealed class TerrainReader
         var paths = new List<string>();
         var ids = new Dictionary<ulong, int>();
         var tilePath = new int[count];
+
+        // How each tile was laid, as the room's bit - see TerrainRoom.Turns. Null without the
+        // rotation tables, which leaves every room's set empty rather than claiming "as authored".
+        byte[]? turns = orientations is null ? null : new byte[count];
 
         for (long i = 0; i < count; i++)
         {
@@ -1051,6 +1055,12 @@ public sealed class TerrainReader
             tilePath[i] = id;
             string path = paths[id];
 
+            if (turns is not null)
+            {
+                int placement = orientations![tiles[at + _rotationSelector]].Placement;
+                turns[i] = placement < 0 ? (byte)0 : (byte)(1 << placement);
+            }
+
             if (_probeTile < 0)
             {
                 _probeTile = i;
@@ -1082,7 +1092,8 @@ public sealed class TerrainReader
         bool[]? walkable = _walkable?.WalkableTileMask();
         _rooms = TerrainRooms.Find(
             paths, tilePath, wide, (int)(count / tilesX),
-            walkable is null ? null : (x, y) => walkable[(y * wide) + x]);
+            walkable is null ? null : (x, y) => walkable[(y * wide) + x],
+            turns);
     }
 
     /// <summary>
@@ -1141,9 +1152,14 @@ public sealed class TerrainReader
             return null;
         }
 
+        // The rotation tables once, for both of the passes that want them: the rooms record how
+        // their tiles were laid, and the heights read each tile's template through the same decode.
+        (byte[] Selector, byte[] Helper)? tables = ReadRotationTables(out string tablesWhy);
+        TileOrientation[]? orientations = tables is { } both ? TileOrientation.Table(both.Selector, both.Helper) : null;
+
         // The same buffer answers all three questions, so the places in the ground and the
         // rooms cost one pass over memory that has already been read.
-        ReadTilePaths(tiles, count, tilesX);
+        ReadTilePaths(tiles, count, tilesX, orientations);
 
         // And, when somebody is chasing it, a look at the bytes around one tile for the level
         // ABOVE it - see RoomProbe. Here because this is the one place holding both the terrain
@@ -1175,7 +1191,14 @@ public sealed class TerrainReader
 
         string tileNote = $"{tilesX}x{tilesY} tiles, multiplier {multiplier}";
 
-        TerrainHeightField? full = ReadSubTileHeights(tiles, count, heights, (int)tilesX, (int)tilesY, tileNote);
+        TerrainHeightField? full = tables is { } read
+            ? ReadSubTileHeights(tiles, count, heights, (int)tilesX, (int)tilesY, tileNote, read.Selector, read.Helper)
+            : null;
+        if (tables is null)
+        {
+            _heightNote = $"{tileNote}; tile-level only ({tablesWhy})";
+        }
+
         if (full is not null)
         {
             return full;
@@ -1198,22 +1221,9 @@ public sealed class TerrainReader
     /// between a few hundred small reads and a few thousand.
     /// </remarks>
     private TerrainHeightField? ReadSubTileHeights(
-        byte[] tiles, long count, float[] heights, int tilesX, int tilesY, string tileNote)
+        byte[] tiles, long count, float[] heights, int tilesX, int tilesY, string tileNote,
+        byte[] selectorTable, byte[] helperTable)
     {
-        if (!_rotation.IsResolved)
-        {
-            _heightNote = $"{tileNote}; tile-level only (rotation tables not resolved)";
-            return null;
-        }
-
-        var selectorTable = new byte[9];
-        var helperTable = new byte[32];
-        if (!_reader.TryRead(_rotation.Selector, selectorTable) || !_reader.TryRead(_rotation.Helper, helperTable))
-        {
-            _heightNote = $"{tileNote}; tile-level only (rotation tables unreadable)";
-            return null;
-        }
-
         var rotation = new byte[count];
         var subIndex = new int[count];
         var arrays = new List<byte[]>();
@@ -1259,6 +1269,34 @@ public sealed class TerrainReader
         _heightNote = $"{tileNote}, sub-tile from {withHeights}/{arrays.Count} templates";
         return TerrainHeightField.WithSubTile(
             heights, tilesX, tilesY, rotation, subIndex, [.. arrays], selectorTable, helperTable);
+    }
+
+    /// <summary>
+    /// The two engine tables that say how a tile was laid, or null and why not.
+    /// </summary>
+    /// <remarks>
+    /// From a pattern scan that can legitimately come up empty after a patch - see
+    /// <see cref="TerrainRotationTables"/> - so null is an ordinary answer, and it costs the
+    /// within-tile heights and the rooms' orientations, nothing else.
+    /// </remarks>
+    private (byte[] Selector, byte[] Helper)? ReadRotationTables(out string why)
+    {
+        if (!_rotation.IsResolved)
+        {
+            why = "rotation tables not resolved";
+            return null;
+        }
+
+        var selectorTable = new byte[9];
+        var helperTable = new byte[32];
+        if (!_reader.TryRead(_rotation.Selector, selectorTable) || !_reader.TryRead(_rotation.Helper, helperTable))
+        {
+            why = "rotation tables unreadable";
+            return null;
+        }
+
+        why = string.Empty;
+        return (selectorTable, helperTable);
     }
 
     /// <summary>Reads one template's height array - an StdVector of bytes at its start.</summary>

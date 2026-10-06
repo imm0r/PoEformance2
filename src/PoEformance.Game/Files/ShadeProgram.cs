@@ -81,13 +81,12 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 ///
 /// <c>InputVertexColor</c> IS THE MESH'S COLOUR STREAM - four bytes a vertex behind bit 1 of the
 /// vertex format word (see SkinnedMesh.Colours for how that was established), interpolated and
-/// scaled to nought to one. A program reading it is compiled whatever the mesh, since a material's
-/// program is compiled once for every mesh that wears it; on a mesh WITHOUT the stream the shape
-/// keeps its texture and says why, because what the engine feeds it then is written down twice and
-/// differently - the <c>VertexColor</c> extension point's own default is nought, "Legacy assets rely
-/// on zero vertex color default value", and the pixel side's <c>InitSemanticsData</c> starts
-/// <c>color0</c> at white - and BasicColour multiplies the colour by it, so the two are black and
-/// the texture. The game decides that, not this.
+/// scaled to nought to one. A mesh WITHOUT the stream reads white. The sources write that down twice
+/// and differently - the <c>VertexColor</c> extension point's own default is nought, "Legacy assets
+/// rely on zero vertex color default value", and the pixel side's <c>InitSemanticsData</c> starts
+/// <c>color0</c> at white - so the game settled it: BasicColour on a rope and on book pages with no
+/// stream is drawn with their textures, where nought would have made both black (see
+/// SkinnedMesh.Colours).
 ///
 /// A NODE THAT READS THE CLOCK IS DRAWN ONLY WHERE THE CLOCK CANNOT SHOW. MuddleTex, MuddleTex2 and
 /// RotateUVOld multiply <c>time</c> by a parameter - a scroll, an angle per second - and with that
@@ -360,7 +359,7 @@ public sealed class ShadeProgram
     /// <summary>Whether a run reads the vertex normal as it is interpolated.</summary>
     internal bool UsesVertexNormal { get; }
 
-    /// <summary>Whether a run reads the vertex colour - which a mesh without a colour stream cannot supply.</summary>
+    /// <summary>Whether a run reads the vertex colour - white where the mesh has no colour stream.</summary>
     public bool UsesVertexColour { get; }
 
     /// <summary>

@@ -593,7 +593,7 @@ public static class MeshPicture
                     cornerSpots[corner] = mesh.Coordinates[vertex];
                     cornerPlaces[corner] = positions[vertex];
                     cornerTurns[corner] = normals[vertex];
-                    cornerColours[corner] = program.UsesVertexColour ? VertexColourOf(mesh.Colours, vertex) : default;
+                    cornerColours[corner] = program.UsesVertexColour ? VertexColourOf(mesh, vertex) : default;
                 }
 
                 program.Levels(
@@ -718,13 +718,24 @@ public static class MeshPicture
     /// shape keeps its plain skin - and a mesh with no coordinates runs none, having nothing for a
     /// program's reads to read at.
     /// </remarks>
-    /// <summary>A vertex's colour as the program reads it: the file's four bytes, nought to one, or nought where the mesh has none.</summary>
-    private static Vector4 VertexColourOf(byte[] colours, int vertex)
+    /// <summary>
+    /// A vertex's colour as the program reads it: the file's four bytes, nought to one - or white
+    /// where the vertex has no colour of its own.
+    /// </summary>
+    /// <remarks>
+    /// WHITE BECAUSE THE GAME SHOWS IT: see SkinnedMesh.Colours - a rope and a book page with no
+    /// colour stream, under BasicColour's texture-times-vertex-colour, are drawn with their textures.
+    /// </remarks>
+    private static Vector4 VertexColourOf(SkinnedMesh mesh, int vertex)
     {
+        if (!mesh.ColourAt(vertex))
+        {
+            return Vector4.One;
+        }
+
+        byte[] colours = mesh.Colours;
         int at = vertex * 4;
-        return at + 3 < colours.Length
-            ? new Vector4(colours[at], colours[at + 1], colours[at + 2], colours[at + 3]) / 255f
-            : default;
+        return new Vector4(colours[at], colours[at + 1], colours[at + 2], colours[at + 3]) / 255f;
     }
 
     private static ShadeProgram[] Programmed(
@@ -740,14 +751,6 @@ public static class MeshPicture
         for (var shape = 0; shape < mesh.Shapes.Count && shape < shades.Count; shape++)
         {
             if (shades[shape] is not { Bound: true } program || program.Registers > ShadeProgram.MostRegisters)
-            {
-                continue;
-            }
-
-            // A PROGRAM READING THE VERTEX COLOUR runs only where the mesh has one to read - see
-            // SkinnedMesh.Colours. The model walk says so under the picture; this is the guard.
-            MeshShape coloured = mesh.Shapes[shape];
-            if (program.UsesVertexColour && !(coloured.From < mesh.Indices.Length && mesh.ColourAt(mesh.Indices[coloured.From])))
             {
                 continue;
             }
@@ -908,7 +911,7 @@ public static class MeshPicture
         private readonly int _stride;
         private readonly Vector3[] _places;
         private readonly Vector3[] _turns;
-        private readonly byte[] _colours;
+        private readonly SkinnedMesh _mesh;
 
         public Drawing(
             Canvas canvas, SkinnedMesh mesh, int triangles, Vector3 lamp, Vector3 ink, Mipmaps?[] palette,
@@ -920,7 +923,7 @@ public static class MeshPicture
             _stride = stride;
             _places = places;
             _turns = turns;
-            _colours = mesh.Colours;
+            _mesh = mesh;
             _pixels = canvas.Pixels;
             _depth = canvas.Depth;
             _size = canvas.Size;
@@ -1039,9 +1042,9 @@ public static class MeshPicture
                 n2 = _turns[i2];
                 if (tinted)
                 {
-                    v0 = VertexColourOf(_colours, i0);
-                    v1 = VertexColourOf(_colours, i1);
-                    v2 = VertexColourOf(_colours, i2);
+                    v0 = VertexColourOf(_mesh, i0);
+                    v1 = VertexColourOf(_mesh, i1);
+                    v2 = VertexColourOf(_mesh, i2);
                 }
             }
 

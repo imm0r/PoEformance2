@@ -1588,17 +1588,15 @@ public class ShadeProgramTests
     }
 
     [Fact]
-    public void ANDAMeshWithoutAColourStreamKeepsItsTextureUnderSuchAProgram()
+    public void ANDAMeshWithoutAColourStreamReadsWhite()
     {
+        // The vertex colour alone, on a quad without a stream: white, as the game draws BasicColour's rope and pages.
         string graph = Colouring("""{"type":"InputVertexColor","index":0,"stage":"VertexInit"}""", string.Empty, "InputVertexColor", "output", "xyz");
         ShadeProgram program = Compile(graph);
         Assert.True(program.UsesVertexColour);
-
-        // No stream: the program is not run, and the shape is drawn in its skin as if it had none.
-        Mipmaps skin = Sheet(Srgb(0.8f), Srgb(0.4f), Srgb(0.2f));
         AssertClose(
-            MeshPicture.Of(Quad(), 64, skins: [skin]),
-            MeshPicture.Of(Quad(), 64, skins: [skin], shades: [program]));
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(255, 255, 255)]),
+            MeshPicture.Of(Quad(), 64, shades: [program]));
     }
 
     /// <summary>One quad facing the camera, its coordinates all on the middle of the texture - with a colour per vertex, where given.</summary>

@@ -8,7 +8,8 @@ namespace PoEformance.Features;
 /// knowing about tiles - the way the item book's drop or held choice does. After
 /// <see cref="Mark"/>: <see cref="Bare"/> leaves the ground out, <see cref="Unwalled"/> the black
 /// walls, and <see cref="SetWord"/> followed by a path names the tileset whose overrides are drawn,
-/// the words joined by <see cref="WordMark"/>. A room's key uses the same mark for its unit.
+/// the words joined by <see cref="WordMark"/>. <see cref="LaidWord"/> followed by a number turns the
+/// tile the way the current area laid it - see <see cref="Laid"/>.
 ///
 /// THE FIRST MARK SPLITS, since a word may hold a path and paths hold neither mark.
 /// </remarks>
@@ -16,7 +17,11 @@ namespace PoEformance.Features;
 /// <param name="Ground">Whether its ground block is drawn.</param>
 /// <param name="Walls">Whether its black walls are drawn.</param>
 /// <param name="Tileset">The <c>.tsi</c> it is drawn as, or empty for its own materials.</param>
-public readonly record struct TileKey(string Path, bool Ground = true, bool Walls = true, string Tileset = "")
+/// <param name="Laid">
+/// Which of the eight placements it is turned to - a <see cref="PoEformance.Game.World.TileOrientation.Placement"/> -
+/// or -1 for the file's own orientation.
+/// </param>
+public readonly record struct TileKey(string Path, bool Ground = true, bool Walls = true, string Tileset = "", int Laid = -1)
 {
     /// <summary>What separates the path from the words.</summary>
     public const char Mark = '|';
@@ -33,10 +38,13 @@ public readonly record struct TileKey(string Path, bool Ground = true, bool Wall
     /// <summary>What starts the word naming the tileset; the tileset's path follows.</summary>
     public const string SetWord = "set=";
 
+    /// <summary>What starts the word naming the placement; its number follows.</summary>
+    public const string LaidWord = "laid=";
+
     /// <summary>The key as a string - the bare path where nothing is chosen.</summary>
     public override string ToString()
     {
-        if (Ground && Walls && Tileset.Length == 0)
+        if (Ground && Walls && Tileset.Length == 0 && Laid < 0)
         {
             return Path;
         }
@@ -51,6 +59,11 @@ public readonly record struct TileKey(string Path, bool Ground = true, bool Wall
         if (!Walls)
         {
             Joined(key, words).Append(Unwalled);
+        }
+
+        if (Laid >= 0)
+        {
+            Joined(key, words).Append(LaidWord).Append(Laid.ToString(System.Globalization.CultureInfo.InvariantCulture));
         }
 
         if (Tileset.Length > 0)
@@ -74,6 +87,7 @@ public readonly record struct TileKey(string Path, bool Ground = true, bool Wall
         bool ground = true;
         bool walls = true;
         string tileset = string.Empty;
+        int laid = -1;
         ReadOnlySpan<char> words = key.AsSpan(mark + 1);
         foreach (Range one in words.Split(WordMark))
         {
@@ -90,9 +104,15 @@ public readonly record struct TileKey(string Path, bool Ground = true, bool Wall
             {
                 tileset = word[SetWord.Length..].ToString();
             }
+            else if (word.StartsWith(LaidWord, StringComparison.Ordinal)
+                && int.TryParse(word[LaidWord.Length..], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int number)
+                && number is >= 0 and < 8)
+            {
+                laid = number;
+            }
         }
 
-        return new TileKey(key[..mark], ground, walls, tileset);
+        return new TileKey(key[..mark], ground, walls, tileset, laid);
     }
 
     private static System.Text.StringBuilder Joined(System.Text.StringBuilder key, int words)

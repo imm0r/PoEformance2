@@ -282,6 +282,9 @@ public sealed record MonsterModel(
     /// <summary>The tileset a tile was drawn as, or empty for the tile's own materials.</summary>
     public string Tileset { get; init; } = string.Empty;
 
+    /// <summary>How a tile was turned to match the way the current area laid it, in words, or empty for the file's own orientation.</summary>
+    public string Laid { get; init; } = string.Empty;
+
     /// <summary>
     /// Each shape's colour as its material's shader graphs compute it, or null where the plain texture stands.
     /// </summary>
@@ -456,21 +459,6 @@ public static class MonsterModels
 
             if (shade.Program is { } program)
             {
-                // A PROGRAM READING THE VERTEX COLOUR NEEDS A MESH THAT HAS ONE. What the engine
-                // feeds a mesh without the stream is not settled - the sources hold nought and white
-                // both - so the shape keeps its texture and the line under the picture says so.
-                MeshShape part = model.Mesh.Shapes[shape];
-                if (program.UsesVertexColour && !(part.From < model.Mesh.Indices.Length && model.Mesh.ColourAt(model.Mesh.Indices[part.From])))
-                {
-                    string why = $"InputVertexColor for {MaterialFile.Bare(material)} on a mesh without a colour stream";
-                    if (!unshaded.Contains(why, StringComparer.Ordinal))
-                    {
-                        unshaded.Add(why);
-                    }
-
-                    continue;
-                }
-
                 shades[shape] = program;
                 drawn.Add(MaterialFile.Bare(material));
                 continue;
