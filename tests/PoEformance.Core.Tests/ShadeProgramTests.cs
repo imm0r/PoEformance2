@@ -124,17 +124,17 @@ public class ShadeProgramTests
                 """
                 {"nodes":[
                   {"type":"InputWorldPos","index":0,"stage":"PreLighting"},
-                  {"type":"Noise31","index":0},
+                  {"type":"DepthDistance","index":0},
                   {"type":"AlbedoColor","index":0,"stage":"PreLighting"}],
                  "links":[
-                  {"src":{"type":"InputWorldPos","index":0,"stage":"PreLighting","variable":"output"},"dst":{"type":"Noise31","index":0,"variable":"pos"}},
-                  {"src":{"type":"Noise31","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"PreLighting","variable":"input"}}]}
+                  {"src":{"type":"InputWorldPos","index":0,"stage":"PreLighting","variable":"output"},"dst":{"type":"DepthDistance","index":0,"variable":"world_pos"}},
+                  {"src":{"type":"DepthDistance","index":0,"variable":"distance"},"dst":{"type":"AlbedoColor","index":0,"stage":"PreLighting","variable":"input"}}]}
                 """)),
         ]);
 
         Assert.NotNull(compiled.Program);
         Assert.Equal(0, compiled.Program.Plain);
-        Assert.Equal(["Noise31 in Dust_simple"], compiled.Skipped);
+        Assert.Equal(["DepthDistance in Dust_simple"], compiled.Skipped);
     }
 
     [Fact]
@@ -437,6 +437,108 @@ public class ShadeProgramTests
             0.9f, 0.2f, 0.4f);
     }
 
+    /// <summary>
+    /// Noise31 and PerlinNoise31 are the declarations' own noises, to the hash - the second Perlin cell lies below nought, where the integer cast wraps.
+    /// </summary>
+    [Fact]
+    public void THENOISESAreTheDeclarationsOwn()
+        => AssertColour(
+            Colouring(
+                """
+                  {"type":"ConstantFloat3","index":0,"parameters":[{"value":[1.3,2.7,0.4]}]},
+                  {"type":"ConstantFloat3","index":1,"parameters":[{"value":[-3.6,0.25,5.9]}]},
+                  {"type":"Noise31","index":0},
+                  {"type":"PerlinNoise31","index":0},
+                  {"type":"PerlinNoise31","index":1},
+                  {"type":"CoordsToFloat3","index":0}
+                """,
+                """
+                  {"src":{"type":"ConstantFloat3","index":0,"variable":"output"},"dst":{"type":"Noise31","index":0,"variable":"pos"}},
+                  {"src":{"type":"ConstantFloat3","index":0,"variable":"output"},"dst":{"type":"PerlinNoise31","index":0,"variable":"pos"}},
+                  {"src":{"type":"ConstantFloat3","index":1,"variable":"output"},"dst":{"type":"PerlinNoise31","index":1,"variable":"pos"}},
+                  {"src":{"type":"Noise31","index":0,"variable":"noise"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"x"}},
+                  {"src":{"type":"PerlinNoise31","index":0,"variable":"val"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"y"}},
+                  {"src":{"type":"PerlinNoise31","index":1,"variable":"val"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"z"}}
+                """,
+                "CoordsToFloat3", "output"),
+            0.3105f, 0.5318f, 0.3478f);
+
+    /// <summary>Vibrance lifts its value by a cubic and raises it to one over each colour component.</summary>
+    [Fact]
+    public void VIBRANCERaisesTheLiftToEachComponent()
+        => AssertColour(
+            Colouring(
+                """
+                  {"type":"ConstantFloat","index":0,"parameters":[{"value":0.6}]},
+                  {"type":"ConstantFloat3","index":0,"parameters":[{"value":[1.0,0.5,2.0]}]},
+                  {"type":"Vibrance","index":0}
+                """,
+                """
+                  {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"Vibrance","index":0,"variable":"val"}},
+                  {"src":{"type":"ConstantFloat3","index":0,"variable":"output"},"dst":{"type":"Vibrance","index":0,"variable":"color"}}
+                """,
+                "Vibrance", "emission"),
+            0.648f, 0.4199f, 0.805f);
+
+    /// <summary>Rotate turns coordinates about nought and RotateUV about its centre; RotateUV without its centre is refused, its default being a half.</summary>
+    [Fact]
+    public void ROTATEAndRotateUVTurnTheCoordinates()
+    {
+        AssertColour(Turning("Rotate", string.Empty), 0.4632f, 0.4307f, 0f);
+        AssertColour(Turning("RotateUV", """{"value":[0.5,0.5]}"""), 0.2847f, 0.7316f, 0f);
+
+        ShadeCompile centreless = ShadeProgram.Compile([(Instance(), Graph(Turning("RotateUV", "{}")))]);
+        Assert.Null(centreless.Program);
+        Assert.Equal(["RotateUV leaving out a value whose default is not nought in Test"], centreless.Skipped);
+    }
+
+    /// <summary>RadiusToPolarNorm gives the length and the angle as nought to one, by the node's own 3.1415.</summary>
+    [Fact]
+    public void RADIUSTOPOLARGivesTheLengthAndTheAngle()
+        => AssertColour(
+            Colouring(
+                """
+                  {"type":"ConstantFloat2","index":0,"parameters":[{"value":[0.3,0.4]}]},
+                  {"type":"RadiusToPolarNorm","index":0}
+                """,
+                """
+                  {"src":{"type":"ConstantFloat2","index":0,"variable":"output"},"dst":{"type":"RadiusToPolarNorm","index":0,"variable":"radius"}}
+                """,
+                "RadiusToPolarNorm", "polar", "xy"),
+            0.5f, 0.6476f, 0f);
+
+    /// <summary>
+    /// A model drawn where it stands has its origin at nought and a scale of one - and a link's swizzle is of the output it names.
+    /// </summary>
+    [Fact]
+    public void THEMODELOriginIsNoughtAndItsScaleOne()
+        => AssertColour(
+            Colouring(
+                """
+                  {"type":"ModelOrigin","index":0},
+                  {"type":"Half","index":0},
+                  {"type":"CoordsToFloat3","index":0}
+                """,
+                """
+                  {"src":{"type":"ModelOrigin","index":0,"variable":"scale"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"x"}},
+                  {"src":{"type":"ModelOrigin","index":0,"variable":"model_origin","swizzle":"y"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"y"}},
+                  {"src":{"type":"Half","index":0,"variable":"output"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"z"}}
+                """,
+                "CoordsToFloat3", "output"),
+            1f, 0f, 0.5f);
+
+    /// <summary>The vertex world position is the model's; its w, which no file says, is refused.</summary>
+    [Fact]
+    public void THEVERTEXWorldPositionIsTheModelsButNotItsW()
+    {
+        // THE QUAD STANDS IN y = 0, so its y is black everywhere.
+        AssertColour(WorldPositioned("y"), 0f, 0f, 0f);
+
+        ShadeCompile whole = ShadeProgram.Compile([(Instance(), Graph(WorldPositioned(string.Empty)))]);
+        Assert.Null(whole.Program);
+        Assert.Equal(["FromVertexWorldPos's w, which no file says in Test"], whole.Skipped);
+    }
+
     /// <summary>FitRangeFromInput divides an empty input range by one, as the node does, rather than giving the bottom of the output.</summary>
     [Fact]
     public void FITRANGEDividesAnEmptyRangeByOne()
@@ -570,11 +672,11 @@ public class ShadeProgramTests
                 """
                 {"nodes":[
                   {"type":"InputWorldPos","index":0,"stage":"Texturing_Init"},
-                  {"type":"Noise31","index":0},
+                  {"type":"DepthDistance","index":0},
                   {"type":"IndirectColor","index":0,"stage":"Texturing_Init"}],
                  "links":[
-                  {"src":{"type":"InputWorldPos","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"Noise31","index":0,"variable":"pos"}},
-                  {"src":{"type":"Noise31","index":0,"variable":"output"},"dst":{"type":"IndirectColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+                  {"src":{"type":"InputWorldPos","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"DepthDistance","index":0,"variable":"world_pos"}},
+                  {"src":{"type":"DepthDistance","index":0,"variable":"distance"},"dst":{"type":"IndirectColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
                 """)),
             (Instance("Metadata/Reader.fxgraph"), Graph(Reading("InputIndirectColor", "xyz", "Texturing"))),
         ]);
@@ -663,6 +765,35 @@ public class ShadeProgramTests
           {"src":{"type":"{{{type}}}","index":2,"variable":"output"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"z"}},
           {"src":{"type":"CoordsToFloat3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
         """;
+
+    /// <summary>A graph of the nodes and links given, one output of which - whole, or by a swizzle - is the colour's xyz.</summary>
+    private static string Colouring(string nodes, string links, string type, string variable, string swizzle = "") =>
+        $$$"""
+        {"nodes":[
+        {{{nodes}}},
+          {{{Albedo}}}],
+         "links":[
+        {{{(links.Trim().Length > 0 ? links + "," : string.Empty)}}}
+          {"src":{"type":"{{{type}}}","index":0,"variable":"{{{variable}}}","swizzle":"{{{swizzle}}}"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"{{{(swizzle.Length > 0 ? swizzle : "xyz")}}}"}}]}
+        """;
+
+    /// <summary>(0.2, 0.6) turned by half a radian by Rotate or RotateUV, with the parameters given, into the colour's x and y.</summary>
+    private static string Turning(string type, string parameters) =>
+        Colouring(
+            $$$"""
+              {"type":"ConstantFloat","index":0,"parameters":[{"value":0.5}]},
+              {"type":"ConstantFloat2","index":0,"parameters":[{"value":[0.2,0.6]}]},
+              {"type":"{{{type}}}","index":0{{{(parameters.Length > 0 ? ",\"parameters\":[" + parameters + "]" : string.Empty)}}}}
+            """,
+            $$$"""
+              {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"{{{type}}}","index":0,"variable":"angle"}},
+              {"src":{"type":"ConstantFloat2","index":0,"variable":"output"},"dst":{"type":"{{{type}}}","index":0,"variable":"in_uv"}}
+            """,
+            type, "out_uv", "xy");
+
+    /// <summary>The vertex world position, by a swizzle or whole, into the colour.</summary>
+    private static string WorldPositioned(string swizzle) =>
+        Colouring("""{"type":"FromVertexWorldPos","index":0}""", string.Empty, "FromVertexWorldPos", "output", swizzle);
 
     /// <summary>RemapHue of (0.8, 0.2, 0.1) with the given parameters, straight into the colour.</summary>
     private static string RemapHue(string parameters) =>

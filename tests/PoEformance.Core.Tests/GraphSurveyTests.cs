@@ -119,9 +119,8 @@ public class GraphSurveyTests
     /// </summary>
     /// <remarks>
     /// What the earlier tile dumps said one material at a time, counted: Dust_simple, on seven of the
-    /// cliffs, waits on two things - Noise31 and the vertex's local position, which is the engine's to
-    /// hand over or not - and the vertex colour BasicColour multiplies by is the only thing standing in
-    /// the ledge's way.
+    /// cliffs, waits on the vertex's local position alone, which is the engine's to hand over or not,
+    /// and the vertex colour BasicColour multiplies by is the only thing standing in the ledge's way.
     /// </remarks>
     [Fact]
     public void ANDOVERTheInstallsOwnMaterialsItNamesWhatTheDumpsNamedOneAtATime()
@@ -143,10 +142,45 @@ public class GraphSurveyTests
         string[] materials = [.. Directory.GetFiles(root, "*.mat").Select(one => Path.GetFileName(one).Replace("__", "/", StringComparison.Ordinal))];
         string survey = GraphSurvey.Of(Read, materials);
 
-        Assert.Contains("  Metadata/Materials/Environment/Dust_simple.fxgraph · 7 materials · missing FromVertexLocalPosition, Noise31", survey, StringComparison.Ordinal);
+        Assert.Contains("  Metadata/Materials/Environment/Dust_simple.fxgraph · 7 materials · missing FromVertexLocalPosition", survey, StringComparison.Ordinal);
         Assert.Contains("  Metadata/Effects/Graphs/General/BasicColour.fxgraph · 2 materials · missing InputVertexColor", survey, StringComparison.Ordinal);
         Assert.DoesNotContain("PBRGroundBN.fxgraph ·", survey, StringComparison.Ordinal);
         Assert.DoesNotContain("StromatoliteLedge_Blend.fxgraph ·", survey, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Beside the survey, a vertex item gets the graph held-back terrain materials name - not the one named most - whole, with one of them.
+    /// </summary>
+    [Fact]
+    public void ANDAVERTEXItemGetsTheTerrainsGraphWhole()
+    {
+        string Shifted(string mark) =>
+            $$$"""
+            {"nodes":[
+              {"type":"InputVertexPosition","index":0,"stage":"WorldTransform"},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing","custom_parameter":"{{{mark}}}"}],
+             "links":[
+              {"src":{"type":"InputVertexPosition","index":0,"stage":"WorldTransform","variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing","variable":"input"}}]}
+            """;
+        var files = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Metadata/Effects/Shifted.fxgraph"] = Encoding.UTF8.GetBytes(Shifted("effect")),
+            ["Metadata/Terrain/Shifted.fxgraph"] = Encoding.UTF8.GetBytes(Shifted("terrain")),
+            ["Metadata/Effects/a.mat"] = Material("Metadata/Effects/Shifted.fxgraph"),
+            ["Metadata/Effects/b.mat"] = Material("Metadata/Effects/Shifted.fxgraph"),
+            ["Art/Models/Terrain/Cliff/c.mat"] = Material("Metadata/Terrain/Shifted.fxgraph"),
+        };
+        var examples = new StringBuilder();
+
+        GraphSurvey.Of(path => files.GetValueOrDefault(path), [.. files.Keys.Where(one => one.EndsWith(".mat", StringComparison.Ordinal))], null, examples);
+        string said = examples.ToString();
+
+        Assert.Contains(
+            "=== InputVertexPosition · graph Metadata/Terrain/Shifted.fxgraph · named by 1 held-back terrain materials, 1 in all",
+            said, StringComparison.Ordinal);
+        Assert.Contains("--- material Art/Models/Terrain/Cliff/c.mat", said, StringComparison.Ordinal);
+        Assert.Contains("\"custom_parameter\":\"terrain\"", said, StringComparison.Ordinal);
+        Assert.DoesNotContain("Metadata/Effects/Shifted.fxgraph", said, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -159,7 +193,8 @@ public class GraphSurveyTests
         Assert.True(ShadeProgram.Knows("SmoothStep"));
         Assert.True(ShadeProgram.Knows("InputIndirectColor"));
         Assert.True(ShadeProgram.Knows("SampleInputTriplanar"));
-        Assert.False(ShadeProgram.Knows("Noise31"));
+        Assert.True(ShadeProgram.Knows("Noise31"));
+        Assert.False(ShadeProgram.Knows("DepthDistance"));
         Assert.False(ShadeProgram.Knows("InputVertexColor"));
         Assert.False(ShadeProgram.Knows("InputVertexUV"));
         Assert.False(ShadeProgram.Knows("FromVertexLocalPosition"));

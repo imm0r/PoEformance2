@@ -25,11 +25,26 @@ namespace PoEformance.Features;
 ///
 /// A MATERIAL'S ITEMS are those of every graph in its chain that writes either, because the
 /// compiler leaves such a graph out whole when it meets one node it cannot evaluate.
+///
+/// AND EXAMPLES OF WHAT THE VERTEX SIDE HANDS OVER. An item a graph reads from the vertex - an
+/// <c>InputVertex</c> or <c>FromVertex</c> node - cannot be settled from the shader sources: what
+/// it holds depends on how a graph wires it. So beside the survey goes one graph per such item,
+/// whole, with a material naming it - the graph most held-back terrain materials name, where any
+/// does - which is what deciding one needs to read.
 /// </remarks>
 public static class GraphSurvey
 {
     /// <summary>What the survey's file, beside the dumps, is called.</summary>
     public const string File = "graph-survey.txt";
+
+    /// <summary>What the file of example graphs beside it is called.</summary>
+    public const string ExamplesFile = "graph-examples.txt";
+
+    /// <summary>Most items given an example graph.</summary>
+    private const int MostExamples = 16;
+
+    /// <summary>The folder terrain materials sit in, for which example graph to pick.</summary>
+    private const string Terrain = "Art/Models/Terrain";
 
     /// <summary>Most missing items listed in the ranking.</summary>
     private const int MostItems = 80;
@@ -49,7 +64,9 @@ public static class GraphSurvey
     /// <param name="read">How to get a file out of the install, by path.</param>
     /// <param name="materials">Every <c>.mat</c> the install has.</param>
     /// <param name="progress">Told how far the survey has got, now and then, for a line under a button.</param>
-    public static string Of(Func<string, byte[]?>? read, IReadOnlyList<string>? materials, Action<string>? progress = null)
+    /// <param name="examples">Where to write the example graphs for the vertex items - see the remarks - or null for none.</param>
+    public static string Of(
+        Func<string, byte[]?>? read, IReadOnlyList<string>? materials, Action<string>? progress = null, StringBuilder? examples = null)
     {
         var said = new StringBuilder();
         if (read is null || materials is not { Count: > 0 })
@@ -63,6 +80,7 @@ public static class GraphSurvey
         var graphs = new Dictionary<string, Facts>(StringComparer.OrdinalIgnoreCase);
         var used = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         var blocked = new List<(string[] Missing, string Folder)>();
+        var vertex = new Dictionary<string, Dictionary<string, Example>>(StringComparer.Ordinal);
         int unreadable = 0, ungraphed = 0, colourless = 0, evaluated = 0;
 
         for (var at = 0; at < ordered.Count; at++)
@@ -121,7 +139,12 @@ public static class GraphSurvey
             }
             else
             {
-                blocked.Add(([.. missing], Folder(material)));
+                string folder = Folder(material);
+                blocked.Add(([.. missing], folder));
+                if (examples is not null)
+                {
+                    Note(vertex, chain, graphs, material, string.Equals(folder, Terrain, StringComparison.OrdinalIgnoreCase));
+                }
             }
         }
 
@@ -141,8 +164,90 @@ public static class GraphSurvey
         Greedy(blocked, evaluated, coloured, said);
         LeftOut(graphs, used, said);
         Stages(graphs, used, said);
+        if (examples is not null)
+        {
+            Examples(vertex, read, examples);
+        }
+
         return said.ToString();
     }
+
+    /// <summary>Whether an item is something a graph reads from the vertex side.</summary>
+    private static bool Vertexed(string item)
+        => item.StartsWith("InputVertex", StringComparison.Ordinal) || item.StartsWith("FromVertex", StringComparison.Ordinal);
+
+    /// <summary>Counts, for every vertex item a held-back material's graphs miss, which graph it is missed in.</summary>
+    private static void Note(
+        Dictionary<string, Dictionary<string, Example>> vertex, IReadOnlyList<ShaderInstance> chain,
+        Dictionary<string, Facts> graphs, string material, bool terrain)
+    {
+        foreach (ShaderInstance instance in chain)
+        {
+            string parent = instance.Parent.Replace('\\', '/').Trim();
+            if (parent.Length == 0 || !graphs.TryGetValue(parent, out Facts? facts) || !facts.Colours)
+            {
+                continue;
+            }
+
+            foreach (string item in facts.Missing)
+            {
+                if (!Vertexed(item))
+                {
+                    continue;
+                }
+
+                if (!vertex.TryGetValue(item, out Dictionary<string, Example>? byGraph))
+                {
+                    byGraph = new Dictionary<string, Example>(StringComparer.OrdinalIgnoreCase);
+                    vertex[item] = byGraph;
+                }
+
+                if (!byGraph.TryGetValue(parent, out Example? example))
+                {
+                    example = new Example(material);
+                    byGraph[parent] = example;
+                }
+
+                example.All++;
+                if (terrain)
+                {
+                    example.Terrain++;
+                    example.TerrainMaterial ??= material;
+                }
+            }
+        }
+    }
+
+    /// <summary>One graph per vertex item, whole, with a material naming it - see the remarks.</summary>
+    private static void Examples(Dictionary<string, Dictionary<string, Example>> vertex, Func<string, byte[]?> read, StringBuilder said)
+    {
+        said.AppendLine("graph examples: for each thing a graph reads from the vertex side and the shade compiler does not, the graph")
+            .AppendLine("that most held-back terrain materials name (or most materials, where no terrain one does), whole, and a material")
+            .AppendLine("naming it - beside " + File);
+        foreach ((string item, Dictionary<string, Example> byGraph) in vertex
+            .OrderByDescending(one => one.Value.Values.Sum(example => example.All))
+            .ThenBy(one => one.Key, StringComparer.Ordinal)
+            .Take(MostExamples))
+        {
+            (string graph, Example example) = byGraph
+                .OrderByDescending(one => one.Value.Terrain)
+                .ThenByDescending(one => one.Value.All)
+                .ThenBy(one => one.Key, StringComparer.OrdinalIgnoreCase)
+                .Select(one => (one.Key, one.Value))
+                .First();
+            string material = example.TerrainMaterial ?? example.Material;
+            said.AppendLine().Append("=== ").Append(item).Append(" · graph ").Append(graph)
+                .Append(" · named by ").Append(Say(example.Terrain)).Append(" held-back terrain materials, ")
+                .Append(Say(example.All)).AppendLine(" in all");
+            said.Append("--- material ").AppendLine(material);
+            said.AppendLine(Text(read, material));
+            said.Append("--- graph ").AppendLine(graph);
+            said.AppendLine(Text(read, graph));
+        }
+    }
+
+    private static string Text(Func<string, byte[]?> read, string path)
+        => read(path) is { Length: > 0 } bytes ? StatDescriptionFiles.Decode(bytes).TrimEnd() : "(not in the install)";
 
     /// <summary>Every missing item: how many materials it alone holds back, how many it is among, in how many graphs, and where.</summary>
     private static void Ranking(List<(string[] Missing, string Folder)> blocked, Dictionary<string, Facts> graphs, StringBuilder said)
@@ -314,6 +419,18 @@ public static class GraphSurvey
 
     private static string Share(int part, int whole)
         => whole == 0 ? "-" : (100.0 * part / whole).ToString("0.0", CultureInfo.InvariantCulture) + "%";
+
+    /// <summary>How many held-back materials miss a vertex item in one graph, and one of them to show.</summary>
+    private sealed class Example(string material)
+    {
+        public string Material { get; } = material;
+
+        public string? TerrainMaterial { get; set; }
+
+        public int All { get; set; }
+
+        public int Terrain { get; set; }
+    }
 
     /// <summary>What one graph's colour path needs, worked out once however many materials name it.</summary>
     private sealed class Facts

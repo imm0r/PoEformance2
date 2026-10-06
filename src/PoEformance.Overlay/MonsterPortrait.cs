@@ -2413,7 +2413,8 @@ public sealed class MonsterPortrait
             if (ImGui.IsItemHovered())
             {
                 ImGui.SetTooltip("Reads every material in the install and writes which graph nodes keep the most of them"
-                    + " from being coloured by their graphs, ranked - " + GraphSurvey.File + " beside the dumps. Takes a while.");
+                    + " from being coloured by their graphs, ranked - " + GraphSurvey.File + " beside the dumps, with "
+                    + GraphSurvey.ExamplesFile + ": a whole graph for each thing a graph reads from the vertex side. Takes a while.");
             }
         }
 
@@ -2497,7 +2498,19 @@ public sealed class MonsterPortrait
             // nobody observes - so whatever stops it is said, with its type, in the same line.
             try
             {
-                Write(at, () => GraphSurvey.Of(install, materials, step => _dumped = "surveying graphs: " + step));
+                // THE EXAMPLES ARE GATHERED IN THE SAME PASS and written beside the survey before it,
+                // so the line under the button links the survey, which is what is read first.
+                string examples = Path.Combine(Folder, GraphSurvey.ExamplesFile);
+                Write(
+                    at,
+                    () =>
+                    {
+                        var gathered = new System.Text.StringBuilder();
+                        string survey = GraphSurvey.Of(install, materials, step => _dumped = "surveying graphs: " + step, gathered);
+                        File.WriteAllText(examples, gathered.ToString());
+                        return survey;
+                    },
+                    " - and " + GraphSurvey.ExamplesFile + " beside it");
             }
             catch (Exception fault)
             {
