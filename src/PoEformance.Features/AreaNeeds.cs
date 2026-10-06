@@ -2,6 +2,15 @@ using PoEformance.Game.Files;
 
 namespace PoEformance.Features;
 
+/// <summary>What reading the area's tiles found, by path: what each needs, and which run with the clock.</summary>
+/// <param name="Needs">The "not evaluated" line of each tile and room - see <see cref="AreaNeeds"/>.</param>
+/// <param name="Clocked">
+/// The materials of each tile and room whose graphs read the game's clock, joined - only for the
+/// paths that have one. What <c>clock:yes</c> finds: the tiles worth comparing with the game while
+/// something on them moves.
+/// </param>
+public sealed record AreaReading(IReadOnlyDictionary<string, string> Needs, IReadOnlyDictionary<string, string> Clocked);
+
 /// <summary>
 /// What each tile and room placed in the current area needs that the shade compiler has not got, by
 /// path - the "not evaluated" line under the picture, for every tile at once, so a search can find
@@ -25,7 +34,7 @@ namespace PoEformance.Features;
 public sealed class AreaNeeds(Func<string, byte[]?>? read, TilesetCatalog? tilesets)
 {
     private readonly Lock _gate = new();
-    private Task<IReadOnlyDictionary<string, string>>? _building;
+    private Task<AreaReading>? _building;
     private IReadOnlyDictionary<string, int>? _from;
     private string _tileset = string.Empty;
     private int _done;
@@ -34,7 +43,7 @@ public sealed class AreaNeeds(Func<string, byte[]?>? read, TilesetCatalog? tiles
     /// <summary>The needs if they are read, starting the read if they are not; null until then.</summary>
     /// <param name="placed">The area's tiles and rooms, by path - a new dictionary whenever the area changes.</param>
     /// <param name="tileset">The tileset tiles are drawn as, or empty for their own materials.</param>
-    public IReadOnlyDictionary<string, string>? Ready(IReadOnlyDictionary<string, int>? placed, string tileset)
+    public AreaReading? Ready(IReadOnlyDictionary<string, int>? placed, string tileset)
         => Start(placed, tileset) is { IsCompletedSuccessfully: true } built ? built.Result : null;
 
     /// <summary>Whether a read is under way.</summary>
@@ -51,7 +60,7 @@ public sealed class AreaNeeds(Func<string, byte[]?>? read, TilesetCatalog? tiles
     /// <param name="tileset">The tileset tiles are drawn as where it places them, or empty.</param>
     /// <param name="index">Which tilesets place which tile, or null to draw every tile as itself.</param>
     /// <param name="step">Called after each path, for a count.</param>
-    public static IReadOnlyDictionary<string, string> Of(
+    public static AreaReading Of(
         Func<string, byte[]?> read,
         IReadOnlyList<string> paths,
         string tileset,
@@ -64,6 +73,7 @@ public sealed class AreaNeeds(Func<string, byte[]?>? read, TilesetCatalog? tiles
         IReadOnlyDictionary<string, string>? swaps = tileset.Length > 0 && index is not null ? TilesetIndex.Overrides(read, tileset) : null;
         string shortName = tileset.Length > 0 ? TilesetIndex.Short(tileset) : string.Empty;
         var needs = new Dictionary<string, string>(paths.Count, StringComparer.OrdinalIgnoreCase);
+        var clocked = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (string path in paths)
         {
             MonsterModel model;
@@ -82,13 +92,18 @@ public sealed class AreaNeeds(Func<string, byte[]?>? read, TilesetCatalog? tiles
             needs[path] = model.Ready
                 ? string.Join(" · ", model.Unshaded)
                 : model.Why.Length > 0 ? "did not load: " + model.Why : string.Empty;
+            if (model.Clocked.Count > 0)
+            {
+                clocked[path] = string.Join(" · ", model.Clocked);
+            }
+
             step?.Invoke();
         }
 
-        return needs;
+        return new AreaReading(needs, clocked);
     }
 
-    private Task<IReadOnlyDictionary<string, string>>? Start(IReadOnlyDictionary<string, int>? placed, string tileset)
+    private Task<AreaReading>? Start(IReadOnlyDictionary<string, int>? placed, string tileset)
     {
         if (read is null || placed is not { Count: > 0 })
         {

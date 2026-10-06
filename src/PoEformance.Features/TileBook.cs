@@ -67,7 +67,12 @@ public sealed class TileBook : ColumnBook
     /// <param name="install">Every <c>.tdt</c> and <c>.arm</c> the install has, or empty where it has not been walked.</param>
     /// <param name="placed">How many times each tile or room is placed in the current area, by path - or empty.</param>
     /// <param name="needs">What each placed tile or room needs that the shade compiler has not got, by path - see <see cref="AreaNeeds"/> - or null before it is read.</param>
-    public static TileBook Of(IReadOnlyList<string>? install, IReadOnlyDictionary<string, int>? placed, IReadOnlyDictionary<string, string>? needs = null)
+    /// <param name="clocked">Which placed tiles and rooms wear a material whose graphs read the game's clock, by path - see <see cref="AreaReading.Clocked"/> - or null before it is read.</param>
+    public static TileBook Of(
+        IReadOnlyList<string>? install,
+        IReadOnlyDictionary<string, int>? placed,
+        IReadOnlyDictionary<string, string>? needs = null,
+        IReadOnlyDictionary<string, string>? clocked = null)
     {
         var order = new List<string>((install?.Count ?? 0) + (placed?.Count ?? 0));
         var rows = new Dictionary<string, int>(order.Capacity, StringComparer.OrdinalIgnoreCase);
@@ -107,6 +112,7 @@ public sealed class TileBook : ColumnBook
         var placings = new double[count];
         var placingsText = new string[count];
         var needed = new string[count];
+        var clocks = new string[count];
 
         for (var at = 0; at < count; at++)
         {
@@ -126,6 +132,7 @@ public sealed class TileBook : ColumnBook
             placings[at] = times;
             placingsText[at] = times > 0 ? times.ToString(CultureInfo.InvariantCulture) : string.Empty;
             needed[at] = needs is not null && needs.TryGetValue(path, out string? need) ? need : string.Empty;
+            clocks[at] = clocked is not null && clocked.ContainsKey(path) ? Here : string.Empty;
 
             // THE PATH AND THE KIND, AND NOT THE WORD "here": that one is a column, asked for as
             // here:yes, and written into the free text it would also answer a bare "here" with
@@ -145,6 +152,10 @@ public sealed class TileBook : ColumnBook
             // WHAT THE PANE WOULD SAY IS LEFT OUT, for every tile of the area at once - see
             // AreaNeeds - so needs:InputVertexColor finds the tiles worth comparing with the game.
             (DataColumn.Words("needs", needed), Area, false),
+
+            // AND WHICH RUN WITH THE CLOCK - a material whose graphs read Time - so clock:yes finds the
+            // tiles whose picture moves, to compare with the game.
+            (DataColumn.Labels("clock", clocks), Area, false),
         ];
 
         ColumnStore store = ColumnStore.Of([.. laid.Select(one => one.Column)]);

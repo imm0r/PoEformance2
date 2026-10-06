@@ -1927,6 +1927,13 @@ public sealed class MonsterPortrait
                 + (_model.Unshaded.Count > 0
                     ? " · not evaluated: " + string.Join(", ", _model.Unshaded.Take(Named))
                         + (_model.Unshaded.Count > Named ? $" and {_model.Unshaded.Count - Named} more" : string.Empty)
+                    : string.Empty)
+
+                // AND WHICH OF THEM RUN WITH THE CLOCK, by name - the picture moves for these, and they
+                // are what to compare with the game. See ShadeProgram.UsesTime.
+                + (_model.Clocked.Count > 0
+                    ? $" · {_model.Clocked.Count} running with the clock: " + string.Join(", ", _model.Clocked.Take(Named).Select(Tail))
+                        + (_model.Clocked.Count > Named ? $" and {_model.Clocked.Count - Named} more" : string.Empty)
                     : string.Empty))
             : string.Empty;
 

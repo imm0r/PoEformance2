@@ -565,13 +565,52 @@ public class TileFilesTests
         // AND THE AREA'S NEEDS SAY THE SAME FOR THE TILE, by path, as the pane's line would - and a
         // path that will not load says so rather than nothing.
         IReadOnlyDictionary<string, string> needs = AreaNeeds.Of(
-            path => files.GetValueOrDefault(path), ["Metadata/Terrain/Test/Arena.tdt", "Metadata/Terrain/Test/Gone.tdt"], string.Empty, null);
+            path => files.GetValueOrDefault(path), ["Metadata/Terrain/Test/Arena.tdt", "Metadata/Terrain/Test/Gone.tdt"], string.Empty, null).Needs;
         Assert.Equal("MaskedContactFade in MaskedContactFade", needs["Metadata/Terrain/Test/Arena.tdt"]);
         Assert.StartsWith("did not load:", needs["Metadata/Terrain/Test/Gone.tdt"], StringComparison.Ordinal);
 
         // SEARCHABLE AS A COLUMN: needs:MaskedContactFade finds the tile, and a tile the needs do not name is not found.
         TileBook book = TileBook.Of(["Metadata/Terrain/Test/Arena.tdt", "Metadata/Terrain/Test/Other.tdt"], new Dictionary<string, int> { ["Metadata/Terrain/Test/Arena.tdt"] = 1 }, needs);
         RowSet? found = book.Matching(ColumnQuery.Parse("needs:MaskedContactFade").Term, out string why);
+        Assert.True(found is not null, why);
+        var rows = new List<int>();
+        found!.CopyTo(rows);
+        Assert.Equal([book.Row("Metadata/Terrain/Test/Arena.tdt")], rows);
+    }
+
+    /// <summary>A tile whose material reads the clock says so, and the book finds it with clock:yes.</summary>
+    [Fact]
+    public void ATileWhoseGraphsReadTheClockIsNamedAndFoundByClockYes()
+    {
+        Dictionary<string, byte[]> files = Install();
+        files["Art/Textures/Floor.mat"] = Encoding.UTF8.GetBytes(
+            """
+            {"graphinstances":[{"parent":"Metadata/Flowing.fxgraph"}]}
+            """);
+        files["Metadata/Flowing.fxgraph"] = Encoding.UTF8.GetBytes(
+            """
+            {"nodes":[
+              {"type":"Time","index":0},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing"}],
+             "links":[
+              {"src":{"type":"Time","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing","variable":"input"}}]}
+            """);
+
+        MonsterModel model = TileModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Test/Arena.tdt", ground: false, shaded: true);
+        Assert.True(model.Ready, model.Why);
+        Assert.Equal(["Art/Textures/Floor.mat"], model.Clocked);
+
+        AreaReading reading = AreaNeeds.Of(
+            path => files.GetValueOrDefault(path), ["Metadata/Terrain/Test/Arena.tdt", "Metadata/Terrain/Test/Gone.tdt"], string.Empty, null);
+        Assert.Equal("Art/Textures/Floor.mat", reading.Clocked["Metadata/Terrain/Test/Arena.tdt"]);
+        Assert.False(reading.Clocked.ContainsKey("Metadata/Terrain/Test/Gone.tdt"));
+
+        TileBook book = TileBook.Of(
+            ["Metadata/Terrain/Test/Arena.tdt", "Metadata/Terrain/Test/Other.tdt"],
+            new Dictionary<string, int> { ["Metadata/Terrain/Test/Arena.tdt"] = 1, ["Metadata/Terrain/Test/Other.tdt"] = 1 },
+            reading.Needs,
+            reading.Clocked);
+        RowSet? found = book.Matching(ColumnQuery.Parse("clock:yes").Term, out string why);
         Assert.True(found is not null, why);
         var rows = new List<int>();
         found!.CopyTo(rows);
