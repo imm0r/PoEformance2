@@ -6,6 +6,13 @@ namespace PoEformance.Game.Ui;
 
 /// <summary>One recipe row of the Runeshape Combinations panel, as the game holds it.</summary>
 /// <param name="Address">The row element, which is what the geometry is read against each tick.</param>
+/// <param name="LabelAddress">
+/// The row's text element - its child at LabelChild - which is placed each tick beside the
+/// row, because WHERE THE TEXT STARTS is where a price goes. The interface browser settled
+/// its shape on 0.5.5: a text element sized to its own text (305x30 window pixels for
+/// "4x Blacksmith's Whetstone"), set 386 UI units into a row whose left edge is the rune
+/// icons', so the gap between the icons and the text is the room a price has.
+/// </param>
 /// <param name="Label">
 /// The text the panel paints on the row - "3x Exalted Orb", or on a Russian client
 /// "Деталь доспеха (6)". LOCALISED, so it is the last thing to match a price on; it is kept
@@ -34,6 +41,7 @@ namespace PoEformance.Game.Ui;
 /// <param name="RewardGemLevel">For the gem recipes with no fixed reward, the level rolled. Zero otherwise.</param>
 public sealed record RunecraftRow(
     ulong Address,
+    ulong LabelAddress,
     string Label,
     string RecipeId,
     string RewardPath,
@@ -45,7 +53,13 @@ public sealed record RunecraftRow(
     int MaxLevel);
 
 /// <summary>Where one row is on the screen this tick.</summary>
-public readonly record struct RunecraftPlace(ulong Address, ScreenRect Where);
+/// <param name="Address">The row element.</param>
+/// <param name="Where">The row's rectangle, rune icons to right edge - what a frame goes round.</param>
+/// <param name="Text">
+/// The row's text element's rectangle, or null when it did not read - what a price sits
+/// before. Null is a missing anchor, not a missing row: the row is still drawn, at its edge.
+/// </param>
+public readonly record struct RunecraftPlace(ulong Address, ScreenRect Where, ScreenRect? Text);
 
 /// <summary>The panel as last resolved: open, with its three elements, or shut with the reason.</summary>
 /// <param name="Gate">The window container, whose visible bit is the panel-open signal.</param>
@@ -312,38 +326,40 @@ public sealed class RunecraftPanelReader
                 continue;
             }
 
-            string label = LabelOf(row);
-            if (label.Length == 0)
+            (ulong label, string text) = LabelOf(row);
+            if (text.Length == 0)
             {
                 continue;
             }
 
-            rows.Add(Describe(row, label));
+            rows.Add(Describe(row, label, text));
         }
 
         return rows;
     }
 
     /// <summary>
-    /// Where the rows are this tick, and the rectangle they are clipped to.
+    /// Where the rows and their texts are this tick, and the rectangle they are clipped to.
     /// </summary>
     /// <remarks>
     /// The rows are placed with ONE walk of the chain above their container, nudged by the
     /// viewport's scroll where the ordinary walk would not have added it - see the remarks on
-    /// the class. A row the game reports hidden, or one whose rectangle did not read, is simply
-    /// absent: a stale position on a scrolled list is a price on the wrong row.
+    /// the class - and each row's text element is placed under its row from there, with no
+    /// second walk. A row the game reports hidden, or one whose rectangle did not read, is
+    /// simply absent: a stale position on a scrolled list is a price on the wrong row. A text
+    /// element that did not read leaves its row in, with no anchor.
     /// </remarks>
     /// <param name="panel">The panel as resolved this tick.</param>
-    /// <param name="rows">The row elements to place - the ones <see cref="Rows"/> reported.</param>
+    /// <param name="rows">The rows to place - the ones <see cref="Rows"/> reported.</param>
     /// <param name="scale">The viewport to place them in.</param>
     public (List<RunecraftPlace> Rows, ScreenRect? Viewport) Place(
-        RunecraftPanelState panel, IReadOnlyList<ulong> rows, UiScale scale)
+        RunecraftPanelState panel, IReadOnlyList<RunecraftRow> rows, UiScale scale)
     {
         ArgumentNullException.ThrowIfNull(panel);
         ArgumentNullException.ThrowIfNull(rows);
 
         var placed = new List<RunecraftPlace>(rows.Count);
-        if (!panel.Open)
+        if (!panel.Open || rows.Count == 0)
         {
             return (placed, null);
         }
@@ -356,21 +372,37 @@ public sealed class RunecraftPanelReader
             clip = new ScreenRect(viewport.Left, viewport.Top, viewport.Right, viewport.Bottom);
         }
 
-        Vector2 nudge = Scroll(panel, scale);
-        foreach ((ulong row, Placed at) in _elements.ReadSiblings(panel.Container, rows, scale, nudge))
+        var addresses = new ulong[rows.Count];
+        for (int i = 0; i < rows.Count; i++)
         {
-            if (!at.Shown || !Sane(at.Position) || !Sane(at.Size) || at.Size.X < 1f || at.Size.Y < 1f)
+            addresses[i] = rows[i].Address;
+        }
+
+        Vector2 nudge = Scroll(panel, scale);
+        Dictionary<ulong, Placed> under = _elements.ReadSiblings(panel.Container, addresses, scale, nudge);
+        foreach (RunecraftRow row in rows)
+        {
+            if (!under.TryGetValue(row.Address, out Placed at) || !at.Shown || Rect(at) is not { } where)
             {
                 continue;
             }
 
-            placed.Add(new RunecraftPlace(
-                row,
-                new ScreenRect(at.Position.X, at.Position.Y, at.Position.X + at.Size.X, at.Position.Y + at.Size.Y)));
+            ScreenRect? text = row.LabelAddress != 0
+                               && _elements.ReadUnder(row.Address, at.Unscaled, row.LabelAddress, scale) is { } label
+                ? Rect(label)
+                : null;
+
+            placed.Add(new RunecraftPlace(row.Address, where, text));
         }
 
         return (placed, clip);
     }
+
+    /// <summary>A placed element's rectangle, or null when it is too small or too far to be one.</summary>
+    private static ScreenRect? Rect(in Placed at)
+        => Sane(at.Position) && Sane(at.Size) && at.Size.X >= 1f && at.Size.Y >= 1f
+            ? new ScreenRect(at.Position.X, at.Position.Y, at.Position.X + at.Size.X, at.Position.Y + at.Size.Y)
+            : null;
 
     /// <summary>
     /// The viewport's scroll offset, in the container's own UI space, where the ordinary walk
@@ -535,7 +567,7 @@ public sealed class RunecraftPanelReader
         List<ulong> children = _elements.Children(element, MostRowsProbed);
         foreach (ulong row in children)
         {
-            if (LabelOf(row).Length > 0)
+            if (LabelOf(row).Text.Length > 0)
             {
                 return true;
             }
@@ -544,15 +576,17 @@ public sealed class RunecraftPanelReader
         return false;
     }
 
-    /// <summary>The row's label - its first child's text - or empty.</summary>
-    private string LabelOf(ulong row)
+    /// <summary>The row's label element - its first child - and that element's text, or empty.</summary>
+    private (ulong Element, string Text) LabelOf(ulong row)
     {
         ulong label = _elements.Child(row, _labelChild);
-        return label == 0 ? string.Empty : _reader.ReadStdWString(label + (ulong)_text, MostLabelChars);
+        return label == 0
+            ? (0, string.Empty)
+            : (label, _reader.ReadStdWString(label + (ulong)_text, MostLabelChars));
     }
 
     /// <summary>A row's recipe and reward, behind the back-pointer, with every hop checked.</summary>
-    private RunecraftRow Describe(ulong row, string label)
+    private RunecraftRow Describe(ulong row, ulong labelElement, string label)
     {
         ulong recipe = _reader.ReadPointer(row + (ulong)_recipePtr);
         string id = recipe == 0
@@ -564,7 +598,8 @@ public sealed class RunecraftPanelReader
         // plausible pointer is not enough.
         if (!LooksLikeRecipeId(id))
         {
-            return new RunecraftRow(row, label, string.Empty, string.Empty, string.Empty, string.Empty, 0, 0, 0, 0);
+            return new RunecraftRow(
+                row, labelElement, label, string.Empty, string.Empty, string.Empty, string.Empty, 0, 0, 0, 0);
         }
 
         int minLevel = _reader.Read<int>(recipe + (ulong)_recipeMinLevel);
@@ -597,7 +632,7 @@ public sealed class RunecraftPanelReader
         }
 
         return new RunecraftRow(
-            row, label, id, path, name, art,
+            row, labelElement, label, id, path, name, art,
             count is > 0 and < 10_000 ? count : 0,
             gemLevel is > 0 and <= 100 ? gemLevel : 0,
             minLevel is >= 0 and <= 100 ? minLevel : 0,

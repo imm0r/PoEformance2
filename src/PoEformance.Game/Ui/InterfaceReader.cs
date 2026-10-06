@@ -265,7 +265,7 @@ public sealed class InterfaceReader
         float right = float.MinValue;
         float bottom = float.MinValue;
 
-        foreach ((ulong child, (Vector2 position, Vector2 size, _)) in
+        foreach ((ulong child, (Vector2 position, Vector2 size, _, _)) in
                  _elements.ReadSiblings(part, inside, scale))
         {
             if (notThese.Contains(child) || !Measurable(position, size)

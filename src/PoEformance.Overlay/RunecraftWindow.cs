@@ -172,7 +172,7 @@ public sealed class RunecraftWindow
         }
 
         bool frame = settings.FrameBest;
-        if (OverlayLayout.Toggle("Ring the most valuable row", ref frame))
+        if (OverlayLayout.Toggle("Frame the most valuable row", ref frame))
         {
             Apply(settings with { FrameBest = frame });
             settings = _watch.Settings;
@@ -194,8 +194,8 @@ public sealed class RunecraftWindow
         }
 
         OverlayLayout.Hint(
-            "Slides the price left or right of the row's edge - for a client language whose"
-            + " reward names run under it, or a letterboxed display.");
+            "Slides the price left or right of where it sits, just before the reward's name - for"
+            + " a client language whose names run further left, or a letterboxed display.");
 
         float text = settings.Writing;
         if (OverlayLayout.Slider("Writing size", ref text, RunecraftSettings.SmallestText, RunecraftSettings.LargestText, "%.2f x"))
@@ -225,6 +225,20 @@ public sealed class RunecraftWindow
             OverlayLayout.Hint(
                 "What the game calls the elements the fingerprint walk resolved. A named panel is"
                 + " a sturdier anchor than a fingerprint - see RunecraftPanel in the schema.");
+        }
+
+        // Where the first row's text was measured, because that is what the price is placed
+        // against: a child index that drifts shows here as "not read" or as a spanning
+        // element, with the price back at the edge, before anyone wonders why it moved.
+        if (view.Rewards.Count > 0)
+        {
+            RunecraftReward first = view.Rewards[0];
+            ImGui.TextColored(
+                first.TextAnchors(0f) ? DimText : WarnText,
+                first.Text is { } text
+                    ? $"row text {text.Width:0} px wide, {text.Left - first.Where.Left:0} px into a {first.Where.Width:0} px row"
+                      + (first.TextAnchors(0f) ? " - the price sits before it" : " - not a text inside its row, so the price sits at the row's edge")
+                    : "row text element not read - the price sits at the row's edge");
         }
 
         IReadOnlyList<(RunecraftRow Row, RunecraftPrice Price)> rows = _watch.Studied;

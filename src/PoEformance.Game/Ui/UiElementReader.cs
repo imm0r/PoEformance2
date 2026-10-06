@@ -104,7 +104,12 @@ public sealed record UiElement(
 /// Whether the element's own visible bit is set - the game paints it. FALSE is the interesting
 /// one: the element exists and is placed, and the game is choosing not to show it.
 /// </param>
-public readonly record struct Placed(Vector2 Position, Vector2 Size, bool Shown);
+/// <param name="Unscaled">
+/// The same top-left in the element's OWN UI space, before its scale pair turned it into
+/// pixels. What a caller hands back to <see cref="UiElementReader.ReadUnder"/> to place this
+/// element's children without walking the chain above it a second time.
+/// </param>
+public readonly record struct Placed(Vector2 Position, Vector2 Size, bool Shown, Vector2 Unscaled);
 
 public sealed class UiElementReader
 {
@@ -198,45 +203,83 @@ public sealed class UiElementReader
             return placed;
         }
 
-        Vector2 parentPosition = UnscaledPosition(parent, scale) + nudge;
-        Vector2 modifier = ReadVector2(parent + (ulong)_positionModifier);
-        byte parentIndex = _reader.Read<byte>(parent + (ulong)_scaleIndex);
-        float parentMultiplier = _reader.Read<float>(parent + (ulong)_localScaleMultiplier);
-        (float parentW, float parentH) = scale.For(parentIndex, parentMultiplier);
-
+        Frame frame = FrameOf(parent, UnscaledPosition(parent, scale) + nudge, scale);
         foreach (ulong child in children)
         {
-            if (!IsUiElement(child))
+            if (IsUiElement(child))
             {
-                continue;
+                placed[child] = PlaceUnder(in frame, child, scale);
             }
-
-            Vector2 relative = ReadVector2(child + (ulong)_relativePosition);
-
-            // The modifier belongs to the parent but is applied only when the CHILD opts in,
-            // so it is read once above and chosen per child here.
-            uint flags = _reader.Read<uint>(child + (ulong)_flags);
-            Vector2 above = (flags & _flagShouldModifyPos) != 0 ? parentPosition + modifier : parentPosition;
-
-            byte index = _reader.Read<byte>(child + (ulong)_scaleIndex);
-            float multiplier = _reader.Read<float>(child + (ulong)_localScaleMultiplier);
-            (float childW, float childH) = scale.For(index, multiplier);
-
-            Vector2 unscaled = index == parentIndex && multiplier.Equals(parentMultiplier)
-                ? above + relative
-                : new Vector2(
-                    childW != 0 ? (above.X * parentW / childW) + relative.X : relative.X,
-                    childH != 0 ? (above.Y * parentH / childH) + relative.Y : relative.Y);
-
-            Vector2 size = ReadVector2(child + (ulong)_unscaledSize);
-
-            placed[child] = new Placed(
-                new Vector2((unscaled.X * childW) + scale.Cull, unscaled.Y * childH),
-                new Vector2(size.X * childW, size.Y * childH),
-                (flags & _flagIsVisible) != 0);
         }
 
         return placed;
+    }
+
+    /// <summary>
+    /// Where one child of an element that was itself just placed is - without reading anything
+    /// above that element again.
+    /// </summary>
+    /// <remarks>
+    /// The chaining step <see cref="ReadSiblings"/> stops short of: a row placed by it carries
+    /// its own unscaled position, and that is everything a child's placement needs from above.
+    /// The recipe panel is the caller - each row's text sits in a child of its own, and where
+    /// that child starts is where a price goes - and a walk up from every row to the root for
+    /// one child each would cost more than placing all the rows did.
+    /// </remarks>
+    /// <param name="parent">The element the child hangs off, placed by a call above.</param>
+    /// <param name="parentUnscaled">That element's <see cref="Placed.Unscaled"/>.</param>
+    /// <param name="child">The child to place.</param>
+    /// <returns>The child's place, or null when either address is not an element.</returns>
+    public Placed? ReadUnder(ulong parent, Vector2 parentUnscaled, ulong child, UiScale scale)
+    {
+        if (!IsUiElement(parent) || !IsUiElement(child))
+        {
+            return null;
+        }
+
+        Frame frame = FrameOf(parent, parentUnscaled, scale);
+        return PlaceUnder(in frame, child, scale);
+    }
+
+    /// <summary>What every child of one parent shares: its position, its modifier and its scale space.</summary>
+    private readonly record struct Frame(Vector2 Position, Vector2 Modifier, byte Index, float Multiplier, float Width, float Height);
+
+    private Frame FrameOf(ulong parent, Vector2 position, UiScale scale)
+    {
+        Vector2 modifier = ReadVector2(parent + (ulong)_positionModifier);
+        byte index = _reader.Read<byte>(parent + (ulong)_scaleIndex);
+        float multiplier = _reader.Read<float>(parent + (ulong)_localScaleMultiplier);
+        (float width, float height) = scale.For(index, multiplier);
+        return new Frame(position, modifier, index, multiplier, width, height);
+    }
+
+    /// <summary>One child's place under a frame: its own relative position, flags, scale and size.</summary>
+    private Placed PlaceUnder(in Frame frame, ulong child, UiScale scale)
+    {
+        Vector2 relative = ReadVector2(child + (ulong)_relativePosition);
+
+        // The modifier belongs to the parent but is applied only when the CHILD opts in, so it
+        // is read once into the frame and chosen per child here.
+        uint flags = _reader.Read<uint>(child + (ulong)_flags);
+        Vector2 above = (flags & _flagShouldModifyPos) != 0 ? frame.Position + frame.Modifier : frame.Position;
+
+        byte index = _reader.Read<byte>(child + (ulong)_scaleIndex);
+        float multiplier = _reader.Read<float>(child + (ulong)_localScaleMultiplier);
+        (float childW, float childH) = scale.For(index, multiplier);
+
+        Vector2 unscaled = index == frame.Index && multiplier.Equals(frame.Multiplier)
+            ? above + relative
+            : new Vector2(
+                childW != 0 ? (above.X * frame.Width / childW) + relative.X : relative.X,
+                childH != 0 ? (above.Y * frame.Height / childH) + relative.Y : relative.Y);
+
+        Vector2 size = ReadVector2(child + (ulong)_unscaledSize);
+
+        return new Placed(
+            new Vector2((unscaled.X * childW) + scale.Cull, unscaled.Y * childH),
+            new Vector2(size.X * childW, size.Y * childH),
+            (flags & _flagIsVisible) != 0,
+            unscaled);
     }
 
     /// <summary>Reads one element resolved to window pixels, or null if it is not one.</summary>

@@ -7,19 +7,27 @@ using PoEformance.Game.Ui;
 namespace PoEformance.Overlay;
 
 /// <summary>
-/// Writes each reward's poe.ninja price onto its row of the Runeshape Combinations panel.
+/// Writes each reward's poe.ninja price onto its row of the Runeshape Combinations panel, and
+/// frames the row worth taking.
 /// </summary>
 /// <remarks>
 /// ON THE GAME'S OWN PANEL, not in a window of this tool's: the reward's name is already on the
-/// row, in the client's language, so the price goes beside it at the row's right edge and
-/// nothing is said twice. That is the reference plugin's design and the reason it is worth
-/// porting - the alternative, a list of the same rows in a second window, is a window that
-/// steals focus from the panel it duplicates.
+/// row, in the client's language, so the price goes just before it and nothing is said twice.
+/// That is the reference plugin's design and the reason it is worth porting - the alternative,
+/// a list of the same rows in a second window, is a window that steals focus from the panel it
+/// duplicates. BEFORE the name rather than at the row's edge, where the reference puts it,
+/// because the game right-aligns the name at that edge and a price there sits on its last word.
+///
+/// THE BEST ROW IS FRAMED WHOLE, icons to edge, rather than its price ringed: a list is read
+/// by rows, and a ring round one figure among six is found after the figure has been read,
+/// which is the reading the frame exists to save.
 ///
 /// CLIPPED TO THE VIEWPORT BY HAND. Rows scrolled out of the list keep their visible bit; the
-/// game clips them with a scissor rectangle, so without this every scrolled-off row's price would
-/// be painted over whatever sits above and below the list. Only the vertical extent is clipped:
-/// the sideways offset is the user's to set and may deliberately put the price outside the frame.
+/// game clips them with a scissor rectangle, so without this every scrolled-off row's price and
+/// frame would be painted over whatever sits above and below the list. Only the vertical extent
+/// is clipped: the sideways offset is the user's to set and may deliberately put the price
+/// outside the frame. A price on a row half out is left off altogether - half a figure reads
+/// as a different figure - while the frame is cut where the game cuts the row.
 ///
 /// THE WRITING FOLLOWS THE ROW, half its height, so it reads at any interface scale and never
 /// outgrows the row it is on. A plate behind it, because the panel's own art is busy exactly
@@ -41,7 +49,10 @@ public sealed class RunecraftLayer
     private const float SmallestText = 12f;
     private const float LargestText = 48f;
 
-    /// <summary>Draws every placed row's price.</summary>
+    /// <summary>Far enough either way to leave the clip open sideways on any display.</summary>
+    private const float Unbounded = 1e6f;
+
+    /// <summary>Draws every placed row's price, and the frame round the best row.</summary>
     public void Draw(ImDrawListPtr draw, RunecraftView view, RunecraftSettings settings)
     {
         ArgumentNullException.ThrowIfNull(view);
@@ -52,6 +63,28 @@ public sealed class RunecraftLayer
             return;
         }
 
+        if (view.Viewport is { } clip)
+        {
+            draw.PushClipRect(
+                new Vector2(-Unbounded, clip.Top), new Vector2(Unbounded, clip.Bottom),
+                intersect_with_current_clip_rect: true);
+            try
+            {
+                Rows(draw, view, settings, clip);
+            }
+            finally
+            {
+                draw.PopClipRect();
+            }
+        }
+        else
+        {
+            Rows(draw, view, settings, null);
+        }
+    }
+
+    private static void Rows(ImDrawListPtr draw, RunecraftView view, RunecraftSettings settings, ScreenRect? clip)
+    {
         ImFontPtr font = ImGui.GetFont();
         float natural = ImGui.GetFontSize();
         float writing = settings.Writing;
@@ -59,13 +92,24 @@ public sealed class RunecraftLayer
         foreach (RunecraftReward reward in view.Rewards)
         {
             ScreenRect row = reward.Where;
+            float size = Math.Clamp(row.Height * Share * writing, SmallestText, LargestText);
+            float scale = size / natural;
+
+            // The frame first, so the plate paints over it where the two meet at a row's edge.
+            // Its stroke sits just outside the row, on the parchment's own border.
+            if (settings.FrameBest && reward.Best && reward.Total is not null)
+            {
+                float line = Math.Clamp(2f * scale, 1.5f, 4f);
+                var grow = new Vector2(line * 0.5f, line * 0.5f);
+                draw.AddRect(row.TopLeft - grow, row.BottomRight + grow, Green, 3f * scale, ImDrawFlags.None, line);
+            }
 
             // The vertical clip: a row whose centre is above or below the viewport is one the
             // game is not drawing, whatever its flag says.
-            if (view.Viewport is { } clip)
+            if (clip is { } inside)
             {
                 float centre = (row.Top + row.Bottom) * 0.5f;
-                if (centre < clip.Top || centre > clip.Bottom)
+                if (centre < inside.Top || centre > inside.Bottom)
                 {
                     continue;
                 }
@@ -88,26 +132,16 @@ public sealed class RunecraftLayer
                 continue;
             }
 
-            float size = Math.Clamp(row.Height * Share * writing, SmallestText, LargestText);
-            float scale = size / natural;
             Vector2 measured = ImGui.CalcTextSize(text) * scale;
-            float padding = 6f * scale;
             var pad = new Vector2(4f * scale, 2f * scale);
+            float gap = 6f * scale;
 
-            var at = new Vector2(
-                row.Right - measured.X - padding + settings.XOffset,
-                row.Top + ((row.Height - measured.Y) * 0.5f));
+            // The plate's right edge a gap before the row's text, or inside the row's own edge
+            // when the text's element did not read - see RunecraftReward.Before.
+            float edge = reward.Before(gap) + settings.XOffset;
+            var at = new Vector2(edge - pad.X - measured.X, row.Top + ((row.Height - measured.Y) * 0.5f));
 
             draw.AddRectFilled(at - pad, at + measured + pad, Plate, 3f * scale);
-
-            // The best row's ring sits OUTSIDE the plate, so it never covers the figure it is
-            // pointing at and still reads as belonging to it.
-            if (settings.FrameBest && reward.Best && reward.Total is not null)
-            {
-                Vector2 ring = pad + new Vector2(2f * scale, 2f * scale);
-                draw.AddRect(at - ring, at + measured + ring, Green, 4f * scale, ImDrawFlags.None, 2f * scale);
-            }
-
             draw.AddText(font, size, at + new Vector2(1f, 1f), Shadow, text);
             draw.AddText(font, size, at, colour, text);
         }

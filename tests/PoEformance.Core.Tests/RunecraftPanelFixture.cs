@@ -48,6 +48,14 @@ internal sealed class RunecraftPanelFixture
     public static readonly Vector2 ViewportSize = new(770, 800);
     public static readonly Vector2 Scroll = new(0, -120);
 
+    /// <summary>
+    /// Where a row's text element sits in its row and how big it is - the browser's measurement
+    /// of a 0.5.5 row: a text sized to itself, set well right of the rune icons, taking its
+    /// parent's modifier.
+    /// </summary>
+    public static readonly Vector2 TextAt = new(386, 19);
+    public static readonly Vector2 TextSize = new(300, 30);
+
     private readonly OffsetSchema _schema;
     private ulong _strings = Strings;
 
@@ -133,7 +141,7 @@ internal sealed class RunecraftPanelFixture
     private void Row(int index, string label, Vector2 relative, int labelIndex, bool visible = true)
     {
         Tree.Add(index, parent: Container, visible: visible, relative: relative, size: new Vector2(700, 60), children: [labelIndex]);
-        Tree.Add(labelIndex, parent: index, text: label);
+        Tree.Add(labelIndex, parent: index, text: label, modifiesPosition: true, relative: TextAt, size: TextSize);
     }
 
     private void Recipe(int row, string id, int count, ulong reward, int gemLevel = 0)

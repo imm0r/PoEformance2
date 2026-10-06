@@ -3818,6 +3818,19 @@ only the price is added. What the port kept, what it changed, and why:
   measured prices freezing on scroll until it did — but only where the content frame does not
   carry `ShouldModifyPos`, since the ordinary position walk adds it when the child asks and
   counting it twice scrolls the list at twice its speed.
+- **The price sits before the reward's name, and the frame goes round the row.** The reference
+  writes the price at the row's right edge, and so did the first build here — but the game
+  right-aligns the name at that edge, so the price landed on its last word. Where the name
+  STARTS was one look in the interface browser away: each row's text element is its first
+  child, sized to its text (305×30 window pixels for "4x Blacksmith's Whetstone" on 0.5.5) and
+  set 386 UI units into a row whose left edge is the rune icons', so the room between icons and
+  name is the price's. The reader places that child under its already-placed row
+  (`UiElementReader.ReadUnder`: no second walk up the chain, the row's own unscaled position is
+  the frame) and the layer aligns the plate's right edge a gap before it, falling back to the
+  row's edge when the element does not read as a text inside its row — a drifted child index
+  then moves the price, not somewhere unrelated, and the tab says which anchor it used. The best
+  row's frame is the row's own rectangle, icons to edge, because a list is read by rows and a
+  ring round one figure is found only after the figure has been read.
 - **Not ported, by decision:** the plugin's monolith labels on the large map, its rune-chain
   valuation and its expedition route planner. They are a different feature several times this
   size, resting on monolith station offsets this tool has not measured, and a port of them would
