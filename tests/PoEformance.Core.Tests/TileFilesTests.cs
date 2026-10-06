@@ -679,29 +679,33 @@ public class TileFilesTests
     }
 
     /// <summary>
-    /// The dump's shader section: the sources by folder, those whose path names the ground whole, and the lines naming it elsewhere.
+    /// The dump counts the shader sources by folder; the export writes every one whole, in path order.
     /// </summary>
     [Fact]
-    public void THEDUMPSearchesTheShaderSourcesForTheGround()
+    public void THEDUMPCountsTheShaderSourcesAndTheExportWritesThemWhole()
     {
         Dictionary<string, byte[]> files = Install();
         files["Shaders/Renderer/Ground.ffx"] = Encoding.UTF8.GetBytes("fragment ground\nfloat2 uv = world_pos.xy * scale;\n");
         files["Shaders/Common/Util.hlsl"] = Encoding.Unicode.GetBytes("\uFEFFfloat a;\r\n// Terrain coordinates\r\nfloat b;\r\n");
         Func<string, byte[]?> read = path => files.GetValueOrDefault(path);
         MonsterModel model = TileModels.Of(read, "Metadata/Terrain/Test/Arena.tdt");
+        string[] shaders = ["Shaders/Renderer/Ground.ffx", "Shaders/Common/Util.hlsl", "Shaders/Common/Missing.hlsl"];
 
-        string dump = ModelDump.OfTile(
-            read, "Metadata/Terrain/Test/Arena.tdt", model, null,
-            ["Shaders/Renderer/Ground.ffx", "Shaders/Common/Util.hlsl", "Shaders/Common/Missing.hlsl"]);
-
+        string dump = ModelDump.OfTile(read, "Metadata/Terrain/Test/Arena.tdt", model, null, shaders);
         Assert.Contains("3 files, by folder:", dump, StringComparison.Ordinal);
         Assert.Contains("  Shaders/Common  2", dump, StringComparison.Ordinal);
         Assert.Contains("  Shaders/Renderer  1", dump, StringComparison.Ordinal);
-        Assert.Contains("1 name the ground or the terrain in their path", dump, StringComparison.Ordinal);
-        Assert.Contains("=== shader source Shaders/Renderer/Ground.ffx", dump, StringComparison.Ordinal);
-        Assert.Contains("float2 uv = world_pos.xy * scale;", dump, StringComparison.Ordinal);
-        Assert.Contains("  Shaders/Common/Util.hlsl:2: // Terrain coordinates", dump, StringComparison.Ordinal);
-        Assert.Contains("searched 2 files, quoted 1 lines", dump, StringComparison.Ordinal);
+        Assert.Contains("every one is written whole beside this dump, to " + ModelDump.ShaderFile, dump, StringComparison.Ordinal);
+        Assert.DoesNotContain("world_pos.xy", dump, StringComparison.Ordinal);
+
+        string sources = ModelDump.ShaderSources(read, shaders);
+        int missing = sources.IndexOf("=== shader source Shaders/Common/Missing.hlsl", StringComparison.Ordinal);
+        int util = sources.IndexOf("=== shader source Shaders/Common/Util.hlsl", StringComparison.Ordinal);
+        int ground = sources.IndexOf("=== shader source Shaders/Renderer/Ground.ffx", StringComparison.Ordinal);
+        Assert.True(missing >= 0 && missing < util && util < ground, "in path order");
+        Assert.Contains("float2 uv = world_pos.xy * scale;", sources, StringComparison.Ordinal);
+        Assert.Contains("// Terrain coordinates", sources, StringComparison.Ordinal);
+        Assert.Contains("(not in the install)", sources, StringComparison.Ordinal);
 
         string none = ModelDump.OfTile(read, "Metadata/Terrain/Test/Arena.tdt", model);
         Assert.Contains("(the install walk found none:", none, StringComparison.Ordinal);

@@ -149,7 +149,7 @@ public static class ModelDump
     /// <param name="path">The tile's .tdt.</param>
     /// <param name="model">The model already gathered, for the shapes and what each one wears.</param>
     /// <param name="tilesets">Which tilesets place which tile - see <see cref="Ground"/>.</param>
-    /// <param name="shaders">The install's shader sources, for where the engine makes a ground's coordinates - see <see cref="Shaders"/>.</param>
+    /// <param name="shaders">The install's shader sources, counted here and written whole by <see cref="ShaderSources"/>.</param>
     public static string OfTile(
         Func<string, byte[]?>? read,
         string path,
@@ -271,7 +271,7 @@ public static class ModelDump
         }
 
         Ground(read, path, tilesets, printed, said);
-        Shaders(read, shaders, said);
+        Shaders(shaders, said);
         return said.ToString();
     }
 
@@ -687,41 +687,25 @@ public static class ModelDump
         }
     }
 
-    /// <summary>Most shader sources printed whole because their path names the ground or the terrain.</summary>
-    private const int MostShaderFiles = 12;
-
-    /// <summary>Most lines naming the ground or the terrain quoted from the other shader sources.</summary>
-    private const int MostShaderLines = 240;
-
-    /// <summary>Most characters of one quoted shader line.</summary>
-    private const int MostShaderLine = 220;
-
-    /// <summary>Most shader sources whose text is searched.</summary>
-    private const int MostShaderSearched = 6000;
-
-    /// <summary>What a shader source's path or line must name to be printed.</summary>
-    private static readonly string[] GroundWords = ["ground", "terrain"];
+    /// <summary>What the file every shader source is written into, beside a tile's dump, is called.</summary>
+    public const string ShaderFile = "shader-sources.txt";
 
     /// <summary>
-    /// The install's shader sources that could say how the engine makes a ground's coordinates.
+    /// Where the shader sources are, by folder - the sources themselves go whole into <see cref="ShaderFile"/>.
     /// </summary>
     /// <remarks>
-    /// THE GROUND'S GRAPHS READ <c>InputUV</c> AND ITS MESH HAS NONE: every ground material in the
-    /// desert tilesets is a PBRGroundBN instance sampling at <c>InputUV * 0.5</c>, while the .tgm's
-    /// ground block carries positions, normals and tangents only. So the engine makes the
-    /// coordinates, and no file read so far says how - which scale, from which axes. If it is
-    /// written anywhere it is in the shader sources, so they are listed and searched:
-    ///
-    ///     how many the install walk found, by folder - whether the install ships any at all
-    ///     every one whose PATH names the ground or the terrain, whole
-    ///     every LINE naming either in the rest, with its file and line number
-    ///
-    /// Not a reading of any shader language - a search, so a reader can find the place. An empty
-    /// list is an answer too: then the rule lives only in compiled shaders.
+    /// A SEARCH BY KEYWORD WAS NOT ENOUGH. The first version printed every line naming the ground or
+    /// the terrain, hit its limit of 240 lines with eight files unread, and gave lines without the
+    /// fragments around them - <c>uv = tile_ground_tiling * pos * ground_scalemove_uv.xy</c> with no
+    /// way to tell what <c>pos</c> is. The questions waiting on these files are bigger than the
+    /// ground, too: the order of the stages a graph runs in (<c>Texturing_Calc</c>, which the desert
+    /// dust writes its colour at), and what each graph node computes - <c>SmoothStep</c> with a centre
+    /// and a steepness is not HLSL's smoothstep. So every source is written whole, once, beside the
+    /// dump, and read where it can be searched properly.
     /// </remarks>
-    private static void Shaders(Func<string, byte[]?> read, IReadOnlyList<string>? shaders, StringBuilder said)
+    private static void Shaders(IReadOnlyList<string>? shaders, StringBuilder said)
     {
-        said.AppendLine().AppendLine("=== shader sources - where the engine could make a ground's coordinates");
+        said.AppendLine().AppendLine("=== shader sources");
         if (shaders is not { Count: > 0 })
         {
             said.AppendLine("(the install walk found none: nothing under Shaders/ and no .ffx, .hlsl, .hlsli or .fxh anywhere - or it has not run yet)");
@@ -738,69 +722,35 @@ public static class ModelDump
             said.Append("  ").Append(folder.Key).Append("  ").AppendLine(Say(folder.Count()));
         }
 
-        var named = shaders.Where(one => GroundWords.Any(word => one.Contains(word, StringComparison.OrdinalIgnoreCase))).ToList();
-        said.Append(Say(named.Count)).AppendLine(" name the ground or the terrain in their path");
-        foreach (string one in named.Take(MostShaderFiles))
+        said.Append("every one is written whole beside this dump, to ").AppendLine(ShaderFile);
+    }
+
+    /// <summary>
+    /// Every shader source whole, one after another under its path - see <see cref="Shaders"/>.
+    /// </summary>
+    /// <remarks>
+    /// IN PATH ORDER, so two exports diff. Nothing cut short: a fragment is only useful whole. A file
+    /// the install will not hand over is named as missing rather than dropped, so the count matches.
+    /// </remarks>
+    /// <param name="read">How to get a file out of the install, by path.</param>
+    /// <param name="shaders">The install's shader sources.</param>
+    public static string ShaderSources(Func<string, byte[]?>? read, IReadOnlyList<string>? shaders)
+    {
+        var said = new StringBuilder();
+        if (read is null || shaders is not { Count: > 0 })
         {
-            said.AppendLine().Append("=== shader source ").AppendLine(one);
-            said.AppendLine(Text(read, one));
+            return said.AppendLine("no shader sources: no install, or the install walk found none").ToString();
         }
 
-        if (named.Count > MostShaderFiles)
+        List<string> ordered = [.. shaders.Order(StringComparer.OrdinalIgnoreCase)];
+        said.Append(Say(ordered.Count)).AppendLine(" shader sources from the install, whole, in path order").AppendLine();
+        foreach (string one in ordered)
         {
-            said.Append(Say(named.Count - MostShaderFiles)).AppendLine(" more not printed:");
-            foreach (string one in named.Skip(MostShaderFiles))
-            {
-                said.Append("  ").AppendLine(one);
-            }
+            said.Append("=== shader source ").AppendLine(one);
+            said.AppendLine(Raw(read, one) is { } text ? text.TrimEnd() : "(not in the install)").AppendLine();
         }
 
-        // THE REST SEARCHED BY LINE, because a ground's coordinates may be made in a file named for
-        // something else - a vertex layout, a common include.
-        said.AppendLine().AppendLine("=== shader lines naming the ground or the terrain, in the files above not printed whole");
-        var quoted = 0;
-        var searched = 0;
-        var printedWhole = new HashSet<string>(named.Take(MostShaderFiles), StringComparer.OrdinalIgnoreCase);
-        foreach (string one in shaders)
-        {
-            if (printedWhole.Contains(one))
-            {
-                continue;
-            }
-
-            if (searched >= MostShaderSearched || quoted >= MostShaderLines)
-            {
-                break;
-            }
-
-            searched++;
-
-            if (Raw(read, one) is not { } text)
-            {
-                continue;
-            }
-
-            var number = 0;
-            foreach (string line in text.Split('\n'))
-            {
-                number++;
-                if (!GroundWords.Any(word => line.Contains(word, StringComparison.OrdinalIgnoreCase)))
-                {
-                    continue;
-                }
-
-                string trimmed = line.Trim();
-                said.Append("  ").Append(one).Append(':').Append(Say(number)).Append(": ")
-                    .AppendLine(trimmed.Length > MostShaderLine ? trimmed[..MostShaderLine] + " ..." : trimmed);
-                if (++quoted >= MostShaderLines)
-                {
-                    break;
-                }
-            }
-        }
-
-        said.Append("searched ").Append(Say(searched)).Append(" files, quoted ")
-            .Append(Say(quoted)).AppendLine(quoted >= MostShaderLines ? " lines (stopped at the limit)" : " lines");
+        return said.ToString();
     }
 
     /// <summary>A path's first two folders, the grouping the shader list is counted by.</summary>
