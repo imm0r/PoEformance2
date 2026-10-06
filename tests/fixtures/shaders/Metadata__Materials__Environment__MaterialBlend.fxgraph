@@ -1,0 +1,2940 @@
+{
+    "version": 3,
+    "textures": [
+        {
+            "filename": "Art/particles/distortion/muddle_double.dds",
+            "format": "BC7",
+            "sources": [
+                {
+                    "filename": "particles/distortion/muddle_double.png"
+                }
+            ],
+            "count": 1
+        }
+    ],
+    "shader_group": [
+        "Material"
+    ],
+    "overriden_lighting_model": "SpecGlossPbrMaterial",
+    "nodes": [
+        {
+            "type": "InputVertexUV",
+            "index": 0,
+            "stage": "LocalTransform",
+            "ui_position": [
+                800.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "VertexUV",
+            "index": 0,
+            "stage": "LocalTransform",
+            "ui_position": [
+                1300.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "InputVertexPosition",
+            "index": 0,
+            "stage": "WorldTransform",
+            "ui_position": [
+                800.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "VertexPosition",
+            "index": 0,
+            "stage": "WorldTransform",
+            "ui_position": [
+                1300.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "InputVertexNormal",
+            "index": 0,
+            "stage": "WorldTransform",
+            "ui_position": [
+                1300.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "VertexNormal",
+            "index": 0,
+            "stage": "WorldTransform",
+            "ui_position": [
+                1800.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "InputWorldPos",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                -1129.8177490234376,
+                -183.47727966308595
+            ]
+        },
+        {
+            "type": "WorldPos",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                6199.4287109375,
+                -60.3946533203125
+            ]
+        },
+        {
+            "type": "InputAlbedoColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                -1129.8177490234376,
+                -183.47727966308595
+            ]
+        },
+        {
+            "type": "ConstantPixel3",
+            "index": 3,
+            "parameters": [
+                {
+                    "value": [
+                        0.12020000070333481,
+                        0.09200000017881394,
+                        0.0
+                    ]
+                }
+            ],
+            "custom_parameter": "Dust_secondary_color",
+            "ui_position": [
+                3420.733642578125,
+                194.9574432373047
+            ]
+        },
+        {
+            "type": "ConstantPixel3",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": [
+                        0.19220000505447389,
+                        0.10559999942779541,
+                        0.04500000178813934
+                    ]
+                }
+            ],
+            "custom_parameter": "Dust_Color",
+            "ui_position": [
+                3411.61474609375,
+                318.03814697265627
+            ]
+        },
+        {
+            "type": "ConstantPixel3",
+            "index": 5,
+            "parameters": [
+                {
+                    "value": [
+                        0.05000000074505806,
+                        0.05000000074505806,
+                        0.05000000074505806
+                    ]
+                }
+            ],
+            "custom_parameter": "SampleTriplanar_Tile",
+            "ui_position": [
+                76.93045043945313,
+                1553.672607421875
+            ]
+        },
+        {
+            "type": "Multiply3",
+            "index": 2,
+            "ui_position": [
+                478.11566162109377,
+                1247.0247802734376
+            ]
+        },
+        {
+            "type": "InputWorldNormal",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                -1129.8177490234376,
+                -183.47727966308595
+            ]
+        },
+        {
+            "type": "SampleTriplanar",
+            "index": 0,
+            "parameters": [
+                {
+                    "format": "BC1",
+                    "srgb": true
+                },
+                {}
+            ],
+            "custom_parameter": "Triplanar_noise",
+            "ui_position": [
+                701.3187255859375,
+                1404.8236083984376
+            ]
+        },
+        {
+            "type": "ConstantPixel2",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": [
+                        0.009999999776482582,
+                        0.009999999776482582
+                    ]
+                }
+            ],
+            "custom_parameter": "Sample_Noise_Tile",
+            "ui_position": [
+                -1036.7918701171876,
+                1139.0628662109376
+            ]
+        },
+        {
+            "type": "Multiply2",
+            "index": 0,
+            "ui_position": [
+                -670.8770141601563,
+                934.976318359375
+            ]
+        },
+        {
+            "type": "ConstantPixel2",
+            "index": 2,
+            "parameters": [
+                {
+                    "value": [
+                        0.13230000436306,
+                        0.21119999885559083
+                    ]
+                }
+            ],
+            "custom_parameter": "SampleNoise_Offset",
+            "ui_position": [
+                -1039.4285888671876,
+                1043.9996337890626
+            ]
+        },
+        {
+            "type": "Add2",
+            "index": 1,
+            "ui_position": [
+                -201.41270446777345,
+                1014.9201049804688
+            ]
+        },
+        {
+            "type": "FromVertexVariance",
+            "index": 0,
+            "ui_position": [
+                -919.0,
+                1247.285888671875
+            ]
+        },
+        {
+            "type": "MuddleTex",
+            "index": 0,
+            "parameters": [
+                {
+                    "path": "Art/particles/distortion/muddle_double.dds",
+                    "srgb": false
+                },
+                {},
+                {
+                    "value": 2.75600004196167
+                },
+                {},
+                {
+                    "value": 0.6978999972343445
+                }
+            ],
+            "ui_position": [
+                29.636098861694337,
+                1174.7047119140626
+            ]
+        },
+        {
+            "type": "SampleTexture2",
+            "index": 0,
+            "parameters": [
+                {
+                    "format": "BC1",
+                    "srgb": true
+                },
+                {}
+            ],
+            "custom_parameter": "Sample_Noise_Texture",
+            "ui_position": [
+                703.029296875,
+                1188.8062744140626
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 5,
+            "ui_position": [
+                2992.038818359375,
+                969.062255859375
+            ]
+        },
+        {
+            "type": "Lerp3",
+            "index": 2,
+            "ui_position": [
+                3728.477783203125,
+                331.92572021484377
+            ]
+        },
+        {
+            "type": "ConstantPixel3",
+            "index": 6,
+            "parameters": [
+                {
+                    "value": [
+                        3.0,
+                        3.0,
+                        3.0
+                    ]
+                }
+            ],
+            "ui_position": [
+                3685.412109375,
+                818.0074462890625
+            ]
+        },
+        {
+            "type": "Multiply3",
+            "index": 3,
+            "ui_position": [
+                3854.41162109375,
+                654.007568359375
+            ]
+        },
+        {
+            "type": "Noise31",
+            "index": 0,
+            "ui_position": [
+                4058.41259765625,
+                672.0074462890625
+            ]
+        },
+        {
+            "type": "Multiply3",
+            "index": 4,
+            "ui_position": [
+                4173.412109375,
+                518.0074462890625
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 30,
+            "parameters": [
+                {
+                    "value": 0.484499990940094
+                }
+            ],
+            "ui_position": [
+                3698.412109375,
+                528.0074462890625
+            ]
+        },
+        {
+            "type": "Lerp3",
+            "index": 3,
+            "ui_position": [
+                4394.41162109375,
+                506.0074462890625
+            ]
+        },
+        {
+            "type": "InputTbnNormal",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                -1129.8177490234376,
+                -183.47727966308595
+            ]
+        },
+        {
+            "type": "FitRange",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": -1.0
+                },
+                {
+                    "value": 1.0
+                },
+                {},
+                {
+                    "value": 1.0
+                }
+            ],
+            "ui_position": [
+                955.544921875,
+                361.66436767578127
+            ]
+        },
+        {
+            "type": "Negate",
+            "index": 0,
+            "ui_position": [
+                -680.0166015625,
+                844.911376953125
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 0,
+            "ui_position": [
+                -219.55177307128907,
+                928.8497314453125
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 3,
+            "ui_position": [
+                1394.91259765625,
+                412.1080627441406
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 10,
+            "ui_position": [
+                1599.971923828125,
+                455.4252624511719
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 16,
+            "parameters": [
+                {
+                    "value": 0.20730000734329225
+                }
+            ],
+            "ui_position": [
+                657.3121337890625,
+                506.75201416015627
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 29,
+            "parameters": [
+                {
+                    "value": 0.09939999878406525
+                }
+            ],
+            "ui_position": [
+                274.0,
+                660.0
+            ]
+        },
+        {
+            "type": "Subtract",
+            "index": 0,
+            "ui_position": [
+                622.0,
+                647.0
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 0.7091000080108643
+                }
+            ],
+            "custom_parameter": "YAxis_Blend",
+            "ui_position": [
+                502.91943359375,
+                789.8403930664063
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 23,
+            "ui_position": [
+                724.412353515625,
+                929.0074462890625
+            ]
+        },
+        {
+            "type": "SmoothStep",
+            "index": 0,
+            "ui_position": [
+                1038.8896484375,
+                583.86083984375
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 2,
+            "ui_position": [
+                1328.900390625,
+                587.3137817382813
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "ui_position": [
+                955.71240234375,
+                708.4547729492188
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 2,
+            "parameters": [
+                {}
+            ],
+            "ui_position": [
+                982.7572021484375,
+                793.0911865234375
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 3,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "ui_position": [
+                976.8787841796875,
+                892.636474609375
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 15,
+            "ui_position": [
+                1461.238525390625,
+                870.7567749023438
+            ]
+        },
+        {
+            "type": "FitRangeFromInput",
+            "index": 0,
+            "ui_position": [
+                1867.45703125,
+                575.52685546875
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 16,
+            "ui_position": [
+                2161.49755859375,
+                642.4423828125
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 19,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "enable_windDistort",
+            "ui_position": [
+                1675.01416015625,
+                1027.5438232421876
+            ]
+        },
+        {
+            "type": "Ceil",
+            "index": 2,
+            "ui_position": [
+                1930.453857421875,
+                987.8775634765625
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 22,
+            "ui_position": [
+                2075.41259765625,
+                907.0076904296875
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 11,
+            "ui_position": [
+                2167.17431640625,
+                1027.0338134765626
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 0,
+            "ui_position": [
+                2314.551025390625,
+                869.359375
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 17,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "Enable_RoughNoise",
+            "ui_position": [
+                1677.5914306640626,
+                1131.6361083984376
+            ]
+        },
+        {
+            "type": "Ceil",
+            "index": 0,
+            "ui_position": [
+                2318.046142578125,
+                1068.73681640625
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 21,
+            "ui_position": [
+                2360.412109375,
+                1300.00732421875
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 1,
+            "ui_position": [
+                2552.14501953125,
+                811.982666015625
+            ]
+        },
+        {
+            "type": "InputIndirectColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                -1129.8177490234376,
+                -183.47727966308595
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 11,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "ContactDust_Radius",
+            "ui_position": [
+                1362.0341796875,
+                1672.296630859375
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 11,
+            "ui_position": [
+                1659.4661865234376,
+                1664.52587890625
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 12,
+            "parameters": [
+                {}
+            ],
+            "ui_position": [
+                1361.4794921875,
+                1744.3480224609376
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 13,
+            "ui_position": [
+                1662.3531494140626,
+                1751.343994140625
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 13,
+            "parameters": [
+                {}
+            ],
+            "ui_position": [
+                1359.5458984375,
+                1816.4288330078126
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 14,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "ContactDust_FadeBias",
+            "ui_position": [
+                1355.7333984375,
+                1887.921142578125
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 12,
+            "ui_position": [
+                1668.645263671875,
+                1900.451171875
+            ]
+        },
+        {
+            "type": "FitRangeFromInput",
+            "index": 2,
+            "ui_position": [
+                1949.131103515625,
+                1706.0048828125
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 4,
+            "ui_position": [
+                3236.5263671875,
+                1696.876220703125
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 4,
+            "ui_position": [
+                3559.8291015625,
+                856.7825927734375
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 18,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "enable_contactDust",
+            "ui_position": [
+                2603.7275390625,
+                1558.0001220703126
+            ]
+        },
+        {
+            "type": "Ceil",
+            "index": 1,
+            "ui_position": [
+                2883.727294921875,
+                1555.272705078125
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 20,
+            "ui_position": [
+                3220.411865234375,
+                1530.00732421875
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 2,
+            "ui_position": [
+                3731.227294921875,
+                921.9122314453125
+            ]
+        },
+        {
+            "type": "FromVertexLocalPosition",
+            "index": 0,
+            "ui_position": [
+                3190.78662109375,
+                1803.29150390625
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 20,
+            "parameters": [
+                {
+                    "value": 100.0
+                }
+            ],
+            "custom_parameter": "Max_Height",
+            "ui_position": [
+                3161.78564453125,
+                1898.291015625
+            ]
+        },
+        {
+            "type": "Negate",
+            "index": 1,
+            "ui_position": [
+                3569.78564453125,
+                1887.291015625
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 21,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "ui_position": [
+                3162.78564453125,
+                1966.291015625
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 22,
+            "parameters": [
+                {}
+            ],
+            "ui_position": [
+                3166.78564453125,
+                2037.291015625
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 23,
+            "parameters": [
+                {
+                    "value": 2.0
+                }
+            ],
+            "custom_parameter": "Max_Height_Fade",
+            "ui_position": [
+                3167.78564453125,
+                2109.291015625
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 27,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "Invert_Height",
+            "ui_position": [
+                3167.694091796875,
+                2181.536376953125
+            ]
+        },
+        {
+            "type": "Ceil",
+            "index": 5,
+            "ui_position": [
+                3513.0,
+                2084.0
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 18,
+            "ui_position": [
+                3736.0,
+                2085.0
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 9,
+            "ui_position": [
+                3996.0,
+                2111.0
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 8,
+            "ui_position": [
+                4010.0,
+                2001.0
+            ]
+        },
+        {
+            "type": "FitRangeFromInput",
+            "index": 3,
+            "ui_position": [
+                4327.7861328125,
+                1989.291015625
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 10,
+            "ui_position": [
+                4657.67431640625,
+                1838.6248779296876
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 24,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "Enable_HeightMask",
+            "ui_position": [
+                4332.05908203125,
+                2146.562744140625
+            ]
+        },
+        {
+            "type": "Ceil",
+            "index": 3,
+            "ui_position": [
+                4655.69921875,
+                2121.82373046875
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 5,
+            "ui_position": [
+                4900.78662109375,
+                1403.735595703125
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 17,
+            "ui_position": [
+                5313.923828125,
+                371.971923828125
+            ]
+        },
+        {
+            "type": "Lerp3",
+            "index": 0,
+            "ui_position": [
+                5778.7607421875,
+                438.43353271484377
+            ]
+        },
+        {
+            "type": "AlbedoColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                6199.4287109375,
+                -60.3946533203125
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 5,
+            "ui_position": [
+                5599.30224609375,
+                573.28466796875
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 28,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "custom_parameter": "Export_Mask_for_NormalGraph",
+            "ui_position": [
+                5117.72802734375,
+                996.4344482421875
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 19,
+            "ui_position": [
+                5514.8779296875,
+                988.8179931640625
+            ]
+        },
+        {
+            "type": "Ceil",
+            "index": 6,
+            "ui_position": [
+                5661.09228515625,
+                801.9999389648438
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 10,
+            "ui_position": [
+                5770.5224609375,
+                552.9090576171875
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 24,
+            "ui_position": [
+                6104.060546875,
+                499.63671875
+            ]
+        },
+        {
+            "type": "TbnNormal",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                6199.4287109375,
+                -60.3946533203125
+            ]
+        },
+        {
+            "type": "WorldNormal",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                6199.4287109375,
+                -60.3946533203125
+            ]
+        },
+        {
+            "type": "InputGlossiness",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                -1129.8177490234376,
+                -183.47727966308595
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 5,
+            "parameters": [
+                {
+                    "value": 0.6531999707221985
+                }
+            ],
+            "custom_parameter": "Glossiness_Muliplier",
+            "ui_position": [
+                3420.92138671875,
+                477.46649169921877
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 0,
+            "ui_position": [
+                5780.32177734375,
+                210.70333862304688
+            ]
+        },
+        {
+            "type": "Glossiness",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                6199.4287109375,
+                -60.3946533203125
+            ]
+        },
+        {
+            "type": "InputSpecularColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                -1129.8177490234376,
+                -183.47727966308595
+            ]
+        },
+        {
+            "type": "ConstantPixel3",
+            "index": 1,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "Specular_clr_Multiplier",
+            "ui_position": [
+                3410.79345703125,
+                689.3988037109375
+            ]
+        },
+        {
+            "type": "Multiply3",
+            "index": 1,
+            "ui_position": [
+                4201.0,
+                613.0
+            ]
+        },
+        {
+            "type": "Lerp3",
+            "index": 1,
+            "ui_position": [
+                5767.8134765625,
+                324.1653747558594
+            ]
+        },
+        {
+            "type": "SpecularColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                6199.4287109375,
+                -60.3946533203125
+            ]
+        },
+        {
+            "type": "InputEmissiveColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                -1129.8177490234376,
+                -183.47727966308595
+            ]
+        },
+        {
+            "type": "EmissiveColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                6199.4287109375,
+                -60.3946533203125
+            ]
+        },
+        {
+            "type": "IndirectColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                6199.4287109375,
+                -60.3946533203125
+            ]
+        },
+        {
+            "type": "OutputVertexLocalPosition",
+            "index": 0,
+            "ui_position": [
+                1359.89453125,
+                -590.1039428710938
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 31,
+            "parameters": [
+                {}
+            ],
+            "ui_position": [
+                5423.673828125,
+                732.7615356445313
+            ]
+        },
+        {
+            "type": "Add3",
+            "index": 0,
+            "ui_position": [
+                4220.412109375,
+                787.0074462890625
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputVertexUV",
+                "index": 0,
+                "stage": "LocalTransform",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "VertexUV",
+                "index": 0,
+                "stage": "LocalTransform",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexPosition",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "VertexPosition",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexNormal",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "VertexNormal",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "z"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 2,
+                "variable": "a",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 2,
+                "variable": "a",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 2,
+                "variable": "a",
+                "swizzle": "z"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel3",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTriplanar",
+                "index": 0,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "SampleTriplanar",
+                "index": 0,
+                "variable": "world_normal",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "SampleTriplanar",
+                "index": 0,
+                "variable": "world_normal",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "SampleTriplanar",
+                "index": 0,
+                "variable": "world_normal",
+                "swizzle": "z"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 0,
+                "variable": "a",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 0,
+                "variable": "a",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply2",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add2",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add2",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add2",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MuddleTex",
+                "index": 0,
+                "variable": "in_uv"
+            }
+        },
+        {
+            "src": {
+                "type": "FromVertexVariance",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MuddleTex",
+                "index": 0,
+                "variable": "variance"
+            }
+        },
+        {
+            "src": {
+                "type": "Add2",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture2",
+                "index": 0,
+                "variable": "uv0"
+            }
+        },
+        {
+            "src": {
+                "type": "MuddleTex",
+                "index": 0,
+                "variable": "out_uv"
+            },
+            "dst": {
+                "type": "SampleTexture2",
+                "index": 0,
+                "variable": "uv1"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTriplanar",
+                "index": 0,
+                "variable": "rgb",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 5,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture2",
+                "index": 0,
+                "variable": "rgba0",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 5,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel3",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 3,
+                "variable": "a",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 3,
+                "variable": "a",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 3,
+                "variable": "a",
+                "swizzle": "z"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel3",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply3",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Noise31",
+                "index": 0,
+                "variable": "pos"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 4,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Noise31",
+                "index": 0,
+                "variable": "noise"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 4,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply3",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 30,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 3,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "FitRange",
+                "index": 0,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "Negate",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Negate",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRange",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 10,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 16,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 29,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 23,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 16,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SmoothStep",
+                "index": 0,
+                "variable": "center"
+            }
+        },
+        {
+            "src": {
+                "type": "Subtract",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SmoothStep",
+                "index": 0,
+                "variable": "steepness"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 23,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SmoothStep",
+                "index": 0,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "SmoothStep",
+                "index": 0,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 2,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 15,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 10,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "in_min"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "in_max"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "out_min"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 15,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "out_max"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 16,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 19,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Ceil",
+                "index": 2,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Ceil",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 22,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture2",
+                "index": 0,
+                "variable": "rgba0",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 11,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture2",
+                "index": 0,
+                "variable": "rgba1",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 11,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 22,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 11,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 11,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 16,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 17,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Ceil",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Ceil",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 21,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 16,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 21,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 11,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 11,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 12,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 13,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 14,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 12,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 11,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "in_min"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 13,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "in_max"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 13,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "out_min"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 12,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "out_max"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 4,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 4,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 4,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 18,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Ceil",
+                "index": 1,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Ceil",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 20,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 20,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 2,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 20,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Negate",
+                "index": 1,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 27,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Ceil",
+                "index": 5,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Ceil",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 18,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 22,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 9,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 23,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 9,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 18,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 9,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 23,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 8,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 22,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 8,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 18,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 8,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "FromVertexLocalPosition",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 3,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "Negate",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 3,
+                "variable": "in_min"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 21,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 3,
+                "variable": "in_max"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 9,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 3,
+                "variable": "out_min"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 8,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 3,
+                "variable": "out_max"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 10,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 10,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 24,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Ceil",
+                "index": 3,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 5,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 10,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 5,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Ceil",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 5,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 17,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 17,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 5,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 17,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 5,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 28,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 19,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 19,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Ceil",
+                "index": 6,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 10,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 10,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Ceil",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 10,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 10,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 24,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 24,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "TbnNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "TbnNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "TbnNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "z"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "WorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputGlossiness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 17,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Glossiness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputSpecularColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel3",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputSpecularColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply3",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 17,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SpecularColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputEmissiveColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "EmissiveColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Noise31",
+                "index": 0,
+                "variable": "noise"
+            },
+            "dst": {
+                "type": "Add3",
+                "index": 0,
+                "variable": "b"
+            }
+        }
+    ]
+}

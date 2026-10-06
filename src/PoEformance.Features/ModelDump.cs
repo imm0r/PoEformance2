@@ -256,6 +256,14 @@ public static class ModelDump
             }
         }
 
+        // EACH DOODAD'S OWN MESH FILE, for a room: the joined mesh has no headers of its own, and the
+        // question of which file carries which vertex fields is per file.
+        foreach (MeshNamed mesh in model.Meshes)
+        {
+            said.AppendLine().Append("=== mesh ").AppendLine(mesh.Path.Length > 0 ? mesh.Path : "(unnamed)");
+            Facts(said, "  ", mesh.Facts);
+        }
+
         said.AppendLine().Append("=== shapes (").Append(Say(shapes.Count)).AppendLine(")");
         IReadOnlyList<string> modes = model.Modes;
         for (var one = 0; one < shapes.Count; one++)
@@ -1542,6 +1550,13 @@ public static class ModelDump
             .Append(" in the header, ").Append(Say(facts.BlockShapes)).Append(" in the block")
             .Append(" · ").Append(Say(facts.Triangles)).Append(" triangles over ")
             .Append(Say(facts.Vertices)).AppendLine(" vertices");
+
+        // THE FIELDS THE READER STEPS OVER, by what is in them - see SkinnedMesh.Extras. Whether a
+        // doodad's mesh carries a vertex colour is read off this line, not guessed from a name.
+        if (facts.Extras.Length > 0)
+        {
+            said.Append(indent).Append("unknown vertex fields · ").AppendLine(facts.Extras);
+        }
 
         said.Append(indent).Append("names: ").Append(Say(facts.NamesSaid))
             .Append(" bytes said, ").Append(Say(facts.NamesRead)).Append(" read")

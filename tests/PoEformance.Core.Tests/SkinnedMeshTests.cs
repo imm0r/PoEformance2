@@ -249,6 +249,22 @@ public class SkinnedMeshTests
     /// that does. The reference's dolm parser writes both, and where they land - the block after
     /// the LAST level of detail, before the names - is what decides whether the names read.
     /// </remarks>
+    /// <summary>
+    /// The fields the reader steps over are described by what is in them, for the dump - see SkinnedMesh.Extras.
+    /// </summary>
+    [Fact]
+    public void TheUnknownVertexFieldsAreSummedUpByWhatIsInThem()
+    {
+        SkinnedMesh plain = SkinnedMesh.Read(Built());
+        Assert.True(plain.Ready);
+        Assert.Equal(string.Empty, plain.Facts.Extras);
+
+        // Four vertices, the first FF 80 00 FF and the rest FF 40 00 FF: two values, and each byte's range.
+        SkinnedMesh sixth = SkinnedMesh.Read(Built(sixth: true));
+        Assert.True(sixth.Ready);
+        Assert.Equal("bit 6: first FF 80 00 FF · 2 distinct over 4 vertices · bytes 255..255 64..128 0..0 255..255", sixth.Facts.Extras);
+    }
+
     [Theory]
     [InlineData(1)]
     [InlineData(2)]
@@ -466,7 +482,9 @@ public class SkinnedMeshTests
                 U8(255); U8(0); U8(0); U8(0);       // weights, summing to 255
                 if (sixth)
                 {
-                    U32(0);                         // whatever the seventh bit adds per vertex
+                    // Whatever the seventh bit adds per vertex - written here as something a colour
+                    // would look like, so the facts' summary of it can be checked.
+                    U32(place == places[0] ? 0xFF0080FFu : 0xFF0040FFu);
                 }
             }
         }
