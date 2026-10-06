@@ -243,18 +243,31 @@ public class ShadeProgramTests
             compiled.Program.Textures.OrderBy(one => one.Path, StringComparer.Ordinal));
     }
 
-    /// <summary>A cliff from the same install is its colour map, and the dust graph after it is named.</summary>
+    /// <summary>
+    /// A cliff from the same install: its colour map with Dust_simple's dust over it, the whole of it evaluated.
+    /// </summary>
+    /// <remarks>
+    /// THE DUST WAS NAMED FOR THREE THINGS IN TURN - the indirect light, Noise31, the vertex's local
+    /// position - and reads the occlusion DielectricSpecGlossBN puts in the indirect light's w, which
+    /// is why that graph's normal map is among the textures.
+    /// </remarks>
     [Fact]
-    public void ANDACLIFFFromTheInstallIsItsColourMapWithTheDustNamed()
+    public void ANDACLIFFFromTheInstallIsDustedByDustSimple()
     {
         ShadeCompile compiled = Real("Art/Textures/Environment/desert/DesertCliffs/DESERT_Cliff13c.mat");
 
         Assert.NotNull(compiled.Program);
+        Assert.Empty(compiled.Skipped);
+        Assert.Equal(-1, compiled.Program.Plain);
         Assert.Equal(
-            "Art/Textures/Environment/desert/DesertCliffs/DESERT_Cliff13_colour_BC1.dds",
-            compiled.Program.Textures[compiled.Program.Plain].Path);
-        Assert.Single(compiled.Skipped);
-        Assert.EndsWith(" in Dust_simple", compiled.Skipped[0], StringComparison.Ordinal);
+            ["Metadata/Materials/DielectricSpecGlossBN.fxgraph", "Metadata/Materials/Environment/Dust_simple.fxgraph"],
+            compiled.Program.Graphs);
+        Assert.Equal(
+            [
+                new ShadeTexture("Art/Textures/Environment/desert/DesertCliffs/DESERT_Cliff13_colour_BC1.dds", true),
+                new ShadeTexture("Art/Textures/Environment/desert/DesertCliffs/DESERT_Cliff13_normal_BC7.dds", false),
+            ],
+            compiled.Program.Textures);
     }
 
     /// <summary>The tall dune: PBRGround's colour at OffsetUVTiling's coordinates, the contact fade named.</summary>
@@ -480,16 +493,13 @@ public class ShadeProgramTests
                 "Vibrance", "emission"),
             0.648f, 0.4199f, 0.805f);
 
-    /// <summary>Rotate turns coordinates about nought and RotateUV about its centre; RotateUV without its centre is refused, its default being a half.</summary>
+    /// <summary>Rotate turns coordinates about nought and RotateUV about its centre - which, left out, is its declared half.</summary>
     [Fact]
     public void ROTATEAndRotateUVTurnTheCoordinates()
     {
         AssertColour(Turning("Rotate", string.Empty), 0.4632f, 0.4307f, 0f);
         AssertColour(Turning("RotateUV", """{"value":[0.5,0.5]}"""), 0.2847f, 0.7316f, 0f);
-
-        ShadeCompile centreless = ShadeProgram.Compile([(Instance(), Graph(Turning("RotateUV", "{}")))]);
-        Assert.Null(centreless.Program);
-        Assert.Equal(["RotateUV leaving out a value whose default is not nought in Test"], centreless.Skipped);
+        AssertColour(Turning("RotateUV", "{}"), 0.2847f, 0.7316f, 0f);
     }
 
     /// <summary>RadiusToPolarNorm gives the length and the angle as nought to one, by the node's own 3.1415.</summary>
@@ -637,14 +647,25 @@ public class ShadeProgramTests
     public void REMAPHUETurnsAColourAsTheShaderDoes()
         => AssertColour(RemapHue("""[{"value":120.0},{"value":0.5},{"value":0.5}]"""), 0.0998f, 0.79996f, 0.2002f);
 
-    /// <summary>A value left out whose declared default is not nought is not taken as nought, nor as the default.</summary>
+    /// <summary>
+    /// A value left out is the fragment's declared default: RemapHue's saturation a half, FitRange's range nought to 255 both ways.
+    /// </summary>
+    /// <remarks>A half mapped from [0, 255] to [0, 255] is a half; as nought the second range would be [0, 0], and the result nought.</remarks>
     [Fact]
-    public void ANDAVALUELeftOutWhoseDefaultIsNotNoughtIsNotGuessed()
+    public void ANDAVALUELeftOutIsTheFragmentsDeclaredDefault()
     {
-        ShadeCompile compiled = ShadeProgram.Compile([(Instance(), Graph(RemapHue("""[{"value":120.0},{},{"value":0.5}]""")))]);
-
-        Assert.Null(compiled.Program);
-        Assert.Equal(["RemapHue leaving out a value whose default is not nought in Test"], compiled.Skipped);
+        AssertColour(RemapHue("""[{"value":120.0},{},{"value":0.5}]"""), 0.0998f, 0.79996f, 0.2002f);
+        AssertColour(
+            Colouring(
+                """
+                  {"type":"ConstantFloat","index":0,"parameters":[{"value":0.5}]},
+                  {"type":"FitRange","index":0}
+                """,
+                """
+                  {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"FitRange","index":0,"variable":"value"}}
+                """,
+                "FitRange", "output"),
+            0.5f, 0.5f, 0.5f);
     }
 
     /// <summary>
@@ -657,9 +678,9 @@ public class ShadeProgramTests
         Assert.NotNull(black.Program);
         Assert.Empty(black.Skipped);
 
-        ShadeCompile occlusion = ShadeProgram.Compile([(Instance(), Graph(Reading("InputIndirectColor", "w")))]);
+        ShadeCompile occlusion = ShadeProgram.Compile([(Instance(), Graph(Reading("InputIndirectColor", "w", into: "xyz")))]);
         Assert.Null(occlusion.Program);
-        Assert.Equal(["InputIndirectColor's w before any graph set it in Test"], occlusion.Skipped);
+        Assert.Equal(["InputIndirectColor's w, which nothing has set in Test"], occlusion.Skipped);
     }
 
     /// <summary>A channel whose write was left out is lost, and the graph reading it after is named for it, not handed the old value.</summary>
@@ -747,7 +768,184 @@ public class ShadeProgramTests
         Assert.Equal(["Add3 with the TBN basis's normal, whose length is not known in Test"], length.Skipped);
     }
 
+    /// <summary>LookUpTexture reads a row of its texture by the colour's alpha and scales it by its multiplier - declared one, left out.</summary>
+    [Fact]
+    public void LOOKUPTEXTUREReadsARowByTheAlpha()
+    {
+        var sheets = new Dictionary<string, Mipmaps> { ["Art/lut.dds"] = Sheet(Srgb(0.6f), Srgb(0.2f), Srgb(0.1f)) };
+        AssertColour(LookingUp("{}", "rgb", "xyz"), 0.6f, 0.2f, 0.1f, sheets);
+        AssertColour(LookingUp("""{"value":0.5}""", "rgb", "xyz"), 0.3f, 0.1f, 0.05f, sheets);
+        AssertColour(LookingUp("{}", "g", string.Empty), 0.2f, 0.2f, 0.2f, sheets);
+
+        ShadeCompile unset = ShadeProgram.Compile([(Instance(), Graph(LookingUp("{}", "a", string.Empty)))]);
+        Assert.Null(unset.Program);
+        Assert.Equal(["LookUpTexture's a, which the fragment never sets in Test"], unset.Skipped);
+    }
+
+    /// <summary>
+    /// The vertex position and normal are the mesh's own, the position with a w of one - at either transform stage, and through uv9.
+    /// </summary>
+    /// <remarks>The quad lies in y = 0 facing -y, so its position's y is nought and its normal's y, made positive, one.</remarks>
+    [Fact]
+    public void THEVERTEXPositionAndNormalAreTheMeshsOwn()
+        => AssertColour(
+            Colouring(
+                """
+                  {"type":"InputVertexPosition","index":0,"stage":"LocalTransform"},
+                  {"type":"FromVertexLocalPosition","index":0},
+                  {"type":"InputVertexNormal","index":0,"stage":"WorldTransform"},
+                  {"type":"Abs3","index":0},
+                  {"type":"CoordsToFloat3","index":0}
+                """,
+                """
+                  {"src":{"type":"InputVertexPosition","index":0,"stage":"LocalTransform","variable":"output","swizzle":"w"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"x"}},
+                  {"src":{"type":"FromVertexLocalPosition","index":0,"variable":"output","swizzle":"y"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"y"}},
+                  {"src":{"type":"InputVertexNormal","index":0,"stage":"WorldTransform","variable":"output"},"dst":{"type":"Abs3","index":0,"variable":"input"}},
+                  {"src":{"type":"Abs3","index":0,"variable":"output","swizzle":"y"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"z"}}
+                """,
+                "CoordsToFloat3", "output"),
+            1f, 0f, 1f);
+
+    /// <summary>A graph that moves the vertices at a vertex stage makes every position after it not the mesh's, and those readers are refused.</summary>
+    [Fact]
+    public void ANDAFTERAGraphMovedTheVerticesTheyAreNotRead()
+    {
+        const string mover =
+            """
+            {"nodes":[
+              {"type":"InputVertexPosition","index":0,"stage":"WorldTransform"},
+              {"type":"ConstantFloat4","index":0,"parameters":[{"value":[0.0,0.0,10.0,0.0]}]},
+              {"type":"Add4","index":0},
+              {"type":"VertexPosition","index":0,"stage":"WorldTransform"}],
+             "links":[
+              {"src":{"type":"InputVertexPosition","index":0,"stage":"WorldTransform","variable":"output"},"dst":{"type":"Add4","index":0,"variable":"a"}},
+              {"src":{"type":"ConstantFloat4","index":0,"variable":"output"},"dst":{"type":"Add4","index":0,"variable":"b"}},
+              {"src":{"type":"Add4","index":0,"variable":"output"},"dst":{"type":"VertexPosition","index":0,"stage":"WorldTransform","variable":"input"}}]}
+            """;
+        string reader = Colouring(
+            """
+              {"type":"FromVertexLocalPosition","index":0},
+              {"type":"Dummy3","index":0}
+            """,
+            """
+              {"src":{"type":"FromVertexLocalPosition","index":0,"variable":"output","swizzle":"xyz"},"dst":{"type":"Dummy3","index":0,"variable":"in_value"}}
+            """,
+            "Dummy3", "out_value");
+
+        ShadeCompile compiled = ShadeProgram.Compile([(Instance("Metadata/Mover.fxgraph"), Graph(mover)), (Instance("Metadata/Reader.fxgraph"), Graph(reader))]);
+
+        Assert.Null(compiled.Program);
+        Assert.Equal(["FromVertexLocalPosition after Mover moved the vertices in Reader"], compiled.Skipped);
+    }
+
+    /// <summary>
+    /// A colour's w is compiled apart: a w this cannot work out costs the w alone, a later reader of that w is refused, and a writer with only a w is refused.
+    /// </summary>
+    [Fact]
+    public void ACOLOURSWIsCompiledApartFromItsXyz()
+    {
+        ShadeCompile faded = ShadeProgram.Compile([(Instance(), Graph(Faded))]);
+        Assert.NotNull(faded.Program);
+        Assert.Empty(faded.Skipped);
+
+        ShadeCompile read = ShadeProgram.Compile(
+        [
+            (Instance(), Graph(Faded)),
+            (Instance("Metadata/Reader.fxgraph"), Graph(Reading("InputAlbedoColor", "w", "Texturing", "xyz"))),
+        ]);
+        Assert.NotNull(read.Program);
+        Assert.Equal(["InputAlbedoColor's w, which nothing has set in Reader"], read.Skipped);
+
+        ShadeCompile alone = ShadeProgram.Compile([(Instance(), Graph(
+            """
+            {"nodes":[
+              {"type":"DepthDistance","index":0},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"DepthDistance","index":0,"variable":"distance"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"w"}}]}
+            """))]);
+        Assert.Null(alone.Program);
+        Assert.Equal(["AlbedoColor with its w alone, whose xyz are then not written down in Test"], alone.Skipped);
+    }
+
+    /// <summary>
+    /// Dust_lookup from the install, behind a base that writes the colour and the occlusion: whole, through the vertex's local position and the lookup.
+    /// </summary>
+    [Fact]
+    public void THEDUSTLookupFromTheInstallCompilesWhole()
+    {
+        const string graph = "Metadata/Materials/Environment/Dust_lookup.fxgraph";
+        ShadeCompile compiled = ShadeProgram.Compile(
+        [
+            (Instance("Metadata/Base.fxgraph"), Graph(Occluding("Art/base.dds"))),
+            (Instance(graph, ("08_lookupTexture", [new ShaderValue("Art/lut.dds", [], true), ShaderValue.Empty, ShaderValue.Empty, ShaderValue.Empty])), FixtureGraph(graph)),
+        ]);
+
+        Assert.NotNull(compiled.Program);
+        Assert.Empty(compiled.Skipped);
+        Assert.Equal(["Metadata/Base.fxgraph", graph], compiled.Program.Graphs);
+        Assert.Contains(new ShadeTexture("Art/lut.dds", true), compiled.Program.Textures);
+    }
+
+    /// <summary>The ZProject blend from the install, behind a plain colour: whole, through the vertex normal and position it masks by.</summary>
+    [Fact]
+    public void ANDTHEZPROJECTBlendFromTheInstallCompilesWhole()
+    {
+        const string graph = "Metadata/LEGACY/Materials/Environment/MaterialBlends/MaterialBlend_ZProject_V01.fxgraph";
+        ShadeCompile compiled = ShadeProgram.Compile(
+        [
+            (Instance(), Graph(Plain("Art/rock.dds"))),
+            (Instance(graph), FixtureGraph(graph)),
+        ]);
+
+        Assert.NotNull(compiled.Program);
+        Assert.Empty(compiled.Skipped);
+        Assert.Equal(["Metadata/Test.fxgraph", graph], compiled.Program.Graphs);
+        Assert.Contains(new ShadeTexture("Art/Models/Terrain/Jungle/Tiles/Jungle/Textures/JungleMoss01_colour_DXT1.dds", true), compiled.Program.Textures);
+    }
+
     // ---- the graphs ----
+
+    /// <summary>A texture's xyz into the colour, and the depth behind the pixel - which this cannot read - into its w.</summary>
+    private const string Faded =
+        """
+        {"nodes":[
+          {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+          {"type":"SampleTexture","index":0,"parameters":[{"path":"Art/a.dds","srgb":true},{}]},
+          {"type":"DepthDistance","index":0},
+          {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+         "links":[
+          {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture","index":0,"variable":"uv"}},
+          {"src":{"type":"SampleTexture","index":0,"variable":"rgba","swizzle":"xyz"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}},
+          {"src":{"type":"DepthDistance","index":0,"variable":"distance"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"w"}}]}
+        """;
+
+    /// <summary>A base graph: a texture as the whole colour, and an occlusion of 0.7 in the indirect light's w.</summary>
+    private static string Occluding(string texture) =>
+        $$$"""
+        {"nodes":[
+          {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+          {"type":"SampleTexture","index":0,"parameters":[{"path":"{{{texture}}}","srgb":true},{}]},
+          {"type":"ConstantFloat4","index":0,"parameters":[{"value":[0.0,0.0,0.0,0.7]}]},
+          {"type":"IndirectColor","index":0,"stage":"Texturing_Init"},
+          {{{Albedo}}}],
+         "links":[
+          {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture","index":0,"variable":"uv"}},
+          {"src":{"type":"SampleTexture","index":0,"variable":"rgba"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}},
+          {"src":{"type":"ConstantFloat4","index":0,"variable":"output"},"dst":{"type":"IndirectColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+        """;
+
+    /// <summary>LookUpTexture over a constant colour whose alpha is a half, with the multiplier given, one of its outputs into the colour.</summary>
+    private static string LookingUp(string multiplier, string output, string swizzle) =>
+        Colouring(
+            $$$"""
+              {"type":"ConstantFloat4","index":0,"parameters":[{"value":[0.2,0.3,0.4,0.5]}]},
+              {"type":"LookUpTexture","index":0,"parameters":[{"path":"Art/lut.dds","srgb":true},{},{{{multiplier}}},{}]}
+            """,
+            """
+              {"src":{"type":"ConstantFloat4","index":0,"variable":"output"},"dst":{"type":"LookUpTexture","index":0,"variable":"source_albedo"}}
+            """,
+            "LookUpTexture", output, swizzle);
 
     /// <summary>
     /// Three float nodes of one type, #0, #1 and #2, put into the colour's x, y and z by CoordsToFloat3 - with the graph's other nodes and links.
@@ -807,14 +1005,14 @@ public class ShadeProgramTests
           {"src":{"type":"RemapHue","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
         """;
 
-    /// <summary>A reader's components straight into the colour.</summary>
-    private static string Reading(string reader, string swizzle, string stage = "Texturing_Init") =>
+    /// <summary>A reader's components straight into the colour's - the same ones, or those given.</summary>
+    private static string Reading(string reader, string swizzle, string stage = "Texturing_Init", string? into = null) =>
         $$$"""
         {"nodes":[
           {"type":"{{{reader}}}","index":0,"stage":"{{{stage}}}"},
           {"type":"AlbedoColor","index":0,"stage":"{{{stage}}}"}],
          "links":[
-          {"src":{"type":"{{{reader}}}","index":0,"stage":"{{{stage}}}","variable":"output","swizzle":"{{{swizzle}}}"},"dst":{"type":"AlbedoColor","index":0,"stage":"{{{stage}}}","variable":"input","swizzle":"{{{swizzle}}}"}}]}
+          {"src":{"type":"{{{reader}}}","index":0,"stage":"{{{stage}}}","variable":"output","swizzle":"{{{swizzle}}}"},"dst":{"type":"AlbedoColor","index":0,"stage":"{{{stage}}}","variable":"input","swizzle":"{{{(into ?? swizzle)}}}"}}]}
         """;
 
     /// <summary>The colour so far, halved, at a stage.</summary>
@@ -980,6 +1178,25 @@ public class ShadeProgramTests
 
     private static ShaderInstance Instance((string Name, ShaderValue[] Values) custom)
         => new("Metadata/Test.fxgraph", new Dictionary<string, ShaderValue[]> { [custom.Name] = custom.Values });
+
+    private static ShaderInstance Instance(string parent, (string Name, ShaderValue[] Values) custom)
+        => new(parent, new Dictionary<string, ShaderValue[]> { [custom.Name] = custom.Values });
+
+    /// <summary>A graph from tests/fixtures/shaders, by its path in the install.</summary>
+    private static ShaderGraph FixtureGraph(string path)
+    {
+        DirectoryInfo? dir = new(AppContext.BaseDirectory);
+        while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
+        {
+            dir = dir.Parent;
+        }
+
+        Assert.NotNull(dir);
+        ShaderGraph graph = ShaderGraph.Read(File.ReadAllBytes(
+            Path.Combine(dir.FullName, "tests", "fixtures", "shaders", path.Replace("/", "__", StringComparison.Ordinal))));
+        Assert.True(graph.Ready);
+        return graph;
+    }
 
     private static ShaderValue Numbers(params float[] numbers) => new(string.Empty, numbers, null);
 

@@ -52,11 +52,32 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 /// were read.
 ///
 /// WHERE THE MODEL STANDS. A model is drawn where its own space puts it - at the origin, unturned
-/// and unscaled - so its space is the world's: <c>WorldPos</c> and <c>FromVertexWorldPos</c> are
-/// its positions, <c>FromVertexNormal</c> its normals, and <c>ModelOrigin</c> the origin with a
-/// scale of one. In the game the same tile stands somewhere else, and a pattern laid in world space
-/// lies elsewhere on it; it is the same pattern. This is a choice about how the picture is placed,
-/// made on purpose and said here, not a claim about the engine.
+/// and unscaled - so its space is the world's: <c>WorldPos</c>, <c>FromVertexWorldPos</c> and
+/// <c>InputVertexPosition</c> at either transform stage are its positions, <c>FromVertexNormal</c>
+/// and <c>InputVertexNormal</c> its normals, and <c>ModelOrigin</c> the origin with a scale of one.
+/// In the game the same tile stands somewhere else, and a pattern laid in world space lies
+/// elsewhere on it; it is the same pattern. This is a choice about how the picture is placed, made
+/// on purpose and said here, not a claim about the engine. A graph that MOVES the vertices - writes
+/// <c>VertexPosition</c> with anything but what it read - makes every position wrong, and those
+/// readers are refused after it.
+///
+/// <c>FromVertexLocalPosition</c> reads <c>semanticsData.uv9</c>, which no graph writes: the engine's
+/// own <c>OutputVertexLocalPosition</c> does, as <c>float4(vertex_local_pos, 1)</c>. That the two are
+/// paired is not in any file, and rests on three things: the names pair as <c>FromVertexUV</c> and
+/// <c>OutputVertexUV</c> do; the macro the output fragment sets, <c>VERTEX_OUTPUT_TEXCOORD9</c>, is
+/// what lets that interpolator exist at all; and Dust_lookup's height gradient, tuned per material
+/// through it, works in the game. So it is the position with a w of one.
+///
+/// A PARAMETER LEFT OUT IS ITS FRAGMENT'S DECLARED DEFAULT. The files omit a value that EQUALS the
+/// default and write one that differs, nought included: a FitRange whose <c>inputMax</c> (default
+/// 255) is written as <c>0.0</c> beside an <c>outputMax</c> (default 255) that is left out; a
+/// CombineTbnNormals whose two scales (default 1) are both left out, which as nought would flatten
+/// every normal map in the game. For most parameters the default is nought, and nothing changes.
+///
+/// ONLY THE COLOUR'S XYZ IS DRAWN - the renderer runs a program on opaque triangles alone and takes
+/// three components - so a colour's w is compiled apart from its xyz: where the w cannot be (a
+/// soft particle's fade by the depth behind it) the colour stands and its w is marked unset, and a
+/// later graph reading that w is refused, not handed nought.
 ///
 /// A FLOAT IS ONE NUMBER IN ALL FOUR COMPONENTS, as HLSL widens one: a scalar node's result is
 /// its first component spread across the register, which is also what HLSL does to a vector handed
@@ -156,7 +177,8 @@ public sealed class ShadeProgram
             "GreaterThan", "LessThan", "EqualsUInt", "GreaterThanUInt", "LessThanUInt", "And", "Or", "Not",
             "Float2ToCoords", "Float3ToCoords", "Float4ToCoords", "CoordsToFloat2", "CoordsToFloat3", "CoordsToFloat4",
             "SampleTexture", "SampleInputTexture", "SampleInputTextureLod", "SampleInputTriplanar",
-            "FromVertexNormal", "FromVertexWorldPos", "ModelOrigin", "GroundScroll", "Transform",
+            "FromVertexNormal", "FromVertexWorldPos", "FromVertexLocalPosition", "InputVertexPosition", "InputVertexNormal",
+            "ModelOrigin", "GroundScroll", "Transform", "LookUpTexture",
             "Noise31", "PerlinNoise31", "Vibrance", "Rotate", "RotateUV", "RadiusToPolarNorm",
         ],
         StringComparer.Ordinal);
@@ -357,11 +379,21 @@ public sealed class ShadeProgram
         var lookups = new Lookup[chain.Count];
         var writers = new List<Writer>[chain.Count, Stages.Count];
         var every = new List<Writer>();
+        var moved = new Displaced(null, null);
         for (var link = 0; link < chain.Count; link++)
         {
             lookups[link] = new Lookup(chain[link].Graph);
             foreach (ShaderNode node in chain[link].Graph.Nodes)
             {
+                // A VERTEX STAGE IS NOT RUN, but a graph that writes the position or the normal there
+                // with anything but what it read has moved the mesh, and what the pixel side reads of
+                // either is not the mesh's any more - see the class's remarks.
+                if (node.Type is "VertexPosition" or "VertexNormal" && lookups[link].Fed(node) && !PassedThrough(lookups[link], node))
+                {
+                    string by = Named(chain[link].Instance.Parent);
+                    moved = node.Type == "VertexPosition" ? moved with { Position = by } : moved with { Normal = by };
+                }
+
                 int at = IndexOf(node.Stage);
                 if (at < 0 || Written(node.Type) is not { } channel || !lookups[link].Fed(node))
                 {
@@ -389,8 +421,8 @@ public sealed class ShadeProgram
                 (ShaderInstance instance, _) = chain[link];
                 string named = Named(instance.Parent);
                 var seen = new Dictionary<string, Held>(state, StringComparer.Ordinal);
-                var unit = new Unit(build, lookups[link], instance, seen, lost);
-                var wrote = new List<(string Channel, int Register)>();
+                var unit = new Unit(build, lookups[link], instance, seen, lost, moved);
+                var wrote = new List<(string Channel, int Register, int Unset)>();
                 foreach (Writer writer in mine)
                 {
                     string channel = Channels[writer.Channel];
@@ -404,9 +436,18 @@ public sealed class ShadeProgram
                     {
                         Builder.Mark mark = build.Marked();
                         unit.Start();
-                        if (unit.Port(writer.Node, "input") is { } register && build.Fits && (channel == "TbnBasis") == (register == Basis))
+                        if (channel == "Albedo")
                         {
-                            wrote.Add((channel, register));
+                            // THE COLOUR'S W APART FROM ITS XYZ - see the class's remarks.
+                            if (unit.Colour(writer.Node) is { } colour && build.Fits)
+                            {
+                                wrote.Add((channel, colour.Register, colour.Unset));
+                                continue;
+                            }
+                        }
+                        else if (unit.Port(writer.Node, "input") is { } register && build.Fits && (channel == "TbnBasis") == (register == Basis))
+                        {
+                            wrote.Add((channel, register, 0));
                             continue;
                         }
 
@@ -424,12 +465,12 @@ public sealed class ShadeProgram
                     }
                     else if (writer.Channel >= FirstFollowed)
                     {
-                        wrote.Add((channel, int.MinValue));
+                        wrote.Add((channel, int.MinValue, 0));
                     }
                 }
 
                 // IN THE GRAPH'S OWN ORDER, so a second write of one channel stands over the first.
-                foreach ((string channel, int register) in wrote)
+                foreach ((string channel, int register, int unset) in wrote)
                 {
                     if (register == int.MinValue)
                     {
@@ -438,7 +479,7 @@ public sealed class ShadeProgram
                         continue;
                     }
 
-                    state[channel] = new Held(register, 0);
+                    state[channel] = new Held(register, unset);
                     lost.Remove(channel);
                     if (channel == "Albedo" && !graphs.Contains(instance.Parent, StringComparer.OrdinalIgnoreCase))
                     {
@@ -1057,6 +1098,40 @@ public sealed class ShadeProgram
             && ReadBy(source.Type) == channel;
     }
 
+    /// <summary>Whether a vertex-stage write hands on exactly what its own reader gave it, component for component.</summary>
+    private static bool PassedThrough(Lookup lookup, ShaderNode writer)
+    {
+        foreach (ShaderLink link in lookup.Into(writer))
+        {
+            if (!string.Equals(link.Source.Type, "Input" + writer.Type, StringComparison.Ordinal)
+                || !string.Equals(link.Source.Swizzle, link.Target.Swizzle, StringComparison.Ordinal))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>Whether a link's target swizzle names the w alone - the alpha of a colour, which is not drawn.</summary>
+    public static bool AlphaOnly(string swizzle)
+    {
+        if (swizzle.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (char letter in swizzle)
+        {
+            if (letter is not ('w' or 'a'))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private static bool Initial(string stage) => stage.EndsWith("_Init", StringComparison.Ordinal);
 
     private static string Family(string stage)
@@ -1394,6 +1469,13 @@ public sealed class ShadeProgram
             "scale" => "w",
             _ => string.Empty,
         },
+        "LookUpTexture" => variable switch
+        {
+            "r" => "x",
+            "g" => "y",
+            "b" => "z",
+            _ => string.Empty,
+        },
         _ => string.Empty,
     };
 
@@ -1408,6 +1490,9 @@ public sealed class ShadeProgram
 
     /// <summary>What a channel holds: its register, and which of its components nothing has set.</summary>
     private readonly record struct Held(int Register, int Unset);
+
+    /// <summary>The graphs, if any, that moved the vertices' positions and normals at a vertex stage.</summary>
+    private readonly record struct Displaced(string? Position, string? Normal);
 
     /// <summary>One fed writer of a channel: its node, the stage it writes at, the channel, what it reads, and whether it only hands on what it read.</summary>
     private readonly record struct Writer(ShaderNode Node, int Stage, int Channel, int Reads, bool Same);
@@ -1610,7 +1695,7 @@ public sealed class ShadeProgram
     /// <summary>One graph's writes at one stage being compiled: its graph, its instance and the values it reads.</summary>
     private sealed class Unit(
         Builder build, Lookup lookup, ShaderInstance instance,
-        IReadOnlyDictionary<string, Held> seen, IReadOnlyDictionary<string, string> lost)
+        IReadOnlyDictionary<string, Held> seen, IReadOnlyDictionary<string, string> lost, Displaced moved)
     {
         /// <summary>Every component taken from x - a float spread across a register.</summary>
         private const int Spread = 0b1111 << 8;
@@ -1645,13 +1730,67 @@ public sealed class ShadeProgram
                 }
             }
 
-            if (links.Count == 0)
+            return links.Count == 0 ? Fail($"{node.Type} with nothing on {port}") : Assembled(node, port, links, -1);
+        }
+
+        /// <summary>
+        /// The register holding a colour writer's input: its xyz, and its w where that compiles.
+        /// </summary>
+        /// <remarks>
+        /// THE W IS TRIED AFTER THE XYZ AND INTO THE SAME REGISTER, and backed out on its own where it
+        /// fails: the colour is what is drawn, the w is not, so a w this cannot work out costs nothing
+        /// but the w - marked unset, so that no later graph reads it. A writer with nothing but a w
+        /// on it is refused: what its xyz are then is not written down.
+        /// </remarks>
+        public (int Register, int Unset)? Colour(ShaderNode node)
+        {
+            var colour = new List<ShaderLink>();
+            var alpha = new List<ShaderLink>();
+            foreach (ShaderLink link in lookup.Into(node))
             {
-                return Fail($"{node.Type} with nothing on {port}");
+                if (string.Equals(link.Target.Variable, "input", StringComparison.Ordinal))
+                {
+                    (AlphaOnly(link.Target.Swizzle) ? alpha : colour).Add(link);
+                }
             }
 
+            if (colour.Count == 0)
+            {
+                Fail(alpha.Count == 0 ? $"{node.Type} with nothing on input" : $"{node.Type} with its w alone, whose xyz are then not written down");
+                return null;
+            }
+
+            // ITS OWN REGISTER WHERE A W IS TO FOLLOW: a whole value brought straight across is the
+            // source's register, which the w must not be written into.
+            if (Assembled(node, "input", colour, -1, alpha.Count > 0) is not { } into)
+            {
+                return null;
+            }
+
+            var unset = 0;
+            if (alpha.Count > 0)
+            {
+                Builder.Mark mark = build.Marked();
+                if (Assembled(node, "input", alpha, into) is null)
+                {
+                    build.Back(mark);
+                    Forget(mark.Next);
+                    Why = string.Empty;
+                    unset = 0b1000;
+                }
+            }
+
+            return (into, unset);
+        }
+
+        /// <summary>
+        /// The links into one port assembled into a register: the given one, or a new one - or the source's own
+        /// where one whole value comes straight across and nothing says it needs its own.
+        /// </summary>
+        private int? Assembled(ShaderNode node, string port, List<ShaderLink> links, int into, bool own = false)
+        {
             // ONE WHOLE VALUE STRAIGHT ACROSS needs no step of its own.
-            if (links.Count == 1 && links[0].Target.Swizzle.Length == 0 && Swizzled(links[0].Source) is { Length: 0 })
+            if (!own && into < 0 && links.Count == 1 && links[0].Target.Swizzle.Length == 0 && Swizzled(links[0].Source) is { Length: 0 })
             {
                 return Brought(node, port, links[0].Source, string.Empty);
             }
@@ -1685,10 +1824,13 @@ public sealed class ShadeProgram
                 covered |= packed >> 8;
             }
 
-            int into = build.Register();
-            if (covered != 0b1111)
+            if (into < 0)
             {
-                build.Steps.Add(new Step(Op.Clear, into, -1, -1, -1, -1, -1, 0));
+                into = build.Register();
+                if (covered != 0b1111)
+                {
+                    build.Steps.Add(new Step(Op.Clear, into, -1, -1, -1, -1, -1, 0));
+                }
             }
 
             foreach ((int from, int packed) in parts)
@@ -1717,12 +1859,18 @@ public sealed class ShadeProgram
                 && seen.TryGetValue(channel, out Held held)
                 && (Mask(swizzle) & held.Unset) != 0)
             {
-                return Fail($"{reader.Type}'s {Letters(Mask(swizzle) & held.Unset)} before any graph set it");
+                return Fail($"{reader.Type}'s {Letters(Mask(swizzle) & held.Unset)}, which nothing has set");
             }
 
             if (lookup.Node(source) is { Type: "FromVertexWorldPos" } && (Mask(swizzle) & 0b1000) != 0)
             {
                 return Fail("FromVertexWorldPos's w, which no file says");
+            }
+
+            // The fragment declares an a and never assigns it.
+            if (lookup.Node(source) is { Type: "LookUpTexture" } && source.Variable == "a")
+            {
+                return Fail("LookUpTexture's a, which the fragment never sets");
             }
 
             if (Output(source) is not { } register)
@@ -2081,20 +2229,19 @@ public sealed class ShadeProgram
                         ? build.Emit(Op.Fit, value, inMin, inMax, outMin, outMax)
                         : null;
 
-                // THE RANGE IS THE NODE'S OWN: inputMin, inputMax, outputMin, outputMax, in that order.
+                // THE RANGE IS THE NODE'S OWN: inputMin, inputMax, outputMin, outputMax, declared 0, 255, 0, 255.
                 case "FitRange":
                     return Port(node, "value") is { } fitted
-                        && Said(node, 0, 0f) is { } fromMin && Said(node, 1, 255f) is { } fromMax
-                        && Said(node, 2, 0f) is { } toMin && Said(node, 3, 255f) is { } toMax
                         ? build.Emit(
-                            Op.Fit, fitted, build.Constant(new Vector4(fromMin)), build.Constant(new Vector4(fromMax)),
-                            build.Constant(new Vector4(toMin)), build.Constant(new Vector4(toMax)))
+                            Op.Fit, fitted,
+                            build.Constant(new Vector4(Said(node, 0, 0f))), build.Constant(new Vector4(Said(node, 1, 255f))),
+                            build.Constant(new Vector4(Said(node, 2, 0f))), build.Constant(new Vector4(Said(node, 3, 255f))))
                         : null;
 
+                // Hue, saturation and brightness, declared 0, a half and a half.
                 case "RemapHue":
                     return Port(node, "color_map") is { } mapped
-                        && Said(node, 0, 0f) is { } hue && Said(node, 1, 0.5f) is { } saturation && Said(node, 2, 0.5f) is { } brightness
-                        ? build.Emit(Op.RemapHue, mapped, build.Constant(Turn(hue, saturation, brightness)))
+                        ? build.Emit(Op.RemapHue, mapped, build.Constant(Turn(Said(node, 0, 0f), Said(node, 1, 0.5f), Said(node, 2, 0.5f))))
                         : null;
 
                 case "RemapHueInput":
@@ -2170,12 +2317,25 @@ public sealed class ShadeProgram
                 // semanticsData.normal: the vertex normal as interpolated, in the model's space - the
                 // world's, for a model drawn where it stands (see the class's remarks).
                 case "FromVertexNormal":
-                    return VertexNormal;
+                    return moved.Normal is { } bent ? Fail($"{node.Type} after {bent} turned the vertices") : VertexNormal;
 
                 // semanticsData.world_pos, the vertex position as interpolated - the model's, drawn where
                 // it stands. Its w is refused in Brought.
                 case "FromVertexWorldPos":
-                    return Position;
+                    return moved.Position is { } shifted ? Fail($"{node.Type} after {shifted} moved the vertices") : Position;
+
+                // VertexLocalPosition's float4(position, 1), at either transform stage the same for a model
+                // drawn where it stands; and semanticsData.uv9, which the engine's OutputVertexLocalPosition
+                // sets to the same - see the class's remarks.
+                case "InputVertexPosition":
+                case "FromVertexLocalPosition":
+                    return moved.Position is { } displaced ? Fail($"{node.Type} after {displaced} moved the vertices") : Placed();
+
+                case "InputVertexNormal":
+                    return moved.Normal is { } tilted ? Fail($"{node.Type} after {tilted} turned the vertices") : VertexNormal;
+
+                case "LookUpTexture":
+                    return LookedUp(node);
 
                 // The model's origin, and how much its transform stretches x: nought and one for a model
                 // drawn where it stands. One register, the outputs parts of it - see Implied.
@@ -2198,12 +2358,12 @@ public sealed class ShadeProgram
                         ? build.Emit(Op.Rotate, angle, swung)
                         : null;
 
-                // ITS CENTRE IS A PARAMETER whose default is a half, not nought - so left out, it is refused.
+                // Its centre is declared "0.5 0.5".
                 case "RotateUV":
                     return Port(node, "angle") is { } spin && Port(node, "in_uv") is { } spun
-                        ? Parameter(node, 0).Numbers is { Length: > 0 } centre
-                            ? build.Emit(Op.Rotate, spin, spun, build.Constant(Vectored(centre)))
-                            : Fail("RotateUV leaving out a value whose default is not nought")
+                        ? build.Emit(
+                            Op.Rotate, spin, spun,
+                            build.Constant(Parameter(node, 0).Numbers is { Length: > 0 } centre ? Vectored(centre) : new Vector4(0.5f, 0.5f, 0f, 0f)))
                         : null;
 
                 case "RadiusToPolarNorm":
@@ -2283,6 +2443,46 @@ public sealed class ShadeProgram
             return build.Emit(Op.Triplanar, alongX, alongY, alongZ, normal);
         }
 
+        /// <summary>The vertex position as the vertex stage hands it on: the position, with a w of one.</summary>
+        private int Placed()
+        {
+            int said = build.Emit(Op.Swizzle, Position, extra: (1 << 2) | (2 << 4) | (0b0111 << 8));
+            build.Into(said, build.Constant(Vector4.One), 0b1000 << 8);
+            return said;
+        }
+
+        /// <summary>
+        /// LookUpTexture, from effects.ffx: a row of a texture read by the colour's alpha, scaled.
+        /// </summary>
+        /// <remarks>
+        /// <c>tex2Dlod(lookup, float4(saturate(a * scale) * 0.95 + 0.025, 0, 0.5, -0.5))</c>, then
+        /// <c>rgb *= mult</c> - the texture at parameter 0, the multiplier at 2 and the scale at 3, both
+        /// declared 1. The fragment takes a <c>uv</c> and never reads it; a level below nought is the
+        /// top one. Its <c>a</c> output is never assigned, and is refused in Brought.
+        /// </remarks>
+        private int? LookedUp(ShaderNode node)
+        {
+            if (Texture(node, Parameter(node, 0)) is not { } table || Port(node, "source_albedo") is not { } source)
+            {
+                return null;
+            }
+
+            float mult = Said(node, 2, 1f);
+            float scale = Said(node, 3, 1f);
+            int alpha = build.Emit(Op.Swizzle, source, extra: 3 | (3 << 2) | (3 << 4) | (3 << 6) | (0b1111 << 8));
+            int along = build.Emit(
+                Op.MultiplyAdd,
+                build.Emit(Op.Saturate, build.Emit(Op.Multiply, alpha, build.Constant(new Vector4(scale)))),
+                build.Constant(new Vector4(0.95f)),
+                build.Constant(new Vector4(0.025f)));
+            int spot = build.Register();
+            build.Steps.Add(new Step(Op.Clear, spot, -1, -1, -1, -1, -1, 0));
+            build.Into(spot, along, 0b0001 << 8);
+            build.Into(spot, build.Constant(new Vector4(0.5f)), 0b0010 << 8);
+            int read = build.Emit(Op.SampleLod, spot, build.Constant(new Vector4(-0.5f)), extra: table);
+            return build.Emit(Op.Multiply, read, build.Constant(new Vector4(mult, mult, mult, 1f)));
+        }
+
         /// <summary>
         /// Transform by the TBN basis, where the vector lies along the basis's normal alone.
         /// </summary>
@@ -2344,9 +2544,10 @@ public sealed class ShadeProgram
         /// <remarks>
         /// BY POSITION, because that is how both are written: a node's <c>parameters</c> list and the
         /// material's list under the node's custom name line up entry for entry, and an empty
-        /// <c>{}</c> on the material's side leaves the node's own. An entry neither side fills reads
-        /// as nought - the files leave out a value that is false or zero, as <c>"UseRoughness":
-        /// [{}]</c> beside <c>"Sharpness": [{"value": 1.0}]</c> shows.
+        /// <c>{}</c> on the material's side leaves the node's own. An entry neither side fills is the
+        /// fragment's declared default - see the class's remarks - which for the constants and the
+        /// Const nodes is nought, as <c>"UseRoughness": [{}]</c> beside <c>"Sharpness": [{"value":
+        /// 1.0}]</c> shows.
         /// </remarks>
         private ShaderValue Parameter(ShaderNode node, int at)
         {
@@ -2358,24 +2559,11 @@ public sealed class ShadeProgram
                 : own;
         }
 
-        /// <summary>
-        /// A one-number parameter, where it is written or its declared default is nought; else null.
-        /// </summary>
-        /// <remarks>
-        /// NOUGHT FOR A VALUE LEFT OUT rests on parameters whose default is nought (see
-        /// <see cref="Parameter"/>), where nought and the default are one. FitRange's inputMax
-        /// defaults to 255 and RemapHue's saturation to a half, and whether a value left out of
-        /// those means the default or nought is something no file shows - so it is refused.
-        /// </remarks>
-        private float? Said(ShaderNode node, int at, float declared)
+        /// <summary>A one-number parameter: as written, or the fragment's declared default where left out - see the class's remarks.</summary>
+        private float Said(ShaderNode node, int at, float declared)
         {
             float[] numbers = Parameter(node, at).Numbers;
-            if (numbers.Length > 0)
-            {
-                return numbers[0];
-            }
-
-            return declared == 0f ? 0f : Fail($"{node.Type} leaving out a value whose default is not nought");
+            return numbers.Length > 0 ? numbers[0] : declared;
         }
 
         private int? Fail(string why)

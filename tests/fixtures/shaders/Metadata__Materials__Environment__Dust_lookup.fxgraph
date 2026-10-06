@@ -1,0 +1,1268 @@
+{
+    "version": 3,
+    "overriden_lighting_model": "SpecGlossPbrMaterial",
+    "nodes": [
+        {
+            "type": "InputWorldPos",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1073.5281982421876,
+                498.70648193359377
+            ]
+        },
+        {
+            "type": "WorldPos",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                3853.1884765625,
+                512.3511352539063
+            ]
+        },
+        {
+            "type": "InputUV",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1073.5281982421876,
+                498.70648193359377
+            ]
+        },
+        {
+            "type": "UV",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                3853.1884765625,
+                512.3511352539063
+            ]
+        },
+        {
+            "type": "ConstantPixelBool",
+            "index": 0,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "03_InvertHeight",
+            "ui_position": [
+                2259.8056640625,
+                1264.9837646484376
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 4,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "custom_parameter": "02_HeightBlendBias",
+            "ui_position": [
+                1623.4068603515626,
+                1338.789306640625
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 650.0
+                }
+            ],
+            "custom_parameter": "01_SetHeight",
+            "ui_position": [
+                1615.064697265625,
+                1151.302001953125
+            ]
+        },
+        {
+            "type": "ConstantPixel2",
+            "index": 0,
+            "parameters": [
+                {}
+            ],
+            "ui_position": [
+                1619.2811279296876,
+                1228.511962890625
+            ]
+        },
+        {
+            "type": "FromVertexLocalPosition",
+            "index": 0,
+            "ui_position": [
+                1491.7095947265626,
+                1068.5948486328126
+            ]
+        },
+        {
+            "type": "Negate",
+            "index": 0,
+            "ui_position": [
+                1747.1798095703126,
+                1067.215087890625
+            ]
+        },
+        {
+            "type": "FitRangeFromInput",
+            "index": 0,
+            "ui_position": [
+                1989.9366455078126,
+                1099.75634765625
+            ]
+        },
+        {
+            "type": "OneMinus",
+            "index": 0,
+            "ui_position": [
+                2316.53564453125,
+                1149.7080078125
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 1,
+            "ui_position": [
+                2566.911865234375,
+                1095.19580078125
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 0.5
+                }
+            ],
+            "custom_parameter": "07_Add_HeightGradient",
+            "ui_position": [
+                2753.430908203125,
+                857.8612060546875
+            ]
+        },
+        {
+            "type": "ConstantPixel4",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": [
+                        0.17970000207424165,
+                        0.3833000063896179,
+                        0.0,
+                        0.25
+                    ]
+                }
+            ],
+            "custom_parameter": "Noise_Params",
+            "ui_position": [
+                1591.072265625,
+                856.26171875
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 5,
+            "parameters": [
+                {
+                    "value": 4.0
+                }
+            ],
+            "custom_parameter": "Noise_Scale",
+            "ui_position": [
+                1158.92919921875,
+                837.7303466796875
+            ]
+        },
+        {
+            "type": "Multiply3",
+            "index": 2,
+            "ui_position": [
+                1497.3575439453126,
+                762.9808349609375
+            ]
+        },
+        {
+            "type": "Noise31",
+            "index": 0,
+            "ui_position": [
+                1734.893798828125,
+                770.9685668945313
+            ]
+        },
+        {
+            "type": "FitRangeFromInput",
+            "index": 2,
+            "ui_position": [
+                1938.214599609375,
+                771.64306640625
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 3,
+            "parameters": [
+                {
+                    "value": 0.5
+                }
+            ],
+            "custom_parameter": "06_AddNoise",
+            "ui_position": [
+                2282.003662109375,
+                772.1473999023438
+            ]
+        },
+        {
+            "type": "ConstantPixel4",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": [
+                        1.0,
+                        2.0,
+                        0.0,
+                        0.5
+                    ]
+                }
+            ],
+            "ui_position": [
+                1596.573974609375,
+                525.1826782226563
+            ]
+        },
+        {
+            "type": "InputWorldNormal",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1073.5281982421876,
+                498.70648193359377
+            ]
+        },
+        {
+            "type": "OneMinus",
+            "index": 2,
+            "ui_position": [
+                1684.7900390625,
+                454.2183837890625
+            ]
+        },
+        {
+            "type": "FitRangeFromInput",
+            "index": 3,
+            "ui_position": [
+                1916.32470703125,
+                449.43267822265627
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "custom_parameter": "04_Add_TopDown",
+            "ui_position": [
+                2289.147705078125,
+                401.7902526855469
+            ]
+        },
+        {
+            "type": "InputIndirectColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1073.5281982421876,
+                498.70648193359377
+            ]
+        },
+        {
+            "type": "OneMinus",
+            "index": 1,
+            "ui_position": [
+                1977.114013671875,
+                656.1707763671875
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 2,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "custom_parameter": "05_Add_AO",
+            "ui_position": [
+                2287.004638671875,
+                510.3616027832031
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 2,
+            "ui_position": [
+                2658.07470703125,
+                460.00445556640627
+            ]
+        },
+        {
+            "type": "Subtract",
+            "index": 0,
+            "ui_position": [
+                2858.5400390625,
+                452.7779846191406
+            ]
+        },
+        {
+            "type": "Subtract",
+            "index": 1,
+            "ui_position": [
+                3082.355712890625,
+                457.50048828125
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 0,
+            "ui_position": [
+                3319.497314453125,
+                463.2151184082031
+            ]
+        },
+        {
+            "type": "InputAlbedoColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1073.5281982421876,
+                498.70648193359377
+            ]
+        },
+        {
+            "type": "OneMinus",
+            "index": 3,
+            "ui_position": [
+                2254.0,
+                983.0
+            ]
+        },
+        {
+            "type": "LookUpTexture",
+            "index": 0,
+            "parameters": [
+                {
+                    "srgb": true
+                },
+                {},
+                {},
+                {}
+            ],
+            "custom_parameter": "08_lookupTexture",
+            "ui_position": [
+                2895.5654296875,
+                1013.2230834960938
+            ]
+        },
+        {
+            "type": "Lerp3",
+            "index": 0,
+            "ui_position": [
+                3604.4736328125,
+                534.1937866210938
+            ]
+        },
+        {
+            "type": "AlbedoColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                3853.1884765625,
+                512.3511352539063
+            ]
+        },
+        {
+            "type": "WorldNormal",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                3853.1884765625,
+                512.3511352539063
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 6,
+            "parameters": [
+                {
+                    "value": 0.10000000149011612
+                }
+            ],
+            "custom_parameter": "Gloss_constant",
+            "ui_position": [
+                3077.14892578125,
+                895.1775512695313
+            ]
+        },
+        {
+            "type": "InputGlossiness",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1073.5281982421876,
+                498.70648193359377
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 2,
+            "ui_position": [
+                3397.183837890625,
+                815.9248657226563
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 0,
+            "ui_position": [
+                3614.28662109375,
+                646.0338134765625
+            ]
+        },
+        {
+            "type": "Glossiness",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                3853.1884765625,
+                512.3511352539063
+            ]
+        },
+        {
+            "type": "IndirectColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                3853.1884765625,
+                512.3511352539063
+            ]
+        },
+        {
+            "type": "OutputVertexLocalPosition",
+            "index": 0,
+            "ui_position": [
+                1388.0,
+                -361.0
+            ]
+        },
+        {
+            "type": "Add3",
+            "index": 0,
+            "ui_position": [
+                3394.51171875,
+                711.662841796875
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 3,
+            "parameters": [
+                {
+                    "value": 0.10000000149011612
+                }
+            ],
+            "custom_parameter": "Albedo_Multiplier",
+            "ui_position": [
+                3077.888671875,
+                774.2042236328125
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "UV",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "FromVertexLocalPosition",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "Negate",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "out_max"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "in_min"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "in_max"
+            }
+        },
+        {
+            "src": {
+                "type": "Negate",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "out_min"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "OneMinus",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixelBool",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Noise31",
+                "index": 0,
+                "variable": "pos"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel4",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "out_max"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel4",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "in_min"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel4",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "in_max"
+            }
+        },
+        {
+            "src": {
+                "type": "Noise31",
+                "index": 0,
+                "variable": "noise"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel4",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "out_min"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "OneMinus",
+                "index": 2,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel4",
+                "index": 1,
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 3,
+                "variable": "out_max"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel4",
+                "index": 1,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 3,
+                "variable": "in_min"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel4",
+                "index": 1,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 3,
+                "variable": "in_max"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 3,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel4",
+                "index": 1,
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 3,
+                "variable": "out_min"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "OneMinus",
+                "index": 1,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Subtract",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Subtract",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "OneMinus",
+                "index": 3,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "LookUpTexture",
+                "index": 0,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "LookUpTexture",
+                "index": 0,
+                "variable": "source_albedo",
+                "swizzle": "xyz"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "LookUpTexture",
+                "index": 0,
+                "variable": "source_albedo",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "LookUpTexture",
+                "index": 0,
+                "variable": "rgb",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "WorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "WorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "z"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "WorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputGlossiness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputGlossiness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Glossiness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add3",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Add3",
+                "index": 0,
+                "variable": "a"
+            }
+        }
+    ]
+}
