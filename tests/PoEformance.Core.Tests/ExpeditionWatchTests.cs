@@ -387,6 +387,62 @@ public class ExpeditionWatchTests
     }
 
     [Fact]
+    public void ARelicCarryingAnAvoidedModIsShunned_AndTheRouteKeepsClearOfIt()
+    {
+        OffsetSchema schema = Schema();
+        var fake = new FakeMemoryReader();
+        ulong relic = 0x0000_0600_0050_0000;
+        ExpeditionReaderTests.PlaceRelic(
+            fake, schema, relic, 400, ["ExpeditionRelicUpsideItemQuantityChest", "ExpeditionRelicDownsideImmuneLightningDamage"]);
+        var settings = new ExpeditionSettings(
+            Enabled: true, ManualTotal: 5,
+            RelicWeights: [new("ExpeditionRelicUpsideItemQuantityChest", 50f)],
+            AvoidMods: ["ExpeditionRelicDownsideImmuneLightningDamage"]);
+        ExpeditionWatch watch = Make(fake, schema, settings);
+        TerrainGrid field = ExpeditionPathsTests.Field(400, 60);
+        WorldEntity[] entities =
+        [
+            At(100, ExpeditionReader.DetonatorPath, 20, 30),
+            At(200, MonolithPath, 100, 30, icon: "Expedition2RemnantActive"),
+            new WorldEntity(400, relic, ExpeditionReader.RelicPath, EntityKind.Unknown, 120f * MapView.WorldToGrid, 30f * MapView.WorldToGrid, 0f),
+        ];
+        MonolithsView monoliths = Monoliths(Mono(200, 100, 30, best: 40));
+        WorldSnapshot snapshot = Snapshot(field, entities);
+        long now = 0;
+
+        watch.Service(snapshot, now, monoliths);
+        ExpeditionTargetView shunned = watch.View.Targets.Single(t => t.Id == 400);
+        Assert.True(shunned.Shunned);
+        Assert.Equal("avoid", shunned.Tier);
+        Assert.Equal(0.0, shunned.Value, 6);
+        Assert.False(shunned.Primary);
+        Assert.Contains("ImmuneLightningDamage", shunned.Info, StringComparison.Ordinal);
+
+        // The plan covers the monolith from its near side and never comes within a blast of the relic.
+        ExpeditionView cooked = Cook(watch, snapshot, monoliths, ref now);
+        Assert.Equal(1, cooked.Route.AnchorsCovered);
+        Assert.Equal(0, cooked.Route.ShunnedHit);
+        Assert.Contains(cooked.Route.Trace, line => line.StartsWith("[shun] relic", StringComparison.Ordinal));
+        foreach (RoutePoint point in cooked.Route.Route)
+        {
+            Assert.True(Vector2.Distance(point.Grid, new Vector2(120, 30)) > cooked.EffRadius, $"a charge at {point.Grid} sets the relic off (radius {cooked.EffRadius})");
+        }
+
+        // Unticked, the same relic nets +50 and becomes an anchor in its own right: a re-plan is due.
+        watch.Settings = settings with { AvoidMods = [] };
+        now += ExpeditionWatch.ScanMs;
+        watch.Service(snapshot, now, monoliths);
+        Assert.True(watch.View.Stale);
+        ExpeditionTargetView sought = watch.View.Targets.Single(t => t.Id == 400);
+        Assert.False(sought.Shunned);
+        Assert.True(sought.Primary);
+        Assert.Equal(50.0, sought.Value, 6);
+
+        ExpeditionView again = Cook(watch, snapshot, monoliths, ref now);
+        Assert.Equal(2, again.Route.AnchorsCovered);
+    }
+
+    [Fact]
     public void AGateIsKeptWhileItsFlagReads_AndItsHoleIsTheSolidBlockBesideIt()
     {
         OffsetSchema schema = Schema();
