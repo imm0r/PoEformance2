@@ -249,6 +249,47 @@ public class SkinnedMeshTests
     /// that does. The reference's dolm parser writes both, and where they land - the block after
     /// the LAST level of detail, before the names - is what decides whether the names read.
     /// </remarks>
+    [Fact]
+    public void BitOneOfTheFormatIsTheColourStream()
+    {
+        SkinnedMesh plain = SkinnedMesh.Read(Built());
+        Assert.True(plain.Ready);
+        Assert.Empty(plain.Colours);
+        Assert.False(plain.ColourAt(0));
+
+        SkinnedMesh coloured = SkinnedMesh.Read(Built(coloured: true));
+        Assert.True(coloured.Ready, coloured.Why);
+        Assert.Equal(36, coloured.Facts.Stride);
+        Assert.Equal(16, coloured.Colours.Length);
+        Assert.Equal([200, 100, 50, 255], coloured.Colours[..4]);
+        Assert.True(coloured.ColourAt(3));
+        Assert.StartsWith("bit 1: first C8 64 32 FF · 1 distinct over 4 vertices", coloured.Facts.Extras, StringComparison.Ordinal);
+
+        // The names still read where they should: the stride took the stream into account.
+        Assert.Equal(["HipsShape", "SkullShape"], coloured.Shapes.Select(one => one.Name));
+    }
+
+    [Fact]
+    public void AJoinKeepsTheColoursOfThePartsThatHaveThemAndSaysWhichDo()
+    {
+        SkinnedMesh with = SkinnedMesh.Read(Built(coloured: true));
+        SkinnedMesh without = SkinnedMesh.Read(Built());
+
+        SkinnedMesh mixed = SkinnedMesh.Joined([new MeshJoin(without), new MeshJoin(with)]);
+        Assert.Equal(8, mixed.Positions.Length);
+        Assert.Equal(32, mixed.Colours.Length);
+        Assert.False(mixed.ColourAt(0));
+        Assert.True(mixed.ColourAt(4));
+        Assert.Equal([200, 100, 50, 255], mixed.Colours[16..20]);
+
+        SkinnedMesh both = SkinnedMesh.Joined([new MeshJoin(with), new MeshJoin(with, Place: Matrix4x4.CreateTranslation(5f, 0f, 0f))]);
+        Assert.Empty(both.Coloured);
+        Assert.True(both.ColourAt(7));
+
+        SkinnedMesh neither = SkinnedMesh.Joined([new MeshJoin(without), new MeshJoin(without, Place: Matrix4x4.CreateTranslation(5f, 0f, 0f))]);
+        Assert.Empty(neither.Colours);
+    }
+
     /// <summary>
     /// The fields the reader steps over are described by what is in them, for the dump - see SkinnedMesh.Extras.
     /// </summary>
@@ -420,12 +461,12 @@ public class SkinnedMeshTests
     /// Whether the vertex format's seventh bit is set, which costs four bytes on every vertex AND
     /// thirty-six per shape after the last level of detail.
     /// </param>
-    private static byte[] Built(int corner = 4, int details = 1, bool sixth = false)
+    private static byte[] Built(int corner = 4, int details = 1, bool sixth = false, bool coloured = false)
     {
         const int Vertices = 4;
         const int Triangles = 2;
-        uint format = sixth ? 0x23Cu | (1u << 6) : 0x23Cu;
-        int stride = sixth ? 36 : 32;
+        uint format = (sixth ? 0x23Cu | (1u << 6) : 0x23Cu) | (coloured ? 1u << 1 : 0u);
+        int stride = 32 + (sixth ? 4 : 0) + (coloured ? 4 : 0);
 
         string[] names = ["HipsShape", "SkullShape"];
         var file = new List<byte>();
@@ -480,6 +521,11 @@ public class SkinnedMeshTests
                 F16(0.25f); F16(0.75f);             // texture coordinate
                 U8(1); U8(0); U8(0); U8(0);         // bones
                 U8(255); U8(0); U8(0); U8(0);       // weights, summing to 255
+                if (coloured)
+                {
+                    U8(200); U8(100); U8(50); U8(255);  // the colour stream, bit 1 - r, g, b, a
+                }
+
                 if (sixth)
                 {
                     // Whatever the seventh bit adds per vertex - written here as something a colour

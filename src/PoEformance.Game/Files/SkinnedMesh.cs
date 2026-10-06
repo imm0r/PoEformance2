@@ -67,6 +67,7 @@ internal readonly record struct MeshBlock(
     Vector2[] Coordinates,
     byte[] Bones,
     byte[] Weights,
+    byte[] Colours,
     int[] Indices,
     (int From, int Count)[] Extents,
     int At,
@@ -75,7 +76,7 @@ internal readonly record struct MeshBlock(
 {
     /// <summary>Nothing read, with the reason. Never a throw: a caller is drawing a picture.</summary>
     internal static MeshBlock Stopped(string why)
-        => new([], [], [], [], [], [], [], 0, default, why);
+        => new([], [], [], [], [], [], [], [], 0, default, why);
 
     /// <summary>Whether there is geometry in here.</summary>
     internal bool Ready => Why.Length == 0;
@@ -155,6 +156,8 @@ public sealed class SkinnedMesh
         Coordinates = [];
         Bones = [];
         Weights = [];
+        Colours = [];
+        Coloured = [];
         Indices = [];
         Shapes = [];
     }
@@ -173,6 +176,38 @@ public sealed class SkinnedMesh
 
     /// <summary>Four weights per vertex, flat, summing to 255.</summary>
     public byte[] Weights { get; private init; }
+
+    /// <summary>
+    /// Four bytes of colour per vertex, flat, in the order the file writes them - or empty where
+    /// the vertex format carries none.
+    /// </summary>
+    /// <remarks>
+    /// BIT 1 OF THE FORMAT WORD IS A COLOUR STREAM, which no reference says: poe_data_tools calls
+    /// the field <c>skin_extra</c> and reads it as four bytes. What settled it was a dump of a
+    /// manor room: the one mesh carrying the field, a carpet with no bones at all, had 57 distinct
+    /// values of it over 1,916 vertices, the first byte running 177 to 248, the next two always
+    /// nought and the last always 255 - a colour (r, 0, 0, 1) with a mask painted into its red.
+    /// Every other mesh in the room carried bit 0 instead, a second texture coordinate, all nought.
+    ///
+    /// THE BYTE ORDER IS TAKEN AS THE FILE'S - first byte red, last alpha - and that is a reading,
+    /// not a finding: the carpet's mask is in its first byte either way round. A mesh whose colour
+    /// is a tint rather than a mask would show a swap, and none has been seen yet.
+    ///
+    /// <c>InputVertexColor</c> reads this. A mesh without the stream has nothing for it to read -
+    /// see <see cref="ColourAt"/> - and what the engine feeds such a mesh is not settled: the
+    /// shader sources hold two defaults, nought and white, and the game has to say which.
+    /// </remarks>
+    public byte[] Colours { get; private init; }
+
+    /// <summary>
+    /// Per vertex, whether <see cref="Colours"/> is the file's own - for a mesh joined from parts
+    /// that do not all carry one. Empty where every vertex's is, or none is.
+    /// </summary>
+    public bool[] Coloured { get; private init; }
+
+    /// <summary>Whether a vertex has a colour of its own, out of its file.</summary>
+    public bool ColourAt(int vertex)
+        => Colours.Length > 0 && (Coloured.Length == 0 || ((uint)vertex < (uint)Coloured.Length && Coloured[vertex]));
 
     /// <summary>Three indices per triangle, into the vertex arrays.</summary>
     public int[] Indices { get; private init; }
@@ -255,6 +290,8 @@ public sealed class SkinnedMesh
     /// them apart has to be testable against a mesh that has more than one.
     /// </param>
     /// <param name="facts">What the file the geometry came out of said of itself, where it came out of one.</param>
+    /// <param name="colours">Four bytes of colour per vertex, or null for a mesh without a colour stream - see <see cref="Colours"/>.</param>
+    /// <param name="coloured">Which vertices' colours are their file's own, for a mesh carried over from a join - see <see cref="Coloured"/>.</param>
     public static SkinnedMesh Of(
         Vector3[] positions,
         Vector3[] normals,
@@ -263,7 +300,9 @@ public sealed class SkinnedMesh
         Vector3 most,
         Vector2[]? coordinates = null,
         IReadOnlyList<MeshShape>? shapes = null,
-        MeshFacts facts = default)
+        MeshFacts facts = default,
+        byte[]? colours = null,
+        bool[]? coloured = null)
     {
         ArgumentNullException.ThrowIfNull(positions);
         ArgumentNullException.ThrowIfNull(normals);
@@ -272,6 +311,11 @@ public sealed class SkinnedMesh
         if (normals.Length != positions.Length)
         {
             throw new ArgumentException("one normal per position", nameof(normals));
+        }
+
+        if (colours is { Length: > 0 } && colours.Length != positions.Length * 4)
+        {
+            throw new ArgumentException("four bytes of colour per position", nameof(colours));
         }
 
         foreach (int one in indices)
@@ -294,6 +338,8 @@ public sealed class SkinnedMesh
             Least = least,
             Most = most,
             Facts = facts,
+            Colours = colours is { Length: > 0 } ? colours : [],
+            Coloured = colours is { Length: > 0 } && coloured is { Length: > 0 } ? coloured : [],
         };
     }
 
@@ -361,6 +407,14 @@ public sealed class SkinnedMesh
         var joined = new int[indices];
         var named = new List<MeshShape>(shapes);
 
+        // A COLOUR STREAM WHERE ANY PART HAS ONE, and which vertices it is real for: a room joins
+        // a carpet that carries colours onto furniture that does not, and a program reading the
+        // colour must not read the furniture's nought as one.
+        bool anyColoured = usable.Any(one => one.Mesh!.Colours.Length == one.Mesh.Positions.Length * 4);
+        bool allColoured = anyColoured && usable.All(one => one.Mesh!.Colours.Length == one.Mesh.Positions.Length * 4 && one.Mesh.Coloured.Length == 0);
+        byte[] colours = anyColoured ? new byte[points * 4] : [];
+        bool[] coloured = anyColoured && !allColoured ? new bool[points] : [];
+
         Vector3 least = usable[0].Mesh!.Least;
         Vector3 most = usable[0].Mesh!.Most;
 
@@ -390,6 +444,17 @@ public sealed class SkinnedMesh
             }
 
             mesh.Coordinates.CopyTo(coordinates.AsSpan(at));
+            if (anyColoured && mesh.Colours.Length == count * 4)
+            {
+                mesh.Colours.CopyTo(colours.AsSpan(at * 4));
+                if (coloured.Length > 0)
+                {
+                    for (var one = 0; one < count; one++)
+                    {
+                        coloured[at + one] = mesh.ColourAt(one);
+                    }
+                }
+            }
 
             // FOUR PER VERTEX, and only where the file really carried them: a mesh read without
             // bones has empty arrays rather than short ones, and copying a short span here would
@@ -438,6 +503,8 @@ public sealed class SkinnedMesh
             Shapes = named,
             Least = least,
             Most = most,
+            Colours = colours,
+            Coloured = coloured,
         };
     }
 
@@ -589,17 +656,20 @@ public sealed class SkinnedMesh
             int bones = at;
             at += 8;  // Bones and weights, four bytes each.
 
+            int extra1 = -1, extra0 = -1;
             if ((format >> 1 & 1) == 1)
             {
+                extra1 = at;
                 at += 4;
             }
 
             if ((format & 1) == 1)
             {
+                extra0 = at;
                 at += 4;
             }
 
-            return new Shape(at, normal, coordinate, bones);
+            return new Shape(at, normal, coordinate, bones, extra1, extra0);
         }
     }
 
@@ -641,6 +711,8 @@ public sealed class SkinnedMesh
             Coordinates = block.Coordinates,
             Bones = block.Bones,
             Weights = block.Weights,
+            Colours = block.Colours,
+            Coloured = [],
             Indices = block.Indices,
             Shapes = named,
             Least = least,
@@ -771,11 +843,16 @@ public sealed class SkinnedMesh
         var bones = new byte[points * 4];
         var weights = new byte[points * 4];
         var extras = new Extras(shape.Extra1, shape.Extra0, shape.Extra6);
+        byte[] colours = shape.Extra1 >= 0 ? new byte[points * 4] : [];
 
         for (var one = 0; one < points; one++)
         {
             int start = at + (one * shape.Stride);
             extras.See(file, start);
+            if (shape.Extra1 >= 0)
+            {
+                file.Slice(start + shape.Extra1, 4).CopyTo(colours.AsSpan(one * 4));
+            }
 
             positions[one] = new Vector3(Float(file, start), Float(file, start + 4), Float(file, start + 8));
             normals[one] = Direction(file, start + shape.Normal);
@@ -800,8 +877,10 @@ public sealed class SkinnedMesh
             Shapes = named,
             Least = least,
             Most = most,
+            Colours = colours,
+            Coloured = [],
             Facts = new MeshFacts(
-                version, 0, 1, format, shape.Stride, shapes, shapes, faces, points, names, read),
+                version, 0, 1, format, shape.Stride, shapes, shapes, faces, points, names, read, extras.Say()),
         };
     }
 
@@ -949,11 +1028,16 @@ public sealed class SkinnedMesh
         var bones = new byte[points * 4];
         var weights = new byte[points * 4];
         var extras = new Extras(shape.Extra1, shape.Extra0, shape.Extra6);
+        byte[] colours = shape.Extra1 >= 0 ? new byte[points * 4] : [];
 
         for (var one = 0; one < points; one++)
         {
             int start = at + (one * shape.Stride);
             extras.See(file, start);
+            if (shape.Extra1 >= 0)
+            {
+                file.Slice(start + shape.Extra1, 4).CopyTo(colours.AsSpan(one * 4));
+            }
 
             positions[one] = new Vector3(Float(file, start), Float(file, start + 4), Float(file, start + 8));
             normals[one] = Direction(file, start + shape.Normal);
@@ -991,7 +1075,7 @@ public sealed class SkinnedMesh
         past += Trailing(format, corner, blockShapes);
 
         return new MeshBlock(
-            positions, normals, coordinates, bones, weights, indices, extents,
+            positions, normals, coordinates, bones, weights, colours, indices, extents,
             (int)past,                              // Bounded by the size check above.
             new MeshFacts(0, corner, lods, format, shape.Stride, 0, blockShapes, faces, points, 0, 0, extras.Say()),
             string.Empty);
@@ -1120,7 +1204,7 @@ public sealed class SkinnedMesh
     /// </remarks>
     private static MeshBlock Nothing(int at, int corner, uint format, int blockShapes, int lods)
         => new(
-            [], [], [], [], [], [], [], at,
+            [], [], [], [], [], [], [], [], at,
             new MeshFacts(0, corner, lods, format, Shape.Of(format).Stride, 0, blockShapes, 0, 0, 0, 0),
             string.Empty);
 

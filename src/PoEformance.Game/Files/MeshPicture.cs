@@ -544,6 +544,7 @@ public static class MeshPicture
         Span<Vector2> cornerSpots = shaded ? stackalloc Vector2[3] : default;
         Span<Vector3> cornerPlaces = shaded ? stackalloc Vector3[3] : default;
         Span<Vector3> cornerTurns = shaded ? stackalloc Vector3[3] : default;
+        Span<Vector4> cornerColours = shaded ? stackalloc Vector4[3] : default;
         ShadeProgram? preset = null;
         for (var one = 0; one < triangles; one++)
         {
@@ -592,11 +593,12 @@ public static class MeshPicture
                     cornerSpots[corner] = mesh.Coordinates[vertex];
                     cornerPlaces[corner] = positions[vertex];
                     cornerTurns[corner] = normals[vertex];
+                    cornerColours[corner] = program.UsesVertexColour ? VertexColourOf(mesh.Colours, vertex) : default;
                 }
 
                 program.Levels(
                     scratch, cornerSpots, cornerPlaces, cornerTurns, a, b, c, area,
-                    spots, shadeLevels.AsSpan(one * stride, program.Samples));
+                    spots, shadeLevels.AsSpan(one * stride, program.Samples), cornerColours);
             }
         }
 
@@ -716,6 +718,15 @@ public static class MeshPicture
     /// shape keeps its plain skin - and a mesh with no coordinates runs none, having nothing for a
     /// program's reads to read at.
     /// </remarks>
+    /// <summary>A vertex's colour as the program reads it: the file's four bytes, nought to one, or nought where the mesh has none.</summary>
+    private static Vector4 VertexColourOf(byte[] colours, int vertex)
+    {
+        int at = vertex * 4;
+        return at + 3 < colours.Length
+            ? new Vector4(colours[at], colours[at + 1], colours[at + 2], colours[at + 3]) / 255f
+            : default;
+    }
+
     private static ShadeProgram[] Programmed(
         SkinnedMesh mesh, IReadOnlyList<ShadeProgram?>? shades, int[] into, int triangles)
     {
@@ -729,6 +740,14 @@ public static class MeshPicture
         for (var shape = 0; shape < mesh.Shapes.Count && shape < shades.Count; shape++)
         {
             if (shades[shape] is not { Bound: true } program || program.Registers > ShadeProgram.MostRegisters)
+            {
+                continue;
+            }
+
+            // A PROGRAM READING THE VERTEX COLOUR runs only where the mesh has one to read - see
+            // SkinnedMesh.Colours. The model walk says so under the picture; this is the guard.
+            MeshShape coloured = mesh.Shapes[shape];
+            if (program.UsesVertexColour && !(coloured.From < mesh.Indices.Length && mesh.ColourAt(mesh.Indices[coloured.From])))
             {
                 continue;
             }
@@ -889,6 +908,7 @@ public static class MeshPicture
         private readonly int _stride;
         private readonly Vector3[] _places;
         private readonly Vector3[] _turns;
+        private readonly byte[] _colours;
 
         public Drawing(
             Canvas canvas, SkinnedMesh mesh, int triangles, Vector3 lamp, Vector3 ink, Mipmaps?[] palette,
@@ -900,6 +920,7 @@ public static class MeshPicture
             _stride = stride;
             _places = places;
             _turns = turns;
+            _colours = mesh.Colours;
             _pixels = canvas.Pixels;
             _depth = canvas.Depth;
             _size = canvas.Size;
@@ -1003,6 +1024,8 @@ public static class MeshPicture
                 : new ReadOnlySpan<float>(_shadeLevels, one * _stride, program.Samples);
             program?.Preset(registers);
             Vector3 p0 = default, p1 = default, p2 = default, n0 = default, n1 = default, n2 = default;
+            Vector4 v0 = default, v1 = default, v2 = default;
+            bool tinted = program is { UsesVertexColour: true };
             if (program is not null)
             {
                 p0 = _places[i0];
@@ -1011,6 +1034,12 @@ public static class MeshPicture
                 n0 = _turns[i0];
                 n1 = _turns[i1];
                 n2 = _turns[i2];
+                if (tinted)
+                {
+                    v0 = VertexColourOf(_colours, i0);
+                    v1 = VertexColourOf(_colours, i1);
+                    v2 = VertexColourOf(_colours, i2);
+                }
             }
 
             Vector2 s0 = default;
@@ -1076,7 +1105,8 @@ public static class MeshPicture
                             (first * s0) + (second * s1) + (third * s2),
                             (first * p0) + (second * p1) + (third * p2),
                             (first * n0) + (second * n1) + (third * n2),
-                            shadeLevels);
+                            shadeLevels,
+                            tinted ? (first * v0) + (second * v1) + (third * v2) : default);
                     }
                     else if (skinned)
                     {

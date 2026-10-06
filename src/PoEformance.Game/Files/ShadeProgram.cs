@@ -79,6 +79,16 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 /// soft particle's fade by the depth behind it) the colour stands and its w is marked unset, and a
 /// later graph reading that w is refused, not handed nought.
 ///
+/// <c>InputVertexColor</c> IS THE MESH'S COLOUR STREAM - four bytes a vertex behind bit 1 of the
+/// vertex format word (see SkinnedMesh.Colours for how that was established), interpolated and
+/// scaled to nought to one. A program reading it is compiled whatever the mesh, since a material's
+/// program is compiled once for every mesh that wears it; on a mesh WITHOUT the stream the shape
+/// keeps its texture and says why, because what the engine feeds it then is written down twice and
+/// differently - the <c>VertexColor</c> extension point's own default is nought, "Legacy assets rely
+/// on zero vertex color default value", and the pixel side's <c>InitSemanticsData</c> starts
+/// <c>color0</c> at white - and BasicColour multiplies the colour by it, so the two are black and
+/// the texture. The game decides that, not this.
+///
 /// A NODE THAT READS THE CLOCK IS DRAWN ONLY WHERE THE CLOCK CANNOT SHOW. MuddleTex, MuddleTex2 and
 /// RotateUVOld multiply <c>time</c> by a parameter - a scroll, an angle per second - and with that
 /// parameter at nought, which is each one's declared default, the picture is the same at every
@@ -110,8 +120,11 @@ public sealed class ShadeProgram
     /// <summary>The vertex normal as it is interpolated, not normalised - what <c>FromVertexNormal</c> reads.</summary>
     internal const int VertexNormal = 3;
 
+    /// <summary>The vertex colour as it is interpolated, nought to one - what <c>InputVertexColor</c> reads. See SkinnedMesh.Colours.</summary>
+    internal const int VertexColour = 4;
+
     /// <summary>How many registers are the mesh's own, before any a program allocates.</summary>
-    private const int Fixed = 4;
+    private const int Fixed = 5;
 
     /// <summary>
     /// Stands in for the TBN basis, which is a matrix and so in no register - see <see cref="Basis"/>'s use in Transform.
@@ -188,7 +201,7 @@ public sealed class ShadeProgram
             "SampleTriplanar", "SampleTexture2", "SampleTextureAtlas2", "SampleTextureLod", "SampleDispersedTexture",
             "MuddleTex", "MuddleTexFromInput", "MuddleTex2", "FromVertexVariance",
             "RGBToTbn", "ScaleUVMaya", "HardLightBlend", "Sine", "RotateUVOld",
-            "FromVertexNormal", "FromVertexWorldPos", "FromVertexLocalPosition", "InputVertexPosition", "InputVertexNormal",
+            "FromVertexNormal", "FromVertexWorldPos", "FromVertexLocalPosition", "InputVertexPosition", "InputVertexNormal", "InputVertexColor",
             "ModelOrigin", "GroundScroll", "Transform", "LookUpTexture",
             "Noise31", "PerlinNoise31", "Vibrance", "Rotate", "RotateUV", "RadiusToPolarNorm",
         ],
@@ -234,6 +247,7 @@ public sealed class ShadeProgram
         _sheets = sheets;
         UsesNormal = result == Normal || steps.Any(one => one.Reads(Normal));
         UsesVertexNormal = result == VertexNormal || steps.Any(one => one.Reads(VertexNormal));
+        UsesVertexColour = result == VertexColour || steps.Any(one => one.Reads(VertexColour));
     }
 
     internal enum Op : byte
@@ -345,6 +359,9 @@ public sealed class ShadeProgram
 
     /// <summary>Whether a run reads the vertex normal as it is interpolated.</summary>
     internal bool UsesVertexNormal { get; }
+
+    /// <summary>Whether a run reads the vertex colour - which a mesh without a colour stream cannot supply.</summary>
+    public bool UsesVertexColour { get; }
 
     /// <summary>
     /// Whether a graph node of this type is something the compiler can evaluate - for the graph survey.
@@ -563,11 +580,17 @@ public sealed class ShadeProgram
     /// <param name="position">The pixel's position in the model's space.</param>
     /// <param name="normal">The pixel's normal in the model's space, interpolated and not yet normalised.</param>
     /// <param name="levels">The level each texture read takes, from <see cref="Levels"/>.</param>
+    /// <param name="vertexColour">The pixel's vertex colour, interpolated, nought to one; read only where <see cref="UsesVertexColour"/>.</param>
     internal Vector3 Colour(
-        Span<Vector4> registers, Vector2 coordinates, Vector3 position, Vector3 normal, ReadOnlySpan<float> levels)
+        Span<Vector4> registers, Vector2 coordinates, Vector3 position, Vector3 normal, ReadOnlySpan<float> levels, Vector4 vertexColour = default)
     {
         registers[Coordinates] = new Vector4(coordinates, 0f, 0f);
         registers[Position] = new Vector4(position, 0f);
+        if (UsesVertexColour)
+        {
+            registers[VertexColour] = vertexColour;
+        }
+
         if (UsesNormal)
         {
             registers[Normal] = new Vector4(normal.LengthSquared() > 1e-12f ? Vector3.Normalize(normal) : normal, 0f);
@@ -601,7 +624,8 @@ public sealed class ShadeProgram
         ReadOnlySpan<Vector3> normals,
         Vector3 c0, Vector3 c1, Vector3 c2, float area,
         Span<Vector2> spots,
-        Span<float> levels)
+        Span<float> levels,
+        ReadOnlySpan<Vector4> colours = default)
     {
         for (var corner = 0; corner < 3; corner++)
         {
@@ -609,6 +633,7 @@ public sealed class ShadeProgram
             registers[Position] = new Vector4(positions[corner], 0f);
             registers[Normal] = new Vector4(normals[corner], 0f);
             registers[VertexNormal] = new Vector4(normals[corner], 0f);
+            registers[VertexColour] = colours.Length == 3 ? colours[corner] : default;
             Run(registers, default, spots, corner);
         }
 
@@ -2506,6 +2531,10 @@ public sealed class ShadeProgram
 
                 case "InputVertexNormal":
                     return moved.Normal is { } tilted ? Fail($"{node.Type} after {tilted} turned the vertices") : VertexNormal;
+
+                // The mesh's own colour stream, where it has one - see the class's remarks.
+                case "InputVertexColor":
+                    return VertexColour;
 
                 case "LookUpTexture":
                     return LookedUp(node);

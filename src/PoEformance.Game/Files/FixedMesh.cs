@@ -215,7 +215,7 @@ public sealed class FixedMesh
         {
             Mesh = SkinnedMesh.Of(
                 block.Positions, block.Normals, block.Indices, least, most,
-                block.Coordinates, named, block.Facts),
+                block.Coordinates, named, block.Facts, block.Colours),
             Named = materials,
         };
     }
