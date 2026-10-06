@@ -67,6 +67,47 @@
     "press 'send exports to be baked' under the boss list in the overlay: it uploads both to the",
     "boss-icons branch, and .github/workflows/bake-boss-icons.yml bakes them and opens a PR."
   ],
-  "areas": {},
-  "tiles": {}
+  "areas": {
+    "MapCenotes": "ChaosGodOwlBossMAP",
+    "MapIceCave": "ViperNapuatziAzmeriMap"
+  },
+  "tiles": {
+    "test": "ShakariDuoMAP"
+  },
+  "names": {
+    "ArbiterofDivinity": "The Arbiter of Divinity",
+    "BaronBossHumanFormMap": "Count Geonor",
+    "BitterGuyBossMap": "Connal, the Tormented",
+    "BlackJawLightningMap": "Stormgore, the Guardian",
+    "ChaosGodOwlBossMAP": "Bahlak, the Sky Seer",
+    "ChimeraUltimatumBossMap": "Gressor-Kul, the Apex",
+    "CrowBellBossEnragedMap": "The Black Crow",
+    "CyclopsSpiderBoss": "The Aberration",
+    "DemonClawBoss": "The Arbiter of Ash",
+    "FaridunOlrothMAP": "Zahmir, the Blade Sovereign",
+    "GeneticsScientistFemale": "Phya, Sentinel of the Cradle",
+    "GeneticsScientistMale": "Phyx, Sentinel of the Spark",
+    "GoblinGiantBossMAP": "Brughor, the Insatiable",
+    "GreatWhiteOneMAP": "The Sandstrider",
+    "HusbandMonsterMAP": "Tycho, the Black Praetor",
+    "IcyQuadrillaBossMap": "The Frostborn Fiend",
+    "IgnagdukBogWitchHagBattleMap": "Ignatia, the Flame-Sworn",
+    "IgnagdukBogWitchMap": "Brakka, the Withered Crone",
+    "KaruiCaptainBossMap": "Manoki, the Chosen",
+    "KulemakBoss": "Vessel of Kulemak",
+    "MastodonBossMAP": "The Bone Colossus",
+    "MedvedBoss": "Medved, the Fallen Seer",
+    "PerennialKingMap": "Jamanra, the Abomination",
+    "PrisonerBossMAP": "The Shackled Horror",
+    "SerpentClanCasterBossMapSpring": "Manassa, the Serpent Queen",
+    "ShakariDuoMAP": "Akthi, the Final Sting",
+    "SirenBossMAP": "Syvora, Daughter of the Deep",
+    "TheRustKingBossMAP": "Gozen, Rebellious Rustlord",
+    "UhtredBoss": "Uhtred, the Stardrinker",
+    "VaalBloodPriestessBossMAP": "Ytzara, Blood Oracle",
+    "VaalForgemasterMAP": "Gulzal, the Living Furnace",
+    "VaalSunWorshipperMAP": "Tonqui, Seer of the Sun",
+    "ViperNapuatziAzmeriMap": "Morwyn, the Kinslayer",
+    "YamaBossMAP": "Yama The White"
+  }
 }
