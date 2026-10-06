@@ -22,7 +22,7 @@ public enum RunecraftColourMode
 /// <remarks>
 /// PORTED FROM yokkenUA's RunecraftHelper for GameHelper2: while the in-game Runeshape
 /// Combinations panel is open, the poe.ninja price of every offered reward is written onto its
-/// row, at the right edge, in Exalted. The row's own text - the reward's name in the client's
+/// row, just before the reward's name, in Exalted. The row's own text - the name in the client's
 /// language - is left to the game; only the price is added. The plugin's monolith-on-map labels,
 /// rune-chain valuation and expedition route planner are NOT here: they are a different feature
 /// several times this size, resting on monolith offsets this tool has not measured.
@@ -34,14 +34,15 @@ public enum RunecraftColourMode
 /// <param name="Enabled">Whether prices are written on the panel at all.</param>
 /// <param name="ColourMode">How a price is tinted.</param>
 /// <param name="XOffset">
-/// Pixels to slide the price sideways. Negative moves it left. For a client language whose
-/// reward names run under the price, or a letterboxed display whose bars the layout does not know.
+/// Pixels to slide the price sideways from its place before the reward's name. Negative moves
+/// it left. For a client language whose names run further left than the room allows, or a
+/// letterboxed display whose bars the layout does not know.
 /// </param>
 /// <param name="TextScale">
 /// How big the price is written, against half the row's height. Zero means "as the row" - the
 /// unset value every zero in these files is, see <see cref="Writing"/>.
 /// </param>
-/// <param name="FrameBest">Ring the most valuable row in green, so the answer needs no reading.</param>
+/// <param name="FrameBest">Frame the most valuable row in green, icons to edge, so the answer needs no reading.</param>
 /// <param name="GoodFrom">In Absolute mode, the Exalted a reward is green at or above.</param>
 /// <param name="BadBelow">In Absolute mode, the Exalted a reward is red below.</param>
 /// <param name="ShowUnpriced">Write a mark on the rows nothing could price, rather than nothing.</param>

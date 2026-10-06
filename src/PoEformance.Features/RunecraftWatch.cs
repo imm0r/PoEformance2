@@ -6,14 +6,40 @@ using PoEformance.Game.Ui;
 namespace PoEformance.Features;
 
 /// <summary>One recipe row with its price, placed on the screen, ready to draw.</summary>
-/// <param name="Where">The row's rectangle this tick, in window pixels.</param>
+/// <param name="Where">The row's rectangle this tick, in window pixels - rune icons to right edge.</param>
+/// <param name="Text">The row's own text's rectangle, or null when its element did not read.</param>
 /// <param name="Label">What the game painted on the row.</param>
 /// <param name="Price">What it is worth and which door answered.</param>
 /// <param name="Best">Whether this is the most valuable row on screen (ties all count).</param>
-public sealed record RunecraftReward(ScreenRect Where, string Label, RunecraftPrice Price, bool Best)
+public sealed record RunecraftReward(ScreenRect Where, ScreenRect? Text, string Label, RunecraftPrice Price, bool Best)
 {
     /// <summary>The whole reward's worth, or null.</summary>
     public double? Total => Price.Total;
+
+    /// <summary>
+    /// Whether the row's text element reads as one, inside its row, with a gap's room before it.
+    /// </summary>
+    /// <remarks>
+    /// The guard on the anchor: a left edge past the row's own and a right edge not past the
+    /// row's is what a text sized to itself and right-aligned on the row looks like. A child
+    /// index that drifts onto some other element - the icons, the row itself - fails it, and
+    /// the price goes back to the row's edge rather than somewhere unrelated.
+    /// </remarks>
+    public bool TextAnchors(float gap)
+        => Text is { Width: >= 1f } text && text.Left > Where.Left + gap && text.Right <= Where.Right + gap;
+
+    /// <summary>
+    /// The x a price's right edge is aligned to: a gap before the row's text, or, when the
+    /// text's element did not read, a gap inside the row's right edge.
+    /// </summary>
+    /// <remarks>
+    /// BEFORE THE TEXT, NOT ON IT. The game right-aligns the reward's name at the row's edge,
+    /// so a price put at that edge lands on the name's last word and both read worse. The
+    /// text element is sized to its text and sits well clear of the rune icons at the row's
+    /// left - 386 UI units in, on 0.5.5 - and that room is where the price goes.
+    /// </remarks>
+    public float Before(float gap)
+        => TextAnchors(gap) ? Text!.Value.Left - gap : Where.Right - gap;
 }
 
 /// <summary>
@@ -86,7 +112,6 @@ public sealed class RunecraftWatch
     private ulong _studiedContainer;
     private long _studiedAt;
     private List<RunecraftRow> _rows = [];
-    private List<ulong> _addresses = [];
     private readonly Dictionary<ulong, int> _index = [];
     private RunecraftPrice[] _prices = [];
     private PriceBook? _pricedWith;
@@ -219,7 +244,7 @@ public sealed class RunecraftWatch
             };
         }
 
-        (List<RunecraftPlace> placed, ScreenRect? viewport) = _panel.Place(panel, _addresses, scale);
+        (List<RunecraftPlace> placed, ScreenRect? viewport) = _panel.Place(panel, _rows, scale);
         return Compose(placed, viewport);
     }
 
@@ -227,11 +252,9 @@ public sealed class RunecraftWatch
     private void Study(ulong container, long nowMs)
     {
         _rows = _panel.Rows(container);
-        _addresses = new List<ulong>(_rows.Count);
         _index.Clear();
         for (int i = 0; i < _rows.Count; i++)
         {
-            _addresses.Add(_rows[i].Address);
             _index[_rows[i].Address] = i;
         }
 
@@ -287,7 +310,7 @@ public sealed class RunecraftWatch
 
             RunecraftPrice price = _prices[at];
             bool top = price.Total is { } total && priced > 0 && total >= best;
-            rewards.Add(new RunecraftReward(place.Where, _rows[at].Label, price, top));
+            rewards.Add(new RunecraftReward(place.Where, place.Text, _rows[at].Label, price, top));
         }
 
         return new RunecraftView(
@@ -309,7 +332,6 @@ public sealed class RunecraftWatch
         }
 
         _rows = [];
-        _addresses = [];
         _index.Clear();
         _prices = [];
         _pricedWith = null;

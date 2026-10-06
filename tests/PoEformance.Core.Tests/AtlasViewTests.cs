@@ -356,7 +356,7 @@ public class AtlasViewTests
 
         var placed = new Dictionary<ulong, Placed>
         {
-            [0x1000] = new Placed(new Vector2(500, 600), new Vector2(40, 20), Shown: true),
+            [0x1000] = new Placed(new Vector2(500, 600), new Vector2(40, 20), Shown: true, new Vector2(500, 600)),
         };
 
         AtlasNode kept = Assert.Single(AtlasWatch.Live([here, gone], placed));

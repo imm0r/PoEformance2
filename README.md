@@ -251,8 +251,9 @@ picker for it. The monster half is the one setting that costs a read
 per monster, so it is off until switched on and takes its cost with it when switched off.
 
 The **Runecraft** tab prices the Runeshape Combinations panel: while it is open at a monolith,
-each offered reward's poe.ninja price is written onto its row, in Exalted, with the most valuable
-row ringed — ported from [`yokkenUA/RunecraftHelper`](https://github.com/yokkenUA/RunecraftHelper).
+each offered reward's poe.ninja price is written on its row just before the reward's name, in
+Exalted, with the most valuable row framed — ported from
+[`yokkenUA/RunecraftHelper`](https://github.com/yokkenUA/RunecraftHelper).
 The row's own name stays the game's; a recipe names its reward by metadata path, and the install's
 own tables turn that into the English name poe.ninja prices under, so it works on a client in any
 language. The panel is found by a fingerprint walk the reference measured on 0.5.5 and this tool has

@@ -47,7 +47,7 @@ public class RunecraftPricesTests
         string path = "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2",
         string art = "",
         int count = 0)
-        => new(0x1000, label, recipe, path, string.Empty, art, count, 0, 1, 100);
+        => new(0x1000, 0x1100, label, recipe, path, string.Empty, art, count, 0, 1, 100);
 
     private static string? Shipped(string? path) => path switch
     {

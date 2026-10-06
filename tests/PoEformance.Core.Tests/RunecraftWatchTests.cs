@@ -124,6 +124,9 @@ public class RunecraftWatchTests
         Assert.Equal(3.0, exalted.Total!.Value, 6);
         Assert.Equal("name", exalted.Price.Via);
         Assert.Equal(new ScreenRect(300, 80, 1000, 140), exalted.Where);
+        Assert.Equal(new ScreenRect(686, 99, 986, 129), exalted.Text);
+        Assert.True(exalted.TextAnchors(6f));
+        Assert.Equal(680f, exalted.Before(6f));
         Assert.False(exalted.Best);
 
         RunecraftReward regal = view.Rewards.Single(r => r.Label == "1x Greater Regal Orb");
@@ -206,6 +209,29 @@ public class RunecraftWatchTests
         Assert.Equal(3, watch.View.Priced);
         Assert.Equal("name", watch.View.Rewards.Single(r => r.Label == "3x Exalted Orb").Price.Via);
         Assert.Equal("name", watch.View.Rewards.Single(r => r.Label == "1x Greater Regal Orb").Price.Via);
+    }
+
+    [Fact]
+    public void ThePriceSitsBeforeTheText_OrAtTheRowsEdgeWhenTheTextIsNotOne()
+    {
+        var row = new ScreenRect(300, 80, 1000, 140);
+        var price = new RunecraftPrice(1, 1, "Exalted Orb", "name");
+
+        // A text sized to itself, inside the row: the price's edge a gap before it.
+        var anchored = new RunecraftReward(row, new ScreenRect(686, 99, 986, 129), "1x Exalted Orb", price, false);
+        Assert.True(anchored.TextAnchors(6f));
+        Assert.Equal(680f, anchored.Before(6f));
+
+        // No element read: the row's own edge, as before.
+        var none = new RunecraftReward(row, null, "1x Exalted Orb", price, false);
+        Assert.False(none.TextAnchors(6f));
+        Assert.Equal(994f, none.Before(6f));
+
+        // An element spanning the row from its left edge is not a text beside the icons - a
+        // drifted child index - and so is one hanging past the row's right edge, or an empty one.
+        Assert.Equal(994f, (anchored with { Text = new ScreenRect(300, 80, 1000, 140) }).Before(6f));
+        Assert.Equal(994f, (anchored with { Text = new ScreenRect(686, 99, 1100, 129) }).Before(6f));
+        Assert.Equal(994f, (anchored with { Text = new ScreenRect(686, 99, 686, 129) }).Before(6f));
     }
 
     [Fact]

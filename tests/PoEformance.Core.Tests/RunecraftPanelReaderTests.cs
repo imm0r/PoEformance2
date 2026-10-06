@@ -92,7 +92,7 @@ public class RunecraftPanelReaderTests
         RunecraftPanelState state = reader.Resolve(UiTree.At(RunecraftPanelFixture.Root), 0);
         List<RunecraftRow> rows = reader.Rows(state.Container);
 
-        (List<RunecraftPlace> placed, ScreenRect? viewport) = reader.Place(state, [.. rows.Select(row => row.Address)], Window());
+        (List<RunecraftPlace> placed, ScreenRect? viewport) = reader.Place(state, rows, Window());
 
         Assert.Equal(new ScreenRect(300, 200, 1070, 1000), viewport);
 
@@ -100,9 +100,34 @@ public class RunecraftPanelReaderTests
         // top is therefore 80, not 200, and the row the game keeps far below is placed where it
         // is - clipping it is the drawing's business, and the viewport above is what it clips to.
         Assert.Equal(5, placed.Count);
-        Assert.Equal(new ScreenRect(300, 80, 1000, 140), placed.Single(p => p.Address == UiTree.At(RunecraftPanelFixture.ExaltedRow)).Where);
+        RunecraftPlace exalted = placed.Single(p => p.Address == UiTree.At(RunecraftPanelFixture.ExaltedRow));
+        Assert.Equal(new ScreenRect(300, 80, 1000, 140), exalted.Where);
         Assert.Equal(new ScreenRect(300, 150, 1000, 210), placed.Single(p => p.Address == UiTree.At(RunecraftPanelFixture.RegalRow)).Where);
         Assert.Equal(new ScreenRect(300, 1480, 1000, 1540), placed.Single(p => p.Address == UiTree.At(RunecraftPanelFixture.FarRow)).Where);
+
+        // And each row's text, placed under its row: 386 in and 19 down from the row's corner,
+        // the size the game gave it - which is where the price's right edge will be aligned to.
+        Assert.Equal(new ScreenRect(686, 99, 986, 129), exalted.Text);
+        Assert.Equal(new ScreenRect(686, 1499, 986, 1529), placed.Single(p => p.Address == UiTree.At(RunecraftPanelFixture.FarRow)).Text);
+    }
+
+    [Fact]
+    public void ARowWhoseTextElementIsGoneKeepsItsPlace_AndLosesItsAnchor()
+    {
+        OffsetSchema schema = Schema();
+        var panel = new RunecraftPanelFixture(schema);
+        RunecraftPanelReader reader = Reader(panel, schema);
+        RunecraftPanelState state = reader.Resolve(UiTree.At(RunecraftPanelFixture.Root), 0);
+        RunecraftRow exalted = reader.Rows(state.Container).Single(row => row.Address == UiTree.At(RunecraftPanelFixture.ExaltedRow));
+
+        // A text element freed under a studied row, or never found: the row is still placed,
+        // so its price is still drawn - at the row's edge, which is what a null anchor means.
+        (List<RunecraftPlace> stale, _) = reader.Place(state, [exalted with { LabelAddress = 0xDEAD_BEEF }], Window());
+        Assert.Equal(new ScreenRect(300, 80, 1000, 140), Assert.Single(stale).Where);
+        Assert.Null(Assert.Single(stale).Text);
+
+        (List<RunecraftPlace> none, _) = reader.Place(state, [exalted with { LabelAddress = 0 }], Window());
+        Assert.Null(Assert.Single(none).Text);
     }
 
     [Fact]
@@ -114,10 +139,12 @@ public class RunecraftPanelReaderTests
         var panel = new RunecraftPanelFixture(schema, contentTakesModifier: true);
         RunecraftPanelReader reader = Reader(panel, schema);
         RunecraftPanelState state = reader.Resolve(UiTree.At(RunecraftPanelFixture.Root), 0);
+        RunecraftRow exalted = reader.Rows(state.Container).Single(row => row.Address == UiTree.At(RunecraftPanelFixture.ExaltedRow));
 
-        (List<RunecraftPlace> placed, _) = reader.Place(state, [UiTree.At(RunecraftPanelFixture.ExaltedRow)], Window());
+        (List<RunecraftPlace> placed, _) = reader.Place(state, [exalted], Window());
 
         Assert.Equal(new ScreenRect(300, 80, 1000, 140), Assert.Single(placed).Where);
+        Assert.Equal(new ScreenRect(686, 99, 986, 129), Assert.Single(placed).Text);
     }
 
     [Fact]

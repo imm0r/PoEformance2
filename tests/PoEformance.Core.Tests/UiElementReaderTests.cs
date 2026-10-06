@@ -121,6 +121,48 @@ public class UiElementReaderTests
         }
     }
 
+    [Theory]
+    [InlineData(2, 1f, 0u)]                          // the ordinary case
+    [InlineData(2, 1f, ShouldModifyPos)]             // the parent's modifier applies
+    [InlineData(3, 1f, ShouldModifyPos)]             // a different scale space, and the modifier
+    [InlineData(2, 2f, 0u)]                          // a different multiplier, same index
+    public void AChildPlacedUnderAPlacedParent_IsWhereTheWalkPutsIt(
+        byte grandchildScale, float grandchildMultiplier, uint extraFlags)
+    {
+        // The chaining step: a sibling read hands back each child's unscaled position, and a
+        // child of THAT child is placed from it without walking to the root again. The only
+        // thing that matters about the shortcut is that it agrees with the walk, on every
+        // branch of the position rule - the modifier lives on the placed parent this time.
+        OffsetSchema schema = Schema();
+        var fake = new FakeMemoryReader();
+        var scale = new UiScale(3440, 1440, Cull: 100);
+        const ulong Grandchild = Leaf + 0x1000;
+
+        PlaceElement(fake, schema, Root, relX: 100, relY: 50);
+        PlaceElement(fake, schema, Panel, parent: Root, relX: 30, relY: 20, modX: 11, modY: 13);
+        PlaceElement(fake, schema, Leaf, parent: Panel, relX: 5, relY: 7, flags: IsVisible | ShouldModifyPos, modX: 17, modY: 19);
+        PlaceElement(
+            fake, schema, Grandchild, parent: Leaf, relX: 386, relY: 19,
+            flags: IsVisible | extraFlags, scaleIndex: grandchildScale, multiplier: grandchildMultiplier,
+            sizeX: 300, sizeY: 30);
+
+        var reader = new UiElementReader(fake, schema);
+        Placed leaf = reader.ReadSiblings(Panel, [Leaf], scale)[Leaf];
+        Placed? placed = reader.ReadUnder(Leaf, leaf.Unscaled, Grandchild, scale);
+        Assert.NotNull(placed);
+        Placed under = placed.Value;
+
+        UiElement walked = reader.Read(Grandchild, scale, withStringId: false)!;
+        Assert.Equal(walked.Position.X, under.Position.X, 3);
+        Assert.Equal(walked.Position.Y, under.Position.Y, 3);
+        Assert.Equal(walked.Size, under.Size);
+        Assert.True(under.Shown);
+
+        // And nothing is placed under something that is not an element, or for one.
+        Assert.Null(reader.ReadUnder(0xDEAD_BEEF, leaf.Unscaled, Grandchild, scale));
+        Assert.Null(reader.ReadUnder(Leaf, leaf.Unscaled, 0xDEAD_BEEF, scale));
+    }
+
     [Fact]
     public void ANDSomethingThatIsNotAnElementIsLeftOutRatherThanPlacedAtZero()
     {
