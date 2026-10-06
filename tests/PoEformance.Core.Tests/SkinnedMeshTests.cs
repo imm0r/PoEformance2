@@ -267,6 +267,17 @@ public class SkinnedMeshTests
 
         // The names still read where they should: the stride took the stream into account.
         Assert.Equal(["HipsShape", "SkullShape"], coloured.Shapes.Select(one => one.Name));
+
+        // WITH A SECOND TEXTURE COORDINATE TOO, the colour is the SECOND of the two fields - the
+        // savannah tree's order, not the reference's. Read the other way round the colour would be
+        // two halves, and the halves a colour.
+        SkinnedMesh both = SkinnedMesh.Read(Built(coloured: true, secondUv: true));
+        Assert.True(both.Ready, both.Why);
+        Assert.Equal(40, both.Facts.Stride);
+        Assert.Equal([200, 100, 50, 255], both.Colours[..4]);
+        Assert.StartsWith("bit 0: first 00 30 00 36 · 1 distinct", both.Facts.Extras, StringComparison.Ordinal);
+        Assert.Contains("bit 1: first C8 64 32 FF", both.Facts.Extras, StringComparison.Ordinal);
+        Assert.Equal(["HipsShape", "SkullShape"], both.Shapes.Select(one => one.Name));
     }
 
     [Fact]
@@ -461,12 +472,12 @@ public class SkinnedMeshTests
     /// Whether the vertex format's seventh bit is set, which costs four bytes on every vertex AND
     /// thirty-six per shape after the last level of detail.
     /// </param>
-    private static byte[] Built(int corner = 4, int details = 1, bool sixth = false, bool coloured = false)
+    private static byte[] Built(int corner = 4, int details = 1, bool sixth = false, bool coloured = false, bool secondUv = false)
     {
         const int Vertices = 4;
         const int Triangles = 2;
-        uint format = (sixth ? 0x23Cu | (1u << 6) : 0x23Cu) | (coloured ? 1u << 1 : 0u);
-        int stride = 32 + (sixth ? 4 : 0) + (coloured ? 4 : 0);
+        uint format = (sixth ? 0x23Cu | (1u << 6) : 0x23Cu) | (coloured ? 1u << 1 : 0u) | (secondUv ? 1u : 0u);
+        int stride = 32 + (sixth ? 4 : 0) + (coloured ? 4 : 0) + (secondUv ? 4 : 0);
 
         string[] names = ["HipsShape", "SkullShape"];
         var file = new List<byte>();
@@ -521,6 +532,11 @@ public class SkinnedMeshTests
                 F16(0.25f); F16(0.75f);             // texture coordinate
                 U8(1); U8(0); U8(0); U8(0);         // bones
                 U8(255); U8(0); U8(0); U8(0);       // weights, summing to 255
+                if (secondUv)
+                {
+                    F16(0.125f); F16(0.375f);           // the second texture coordinate, bit 0 - BEFORE the colour
+                }
+
                 if (coloured)
                 {
                     U8(200); U8(100); U8(50); U8(255);  // the colour stream, bit 1 - r, g, b, a

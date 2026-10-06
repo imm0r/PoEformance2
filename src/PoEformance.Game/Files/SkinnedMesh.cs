@@ -188,6 +188,9 @@ public sealed class SkinnedMesh
     /// values of it over 1,916 vertices, the first byte running 177 to 248, the next two always
     /// nought and the last always 255 - a colour (r, 0, 0, 1) with a mask painted into its red.
     /// Every other mesh in the room carried bit 0 instead, a second texture coordinate, all nought.
+    /// A savannah tree carrying BOTH then showed the two fields lie in the other order from the
+    /// reference's - bit 0's first - see <c>Shape.Of</c>; read the reference's way its crown came
+    /// out black, the nought of the wrong field taken for its ambient occlusion.
     ///
     /// THE BYTE ORDER IS TAKEN AS THE FILE'S - first byte red, last alpha - and that is a reading,
     /// not a finding: the carpet's mask is in its first byte either way round. A mesh whose colour
@@ -606,16 +609,25 @@ public sealed class SkinnedMesh
                 at += 8;
             }
 
+            // BIT 0'S FIELD COMES BEFORE BIT 1'S, the other way round from poe_data_tools' parser,
+            // which reads skin_extra (bit 1) and then tex_coord1 (bit 0). Both are four bytes, so
+            // the stride agrees either way and nothing else in the file can tell. What told was a
+            // savannah tree with both bits set, read in the reference's order: its "bit 1" field was
+            // nought on every one of 9,325 vertices and its "bit 0" field ran 0..191, 0..168, 0..148
+            // with the last byte 255 - the colour, which on a carpet with bit 1 alone sat in the one
+            // field, and on furniture with bit 0 alone the one field was nought. Only this order
+            // puts the colour in the bit-1 field in all three cases, and VertexColourAO read the
+            // other way round painted the tree's crown black.
             int extra1 = -1, extra0 = -1, extra6 = -1;
-            if ((format >> 1 & 1) == 1)
-            {
-                extra1 = at;
-                at += 4;
-            }
-
             if ((format & 1) == 1)
             {
                 extra0 = at;
+                at += 4;
+            }
+
+            if ((format >> 1 & 1) == 1)
+            {
+                extra1 = at;
                 at += 4;
             }
 
@@ -656,6 +668,8 @@ public sealed class SkinnedMesh
             int bones = at;
             at += 8;  // Bones and weights, four bytes each.
 
+            // IN THE REFERENCE'S ORDER, bit 1 then bit 0: no file of this version with both set has
+            // been seen, so the DOLm finding (see Shape.Of) is not carried over by guess.
             int extra1 = -1, extra0 = -1;
             if ((format >> 1 & 1) == 1)
             {
@@ -1112,9 +1126,10 @@ public sealed class SkinnedMesh
 
         public readonly string Say()
         {
+            // In the order they lie in the vertex - see Shape.Of.
             var said = new StringBuilder();
-            _bit1.Say(said, "bit 1");
             _bit0.Say(said, "bit 0");
+            _bit1.Say(said, "bit 1");
             _bit6.Say(said, "bit 6");
             return said.ToString();
         }
