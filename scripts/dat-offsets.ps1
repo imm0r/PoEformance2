@@ -222,7 +222,15 @@ $KnownRows = @(
     @{ Struct = 'MinimapIconRow';        Table = 'MinimapIcons'
        Fields = [ordered]@{ NamePtr = 'Id' } }
     @{ Struct = 'ItemVisualIdentityRow'; Table = 'ItemVisualIdentity'
-       Fields = [ordered]@{ IdPtr = 'Id' } }
+       Fields = [ordered]@{ IdPtr = 'Id'; DdsFilePtr = 'DDSFile' } }
+    # The reward chain the Runeshape Combinations panel is priced through. VisualIdentityPtr is
+    # the column START - the row half of the reference - which is where a reference plugin and
+    # this arithmetic disagree by four bytes; see BaseItemTypesRow in the schema.
+    @{ Struct = 'BaseItemTypesRow';     Table = 'BaseItemTypes'
+       Fields = [ordered]@{ IdPtr = 'Id'; NamePtr = 'Name'; VisualIdentityPtr = 'ItemVisualIdentity' } }
+    @{ Struct = 'Expedition2RecipesRow'; Table = 'Expedition2Recipes'
+       Fields = [ordered]@{ IdPtr = 'Id'; MinLevelReq = 'MinLevelReq'; MaxLevelReq = 'MaxLevelReq'
+                            RewardRowPtr = 'Reward'; RewardCount = 'RewardCount'; RewardGemLevel = 'RewardGemLevel' } }
     @{ Struct = 'QuestFlagsRow';         Table = 'QuestFlags'
        Fields = [ordered]@{ Id = 'Id'; Hash32 = 'HASH32' } }
     @{ Struct = 'NpcsRow';               Table = 'NPCs'

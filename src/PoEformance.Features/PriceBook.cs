@@ -108,6 +108,26 @@ public sealed class PriceBook
     /// </remarks>
     private readonly Dictionary<string, HashSet<string>> _drawnBy = new(StringComparer.Ordinal);
 
+    /// <summary>
+    /// The fungible lines by NAME alone, as poe.ninja spells it.
+    /// </summary>
+    /// <remarks>
+    /// FOR THE CALLER THAT HAS A NAME AND NO ITEM. A stash holds an item, which carries its art,
+    /// so the picture is the join there. The Runeshape Combinations panel holds a RECIPE, whose
+    /// reward is a metadata path - and a path resolves to the reward's English name through the
+    /// install's own table far more reliably than to its picture, which hangs off a column this
+    /// project computed rather than measured. The name is also the one key that tells a Perfect
+    /// Regal Orb from a Regal Orb without a picture to disambiguate.
+    ///
+    /// Still language-independent, for the reason <see cref="_byArtName"/> gives: what is looked
+    /// up is never what the client painted, it is the English spelling the shipped and
+    /// installed tables resolve from the path.
+    ///
+    /// Only the exchange half: a unique's name goes to <see cref="_byName"/> as before, and a
+    /// base type spelled like a listed line must not pick that line's price up here either.
+    /// </remarks>
+    private readonly Dictionary<string, double> _bySpelling = new(StringComparer.Ordinal);
+
     /// <summary>How many Exalted one Divine is worth.</summary>
     /// <remarks>
     /// TAKEN ONLY FROM AN ANSWER THAT HAD PRICES IN IT. Every response carries a rate, including
@@ -266,10 +286,27 @@ public sealed class PriceBook
 
                 added++;
             }
+
+            // Under its name as well, picture or no picture: a line with no art in the table
+            // can still be asked for by what it is called.
+            if (called.TryGetValue(id, out string? named) && Tidy(named) is { Length: > 0 } spelling)
+            {
+                _bySpelling[spelling] = worth;
+            }
         }
 
         return added;
     }
+
+    /// <summary>
+    /// What one of a fungible thing is worth, by its English name alone, or null.
+    /// </summary>
+    /// <param name="name">
+    /// The name as poe.ninja spells it - "Greater Regal Orb", "Uncut Skill Gem (Level 19)" -
+    /// from a table that resolved it from a metadata path, never from what the client painted.
+    /// </param>
+    public double? Spelt(string? name)
+        => name is { Length: > 0 } && _bySpelling.TryGetValue(Tidy(name), out double worth) ? worth : null;
 
     /// <summary>The listed half: uniques and tablets, keyed by name.</summary>
     private int Gear(JsonElement lines)
@@ -512,9 +549,16 @@ public sealed class PriceBook
             currency[key] = worth;
         }
 
+        var spelt = new System.Text.Json.Nodes.JsonObject();
+        foreach ((string key, double worth) in _bySpelling)
+        {
+            spelt[key] = worth;
+        }
+
         writing["art"] = art;
         writing["name"] = named;
         writing["currency"] = currency;
+        writing["spelt"] = spelt;
         return writing.ToJsonString();
     }
 
@@ -555,6 +599,10 @@ public sealed class PriceBook
             // Absent in a file written before this key existed, which costs the trade layer a
             // few currencies it can convert and nothing else - Pour simply finds nothing.
             Pour(root, "currency", book._byId);
+
+            // The same for the names: a book written before them prices the recipe panel by
+            // picture alone until the next refresh, which is half an hour at most.
+            Pour(root, "spelt", book._bySpelling);
 
             long when = Number(root, "when") is { } stamp ? (long)stamp : 0;
             return book.Ready ? new Kept(book, DateTimeOffset.FromUnixTimeSeconds(when)) : null;

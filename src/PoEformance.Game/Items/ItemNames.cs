@@ -318,6 +318,20 @@ public sealed class ItemNames
     }
 
     /// <summary>
+    /// What the SHIPPED table calls a base type - English, whatever language the client runs in.
+    /// </summary>
+    /// <remarks>
+    /// NOT <see cref="Base"/>, and the difference is the whole reason it exists. Base prefers the
+    /// game's own table, which is the right answer for a name somebody reads - and that table is
+    /// in the client's language, which is the wrong answer for a name a price site is asked
+    /// for. data/item-names.json was extracted from an English client, so this is the spelling
+    /// poe.ninja uses, and it goes SHORT rather than wrong: a base type added since the export
+    /// answers null, never a translation.
+    /// </remarks>
+    public string? ShippedBase(string? path)
+        => path is { Length: > 0 } && _bases.TryGetValue(path, out string? known) ? known : null;
+
+    /// <summary>
     /// What a unique is called, from the ItemVisualIdentity id the item carries.
     /// </summary>
     /// <remarks>

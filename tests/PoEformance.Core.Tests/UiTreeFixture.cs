@@ -53,6 +53,7 @@ internal sealed class UiTree
         float multiplier = 1f,
         Vector2 positionModifier = default,
         ulong itemPtr = 0,
+        uint flags = 0,
         params int[] children)
     {
         ArgumentNullException.ThrowIfNull(children);
@@ -64,9 +65,14 @@ internal sealed class UiTree
 
         _fake.Place<ulong>(address + (ulong)_ui.OffsetOf("Self"), address);
         _fake.Place<ulong>(address + (ulong)_ui.OffsetOf("ParentPtr"), parent >= 0 ? At(parent) : 0UL);
+
+        // The whole flags word, for the readers that match elements by its other bits - the
+        // atlas and the recipe panel both fingerprint a kind of element that way. The two bits
+        // with names are OR'd in, so a fixture may say "this fingerprint, visible" as two
+        // arguments and never carry the visible bit inside its fingerprint.
         _fake.Place<uint>(
             address + (ulong)_ui.OffsetOf("Flags"),
-            (visible ? FlagVisible : 0u) | (modifiesPosition ? FlagModifyPos : 0u));
+            flags | (visible ? FlagVisible : 0u) | (modifiesPosition ? FlagModifyPos : 0u));
         _fake.Place(address + (ulong)_ui.OffsetOf("ScaleIndex"), scaleIndex);
         _fake.Place(address + (ulong)_ui.OffsetOf("LocalScaleMultiplier"), multiplier);
         PlaceVector(address + (ulong)_ui.OffsetOf("RelativePosition"), relative);

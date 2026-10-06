@@ -1197,6 +1197,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly RitualLayer _ritual = new();
     private RitualWatch? _ritualWatch;
     private RitualWindow? _ritualWindow;
+    private readonly RunecraftLayer _runecraft = new();
+    private RunecraftWatch? _runecraftWatch;
 
     /// <summary>Called when a preload switch changed, so it can be written down.</summary>
     public Action<PreloadSettings>? PreloadRulesChanged { get; set; }
@@ -2542,6 +2544,31 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>
+    /// Adds the Runeshape Combinations prices: poe.ninja's figure on each recipe row of the panel.
+    /// </summary>
+    /// <remarks>
+    /// Beside the stash, the wealth and the rates rather than on the atlas page, because it is
+    /// the fourth thing in the tool that is about what something is WORTH - and it shares their
+    /// book and their switch. The window is handed the price store for that switch, and the
+    /// overlay's own settings callback so a flip of it is written down exactly as the Stash tab
+    /// writes its copy.
+    /// </remarks>
+    public void AttachRunecraft(RunecraftWatch watch, Action<RunecraftSettings> saved, PriceStore prices, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(watch);
+        ArgumentNullException.ThrowIfNull(saved);
+        ArgumentNullException.ThrowIfNull(prices);
+        _runecraftWatch = watch;
+
+        var window = new RunecraftWindow(watch, saved, prices, () => SettingsChanged?.Invoke());
+        _tools.Add(63, "runecraft", "Runecraft", window.DrawTab);
+        if (visible)
+        {
+            _tools.Show("runecraft");
+        }
+    }
+
+    /// <summary>
     /// Adds the raw-memory dissector.
     /// </summary>
     /// <remarks>
@@ -3479,6 +3506,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             _flaskUses.Draw(ImGui.GetBackgroundDrawList(), _snapshot);
             _skillDps.Draw(ImGui.GetBackgroundDrawList(), _snapshot);
+
+            // On the game's own Runeshape Combinations panel, so it sits with the HUD layers
+            // rather than behind the panel gate: the panel this draws on IS a panel, and hiding
+            // behind panels would hide the feature exactly when it is wanted. It draws nothing
+            // while the panel is shut, which is what the view reports.
+            if (_runecraftWatch is not null)
+            {
+                _runecraft.Draw(ImGui.GetBackgroundDrawList(), _runecraftWatch.View, _runecraftWatch.Settings);
+            }
         }
 
         // OUTSIDE the marker gate above, which only lets things through in a hostile area.
@@ -4462,6 +4498,19 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                     _atlasWatch.View.Hovering && !_atlasHover.Found ? Warning : Measured,
                     figure: true);
             }
+        }
+
+        // The Runeshape Combinations panel, while its prices are switched on: whether it was
+        // found, what it holds, and - the line this row exists for - what the game CALLS the
+        // elements the fingerprint walk resolved, since a name would anchor it better.
+        if (_runecraftWatch is { Settings.Enabled: true })
+        {
+            RunecraftView recipes = _runecraftWatch.View;
+            Row(
+                "runecraft",
+                recipes.Status + (recipes.Named.Length > 0 ? $"   ({recipes.Named})" : string.Empty),
+                recipes.Open && recipes.Priced == 0 && recipes.Rewards.Count > 0 ? Warning : Measured,
+                figure: true);
         }
 
         if (_snapshot.Player is not WorldEntity player)
