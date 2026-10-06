@@ -66,7 +66,8 @@ public sealed class TileBook : ColumnBook
     /// </summary>
     /// <param name="install">Every <c>.tdt</c> and <c>.arm</c> the install has, or empty where it has not been walked.</param>
     /// <param name="placed">How many times each tile or room is placed in the current area, by path - or empty.</param>
-    public static TileBook Of(IReadOnlyList<string>? install, IReadOnlyDictionary<string, int>? placed)
+    /// <param name="needs">What each placed tile or room needs that the shade compiler has not got, by path - see <see cref="AreaNeeds"/> - or null before it is read.</param>
+    public static TileBook Of(IReadOnlyList<string>? install, IReadOnlyDictionary<string, int>? placed, IReadOnlyDictionary<string, string>? needs = null)
     {
         var order = new List<string>((install?.Count ?? 0) + (placed?.Count ?? 0));
         var rows = new Dictionary<string, int>(order.Capacity, StringComparer.OrdinalIgnoreCase);
@@ -105,6 +106,7 @@ public sealed class TileBook : ColumnBook
         var heres = new string[count];
         var placings = new double[count];
         var placingsText = new string[count];
+        var needed = new string[count];
 
         for (var at = 0; at < count; at++)
         {
@@ -123,6 +125,7 @@ public sealed class TileBook : ColumnBook
             heres[at] = times > 0 ? Here : string.Empty;
             placings[at] = times;
             placingsText[at] = times > 0 ? times.ToString(CultureInfo.InvariantCulture) : string.Empty;
+            needed[at] = needs is not null && needs.TryGetValue(path, out string? need) ? need : string.Empty;
 
             // THE PATH AND THE KIND, AND NOT THE WORD "here": that one is a column, asked for as
             // here:yes, and written into the free text it would also answer a bare "here" with
@@ -138,6 +141,10 @@ public sealed class TileBook : ColumnBook
             (DataColumn.Words("folder", folders), Named, true),
             (DataColumn.Labels("here", heres), Area, true),
             (DataColumn.Magnitudes("placed", string.Empty, placings, placingsText), Area, false),
+
+            // WHAT THE PANE WOULD SAY IS LEFT OUT, for every tile of the area at once - see
+            // AreaNeeds - so needs:InputVertexColor finds the tiles worth comparing with the game.
+            (DataColumn.Words("needs", needed), Area, false),
         ];
 
         ColumnStore store = ColumnStore.Of([.. laid.Select(one => one.Column)]);

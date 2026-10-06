@@ -59,9 +59,10 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// </remarks>
     private string _tileset = string.Empty;
 
-    /// <summary>The two lists the book was built from, compared by reference to notice a new one.</summary>
+    /// <summary>The lists the book was built from, compared by reference to notice a new one.</summary>
     private IReadOnlyList<string>? _installed;
     private IReadOnlyDictionary<string, int>? _placedOf;
+    private IReadOnlyDictionary<string, string>? _needsOf;
     private TileBook _page = TileBook.Empty;
 
     /// <summary>What the portrait is handed - a name to show and the tile's path as the key - made once per choice.</summary>
@@ -80,11 +81,14 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>Which tilesets place which tile, for the "drawn as" choice. Null leaves the choice out.</summary>
     public TilesetCatalog? Tilesets { get; init; }
 
+    /// <summary>What each placed tile needs that the compiler has not got, read off the frame for the "needs" column. Null leaves the column empty.</summary>
+    public AreaNeeds? Needs { get; init; }
+
     /// <inheritdoc/>
     protected override string Caption => "Search for any terrain tile or room";
 
     /// <inheritdoc/>
-    protected override string Grammar => "arena  ·  kind:room  ·  set:woods  ·  here:yes  ·  folder:areatransitions";
+    protected override string Grammar => "arena  ·  kind:room  ·  set:woods  ·  here:yes  ·  needs:InputVertexColor  ·  folder:areatransitions";
 
     /// <inheritdoc/>
     protected override string Noun => "tiles";
@@ -103,11 +107,16 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     {
         IReadOnlyList<string> installed = _install();
         IReadOnlyDictionary<string, int> placings = _placed();
-        if (!ReferenceEquals(_installed, installed) || !ReferenceEquals(_placedOf, placings))
+
+        // THE NEEDS ARRIVE LATER THAN THE LISTS, read off the frame as the tileset is chosen, and the
+        // book is built again when they do - a reference compare per frame until then.
+        IReadOnlyDictionary<string, string>? needs = Needs?.Ready(placings, _tileset);
+        if (!ReferenceEquals(_installed, installed) || !ReferenceEquals(_placedOf, placings) || !ReferenceEquals(_needsOf, needs))
         {
             _installed = installed;
             _placedOf = placings;
-            _page = TileBook.Of(installed, placings);
+            _needsOf = needs;
+            _page = TileBook.Of(installed, placings, needs);
         }
 
         return _page;
@@ -128,6 +137,18 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         if (ImGui.Checkbox("Only this area", ref only))
         {
             Toggle(HereField, TileBook.Here);
+        }
+
+        if (Needs is { Reading: true } reading)
+        {
+            (int done, int of) = reading.Progress;
+            ImGui.SameLine();
+            ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture, $"needs: {done} of {of} read"));
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Reading every tile and room of this area the way the pane does, to fill the \"needs\" column:"
+                    + " what each one's shader graphs leave out. Search it with needs:InputVertexColor.");
+            }
         }
     }
 

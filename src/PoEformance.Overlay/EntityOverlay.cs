@@ -2851,6 +2851,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             Changed = () => SettingsChanged?.Invoke(),
             Tilesets = catalog,
+            Needs = new AreaNeeds(readFile, catalog),
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
                 Load = static (read, _, key, _) => TileBookWindow.Load(read, key),

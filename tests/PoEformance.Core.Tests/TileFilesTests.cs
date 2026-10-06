@@ -532,6 +532,21 @@ public class TileFilesTests
         Assert.Contains("  r: 30 30 30 30 30 · 30.0", dump, StringComparison.Ordinal);
         Assert.Contains("  a: 255 255 255 255 255 · 255.0", dump, StringComparison.Ordinal);
         Assert.Contains("graphs program", dump, StringComparison.Ordinal);
+
+        // AND THE AREA'S NEEDS SAY THE SAME FOR THE TILE, by path, as the pane's line would - and a
+        // path that will not load says so rather than nothing.
+        IReadOnlyDictionary<string, string> needs = AreaNeeds.Of(
+            path => files.GetValueOrDefault(path), ["Metadata/Terrain/Test/Arena.tdt", "Metadata/Terrain/Test/Gone.tdt"], string.Empty, null);
+        Assert.Equal("MaskedContactFade in MaskedContactFade", needs["Metadata/Terrain/Test/Arena.tdt"]);
+        Assert.StartsWith("did not load:", needs["Metadata/Terrain/Test/Gone.tdt"], StringComparison.Ordinal);
+
+        // SEARCHABLE AS A COLUMN: needs:MaskedContactFade finds the tile, and a tile the needs do not name is not found.
+        TileBook book = TileBook.Of(["Metadata/Terrain/Test/Arena.tdt", "Metadata/Terrain/Test/Other.tdt"], new Dictionary<string, int> { ["Metadata/Terrain/Test/Arena.tdt"] = 1 }, needs);
+        RowSet? found = book.Matching(ColumnQuery.Parse("needs:MaskedContactFade").Term, out string why);
+        Assert.True(found is not null, why);
+        var rows = new List<int>();
+        found!.CopyTo(rows);
+        Assert.Equal([book.Row("Metadata/Terrain/Test/Arena.tdt")], rows);
     }
 
     /// <summary>A definition's four corner ground types are read where annalithic reads them, and only whole.</summary>
