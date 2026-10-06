@@ -66,6 +66,28 @@ public class RunecraftSettingsTests
     }
 
     [Fact]
+    public void TheMapAndListSettingsRoundTrip_AndNormalise()
+    {
+        var written = new RunecraftSettings(Enabled: true, MapLabels: false, MapSockets: false, ListMinEx: 12.5f);
+        string path = Path.Combine(Path.GetTempPath(), $"runecraft-{Guid.NewGuid():N}.json");
+        try
+        {
+            Assert.True(RunecraftStore.Save(written, path));
+            Assert.Equal(written, RunecraftStore.Load(path));
+            Assert.Contains("\"mapLabels\"", File.ReadAllText(path), StringComparison.Ordinal);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+
+        Assert.True(RunecraftSettings.Default.MapLabels);
+        Assert.True(RunecraftSettings.Default.MapSockets);
+        Assert.Equal(0f, new RunecraftSettings(ListMinEx: -3f).Normalised().ListMinEx);
+        Assert.Equal(0f, new RunecraftSettings(ListMinEx: float.NaN).Normalised().ListMinEx);
+    }
+
+    [Fact]
     public void AMissingOrBrokenFileLeavesTheDefaults()
     {
         string path = Path.Combine(Path.GetTempPath(), $"runecraft-{Guid.NewGuid():N}.json");

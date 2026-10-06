@@ -3,6 +3,7 @@ using System.Runtime.Versioning;
 using ImGuiNET;
 using PoEformance.Features;
 using PoEformance.Game.Ui;
+using PoEformance.Game.World;
 
 namespace PoEformance.Overlay;
 
@@ -34,13 +35,15 @@ public sealed class RunecraftWindow
     private static readonly string[] ColourModes = ["Off", "Relative - against the rows on screen", "Absolute - fixed Exalted thresholds"];
 
     private readonly RunecraftWatch _watch;
+    private readonly MonolithWatch _monoliths;
     private readonly Action<RunecraftSettings> _saved;
     private readonly PriceStore _prices;
     private readonly Action _pricesChanged;
 
     private bool _unsaved;
 
-    /// <param name="watch">The reader's half.</param>
+    /// <param name="watch">The reader's half for the panel.</param>
+    /// <param name="monoliths">The reader's half for the area's monoliths.</param>
     /// <param name="saved">Writes a changed setting down - called once the typing has stopped.</param>
     /// <param name="prices">The poe.ninja book, and its switch.</param>
     /// <param name="pricesChanged">
@@ -48,13 +51,15 @@ public sealed class RunecraftWindow
     /// same callback the Stash tab's copy of the switch uses, so the two cannot disagree.
     /// </param>
     public RunecraftWindow(
-        RunecraftWatch watch, Action<RunecraftSettings> saved, PriceStore prices, Action pricesChanged)
+        RunecraftWatch watch, MonolithWatch monoliths, Action<RunecraftSettings> saved, PriceStore prices, Action pricesChanged)
     {
         ArgumentNullException.ThrowIfNull(watch);
+        ArgumentNullException.ThrowIfNull(monoliths);
         ArgumentNullException.ThrowIfNull(saved);
         ArgumentNullException.ThrowIfNull(prices);
         ArgumentNullException.ThrowIfNull(pricesChanged);
         _watch = watch;
+        _monoliths = monoliths;
         _saved = saved;
         _prices = prices;
         _pricesChanged = pricesChanged;
@@ -75,7 +80,8 @@ public sealed class RunecraftWindow
         OverlayLayout.Note(
             "While the Runeshape Combinations panel is open at a monolith, each offered reward's"
             + " poe.ninja price is written on its row, in Exalted. The row's own name stays the"
-            + " game's; only the price is added.");
+            + " game's; only the price is added. Every monolith in the area is priced on the map"
+            + " too, from what it can roll, before anybody walks to it.");
 
         Sources();
 
@@ -88,6 +94,9 @@ public sealed class RunecraftWindow
 
         ImGui.Separator();
         Reading();
+
+        ImGui.Separator();
+        Monoliths();
     }
 
     /// <summary>Where the prices come from, and whether they are being fetched at all.</summary>
@@ -201,9 +210,180 @@ public sealed class RunecraftWindow
         if (OverlayLayout.Slider("Writing size", ref text, RunecraftSettings.SmallestText, RunecraftSettings.LargestText, "%.2f x"))
         {
             Apply(settings with { TextScale = text });
+            settings = _watch.Settings;
         }
 
         OverlayLayout.Hint("Against half the row's height, which is what 1.00 writes at.");
+
+        OverlayLayout.Group("On the Map");
+
+        bool labels = settings.MapLabels;
+        if (OverlayLayout.Toggle("Price each monolith on the map", ref labels))
+        {
+            Apply(settings with { MapLabels = labels });
+            settings = _watch.Settings;
+        }
+
+        OverlayLayout.Hint(
+            "The best reward each monolith can roll, written at the monolith on whichever map is"
+            + " open. Worked out from the monolith's own anchor rune and hole count against the"
+            + " install's recipe table - the game's own rule - so it is known before the panel is.");
+
+        bool sockets = settings.MapSockets;
+        if (OverlayLayout.Toggle("Hole count before the price", ref sockets))
+        {
+            Apply(settings with { MapSockets = sockets });
+        }
+
+        OverlayLayout.Hint("\"[5] 49 ex\": five holes, best reward 49 Exalted. The holes decide the walk first.");
+    }
+
+    /// <summary>The area's monoliths: what each is, what it can roll, and what the walk read.</summary>
+    private void Monoliths()
+    {
+        MonolithsView monoliths = _monoliths.View;
+        OverlayLayout.Group("Monoliths in This Area");
+        ImGui.TextColored(monoliths.Any ? DimText : WarnText, monoliths.Status);
+
+        RecipeCatalog catalog = _monoliths.Catalog;
+        if (catalog.Count == 0)
+        {
+            ImGui.TextColored(WarnText, catalog.Say.Count > 0 ? catalog.Say[0] : "the install's recipe tables have not been read yet");
+        }
+
+        if (!monoliths.Any)
+        {
+            return;
+        }
+
+        RunecraftSettings settings = _watch.Settings;
+        float least = settings.ListMinEx;
+        if (OverlayLayout.Drag("Hide offers under (ex)", ref least, 0.5f, 0f, 10_000f, "%.1f"))
+        {
+            Apply(settings with { ListMinEx = least });
+            settings = _watch.Settings;
+        }
+
+        foreach (MonolithView view in monoliths.Monoliths)
+        {
+            string mark = view.PanelOpen ? "> " : view.Collected ? "(collected) " : string.Empty;
+            bool open = ImGui.CollapsingHeader($"{mark}{view.Headline}###monolith{view.EntityId}");
+            if (!open)
+            {
+                continue;
+            }
+
+            Monolith(view, catalog, settings.ListMinEx);
+        }
+    }
+
+    /// <summary>One monolith unfolded: its reading, then its offers.</summary>
+    private void Monolith(MonolithView view, RecipeCatalog catalog, float least)
+    {
+        MonolithStation station = view.Station;
+        if (!station.Resolved)
+        {
+            ImGui.TextColored(WarnText, "  no station: " + station.Why);
+        }
+        else if (station.Why.Length > 0)
+        {
+            ImGui.TextColored(WarnText, "  " + station.Why);
+        }
+
+        ImGui.TextColored(
+            DimText,
+            $"  holes {station.HoleCount} (state {view.States.Sockets}) · mode {station.RecipeMode}"
+            + $" · gold sockets {string.Join(",", station.GlowSockets)} · empowered {(station.Empowered ? "yes" : "no")}"
+            + (view.Rerolled ? " · sealed by a reroll" : string.Empty)
+            + (view.Foreign ? " · standalone, not part of the dig" : string.Empty)
+            + (station.Committed ? $" · chosen {station.SelectedRecipeId}" : string.Empty)
+            + (view.Listed ? string.Empty : " · out of range, as last read"));
+        if (view.States.Summary.Length > 0)
+        {
+            ImGui.TextColored(DimText, "  states: " + view.States.Summary);
+        }
+
+        if (view.Candidates.Count == 0)
+        {
+            ImGui.TextColored(DimText, catalog.Count == 0 ? "  (no catalogue to offer from)" : "  (no recipe fits this monolith)");
+            return;
+        }
+
+        if (!ImGui.BeginTable($"##offers{view.EntityId}", 4, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg))
+        {
+            return;
+        }
+
+        try
+        {
+            ImGui.TableSetupColumn("reward");
+            ImGui.TableSetupColumn("x");
+            ImGui.TableSetupColumn("unit");
+            ImGui.TableSetupColumn("total");
+            ImGui.TableHeadersRow();
+
+            var shown = 0;
+            foreach (MonolithCandidate candidate in view.Candidates)
+            {
+                double? total = candidate.Total;
+                if (least > 0 && (total is null || total < least))
+                {
+                    continue;
+                }
+
+                ImGui.TableNextRow();
+                ImGui.TableSetColumnIndex(0);
+                ImGui.TextUnformatted(candidate.Reward);
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip($"[{candidate.Recipe.Size}] {Runes(candidate.Recipe, catalog, station.AnchorHole)}  ·  {candidate.Recipe.Id}");
+                }
+
+                ImGui.TableSetColumnIndex(1);
+                ImGui.TextUnformatted(Math.Max(1, candidate.Recipe.RewardCount).ToString(System.Globalization.CultureInfo.InvariantCulture));
+
+                ImGui.TableSetColumnIndex(2);
+                ImGui.TextColored(
+                    candidate.Price.Priced ? DimText : WarnText,
+                    candidate.Price.Unit is { } unit ? RunecraftPrices.Format(unit) : candidate.Price.Via);
+
+                ImGui.TableSetColumnIndex(3);
+                if (total is { } worth)
+                {
+                    ImGui.TextColored(MoneyText, RunecraftPrices.Format(worth));
+                }
+                else
+                {
+                    ImGui.TextColored(DimText, "-");
+                }
+
+                shown++;
+            }
+
+            if (shown == 0)
+            {
+                ImGui.TableNextRow();
+                ImGui.TableSetColumnIndex(0);
+                ImGui.TextColored(DimText, "(nothing above the threshold)");
+            }
+        }
+        finally
+        {
+            ImGui.EndTable();
+        }
+    }
+
+    /// <summary>The recipe's runes by hole, the anchor's in brackets.</summary>
+    private static string Runes(RuneshapeRecipe recipe, RecipeCatalog catalog, int anchorHole)
+    {
+        var parts = new string[recipe.Runes.Count];
+        for (var i = 0; i < parts.Length; i++)
+        {
+            string name = catalog.RuneName(recipe.Runes[i]);
+            parts[i] = i == anchorHole ? $"[{name}]" : name;
+        }
+
+        return string.Join(" · ", parts);
     }
 
     /// <summary>What the panel read, row by row, with the door each price came through.</summary>
@@ -303,9 +483,12 @@ public sealed class RunecraftWindow
     }
 
     /// <summary>Takes a changed setting into use at once; the write waits for the typing to stop.</summary>
+    /// <remarks>Both watches read the one record, so a change reaches the panel and the map together.</remarks>
     private void Apply(RunecraftSettings changed)
     {
-        _watch.Settings = changed.Normalised();
+        RunecraftSettings settings = changed.Normalised();
+        _watch.Settings = settings;
+        _monoliths.Settings = settings;
         _unsaved = true;
     }
 

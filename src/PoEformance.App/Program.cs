@@ -2497,6 +2497,15 @@ internal static class Program
             Settings = PoEformance.Features.RunecraftStore.Load(),
         };
 
+        // AND THE MONOLITHS THEMSELVES - every one in the area, read off its station and priced
+        // by what it can roll, before the panel is opened on any of them. The same settings
+        // record, since they are one feature with one switch; the recipe catalogue lands with
+        // the reward names below.
+        var monoliths = new PoEformance.Features.MonolithWatch(reader, schema, gameStatesStatic, itemNames.ShippedBase)
+        {
+            Settings = runecraft.Settings,
+        };
+
         // What a map contains, drawn as the game's own pictures. Shares the stash's art store,
         // so one cache on disk serves both and a picture is unpacked once - and asks the install
         // itself where that art lives, rather than being told by a list somebody maintains.
@@ -2805,6 +2814,7 @@ internal static class Program
                 // After the book has been told the league, so the first tick the panel is open
                 // prices against whatever book is finished rather than against none.
                 runecraft.Service(scale, Environment.TickCount64, prices.Book);
+                monoliths.Service(snapshot, Environment.TickCount64, prices.Book);
 
                 // The same arrangement for the game's own exchange, and for the same reason:
                 // told the league every tick, it refreshes only when that is news or the hour
@@ -3071,7 +3081,7 @@ internal static class Program
                 atlas.Settings = kept;
                 PoEformance.Features.AtlasStore.Save(kept);
             });
-        overlay.AttachRunecraft(runecraft, changed => PoEformance.Features.RunecraftStore.Save(changed), prices);
+        overlay.AttachRunecraft(runecraft, monoliths, changed => PoEformance.Features.RunecraftStore.Save(changed), prices);
         overlay.Noise = world.Noise;
         overlay.Memory = world.Memory;
 
@@ -3202,6 +3212,22 @@ internal static class Program
                 }
 
                 runecraft.Catalog = rewards;
+                monoliths.Rewards = rewards;
+
+                // AND THE RECIPES, off three more tables on the same task: what every runeshape
+                // combination takes and pays, which is what a monolith's station is matched
+                // against to say what it can roll. The reference plugin ships a dump of this; the
+                // install is the copy that is never out of date.
+                PoEformance.Features.RecipeCatalog recipes = PoEformance.Features.RecipeCatalog.Read(
+                    installed,
+                    PoEformance.Features.QuestTableLayouts.Load(FindDataFile("expedition-tables.json")),
+                    itemLayouts);
+                foreach (string line in recipes.Say)
+                {
+                    Console.WriteLine(line);
+                }
+
+                monoliths.Catalog = recipes;
             });
 
             // AND THE EFFECT BOOK'S, on its own task for the same reason - four more .dat files.

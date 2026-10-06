@@ -46,6 +46,13 @@ public enum RunecraftColourMode
 /// <param name="GoodFrom">In Absolute mode, the Exalted a reward is green at or above.</param>
 /// <param name="BadBelow">In Absolute mode, the Exalted a reward is red below.</param>
 /// <param name="ShowUnpriced">Write a mark on the rows nothing could price, rather than nothing.</param>
+/// <param name="MapLabels">
+/// Write each monolith's best price on the map, at the monolith - what every monolith in the
+/// area can pay, before anybody walks to it. Hidden while the Runeshape panel is open, since the
+/// panel's own rows say it better then.
+/// </param>
+/// <param name="MapSockets">Put the hole count before the price on the map: "[5] 49 ex".</param>
+/// <param name="ListMinEx">On the tab's monolith list, hide offers worth less than this. 0 shows all.</param>
 public sealed record RunecraftSettings(
     [property: JsonPropertyName("enabled")] bool Enabled = false,
     [property: JsonPropertyName("colourMode")] RunecraftColourMode ColourMode = RunecraftColourMode.Relative,
@@ -54,7 +61,10 @@ public sealed record RunecraftSettings(
     [property: JsonPropertyName("frameBest")] bool FrameBest = true,
     [property: JsonPropertyName("goodFrom")] float GoodFrom = 5f,
     [property: JsonPropertyName("badBelow")] float BadBelow = 0.5f,
-    [property: JsonPropertyName("showUnpriced")] bool ShowUnpriced = false)
+    [property: JsonPropertyName("showUnpriced")] bool ShowUnpriced = false,
+    [property: JsonPropertyName("mapLabels")] bool MapLabels = true,
+    [property: JsonPropertyName("mapSockets")] bool MapSockets = true,
+    [property: JsonPropertyName("listMinEx")] float ListMinEx = 0f)
 {
     public static RunecraftSettings Default { get; } = new();
 
@@ -76,6 +86,7 @@ public sealed record RunecraftSettings(
         TextScale = float.IsFinite(TextScale) && TextScale > 0f ? Math.Clamp(TextScale, SmallestText, LargestText) : 0f,
         GoodFrom = float.IsFinite(GoodFrom) && GoodFrom > 0f ? GoodFrom : Default.GoodFrom,
         BadBelow = float.IsFinite(BadBelow) && BadBelow >= 0f ? BadBelow : Default.BadBelow,
+        ListMinEx = float.IsFinite(ListMinEx) && ListMinEx >= 0f ? ListMinEx : 0f,
     };
 }
 

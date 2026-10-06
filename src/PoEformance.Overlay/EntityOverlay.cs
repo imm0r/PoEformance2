@@ -1199,6 +1199,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private RitualWindow? _ritualWindow;
     private readonly RunecraftLayer _runecraft = new();
     private RunecraftWatch? _runecraftWatch;
+    private readonly MonolithLayer _monoliths = new();
+    private MonolithWatch? _monolithWatch;
 
     /// <summary>Called when a preload switch changed, so it can be written down.</summary>
     public Action<PreloadSettings>? PreloadRulesChanged { get; set; }
@@ -2553,14 +2555,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// overlay's own settings callback so a flip of it is written down exactly as the Stash tab
     /// writes its copy.
     /// </remarks>
-    public void AttachRunecraft(RunecraftWatch watch, Action<RunecraftSettings> saved, PriceStore prices, bool visible = false)
+    public void AttachRunecraft(
+        RunecraftWatch watch, MonolithWatch monoliths, Action<RunecraftSettings> saved, PriceStore prices, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(watch);
+        ArgumentNullException.ThrowIfNull(monoliths);
         ArgumentNullException.ThrowIfNull(saved);
         ArgumentNullException.ThrowIfNull(prices);
         _runecraftWatch = watch;
+        _monolithWatch = monoliths;
 
-        var window = new RunecraftWindow(watch, saved, prices, () => SettingsChanged?.Invoke());
+        var window = new RunecraftWindow(watch, monoliths, saved, prices, () => SettingsChanged?.Invoke());
         _tools.Add(63, "runecraft", "Runecraft", window.DrawTab);
         if (visible)
         {
@@ -4511,6 +4516,27 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 recipes.Status + (recipes.Named.Length > 0 ? $"   ({recipes.Named})" : string.Empty),
                 recipes.Open && recipes.Priced == 0 && recipes.Rewards.Count > 0 ? Warning : Measured,
                 figure: true);
+
+            // The monoliths of the area, and - the half this row exists for - what the station
+            // walk could not read, since every offset behind it is the reference's and unseen.
+            if (_monolithWatch is not null)
+            {
+                MonolithsView monoliths = _monolithWatch.View;
+                var unread = 0;
+                foreach (MonolithView view in monoliths.Monoliths)
+                {
+                    if (view.Listed && !view.Station.Resolved)
+                    {
+                        unread++;
+                    }
+                }
+
+                Row(
+                    "monoliths",
+                    monoliths.Status + (unread > 0 ? $"   ({unread} without a station - see the Runecraft tab)" : string.Empty),
+                    unread > 0 ? Warning : Measured,
+                    figure: true);
+            }
         }
 
         if (_snapshot.Player is not WorldEntity player)
@@ -5009,6 +5035,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // Over the entity dots: a landmark is what the map is being consulted for, so it wins
         // when the two land on the same pixel.
         _poi?.DrawOnMap(draw, map, _snapshot, player);
+
+        // Over the places: a monolith's price is the one figure the map is consulted FOR in an
+        // expedition. Not while the Runeshape panel is open - its rows say it better, and the
+        // labels would sit on the panel.
+        if (_monolithWatch is not null
+            && _runecraftWatch is { Settings: { Enabled: true, MapLabels: true } } recipes
+            && !recipes.View.Open)
+        {
+            _monoliths.Draw(draw, map, player, _monolithWatch.View, recipes.Settings);
+        }
 
         if (ShowCalibration)
         {

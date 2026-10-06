@@ -3831,10 +3831,30 @@ only the price is added. What the port kept, what it changed, and why:
   then moves the price, not somewhere unrelated, and the tab says which anchor it used. The best
   row's frame is the row's own rectangle, icons to edge, because a list is read by rows and a
   ring round one figure is found only after the figure has been read.
-- **Not ported, by decision:** the plugin's monolith labels on the large map, its rune-chain
-  valuation and its expedition route planner. They are a different feature several times this
-  size, resting on monolith station offsets this tool has not measured, and a port of them would
-  be a guess at every one.
+- **Every monolith in the area is priced before the panel is opened on it.** A monolith is an
+  ordinary entity (the `Expedition2Encounter` device, whose MinimapIcon the game flips from
+  `Expedition2RemnantActive` to `Expedition2RemnantDeactivated` once it is collected — the
+  tool's "collected" signal, where the plugin inferred it from a state reaching 7), and its
+  interesting half is a `RuneStation` that is NOT a component. The station registers itself as
+  a listener on the device's `StateMachine`, so the way back to it is `StateMachine.ListenerVec`:
+  each node points into the station at a fixed offset and the station names its device at
+  another — the plugin's route (docs 6.10), with no heap scan and working outside the network
+  bubble. `MonolithReader` reads the station's hole count, anchor rune (arithmetic over the
+  per-area rune table, re-read every time because a base cached across areas goes negative),
+  anchor hole, gold sockets, recipe mode, empowerment, the committed recipe and the panel-open
+  listener, each checked by content so a drifted offset reads as a sentence on the tab. The
+  recipes it can roll are then RECOMPUTED by the game's own offer rule (`MonolithOffers`,
+  decoded by the plugin from the client's offer builder: the anchor rune at the anchor hole,
+  size at most the holes, the level band, and a shorter recipe only where
+  `Expedition2RunesWeights` permits it) against `RecipeCatalog` — Expedition2Recipes, Runes and
+  RunesWeights read out of the INSTALL rather than the plugin's shipped dump, which went stale
+  the patch a recipe was added. The best offer is written at the monolith on whichever map is
+  open, holes first ("[5] 49 ex"), tinted against the best on screen rather than the median
+  because the price distribution is bimodal; the tab lists every monolith with its offers and
+  what the station walk read or could not. Every station offset is the plugin's 0.5.5
+  measurement and unseen by this tool: the first expedition with the tab up is the confirmation.
+- **Not ported yet:** the plugin's rune-chain valuation and its expedition route planner. Both
+  rest on the station reads above and follow them.
 
 ### The trade site — the uniques poe.ninja has nothing on
 

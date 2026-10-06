@@ -110,6 +110,20 @@ internal sealed class FakeDat(int rows, int rowSize)
         return Array(row, offset, targets.Length, into);
     }
 
+    /// <summary>An array of 32-bit integers: a count and an offset, then four bytes each.</summary>
+    public FakeDat Ints(int row, int offset, params int[] values)
+    {
+        ulong into = (ulong)(8 + _variable.Count);
+        Span<byte> four = stackalloc byte[4];
+        foreach (int value in values)
+        {
+            BinaryPrimitives.WriteInt32LittleEndian(four, value);
+            _variable.AddRange(four);
+        }
+
+        return Array(row, offset, values.Length, into);
+    }
+
     /// <summary>An array of strings: a count and an offset, then eight bytes each.</summary>
     public FakeDat Texts(int row, int offset, params string[] texts)
     {

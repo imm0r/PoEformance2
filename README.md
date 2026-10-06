@@ -253,7 +253,11 @@ per monster, so it is off until switched on and takes its cost with it when swit
 The **Runecraft** tab prices the Runeshape Combinations panel: while it is open at a monolith,
 each offered reward's poe.ninja price is written on its row just before the reward's name, in
 Exalted, with the most valuable row framed — ported from
-[`yokkenUA/RunecraftHelper`](https://github.com/yokkenUA/RunecraftHelper).
+[`yokkenUA/RunecraftHelper`](https://github.com/yokkenUA/RunecraftHelper). Every monolith in
+the area is priced before anybody walks to it, too: its station is read off the device, the
+recipes it can roll are worked out by the game's own rule against the install's recipe tables,
+and the best is written at the monolith on the map as "[5] 49 ex" — holes, then price — with
+the whole offer list on the tab.
 The row's own name stays the game's; a recipe names its reward by metadata path, and the install's
 own tables turn that into the English name poe.ninja prices under, so it works on a client in any
 language. The panel is found by a fingerprint walk the reference measured on 0.5.5 and this tool has
