@@ -196,9 +196,13 @@ public sealed class SkinnedMesh
     /// not a finding: the carpet's mask is in its first byte either way round. A mesh whose colour
     /// is a tint rather than a mask would show a swap, and none has been seen yet.
     ///
-    /// <c>InputVertexColor</c> reads this. A mesh without the stream has nothing for it to read -
-    /// see <see cref="ColourAt"/> - and what the engine feeds such a mesh is not settled: the
-    /// shader sources hold two defaults, nought and white, and the game has to say which.
+    /// <c>InputVertexColor</c> reads this. A vertex without a colour of its own - see
+    /// <see cref="ColourAt"/> - reads WHITE, and that was settled in the game, not in the sources,
+    /// which hold both answers (the <c>VertexColor</c> extension point's nought, <c>InitSemanticsData</c>'s
+    /// white). An expedition camp's rope coil (<c>VaalTownstring01c</c>, on a mesh of format 0x38) and
+    /// book pages (<c>EST_BookPages01c</c>, on <c>ScatterBooks13.fmt</c>, format 0x239), both under
+    /// BasicColour's texture-times-vertex-colour and neither with a stream, are drawn in the game with
+    /// their rope and paper textures - under nought both would be black.
     /// </remarks>
     public byte[] Colours { get; private init; }
 

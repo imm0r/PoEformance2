@@ -8,8 +8,8 @@ namespace PoEformance.Features;
 /// the one worth looking at in the game.
 /// </summary>
 /// <remarks>
-/// WHY. Settling what the engine feeds <c>InputVertexColor</c> on a mesh without a colour stream
-/// takes a mesh that wears such a material and can be seen in the game - and a map of seventy
+/// WHY. Settling what the engine fed <c>InputVertexColor</c> on a mesh without a colour stream took
+/// a mesh that wears such a material and can be seen in the game - and a map of seventy
 /// tiles does not say which of them that is. Clicking through them one by one found a tile whose
 /// BasicColour was a black fog blocker, which decides nothing. This reads every placed tile and
 /// room the way the pane would, off the frame, and keeps each one's left-out list as text, so
