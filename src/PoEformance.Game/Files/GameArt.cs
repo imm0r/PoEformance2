@@ -30,7 +30,8 @@ public readonly record struct GamePicture(int Width, int Height, byte[] Rgba)
 ///
 /// Which of the three is worked out from the CONTENT rather than the name, because the name is
 /// <c>.dds</c> in all three cases. Then it is a DDS in whichever block format that texture used
-/// - BC1 through BC7 all turn up, and Pfim decodes all of them.
+/// - BC1 through BC7 all turn up, and Pfim decodes all of them. The one-channel BC4 - grunge masks,
+/// height maps - comes out of Pfim in a shape of its own and is laid out as a graphics card reads it.
 /// </remarks>
 public static class GameArt
 {
@@ -210,7 +211,7 @@ public static class GameArt
             }
 
             var rgba = new byte[image.Width * image.Height * 4];
-            return Lay(image, rgba)
+            return Lay(image, rgba, Red(dds))
                 ? new GamePicture(image.Width, image.Height, rgba)
                 : null;
         }
@@ -224,13 +225,44 @@ public static class GameArt
         }
     }
 
+    /// <summary>
+    /// Whether a DDS says it is BC4, unsigned: one channel, and that channel red.
+    /// </summary>
+    /// <remarks>
+    /// ASKED OF THE HEADER, NOT OF PFIM. Pfim hands a BC4 back as <c>Rgb8</c>, one byte a pixel,
+    /// and hands other one-byte formats back the same way - but a graphics card reads them
+    /// differently: a BC4 as (r, 0, 0, 1), a luminance texture as (l, l, l, 1), an alpha one as
+    /// (0, 0, 0, a). Only the first is known to be what the byte is, so only that one is taken.
+    /// The four-character codes and the DX10 header's format number are the ones Pfim itself
+    /// reads a BC4 by; the signed and typeless kinds are left out.
+    /// </remarks>
+    private static bool Red(byte[] dds)
+    {
+        const int pixelFlags = 80;
+        const int fourCharacters = 84;
+        const int dx10Format = 128;
+        if (dds.Length < dx10Format || (BitConverter.ToUInt32(dds, pixelFlags) & 0x4) == 0)
+        {
+            return false;
+        }
+
+        ReadOnlySpan<byte> code = dds.AsSpan(fourCharacters, 4);
+        return code.SequenceEqual("ATI1"u8)
+            || code.SequenceEqual("BC4U"u8)
+            || (code.SequenceEqual("DX10"u8) && dds.Length >= dx10Format + 4 && BitConverter.ToUInt32(dds, dx10Format) == 80);
+    }
+
     /// <summary>Copies Pfim's pixels out as red, green, blue, alpha.</summary>
-    private static bool Lay(Pfim.IImage image, byte[] rgba)
+    /// <param name="image">What Pfim decoded.</param>
+    /// <param name="rgba">Where the pixels go.</param>
+    /// <param name="red">Whether a one-byte pixel is a BC4's red - see <see cref="Red"/>.</param>
+    private static bool Lay(Pfim.IImage image, byte[] rgba, bool red)
     {
         int wide = image.Format switch
         {
             Pfim.ImageFormat.Rgba32 => 4,
             Pfim.ImageFormat.Rgb24 => 3,
+            Pfim.ImageFormat.Rgb8 when red => 1,
             _ => 0,
         };
 
@@ -254,6 +286,14 @@ public static class GameArt
             {
                 int one = reading + (x * wide);
                 int other = writing + (x * 4);
+                if (wide == 1)
+                {
+                    // A BC4 AS A GRAPHICS CARD READS ONE: its channel is red, green and blue are
+                    // nought, alpha is whole.
+                    rgba[other] = from[one];
+                    rgba[other + 3] = 255;
+                    continue;
+                }
 
                 rgba[other] = from[one + 2];       // blue first out of Pfim, red first into this
                 rgba[other + 1] = from[one + 1];
