@@ -788,6 +788,22 @@ public sealed class MonsterPortrait
                 ImGui.TextDisabled(_cost);
             }
 
+            // A TILE OR ROOM THAT DID NOT LOAD CAN STILL BE DUMPED - its own file and the reason - since
+            // "the room places no doodads" is exactly the claim somebody wants to check against the file.
+            // Only the tile book's portrait has a tileset catalogue, which is what marks it here.
+            if (Tilesets is not null && _loading is not { IsCompleted: false } && _wanted.Length > 0 && !_model.Ready)
+            {
+                if (ImGui.Button("files##monster-dump-failed"))
+                {
+                    Dump();
+                }
+
+                if (_dumped.Length > 0)
+                {
+                    PathLink.Line(_dumped);
+                }
+            }
+
             return;
         }
 
@@ -2445,7 +2461,7 @@ public sealed class MonsterPortrait
     private void Dump()
     {
         string at = Path.Combine(Folder, Stem(_wanted) + ".files.txt");
-        if (_model.Kind is not (ModelKind.Tile or ModelKind.Room))
+        if (_model.Kind is not (ModelKind.Tile or ModelKind.Room) && (_model.Ready || Tilesets is null))
         {
             Write(at, () => ModelDump.Of(_install, _variety, _wanted, _model));
             return;

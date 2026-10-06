@@ -38,8 +38,15 @@ public static class TileModels
     /// <summary>A terrain tile's side in world units.</summary>
     public const float Side = 250f;
 
-    /// <summary>Most sub-tiles read for one tile - a guard against a size read from the wrong place.</summary>
-    public const int MostSubTiles = 256;
+    /// <summary>
+    /// Most sub-tiles read for one tile - a guard against a size read from the wrong place.
+    /// </summary>
+    /// <remarks>
+    /// 256 WAS TOO FEW for a real tile: Port_Boss_01.tgt says 15x21, 315 sub-tiles, and is the whole
+    /// harbour the boss fight stands in. A misread size is a garbage number in the thousands or
+    /// millions, so the guard still catches what it is for at 1024.
+    /// </remarks>
+    public const int MostSubTiles = 1024;
 
     /// <summary>
     /// What the colour texture of a tile's black walls is called.

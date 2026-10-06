@@ -229,6 +229,23 @@ public class RoomLayoutTests
     }
 
     [Fact]
+    public void ARoomThatDidNotLoadIsStillDumpedWithItsOwnFile()
+    {
+        // "the room places no doodads" is a claim about the file, so the dump of such a room is the
+        // file itself and the reason - Port's town rooms said it and could not be checked.
+        Dictionary<string, byte[]> files = Install();
+        const string path = "Metadata/Terrain/Woods/Rooms/Clearing.arm";
+        MonsterModel failed = MonsterModel.None with { Why = "the room places no doodads: " + path };
+
+        string dump = ModelDump.OfTile(one => files.GetValueOrDefault(one), path, failed);
+
+        Assert.StartsWith("room: " + path, dump, StringComparison.Ordinal);
+        Assert.Contains("=== .arm " + path, dump, StringComparison.Ordinal);
+        Assert.Contains("\"Metadata/Doodads/Rock.ao\"", dump, StringComparison.Ordinal);
+        Assert.Contains("did not load: the room places no doodads", dump, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void ANDAROOMCostsWhatItRead()
     {
         // COUNTED AT THE READER, so the number under the picture is what the install was asked for
