@@ -403,7 +403,6 @@ public sealed class ExpeditionWindow
         OverlayLayout.Hint(
             "A monolith this big is a detour whatever its recipe pays: one wave per socket, each"
             + " carrying every rune propagated before it, so the chain ends on it. 0 switches this off.");
-        OverlayLayout.Gap();
 
         // The Grand controls, and the normal ones, each shown unless the map is known to be the other.
         bool knownNormal = view.HasDetonator && view.CountsKnown && !view.IsGrand;
@@ -452,7 +451,6 @@ public sealed class ExpeditionWindow
             }
 
             OverlayLayout.Hint("The tall two-triangle flag: a logbook. Also what makes the Kalguur Sentinel worth routing to first.");
-            OverlayLayout.Gap();
         }
 
         if (!knownNormal)
@@ -475,7 +473,6 @@ public sealed class ExpeditionWindow
                 + " flag cannot be told from a trash one in memory, so density is the only honest signal.");
 
             RewardTable(settings, view);
-            OverlayLayout.Gap();
         }
     }
 
@@ -942,7 +939,6 @@ public sealed class ExpeditionWindow
             _newProp = string.Empty;
         }
 
-        OverlayLayout.Gap();
         OverlayLayout.Group(
             "Objects Matching No Rule",
             "The expedition objects on this map that no rule names. Most are scenery; add a rule only"
@@ -1013,7 +1009,6 @@ public sealed class ExpeditionWindow
         }
 
         OverlayLayout.Hint("The shut blockers (red) with the cells they make solid, and the opened ones (green) the chain may pass.");
-        OverlayLayout.Gap();
 
         OverlayLayout.Group("Run", "Re-plan without a trip to this window, and keep the planner's reasoning on disk.");
         int key = RunKeys.IndexOf(settings.RunKey);
