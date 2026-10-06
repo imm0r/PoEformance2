@@ -41,14 +41,14 @@ public class GraphSurveyTests
         """
         {"nodes":[
           {"type":"ConstantFloat","index":0,"parameters":[{"value":0.5}]},
-          {"type":"SmoothStep","index":0},
+          {"type":"MuddleTex","index":0},
           {"type":"NormalTexToTbn","index":0},
-          {"type":"TbnNormal","index":0,"stage":"Texturing_Calc"},
-          {"type":"AlbedoColor","index":0,"stage":"Texturing_Calc"}],
+          {"type":"TbnNormal","index":0,"stage":"PixelOutput_Calc"},
+          {"type":"AlbedoColor","index":0,"stage":"PixelOutput_Calc"}],
          "links":[
-          {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"SmoothStep","index":0,"variable":"in_value"}},
-          {"src":{"type":"SmoothStep","index":0,"variable":"out_value"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Calc","variable":"input"}},
-          {"src":{"type":"NormalTexToTbn","index":0,"variable":"tbn_normal"},"dst":{"type":"TbnNormal","index":0,"stage":"Texturing_Calc","variable":"input"}}]}
+          {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"MuddleTex","index":0,"variable":"in_value"}},
+          {"src":{"type":"MuddleTex","index":0,"variable":"out_value"},"dst":{"type":"AlbedoColor","index":0,"stage":"PixelOutput_Calc","variable":"input"}},
+          {"src":{"type":"NormalTexToTbn","index":0,"variable":"tbn_normal"},"dst":{"type":"TbnNormal","index":0,"stage":"PixelOutput_Calc","variable":"input"}}]}
         """;
 
     private const string Normals =
@@ -96,20 +96,20 @@ public class GraphSurveyTests
         Assert.Contains(
             "  InputVertexColor · alone 2 · among 2 · graphs 1 · Art/Models/Monsters 1, Art/Textures/Environment 1",
             survey, StringComparison.Ordinal);
-        Assert.Contains("  SmoothStep · alone 0 · among 1 · graphs 1 · Art/Textures/Environment 1", survey, StringComparison.Ordinal);
-        Assert.Contains("  stage Texturing_Calc · alone 0 · among 1", survey, StringComparison.Ordinal);
+        Assert.Contains("  MuddleTex · alone 0 · among 1 · graphs 1 · Art/Textures/Environment 1", survey, StringComparison.Ordinal);
+        Assert.Contains("  stage PixelOutput_Calc · alone 0 · among 1", survey, StringComparison.Ordinal);
         Assert.DoesNotContain("NormalTexToTbn ·", survey, StringComparison.Ordinal);
         Assert.True(
             survey.IndexOf("  InputVertexColor · alone", StringComparison.Ordinal)
-                < survey.IndexOf("  SmoothStep · alone", StringComparison.Ordinal),
+                < survey.IndexOf("  MuddleTex · alone", StringComparison.Ordinal),
             "what completes the most comes first");
 
         Assert.Contains("  1. InputVertexColor · completes 2 · 75.0% of the coloured materials evaluate whole after it", survey, StringComparison.Ordinal);
-        Assert.Contains("  2. SmoothStep · completes 0 · 75.0%", survey, StringComparison.Ordinal);
-        Assert.Contains("  3. stage Texturing_Calc · completes 1 · 100.0%", survey, StringComparison.Ordinal);
+        Assert.Contains("  2. MuddleTex · completes 0 · 75.0%", survey, StringComparison.Ordinal);
+        Assert.Contains("  3. stage PixelOutput_Calc · completes 1 · 100.0%", survey, StringComparison.Ordinal);
 
         Assert.Contains("  Metadata/Tinted.fxgraph · 2 materials · missing InputVertexColor", survey, StringComparison.Ordinal);
-        Assert.Contains("  Texturing_Calc · NOT run · graphs 1 · material uses 1", survey, StringComparison.Ordinal);
+        Assert.Contains("  PixelOutput_Calc · NOT run · graphs 1 · material uses 1", survey, StringComparison.Ordinal);
         Assert.Contains("  Texturing_Init · run · graphs 1 · material uses 2", survey, StringComparison.Ordinal);
         Assert.Equal("0 of 7 materials", told[0]);
     }
@@ -119,8 +119,9 @@ public class GraphSurveyTests
     /// </summary>
     /// <remarks>
     /// What the earlier tile dumps said one material at a time, counted: Dust_simple, on seven of the
-    /// cliffs, waits on three things - the indirect colour, Noise31 and the vertex's local position -
-    /// and the vertex colour BasicColour multiplies by is the only thing standing in the ledge's way.
+    /// cliffs, waits on two things - Noise31 and the vertex's local position, which is the engine's to
+    /// hand over or not - and the vertex colour BasicColour multiplies by is the only thing standing in
+    /// the ledge's way.
     /// </remarks>
     [Fact]
     public void ANDOVERTheInstallsOwnMaterialsItNamesWhatTheDumpsNamedOneAtATime()
@@ -142,7 +143,7 @@ public class GraphSurveyTests
         string[] materials = [.. Directory.GetFiles(root, "*.mat").Select(one => Path.GetFileName(one).Replace("__", "/", StringComparison.Ordinal))];
         string survey = GraphSurvey.Of(Read, materials);
 
-        Assert.Contains("  Metadata/Materials/Environment/Dust_simple.fxgraph · 7 materials · missing FromVertexLocalPosition, InputIndirectColor, Noise31", survey, StringComparison.Ordinal);
+        Assert.Contains("  Metadata/Materials/Environment/Dust_simple.fxgraph · 7 materials · missing FromVertexLocalPosition, Noise31", survey, StringComparison.Ordinal);
         Assert.Contains("  Metadata/Effects/Graphs/General/BasicColour.fxgraph · 2 materials · missing InputVertexColor", survey, StringComparison.Ordinal);
         Assert.DoesNotContain("PBRGroundBN.fxgraph ·", survey, StringComparison.Ordinal);
         Assert.DoesNotContain("StromatoliteLedge_Blend.fxgraph ·", survey, StringComparison.Ordinal);
@@ -155,8 +156,13 @@ public class GraphSurveyTests
         Assert.True(ShadeProgram.Knows("InputUV"));
         Assert.True(ShadeProgram.Knows("InputTexture"));
         Assert.True(ShadeProgram.Knows("One"));
-        Assert.False(ShadeProgram.Knows("SmoothStep"));
+        Assert.True(ShadeProgram.Knows("SmoothStep"));
+        Assert.True(ShadeProgram.Knows("InputIndirectColor"));
+        Assert.True(ShadeProgram.Knows("SampleInputTriplanar"));
+        Assert.False(ShadeProgram.Knows("Noise31"));
         Assert.False(ShadeProgram.Knows("InputVertexColor"));
+        Assert.False(ShadeProgram.Knows("InputVertexUV"));
+        Assert.False(ShadeProgram.Knows("FromVertexLocalPosition"));
         Assert.False(ShadeProgram.Knows(string.Empty));
     }
 
