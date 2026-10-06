@@ -2434,17 +2434,30 @@ public sealed class MonsterPortrait
         TilesetCatalog? catalog = Tilesets;
         IReadOnlyList<string> shaders = Shaders?.Invoke() ?? [];
         _dumped = "writing " + at + " - reading every tileset, this takes a moment";
-        _ = Task.Run(() => Write(at, () => ModelDump.OfTile(install, tile, model, catalog?.Wait(), shaders)));
+
+        // AND EVERY SHADER SOURCE BESIDE IT, whole - see ModelDump.ShaderSources. One file for all
+        // tiles, so it is written again with each dump rather than once per tile.
+        string beside = shaders.Count > 0 ? Path.Combine(Folder, ModelDump.ShaderFile) : string.Empty;
+        _ = Task.Run(() =>
+        {
+            if (beside.Length > 0)
+            {
+                Write(beside, () => ModelDump.ShaderSources(install, shaders));
+            }
+
+            Write(at, () => ModelDump.OfTile(install, tile, model, catalog?.Wait(), shaders),
+                beside.Length > 0 ? $" - and the {shaders.Count} shader sources beside it, in {ModelDump.ShaderFile}" : string.Empty);
+        });
     }
 
     /// <summary>Writes a dump and says where, or why not, under the buttons.</summary>
-    private void Write(string at, Func<string> text)
+    private void Write(string at, Func<string> text, string more = "")
     {
         try
         {
             Directory.CreateDirectory(Folder);
             File.WriteAllText(at, text());
-            _dumped = "wrote " + at;
+            _dumped = "wrote " + at + more;
         }
         catch (Exception fault) when (fault is IOException or UnauthorizedAccessException)
         {
