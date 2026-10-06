@@ -22,6 +22,17 @@ namespace PoEformance.Overlay;
 /// distribution is bimodal - a couple of huge ones among many cheap - and a median baseline
 /// drifts into the cheap tail and lights an 8 ex monolith green beside a 387 ex one.
 ///
+/// THE RUNE TAKES THE PRICE'S PLACE where the price would mislead: a player who committed to
+/// a recipe paying less than the monolith offered took it for the rune, and a small figure
+/// there argues against walking to a monolith worth walking to - "[5] Opulent". A monolith
+/// sealed by a reroll shows both, "[5] 49 ex | Opulent", since neither can change and no
+/// intent can be read out of a random pick. The label is built as coloured SEGMENTS because
+/// the two halves want different tints - the price against the best on screen, the rune by
+/// its class - and one colour for both would make one of them lie.
+///
+/// Scouting puts the runes a monolith could still propagate on a line above, in amber, best
+/// first - so the map says which monoliths can seed a strong chain, not only which pay.
+///
 /// Hidden while the Runeshape panel is open - its rows say it better then - and off a
 /// collected monolith, whose price is history.
 /// </remarks>
@@ -34,9 +45,17 @@ public sealed class MonolithLayer
     private const uint Red = 0xFF40_40FFu;
     private const uint Shadow = 0xCC00_0000u;
     private const uint Plate = 0xB000_0000u;
+    private const uint Amber = 0xFF4D_CCFFu;
+    private const uint Grey = 0xFF9A_9A9Au;
 
     /// <summary>How far below the monolith's point the label's top sits.</summary>
     private const float Below = 6f;
+
+    /// <summary>Between the price and the rune on a sealed monolith's label - two kinds of fact, not one phrase.</summary>
+    private const string Separator = " | ";
+
+    /// <summary>One label's segments: reused across labels and frames, since this runs in the draw loop.</summary>
+    private readonly List<(string Text, uint Colour, float Width)> _parts = new(3);
 
     /// <summary>Draws a label per monolith on the map that is open.</summary>
     public void Draw(ImDrawListPtr draw, MapView map, WorldEntity player, MonolithsView monoliths, RunecraftSettings settings)
@@ -63,26 +82,33 @@ public sealed class MonolithLayer
                 continue;
             }
 
-            string text;
-            uint colour;
-            if (view.Priced)
+            MonolithRuneLabel mode = settings.MapRune ? view.RuneOnMap : MonolithRuneLabel.None;
+            bool scouting = settings.MapScout && mode == MonolithRuneLabel.None && view.Scout.Count > 0;
+
+            _parts.Clear();
+            string head = settings.MapSockets && view.HoleCount > 0 ? $"[{view.HoleCount}] " : string.Empty;
+            if (mode == MonolithRuneLabel.Replace)
             {
-                text = RunecraftPrices.Format(view.Best);
-                colour = Tint(settings, view.Best, monoliths.MaxBest);
+                // The price is absent, not recoloured: it is the thing that misleads.
+                Part(head + view.ChosenRune, RunecraftLayer.RuneTint(view.ChosenMult), scale);
+            }
+            else if (view.Priced)
+            {
+                Part(head + RunecraftPrices.Format(view.Best), Tint(settings, view.Best, monoliths.MaxBest), scale);
+                if (mode == MonolithRuneLabel.Append)
+                {
+                    Part(Separator, Grey, scale);
+                    Part(view.ChosenRune, RunecraftLayer.RuneTint(view.ChosenMult), scale);
+                }
             }
             else if (settings.ShowUnpriced && view.HoleCount > 0)
             {
-                text = "?";
-                colour = White;
-            }
-            else
-            {
-                continue;
+                Part(head + "?", White, scale);
             }
 
-            if (settings.MapSockets && view.HoleCount > 0)
+            if (_parts.Count == 0 && !scouting)
             {
-                text = $"[{view.HoleCount}] {text}";
+                continue;
             }
 
             Vector2 at = map.Project(
@@ -93,13 +119,43 @@ public sealed class MonolithLayer
                 continue;
             }
 
-            Vector2 measured = ImGui.CalcTextSize(text) * scale;
-            var corner = new Vector2(at.X - (measured.X * 0.5f), at.Y + Below);
-            draw.AddRectFilled(corner - pad, corner + measured + pad, Plate, 2f);
-            draw.AddText(font, size, corner + new Vector2(1f, 1f), Shadow, text);
-            draw.AddText(font, size, corner, colour, text);
+            float top = at.Y + Below;
+            if (_parts.Count > 0)
+            {
+                float wide = 0f;
+                foreach ((_, _, float width) in _parts)
+                {
+                    wide += width;
+                }
+
+                var corner = new Vector2(at.X - (wide * 0.5f), top);
+                draw.AddRectFilled(corner - pad, corner + new Vector2(wide, size) + pad, Plate, 2f);
+                float pen = corner.X;
+                foreach ((string text, uint colour, float width) in _parts)
+                {
+                    var origin = new Vector2(pen, corner.Y);
+                    draw.AddText(font, size, origin + new Vector2(1f, 1f), Shadow, text);
+                    draw.AddText(font, size, origin, colour, text);
+                    pen += width;
+                }
+            }
+
+            if (scouting)
+            {
+                // One line above the price, not a tower: the label sits on the map, and a stack
+                // of names over a monolith hides more than it tells.
+                string names = string.Join(Separator, view.Scout);
+                Vector2 measured = ImGui.CalcTextSize(names) * scale;
+                var corner = new Vector2(at.X - (measured.X * 0.5f), top - size - (3f * scale));
+                draw.AddRectFilled(corner - pad, corner + measured + pad, Plate, 2f);
+                draw.AddText(font, size, corner + new Vector2(1f, 1f), Shadow, names);
+                draw.AddText(font, size, corner, Amber, names);
+            }
         }
     }
+
+    private void Part(string text, uint colour, float scale)
+        => _parts.Add((text, colour, ImGui.CalcTextSize(text).X * scale));
 
     /// <summary>The colour a monolith's price is written in, by the chosen mode.</summary>
     /// <remarks>

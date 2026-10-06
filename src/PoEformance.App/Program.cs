@@ -2813,8 +2813,10 @@ internal static class Program
 
                 // After the book has been told the league, so the first tick the panel is open
                 // prices against whatever book is finished rather than against none.
-                runecraft.Service(scale, Environment.TickCount64, prices.Book);
+                // The monoliths first, so the panel's rows are joined to the one whose panel
+                // is open as it stands this tick.
                 monoliths.Service(snapshot, Environment.TickCount64, prices.Book);
+                runecraft.Service(scale, Environment.TickCount64, prices.Book, monoliths.View);
 
                 // The same arrangement for the game's own exchange, and for the same reason:
                 // told the league every tick, it refreshes only when that is news or the hour
@@ -3228,6 +3230,7 @@ internal static class Program
                 }
 
                 monoliths.Catalog = recipes;
+                runecraft.Recipes = recipes;
             });
 
             // AND THE EFFECT BOOK'S, on its own task for the same reason - four more .dat files.

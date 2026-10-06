@@ -88,6 +88,49 @@ public class RunecraftSettingsTests
     }
 
     [Fact]
+    public void TheChainSettingsRoundTrip_AndTheWeightsNormalise()
+    {
+        Assert.True(RunecraftSettings.Default.ChainEnabled);
+        Assert.Equal(RuneChain.DefaultBaseEx, RunecraftSettings.Default.ChainBaseEx);
+        Assert.Same(RuneChain.DefaultWeights, RunecraftSettings.Default.ChainWeights);
+        Assert.True(RunecraftSettings.Default.MapRune);
+        Assert.False(RunecraftSettings.Default.MapScout);
+
+        var written = new RunecraftSettings(
+            Enabled: true, ChainEnabled: false, ChainBaseEx: 45f, MapRune: false, MapScout: true,
+            ChainWeights: [new("Opulent", 1.5f), new("Wisdom", 0.9f, Avoid: true)]);
+        string path = Path.Combine(Path.GetTempPath(), $"runecraft-{Guid.NewGuid():N}.json");
+        try
+        {
+            Assert.True(RunecraftStore.Save(written, path));
+            RunecraftSettings read = RunecraftStore.Load(path);
+            Assert.Equal(written, read);
+            Assert.Equal(written.GetHashCode(), read.GetHashCode());
+            Assert.Contains("\"chainWeights\"", File.ReadAllText(path), StringComparison.Ordinal);
+            Assert.Contains("\"lootMult\"", File.ReadAllText(path), StringComparison.Ordinal);
+
+            // A file from before the chain existed carries the defaults.
+            File.WriteAllText(path, "{ \"enabled\": true }");
+            RunecraftSettings older = RunecraftStore.Load(path);
+            Assert.True(older.ChainEnabled);
+            Assert.Equal(RuneChain.DefaultWeights, older.ChainWeights);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+
+        // A clean table comes back as the same list; a dirty one is cleaned.
+        Assert.Same(written.ChainWeights, written.Normalised().ChainWeights);
+        RunecraftSettings wild = new RunecraftSettings(
+            ChainBaseEx: float.NaN,
+            ChainWeights: [new("Opulent", 99f), new("", 2f), new("Opulent", 1.1f), new("Bond", float.NaN)]).Normalised();
+        Assert.Equal(RuneChain.DefaultBaseEx, wild.ChainBaseEx);
+        Assert.Equal([new RuneWeight("Opulent", 10f), new RuneWeight("Bond", 1f)], wild.ChainWeights);
+        Assert.NotEqual(written, written with { ChainWeights = [new("Opulent", 1.5f)] });
+    }
+
+    [Fact]
     public void AMissingOrBrokenFileLeavesTheDefaults()
     {
         string path = Path.Combine(Path.GetTempPath(), $"runecraft-{Guid.NewGuid():N}.json");

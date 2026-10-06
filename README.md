@@ -257,13 +257,17 @@ Exalted, with the most valuable row framed — ported from
 the area is priced before anybody walks to it, too: its station is read off the device, the
 recipes it can roll are worked out by the game's own rule against the install's recipe tables,
 and the best is written at the monolith on the map as "[5] 49 ex" — holes, then price — with
-the whole offer list on the tab.
+the whole offer list on the tab. The rune a recipe would propagate down the chain from the
+gold-framed socket is valued beside its reward — the plugin's rune-chain model, with the
+tier-list weights editable on the tab — so the panel names each row's rune before the price and
+rings the strongest in amber, the tab lists every offer with reward, chain and the two together,
+and the map names the chosen rune where it says more than the price.
 The row's own name stays the game's; a recipe names its reward by metadata path, and the install's
 own tables turn that into the English name poe.ninja prices under, so it works on a client in any
 language. The panel is found by a fingerprint walk the reference measured on 0.5.5 and this tool has
 not yet seen — the tab lists what it resolved, row by row, with the key each price came through, and
 the Status page names the elements, so the first opening is also the confirmation. The plugin's
-monolith map labels, rune-chain valuation and expedition route planner are not ported.
+expedition route planner is not ported yet.
 
 The config window has a **Map** tab showing the same layout at a readable size, with the
 player and nearby markers on it. It stays open while the overlay runs and its settings apply

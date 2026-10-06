@@ -3853,8 +3853,35 @@ only the price is added. What the port kept, what it changed, and why:
   because the price distribution is bimodal; the tab lists every monolith with its offers and
   what the station walk read or could not. Every station offset is the plugin's 0.5.5
   measurement and unseen by this tool: the first expedition with the tab up is the confirmation.
-- **Not ported yet:** the plugin's rune-chain valuation and its expedition route planner. Both
-  rest on the station reads above and follow them.
+- **The rune a recipe propagates is valued beside its reward.** A remnant picks which rune
+  SLOT propagates to the monsters unearthed by the explosive placed on it and by every later one,
+  and the panel frames that slot in gold (the 0.5.4 notes); buffing those monsters raises their
+  drops, so the propagated rune is worth currency. The socket is a POSITION on the station
+  (`RuneStation.GlowSockets`), known before anybody picks, so the rune every offered recipe
+  would propagate is its rune at that hole — which is what lets the tool RECOMMEND a recipe.
+  `RuneChain` is the plugin's model: `chainEx = baseEx × packsStillBuffed × (effMult − 1)`,
+  with the multipliers calibrated rather than read (they are server-side; the defaults follow
+  the community tier list and the tab's table re-tunes them, as a multiplier or as the Exalted
+  one wave gains), Power multiplying every other rune's uplift by a fixed 1.5 and read live off
+  the station's empowered byte, and "modifiers of the same type no longer stack" as a bit per
+  rune: a rune committed on any monolith is dead everywhere, one expected from an earlier
+  monolith on the plan is dead downstream — which changes the recommendation, not just the
+  figure. `RuneChainPlan` is the area-wide second pass `MonolithWatch` runs after the stations
+  are read: what is committed, then forwards along the planner's order (Power upstream, runes
+  already in) and backwards (waves still ahead, the uplift a Power would multiply), each
+  monolith's expectation from the previous scan so a fresh area converges over a few. Without
+  an order the packs ahead are every other live monolith's waves, an upper bound the plugin
+  measured far closer than its first count of one wave per charge. Each monolith's offers are
+  then ordered by reward PLUS chain — a joint maximum, since the player picks one recipe —
+  while the panel keeps two separate calls: the green frame on the dearest reward, an amber
+  ring round the rune plate on the strongest rune, the rune named before the price in its
+  class colour. `RunecraftWatch` joins the rows to the monolith whose station carries the panel
+  listener, handed in from the monolith watch that runs in the same pass. On the map the
+  committed rune replaces the price on a monolith whose player gave up reward for it and
+  joins it on one sealed by a reroll; scouting writes the best few runes a monolith could
+  still propagate above its price.
+- **Not ported yet:** the plugin's expedition route planner, which rests on everything above
+  and supplies the detonation order the chain plan takes.
 
 ### The trade site — the uniques poe.ninja has nothing on
 
