@@ -158,7 +158,8 @@ public static class ModelDump
         IReadOnlyList<string>? shaders = null)
     {
         var said = new StringBuilder();
-        said.Append("tile: ").AppendLine(path);
+        bool room = model?.Kind == ModelKind.Room;
+        said.Append(room ? "room: " : "tile: ").AppendLine(path);
         if (read is null || model is null)
         {
             return said.AppendLine("nothing to read: no install, or no model").ToString();
@@ -278,7 +279,12 @@ public static class ModelDump
                 .Append("	graphs ").AppendLine(one < model.Shades.Count && model.Shades[one] is not null ? "program" : "-");
         }
 
-        Ground(read, path, tilesets, printed, said);
+        // A ROOM HAS NO GROUND OF ITS OWN - its tiles are chosen when the area is generated.
+        if (!room)
+        {
+            Ground(read, path, tilesets, printed, said);
+        }
+
         Shaders(shaders, said);
         return said.ToString();
     }

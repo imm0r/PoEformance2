@@ -2440,11 +2440,15 @@ public sealed class MonsterPortrait
     private void Dump()
     {
         string at = Path.Combine(Folder, Stem(_wanted) + ".files.txt");
-        if (_model.Kind != ModelKind.Tile)
+        if (_model.Kind is not (ModelKind.Tile or ModelKind.Room))
         {
             Write(at, () => ModelDump.Of(_install, _variety, _wanted, _model));
             return;
         }
+
+        // A ROOM TAKES THE TILE'S DUMP, not the monster's: it is materials, graphs and textures
+        // over a joined mesh, plus each doodad's own mesh file. The monster dump walks an .ao
+        // chain a room has not got, and wrote "names no .ao file" for one.
 
         // A TILE'S DUMP READS EVERY TILESET in the install to find the ones using it - hundreds of
         // small files - so it is written off the frame, and says so while it is. The model and the
