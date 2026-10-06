@@ -2955,6 +2955,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         "pala.ttf",      // Palatino Linotype - the last resort that is still a serif
     ];
 
+    /// <summary>Each serif's own italic file, for the aside face - by Windows' own file names.</summary>
+    /// <remarks>
+    /// Looked up by the REGULAR file that loaded, so the italic is always the same family as the
+    /// body: a Georgia body with a Constantia italic under it would be the two typefaces arguing
+    /// that the heading face was chosen to avoid. A family whose italic file is missing keeps the
+    /// body face for asides, like a machine with none of these.
+    /// </remarks>
+    private static readonly (string Regular, string Italic)[] Italics =
+    [
+        ("constan.ttf", "constani.ttf"),
+        ("georgia.ttf", "georgiai.ttf"),
+        ("pala.ttf", "palai.ttf"),
+    ];
+
     /// <summary>
     /// Faces to try for figures, best first.
     /// </summary>
@@ -3018,7 +3032,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
             try
             {
-                if (File.Exists(file) && WearTheseFaces(file, mono, size))
+                if (File.Exists(file) && WearTheseFaces(file, ItalicOf(fonts, face), mono, size))
                 {
                     return;
                 }
@@ -3034,6 +3048,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // its pointers behind, and those now name fonts that are not in the atlas being drawn -
         // so the state is said again rather than assumed to be still what it was set to above.
         OverlayFonts.None();
+    }
+
+    /// <summary>The italic file of a serif that loaded, when the machine has it, else null.</summary>
+    private static string? ItalicOf(string folder, string regular)
+    {
+        foreach ((string known, string italic) in Italics)
+        {
+            if (string.Equals(known, regular, StringComparison.OrdinalIgnoreCase))
+            {
+                return FirstPresent(folder, [italic]);
+            }
+        }
+
+        return null;
     }
 
     /// <summary>The first of these font files that the machine actually has, if any.</summary>
@@ -3081,12 +3109,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// pattern; it copies what it needs out of it.
     /// </remarks>
     /// <param name="file">The serif face. Already known to exist.</param>
+    /// <param name="italic">
+    /// The same family's italic file, or null when the machine has none. Null leaves asides in
+    /// the body face, which is how they were drawn before the aside face existed.
+    /// </param>
     /// <param name="mono">
     /// The monospaced face, or null when the machine has none of them. Null leaves figures in
     /// the body face, which is exactly how they were drawn before this existed.
     /// </param>
     /// <param name="size">Pixels, for the body text.</param>
-    private unsafe bool WearTheseFaces(string file, string? mono, int size)
+    private unsafe bool WearTheseFaces(string file, string? italic, string? mono, int size)
     {
         // The library hands the delegate a raw ImFontConfig*, which is what makes this method
         // unsafe - the same reason the tab bar's own BeginTabItem is.
@@ -3108,6 +3140,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // titles - see OverlayFonts.RebuiltLabel for why a fifth size earns its glyphs.
             OverlayFonts.RebuiltLabel(io.Fonts.AddFontFromFileTTF(
                 file, InterfaceStyle.LabelSizeFor(size), config, english));
+
+            // The family's italic at the body size, for the asides under group titles. The one
+            // face here that is another FILE, since ImGui has no slant of its own.
+            if (italic is not null)
+            {
+                OverlayFonts.RebuiltAside(io.Fonts.AddFontFromFileTTF(italic, size, config, english));
+            }
 
             if (mono is not null)
             {

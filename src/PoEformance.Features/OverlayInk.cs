@@ -174,6 +174,20 @@ public static class OverlayInk
     /// </remarks>
     public static readonly Vector4 Quiet = new(0.72f, 0.70f, 0.65f, 1f);
 
+    /// <summary>
+    /// What an aside is set in: the sentence under a group's title saying what the block is.
+    /// </summary>
+    /// <remarks>
+    /// A STEP BELOW <see cref="Quiet"/>, and the first ink allowed to be. Quiet carries the
+    /// prose that has to be read - a unit, a label, "not in an area" - so it sits well above
+    /// ImGui's half grey. An aside is read once and then known, and set in Quiet it competed
+    /// with the controls under it; a shade nearer the panel, and italic, it reads as the
+    /// explanation it is. Still over seven to one against the panel - the floor every ink of
+    /// the tool's own holds to, checked in <c>OverlayInkTests</c> - so "greyer" never becomes
+    /// "gone": the step is the smallest the floor allows, not the largest the eye forgives.
+    /// </remarks>
+    public static readonly Vector4 Aside = new(0.65f, 0.63f, 0.59f, 1f);
+
     /// <summary>The tool's accent: gilt, to sit beside what the game already paints in.</summary>
     /// <remarks>
     /// CHROME, NOT TEXT. A checkmark, the strip over the tab in front, a slider's grab, a

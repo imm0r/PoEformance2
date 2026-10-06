@@ -55,6 +55,8 @@ public static class OverlayFonts
     private static bool _have;
     private static ImFontPtr _label;
     private static bool _haveLabel;
+    private static ImFontPtr _aside;
+    private static bool _haveAside;
     private static ImFontPtr _mono;
     private static bool _haveMono;
     private static ImFontPtr _figures;
@@ -99,6 +101,23 @@ public static class OverlayFonts
         _haveLabel = true;
     }
 
+    /// <summary>The same, for the aside face - the body serif's own italic, at the body size.</summary>
+    /// <remarks>
+    /// A SIXTH FACE, and the first that is a different FILE of the same family rather than the
+    /// same file at another size: ImGui rasterises glyphs as they are drawn in the file and has
+    /// no slant of its own, so an italic is the italic font or nothing. What it is for is the
+    /// one kind of line that is not a control, a figure or a heading - the sentence under a
+    /// group's title saying what the block is (<see cref="OverlayLayout.Note"/>). Set upright
+    /// in the quiet ink it still read as one more row of the list; italic, and a shade greyer,
+    /// it reads as an aside, which is what it is. A machine without the italic file keeps the
+    /// body face there, which is how the line was drawn before this existed.
+    /// </remarks>
+    public static void RebuiltAside(ImFontPtr aside)
+    {
+        _aside = aside;
+        _haveAside = true;
+    }
+
     /// <summary>The same, for the face figures are set in.</summary>
     /// <remarks>
     /// SEPARATE FROM <see cref="Rebuilt"/> because the two faces are found separately: the
@@ -131,6 +150,7 @@ public static class OverlayFonts
     {
         _have = false;
         _haveLabel = false;
+        _haveAside = false;
         _haveMono = false;
         _haveFigures = false;
     }
@@ -140,6 +160,9 @@ public static class OverlayFonts
 
     /// <summary>Whether the label face is available at all.</summary>
     public static bool HasLabel => _haveLabel;
+
+    /// <summary>Whether the italic aside face is available at all.</summary>
+    public static bool HasAside => _haveAside;
 
     /// <summary>Whether a monospaced face is available at all.</summary>
     public static bool HasMono => _haveMono;
@@ -258,6 +281,24 @@ public static class OverlayFonts
     public static void PopLabel()
     {
         if (_haveLabel)
+        {
+            ImGui.PopFont();
+        }
+    }
+
+    /// <summary>Sets the italic aside face, until <see cref="PopAside"/>.</summary>
+    public static void PushAside()
+    {
+        if (_haveAside)
+        {
+            ImGui.PushFont(_aside);
+        }
+    }
+
+    /// <summary>Undoes exactly one <see cref="PushAside"/>.</summary>
+    public static void PopAside()
+    {
+        if (_haveAside)
         {
             ImGui.PopFont();
         }
