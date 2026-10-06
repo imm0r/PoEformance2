@@ -1,4 +1,5 @@
 using System.Buffers.Binary;
+using System.Globalization;
 using System.Numerics;
 using System.Text;
 
@@ -35,6 +36,10 @@ public readonly record struct MeshShape(string Name, int From, int Count);
 /// <param name="Vertices">Vertices in the first level of detail.</param>
 /// <param name="NamesSaid">Bytes of names the outer header says the name section holds.</param>
 /// <param name="NamesRead">Bytes of names this reader found where it went looking for them.</param>
+/// <param name="Extras">
+/// What the vertex fields this reader steps over and does not know the meaning of look like - see
+/// <see cref="SkinnedMesh.Extras"/>. Empty where the format has none, or the geometry is not a DOLm's.
+/// </param>
 public readonly record struct MeshFacts(
     int Version,
     int Corner,
@@ -46,7 +51,8 @@ public readonly record struct MeshFacts(
     int Triangles,
     int Vertices,
     int NamesSaid,
-    int NamesRead);
+    int NamesRead,
+    string Extras = "");
 
 /// <summary>
 /// One DOLm block, read whole - the geometry two different file types both wrap.
@@ -248,6 +254,7 @@ public sealed class SkinnedMesh
     /// monster is built of several and each wears its own material, so a renderer that paints
     /// them apart has to be testable against a mesh that has more than one.
     /// </param>
+    /// <param name="facts">What the file the geometry came out of said of itself, where it came out of one.</param>
     public static SkinnedMesh Of(
         Vector3[] positions,
         Vector3[] normals,
@@ -255,7 +262,8 @@ public sealed class SkinnedMesh
         Vector3 least,
         Vector3 most,
         Vector2[]? coordinates = null,
-        IReadOnlyList<MeshShape>? shapes = null)
+        IReadOnlyList<MeshShape>? shapes = null,
+        MeshFacts facts = default)
     {
         ArgumentNullException.ThrowIfNull(positions);
         ArgumentNullException.ThrowIfNull(normals);
@@ -285,6 +293,7 @@ public sealed class SkinnedMesh
             Shapes = shapes is { Count: > 0 } ? shapes : [new MeshShape("shape 0", 0, indices.Length)],
             Least = least,
             Most = most,
+            Facts = facts,
         };
     }
 
@@ -503,7 +512,10 @@ public sealed class SkinnedMesh
     /// bytes the vertex buffer overruns the name section that follows it. The spec marks them
     /// unknown; this says what they measure out to, and the measurement is the test.
     /// </remarks>
-    private readonly record struct Shape(int Stride, int Normal, int Coordinate, int Bones)
+    /// <param name="Extra1">Where the four bytes bit 1 adds sit, or -1. poe_data_tools calls them <c>skin_extra</c> and reads them as bytes.</param>
+    /// <param name="Extra0">Where the four bytes bit 0 adds sit, or -1 - a second texture coordinate, two halves, in the reference.</param>
+    /// <param name="Extra6">Where the four bytes bit 6 adds sit, or -1. The reference reads them as bytes and names them after the bit.</param>
+    private readonly record struct Shape(int Stride, int Normal, int Coordinate, int Bones, int Extra1 = -1, int Extra0 = -1, int Extra6 = -1)
     {
         public static Shape Of(uint format)
         {
@@ -527,22 +539,26 @@ public sealed class SkinnedMesh
                 at += 8;
             }
 
+            int extra1 = -1, extra0 = -1, extra6 = -1;
             if ((format >> 1 & 1) == 1)
             {
+                extra1 = at;
                 at += 4;
             }
 
             if ((format & 1) == 1)
             {
+                extra0 = at;
                 at += 4;
             }
 
             if ((format >> 6 & 1) == 1)
             {
+                extra6 = at;
                 at += 4;
             }
 
-            return new Shape(at, normal, coordinate, bones);
+            return new Shape(at, normal, coordinate, bones, extra1, extra0, extra6);
         }
 
         /// <summary>
@@ -754,10 +770,12 @@ public sealed class SkinnedMesh
         var coordinates = new Vector2[points];
         var bones = new byte[points * 4];
         var weights = new byte[points * 4];
+        var extras = new Extras(shape.Extra1, shape.Extra0, shape.Extra6);
 
         for (var one = 0; one < points; one++)
         {
             int start = at + (one * shape.Stride);
+            extras.See(file, start);
 
             positions[one] = new Vector3(Float(file, start), Float(file, start + 4), Float(file, start + 8));
             normals[one] = Direction(file, start + shape.Normal);
@@ -930,10 +948,12 @@ public sealed class SkinnedMesh
         var coordinates = new Vector2[points];
         var bones = new byte[points * 4];
         var weights = new byte[points * 4];
+        var extras = new Extras(shape.Extra1, shape.Extra0, shape.Extra6);
 
         for (var one = 0; one < points; one++)
         {
             int start = at + (one * shape.Stride);
+            extras.See(file, start);
 
             positions[one] = new Vector3(Float(file, start), Float(file, start + 4), Float(file, start + 8));
             normals[one] = Direction(file, start + shape.Normal);
@@ -973,8 +993,107 @@ public sealed class SkinnedMesh
         return new MeshBlock(
             positions, normals, coordinates, bones, weights, indices, extents,
             (int)past,                              // Bounded by the size check above.
-            new MeshFacts(0, corner, lods, format, shape.Stride, 0, blockShapes, faces, points, 0, 0),
+            new MeshFacts(0, corner, lods, format, shape.Stride, 0, blockShapes, faces, points, 0, 0, extras.Say()),
             string.Empty);
+    }
+
+    /// <summary>
+    /// What the vertex fields this reader does not know the meaning of hold, summed up for a dump.
+    /// </summary>
+    /// <remarks>
+    /// THREE FOUR-BYTE FIELDS the format word can add - bits 1, 0 and 6 - and the reference names
+    /// none of them for what it is: <c>skin_extra</c>, <c>tex_coord1</c>, <c>extra_vformat_6</c>.
+    /// Four bytes a vertex is also exactly what a vertex COLOUR is, and whether these meshes carry
+    /// one is the question behind <c>InputVertexColor</c>, which BasicColour multiplies the colour
+    /// by: a stream of colours shows as four bytes that run over their range with the last one
+    /// mostly 255, a bone or an index as small numbers, a pair of halves as neither. So each field
+    /// is described by what is IN it - its first value, how many distinct values, and each byte's
+    /// range - which is the measurement, where a name for the field would be the guess.
+    /// </remarks>
+    private struct Extras(int extra1, int extra0, int extra6)
+    {
+        /// <summary>Past this many distinct values the count stops; the point is one, few or many.</summary>
+        private const int MostDistinct = 256;
+
+        private Field _bit1 = new(extra1);
+        private Field _bit0 = new(extra0);
+        private Field _bit6 = new(extra6);
+
+        public void See(ReadOnlySpan<byte> file, int start)
+        {
+            _bit1.See(file, start);
+            _bit0.See(file, start);
+            _bit6.See(file, start);
+        }
+
+        public readonly string Say()
+        {
+            var said = new StringBuilder();
+            _bit1.Say(said, "bit 1");
+            _bit0.Say(said, "bit 0");
+            _bit6.Say(said, "bit 6");
+            return said.ToString();
+        }
+
+        private struct Field(int at)
+        {
+            private readonly HashSet<uint>? _distinct = at >= 0 ? [] : null;
+            private uint _first;
+            private int _seen;
+            private int _low0 = 255, _low1 = 255, _low2 = 255, _low3 = 255;
+            private int _high0, _high1, _high2, _high3;
+
+            public void See(ReadOnlySpan<byte> file, int start)
+            {
+                if (_distinct is null)
+                {
+                    return;
+                }
+
+                ReadOnlySpan<byte> bytes = file.Slice(start + at, 4);
+                uint value = BinaryPrimitives.ReadUInt32LittleEndian(bytes);
+                if (_seen++ == 0)
+                {
+                    _first = value;
+                }
+
+                if (_distinct.Count < MostDistinct)
+                {
+                    _distinct.Add(value);
+                }
+
+                _low0 = Math.Min(_low0, bytes[0]);
+                _low1 = Math.Min(_low1, bytes[1]);
+                _low2 = Math.Min(_low2, bytes[2]);
+                _low3 = Math.Min(_low3, bytes[3]);
+                _high0 = Math.Max(_high0, bytes[0]);
+                _high1 = Math.Max(_high1, bytes[1]);
+                _high2 = Math.Max(_high2, bytes[2]);
+                _high3 = Math.Max(_high3, bytes[3]);
+            }
+
+            public readonly void Say(StringBuilder said, string name)
+            {
+                if (_distinct is null || _seen == 0)
+                {
+                    return;
+                }
+
+                if (said.Length > 0)
+                {
+                    said.Append(" · ");
+                }
+
+                string distinct = _distinct.Count >= MostDistinct
+                    ? string.Create(CultureInfo.InvariantCulture, $"{MostDistinct}+")
+                    : _distinct.Count.ToString(CultureInfo.InvariantCulture);
+                said.Append(string.Create(
+                    CultureInfo.InvariantCulture,
+                    $"{name}: first {_first & 0xFF:X2} {(_first >> 8) & 0xFF:X2} {(_first >> 16) & 0xFF:X2} {_first >> 24:X2}"
+                    + $" · {distinct} distinct over {_seen} vertices"
+                    + $" · bytes {_low0}..{_high0} {_low1}..{_high1} {_low2}..{_high2} {_low3}..{_high3}"));
+            }
+        }
     }
 
     /// <summary>

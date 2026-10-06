@@ -29,6 +29,9 @@ public enum ModelKind : byte
 /// Why the monster is drawn in plain ink, or empty where its own texture is on it. A separate
 /// answer from <paramref name="Why"/>: a model can be found in full and still have no colour.
 /// </param>
+/// <summary>One mesh file behind a model, with what its headers said. See <see cref="MonsterModel.Meshes"/>.</summary>
+public readonly record struct MeshNamed(string Path, MeshFacts Facts);
+
 public sealed record MonsterModel(
     SkinnedMesh Mesh,
     Mipmaps? Skin,
@@ -102,6 +105,27 @@ public sealed record MonsterModel(
 
     /// <inheritdoc cref="BodyLeast"/>
     public Vector3 BodyMost { get; init; }
+
+    /// <summary>
+    /// What the body's own mesh file said of itself, kept from before anything was joined onto it.
+    /// </summary>
+    /// <remarks>
+    /// A JOINED MESH HAS NO FACTS - it is several files' geometry in one buffer - and a room is
+    /// nothing but joins. The question a room's dump has to answer is about the FILES: which
+    /// vertex format each doodad's mesh carries, and what is in the fields of it this reader
+    /// steps over. See <see cref="Meshes"/>.
+    /// </remarks>
+    public MeshFacts BodyFacts { get; init; }
+
+    /// <summary>
+    /// The mesh files behind a model built from several, each with its facts - a room's doodads.
+    /// </summary>
+    /// <remarks>
+    /// FOR THE DUMP, which otherwise sees one joined mesh and cannot say which doodad's file holds
+    /// a vertex colour and which does not. Empty on a model read from one file, whose
+    /// <see cref="Mesh"/> carries its own facts.
+    /// </remarks>
+    public IReadOnlyList<MeshNamed> Meshes { get; init; } = [];
 
     /// <summary>
     /// How many materials the files NAMED: the .ao's own, and the mesh manifest's.
@@ -589,6 +613,7 @@ public static class MonsterModels
         // construction and any question of the form "is this piece anywhere near him" answers
         // itself. Sections count as body, because a section is not an accessory.
         Vector3 bare = mesh.Least, worn_ = mesh.Most;
+        MeshFacts facts = mesh.Facts;
         for (var section = 0; section < sections; section++)
         {
             bare = Vector3.Min(bare, parts[section].Mesh.Least);
@@ -619,6 +644,7 @@ public static class MonsterModels
             Fitted = told,
             BodyLeast = bare,
             BodyMost = worn_,
+            BodyFacts = facts,
             Skins = dress.Skins,
             Modes = dress.Modes,
             Materials = dress.Materials,
@@ -730,6 +756,7 @@ public static class MonsterModels
         {
             BodyLeast = mesh.Least,
             BodyMost = mesh.Most,
+            BodyFacts = mesh.Facts,
             Skins = dress.Skins,
             Modes = dress.Modes,
             Materials = dress.Materials,

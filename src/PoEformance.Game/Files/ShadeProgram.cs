@@ -79,6 +79,14 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 /// soft particle's fade by the depth behind it) the colour stands and its w is marked unset, and a
 /// later graph reading that w is refused, not handed nought.
 ///
+/// A NODE THAT READS THE CLOCK IS DRAWN ONLY WHERE THE CLOCK CANNOT SHOW. MuddleTex, MuddleTex2 and
+/// RotateUVOld multiply <c>time</c> by a parameter - a scroll, an angle per second - and with that
+/// parameter at nought, which is each one's declared default, the picture is the same at every
+/// instant and is drawn; with it set the material is refused and named, not frozen at an instant of
+/// this reader's choosing. <c>FromVertexVariance</c> is a particle's: the fragment hands on
+/// <c>uv2.x</c> under <c>PARTICLE_VARIANCE_ENABLED</c> and nought otherwise, and a mesh is not a
+/// particle, so it is nought.
+///
 /// A FLOAT IS ONE NUMBER IN ALL FOUR COMPONENTS, as HLSL widens one: a scalar node's result is
 /// its first component spread across the register, which is also what HLSL does to a vector handed
 /// to a float input - it keeps the x.
@@ -177,6 +185,9 @@ public sealed class ShadeProgram
             "GreaterThan", "LessThan", "EqualsUInt", "GreaterThanUInt", "LessThanUInt", "And", "Or", "Not",
             "Float2ToCoords", "Float3ToCoords", "Float4ToCoords", "CoordsToFloat2", "CoordsToFloat3", "CoordsToFloat4",
             "SampleTexture", "SampleInputTexture", "SampleInputTextureLod", "SampleInputTriplanar",
+            "SampleTriplanar", "SampleTexture2", "SampleTextureAtlas2", "SampleTextureLod", "SampleDispersedTexture",
+            "MuddleTex", "MuddleTexFromInput", "MuddleTex2", "FromVertexVariance",
+            "RGBToTbn", "ScaleUVMaya", "HardLightBlend", "Sine", "RotateUVOld",
             "FromVertexNormal", "FromVertexWorldPos", "FromVertexLocalPosition", "InputVertexPosition", "InputVertexNormal",
             "ModelOrigin", "GroundScroll", "Transform", "LookUpTexture",
             "Noise31", "PerlinNoise31", "Vibrance", "Rotate", "RotateUV", "RadiusToPolarNorm",
@@ -269,6 +280,8 @@ public sealed class ShadeProgram
         Polar,
         RemapHue,
         Triplanar,
+        HardLight,
+        Sine,
         Sample,
         SampleLod,
     }
@@ -841,8 +854,19 @@ public sealed class ShadeProgram
                     break;
 
                 case Op.Triplanar:
-                    r[step.To] = Triplanar(r[step.A], r[step.B], r[step.C], r[step.D]);
+                    r[step.To] = Triplanar(r[step.A], r[step.B], r[step.C], r[step.D], step.Extra != 0);
                     break;
+
+                case Op.HardLight:
+                    r[step.To] = HardLit(r[step.A], r[step.B]);
+                    break;
+
+                case Op.Sine:
+                {
+                    Vector4 v = r[step.A];
+                    r[step.To] = new Vector4(MathF.Sin(v.X), MathF.Sin(v.Y), MathF.Sin(v.Z), MathF.Sin(v.W));
+                    break;
+                }
 
                 case Op.Sample:
                     if (corner >= 0)
@@ -1382,14 +1406,40 @@ public sealed class ShadeProgram
         return new Vector4(length, (MathF.Atan2(radius.Y / length, radius.X / length) / 3.1415f * 0.5f) + 0.5f, 0f, 0f);
     }
 
-    /// <summary>SampleInputTriplanar's blend of its three reads, weighted by the normal's squared components.</summary>
-    private static Vector4 Triplanar(Vector4 alongX, Vector4 alongY, Vector4 alongZ, Vector4 normal)
+    /// <summary>
+    /// The blend of three reads along the axes, weighted by the normal: SampleInputTriplanar's by its
+    /// squared components, SampleTriplanar's by their absolute values.
+    /// </summary>
+    /// <remarks>
+    /// TWO NODES, TWO WEIGHTINGS, and each as its fragment writes it: the first normalises by
+    /// <c>max(1e-5, length)</c> and squares, the second divides by <c>length + 1e-7</c> and takes the
+    /// absolute value. On a face square to an axis they agree; on a slope the squares favour the
+    /// nearest axis more.
+    /// </remarks>
+    private static Vector4 Triplanar(Vector4 alongX, Vector4 alongY, Vector4 alongZ, Vector4 normal, bool absolute)
     {
         var n = new Vector3(normal.X, normal.Y, normal.Z);
-        n /= MathF.Max(1e-5f, n.Length());
-        Vector3 weights = n * n;
-        weights /= MathF.Max(1e-5f, weights.X + weights.Y + weights.Z);
+        Vector3 weights;
+        if (absolute)
+        {
+            weights = Vector3.Abs(n / (n.Length() + 1e-7f));
+            weights /= MathF.Max(1e-7f, weights.X + weights.Y + weights.Z);
+        }
+        else
+        {
+            n /= MathF.Max(1e-5f, n.Length());
+            weights = n * n;
+            weights /= MathF.Max(1e-5f, weights.X + weights.Y + weights.Z);
+        }
+
         return (alongX * weights.X) + (alongY * weights.Y) + (alongZ * weights.Z);
+    }
+
+    /// <summary>HardLightBlend, component by component: the second colour below a half multiplies, above it screens.</summary>
+    private static Vector4 HardLit(Vector4 one, Vector4 other)
+    {
+        float Lit(float a, float b) => b < 0.5f ? 2f * a * b : 1f - (2f * (1f - a) * (1f - b));
+        return new Vector4(Lit(one.X, other.X), Lit(one.Y, other.Y), Lit(one.Z, other.Z), Lit(one.W, other.W));
     }
 
     // NOT A NUMBER COMES OUT AS NOUGHT rather than as an index nowhere: a graph's square root of a
@@ -1703,6 +1753,9 @@ public sealed class ShadeProgram
         private readonly Dictionary<ShaderNode, int> _done = new(ReferenceEqualityComparer.Instance);
         private readonly HashSet<ShaderNode> _open = new(ReferenceEqualityComparer.Instance);
 
+        /// <summary>The registers of the nodes whose outputs are two reads, by output - see <see cref="Paired"/>.</summary>
+        private readonly Dictionary<(ShaderNode Node, string Output), int> _pairs = [];
+
         /// <summary>Why the expression could not be compiled - the node type it stopped at.</summary>
         public string Why { get; private set; } = string.Empty;
 
@@ -1715,6 +1768,11 @@ public sealed class ShadeProgram
             foreach (ShaderNode gone in _done.Where(one => one.Value >= from).Select(one => one.Key).ToList())
             {
                 _done.Remove(gone);
+            }
+
+            foreach ((ShaderNode Node, string Output) gone in _pairs.Where(one => one.Value >= from).Select(one => one.Key).ToList())
+            {
+                _pairs.Remove(gone);
             }
         }
 
@@ -1932,6 +1990,11 @@ public sealed class ShadeProgram
                 return known;
             }
 
+            if (node.Type is "SampleTexture2" or "SampleTextureAtlas2")
+            {
+                return Paired(node, end.Variable);
+            }
+
             if (!_open.Add(node))
             {
                 return Fail($"{node.Type} feeding itself");
@@ -1945,6 +2008,74 @@ public sealed class ShadeProgram
             }
 
             return said;
+        }
+
+        /// <summary>
+        /// One output of a node that reads its texture twice - <c>rgba0</c> and <c>rgba1</c>, each its own register.
+        /// </summary>
+        /// <remarks>
+        /// BOTH READS ARE EMITTED THE FIRST TIME EITHER IS ASKED FOR, since they share what comes before
+        /// them, and the one no link reads is dropped with the rest of the dead steps in Finish.
+        /// </remarks>
+        private int? Paired(ShaderNode node, string output)
+        {
+            if (_pairs.TryGetValue((node, output), out int known))
+            {
+                return known;
+            }
+
+            if (!_open.Add(node))
+            {
+                return Fail($"{node.Type} feeding itself");
+            }
+
+            (int First, int Second)? pair = node.Type == "SampleTexture2" ? Twice(node) : Atlas(node);
+            _open.Remove(node);
+            if (pair is not { } registers)
+            {
+                return null;
+            }
+
+            _pairs[(node, "rgba0")] = registers.First;
+            _pairs[(node, "rgba1")] = registers.Second;
+            return output switch
+            {
+                "rgba0" => registers.First,
+                "rgba1" => registers.Second,
+                _ => Fail($"{node.Type} has no output called {output}"),
+            };
+        }
+
+        /// <summary>SampleTexture2: one texture read at two coordinates.</summary>
+        private (int, int)? Twice(ShaderNode node)
+            => Texture(node, Parameter(node, 0)) is { } sheet && Port(node, "uv0") is { } first && Port(node, "uv1") is { } second
+                ? (build.Sample(sheet, first), build.Sample(sheet, second))
+                : null;
+
+        /// <summary>
+        /// SampleTextureAtlas2: the left and right halves of one texture, read at one coordinate wrapped in u.
+        /// </summary>
+        /// <remarks>
+        /// <c>uv.x = fmod(uv.x + 1, 1)</c> - the u alone, the v as it came - then each half at
+        /// <c>uv * (0.5, 1)</c>, the right one shifted by a half. HLSL's fmod keeps the sign of what it
+        /// divides, as the step's does.
+        /// </remarks>
+        private (int, int)? Atlas(ShaderNode node)
+        {
+            if (Texture(node, Parameter(node, 0)) is not { } sheet || Port(node, "uv") is not { } uv)
+            {
+                return null;
+            }
+
+            int wrapped = build.Emit(Op.Fmod, build.Emit(Op.Add, uv, build.Constant(Vector4.One)), build.Constant(Vector4.One));
+            int spot = build.Register();
+            build.Steps.Add(new Step(Op.Clear, spot, -1, -1, -1, -1, -1, 0));
+            build.Into(spot, wrapped, 0b0001 << 8);
+            build.Into(spot, uv, (1 << 2) | (0b0010 << 8));
+            int half = build.Constant(new Vector4(0.5f, 1f, 0f, 0f));
+            int left = build.Emit(Op.Multiply, spot, half);
+            int right = build.Emit(Op.MultiplyAdd, spot, half, build.Constant(new Vector4(0.5f, 0f, 0f, 0f)));
+            return (build.Sample(sheet, left), build.Sample(sheet, right));
         }
 
         private int? Compiled(ShaderNode node)
@@ -2314,6 +2445,48 @@ public sealed class ShadeProgram
                 case "SampleInputTriplanar":
                     return Triplanar(node);
 
+                case "SampleTriplanar":
+                    return Triplanar(node, own: true);
+
+                case "SampleTextureLod":
+                    return Texture(node, Parameter(node, 0)) is { } levelled && Port(node, "uv") is { } there && Port(node, "lod") is { } level
+                        ? build.Emit(Op.SampleLod, there, level, extra: levelled)
+                        : null;
+
+                case "SampleDispersedTexture":
+                    return Dispersed(node);
+
+                case "MuddleTex":
+                    return Muddled(node);
+
+                case "MuddleTexFromInput":
+                    return MuddledFromInput(node);
+
+                case "MuddleTex2":
+                    return MuddledTwice(node);
+
+                // semanticsData.uv2.x under PARTICLE_VARIANCE_ENABLED and nought otherwise, says the
+                // fragment; a mesh is not a particle, so it is nought.
+                case "FromVertexVariance":
+                    return build.Constant(Vector4.Zero);
+
+                case "RGBToTbn":
+                    return Single(node) is { } rgb
+                        ? build.Emit(Op.MultiplyAdd, rgb, build.Constant(new Vector4(2f)), build.Constant(new Vector4(-1f)))
+                        : null;
+
+                case "ScaleUVMaya":
+                    return Scaled(node);
+
+                case "HardLightBlend":
+                    return Binary(node, Op.HardLight, "color1", "color2", false);
+
+                case "Sine":
+                    return Unary(node, Op.Sine, splat);
+
+                case "RotateUVOld":
+                    return RotatedOld(node);
+
                 // semanticsData.normal: the vertex normal as interpolated, in the model's space - the
                 // world's, for a model drawn where it stands (see the class's remarks).
                 case "FromVertexNormal":
@@ -2422,25 +2595,176 @@ public sealed class ShadeProgram
         }
 
         /// <summary>
-        /// SampleInputTriplanar: the texture read three times, along each axis, and blended by the normal.
+        /// SampleInputTriplanar and SampleTriplanar: the texture read three times, along each axis, and blended by the normal.
         /// </summary>
         /// <remarks>
         /// THREE ORDINARY READS - at the position's yz, xz and xy - so each takes its own level from
-        /// the triangle, as a graphics card would give each its own derivatives.
+        /// the triangle, as a graphics card would give each its own derivatives. The first node is
+        /// handed its texture and weights by the normal's squares; the second owns its texture and
+        /// weights by the normal's absolute values - see <see cref="ShadeProgram.Triplanar"/>.
         /// </remarks>
-        private int? Triplanar(ShaderNode node)
+        private int? Triplanar(ShaderNode node, bool own = false)
         {
-            if (Handed(node) is not { } texture || Port(node, "uv") is not { } uvw || Port(node, "world_normal") is not { } normal)
+            int? texture = own ? Texture(node, Parameter(node, 0)) : Handed(node);
+            if (texture is not { } sheet || Port(node, "uv") is not { } uvw || Port(node, "world_normal") is not { } normal)
             {
                 return null;
             }
 
             int yz = build.Emit(Op.Swizzle, uvw, extra: 1 | (2 << 2) | (0b0011 << 8));
             int xz = build.Emit(Op.Swizzle, uvw, extra: 0 | (2 << 2) | (0b0011 << 8));
-            int alongX = build.Sample(texture, yz);
-            int alongY = build.Sample(texture, xz);
-            int alongZ = build.Sample(texture, uvw);
-            return build.Emit(Op.Triplanar, alongX, alongY, alongZ, normal);
+            int alongX = build.Sample(sheet, yz);
+            int alongY = build.Sample(sheet, xz);
+            int alongZ = build.Sample(sheet, uvw);
+            return build.Emit(Op.Triplanar, alongX, alongY, alongZ, normal, extra: own ? 1 : 0);
+        }
+
+        /// <summary>
+        /// SampleDispersedTexture: the red, green and blue read a little apart, as a lens would spread them.
+        /// </summary>
+        /// <remarks>
+        /// Three reads at the level given - at <c>uv</c>, <c>uv + dispersion / 2</c> and
+        /// <c>uv + dispersion</c> - the first's red, the second's green, the third's blue, and a third of
+        /// each alpha.
+        /// </remarks>
+        private int? Dispersed(ShaderNode node)
+        {
+            if (Handed(node, "tex") is not { } sheet || Port(node, "uv") is not { } uv
+                || Port(node, "uv_dispersion") is not { } spread || Port(node, "mip_level") is not { } level)
+            {
+                return null;
+            }
+
+            int near = build.Emit(Op.SampleLod, uv, level, extra: sheet);
+            int middle = build.Emit(Op.SampleLod, build.Emit(Op.MultiplyAdd, spread, build.Constant(new Vector4(0.5f)), uv), level, extra: sheet);
+            int far = build.Emit(Op.SampleLod, build.Emit(Op.Add, uv, spread), level, extra: sheet);
+            const float third = 1f / 3f;
+            return build.Emit(
+                Op.Add,
+                build.Emit(Op.Multiply, near, build.Constant(new Vector4(1f, 0f, 0f, third))),
+                build.Emit(Op.Multiply, middle, build.Constant(new Vector4(0f, 1f, 0f, third))),
+                build.Emit(Op.Multiply, far, build.Constant(new Vector4(0f, 0f, 1f, third))));
+        }
+
+        /// <summary>
+        /// MuddleTex: the coordinates pushed about by a texture read at them - scaled, shifted by the variance - times an intensity.
+        /// </summary>
+        /// <remarks>
+        /// <c>MuddleTexHelper</c>: <c>muddle_uv = uv * freq + time * scroll + variance; uv + (tex(muddle_uv).rg - 0.5) * intensity</c>.
+        /// THE SCROLL RIDES ON THE CLOCK, so a material that scrolls is refused rather than frozen at
+        /// some instant; one that does not - the declared default, "0 0" - is the same picture at every
+        /// instant and is drawn. The texture is at parameter 0, the frequency (declared 1) at 2, the
+        /// scroll at 3 and the intensity (declared 0) at 4.
+        /// </remarks>
+        private int? Muddled(ShaderNode node)
+        {
+            if (Texture(node, Parameter(node, 0)) is not { } sheet || Port(node, "in_uv") is not { } uv || Port(node, "variance") is not { } variance)
+            {
+                return null;
+            }
+
+            Vector4 scroll = Numbers(node, 3, Vector4.Zero);
+            if (scroll.X != 0f || scroll.Y != 0f)
+            {
+                return Fail("MuddleTex scrolling with time");
+            }
+
+            return Muddle(sheet, uv, build.Constant(new Vector4(Said(node, 2, 1f))), variance, build.Constant(new Vector4(Said(node, 4, 0f))));
+        }
+
+        /// <summary>MuddleTexFromInput: MuddleTex with its frequency, scroll and intensity on ports.</summary>
+        /// <remarks>A scroll on a port is refused unless it is a constant nought - the same rule as <see cref="Muddled"/>.</remarks>
+        private int? MuddledFromInput(ShaderNode node)
+        {
+            if (Texture(node, Parameter(node, 0)) is not { } sheet || Port(node, "in_uv") is not { } uv
+                || Port(node, "flow_variance") is not { } variance || Port(node, "flow_frequency") is not { } frequency
+                || Port(node, "flow_scroll") is not { } scroll || Port(node, "flow_intensity") is not { } intensity)
+            {
+                return null;
+            }
+
+            if (!build.ConstantOf(scroll, out Vector4 fixed_) || fixed_.X != 0f || fixed_.Y != 0f)
+            {
+                return Fail("MuddleTexFromInput scrolling with time");
+            }
+
+            return Muddle(sheet, uv, frequency, variance, intensity);
+        }
+
+        /// <summary>
+        /// MuddleTex2: two muddles of one texture added, each with its own frequency, scroll and intensity in one float4.
+        /// </summary>
+        /// <remarks>
+        /// <c>Freq ScrollX ScrollY Intensity</c>, declared "1 0 0 0", at parameters 2 and 3. A scroll in
+        /// either is refused, as in <see cref="Muddled"/>.
+        /// </remarks>
+        private int? MuddledTwice(ShaderNode node)
+        {
+            if (Texture(node, Parameter(node, 0)) is not { } sheet || Port(node, "in_uv") is not { } uv)
+            {
+                return null;
+            }
+
+            Vector4 first = Numbers(node, 2, new Vector4(1f, 0f, 0f, 0f));
+            Vector4 second = Numbers(node, 3, new Vector4(1f, 0f, 0f, 0f));
+            if (first.Y != 0f || first.Z != 0f || second.Y != 0f || second.Z != 0f)
+            {
+                return Fail("MuddleTex2 scrolling with time");
+            }
+
+            int once = Offset(sheet, build.Emit(Op.Multiply, uv, build.Constant(new Vector4(first.X))), build.Constant(new Vector4(first.W)));
+            int twice = Offset(sheet, build.Emit(Op.Multiply, uv, build.Constant(new Vector4(second.X))), build.Constant(new Vector4(second.W)));
+            return build.Emit(Op.Add, uv, once, twice);
+        }
+
+        /// <summary>The helper's body once the scroll is nought: <c>uv + (tex(uv * frequency + variance).rg - 0.5) * intensity</c>.</summary>
+        private int Muddle(int sheet, int uv, int frequency, int variance, int intensity)
+            => build.Emit(Op.Add, uv, Offset(sheet, build.Emit(Op.MultiplyAdd, uv, frequency, variance), intensity));
+
+        /// <summary>What a muddle read at a spot pushes the coordinates by: <c>(tex(spot).rg - 0.5) * intensity</c>.</summary>
+        private int Offset(int sheet, int spot, int intensity)
+            => build.Emit(Op.Multiply, build.Emit(Op.Subtract, build.Sample(sheet, spot), build.Constant(new Vector4(0.5f))), intensity);
+
+        /// <summary>
+        /// ScaleUVMaya: the coordinates scaled about a pivot given in Maya's texture space, whose v runs the other way.
+        /// </summary>
+        /// <remarks><c>real_pivot = (pivot.x, 1 - pivot.y); (uv - real_pivot) * scale + real_pivot</c>, the pivot declared "0 0".</remarks>
+        private int? Scaled(ShaderNode node)
+        {
+            if (Port(node, "in_uv") is not { } uv || Port(node, "scale") is not { } scale)
+            {
+                return null;
+            }
+
+            Vector4 pivot = Numbers(node, 0, Vector4.Zero);
+            int real = build.Constant(new Vector4(pivot.X, 1f - pivot.Y, 0f, 0f));
+            return build.Emit(Op.MultiplyAdd, build.Emit(Op.Subtract, uv, real), scale, real);
+        }
+
+        /// <summary>
+        /// RotateUVOld: the coordinates turned about the half-point of their own quadrant.
+        /// </summary>
+        /// <remarks>
+        /// <c>angle = time * AngleTime + AngleOffset</c>, so a material with an AngleTime is refused as
+        /// turning with the clock; the declared default is "0 0". The offset is <c>sign(uv) * 0.5</c>,
+        /// and the turn is <c>(x cos - y sin, x sin + y cos)</c> - the other way round from Rotate's, so
+        /// Rotate's step is given the angle negated.
+        /// </remarks>
+        private int? RotatedOld(ShaderNode node)
+        {
+            if (Port(node, "in_uv") is not { } uv)
+            {
+                return null;
+            }
+
+            Vector4 turn = Numbers(node, 0, Vector4.Zero);
+            if (turn.X != 0f)
+            {
+                return Fail("RotateUVOld turning with time");
+            }
+
+            int centre = build.Emit(Op.Multiply, build.Emit(Op.Sign, uv), build.Constant(new Vector4(0.5f)));
+            return build.Emit(Op.Rotate, build.Constant(new Vector4(-turn.Y)), uv, centre);
         }
 
         /// <summary>The vertex position as the vertex stage hands it on: the position, with a w of one.</summary>
@@ -2521,10 +2845,10 @@ public sealed class ShadeProgram
             return ports.Length == 1 ? Port(node, ports[0]) : Fail($"{node.Type} with {ports.Length} inputs");
         }
 
-        /// <summary>The texture an InputTexture hands a SampleInputTexture through its <c>in_texture</c> port.</summary>
-        private int? Handed(ShaderNode node)
+        /// <summary>The texture an InputTexture hands a node through its texture port - <c>in_texture</c>, or <c>tex</c> on the dispersed read.</summary>
+        private int? Handed(ShaderNode node, string port = "in_texture")
         {
-            ShaderLink[] links = [.. lookup.Into(node).Where(one => one.Target.Variable == "in_texture")];
+            ShaderLink[] links = [.. lookup.Into(node).Where(one => one.Target.Variable == port)];
             if (links.Length != 1 || lookup.Node(links[0].Source) is not { Type: "InputTexture" } source)
             {
                 return Fail($"{node.Type} without an InputTexture");
@@ -2566,6 +2890,13 @@ public sealed class ShadeProgram
             return numbers.Length > 0 ? numbers[0] : declared;
         }
 
+        /// <summary>A vector parameter: as written, or the fragment's declared default where left out.</summary>
+        private Vector4 Numbers(ShaderNode node, int at, Vector4 declared)
+        {
+            float[] numbers = Parameter(node, at).Numbers;
+            return numbers.Length > 0 ? Vectored(numbers) : declared;
+        }
+
         private int? Fail(string why)
         {
             if (Why.Length == 0)
@@ -2578,7 +2909,7 @@ public sealed class ShadeProgram
 
         /// <summary>The ports a direction of unknown length may go to: where it is normalised before use, or passed through.</summary>
         private static bool Directional(string type, string port)
-            => (type, port) is ("SampleInputTriplanar", "world_normal")
+            => (type, port) is ("SampleInputTriplanar", "world_normal") or ("SampleTriplanar", "world_normal")
                 || type is "Normalize2" or "Normalize3" or "Normalize4" or "Dummy3" or "Dummy4";
 
         /// <summary>The width on the end of a node's type: 3 for Normalize3.</summary>

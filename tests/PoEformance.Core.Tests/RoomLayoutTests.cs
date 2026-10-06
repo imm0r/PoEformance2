@@ -187,7 +187,7 @@ public class RoomLayoutTests
             return got;
         }
 
-        MonsterModel model = RoomModels.Of(Read, "Metadata/Terrain/Woods/Rooms/Clearing.arm", RoomUnit.World);
+        MonsterModel model = RoomModels.Of(Read, "Metadata/Terrain/Woods/Rooms/Clearing.arm");
 
         Assert.True(model.Ready, model.Why);
         Assert.Equal(2, model.Skins.Count);
@@ -201,7 +201,7 @@ public class RoomLayoutTests
     public void AROOMSDoodadsAreJoinedWhereTheFilePutsThem()
     {
         Dictionary<string, byte[]> files = Install();
-        MonsterModel model = RoomModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Woods/Rooms/Clearing.arm", RoomUnit.World);
+        MonsterModel model = RoomModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Woods/Rooms/Clearing.arm");
 
         Assert.True(model.Ready, model.Why);
         Assert.Equal(2, model.Parts);
@@ -210,10 +210,15 @@ public class RoomLayoutTests
         Assert.Equal(4, model.Mesh.Triangles);
         Assert.Equal(model.Mesh.Shapes.Count, model.Skins.Count);
 
-        // THE TREE STANDS AT x 30 IN WORLD UNITS - its prop spans x -1 to 1, unscaled and unturned.
-        Assert.Equal(31f, model.Mesh.Most.X, 3);
+        // THE TREE STANDS AT CELL 30 - 30 cells of 250 / 23 units - and its prop spans x -1 to 1, unscaled and unturned.
+        Assert.Equal((30f * 250f / 23f) + 1f, model.Mesh.Most.X, 2);
         Assert.Contains("doodads reach x 30, y 20", model.Move, StringComparison.Ordinal);
 
+        // AND THE DUMP CAN SAY WHICH FILE EACH DOODAD'S MESH IS - once per file, with the file's own
+        // facts, which the joined mesh no longer carries. Both doodads here are cut from one file.
+        MeshNamed named = Assert.Single(model.Meshes);
+        Assert.Equal("art/rock.fmt", named.Path);
+        Assert.True(named.Facts.Vertices > 0, "the body's facts travel with the file");
     }
 
     [Fact]
@@ -237,7 +242,7 @@ public class RoomLayoutTests
             return got;
         }
 
-        MonsterModel model = RoomModels.Of(Read, "Metadata/Terrain/Woods/Rooms/Clearing.arm", RoomUnit.World);
+        MonsterModel model = RoomModels.Of(Read, "Metadata/Terrain/Woods/Rooms/Clearing.arm");
 
         Assert.True(model.Ready, model.Why);
         Assert.Equal(handed.Count, model.Files);
@@ -250,15 +255,9 @@ public class RoomLayoutTests
     }
 
     [Fact]
-    public void ANDTheUnitScalesThePositionsAndTheReachSaysWhichOneFits()
+    public void ANDTheReachSaysWhenARoomBreaksTheCellRule()
     {
-        Dictionary<string, byte[]> files = Install();
-        MonsterModel cells = RoomModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Woods/Rooms/Clearing.arm", RoomUnit.Cells);
-
-        Assert.True(cells.Ready, cells.Why);
-        Assert.Equal((30f * 250f / 23f) + 1f, cells.Mesh.Most.X, 2);
-
-        // The room is 2 x 1 tiles - 46 x 23 cells - and nothing lies past it, so cells is not ruled out.
+        // The room is 2 x 1 tiles - 46 x 23 cells - and nothing lies past it.
         RoomModels.Spread spread = RoomModels.SpreadOf(RoomLayout.Parse(Version31));
         Assert.False(spread.NotCells);
 
@@ -272,7 +271,7 @@ public class RoomLayoutTests
         Dictionary<string, byte[]> files = Install();
         files.Remove("Metadata/Doodads/Tree.ao");
 
-        MonsterModel model = RoomModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Woods/Rooms/Clearing.arm", RoomUnit.World);
+        MonsterModel model = RoomModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Woods/Rooms/Clearing.arm");
 
         Assert.True(model.Ready, model.Why);
         Assert.Equal(1, model.Parts);

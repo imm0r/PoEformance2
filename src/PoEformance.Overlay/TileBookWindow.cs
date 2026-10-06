@@ -38,17 +38,11 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>The query term the "only this area" checkbox writes.</summary>
     private const string HereField = "here";
 
-    /// <summary>What separates a room's path from its unit in the key the portrait loads by - the tile key's mark. See TileKey.</summary>
-    private const char UnitMark = TileKey.Mark;
-
     /// <summary>The colour the unpainted ground is drawn in: a dark, flat grey that stays behind the props.</summary>
     public static readonly Vector3 GroundInk = new(0.34f, 0.34f, 0.35f);
 
     private readonly Func<IReadOnlyList<string>> _install;
     private readonly Func<IReadOnlyDictionary<string, int>> _placed;
-
-    /// <summary>What a room's doodad positions are read as. See RoomModels - the file does not say.</summary>
-    private RoomUnit _unit = RoomUnit.Cells;
 
     /// <summary>Whether a tile is drawn with its ground block. See TileModels.Of.</summary>
     private bool _ground = true;
@@ -151,9 +145,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     {
         ArgumentNullException.ThrowIfNull(key);
 
-        int mark = key.IndexOf(UnitMark, StringComparison.Ordinal);
-        string path = mark < 0 ? key : key[..mark];
-        if (!TileBook.IsRoom(path))
+        if (!TileBook.IsRoom(key))
         {
             TileKey tile = TileKey.Read(key);
             return TileModels.Of(
@@ -166,8 +158,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 tileset: tile.Tileset.Length > 0 ? TilesetIndex.Short(tile.Tileset) : string.Empty);
         }
 
-        RoomUnit unit = mark >= 0 && Enum.TryParse(key[(mark + 1)..], out RoomUnit said) ? said : RoomUnit.Cells;
-        return RoomModels.Of(read, path, unit, shaded: true);
+        return RoomModels.Of(read, key, shaded: true);
     }
 
     /// <summary>What the tile or room is and where it is used, then its geometry under it.</summary>
@@ -196,30 +187,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
         ImGui.TextDisabled(ImGuiText.Escape(chosen));
 
-        if (room)
-        {
-            // THE FILE DOES NOT SAY WHAT ITS POSITIONS COUNT, so the reading is a choice in plain
-            // sight - and the line under the picture says which one the doodads' reach supports.
-            ImGui.TextDisabled("Doodad positions in");
-            ImGui.SameLine();
-            if (ImGui.RadioButton("cells (23 per tile)", _unit == RoomUnit.Cells))
-            {
-                _unit = RoomUnit.Cells;
-            }
-
-            ImGui.SameLine();
-            if (ImGui.RadioButton("world units", _unit == RoomUnit.World))
-            {
-                _unit = RoomUnit.World;
-            }
-
-            if (ImGui.IsItemHovered())
-            {
-                ImGui.SetTooltip("Neither reference says which unit a room's doodad positions are in."
-                    + " The line under the picture says whether any doodad lies past the room's edge when read as cells.");
-            }
-        }
-        else
+        if (!room)
         {
             ImGui.Checkbox("ground", ref _ground);
             if (ImGui.IsItemHovered())
@@ -248,7 +216,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             return;
         }
 
-        string key = room ? chosen + UnitMark + _unit.ToString() : new TileKey(chosen, _ground, _walls, Placing(chosen)).ToString();
+        string key = room ? chosen : new TileKey(chosen, _ground, _walls, Placing(chosen)).ToString();
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
             _subjectKey = key;

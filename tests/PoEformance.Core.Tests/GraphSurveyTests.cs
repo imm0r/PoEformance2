@@ -41,13 +41,13 @@ public class GraphSurveyTests
         """
         {"nodes":[
           {"type":"ConstantFloat","index":0,"parameters":[{"value":0.5}]},
-          {"type":"MuddleTex","index":0},
+          {"type":"Muddle","index":0},
           {"type":"NormalTexToTbn","index":0},
           {"type":"TbnNormal","index":0,"stage":"PixelOutput_Calc"},
           {"type":"AlbedoColor","index":0,"stage":"PixelOutput_Calc"}],
          "links":[
-          {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"MuddleTex","index":0,"variable":"in_value"}},
-          {"src":{"type":"MuddleTex","index":0,"variable":"out_value"},"dst":{"type":"AlbedoColor","index":0,"stage":"PixelOutput_Calc","variable":"input"}},
+          {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"Muddle","index":0,"variable":"in_value"}},
+          {"src":{"type":"Muddle","index":0,"variable":"out_value"},"dst":{"type":"AlbedoColor","index":0,"stage":"PixelOutput_Calc","variable":"input"}},
           {"src":{"type":"NormalTexToTbn","index":0,"variable":"tbn_normal"},"dst":{"type":"TbnNormal","index":0,"stage":"PixelOutput_Calc","variable":"input"}}]}
         """;
 
@@ -96,16 +96,16 @@ public class GraphSurveyTests
         Assert.Contains(
             "  InputVertexColor · alone 2 · among 2 · graphs 1 · Art/Models/Monsters 1, Art/Textures/Environment 1",
             survey, StringComparison.Ordinal);
-        Assert.Contains("  MuddleTex · alone 0 · among 1 · graphs 1 · Art/Textures/Environment 1", survey, StringComparison.Ordinal);
+        Assert.Contains("  Muddle · alone 0 · among 1 · graphs 1 · Art/Textures/Environment 1", survey, StringComparison.Ordinal);
         Assert.Contains("  stage PixelOutput_Calc · alone 0 · among 1", survey, StringComparison.Ordinal);
         Assert.DoesNotContain("NormalTexToTbn ·", survey, StringComparison.Ordinal);
         Assert.True(
             survey.IndexOf("  InputVertexColor · alone", StringComparison.Ordinal)
-                < survey.IndexOf("  MuddleTex · alone", StringComparison.Ordinal),
+                < survey.IndexOf("  Muddle · alone", StringComparison.Ordinal),
             "what completes the most comes first");
 
         Assert.Contains("  1. InputVertexColor · completes 2 · 75.0% of the coloured materials evaluate whole after it", survey, StringComparison.Ordinal);
-        Assert.Contains("  2. MuddleTex · completes 0 · 75.0%", survey, StringComparison.Ordinal);
+        Assert.Contains("  2. Muddle · completes 0 · 75.0%", survey, StringComparison.Ordinal);
         Assert.Contains("  3. stage PixelOutput_Calc · completes 1 · 100.0%", survey, StringComparison.Ordinal);
 
         Assert.Contains("  Metadata/Tinted.fxgraph · 2 materials · missing InputVertexColor", survey, StringComparison.Ordinal);
@@ -227,6 +227,11 @@ public class GraphSurveyTests
         Assert.False(ShadeProgram.Knows("InputVertexUV"));
         Assert.True(ShadeProgram.Knows("FromVertexLocalPosition"));
         Assert.True(ShadeProgram.Knows("LookUpTexture"));
+        Assert.True(ShadeProgram.Knows("SampleTriplanar"));
+        Assert.True(ShadeProgram.Knows("MuddleTex"));
+        Assert.True(ShadeProgram.Knows("FromVertexVariance"));
+        Assert.True(ShadeProgram.Knows("RGBToTbn"));
+        Assert.False(ShadeProgram.Knows("Muddle"));
         Assert.False(ShadeProgram.Knows("FromVertexColor"));
         Assert.False(ShadeProgram.Knows(string.Empty));
     }

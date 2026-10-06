@@ -887,6 +887,45 @@ public class ShadeProgramTests
         Assert.Contains(new ShadeTexture("Art/lut.dds", true), compiled.Program.Textures);
     }
 
+    /// <summary>
+    /// MaterialBlend from the install - the terrain blend the hideout furniture wears - behind a base that writes the colour
+    /// and the occlusion: whole, through SampleTriplanar, SampleTexture2, MuddleTex and a variance of nought.
+    /// </summary>
+    [Fact]
+    public void ANDTHEMATERIALBLENDFromTheInstallCompilesWhole()
+    {
+        const string graph = "Metadata/Materials/Environment/MaterialBlend.fxgraph";
+        const string material = "art/models/terrain/doodads/hideouts/atlantis/deepwater/textures/atlantisdeepwaterbootsc.mat";
+        ShaderInstance asShipped = FixtureInstance(material, graph);
+
+        // AS THE MATERIAL SHIPS, its SampleTriplanar has no texture: the graph's node names none and
+        // the material's Triplanar_noise is not among its parameters. What the engine reads then is
+        // not in any file, so the graph is left out and says why.
+        ShadeCompile bare = ShadeProgram.Compile(
+        [
+            (Instance("Metadata/Base.fxgraph"), Graph(Occluding("Art/base.dds"))),
+            (asShipped, FixtureGraph(graph)),
+        ]);
+        Assert.Equal(["SampleTriplanar naming no texture in MaterialBlend"], bare.Skipped);
+
+        // WITH THE NOISE NAMED, as a material that sets it would: whole.
+        var custom = new Dictionary<string, ShaderValue[]>(asShipped.Custom)
+        {
+            ["Triplanar_noise"] = [new ShaderValue("Art/triplanar_noise.dds", [], true), ShaderValue.Empty],
+        };
+        ShadeCompile compiled = ShadeProgram.Compile(
+        [
+            (Instance("Metadata/Base.fxgraph"), Graph(Occluding("Art/base.dds"))),
+            (new ShaderInstance(graph, custom), FixtureGraph(graph)),
+        ]);
+
+        Assert.NotNull(compiled.Program);
+        Assert.Empty(compiled.Skipped);
+        Assert.Equal(["Metadata/Base.fxgraph", graph], compiled.Program.Graphs);
+        Assert.Contains(new ShadeTexture("Art/triplanar_noise.dds", true), compiled.Program.Textures);
+        Assert.Contains(new ShadeTexture("Art/particles/distortion/muddle_double.dds", false), compiled.Program.Textures);
+    }
+
     /// <summary>The ZProject blend from the install, behind a plain colour: whole, through the vertex normal and position it masks by.</summary>
     [Fact]
     public void ANDTHEZPROJECTBlendFromTheInstallCompilesWhole()
@@ -921,6 +960,239 @@ public class ShadeProgramTests
         """;
 
     /// <summary>A base graph: a texture as the whole colour, and an occlusion of 0.7 in the indirect light's w.</summary>
+    [Fact]
+    public void SAMPLETRIPLANAROwnsItsTextureAndBlendsByTheNormalsAbsoluteParts()
+    {
+        // The normal in parts, as MaterialBlend feeds it - and whichever way it points, three reads of
+        // one texture blended by weights that sum to one are that texture.
+        string graph = Colouring(
+            """
+              {"type":"InputWorldPos","index":0,"stage":"Texturing_Init"},
+              {"type":"InputWorldNormal","index":0,"stage":"Texturing_Init"},
+              {"type":"SampleTriplanar","index":0,"parameters":[{"path":"Art/own.dds","srgb":true},{}]}
+            """,
+            """
+              {"src":{"type":"InputWorldPos","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTriplanar","index":0,"variable":"uv"}},
+              {"src":{"type":"InputWorldNormal","index":0,"stage":"Texturing_Init","variable":"output","swizzle":"x"},"dst":{"type":"SampleTriplanar","index":0,"variable":"world_normal","swizzle":"x"}},
+              {"src":{"type":"InputWorldNormal","index":0,"stage":"Texturing_Init","variable":"output","swizzle":"y"},"dst":{"type":"SampleTriplanar","index":0,"variable":"world_normal","swizzle":"y"}},
+              {"src":{"type":"InputWorldNormal","index":0,"stage":"Texturing_Init","variable":"output","swizzle":"z"},"dst":{"type":"SampleTriplanar","index":0,"variable":"world_normal","swizzle":"z"}}
+            """,
+            "SampleTriplanar", "rgb", "xyz");
+        ShadeProgram program = Compile(graph);
+        Assert.Equal(["Art/own.dds"], program.Textures.Select(one => one.Path));
+        Assert.Equal(3, program.Samples);
+        AssertColour(graph, 0.8f, 0.4f, 0.2f, new() { ["Art/own.dds"] = Sheet(Srgb(0.8f), Srgb(0.4f), Srgb(0.2f)) });
+    }
+
+    [Fact]
+    public void SAMPLETEXTURE2ReadsOnceAtEachCoordinateAndTheReadNobodyTakesIsDropped()
+    {
+        string first = Owning(
+            "SampleTexture2", "rgba0", "xyz",
+            ports: """
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture2","index":0,"variable":"uv1"}}
+            """).Replace("\"variable\":\"uv\"}", "\"variable\":\"uv0\"}", StringComparison.Ordinal);
+        ShadeProgram program = Compile(first);
+        Assert.Equal(1, program.Samples);
+        AssertColour(first, 0.3f, 0.6f, 0.9f, new() { ["Art/own.dds"] = Sheet(Srgb(0.3f), Srgb(0.6f), Srgb(0.9f)) });
+
+        string second = first.Replace("\"variable\":\"rgba0\"", "\"variable\":\"rgba1\"", StringComparison.Ordinal);
+        AssertColour(second, 0.3f, 0.6f, 0.9f, new() { ["Art/own.dds"] = Sheet(Srgb(0.3f), Srgb(0.6f), Srgb(0.9f)) });
+
+        string third = first.Replace("\"variable\":\"rgba0\"", "\"variable\":\"rgba2\"", StringComparison.Ordinal);
+        ShadeCompile refused = ShadeProgram.Compile([(Instance(), Graph(third))]);
+        Assert.Null(refused.Program);
+        Assert.Contains(refused.Skipped, one => one.Contains("SampleTexture2 has no output called rgba2", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void SAMPLETEXTUREATLAS2ReadsTheHalvesOfOneSheet()
+    {
+        string graph = Owning("SampleTextureAtlas2", "rgba1", "xyz");
+        ShadeProgram program = Compile(graph);
+        Assert.Equal(1, program.Samples);
+        AssertColour(graph, 0.3f, 0.6f, 0.9f, new() { ["Art/own.dds"] = Sheet(Srgb(0.3f), Srgb(0.6f), Srgb(0.9f)) });
+    }
+
+    [Fact]
+    public void SAMPLETEXTURELODReadsItsOwnTextureAtTheLevelGiven()
+    {
+        string graph = Owning(
+            "SampleTextureLod", "rgba", "xyz",
+            ports: """
+              {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"SampleTextureLod","index":0,"variable":"lod"}}
+            """,
+            nodes: """{"type":"ConstantFloat","index":0,"parameters":[{"value":1.0}]},""");
+        ShadeProgram program = Compile(graph);
+        Assert.Equal(0, program.Samples);
+        AssertColour(graph, 0.3f, 0.6f, 0.9f, new() { ["Art/own.dds"] = Sheet(Srgb(0.3f), Srgb(0.6f), Srgb(0.9f)) });
+    }
+
+    [Fact]
+    public void SAMPLEDISPERSEDTEXTURETakesEachChannelFromItsOwnRead()
+    {
+        string graph = Colouring(
+            """
+              {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+              {"type":"InputTexture","index":0,"parameters":[{"path":"Art/dust.dds","srgb":true}]},
+              {"type":"ConstantFloat2","index":0,"parameters":[{"value":[0.0,0.0]}]},
+              {"type":"ConstantFloat","index":0,"parameters":[{"value":0.0}]},
+              {"type":"SampleDispersedTexture","index":0,"parameters":[{}]}
+            """,
+            """
+              {"src":{"type":"InputTexture","index":0,"variable":"out_texture"},"dst":{"type":"SampleDispersedTexture","index":0,"variable":"tex"}},
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleDispersedTexture","index":0,"variable":"uv"}},
+              {"src":{"type":"ConstantFloat2","index":0,"variable":"output"},"dst":{"type":"SampleDispersedTexture","index":0,"variable":"uv_dispersion"}},
+              {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"SampleDispersedTexture","index":0,"variable":"mip_level"}}
+            """,
+            "SampleDispersedTexture", "dispersed_color", "xyz");
+        AssertColour(graph, 0.8f, 0.4f, 0.2f, new() { ["Art/dust.dds"] = Sheet(Srgb(0.8f), Srgb(0.4f), Srgb(0.2f)) });
+    }
+
+    [Fact]
+    public void MUDDLETEXPushesTheCoordinatesByItsReadAndAVarianceOfNought()
+    {
+        // A white muddle texture, read linear, is one: uv + (1 - 0.5) * 0.4 on x and y, and z has nothing.
+        AssertColour(Muddling(""",{"value":2.0},{},{"value":0.4}"""), 0.7f, 0.7f, 0f, new() { ["Art/muddle.dds"] = Sheet(255, 255, 255) });
+
+        // The declared defaults: a frequency of one, no scroll, no intensity - the coordinates as they were.
+        AssertColour(Muddling(string.Empty), 0.5f, 0.5f, 0f, new() { ["Art/muddle.dds"] = Sheet(255, 255, 255) });
+    }
+
+    [Fact]
+    public void ANDAMuddleThatScrollsWithTimeIsRefused()
+    {
+        ShadeCompile refused = ShadeProgram.Compile([(Instance(), Graph(Muddling(""",{"value":2.0},{"value":[0.1,0.0]},{"value":0.4}""")))]);
+        Assert.Null(refused.Program);
+        Assert.Contains(refused.Skipped, one => one.Contains("MuddleTex scrolling with time", StringComparison.Ordinal));
+
+        ShadeCompile still = ShadeProgram.Compile([(Instance(), Graph(Muddling(""",{"value":2.0},{"value":[0.0,0.0]},{"value":0.4}""")))]);
+        Assert.NotNull(still.Program);
+    }
+
+    [Fact]
+    public void MUDDLETEXFROMINPUTTakesItsNumbersFromPortsAndRefusesAScrollThere()
+    {
+        static string Graph_(string scroll) => Colouring(
+            $$$"""
+              {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+              {"type":"Zero","index":0},
+              {"type":"ConstantFloat","index":0,"parameters":[{"value":2.0}]},
+              {"type":"ConstantFloat2","index":0,"parameters":[{"value":{{{scroll}}}}]},
+              {"type":"ConstantFloat","index":1,"parameters":[{"value":0.4}]},
+              {"type":"MuddleTexFromInput","index":0,"parameters":[{"path":"Art/muddle.dds","srgb":false},{}]}
+            """,
+            """
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"MuddleTexFromInput","index":0,"variable":"in_uv"}},
+              {"src":{"type":"Zero","index":0,"variable":"output"},"dst":{"type":"MuddleTexFromInput","index":0,"variable":"flow_variance"}},
+              {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"MuddleTexFromInput","index":0,"variable":"flow_frequency"}},
+              {"src":{"type":"ConstantFloat2","index":0,"variable":"output"},"dst":{"type":"MuddleTexFromInput","index":0,"variable":"flow_scroll"}},
+              {"src":{"type":"ConstantFloat","index":1,"variable":"output"},"dst":{"type":"MuddleTexFromInput","index":0,"variable":"flow_intensity"}}
+            """,
+            "MuddleTexFromInput", "out_uv", "xy");
+
+        AssertColour(Graph_("[0.0,0.0]"), 0.7f, 0.7f, 0f, new() { ["Art/muddle.dds"] = Sheet(255, 255, 255) });
+
+        ShadeCompile refused = ShadeProgram.Compile([(Instance(), Graph(Graph_("[0.0,0.2]")))]);
+        Assert.Null(refused.Program);
+        Assert.Contains(refused.Skipped, one => one.Contains("MuddleTexFromInput scrolling with time", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void MUDDLETEX2AddsTwoMuddlesAndRefusesAScrollInEither()
+    {
+        static string Graph_(string parameters) => Owning("MuddleTex2", "out_uv", "xy", parameters: parameters)
+            .Replace("\"variable\":\"uv\"}", "\"variable\":\"in_uv\"}", StringComparison.Ordinal);
+
+        // Both at frequency one and intensity 0.4 over a white, linear texture: uv + 0.2 + 0.2.
+        AssertColour(Graph_(""",{"value":[1.0,0.0,0.0,0.4]},{"value":[1.0,0.0,0.0,0.4]}"""), 0.9f, 0.9f, 0f, new() { ["Art/own.dds"] = Sheet(255, 255, 255) });
+
+        // Declared "1 0 0 0" twice: no intensity, so the coordinates as they were.
+        AssertColour(Graph_(string.Empty), 0.5f, 0.5f, 0f, new() { ["Art/own.dds"] = Sheet(255, 255, 255) });
+
+        ShadeCompile refused = ShadeProgram.Compile([(Instance(), Graph(Graph_(""",{},{"value":[1.0,0.0,0.3,0.4]}""")))]);
+        Assert.Null(refused.Program);
+        Assert.Contains(refused.Skipped, one => one.Contains("MuddleTex2 scrolling with time", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void FROMVERTEXVARIANCEIsNoughtOnAMesh()
+        => AssertColour(Colouring("""{"type":"FromVertexVariance","index":0}""", string.Empty, "FromVertexVariance", "output"), 0f, 0f, 0f);
+
+    [Fact]
+    public void RGBTOTBNUnpacksAColourToAVector()
+        => AssertColour(
+            Colouring(
+                """
+                  {"type":"ConstantFloat3","index":0,"parameters":[{"value":[0.75,0.5,0.25]}]},
+                  {"type":"RGBToTbn","index":0}
+                """,
+                """
+                  {"src":{"type":"ConstantFloat3","index":0,"variable":"output"},"dst":{"type":"RGBToTbn","index":0,"variable":"rgb_vec"}}
+                """,
+                "RGBToTbn", "tbn_vec", "xyz"),
+            0.5f, 0f, 0f);
+
+    [Fact]
+    public void SCALEUVMAYAScalesAboutAPivotWhoseVRunsTheOtherWay()
+        => AssertColour(
+            Colouring(
+                """
+                  {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+                  {"type":"ConstantFloat2","index":0,"parameters":[{"value":[2.0,3.0]}]},
+                  {"type":"ScaleUVMaya","index":0,"parameters":[{"value":[0.25,0.5]}]}
+                """,
+                """
+                  {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"ScaleUVMaya","index":0,"variable":"in_uv"}},
+                  {"src":{"type":"ConstantFloat2","index":0,"variable":"output"},"dst":{"type":"ScaleUVMaya","index":0,"variable":"scale"}}
+                """,
+                "ScaleUVMaya", "out_uv", "xy"),
+            0.75f, 0.5f, 0f);
+
+    [Fact]
+    public void HARDLIGHTBLENDMultipliesBelowAHalfAndScreensAbove()
+        => AssertColour(
+            Colouring(
+                """
+                  {"type":"ConstantFloat3","index":0,"parameters":[{"value":[0.5,0.5,0.2]}]},
+                  {"type":"ConstantFloat3","index":1,"parameters":[{"value":[0.25,0.75,0.5]}]},
+                  {"type":"HardLightBlend","index":0}
+                """,
+                """
+                  {"src":{"type":"ConstantFloat3","index":0,"variable":"output"},"dst":{"type":"HardLightBlend","index":0,"variable":"color1"}},
+                  {"src":{"type":"ConstantFloat3","index":1,"variable":"output"},"dst":{"type":"HardLightBlend","index":0,"variable":"color2"}}
+                """,
+                "HardLightBlend", "res_color", "xyz"),
+            0.25f, 0.75f, 0.2f);
+
+    [Fact]
+    public void SINEIsAFloatSpread()
+        => AssertColour(
+            Colouring(
+                """
+                  {"type":"ConstantFloat","index":0,"parameters":[{"value":0.5}]},
+                  {"type":"Sine","index":0}
+                """,
+                """
+                  {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"Sine","index":0,"variable":"input"}}
+                """,
+                "Sine", "output"),
+            MathF.Sin(0.5f), MathF.Sin(0.5f), MathF.Sin(0.5f));
+
+    [Fact]
+    public void ROTATEUVOLDTurnsAboutTheQuadrantsHalfPointAndRefusesATurnWithTime()
+    {
+        // (0.2, 0.6) less (0.5, 0.5), turned by half a radian the node's way, and put back.
+        const float cos = 0.87758256f, sin = 0.47942554f;
+        AssertColour(
+            Turning("RotateUVOld", """{"value":[0.0,0.5]}"""),
+            (-0.3f * cos) - (0.1f * sin) + 0.5f, (-0.3f * sin) + (0.1f * cos) + 0.5f, 0f);
+
+        ShadeCompile refused = ShadeProgram.Compile([(Instance(), Graph(Turning("RotateUVOld", """{"value":[1.0,0.5]}""")))]);
+        Assert.Null(refused.Program);
+        Assert.Contains(refused.Skipped, one => one.Contains("RotateUVOld turning with time", StringComparison.Ordinal));
+    }
+
     private static string Occluding(string texture) =>
         $$$"""
         {"nodes":[
@@ -1079,6 +1351,35 @@ public class ShadeProgramTests
           {"src":{"type":"{{{type}}}","index":0,"variable":"{{{(type == "Add3" ? "output" : "color")}}}","swizzle":"xyz"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
         """;
 
+    /// <summary>A node that owns its texture at parameter 0, read at the mesh's coordinates - with extra ports and parameters - one output into the colour.</summary>
+    private static string Owning(string type, string output, string swizzle = "", string ports = "", string parameters = "", string nodes = "") =>
+        Colouring(
+            $$$"""
+              {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+              {{{nodes}}}
+              {"type":"{{{type}}}","index":0,"parameters":[{"path":"Art/own.dds","srgb":true},{}{{{parameters}}}]}
+            """,
+            $$$"""
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"{{{type}}}","index":0,"variable":"uv"}}{{{(ports.Length > 0 ? "," + ports : string.Empty)}}}
+            """,
+            type, output, swizzle);
+
+    /// <summary>
+    /// MuddleTex at the mesh's coordinates with the parameters given, its coordinates out straight into the colour's x and y.
+    /// </summary>
+    private static string Muddling(string parameters, string variance = "FromVertexVariance") =>
+        Colouring(
+            $$$"""
+              {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+              {"type":"{{{variance}}}","index":0},
+              {"type":"MuddleTex","index":0,"parameters":[{"path":"Art/muddle.dds","srgb":false},{}{{{parameters}}}]}
+            """,
+            $$$"""
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"MuddleTex","index":0,"variable":"in_uv"}},
+              {"src":{"type":"{{{variance}}}","index":0,"variable":"output"},"dst":{"type":"MuddleTex","index":0,"variable":"variance"}}
+            """,
+            "MuddleTex", "out_uv", "xy");
+
     /// <summary>OffsetUVTiling, as the game ships it.</summary>
     private const string Tiling =
         """
@@ -1185,6 +1486,20 @@ public class ShadeProgramTests
     /// <summary>A graph from tests/fixtures/shaders, by its path in the install.</summary>
     private static ShaderGraph FixtureGraph(string path)
     {
+        ShaderGraph graph = ShaderGraph.Read(File.ReadAllBytes(Fixture(path)));
+        Assert.True(graph.Ready);
+        return graph;
+    }
+
+    /// <summary>The instance of one graph as a material from tests/fixtures/shaders sets it up - its custom parameters.</summary>
+    private static ShaderInstance FixtureInstance(string material, string graph)
+    {
+        IReadOnlyList<ShaderInstance> instances = ShaderGraph.Instances(File.ReadAllBytes(Fixture(material)));
+        return Assert.Single(instances, one => string.Equals(one.Parent, graph, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string Fixture(string path)
+    {
         DirectoryInfo? dir = new(AppContext.BaseDirectory);
         while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests", "fixtures")))
         {
@@ -1192,10 +1507,7 @@ public class ShadeProgramTests
         }
 
         Assert.NotNull(dir);
-        ShaderGraph graph = ShaderGraph.Read(File.ReadAllBytes(
-            Path.Combine(dir.FullName, "tests", "fixtures", "shaders", path.Replace("/", "__", StringComparison.Ordinal))));
-        Assert.True(graph.Ready);
-        return graph;
+        return Path.Combine(dir.FullName, "tests", "fixtures", "shaders", path.Replace("/", "__", StringComparison.Ordinal));
     }
 
     private static ShaderValue Numbers(params float[] numbers) => new(string.Empty, numbers, null);

@@ -4,16 +4,6 @@ using PoEformance.Game.Files;
 
 namespace PoEformance.Features;
 
-/// <summary>What a room's doodad positions are counted in. See <see cref="RoomModels"/>.</summary>
-public enum RoomUnit
-{
-    /// <summary>The 23 cells of a tile - 250 / 23 world units each.</summary>
-    Cells,
-
-    /// <summary>World units - 250 to a tile.</summary>
-    World,
-}
-
 /// <summary>
 /// A room's doodads, each drawn from its own .ao and put where the room file says.
 /// </summary>
@@ -23,11 +13,12 @@ public enum RoomUnit
 /// model is the same .ao walk a monster or an item takes, read ONCE however many times the room
 /// places it, and joined into one mesh at each place.
 ///
-/// THE UNIT OF A POSITION IS NOT KNOWN, and the view says so rather than choosing in silence. Cells
-/// is the default - 23 to a tile, which is the grid every .tdt's walkability blocks are written in -
-/// and World is the other reading. <see cref="Spread"/> reports how far the doodads reach against
-/// what the room's own size allows under each, so the first real room settles it: a doodad past the
-/// room's edge in cells is a file counted in world units.
+/// A POSITION COUNTS CELLS, 23 to a tile. The file does not say so in words; the reference does in
+/// its types: poe_data_tools' <c>arm</c> parser reads a doodad's x and y as <c>u32</c> and a decal's
+/// as <c>f32</c>, and a whole number is a place on the grid every .tdt's walkability blocks are
+/// written in, not a length. The first real room agreed - read as world units its furniture piled
+/// onto a fifth of one tile, read as cells it filled the room. <see cref="Spread"/> still reports how
+/// far the doodads reach against the room's size in cells, so a room that breaks the rule says so.
 ///
 /// NOTHING HERE IS ANIMATED - a doodad's rig, where it has one, stays in its rest pose - and there
 /// are caps, because a room of three hundred trees is three hundred copies of a tree to rasterise.
@@ -40,22 +31,25 @@ public static class RoomModels
     /// <summary>Most triangles placed. The renderer is on the processor; past this, turning stutters.</summary>
     public const int MostTriangles = 400_000;
 
-    /// <summary>World units in one of the given unit.</summary>
-    public static float Size(RoomUnit unit) => unit == RoomUnit.World ? 1f : TileModels.Side / 23f;
+    /// <summary>Cells to a tile - the grid a room's doodad positions and a tile's walkability are written in.</summary>
+    public const int CellsPerTile = 23;
+
+    /// <summary>World units in one cell.</summary>
+    public static float CellSize => TileModels.Side / CellsPerTile;
 
     /// <summary>
     /// How far a room's doodads reach, and what that says about the unit.
     /// </summary>
     /// <param name="Most">The largest x and y any doodad has.</param>
     /// <param name="Cells">The room's size in cells - 23 to a tile.</param>
-    /// <param name="NotCells">True when a doodad lies past the room's edge if the positions are cells.</param>
+    /// <param name="NotCells">True when a doodad lies past the room's edge read as cells - a room the rule does not hold for.</param>
     public readonly record struct Spread(Vector2 Most, Vector2 Cells, bool NotCells)
     {
         /// <summary>The line the view prints.</summary>
         public string Say => string.Create(
                 CultureInfo.InvariantCulture,
                 $"doodads reach x {Most.X}, y {Most.Y}; the room is {Cells.X} x {Cells.Y} cells")
-            + (NotCells ? " - past its edge as cells, so the file counts in world units" : string.Empty);
+            + (NotCells ? " - past its edge, so this room's positions are not cells" : string.Empty);
     }
 
     /// <summary>How far the doodads reach against the room's size. See <see cref="Spread"/>.</summary>
@@ -69,7 +63,7 @@ public static class RoomModels
             most = Vector2.Max(most, new Vector2(one.X, one.Y));
         }
 
-        var cells = new Vector2(room.Width * 23, room.Height * 23);
+        var cells = new Vector2(room.Width * CellsPerTile, room.Height * CellsPerTile);
         return new Spread(most, cells, most.X > cells.X || most.Y > cells.Y);
     }
 
@@ -78,9 +72,8 @@ public static class RoomModels
     /// </summary>
     /// <param name="read">How to get a file out of the install, by path.</param>
     /// <param name="path">The room's <c>.arm</c>.</param>
-    /// <param name="unit">What the positions are counted in.</param>
     /// <param name="shaded">Whether each material's shader graphs are read - see MonsterModels.Shaded.</param>
-    public static MonsterModel Of(Func<string, byte[]?>? read, string? path, RoomUnit unit, bool shaded = false)
+    public static MonsterModel Of(Func<string, byte[]?>? read, string? path, bool shaded = false)
     {
         if (read is null)
         {
@@ -129,7 +122,7 @@ public static class RoomModels
         var skins = new List<Mipmaps?>();
         var modes = new List<string>();
         var wearing = new List<string>();
-        float size = Size(unit);
+        float size = CellSize;
         var triangles = 0;
         int placed = 0, missing = 0, capped = 0;
         string firstMissing = string.Empty;
@@ -221,6 +214,7 @@ public static class RoomModels
             Files = files,
             Move = string.Join("; ", said),
             Shaders = [.. models.Values.SelectMany(one => one.Shaders).Distinct(StringComparer.OrdinalIgnoreCase)],
+            Meshes = [.. models.Values.Where(one => one.Ready).Select(one => new MeshNamed(one.Mesh_, one.BodyFacts)).Distinct()],
         };
 
         // THE GRAPHS ONCE, OVER THE JOINED ROOM: every doodad's materials are in the one list, and a
