@@ -1199,6 +1199,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private RitualWindow? _ritualWindow;
     private readonly RunecraftLayer _runecraft = new();
     private RunecraftWatch? _runecraftWatch;
+    private readonly MonolithLayer _monoliths = new();
+    private MonolithWatch? _monolithWatch;
+    private readonly ExpeditionLayer _expedition = new();
+    private ExpeditionWatch? _expeditionWatch;
 
     /// <summary>Called when a preload switch changed, so it can be written down.</summary>
     public Action<PreloadSettings>? PreloadRulesChanged { get; set; }
@@ -2553,18 +2557,36 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// overlay's own settings callback so a flip of it is written down exactly as the Stash tab
     /// writes its copy.
     /// </remarks>
-    public void AttachRunecraft(RunecraftWatch watch, Action<RunecraftSettings> saved, PriceStore prices, bool visible = false)
+    public void AttachRunecraft(
+        RunecraftWatch watch, MonolithWatch monoliths, Action<RunecraftSettings> saved, PriceStore prices, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(watch);
+        ArgumentNullException.ThrowIfNull(monoliths);
         ArgumentNullException.ThrowIfNull(saved);
         ArgumentNullException.ThrowIfNull(prices);
         _runecraftWatch = watch;
+        _monolithWatch = monoliths;
 
-        var window = new RunecraftWindow(watch, saved, prices, () => SettingsChanged?.Invoke());
+        var window = new RunecraftWindow(watch, monoliths, saved, prices, () => SettingsChanged?.Invoke());
         _tools.Add(63, "runecraft", "Runecraft", window.DrawTab);
         if (visible)
         {
             _tools.Show("runecraft");
+        }
+    }
+
+    /// <summary>Attaches the expedition route planner: its tab, its map and world drawing, its hotkey.</summary>
+    public void AttachExpedition(ExpeditionWatch watch, Action<ExpeditionSettings> saved, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(watch);
+        ArgumentNullException.ThrowIfNull(saved);
+        _expeditionWatch = watch;
+
+        var window = new ExpeditionWindow(watch, saved);
+        _tools.Add(64, "expedition", "Expedition", window.DrawTab);
+        if (visible)
+        {
+            _tools.Show("expedition");
         }
     }
 
@@ -3381,6 +3403,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         PollScreenshot(Environment.TickCount64);
 
+        // The planner's Run key, behind the foreground gate above so a press meant for another
+        // application never reaches it, and inert unless there is a chain to plan.
+        if (_expeditionWatch is { Settings.Enabled: true } planner)
+        {
+            _expedition.PollRunKey(planner, planner.Settings, planner.View);
+        }
+
         // Before the marker gate, and outside it: the watcher decides for itself where it is
         // quiet, and its own rule is towns rather than "wherever markers are drawn".
         if (_snapshot.InGame)
@@ -3465,6 +3494,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // marker has to be the one on top. It is the half you are meant to react to.
             _evasion.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
             _statusIcons.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
+
+            // The next charge of the expedition plan, ringed on the ground where it goes. On
+            // the ground like the hazard rings, and after the icons because it is the one mark
+            // the player is walking toward rather than reading.
+            if (_expeditionWatch is { Settings.Enabled: true } expedition)
+            {
+                _expedition.DrawWorld(ImGui.GetBackgroundDrawList(), _snapshot, width, height, expedition.View);
+            }
 
             if (ShowWorldDots)
             {
@@ -4511,6 +4548,39 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 recipes.Status + (recipes.Named.Length > 0 ? $"   ({recipes.Named})" : string.Empty),
                 recipes.Open && recipes.Priced == 0 && recipes.Rewards.Count > 0 ? Warning : Measured,
                 figure: true);
+
+            // The monoliths of the area, and - the half this row exists for - what the station
+            // walk could not read, since every offset behind it is the reference's and unseen.
+            if (_monolithWatch is not null)
+            {
+                MonolithsView monoliths = _monolithWatch.View;
+                var unread = 0;
+                foreach (MonolithView view in monoliths.Monoliths)
+                {
+                    if (view.Listed && !view.Station.Resolved)
+                    {
+                        unread++;
+                    }
+                }
+
+                Row(
+                    "monoliths",
+                    monoliths.Status + (unread > 0 ? $"   ({unread} without a station - see the Runecraft tab)" : string.Empty),
+                    unread > 0 ? Warning : Measured,
+                    figure: true);
+            }
+        }
+
+        // The expedition planner: what the scan found and where the charge counts came from -
+        // the half that says whether the controller offsets, unseen by this tool, resolved.
+        if (_expeditionWatch is { Settings.Enabled: true } planner)
+        {
+            ExpeditionView expedition = planner.View;
+            Row(
+                "expedition",
+                expedition.Status + (expedition.HasDetonator ? $"   (charges {expedition.Placed}/{expedition.Total} by {expedition.CountsSource})" : string.Empty),
+                expedition.HasDetonator && !expedition.CountsKnown ? Warning : Measured,
+                figure: true);
         }
 
         if (_snapshot.Player is not WorldEntity player)
@@ -5009,6 +5079,23 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // Over the entity dots: a landmark is what the map is being consulted for, so it wins
         // when the two land on the same pixel.
         _poi?.DrawOnMap(draw, map, _snapshot, player);
+
+        // Over the places: a monolith's price is the one figure the map is consulted FOR in an
+        // expedition. Not while the Runeshape panel is open - its rows say it better, and the
+        // labels would sit on the panel.
+        if (_monolithWatch is not null
+            && _runecraftWatch is { Settings: { Enabled: true, MapLabels: true } } recipes
+            && !recipes.View.Open)
+        {
+            _monoliths.Draw(draw, map, player, _monolithWatch.View, recipes.Settings);
+        }
+
+        // Over the labels: the chain is the map's answer to "where next" in an expedition, and
+        // a numbered charge wants to be read over the price it collects.
+        if (_expeditionWatch is { Settings.Enabled: true } planner)
+        {
+            _expedition.DrawOnMap(draw, map, player, _snapshot.Terrain, planner.View, planner.Settings);
+        }
 
         if (ShowCalibration)
         {

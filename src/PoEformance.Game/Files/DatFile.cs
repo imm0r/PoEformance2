@@ -471,4 +471,44 @@ public sealed class DatFile
 
         return made;
     }
+
+    /// <summary>
+    /// An array column of 32-bit integers: a count and an offset, then four bytes each.
+    /// </summary>
+    /// <remarks>
+    /// Its own reader rather than <see cref="References"/> at width four, because that one
+    /// reads eight bytes per element and an array of ints sitting at the very end of the file
+    /// has no eight bytes left at its last element. A recipe's area tags are such an array.
+    /// </remarks>
+    public IReadOnlyList<int> Ints(int row, int offset)
+    {
+        int at = At(row, offset, 16);
+        if (at < 0)
+        {
+            return [];
+        }
+
+        ulong first = BinaryPrimitives.ReadUInt64LittleEndian(_bytes.AsSpan(at));
+        ulong second = BinaryPrimitives.ReadUInt64LittleEndian(_bytes.AsSpan(at + 8));
+        (ulong count, ulong into) = Arrays == ArrayOrder.OffsetFirst ? (second, first) : (first, second);
+
+        if (count == 0 || count > MostElements)
+        {
+            return [];
+        }
+
+        long start = VariableAt + (long)into;
+        if (start < 0 || start + ((long)count * 4) > _bytes.Length)
+        {
+            return [];
+        }
+
+        var made = new int[count];
+        for (ulong i = 0; i < count; i++)
+        {
+            made[i] = BinaryPrimitives.ReadInt32LittleEndian(_bytes.AsSpan((int)(start + ((long)i * 4))));
+        }
+
+        return made;
+    }
 }

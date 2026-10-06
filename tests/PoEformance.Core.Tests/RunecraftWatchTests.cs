@@ -1,6 +1,7 @@
 using PoEformance.Core.Schema;
 using PoEformance.Features;
 using PoEformance.Game.Ui;
+using PoEformance.Game.World;
 
 namespace PoEformance.Core.Tests;
 
@@ -232,6 +233,82 @@ public class RunecraftWatchTests
         Assert.Equal(994f, (anchored with { Text = new ScreenRect(300, 80, 1000, 140) }).Before(6f));
         Assert.Equal(994f, (anchored with { Text = new ScreenRect(686, 99, 1100, 129) }).Before(6f));
         Assert.Equal(994f, (anchored with { Text = new ScreenRect(686, 99, 686, 129) }).Before(6f));
+    }
+
+    /// <summary>The fixture's rows as recipes, with the gold socket - hole 2 - holding a different rune on each.</summary>
+    private static RecipeCatalog Recipes() => RecipeCatalogTests.With(
+        [
+            new RecipeCatalogTests.Recipe("4SlotExaltedOrb3", [7, 20, 3, 0], "Metadata/Items/Currency/CurrencyAddModToRare", "Exalted Orb", 3),
+            new RecipeCatalogTests.Recipe("4SlotGreaterRegalOrb1", [7, 20, 26, 0], "Metadata/Items/Currency/CurrencyUpgradeMagicToRare2", "Greater Regal Orb"),
+            new RecipeCatalogTests.Recipe("3SlotChaosOrb1", [7, 20, 32], "Metadata/Items/Currency/CurrencyRerollRare", "Chaos Orb"),
+        ]);
+
+    /// <summary>A monolith whose panel is open, framing hole 2, standing where the site says.</summary>
+    private static MonolithsView Open(ChainSite site, int mode = 1)
+    {
+        var station = new MonolithStation(0x5000, 4, 20, 1, false, [2], mode, false, string.Empty, PanelOpen: true, string.Empty);
+        var view = new MonolithView(
+            9, 0x4000, MonolithFixture.DevicePath, "Expedition2RemnantActive", 0, 0, 0, 0, true,
+            station, new MonolithStates(4, 1, false, string.Empty), [], 0, 0, "Opulent")
+        {
+            Site = site,
+        };
+        return new MonolithsView([view], "one", 0);
+    }
+
+    [Fact]
+    public void EachRowNamesTheRuneItWouldPropagate_AndTheStrongestIsFramed()
+    {
+        OffsetSchema schema = Schema();
+        (RunecraftWatch watch, _) = Make(schema);
+        watch.Recipes = Recipes();
+        var scale = new UiScale(2560, 1600, 0);
+        PriceBook book = Book();
+
+        // No monolith open: prices only.
+        watch.Service(scale, 0, book);
+        Assert.All(watch.View.Rewards, r => Assert.False(r.Runed));
+
+        // The open monolith frames hole 2: Tempest on the Exalted row (no loot effect), Bond
+        // on the Regal, Power on the Chaos - the strongest, so it wears the amber ring.
+        watch.Service(scale, 1, book, Open(ChainSite.Alone));
+        RunecraftView view = watch.View;
+        RunecraftReward exalted = view.Rewards.Single(r => r.Label == "3x Exalted Orb");
+        Assert.Equal("Tempest", exalted.Rune);
+        Assert.Equal(1.0, exalted.RuneMult, 6);
+        Assert.False(exalted.BestRune);
+
+        RunecraftReward regal = view.Rewards.Single(r => r.Label == "1x Greater Regal Orb");
+        Assert.Equal("Bond", regal.Rune);
+        Assert.Equal(1.25, regal.RuneMult, 6);
+        Assert.False(regal.BestRune);
+
+        RunecraftReward chaos = view.Rewards.Single(r => r.Where.Top > 1000);
+        Assert.Equal("Power", chaos.Rune);
+        Assert.Equal(1.30, chaos.RuneMult, 6);
+        Assert.True(chaos.BestRune);
+        Assert.True(chaos.Best);
+        Assert.Contains("3 with a rune", view.Status, StringComparison.Ordinal);
+
+        // The rolled gem's recipe puts nothing on hole 2 (two holes), the sentinel has none.
+        Assert.False(view.Rewards.Single(r => r.Label.StartsWith("Uncut", StringComparison.Ordinal)).Runed);
+        Assert.False(view.Rewards.Single(r => r.Label == "1x Mirror of Kalandra").Runed);
+
+        // Power already in the chain elsewhere: the Chaos row says so and Bond is the best left.
+        watch.Service(scale, 2, book, Open(new ChainSite(1UL << 32, false)));
+        view = watch.View;
+        Assert.Equal("Power (taken)", view.Rewards.Single(r => r.Where.Top > 1000).Rune);
+        Assert.Equal(1.0, view.Rewards.Single(r => r.Where.Top > 1000).RuneMult, 6);
+        Assert.True(view.Rewards.Single(r => r.Label == "1x Greater Regal Orb").BestRune);
+
+        // A monolith the game frames no socket on (the standalone one) names nothing.
+        watch.Service(scale, 3, book, Open(ChainSite.Alone, mode: 0));
+        Assert.All(watch.View.Rewards, r => Assert.False(r.Runed));
+
+        // And with the chain switched off, nothing either.
+        watch.Settings = new RunecraftSettings(Enabled: true, ChainEnabled: false);
+        watch.Service(scale, 4, book, Open(ChainSite.Alone));
+        Assert.All(watch.View.Rewards, r => Assert.False(r.Runed));
     }
 
     [Fact]

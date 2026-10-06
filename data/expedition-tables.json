@@ -1,0 +1,207 @@
+{
+  "comment": "Column order of the three tables a Runecraft monolith's OFFERS are built from, from poe-tool-dev/dat-schema (PoE2 entries; its CI republishes schema.min.json on every commit). Offsets are NOT stored - they are arithmetic over the widths in DatColumns, recomputed on load, so a corrected width moves every column after it. THE JOIN: Expedition2Recipes lists each recipe's Runes as an array of Expedition2Runes rows (the rune at index p is what must sit in hole p), its Reward as a BaseItemTypes row (data/item-tables.json carries that table), and its RuneWeights as rows of Expedition2RunesWeights - the table that says at which area level a recipe SHORTER than the monolith may be offered for a given anchor rune at a given slot (RecipeRuneCount, HighlightedRuneSlot, HighlightedRune, MinAreaLevel). The last, unnamed i32 array of Expedition2Recipes (column_19) is the recipe's AREA CONTENT TAGS: on the 0.5.5 HF9 client a recipe carrying any is offered only in an area whose own tag set (AreaInstance.ContentTags in the offsets schema) shares one - one recipe of 322 today, 7SlotAldursLogbook1 with tag 54 (yokkenUA/RunecraftHelper). Named by position because the community schema has not named it; RecipeCatalog reads it by that name. The sizes these columns compute are Expedition2Recipes 201 (0xC9) - the stride RunecraftHelper measured between two live recipe rows - Expedition2Runes 104 (0x68) and Expedition2RunesWeights 57 (0x39); each is checked against the file's own row size when the install is read.",
+  "source": "poe-tool-dev/dat-schema, release latest, read 2026-10-06 (schema createdAt 1789458335)",
+  "tables": {
+    "Expedition2Recipes": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "Runes",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "Description",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "RuneCountRequired",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "MinLevelReq",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "MaxLevelReq",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "Reward",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "RewardCount",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_8",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_9",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_10",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_11",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_12",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_13",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "RewardGemLevel",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "QuestFlag",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "Category",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "RuneWeights",
+        "type": "foreignrow",
+        "array": true
+      },
+      {
+        "name": "DisabledText",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "column_19",
+        "type": "i32",
+        "array": true
+      }
+    ],
+    "Expedition2Runes": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_1",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "ArchnemesisMod",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "ArchnemesisModPower",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "TomeArt",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "RemnantArt",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "Mod",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "EnemyArt",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "TomeArt2",
+        "type": "string",
+        "array": false
+      }
+    ],
+    "Expedition2RunesWeights": [
+      {
+        "name": "Id",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "RecipeRuneCount",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "HighlightedRuneSlot",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "HighlightedRune",
+        "type": "foreignrow",
+        "array": false
+      },
+      {
+        "name": "MinAreaLevel",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "MaxAreaLevel",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "column_6",
+        "type": "i32",
+        "array": false
+      },
+      {
+        "name": "TableComments",
+        "type": "string",
+        "array": false
+      },
+      {
+        "name": "column_8",
+        "type": "bool",
+        "array": false
+      },
+      {
+        "name": "column_9",
+        "type": "i32",
+        "array": false
+      }
+    ]
+  }
+}

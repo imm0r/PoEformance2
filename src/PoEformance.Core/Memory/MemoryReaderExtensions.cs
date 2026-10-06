@@ -286,6 +286,64 @@ public static class MemoryReaderExtensions
         return new string(nul < 0 ? data : data[..nul]);
     }
 
+    /// <summary>
+    /// Reads an MSVC <c>std::string</c> - the NARROW one - at <paramref name="address"/>.
+    /// </summary>
+    /// <remarks>
+    /// The same header as <see cref="ReadStdWString"/> with the other character width: size at
+    /// +0x10, capacity at +0x18, and the small-string optimisation keeping up to fifteen bytes
+    /// INLINE in the first sixteen when the capacity is below sixteen. The game uses it for the
+    /// names of a StateMachine's states, which the AHK tool's decoder reads exactly this way.
+    /// Garbage headers are rejected by the same size and capacity checks.
+    /// </remarks>
+    public static string ReadStdString(this IMemoryReader reader, ulong address, int maxChars = 256)
+    {
+        Span<byte> header = stackalloc byte[32];
+        if (!reader.TryRead(address, header))
+        {
+            return string.Empty;
+        }
+
+        long size = MemoryMarshal.Read<long>(header[16..]);
+        long capacity = MemoryMarshal.Read<long>(header[24..]);
+        if (size < 0 || capacity < size || capacity > 100_000)
+        {
+            return string.Empty;
+        }
+
+        int chars = (int)Math.Min(size, maxChars);
+        if (chars == 0)
+        {
+            return string.Empty;
+        }
+
+        if (capacity < 16)
+        {
+            return Encoding.UTF8.GetString(header[..Math.Min(chars, 15)]);
+        }
+
+        ulong dataPtr = MemoryMarshal.Read<ulong>(header);
+        if (!IsPlausiblePointer(dataPtr))
+        {
+            return string.Empty;
+        }
+
+        int want = chars;
+        var buffer = new byte[want];
+        while (want >= 1 && !reader.TryRead(dataPtr, buffer.AsSpan(0, want)))
+        {
+            want /= 2;
+        }
+
+        if (want < 1)
+        {
+            return string.Empty;
+        }
+
+        int nul = buffer.AsSpan(0, want).IndexOf((byte)0);
+        return Encoding.UTF8.GetString(buffer.AsSpan(0, nul < 0 ? want : nul));
+    }
+
     /// <summary>x64 page size, for chunked string reads.</summary>
     private const ulong PageSize = 4096;
 }

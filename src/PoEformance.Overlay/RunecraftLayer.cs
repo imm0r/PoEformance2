@@ -32,6 +32,13 @@ namespace PoEformance.Overlay;
 /// THE WRITING FOLLOWS THE ROW, half its height, so it reads at any interface scale and never
 /// outgrows the row it is on. A plate behind it, because the panel's own art is busy exactly
 /// where a price lands.
+///
+/// THE RUNE GOES BEFORE THE PRICE, on its own plate, in its own colour: amber gains loot down
+/// the chain, grey is pure danger, red costs. Two separate calls, not one merged figure - the
+/// green frame keeps meaning "dearest reward" and an amber ring round a rune's plate means
+/// "strongest rune", and the two landing on different rows is exactly the trade-off to see.
+/// Before rather than after, where the reference puts it, because the room on a row is between
+/// the icons and the name, and the price already sits at the name's end of it.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 public sealed class RunecraftLayer
@@ -42,6 +49,12 @@ public sealed class RunecraftLayer
     private const uint Red = 0xFF40_40FFu;
     private const uint Shadow = 0xCC00_0000u;
     private const uint Plate = 0xE600_0000u;
+
+    /// <summary>The rune's own colour: gains loot. The same amber the map's scouting line is written in.</summary>
+    private const uint Amber = 0xFF4D_CCFFu;
+
+    /// <summary>A rune with no loot effect, or one already in the chain.</summary>
+    private const uint Grey = 0xFF9A_9A9Au;
 
     /// <summary>What the price is written as a share of the row's height, before the user's scale.</summary>
     private const float Share = 0.5f;
@@ -129,23 +142,52 @@ public sealed class RunecraftLayer
             }
             else
             {
+                text = string.Empty;
+                colour = White;
+            }
+
+            if (text.Length == 0 && !reward.Runed)
+            {
                 continue;
             }
 
-            Vector2 measured = ImGui.CalcTextSize(text) * scale;
             var pad = new Vector2(4f * scale, 2f * scale);
             float gap = 6f * scale;
 
             // The plate's right edge a gap before the row's text, or inside the row's own edge
             // when the text's element did not read - see RunecraftReward.Before.
             float edge = reward.Before(gap) + settings.XOffset;
-            var at = new Vector2(edge - pad.X - measured.X, row.Top + ((row.Height - measured.Y) * 0.5f));
+            float left = edge;
+            if (text.Length > 0)
+            {
+                Vector2 measured = ImGui.CalcTextSize(text) * scale;
+                var at = new Vector2(edge - pad.X - measured.X, row.Top + ((row.Height - measured.Y) * 0.5f));
+                draw.AddRectFilled(at - pad, at + measured + pad, Plate, 3f * scale);
+                draw.AddText(font, size, at + new Vector2(1f, 1f), Shadow, text);
+                draw.AddText(font, size, at, colour, text);
+                left = at.X - pad.X;
+            }
 
-            draw.AddRectFilled(at - pad, at + measured + pad, Plate, 3f * scale);
-            draw.AddText(font, size, at + new Vector2(1f, 1f), Shadow, text);
-            draw.AddText(font, size, at, colour, text);
+            // The rune before the price - or in its place on a row nothing could price, where
+            // the rune is the one thing the row has to say.
+            if (reward.Runed)
+            {
+                Vector2 measured = ImGui.CalcTextSize(reward.Rune) * scale;
+                var at = new Vector2(left - gap - pad.X - measured.X, row.Top + ((row.Height - measured.Y) * 0.5f));
+                draw.AddRectFilled(at - pad, at + measured + pad, Plate, 3f * scale);
+                if (reward.BestRune)
+                {
+                    draw.AddRect(at - pad, at + measured + pad, Amber, 3f * scale, ImDrawFlags.None, Math.Clamp(2f * scale, 1.5f, 4f));
+                }
+
+                draw.AddText(font, size, at + new Vector2(1f, 1f), Shadow, reward.Rune);
+                draw.AddText(font, size, at, RuneTint(reward.RuneMult), reward.Rune);
+            }
         }
     }
+
+    /// <summary>The colour a rune's name is written in: amber gains, grey is neutral, red costs.</summary>
+    public static uint RuneTint(double mult) => mult > 1 ? Amber : mult < 1 ? Red : Grey;
 
     /// <summary>The colour a price is written in, by the chosen mode.</summary>
     /// <remarks>

@@ -231,6 +231,10 @@ $KnownRows = @(
     @{ Struct = 'Expedition2RecipesRow'; Table = 'Expedition2Recipes'
        Fields = [ordered]@{ IdPtr = 'Id'; MinLevelReq = 'MinLevelReq'; MaxLevelReq = 'MaxLevelReq'
                             RewardRowPtr = 'Reward'; RewardCount = 'RewardCount'; RewardGemLevel = 'RewardGemLevel' } }
+    # The rune a monolith's station anchors on: only the Id is read, but the ROW SIZE is what the
+    # anchor arithmetic divides by (ComputedRowSize 0x68), and this check keeps it honest.
+    @{ Struct = 'Expedition2RunesRow';   Table = 'Expedition2Runes'
+       Fields = [ordered]@{ IdPtr = 'Id' } }
     @{ Struct = 'QuestFlagsRow';         Table = 'QuestFlags'
        Fields = [ordered]@{ Id = 'Id'; Hash32 = 'HASH32' } }
     @{ Struct = 'NpcsRow';               Table = 'NPCs'

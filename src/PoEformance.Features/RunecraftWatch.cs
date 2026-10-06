@@ -2,6 +2,7 @@ using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
 using PoEformance.Core.Schema;
 using PoEformance.Game.Ui;
+using PoEformance.Game.World;
 
 namespace PoEformance.Features;
 
@@ -11,10 +12,28 @@ namespace PoEformance.Features;
 /// <param name="Label">What the game painted on the row.</param>
 /// <param name="Price">What it is worth and which door answered.</param>
 /// <param name="Best">Whether this is the most valuable row on screen (ties all count).</param>
-public sealed record RunecraftReward(ScreenRect Where, ScreenRect? Text, string Label, RunecraftPrice Price, bool Best)
+/// <param name="Rune">
+/// The rune this recipe would drop on the open monolith's gold socket, by name, with
+/// " (taken)" after it when the rune is already in the chain - or empty when the chain is off,
+/// no monolith's panel is open, that monolith frames no socket, or the recipe puts nothing on
+/// a framed one.
+/// </param>
+/// <param name="RuneMult">
+/// That rune's loot multiplier at the open monolith: above 1 gains loot, 1 is neutral or already
+/// in the chain, below 1 costs. The key the amber frame is awarded by - deliberately not the
+/// chain's Exalted, which also scales with the recipe's length and would call a weak rune on a
+/// long combination "the best rune".
+/// </param>
+/// <param name="BestRune">Whether this row's rune is the strongest on the panel (ties all count). Only a rune above 1 qualifies.</param>
+public sealed record RunecraftReward(
+    ScreenRect Where, ScreenRect? Text, string Label, RunecraftPrice Price, bool Best,
+    string Rune = "", double RuneMult = 1, bool BestRune = false)
 {
     /// <summary>The whole reward's worth, or null.</summary>
     public double? Total => Price.Total;
+
+    /// <summary>Whether the row names a rune.</summary>
+    public bool Runed => Rune.Length > 0;
 
     /// <summary>
     /// Whether the row's text element reads as one, inside its row, with a gap's room before it.
@@ -86,9 +105,21 @@ public sealed record RunecraftView(
 ///
 /// IDLE UNLESS OPEN: the whole cost of having it switched on while the panel is shut is the
 /// reader's gate check - two reads and a short visibility walk a tick - see RunecraftPanelReader.
+///
+/// THE RUNE ON EACH ROW comes from the monolith whose panel is open - the one whose station
+/// carries the panel listener - and not from the panel: the gold socket is a position on the
+/// station, and the recipe behind the row says what sits there. So the rows are joined to
+/// <see cref="MonolithsView.Open"/>, handed in by the caller from the monolith watch that runs
+/// in the same pass, and re-resolved whenever that view is a new one.
 /// </remarks>
 public sealed class RunecraftWatch
 {
+    /// <summary>The rune a studied row would propagate, or none.</summary>
+    private readonly record struct RowRune(string Label, double Mult)
+    {
+        public static RowRune None => new(string.Empty, 1);
+    }
+
     /// <summary>How long the studied rows are kept before they are read again.</summary>
     /// <remarks>
     /// A quarter of a second: the offered set changes when the player opens another monolith's
@@ -105,6 +136,7 @@ public sealed class RunecraftWatch
 
     private RunecraftSettings _settings = RunecraftSettings.Default;
     private RewardCatalog _catalog = RewardCatalog.Empty;
+    private RecipeCatalog _recipes = RecipeCatalog.Empty;
     private RunecraftView _view = RunecraftView.Closed;
 
     // The slow half's answers: the rows as last studied, their prices, and what they were
@@ -114,9 +146,17 @@ public sealed class RunecraftWatch
     private List<RunecraftRow> _rows = [];
     private readonly Dictionary<ulong, int> _index = [];
     private RunecraftPrice[] _prices = [];
+    private RowRune[] _runes = [];
     private PriceBook? _pricedWith;
     private RewardCatalog? _pricedFrom;
+    private MonolithView? _runedAt;
+    private RuneChainTable? _runedBy;
     private string _named = string.Empty;
+
+    // The weights compiled against the rune rows, kept while neither half changes.
+    private RuneChainTable _table = RuneChainTable.Off;
+    private RunecraftSettings? _tableSettings;
+    private RecipeCatalog? _tableCatalog;
 
     public RunecraftWatch(
         IMemoryReader reader,
@@ -161,6 +201,17 @@ public sealed class RunecraftWatch
         }
     }
 
+    /// <summary>The install's recipes, for the runes behind each row. Arrives late, like the names.</summary>
+    public RecipeCatalog Recipes
+    {
+        get => Volatile.Read(ref _recipes);
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            Volatile.Write(ref _recipes, value);
+        }
+    }
+
     /// <summary>The newest answer. Never blocks, never null, never partially built.</summary>
     public RunecraftView View => Volatile.Read(ref _view);
 
@@ -174,7 +225,11 @@ public sealed class RunecraftWatch
     private IReadOnlyList<(RunecraftRow Row, RunecraftPrice Price)> _studied = [];
 
     /// <summary>Reads the panel once. Called on the reader thread, in the same pass as a world read.</summary>
-    public void Service(UiScale scale, long nowMs, PriceBook book)
+    /// <param name="scale">The viewport to place the rows in.</param>
+    /// <param name="nowMs">The tick's clock.</param>
+    /// <param name="book">What things are worth.</param>
+    /// <param name="monoliths">The area's monoliths as last scanned, for the one whose panel is open. Null for none.</param>
+    public void Service(UiScale scale, long nowMs, PriceBook book, MonolithsView? monoliths = null)
     {
         ArgumentNullException.ThrowIfNull(book);
 
@@ -188,7 +243,7 @@ public sealed class RunecraftWatch
 
         try
         {
-            Volatile.Write(ref _view, Build(scale, nowMs, book));
+            Volatile.Write(ref _view, Build(scale, nowMs, book, settings, monoliths?.Open));
         }
         catch (Exception exception)
         {
@@ -199,7 +254,7 @@ public sealed class RunecraftWatch
         }
     }
 
-    private RunecraftView Build(UiScale scale, long nowMs, PriceBook book)
+    private RunecraftView Build(UiScale scale, long nowMs, PriceBook book, RunecraftSettings settings, MonolithView? open)
     {
         GameChainAddresses chain = GameChain.Resolve(_reader, _schema, _gameStatesStatic);
         if (chain.UiRoot == 0)
@@ -221,6 +276,8 @@ public sealed class RunecraftWatch
         }
 
         RewardCatalog catalog = Volatile.Read(ref _catalog);
+        RecipeCatalog recipes = Volatile.Read(ref _recipes);
+        RuneChainTable table = TableFor(settings, recipes);
         bool restudy = panel.Container != _studiedContainer
                        || nowMs - _studiedAt >= RestudyMs
                        || nowMs < _studiedAt;
@@ -232,6 +289,11 @@ public sealed class RunecraftWatch
         if (restudy || !ReferenceEquals(book, _pricedWith) || !ReferenceEquals(catalog, _pricedFrom))
         {
             Reprice(book, catalog);
+        }
+
+        if (restudy || !ReferenceEquals(open, _runedAt) || !ReferenceEquals(table, _runedBy))
+        {
+            Rerune(table, recipes, open);
         }
 
         if (_rows.Count == 0)
@@ -279,6 +341,64 @@ public sealed class RunecraftWatch
         Volatile.Write(ref _studied, studied);
     }
 
+    /// <summary>The weights compiled against this catalogue's runes, rebuilt only when either changes.</summary>
+    private RuneChainTable TableFor(RunecraftSettings settings, RecipeCatalog recipes)
+    {
+        if (!ReferenceEquals(settings, _tableSettings) || !ReferenceEquals(recipes, _tableCatalog))
+        {
+            _table = RuneChainTable.Build(settings, recipes);
+            _tableSettings = settings;
+            _tableCatalog = recipes;
+        }
+
+        return _table;
+    }
+
+    /// <summary>
+    /// The rune each studied row would propagate on the open monolith, and how good it is there.
+    /// </summary>
+    /// <remarks>
+    /// Nothing on a monolith the game frames no socket on (modes 0 and 3), nothing while no
+    /// panel is open, nothing for a row whose recipe did not resolve. A rune already in the chain
+    /// reads as neutral - taking it again adds nothing - and is called "(taken)" only when it
+    /// would otherwise have been worth something: a neutral rune is duplicated all over a map,
+    /// and flagging it would be noise on a row that was never a candidate.
+    /// </remarks>
+    private void Rerune(RuneChainTable table, RecipeCatalog recipes, MonolithView? open)
+    {
+        var runes = new RowRune[_rows.Count];
+        bool any = table.Enabled && open is not null
+                   && open.Station.FramesASocket && open.Station.GlowSockets.Count > 0;
+        if (any)
+        {
+            MonolithStation station = open!.Station;
+            ChainSite site = open.Site;
+            for (int i = 0; i < _rows.Count; i++)
+            {
+                RuneshapeRecipe? recipe = recipes.ById(_rows[i].RecipeId);
+                int rune = recipe is null ? -1 : table.Propagated(site, station.GlowSockets, recipe.Runes, station.Empowered);
+                if (rune < 0)
+                {
+                    runes[i] = RowRune.None;
+                    continue;
+                }
+
+                bool taken = site.Taken(rune) && table.EffMult(rune, station.Empowered) > 1;
+                runes[i] = new RowRune(
+                    taken ? table.Name(rune) + " (taken)" : table.Name(rune),
+                    table.EffMultAt(site, rune, station.Empowered));
+            }
+        }
+        else
+        {
+            Array.Fill(runes, RowRune.None);
+        }
+
+        _runes = runes;
+        _runedAt = open;
+        _runedBy = table;
+    }
+
     /// <summary>The fast half joined to the slow one: each placed row with its price.</summary>
     private RunecraftView Compose(List<RunecraftPlace> placed, ScreenRect? viewport)
     {
@@ -300,6 +420,19 @@ public sealed class RunecraftWatch
             }
         }
 
+        // The strongest rune over the full studied set, by multiplier; only a rune that gains
+        // loot qualifies, so a panel whose one propagatable rune is Wisdom frames nothing.
+        double bestRune = 1;
+        var runed = 0;
+        foreach (RowRune rune in _runes)
+        {
+            if (rune.Label.Length > 0)
+            {
+                runed++;
+                bestRune = Math.Max(bestRune, rune.Mult);
+            }
+        }
+
         var rewards = new List<RunecraftReward>(placed.Count);
         foreach (RunecraftPlace place in placed)
         {
@@ -310,7 +443,10 @@ public sealed class RunecraftWatch
 
             RunecraftPrice price = _prices[at];
             bool top = price.Total is { } total && priced > 0 && total >= best;
-            rewards.Add(new RunecraftReward(place.Where, place.Text, _rows[at].Label, price, top));
+            RowRune rune = at < _runes.Length ? _runes[at] : RowRune.None;
+            rewards.Add(new RunecraftReward(
+                place.Where, place.Text, _rows[at].Label, price, top,
+                rune.Label, rune.Mult, rune.Label.Length > 0 && bestRune > 1 && rune.Mult >= bestRune));
         }
 
         return new RunecraftView(
@@ -320,7 +456,7 @@ public sealed class RunecraftWatch
             RunecraftPrices.Median(totals),
             priced,
             _prices.Length - priced,
-            $"panel open: {_rows.Count} rows, {priced} priced",
+            $"panel open: {_rows.Count} rows, {priced} priced" + (runed > 0 ? $", {runed} with a rune" : string.Empty),
             _named);
     }
 
@@ -334,8 +470,11 @@ public sealed class RunecraftWatch
         _rows = [];
         _index.Clear();
         _prices = [];
+        _runes = [];
         _pricedWith = null;
         _pricedFrom = null;
+        _runedAt = null;
+        _runedBy = null;
         _studiedContainer = 0;
         Volatile.Write(ref _studied, []);
     }

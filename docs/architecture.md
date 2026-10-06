@@ -3831,10 +3831,90 @@ only the price is added. What the port kept, what it changed, and why:
   then moves the price, not somewhere unrelated, and the tab says which anchor it used. The best
   row's frame is the row's own rectangle, icons to edge, because a list is read by rows and a
   ring round one figure is found only after the figure has been read.
-- **Not ported, by decision:** the plugin's monolith labels on the large map, its rune-chain
-  valuation and its expedition route planner. They are a different feature several times this
-  size, resting on monolith station offsets this tool has not measured, and a port of them would
-  be a guess at every one.
+- **Every monolith in the area is priced before the panel is opened on it.** A monolith is an
+  ordinary entity (the `Expedition2Encounter` device, whose MinimapIcon the game flips from
+  `Expedition2RemnantActive` to `Expedition2RemnantDeactivated` once it is collected — the
+  tool's "collected" signal, where the plugin inferred it from a state reaching 7), and its
+  interesting half is a `RuneStation` that is NOT a component. The station registers itself as
+  a listener on the device's `StateMachine`, so the way back to it is `StateMachine.ListenerVec`:
+  each node points into the station at a fixed offset and the station names its device at
+  another — the plugin's route (docs 6.10), with no heap scan and working outside the network
+  bubble. `MonolithReader` reads the station's hole count, anchor rune (arithmetic over the
+  per-area rune table, re-read every time because a base cached across areas goes negative),
+  anchor hole, gold sockets, recipe mode, empowerment, the committed recipe and the panel-open
+  listener, each checked by content so a drifted offset reads as a sentence on the tab. The
+  recipes it can roll are then RECOMPUTED by the game's own offer rule (`MonolithOffers`,
+  decoded by the plugin from the client's offer builder: the anchor rune at the anchor hole,
+  size at most the holes, the level band, and a shorter recipe only where
+  `Expedition2RunesWeights` permits it) against `RecipeCatalog` — Expedition2Recipes, Runes and
+  RunesWeights read out of the INSTALL rather than the plugin's shipped dump, which went stale
+  the patch a recipe was added. The best offer is written at the monolith on whichever map is
+  open, holes first ("[5] 49 ex"), tinted against the best on screen rather than the median
+  because the price distribution is bimodal; the tab lists every monolith with its offers and
+  what the station walk read or could not. Every station offset is the plugin's 0.5.5
+  measurement and unseen by this tool: the first expedition with the tab up is the confirmation.
+- **The rune a recipe propagates is valued beside its reward.** A remnant picks which rune
+  SLOT propagates to the monsters unearthed by the explosive placed on it and by every later one,
+  and the panel frames that slot in gold (the 0.5.4 notes); buffing those monsters raises their
+  drops, so the propagated rune is worth currency. The socket is a POSITION on the station
+  (`RuneStation.GlowSockets`), known before anybody picks, so the rune every offered recipe
+  would propagate is its rune at that hole — which is what lets the tool RECOMMEND a recipe.
+  `RuneChain` is the plugin's model: `chainEx = baseEx × packsStillBuffed × (effMult − 1)`,
+  with the multipliers calibrated rather than read (they are server-side; the defaults follow
+  the community tier list and the tab's table re-tunes them, as a multiplier or as the Exalted
+  one wave gains), Power multiplying every other rune's uplift by a fixed 1.5 and read live off
+  the station's empowered byte, and "modifiers of the same type no longer stack" as a bit per
+  rune: a rune committed on any monolith is dead everywhere, one expected from an earlier
+  monolith on the plan is dead downstream — which changes the recommendation, not just the
+  figure. `RuneChainPlan` is the area-wide second pass `MonolithWatch` runs after the stations
+  are read: what is committed, then forwards along the planner's order (Power upstream, runes
+  already in) and backwards (waves still ahead, the uplift a Power would multiply), each
+  monolith's expectation from the previous scan so a fresh area converges over a few. Without
+  an order the packs ahead are every other live monolith's waves, an upper bound the plugin
+  measured far closer than its first count of one wave per charge. Each monolith's offers are
+  then ordered by reward PLUS chain — a joint maximum, since the player picks one recipe —
+  while the panel keeps two separate calls: the green frame on the dearest reward, an amber
+  ring round the rune plate on the strongest rune, the rune named before the price in its
+  class colour. `RunecraftWatch` joins the rows to the monolith whose station carries the panel
+  listener, handed in from the monolith watch that runs in the same pass. On the map the
+  committed rune replaces the price on a monolith whose player gave up reward for it and
+  joins it on one sealed by a reroll; scouting writes the best few runes a monolith could
+  still propagate above its price.
+- **The route planner** rests on everything above and supplies the detonation order the chain
+  plan takes. `ExpeditionReader` (Game) reads what the plan needs off the game, every offset the
+  plugin's and none yet seen here: the charge counts from the controller the ServerData holds
+  (its slot, then the slot it used to be in, then a window scan, each believed only when the
+  type id and the back-pointer to the ServerData both hold), the HUD counter's remaining text as
+  the fallback and the manual total as the last, the map's placement and radius modifiers as
+  stat-key pairs off `AreaInstance.MapMods`, the detonator's `activated` state, a blocker's shut
+  flag and a relic's mod ids. `ExpeditionWatch` (Features) owns the area on the reader thread:
+  a target cache that ACCUMULATES — the game stops listing a flag the player walks away from,
+  and a route recomputed on every such change would be a different route every few seconds —
+  and a fingerprint over the cache and the knobs that decides when the plan is stale; movement
+  alone never re-plans. A run only raises a flag; the next service snapshots the inputs and hands
+  them to a task, and a later service takes the result up, discarding one made for a previous
+  area. Monoliths join by entity id from the chain-valued view (joint value, holes, expected
+  waves, and an order-independent "strongest uplift it could propagate" for the reorder);
+  markers weigh by the reward icon on a Grand expedition and by POLE HEIGHT on a normal one — the
+  game fixes each tier's pole, so the modal height is the tiny swarm and taller is better.
+  Grand physics (108 cells placement, 37 blast) against normal (90, 30) is decided by the
+  logbook area id, else by a confirmed total of ten or more; unconfirmed reads as normal because
+  that never proposes a point the game refuses.
+  `ExpeditionPaths` is the planner's pathfinder over the terrain grid: a bounded A\* for "within
+  one hop", the full length with a component-label short-circuit for the unreachable, a memo
+  keyed on both endpoints that the tour matrix fills in parallel, and the doorways a shut gate
+  opens or a "Door" entity marks. `ExpeditionPlanner` is the plugin's spine planner in order: a
+  nearest-neighbour tour over walkable distances improved by 2-opt; the chain's re-scoring of it
+  (`J = baseEx × Σ waves × cumulative uplift + rewards − 8 ex per charge`, over the part the
+  budget affords — without that truncation a saturated plan scored every order the same and the
+  reorder switched itself off where it mattered); the Sentinel pinned first; the ordered anchors
+  rasterised into one dense polyline; the forward sweep that sets each charge past its anchor
+  toward the next, merges a bridge onto an adjacent reward when that costs nothing and lays
+  stepping stones where a hop will not reach; then the spares, each spent on the uncovered
+  cluster worth most per charge counting the bridges out and the reconnect back, rolled back
+  whole when it cannot complete. The result is drawn as numbered charges with blast rings on the
+  map, the next one ringed in the world, and the whole decision trace on the tab — and to a file
+  on request, which is how a wrong plan gets diagnosed without the game.
 
 ### The trade site — the uniques poe.ninja has nothing on
 
