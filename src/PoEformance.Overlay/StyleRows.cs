@@ -140,6 +140,7 @@ public sealed class StyleRows
             ImGui.TableSetupColumn("##size");
             ImGui.TableSetupColumn("##reset");
 
+            var first = true;
             foreach (string group in _groups)
             {
                 IGrouping<string, StyleEntry>? entries =
@@ -153,15 +154,33 @@ public sealed class StyleRows
                 // they are spread over four tabs, and a fold over three rows is a click to
                 // reveal what would have fitted anyway. Only when there are several: one group
                 // is named by the tab it is on.
+                //
+                // In the label face, with a blank row before every group but the first - the
+                // same air and the same size a Group gets outside a table, so the styles page
+                // reads like the other pages rather than as one long list with names in it.
                 if (_groups.Length > 1)
                 {
+                    if (!first)
+                    {
+                        ImGui.TableNextRow(ImGuiTableRowFlags.None, ImGui.GetTextLineHeight());
+                    }
+
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
                     ImGui.TableNextColumn();
                     ImGui.TableNextColumn();
-                    ImGui.TextColored(OverlayInk.Accent, group);
+                    OverlayFonts.PushLabel();
+                    try
+                    {
+                        ImGui.TextColored(OverlayInk.Accent, group);
+                    }
+                    finally
+                    {
+                        OverlayFonts.PopLabel();
+                    }
                 }
 
+                first = false;
                 foreach (StyleEntry entry in entries)
                 {
                     DrawRow(entry);

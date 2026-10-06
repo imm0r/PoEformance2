@@ -318,12 +318,18 @@ public static class OverlayLayout
     /// wash of the warm ray behind the whole line, and one pixel of size, is enough to see the
     /// title as a lid on the block under it; the rule stays, because the band's bottom edge is
     /// soft and the rule is what the eye runs along.
+    ///
+    /// AND A BLANK LINE BEFORE IT, on every page. The air between one block's last control and
+    /// the next block's title was first added by hand on the expedition tab, one call after each
+    /// group - which is one call every other page would have to remember. Opening with the gap
+    /// here means no page can forget it, at the price of a line of air over the first group of
+    /// a page, which the pages can afford.
     /// </remarks>
     public static void Group(string title, string? hint = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(title);
 
-        ImGui.Spacing();
+        Gap();
         OverlayFonts.PushLabel();
         try
         {
@@ -371,10 +377,12 @@ public static class OverlayLayout
 
     /// <summary>A blank line between two blocks, where one ends and the next begins.</summary>
     /// <remarks>
-    /// THE AIR BETWEEN GROUPS. <see cref="Group"/> opens with a title and a rule but closes with
-    /// nothing: its last control sits one item-space above the next title, and a page of six
-    /// groups reads as one long list with headings dropped into it. One text line of nothing
-    /// is enough to see six blocks instead - and it is one call, so every page breathes alike.
+    /// THE AIR BETWEEN GROUPS. <see cref="Group"/> used to open with a single item-space, so
+    /// its title sat one row under the last control of the block before it, and a page of six
+    /// groups read as one long list with headings dropped into it. One text line of nothing is
+    /// enough to see six blocks instead. Every <see cref="Group"/> now opens with one, so no page
+    /// has to remember it; this is public for the places that are not groups and still want the
+    /// air - a fold after a table, a tab bar after a block of state.
     /// </remarks>
     public static void Gap() => ImGui.Dummy(new Vector2(0f, ImGui.GetTextLineHeight()));
 
