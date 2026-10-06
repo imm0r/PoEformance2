@@ -46,10 +46,17 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 /// <c>shaders/renderer/nodes/utilitynodes.ffx</c> writes it - <c>Power</c> is
 /// <c>pow(max(abs(base), 1e-7), exp)</c>, <c>Divide</c> gives nought for a nought divisor,
 /// <c>SmoothStep</c> is the node's own curve and not HLSL's. A graph whose colour depends on
-/// anything else - MaskedContactFade, Noise31, a vertex colour this reader does not have - is left
-/// out whole and NAMED, and the colour stays what the graphs before it made it. A material none of
+/// anything else - MaskedContactFade, the depth behind a pixel, a vertex colour this reader does not
+/// have - is left out whole and NAMED, and the colour stays what the graphs before it made it. A material none of
 /// whose graphs could be evaluated has no program, and is drawn exactly as it was before graphs
 /// were read.
+///
+/// WHERE THE MODEL STANDS. A model is drawn where its own space puts it - at the origin, unturned
+/// and unscaled - so its space is the world's: <c>WorldPos</c> and <c>FromVertexWorldPos</c> are
+/// its positions, <c>FromVertexNormal</c> its normals, and <c>ModelOrigin</c> the origin with a
+/// scale of one. In the game the same tile stands somewhere else, and a pattern laid in world space
+/// lies elsewhere on it; it is the same pattern. This is a choice about how the picture is placed,
+/// made on purpose and said here, not a claim about the engine.
 ///
 /// A FLOAT IS ONE NUMBER IN ALL FOUR COMPONENTS, as HLSL widens one: a scalar node's result is
 /// its first component spread across the register, which is also what HLSL does to a vector handed
@@ -149,7 +156,8 @@ public sealed class ShadeProgram
             "GreaterThan", "LessThan", "EqualsUInt", "GreaterThanUInt", "LessThanUInt", "And", "Or", "Not",
             "Float2ToCoords", "Float3ToCoords", "Float4ToCoords", "CoordsToFloat2", "CoordsToFloat3", "CoordsToFloat4",
             "SampleTexture", "SampleInputTexture", "SampleInputTextureLod", "SampleInputTriplanar",
-            "FromVertexNormal", "GroundScroll", "Transform",
+            "FromVertexNormal", "FromVertexWorldPos", "ModelOrigin", "GroundScroll", "Transform",
+            "Noise31", "PerlinNoise31", "Vibrance", "Rotate", "RotateUV", "RadiusToPolarNorm",
         ],
         StringComparer.Ordinal);
 
@@ -233,6 +241,10 @@ public sealed class ShadeProgram
         Compare,
         Pick,
         HueTurn,
+        Noise,
+        Vibrance,
+        Rotate,
+        Polar,
         RemapHue,
         Triplanar,
         Sample,
@@ -768,6 +780,25 @@ public sealed class ShadeProgram
                     r[step.To] = Remapped(r[step.A], r[step.B]);
                     break;
 
+                case Op.Noise:
+                {
+                    var at = new Vector3(r[step.A].X, r[step.A].Y, r[step.A].Z);
+                    r[step.To] = new Vector4(step.Extra == 0 ? ValueNoise(at) : PerlinNoise(at));
+                    break;
+                }
+
+                case Op.Vibrance:
+                    r[step.To] = Vibrant(r[step.A].X, r[step.B]);
+                    break;
+
+                case Op.Rotate:
+                    r[step.To] = Rotated(r[step.A].X, r[step.B], step.C >= 0 ? r[step.C] : Vector4.Zero);
+                    break;
+
+                case Op.Polar:
+                    r[step.To] = Polar(r[step.A]);
+                    break;
+
                 case Op.Triplanar:
                     r[step.To] = Triplanar(r[step.A], r[step.B], r[step.C], r[step.D]);
                     break;
@@ -1166,6 +1197,116 @@ public sealed class ShadeProgram
         return new Vector4(said, 0f);
     }
 
+    /// <summary>Noise31: <c>vnoise31</c> from the <c>noises</c> declarations - value noise over <c>hash33</c>, smoothed.</summary>
+    /// <remarks>
+    /// THE X ALONE is kept of every corner's hash: the node ends in <c>.x</c>, and every lerp before it
+    /// works component by component, so the other two never reach it.
+    /// </remarks>
+    private static float ValueNoise(Vector3 x)
+    {
+        var p = new Vector3(MathF.Floor(x.X), MathF.Floor(x.Y), MathF.Floor(x.Z));
+        Vector3 f = x - p;
+        f = f * f * (new Vector3(3f) - (2f * f));
+        float Lerp(float a, float b, float t) => a + (t * (b - a));
+        float Corner(float dx, float dy, float dz) => Hash33X(p + new Vector3(dx, dy, dz));
+        return Lerp(
+            Lerp(Lerp(Corner(0f, 0f, 0f), Corner(1f, 0f, 0f), f.X), Lerp(Corner(0f, 1f, 0f), Corner(1f, 1f, 0f), f.X), f.Y),
+            Lerp(Lerp(Corner(0f, 0f, 1f), Corner(1f, 0f, 1f), f.X), Lerp(Corner(0f, 1f, 1f), Corner(1f, 1f, 1f), f.X), f.Y),
+            f.Z);
+    }
+
+    /// <summary>The x of <c>hash33</c>: <c>frac((p3.x + p3.y) * p3.z)</c> once p3 is scrambled as the declaration does.</summary>
+    private static float Hash33X(Vector3 p3)
+    {
+        p3 *= new Vector3(0.1031f, 0.1030f, 0.0973f);
+        p3 -= new Vector3(MathF.Floor(p3.X), MathF.Floor(p3.Y), MathF.Floor(p3.Z));
+        float d = (p3.X * (p3.Y + 19.19f)) + (p3.Y * (p3.X + 19.19f)) + (p3.Z * (p3.Z + 19.19f));
+        p3 += new Vector3(d);
+        float h = (p3.X + p3.Y) * p3.Z;
+        return h - MathF.Floor(h);
+    }
+
+    /// <summary>PerlinNoise31: the x of <c>GetPerlinNoise3</c> - gradients from <c>hash33UintPcg</c> on the cell, in the declaration's order.</summary>
+    private static float PerlinNoise(Vector3 pos)
+    {
+        int bx = (int)MathF.Floor(pos.X), by = (int)MathF.Floor(pos.Y), bz = (int)MathF.Floor(pos.Z);
+        Vector3 ratio = pos - new Vector3(MathF.Floor(pos.X), MathF.Floor(pos.Y), MathF.Floor(pos.Z));
+        Vector3 r2 = ratio * ratio;
+        Vector3 r3 = r2 * ratio;
+        ratio = (3f * r2) - (2f * r3);
+        float ix = 1f - ratio.X, iy = 1f - ratio.Y, iz = 1f - ratio.Z;
+
+        float res = 0f;
+        res += Gradient(bx, by, bz, pos) * ix * iy * iz;
+        res += Gradient(bx + 1, by, bz, pos) * ratio.X * iy * iz;
+        res += Gradient(bx + 1, by + 1, bz, pos) * ratio.X * ratio.Y * iz;
+        res += Gradient(bx, by + 1, bz, pos) * ix * ratio.Y * iz;
+        res += Gradient(bx, by, bz + 1, pos) * ix * iy * ratio.Z;
+        res += Gradient(bx + 1, by, bz + 1, pos) * ratio.X * iy * ratio.Z;
+        res += Gradient(bx + 1, by + 1, bz + 1, pos) * ratio.X * ratio.Y * ratio.Z;
+        res += Gradient(bx, by + 1, bz + 1, pos) * ix * ratio.Y * ratio.Z;
+
+        // GetPerlinNoiseRange(3) is sqrt(3) / 2.
+        return (res / (MathF.Sqrt(3f) / 2f) * 0.5f) + 0.5f;
+    }
+
+    /// <summary>The x of <c>GetGradientSample</c>: the offset from the cell along its hashed, normalised gradient.</summary>
+    private static float Gradient(int cx, int cy, int cz, Vector3 pos)
+    {
+        (uint hx, uint hy, uint hz) = Pcg(unchecked((uint)cx), unchecked((uint)cy), unchecked((uint)cz));
+        var grad = new Vector3(HashUnit(hx) - 0.5f, HashUnit(hy) - 0.5f, HashUnit(hz) - 0.5f);
+        grad /= MathF.Sqrt(Vector3.Dot(grad, grad));
+        return Vector3.Dot(pos - new Vector3(cx, cy, cz), grad);
+    }
+
+    /// <summary><c>hash33UintPcg</c>, from the <c>hashes</c> declarations: integer arithmetic, so the same to the bit.</summary>
+    private static (uint X, uint Y, uint Z) Pcg(uint x, uint y, uint z)
+    {
+        unchecked
+        {
+            x = (x * 1664525u) + 1013904223u;
+            y = (y * 1664525u) + 1013904223u;
+            z = (z * 1664525u) + 1013904223u;
+            x += y * z;
+            y += z * x;
+            z += x * y;
+            x ^= x >> 16;
+            y ^= y >> 16;
+            z ^= z >> 16;
+            x += y * z;
+            y += z * x;
+            z += x * y;
+            return (x, y, z);
+        }
+    }
+
+    /// <summary><c>HashUToF</c>: 23 bits of a hash as a float in [0, 1).</summary>
+    private static float HashUnit(uint hash) => Saturated(BitConverter.Int32BitsToSingle(unchecked((int)((hash >> 9) | 0x3f800000u))) - 1f);
+
+    /// <summary>Vibrance: <c>pow(saturate(3v² - 2v³), 1 / (color + 1e-6))</c>, component by component of the colour.</summary>
+    private static Vector4 Vibrant(float value, Vector4 colour)
+    {
+        float lift = Saturated((3f * value * value) - (2f * value * value * value));
+        return new Vector4(
+            Pow(lift, 1f / (colour.X + 1e-6f)), Pow(lift, 1f / (colour.Y + 1e-6f)), Pow(lift, 1f / (colour.Z + 1e-6f)), 0f);
+    }
+
+    /// <summary>Rotate and RotateUV: the coordinates turned by the angle about a centre - nought for Rotate.</summary>
+    private static Vector4 Rotated(float angle, Vector4 uv, Vector4 centre)
+    {
+        (float sin, float cos) = MathF.SinCos(angle);
+        float u = uv.X - centre.X;
+        float v = uv.Y - centre.Y;
+        return new Vector4((cos * u) + (sin * v) + centre.X, (-sin * u) + (cos * v) + centre.Y, 0f, 0f);
+    }
+
+    /// <summary>RadiusToPolarNorm: the length, and the angle as nought to one - by the node's own 3.1415.</summary>
+    private static Vector4 Polar(Vector4 radius)
+    {
+        float length = MathF.Sqrt((radius.X * radius.X) + (radius.Y * radius.Y));
+        return new Vector4(length, (MathF.Atan2(radius.Y / length, radius.X / length) / 3.1415f * 0.5f) + 0.5f, 0f, 0f);
+    }
+
     /// <summary>SampleInputTriplanar's blend of its three reads, weighted by the normal's squared components.</summary>
     private static Vector4 Triplanar(Vector4 alongX, Vector4 alongY, Vector4 alongZ, Vector4 normal)
     {
@@ -1228,32 +1369,32 @@ public sealed class ShadeProgram
     };
 
     /// <summary>
-    /// The component a node's named scalar output is, for the nodes that have several; else -1.
+    /// The components of its register a node's named output is, for the nodes with several outputs; else empty.
     /// </summary>
     /// <remarks>
-    /// A LINK NAMES ITS PORT, and for these the port is the component: <c>Float3ToCoords</c>'s
-    /// <c>y</c> is its input's y, <c>SampleTexture</c>'s <c>g</c> its read's green. Read as the whole
-    /// register, a link from <c>.y</c> would hand on x, y and z.
+    /// A LINK NAMES ITS PORT, and for these the port is part of one register: <c>Float3ToCoords</c>'s
+    /// <c>y</c> is its input's y, <c>SampleTexture</c>'s <c>g</c> its read's green, <c>ModelOrigin</c>'s
+    /// <c>model_origin</c> the xyz and its <c>scale</c> the w. Read as the whole register, a link from
+    /// <c>.y</c> would hand on x, y and z.
     /// </remarks>
-    private static int Implied(string type, string variable) => type switch
+    private static string Implied(string type, string variable) => type switch
     {
-        "Float2ToCoords" or "Float3ToCoords" or "Float4ToCoords" => variable switch
-        {
-            "x" => 0,
-            "y" => 1,
-            "z" => 2,
-            "w" => 3,
-            _ => -1,
-        },
+        "Float2ToCoords" or "Float3ToCoords" or "Float4ToCoords" => variable is "x" or "y" or "z" or "w" ? variable : string.Empty,
         "SampleTexture" => variable switch
         {
-            "r" => 0,
-            "g" => 1,
-            "b" => 2,
-            "a" => 3,
-            _ => -1,
+            "r" => "x",
+            "g" => "y",
+            "b" => "z",
+            "a" => "w",
+            _ => string.Empty,
         },
-        _ => -1,
+        "ModelOrigin" => variable switch
+        {
+            "model_origin" => "xyz",
+            "scale" => "w",
+            _ => string.Empty,
+        },
+        _ => string.Empty,
     };
 
     /// <summary>A graph's file name without its folder or extension, for the line under the picture.</summary>
@@ -1563,10 +1704,11 @@ public sealed class ShadeProgram
         /// The register a link brings, with what it may be used for checked.
         /// </summary>
         /// <remarks>
-        /// THREE THINGS ARE REFUSED HERE. A component of a channel nobody has set - the indirect
-        /// light's w before any graph wrote it. The TBN basis anywhere but where a matrix goes. And
-        /// the basis's normal anywhere its length would matter: the engine builds the basis from the
-        /// interpolated normal, and whether it normalises it on the way is not written down.
+        /// THREE THINGS ARE REFUSED HERE. A component nothing has set - the indirect light's w before
+        /// any graph wrote it, the vertex world position's w, which no file says. The TBN basis
+        /// anywhere but where a matrix goes. And the basis's normal anywhere its length would matter:
+        /// the engine builds the basis from the interpolated normal, and whether it normalises it on
+        /// the way is not written down.
         /// </remarks>
         private int? Brought(ShaderNode node, string port, ShaderEnd source, string swizzle)
         {
@@ -1576,6 +1718,11 @@ public sealed class ShadeProgram
                 && (Mask(swizzle) & held.Unset) != 0)
             {
                 return Fail($"{reader.Type}'s {Letters(Mask(swizzle) & held.Unset)} before any graph set it");
+            }
+
+            if (lookup.Node(source) is { Type: "FromVertexWorldPos" } && (Mask(swizzle) & 0b1000) != 0)
+            {
+                return Fail("FromVertexWorldPos's w, which no file says");
             }
 
             if (Output(source) is not { } register)
@@ -1596,21 +1743,32 @@ public sealed class ShadeProgram
             return register;
         }
 
-        /// <summary>A link's source swizzle, with the component a scalar output names put in; null where it cannot be.</summary>
+        /// <summary>A link's source swizzle, with the components a named output is put in; null where it cannot be.</summary>
+        /// <remarks>
+        /// THE LINK'S OWN SWIZZLE IS OF THE OUTPUT, not of the register behind it: <c>model_origin.y</c>
+        /// is the register's y, <c>scale.x</c> its w. A letter past the output's width is no swizzle of it.
+        /// </remarks>
         private string? Swizzled(ShaderEnd end)
         {
-            int implied = lookup.Node(end) is { } source ? Implied(source.Type, end.Variable) : -1;
-            if (implied < 0)
+            string implied = lookup.Node(end) is { } source ? Implied(source.Type, end.Variable) : string.Empty;
+            if (implied.Length == 0 || end.Swizzle.Length == 0)
             {
-                return end.Swizzle;
+                return implied.Length == 0 ? end.Swizzle : implied;
             }
 
-            if (end.Swizzle.Any(one => Component(one) != 0))
+            var said = new char[end.Swizzle.Length];
+            for (var at = 0; at < said.Length; at++)
             {
-                return null;
+                int part = Component(end.Swizzle[at]);
+                if (part < 0 || part >= implied.Length)
+                {
+                    return null;
+                }
+
+                said[at] = implied[part];
             }
 
-            return new string("xyzw"[implied], Math.Max(1, end.Swizzle.Length));
+            return new string(said);
         }
 
         /// <summary>The register holding a node's output.</summary>
@@ -2010,9 +2168,46 @@ public sealed class ShadeProgram
                     return Triplanar(node);
 
                 // semanticsData.normal: the vertex normal as interpolated, in the model's space - the
-                // world's, for a tile drawn where it stands.
+                // world's, for a model drawn where it stands (see the class's remarks).
                 case "FromVertexNormal":
                     return VertexNormal;
+
+                // semanticsData.world_pos, the vertex position as interpolated - the model's, drawn where
+                // it stands. Its w is refused in Brought.
+                case "FromVertexWorldPos":
+                    return Position;
+
+                // The model's origin, and how much its transform stretches x: nought and one for a model
+                // drawn where it stands. One register, the outputs parts of it - see Implied.
+                case "ModelOrigin":
+                    return build.Constant(new Vector4(0f, 0f, 0f, 1f));
+
+                case "Noise31":
+                    return Single(node) is { } noised ? build.Emit(Op.Noise, noised, extra: 0) : null;
+
+                case "PerlinNoise31":
+                    return Single(node) is { } perlin ? build.Emit(Op.Noise, perlin, extra: 1) : null;
+
+                case "Vibrance":
+                    return Port(node, "val") is { } vibrance && Port(node, "color") is { } vivid
+                        ? build.Emit(Op.Vibrance, vibrance, vivid)
+                        : null;
+
+                case "Rotate":
+                    return Port(node, "angle") is { } angle && Port(node, "in_uv") is { } swung
+                        ? build.Emit(Op.Rotate, angle, swung)
+                        : null;
+
+                // ITS CENTRE IS A PARAMETER whose default is a half, not nought - so left out, it is refused.
+                case "RotateUV":
+                    return Port(node, "angle") is { } spin && Port(node, "in_uv") is { } spun
+                        ? Parameter(node, 0).Numbers is { Length: > 0 } centre
+                            ? build.Emit(Op.Rotate, spin, spun, build.Constant(Vectored(centre)))
+                            : Fail("RotateUV leaving out a value whose default is not nought")
+                        : null;
+
+                case "RadiusToPolarNorm":
+                    return Single(node) is { } radius ? build.Emit(Op.Polar, radius) : null;
 
                 // in_position.xy + ground_scalemove_uv.zw, where that shift is the engine's, set for the
                 // whole scene and in no file. It moves where a pattern lies, not what it looks like, so
