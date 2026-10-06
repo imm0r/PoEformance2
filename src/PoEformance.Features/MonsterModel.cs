@@ -282,6 +282,9 @@ public sealed record MonsterModel(
     /// <summary>The tileset a tile was drawn as, or empty for the tile's own materials.</summary>
     public string Tileset { get; init; } = string.Empty;
 
+    /// <summary>How a tile was turned to match the way the current area laid it, in words, or empty for the file's own orientation.</summary>
+    public string Laid { get; init; } = string.Empty;
+
     /// <summary>
     /// Each shape's colour as its material's shader graphs compute it, or null where the plain texture stands.
     /// </summary>

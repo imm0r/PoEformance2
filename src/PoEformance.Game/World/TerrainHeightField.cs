@@ -51,8 +51,7 @@ public sealed class TerrainHeightField
     private readonly byte[] _rotation;
     private readonly int[] _subIndex;
     private readonly byte[][] _subHeights;
-    private readonly byte[] _selectorTable;
-    private readonly byte[] _helperTable;
+    private readonly TileOrientation[] _orientations;
 
     private TerrainHeightField(
         float[] tileBase, int tilesX, int tilesY,
@@ -65,8 +64,12 @@ public sealed class TerrainHeightField
         _rotation = rotation ?? [];
         _subIndex = subIndex ?? [];
         _subHeights = subHeights ?? [];
-        _selectorTable = selectorTable ?? [];
-        _helperTable = helperTable ?? [];
+
+        // Decoded once for every selector a byte can hold, so a cell's lookup is an array read
+        // rather than two table walks - the same decode the tile book turns models with.
+        _orientations = selectorTable is { Length: >= 9 } && helperTable is { Length: >= 27 }
+            ? TileOrientation.Table(selectorTable, helperTable)
+            : [];
     }
 
     public int TilesX { get; }
@@ -74,7 +77,7 @@ public sealed class TerrainHeightField
     public int TilesY { get; }
 
     /// <summary>True when the within-tile slope is included, not just the tile's level.</summary>
-    public bool HasSubTile => _subIndex.Length > 0 && _selectorTable.Length >= 9 && _helperTable.Length >= 27;
+    public bool HasSubTile => _subIndex.Length > 0 && _orientations.Length > 0;
 
     /// <summary>Tile levels only - the coarse field, and what a failed sub-tile read leaves.</summary>
     public static TerrainHeightField Tiles(float[] tileHeights, int tilesX, int tilesY)
@@ -120,57 +123,16 @@ public sealed class TerrainHeightField
 
         int inTileX = Math.Clamp(cellX, 0, (TilesX * Cells) - 1) % Cells;
         int inTileY = Math.Clamp(cellY, 0, (TilesY * Cells) - 1) % Cells;
-        int index = RotatedIndex(_rotation[tile], inTileX, inTileY);
+        int index = _orientations[_rotation[tile]].TemplateIndex(inTileX, inTileY, Cells);
 
         return index < 0 ? height : height + (SubHeight(_subHeights[which], index) * HeightScale);
     }
 
-    /// <summary>
-    /// Turns a position inside a tile into an index into that tile's height array.
-    /// </summary>
-    /// <remarks>
-    /// Tiles are placed rotated and mirrored, and the height array is stored once per tile
-    /// TEMPLATE, so reading it needs the position transformed back into the template's own
-    /// orientation. The two tables that describe the transform are engine data found by
-    /// pattern scan, not constants - which is why an unresolved scan leaves the field
-    /// tile-only rather than guessing at an orientation.
-    /// </remarks>
-    private int RotatedIndex(byte selector, int inTileX, int inTileY)
-    {
-        int rotation = selector < _selectorTable.Length ? _selectorTable[selector] * 3 : 24;
-        if (rotation > 24)
-        {
-            rotation = 24;
-        }
-
-        if (rotation + 2 >= _helperTable.Length)
-        {
-            return -1;
-        }
-
-        // The four candidate coordinates: each axis either straight or mirrored.
-        Span<int> candidates =
-        [
-            Cells - inTileX - 1,
-            inTileX,
-            Cells - inTileY - 1,
-            inTileY,
-        ];
-
-        int rx0 = _helperTable[rotation];
-        int rx1 = _helperTable[rotation + 1];
-        int ry0 = _helperTable[rotation + 2];
-        int ry1 = rx0 == 0 ? 2 : 0;
-
-        int ix = (rx0 * 2) + rx1;
-        int iy = ry0 + ry1;
-        if ((uint)ix > 3 || (uint)iy > 3)
-        {
-            return -1;
-        }
-
-        return (candidates[iy] * Cells) + candidates[ix];
-    }
+    // TILES ARE PLACED ROTATED AND MIRRORED, and the height array is stored once per tile
+    // TEMPLATE, so reading it needs the position transformed back into the template's own
+    // orientation - see TileOrientation. The two tables that describe the transform are engine
+    // data found by pattern scan, not constants, which is why an unresolved scan leaves the field
+    // tile-only rather than guessing at an orientation.
 
     /// <summary>
     /// Reads one height out of a tile template's array.

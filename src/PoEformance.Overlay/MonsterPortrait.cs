@@ -1720,6 +1720,11 @@ public sealed class MonsterPortrait
                     {
                         said += $" · drawn as {_model.Tileset}: {_model.Swapped} of the tile's materials swapped";
                     }
+
+                    if (_model.Laid.Length > 0)
+                    {
+                        said += $" · laid as in this area: {_model.Laid}";
+                    }
                 }
                 else if (_model.Mesh.Shapes.Count > _model.Materials.Count)
                 {

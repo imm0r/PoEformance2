@@ -395,6 +395,35 @@ public class TileFilesTests
 
     }
 
+    /// <summary>A tile laid turned is the same tile, every point turned the same way about one point.</summary>
+    [Fact]
+    public void ATileLaidAsTheAreaLaidItTurnsAsOnePiece()
+    {
+        Dictionary<string, byte[]> files = Install();
+        MonsterModel own = TileModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Test/Arena.tdt");
+
+        // Selector 1 of the game's own tables: X' = -Y, Y' = X.
+        PoEformance.Game.World.TileOrientation quarter =
+            PoEformance.Game.World.TileOrientation.Table(TileOrientationTests.GameSelectors, TileOrientationTests.GameHelper)[1];
+        MonsterModel turned = TileModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Test/Arena.tdt", laid: quarter);
+
+        Assert.True(turned.Ready, turned.Why);
+        Assert.Equal("turned 90°", turned.Laid);
+        Assert.Equal(own.Mesh.Positions.Length, turned.Mesh.Positions.Length);
+        for (var one = 0; one < own.Mesh.Positions.Length; one++)
+        {
+            Vector3 was = own.Mesh.Positions[one];
+            Assert.Equal(new Vector3(-was.Y, was.X, was.Z), turned.Mesh.Positions[one]);
+        }
+
+        // As the file holds it, nothing is said and nothing is moved.
+        MonsterModel authored = TileModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Test/Arena.tdt",
+            laid: PoEformance.Game.World.TileOrientation.OfPlacement(3));
+        Assert.Equal("as authored", authored.Laid);
+        Assert.Equal(own.Mesh.Positions, authored.Mesh.Positions);
+        Assert.Equal(string.Empty, own.Laid);
+    }
+
     /// <summary>Without its ground a tile is its props alone - every shape painted, and still a tile.</summary>
     [Fact]
     public void ANDATileDrawnWithoutItsGroundIsItsPropsAlone()

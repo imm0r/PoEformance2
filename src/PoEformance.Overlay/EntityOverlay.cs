@@ -1094,11 +1094,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _tilesHereOf = rooms;
         _loadedOf = loaded;
         var here = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var laid = new Dictionary<string, byte>(StringComparer.OrdinalIgnoreCase);
         foreach (TerrainRoom room in rooms ?? [])
         {
             if (room.Path.Length > 0)
             {
                 here[room.Path] = room.Placements;
+
+                // Every way the file was laid, across all of its rooms - each room's set already
+                // covers the placements its fill joined.
+                laid[room.Path] = (byte)(laid.GetValueOrDefault(room.Path) | room.Turns);
             }
         }
 
@@ -1113,8 +1118,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         _tilesHere = here;
+        _laidHere = laid;
         return here;
     }
+
+    /// <summary>
+    /// The ways each tile file was laid in the current area, by path, one bit per TileOrientation.Placement -
+    /// built with <see cref="TilesHere"/> and on the same cache.
+    /// </summary>
+    private IReadOnlyDictionary<string, byte> LaidHere()
+    {
+        _ = TilesHere();
+        return _laidHere;
+    }
+
+    private IReadOnlyDictionary<string, byte> _laidHere = new Dictionary<string, byte>();
 
     /// <summary>
     /// The files the current area loaded, by path - a new list per area. Where the tile book finds
@@ -2852,6 +2870,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Changed = () => SettingsChanged?.Invoke(),
             Tilesets = catalog,
             Needs = new AreaNeeds(readFile, catalog),
+            Laid = LaidHere,
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
                 Load = static (read, _, key, _) => TileBookWindow.Load(read, key),

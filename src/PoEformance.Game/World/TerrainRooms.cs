@@ -32,6 +32,14 @@ namespace PoEformance.Game.World;
 /// Size cannot say this either way; an area is built from one module repeated, so nearly every
 /// room is the same handful of tiles across.
 /// </param>
+/// <param name="Turns">
+/// Which of the eight ways a tile can be laid down its tiles were laid, one bit per
+/// <see cref="TileOrientation.Placement"/>. Zero when the rotation tables were not to hand.
+///
+/// A SET RATHER THAN ONE, because the fill joins touching placements of the same file into one
+/// room, and two of them may well have been laid differently. What the tile book offers is every
+/// way this file was laid here, and the set is that without a second pass.
+/// </param>
 public sealed record TerrainRoom(
     ulong Id,
     string Path,
@@ -44,7 +52,8 @@ public sealed record TerrainRoom(
     float GridX,
     float GridY,
     int WalkableTiles = 0,
-    int Placements = 1)
+    int Placements = 1,
+    byte Turns = 0)
 {
     /// <summary>True when there is ground in this room somebody could stand on.</summary>
     public bool IsWalkable => WalkableTiles > 0;
@@ -113,9 +122,13 @@ public static class TerrainRooms
     /// or a caller that cannot answer the question - a test, a page drawing the layout from
     /// outside the game - would silently get an empty map.
     /// </param>
+    /// <param name="tileTurns">
+    /// Per tile, the bit of the way it was laid - <c>1 &lt;&lt; TileOrientation.Placement</c>, or zero.
+    /// Optional; without it every room's <see cref="TerrainRoom.Turns"/> is zero.
+    /// </param>
     public static List<TerrainRoom> Find(
         IReadOnlyList<string> paths, int[] tilePath, int tilesX, int tilesY,
-        Func<int, int, bool>? tileWalkable = null)
+        Func<int, int, bool>? tileWalkable = null, byte[]? tileTurns = null)
     {
         ArgumentNullException.ThrowIfNull(paths);
         ArgumentNullException.ThrowIfNull(tilePath);
@@ -128,6 +141,10 @@ public static class TerrainRooms
         }
 
         var taken = new bool[count];
+        if (tileTurns is not null && tileTurns.Length < count)
+        {
+            tileTurns = null;
+        }
 
         // The frontier, as an array rather than a Stack<int>: a room can be the whole area, so
         // this is sized for the worst case once instead of growing through it.
@@ -147,6 +164,7 @@ public static class TerrainRooms
 
             int tiles = 0;
             int walkable = 0;
+            int turns = 0;
             long sumX = 0;
             long sumY = 0;
             int minX = int.MaxValue;
@@ -163,6 +181,7 @@ public static class TerrainRooms
                 tiles++;
                 sumX += x;
                 sumY += y;
+                turns |= tileTurns?[at] ?? 0;
 
                 // Counted per tile as the fill visits it, which is the only pass that knows
                 // which tiles this room owns - and every tile is visited exactly once.
@@ -213,7 +232,8 @@ public static class TerrainRooms
                 tiles,
                 Centre(sumX / (double)tiles),
                 Centre(sumY / (double)tiles),
-                walkable));
+                walkable,
+                Turns: (byte)turns));
 
             if (rooms.Count >= MaxRooms)
             {

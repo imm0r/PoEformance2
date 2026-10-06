@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Numerics;
 using PoEformance.Game.Files;
+using PoEformance.Game.World;
 
 namespace PoEformance.Features;
 
@@ -70,6 +71,13 @@ public static class TileModels
     /// and ledge materials, so the tile's own are what no area of the game shows.
     /// </param>
     /// <param name="tileset">The tileset the swaps are from, for the line under the picture.</param>
+    /// <param name="laid">
+    /// How the game laid the tile down in the current area - see <see cref="TileOrientation"/> - or
+    /// unknown for the tile as its file holds it. THE WHOLE TILE TURNS AS ONE: every tile of a
+    /// placed piece carries the same selector, and each sub-tile is turned about the same point, so
+    /// a piece several tiles across keeps its shape. The point is the template's origin, which moves
+    /// the picture but not the tile - the pane frames on the model's own box.
+    /// </param>
     public static MonsterModel Of(
         Func<string, byte[]?>? read,
         string? path,
@@ -77,7 +85,8 @@ public static class TileModels
         bool walls = true,
         bool shaded = false,
         IReadOnlyDictionary<string, string>? swaps = null,
-        string tileset = "")
+        string tileset = "",
+        TileOrientation laid = default)
     {
         if (read is null)
         {
@@ -121,6 +130,7 @@ public static class TileModels
         var said = new List<string>();
         int inexact = 0;
         int subTiles = 0;
+        Matrix4x4? turn = Turned(laid);
 
         foreach (string template in definition.Templates)
         {
@@ -152,6 +162,10 @@ public static class TileModels
                     subTiles++;
                     inexact += part.Exact ? 0 : 1;
                     Matrix4x4 place = Matrix4x4.CreateTranslation((x - 1) * Side, -(y - 1) * Side, 0f);
+                    if (turn is { } turning)
+                    {
+                        place *= turning;
+                    }
 
                     if (part.Props.Ready)
                     {
@@ -202,12 +216,36 @@ public static class TileModels
             Kind = ModelKind.Tile,
             Swapped = swapped.Count,
             Tileset = swaps is null ? string.Empty : tileset,
+            Laid = laid.IsPlacement ? laid.ToString() : string.Empty,
         };
 
         // THE WALLS GO BEFORE THE GRAPHS ARE READ, so a material only the walls wear is not compiled
         // for nothing.
         model = walls ? model : Unwalled(model);
         return shaded ? MonsterModels.Shaded(Counted, model, paints) : model;
+    }
+
+    /// <summary>
+    /// The matrix that lays a tile's points down the way <paramref name="laid"/> says, or null where it leaves them as they are.
+    /// </summary>
+    /// <remarks>
+    /// Rows, as System.Numerics multiplies: X' = X * M11 + Y * M21 and Y' = X * M12 + Y * M22, with
+    /// the height left alone. A MIRROR TURNS EVERY TRIANGLE'S WINDING over, which costs nothing here:
+    /// the picture neither culls nor lights one side only - see MeshPicture.
+    /// </remarks>
+    public static Matrix4x4? Turned(TileOrientation laid)
+    {
+        if (!laid.IsPlacement || (laid.Degrees == 0 && !laid.Mirrored))
+        {
+            return null;
+        }
+
+        (int xx, int xy, int yx, int yy) = laid.Turn;
+        return new Matrix4x4(
+            xx, yx, 0f, 0f,
+            xy, yy, 0f, 0f,
+            0f, 0f, 1f, 0f,
+            0f, 0f, 0f, 1f);
     }
 
     /// <summary>
