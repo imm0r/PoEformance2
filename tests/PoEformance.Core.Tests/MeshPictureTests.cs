@@ -647,6 +647,37 @@ public class MeshPictureTests
         Assert.True(Channel(kept, 1) > 50, $"the program's green should cover the red: {Channel(kept, 1)}");
     }
 
+    /// <summary>
+    /// A cut-out shape whose graphs set the colour's alpha is cut on that alpha, texture or none.
+    /// </summary>
+    /// <remarks>
+    /// transparentobjectsc.mat's shape: ForceAlphaTest over a graph writing Zero to the colour, and no
+    /// texture. The engine's AlphaTestClipping clips on albedo_color.a, so the game never shows it; cut
+    /// on the texture alone it was a black slab, because there is no texture to cut on.
+    /// </remarks>
+    [Fact]
+    public void ACUTOUTShapeIsCutOnTheAlphaItsGraphsLeave()
+    {
+        const int Size = 64;
+        ShaderGraph graph = ShaderGraph.Read(System.Text.Encoding.UTF8.GetBytes(
+            """
+            {"nodes":[
+              {"type":"Zero","index":1},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"Zero","index":1,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+            """));
+        ShadeProgram? hidden = ShadeProgram.Compile([(new ShaderInstance("Metadata/Art/Textures/masks/transparentobjectsc.fxgraph", new Dictionary<string, ShaderValue[]>()), graph)]).Program;
+        Assert.NotNull(hidden);
+        Assert.True(hidden.HasAlpha);
+        Assert.False(Constant(0f, 0.6f, 0f).HasAlpha);
+
+        GamePicture picture = MeshPicture.Of(
+            Layered(), Size, skins: [Sheet(220, 0, 0), null], blends: [MaterialBlend.Opaque, MaterialBlend.Cutout], shades: [null, hidden]);
+
+        Assert.True(Channel(picture, 0) > 50, $"the red behind should show: {Channel(picture, 0)}");
+    }
+
     /// <summary>A program whose colour is one constant, in linear light, bound to nothing - it reads no texture.</summary>
     private static ShadeProgram Constant(float r, float g, float b)
     {
