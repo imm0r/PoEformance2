@@ -68,6 +68,8 @@ public class StartUpTests
         _ = new StructureInspector(memory, schema, gameStates);
         _ = new AtlasWatch(memory, schema, gameStates);
         _ = new WorldReader(memory, schema);
+        _ = new RunecraftPanelReader(memory, schema, new UiElementReader(memory, schema));
+        _ = new RunecraftWatch(memory, schema, gameStates);
     }
 
     [Fact]

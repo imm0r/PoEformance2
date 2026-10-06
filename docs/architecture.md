@@ -3770,6 +3770,59 @@ Every total is shown with **how many items it could not price**, because a total
 reads as "what this stash is worth" and a book covering a fifth of it would answer that with a
 number nobody can see is wrong.
 
+### The recipe panel — what a Runecraft monolith offers
+
+Ported from [`yokkenUA/RunecraftHelper`](https://github.com/yokkenUA/RunecraftHelper), a
+GameHelper2 plugin: while the Runeshape Combinations panel is open at a monolith, poe.ninja's
+price is written onto each offered reward's row, in Exalted. The row's own name stays the game's;
+only the price is added. What the port kept, what it changed, and why:
+
+- **The panel is found by fingerprint, and that is the reference's measurement, not a habit.**
+  It records that the child indices through this panel wiggle between game restarts while each
+  element's Flags word, visible bit masked, holds — so the walk matches one fingerprint per level
+  and BACKTRACKS across siblings carrying the same one, because its own greedy first version
+  dead-ended in the wrong subtree. The five fingerprints, the row's back-pointer to its recipe
+  and the viewport's scroll are all in `schema/poe2.offsets.json` under `RunecraftPanel`, with
+  the measurements behind them, and **none of them has been seen by this tool yet**: the first
+  opening with the Runecraft tab up is the confirmation, which is why that tab lists every row it
+  read and why the Status page NAMES the elements the walk resolved. This tool reads StringIds
+  and the reference could not; if the game names the panel, the name should replace the
+  fingerprint at that step, and the walk is data so that costs no build.
+- **The walk runs once, not every frame.** The reference re-walks the whole tree from the root
+  sixty times a second to learn the panel is still shut. Here the gate is kept once found and
+  re-checked with two reads a tick; the scan of the root runs only while no gate is known, at
+  most four times a second. Rows are read in two rates like the atlas — what a row IS on an
+  interval, WHERE it is every tick — and a changed price book re-prices without waiting for
+  either.
+- **The reward is a path, and the path becomes an English name through the install.** A recipe
+  row names its reward by `BaseItemTypes` row, whose Name column is in the client's language —
+  useless to an English price site. The install's `data/balance` tables are the unlocalised ones,
+  so `RewardCatalog` reads every base type's name and picture out of them on the item book's
+  background task, with the shipped `item-names.json` as the fallback. The book gained a name
+  door for fungible lines (`PriceBook.Spelt`) because that is what a recipe has to offer: no
+  item, no art, a path — and the name is also the one key that tells a Perfect Regal Orb from a
+  Regal Orb, which draw one picture a hundredfold apart.
+- **Three doors, in order, and the last one is honest about its reach.** The English name, the
+  picture, the label. The label is what the game painted and prices nothing on a non-English
+  client; the tab says which door answered per row, and which hop failed where none did, so an
+  unpriced row is a sentence rather than a blank.
+- **One offset is computed and disagrees with the reference by four bytes.** The art hangs off
+  `BaseItemTypes.ItemVisualIdentity`, which dat-schema's arithmetic puts at 0x7C — the arithmetic
+  that sums the row to the 0x168 the client reports — while the plugin reads it at 0x78 and never
+  depends on the answer, its name fallback hiding a dead read entirely. This file takes the
+  arithmetic and guards it by content: art is believed only when it reads as a path under `Art/`,
+  and the name is tried first anyway, so a wrong byte costs nothing visible.
+- **Rows scrolled out of the viewport keep their visible bit**; the game clips them with a
+  scissor rectangle. So the drawing clips to the viewport's own rectangle, read every tick, and
+  the scroll is the viewport's `PositionModifier` added by hand to its content — the reference
+  measured prices freezing on scroll until it did — but only where the content frame does not
+  carry `ShouldModifyPos`, since the ordinary position walk adds it when the child asks and
+  counting it twice scrolls the list at twice its speed.
+- **Not ported, by decision:** the plugin's monolith labels on the large map, its rune-chain
+  valuation and its expedition route planner. They are a different feature several times this
+  size, resting on monolith station offsets this tool has not measured, and a port of them would
+  be a guess at every one.
+
 ### The trade site — the uniques poe.ninja has nothing on
 
 poe.ninja has no unique prices on Standard at all, and on every league the listing gate drops

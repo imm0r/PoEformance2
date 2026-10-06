@@ -179,9 +179,16 @@ public sealed class UiElementReader
     /// modifier, its scale space - is read once here. What remains per child is its own
     /// relative position, flags, scale and size.
     /// </remarks>
+    /// <param name="nudge">
+    /// A translation to add to the parent's accumulated position, in the parent's own UI space,
+    /// before the children are placed. For a container the game moves without telling the
+    /// children - a scrolled list, whose rows keep the relative positions they were laid out at
+    /// while the viewport above slides the whole content under its clip. Zero for everything
+    /// else, which is every other caller.
+    /// </param>
     /// <returns>Where each child is and whether it is drawn, by address. Missing for a bad one.</returns>
     public Dictionary<ulong, Placed> ReadSiblings(
-        ulong parent, IReadOnlyList<ulong> children, UiScale scale)
+        ulong parent, IReadOnlyList<ulong> children, UiScale scale, Vector2 nudge = default)
     {
         ArgumentNullException.ThrowIfNull(children);
 
@@ -191,7 +198,7 @@ public sealed class UiElementReader
             return placed;
         }
 
-        Vector2 parentPosition = UnscaledPosition(parent, scale);
+        Vector2 parentPosition = UnscaledPosition(parent, scale) + nudge;
         Vector2 modifier = ReadVector2(parent + (ulong)_positionModifier);
         byte parentIndex = _reader.Read<byte>(parent + (ulong)_scaleIndex);
         float parentMultiplier = _reader.Read<float>(parent + (ulong)_localScaleMultiplier);
@@ -393,6 +400,14 @@ public sealed class UiElementReader
     }
 
     /// <summary>Reads the element's child pointers.</summary>
+    /// <remarks>
+    /// THE POINTER ARRAY IN ONE READ, and one per child only when that fails. The array is
+    /// contiguous, so a container of three hundred rows is one kernel transition rather than
+    /// three hundred - which is the difference between a list that can be re-read every tick
+    /// and one that cannot. The per-pointer walk stays as the fallback because a recording made
+    /// before this read existed holds the pointers one at a time and nothing wider, and a
+    /// replay must keep answering; it costs that replay one refused read and nothing else.
+    /// </remarks>
     public List<ulong> Children(ulong address, int max = 512)
     {
         var children = new List<ulong>();
@@ -414,6 +429,23 @@ public sealed class UiElementReader
             return children; // a torn read mid-resize, not a real child list
         }
 
+        int take = (int)Math.Min(count, max);
+        Span<byte> block = take * 8 <= 2048 ? stackalloc byte[take * 8] : new byte[take * 8];
+        if (_reader.TryRead(first, block))
+        {
+            ReadOnlySpan<ulong> pointers = System.Runtime.InteropServices.MemoryMarshal.Cast<byte, ulong>(block);
+            children.Capacity = take;
+            foreach (ulong child in pointers)
+            {
+                if (MemoryReaderExtensions.IsPlausiblePointer(child))
+                {
+                    children.Add(child);
+                }
+            }
+
+            return children;
+        }
+
         for (long i = 0; i < count && children.Count < max; i++)
         {
             ulong child = _reader.ReadPointer(first + (ulong)(i * 8));
@@ -425,6 +457,25 @@ public sealed class UiElementReader
 
         return children;
     }
+
+    /// <summary>The parent's PositionModifier - for a scroll viewport, how far its content has slid.</summary>
+    public Vector2 PositionModifierOf(ulong address)
+        => IsUiElement(address) ? ReadVector2(address + (ulong)_positionModifier) : Vector2.Zero;
+
+    /// <summary>Whether an element takes its parent's PositionModifier on its own account.</summary>
+    /// <remarks>
+    /// The one flag the position arithmetic turns on, exposed so a reader that has to add a
+    /// parent's modifier BY HAND can tell when the ordinary walk has already done it - adding
+    /// it twice would scroll a list at twice its speed.
+    /// </remarks>
+    public bool TakesParentModifier(ulong address)
+        => IsUiElement(address) && (_reader.Read<uint>(address + (ulong)_flags) & _flagShouldModifyPos) != 0;
+
+    /// <summary>An element's scale space, for converting a translation between two of them.</summary>
+    public (byte Index, float Multiplier) ScaleSpaceOf(ulong address)
+        => IsUiElement(address)
+            ? (_reader.Read<byte>(address + (ulong)_scaleIndex), _reader.Read<float>(address + (ulong)_localScaleMultiplier))
+            : ((byte)0, 1f);
 
     /// <summary>Reads the nth child directly, without materialising the whole list.</summary>
     public ulong Child(ulong address, int index)

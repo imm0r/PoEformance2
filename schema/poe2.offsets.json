@@ -1335,9 +1335,43 @@
       "comment": "A row of BaseItemTypes.dat - what an item's metadata path is CALLED. Id is the path itself ('Metadata/Items/Currency/CurrencyWeaponQuality') and Name is the words on the item ('Blacksmith's Whetstone'), which is exactly the pair data/item-names.json ships 5055 of. THE LAYOUT IS NOT GUESSED AND NOT MERELY COMPUTED: the columns come from poe-tool-dev/dat-schema (validFor 2, the PoE2 entry), priced with the width table scripts/dat-offsets.ps1 verified, and they sum to 0x168 - which is BYTE FOR BYTE what the loader's own file table reports for this table on a live 0.5.5 client (5496 rows of 360, session-2026-09-tables-055.rec). A computed size agreeing with the client's is the strongest check available without the game running, because every column in front of Name has to be right for the total to land. WHAT THE SAME MEASUREMENT REFUSED AT FIRST, and what it turned out to be: Mods computed 0x295 against the client's 0x2B5, and that was written down here as thirty-two bytes of columns nobody had carried. It was not. Mods has eight INTERVAL columns - Stat1Value through Stat8Value - and an interval is a range the schema stores as two values of its type, so eight i32 columns owe four bytes each beyond what a plain i32 costs. 661 + 32 = 693, exactly. The columns were all there and the width rule was short one case; see DatColumn.Interval, where the rule is checked against every table whose size is known. Mods is therefore readable and is the next step rather than a dead end - which is worth recording, because the wrong version of this sentence stood here first and would have closed the question.",
       "fields": {
         "IdPtr": { "offset": "0x00", "type": "ptr" },
-        "NamePtr": { "offset": "0x20", "type": "ptr" }
+        "NamePtr": { "offset": "0x20", "type": "ptr" },
+        "VisualIdentityPtr": { "offset": "0x7C", "type": "ptr", "struct": "ItemVisualIdentityRow", "comment": "The ItemVisualIdentity column - a foreign reference, so the row pointer sits at the column start - which is where the item's inventory art lives (ItemVisualIdentityRow.DdsFilePtr). COMPUTED, NOT MEASURED, and it DISAGREES WITH A REFERENCE: dat-schema puts ModDomain (an enumrow, 4 bytes) at 0x78 and this column at 0x7C, and that arithmetic is what sums the row to the 0x168 the client reports; yokkenUA's RunecraftHelper reads the same pointer at 0x78 and says it reaches the .dds. Both cannot be right - a qword at 0x78 would be ModDomain's four bytes under the pointer's low half - and that plugin never depends on the read: its price lookup falls back to the reward's English name whenever the art misses, which hides a dead offset completely. So this file takes the arithmetic, and the one reader of it (RunecraftPanelReader) accepts the result only when the string behind it starts with 'Art/' - a wrong offset then costs the art key and nothing else, since the English name is tried first there too. UNALIGNED on purpose: dat rows are packed." }
       },
       "consts": { "ComputedRowSize": "0x168" }
+    },
+
+    "Expedition2RecipesRow": {
+      "comment": "A row of Expedition2Recipes.dat - one runeshape combination the Runecraft monoliths can offer: which runes, in which order, for which reward. Offsets are dat-schema arithmetic (scripts/dat-offsets.ps1 -Table Expedition2Recipes): Id 0x00, Runes 0x08 (array), Description 0x18, RuneCountRequired 0x20, MinLevelReq 0x24, MaxLevelReq 0x28, Reward 0x2C (foreignrow -> BaseItemTypes, row pointer at the column start), RewardCount 0x3C, RewardGemLevel 0x75, and the row sums to 0xC9. CORROBORATED FROM MEMORY by yokkenUA's RunecraftHelper (0.5.5 HF9): it reads the reward pointer at +0x2C and the level band at +0x24/+0x28, and the two recipe rows it found behind two neighbouring panel rows sat exactly 7 x 0xC9 apart - the stride the arithmetic predicts, measured without it. Reward is NULL for the recipes with no fixed item (the uncut gems of the area's level, a random currency, a unique of a slot) - RewardGemLevel is what the game rolls the gem from, and Description is the game's own wording for the rest.",
+      "fields": {
+        "IdPtr": { "offset": "0x00", "type": "ptr", "comment": "Raw UTF-16, the recipe's engine id: '4SlotArchaicRuneofControl1', '10SlotBait'. Always a slot count, the word Slot, then the reward's English spelling with no spaces - the shape RunecraftPanelReader checks before it believes a row's back-pointer led here." },
+        "MinLevelReq": { "offset": "0x24", "type": "i32" },
+        "MaxLevelReq": { "offset": "0x28", "type": "i32" },
+        "RewardRowPtr": { "offset": "0x2C", "type": "ptr", "struct": "BaseItemTypesRow", "comment": "The reward's BaseItemTypes row, or null where the recipe's reward is rolled rather than fixed." },
+        "RewardCount": { "offset": "0x3C", "type": "i32" },
+        "RewardGemLevel": { "offset": "0x75", "type": "i32" }
+      },
+      "consts": { "ComputedRowSize": "0xC9" }
+    },
+
+    "RunecraftPanel": {
+      "comment": "The Runeshape Combinations panel - the list of recipes a Runecraft monolith offers, opened at the monolith. FOUND BY A FINGERPRINT WALK rather than by a child path, and that is the reference's finding, not a preference: yokkenUA's RunecraftHelper records that the child indices through this panel wiggle between game restarts while each element's Flags word, with the visible bit masked off, holds its value - so the walk matches one fingerprint per level from the UI root down, and BACKTRACKS across siblings carrying the same fingerprint, because the tree has many, and a greedy pick dead-ends in the wrong subtree. The five steps, root to list: the window container (GateStep - its visible bit is the panel-open signal, so only a visible match is accepted there), two layout frames, the scroll viewport (ViewportStep - a fixed-size clip whose PositionModifier is the scroll offset the list's content slides by; see RunecraftPanelReader for why that is added by hand), the content frame, and the recipes container itself, whose ~320 children are the rows. A row is told from a sibling that merely shares the last fingerprint by its content: its first child carries the '<count>x <reward>' label at UiElementBase.TextPtr, which is the reference's own measurement of 0x360 on 0.5.5 ('1x Aldur's Legacy' read there live) and so also the first live confirmation of this schema's TextPtr. ROWS SCROLLED OUT OF THE VIEWPORT KEEP THEIR VISIBLE BIT - the game clips them with a scissor rectangle - so a reader must clip to the viewport's own rectangle rather than trust the flag. The fingerprints are 0.5.5 values from that plugin (version 0.5.5c) and NOT YET SEEN BY THIS TOOL: the first opening of the panel with the Runecraft tab's readout up is what confirms them, and the readout names what it resolved. WHAT THIS TOOL CAN DO THAT THE REFERENCE COULD NOT: it reads StringIds. If the panel or its rows turn out to be NAMED - the interface browser with the panel open answers that in one look - the name is the sturdier anchor and should replace the fingerprint at that step; the walk is data so that costs no build.",
+      "fields": {
+        "RecipeRowPtr": { "offset": "0x528", "type": "ptr", "struct": "Expedition2RecipesRow", "comment": "ON THE ROW ELEMENT: the Expedition2Recipes row this panel row displays, which is what makes the reward LANGUAGE-INDEPENDENT - the label is localised text, the recipe is an id and a BaseItemTypes pointer. 0.5.5 HF9 per RunecraftHelper, which moved it 0x540 -> 0x528 with the UiElementBase tail's -0x18 and VERIFIED IT BY CONTENT rather than by the shift: the two pointers read off two visible rows differed by exactly seven recipe strides, and the second decoded as a real recipe (count 7, band 1..100, Id '7SlotCelestialAlloy1') matching the row's own label. Worth copying the failure it records: the stale slot did not read as null but held an all-0xFF sentinel, so the pointer looked live and every field behind it came back empty, and pricing silently fell back to the localised label - invisible on an English client, broken on every other. RunecraftPanelReader therefore refuses a recipe whose Id does not read as '<digits>Slot...', so a drift here reads as 'no recipe' in the readout rather than as prices that happen to work in English." }
+      },
+      "consts": {
+        "Fingerprint0": "0x00462EF1",
+        "Fingerprint1": "0x00502EF3",
+        "Fingerprint2": "0x00502EF7",
+        "Fingerprint3": "0x00542EF1",
+        "Fingerprint4": "0x00502EF1",
+        "GateStep": "0",
+        "ViewportStep": "2",
+        "LabelChild": "0",
+        "MostRootChildren": "512",
+        "MostRows": "512",
+        "MostSiblings": "4096"
+      }
     },
 
     "ModsRow": {
@@ -1774,7 +1808,8 @@
     "ItemVisualIdentityRow": {
       "comment": "The dat row ItemBaseComponent.UniqueIviRow points at. Its Id - \"FourUniquePinnacle1\" - is the ROBUST key for a unique: it is an engine identifier and stays English on a localised client, where the displayed name does not. data/unique_ivi_name_map.tsv turns it into the name price sites use. Chain and offsets from the AHK tool, live-verified there 2026-06-24.",
       "fields": {
-        "IdPtr": { "offset": "0x00", "type": "ptr", "comment": "Points at the Id as a wide string." }
+        "IdPtr": { "offset": "0x00", "type": "ptr", "comment": "Points at the Id as a wide string." },
+        "DdsFilePtr": { "offset": "0x08", "type": "ptr", "comment": "DDSFile - the inventory picture's path, 'Art/2DItems/Currency/CurrencyAddModToRare.dds', as a raw UTF-16 pointer. Its file name is the key poe.ninja's exchange lines carry (PriceBook.ArtOf), so a reward reached through BaseItemTypesRow.VisualIdentityPtr can be priced on a client in any language. Column 2 of the table by dat-schema arithmetic, and the one offset of that chain the RunecraftHelper reference agrees on ('+0x08 -> .dds path')." }
       }
     },
 

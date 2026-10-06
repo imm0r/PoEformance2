@@ -2486,6 +2486,17 @@ internal static class Program
         };
         atlas.RitualWorth = atlas.Settings.Worth;
 
+        // The Runeshape Combinations panel - the recipes a Runecraft monolith offers - with
+        // poe.ninja's price on each row. Interface rather than world, like the atlas, and idle
+        // while the panel is shut, which is almost always. The reward names come from the
+        // install's own tables once that read lands (below, on the item book's task); until
+        // then, and without an install, from the shipped item-names.json.
+        handle.Stage = "loading runecraft settings";
+        var runecraft = new PoEformance.Features.RunecraftWatch(reader, schema, gameStatesStatic, itemNames.ShippedBase)
+        {
+            Settings = PoEformance.Features.RunecraftStore.Load(),
+        };
+
         // What a map contains, drawn as the game's own pictures. Shares the stash's art store,
         // so one cache on disk serves both and a picture is unpacked once - and asks the install
         // itself where that art lives, rather than being told by a list somebody maintains.
@@ -2791,6 +2802,10 @@ internal static class Program
                 // seconds, and this only starts a fetch when it is news or the book has aged.
                 prices.Watching(stash.League);
 
+                // After the book has been told the league, so the first tick the panel is open
+                // prices against whatever book is finished rather than against none.
+                runecraft.Service(scale, Environment.TickCount64, prices.Book);
+
                 // The same arrangement for the game's own exchange, and for the same reason:
                 // told the league every tick, it refreshes only when that is news or the hour
                 // has turned. Its digests are immutable, so a refresh is one request.
@@ -3056,6 +3071,7 @@ internal static class Program
                 atlas.Settings = kept;
                 PoEformance.Features.AtlasStore.Save(kept);
             });
+        overlay.AttachRunecraft(runecraft, changed => PoEformance.Features.RunecraftStore.Save(changed), prices);
         overlay.Noise = world.Noise;
         overlay.Memory = world.Memory;
 
@@ -3162,9 +3178,10 @@ internal static class Program
             // is no shipped export to fall back on, so a failure leaves the book empty and saying why.
             _ = Task.Run(() =>
             {
-                PoEformance.Features.ItemVisuals items = PoEformance.Features.ItemVisuals.Read(
-                    installed,
-                    PoEformance.Features.QuestTableLayouts.Load(FindDataFile("item-tables.json")));
+                PoEformance.Features.QuestTableLayouts? itemLayouts =
+                    PoEformance.Features.QuestTableLayouts.Load(FindDataFile("item-tables.json"));
+
+                PoEformance.Features.ItemVisuals items = PoEformance.Features.ItemVisuals.Read(installed, itemLayouts);
 
                 foreach (string line in items.Say)
                 {
@@ -3172,6 +3189,19 @@ internal static class Program
                 }
 
                 overlay.Items = items;
+
+                // AND EVERY BASE TYPE'S ENGLISH NAME, off the same two tables on the same task:
+                // the recipe panel names a reward by path, and the install is the one place that
+                // path becomes the spelling poe.ninja prices under whatever language the client
+                // runs in. The item book keeps only the rows with a model, which are exactly the
+                // rows a monolith never pays, so this is its own read of the same files.
+                PoEformance.Features.RewardCatalog rewards = PoEformance.Features.RewardCatalog.Read(installed, itemLayouts);
+                foreach (string line in rewards.Say)
+                {
+                    Console.WriteLine(line);
+                }
+
+                runecraft.Catalog = rewards;
             });
 
             // AND THE EFFECT BOOK'S, on its own task for the same reason - four more .dat files.
