@@ -219,6 +219,13 @@ public class RoomLayoutTests
         MeshNamed named = Assert.Single(model.Meshes);
         Assert.Equal("art/rock.fmt", named.Path);
         Assert.True(named.Facts.Vertices > 0, "the body's facts travel with the file");
+
+        // AND THE ROOM'S DUMP PRINTS IT, as a room and with no ground section.
+        string dump = ModelDump.OfTile(path => files.GetValueOrDefault(path), "Metadata/Terrain/Woods/Rooms/Clearing.arm", model);
+        Assert.StartsWith("room: Metadata/Terrain/Woods/Rooms/Clearing.arm", dump, StringComparison.Ordinal);
+        Assert.Contains("=== mesh art/rock.fmt", dump, StringComparison.Ordinal);
+        Assert.Contains("format 0x8 · stride", dump, StringComparison.Ordinal);
+        Assert.DoesNotContain("=== ground", dump, StringComparison.Ordinal);
     }
 
     [Fact]
