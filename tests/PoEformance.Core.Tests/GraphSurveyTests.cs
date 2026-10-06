@@ -119,8 +119,8 @@ public class GraphSurveyTests
     /// </summary>
     /// <remarks>
     /// What the earlier tile dumps said one material at a time, counted: Dust_simple, on seven of the
-    /// cliffs, waits on the vertex's local position alone, which is the engine's to hand over or not,
-    /// and the vertex colour BasicColour multiplies by is the only thing standing in the ledge's way.
+    /// cliffs, evaluates whole now that the vertex's local position is read, and the vertex colour
+    /// BasicColour multiplies by is the only thing standing in the ledge's way.
     /// </remarks>
     [Fact]
     public void ANDOVERTheInstallsOwnMaterialsItNamesWhatTheDumpsNamedOneAtATime()
@@ -142,7 +142,7 @@ public class GraphSurveyTests
         string[] materials = [.. Directory.GetFiles(root, "*.mat").Select(one => Path.GetFileName(one).Replace("__", "/", StringComparison.Ordinal))];
         string survey = GraphSurvey.Of(Read, materials);
 
-        Assert.Contains("  Metadata/Materials/Environment/Dust_simple.fxgraph · 7 materials · missing FromVertexLocalPosition", survey, StringComparison.Ordinal);
+        Assert.DoesNotContain("Dust_simple.fxgraph ·", survey, StringComparison.Ordinal);
         Assert.Contains("  Metadata/Effects/Graphs/General/BasicColour.fxgraph · 2 materials · missing InputVertexColor", survey, StringComparison.Ordinal);
         Assert.DoesNotContain("PBRGroundBN.fxgraph ·", survey, StringComparison.Ordinal);
         Assert.DoesNotContain("StromatoliteLedge_Blend.fxgraph ·", survey, StringComparison.Ordinal);
@@ -157,10 +157,10 @@ public class GraphSurveyTests
         string Shifted(string mark) =>
             $$$"""
             {"nodes":[
-              {"type":"InputVertexPosition","index":0,"stage":"WorldTransform"},
+              {"type":"InputVertexColor","index":0,"stage":"VertexInit"},
               {"type":"AlbedoColor","index":0,"stage":"Texturing","custom_parameter":"{{{mark}}}"}],
              "links":[
-              {"src":{"type":"InputVertexPosition","index":0,"stage":"WorldTransform","variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing","variable":"input"}}]}
+              {"src":{"type":"InputVertexColor","index":0,"stage":"VertexInit","variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing","variable":"input"}}]}
             """;
         var files = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase)
         {
@@ -176,11 +176,39 @@ public class GraphSurveyTests
         string said = examples.ToString();
 
         Assert.Contains(
-            "=== InputVertexPosition · graph Metadata/Terrain/Shifted.fxgraph · named by 1 held-back terrain materials, 1 in all",
+            "=== InputVertexColor · graph Metadata/Terrain/Shifted.fxgraph · named by 1 held-back terrain materials, 1 in all",
             said, StringComparison.Ordinal);
         Assert.Contains("--- material Art/Models/Terrain/Cliff/c.mat", said, StringComparison.Ordinal);
         Assert.Contains("\"custom_parameter\":\"terrain\"", said, StringComparison.Ordinal);
         Assert.DoesNotContain("Metadata/Effects/Shifted.fxgraph", said, StringComparison.Ordinal);
+    }
+
+    /// <summary>What feeds a colour's w alone - a soft particle's fade by depth - holds nothing back: the w is not drawn.</summary>
+    [Fact]
+    public void ANDWHATFeedsAColoursWAloneHoldsNothingBack()
+    {
+        const string faded =
+            """
+            {"nodes":[
+              {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+              {"type":"SampleTexture","index":0,"parameters":[{"path":"Art/a.dds","srgb":true},{}]},
+              {"type":"DepthDistance","index":0},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture","index":0,"variable":"uv"}},
+              {"src":{"type":"SampleTexture","index":0,"variable":"rgba","swizzle":"xyz"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}},
+              {"src":{"type":"DepthDistance","index":0,"variable":"distance"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"w"}}]}
+            """;
+        var files = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Metadata/Faded.fxgraph"] = Encoding.UTF8.GetBytes(faded),
+            ["Art/Textures/Environment/a.mat"] = Material("Metadata/Faded.fxgraph"),
+        };
+
+        string survey = GraphSurvey.Of(path => files.GetValueOrDefault(path), ["Art/Textures/Environment/a.mat"]);
+
+        Assert.Contains("    1 evaluate whole now (100.0%)", survey, StringComparison.Ordinal);
+        Assert.DoesNotContain("DepthDistance", survey, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -197,7 +225,9 @@ public class GraphSurveyTests
         Assert.False(ShadeProgram.Knows("DepthDistance"));
         Assert.False(ShadeProgram.Knows("InputVertexColor"));
         Assert.False(ShadeProgram.Knows("InputVertexUV"));
-        Assert.False(ShadeProgram.Knows("FromVertexLocalPosition"));
+        Assert.True(ShadeProgram.Knows("FromVertexLocalPosition"));
+        Assert.True(ShadeProgram.Knows("LookUpTexture"));
+        Assert.False(ShadeProgram.Knows("FromVertexColor"));
         Assert.False(ShadeProgram.Knows(string.Empty));
     }
 

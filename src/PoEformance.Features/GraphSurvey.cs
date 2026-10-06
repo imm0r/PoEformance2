@@ -18,8 +18,8 @@ namespace PoEformance.Features;
 ///     AMONG    materials it is one of several missing items for
 ///     GREEDY   the order that unlocks the most materials step by step, each item exactly once
 ///
-/// THE COLOUR PATH is everything that feeds an <c>AlbedoColor</c> or a <c>UV</c> - the colour and
-/// the coordinates it is read at - followed back along the graph's links; a node nothing on it
+/// THE COLOUR PATH is everything that feeds an <c>AlbedoColor</c>'s xyz or a <c>UV</c> - the colour
+/// and the coordinates it is read at, not the alpha nothing draws - followed back along the graph's links; a node nothing on it
 /// reaches is not counted, so a graph's normals and gloss do not inflate the list. A colour or a
 /// coordinate written at a stage the compiler does not run is an item of its own, <c>stage X</c>.
 ///
@@ -463,6 +463,13 @@ public static class GraphSurvey
             var into = new Dictionary<(string, int, string), List<(string, int, string)>>();
             foreach (ShaderLink link in graph.Links)
             {
+                // A COLOUR'S W IS NOT DRAWN, and the compiler takes it apart from the xyz - see
+                // ShadeProgram - so what feeds it alone holds nothing back.
+                if (link.Target.Type == "AlbedoColor" && ShadeProgram.AlphaOnly(link.Target.Swizzle))
+                {
+                    continue;
+                }
+
                 (string, int, string) target = (link.Target.Type, link.Target.Index, link.Target.Stage);
                 if (!into.TryGetValue(target, out List<(string, int, string)>? sources))
                 {

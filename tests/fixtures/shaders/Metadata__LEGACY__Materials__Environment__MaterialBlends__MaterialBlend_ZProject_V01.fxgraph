@@ -1,0 +1,4391 @@
+{
+    "version": 6,
+    "shader_group": [
+        "Material"
+    ],
+    "overriden_lighting_model": "SpecGlossPbrMaterial",
+    "description": "Blends a Triplanar Projected, Tileable Material on Top of the Base Material using a World Z Up Mask. Useful for Snow Settled on a Surface, or Moss Growing on Top of a Surface.",
+    "nodes": [
+        {
+            "type": "InputVertexPosition",
+            "index": 0,
+            "stage": "LocalTransform",
+            "ui_position": [
+                -768.0,
+                -512.0
+            ]
+        },
+        {
+            "type": "VertexPosition",
+            "index": 0,
+            "stage": "LocalTransform",
+            "ui_position": [
+                -192.0,
+                -512.0
+            ]
+        },
+        {
+            "type": "InputVertexNormal",
+            "index": 0,
+            "stage": "LocalTransform",
+            "ui_position": [
+                -768.0,
+                -512.0
+            ]
+        },
+        {
+            "type": "VertexNormal",
+            "index": 0,
+            "stage": "LocalTransform",
+            "ui_position": [
+                -192.0,
+                -512.0
+            ]
+        },
+        {
+            "type": "InputVertexPosition",
+            "index": 0,
+            "stage": "WorldTransform",
+            "ui_position": [
+                -192.0,
+                -512.0
+            ]
+        },
+        {
+            "type": "VertexPosition",
+            "index": 0,
+            "stage": "WorldTransform",
+            "ui_position": [
+                10368.0,
+                -512.0
+            ]
+        },
+        {
+            "type": "InputWorldPos",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                897.3333740234375,
+                189.99998474121095
+            ]
+        },
+        {
+            "type": "WorldPos",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputAlbedoColor",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                897.3333740234375,
+                189.99998474121095
+            ]
+        },
+        {
+            "type": "Dummy4",
+            "index": 4,
+            "ui_position": [
+                8003.853515625,
+                219.95132446289063
+            ]
+        },
+        {
+            "type": "Dummy4",
+            "index": 2,
+            "ui_position": [
+                8640.0,
+                640.0
+            ],
+            "group_id": "<Group>_25"
+        },
+        {
+            "type": "InputTexture",
+            "index": 0,
+            "parameters": [
+                {
+                    "path": "Art/Models/Terrain/Jungle/Tiles/Jungle/Textures/JungleMoss01_colour_DXT1.dds",
+                    "srgb": true,
+                    "layout": {
+                        "icon": 77,
+                        "priority": 10,
+                        "tooltip": "Colour Texture Input.",
+                        "group": "Textures"
+                    }
+                }
+            ],
+            "custom_parameter": "TextureBlend_Albedo",
+            "ui_position": [
+                4095.99365234375,
+                960.00048828125
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Dummy3",
+            "index": 2,
+            "ui_position": [
+                1984.00048828125,
+                1088.0001220703126
+            ],
+            "group_id": "<Group>_18"
+        },
+        {
+            "type": "MultiplyConst3",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 4.0,
+                    "layout": {
+                        "icon": 90,
+                        "tooltip": "Control the Tileable Scale of the Blend Material.",
+                        "group": "Scale",
+                        "range": [
+                            {
+                                "min": 0.0,
+                                "max": 15.0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "custom_parameter": "TextureBlend_Tiling",
+            "ui_position": [
+                3328.0,
+                1088.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "MultiplyConst3",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": 0.0010000000474974514
+                }
+            ],
+            "ui_position": [
+                3647.99951171875,
+                1088.000732421875
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Dummy3",
+            "index": 22,
+            "ui_position": [
+                4095.99365234375,
+                1088.000732421875
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "ConstantFloat3",
+            "index": 2,
+            "parameters": [
+                {
+                    "value": [
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                }
+            ],
+            "ui_position": [
+                1279.999755859375,
+                1343.9996337890626
+            ],
+            "group_id": "<Group>_2"
+        },
+        {
+            "type": "InputTbnBasis",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                897.3333740234375,
+                189.99998474121095
+            ]
+        },
+        {
+            "type": "Transform",
+            "index": 0,
+            "ui_position": [
+                1600.0,
+                1344.0
+            ],
+            "group_id": "<Group>_2"
+        },
+        {
+            "type": "Dummy3",
+            "index": 3,
+            "ui_position": [
+                1919.998779296875,
+                1343.9996337890626
+            ],
+            "group_id": "<Group>_2"
+        },
+        {
+            "type": "Dummy3",
+            "index": 0,
+            "ui_position": [
+                3328.0,
+                1344.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Dummy3",
+            "index": 23,
+            "ui_position": [
+                4095.99365234375,
+                1215.999755859375
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "SampleInputTriplanar",
+            "index": 0,
+            "parameters": [
+                {}
+            ],
+            "ui_position": [
+                4543.99560546875,
+                960.000244140625
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Dummy4",
+            "index": 3,
+            "ui_position": [
+                8640.0,
+                960.0
+            ],
+            "group_id": "<Group>_24"
+        },
+        {
+            "type": "Float3ToCoords",
+            "index": 0,
+            "ui_position": [
+                3264.0,
+                3840.0
+            ]
+        },
+        {
+            "type": "Dummy",
+            "index": 25,
+            "ui_position": [
+                3584.0,
+                3840.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "OneMinus",
+            "index": 1,
+            "ui_position": [
+                3904.0,
+                3712.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "Dummy",
+            "index": 24,
+            "ui_position": [
+                3904.0,
+                3840.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "ConstantBool",
+            "index": 6,
+            "parameters": [
+                {
+                    "layout": {
+                        "icon": 137,
+                        "priority": 41,
+                        "tooltip": "Invert the World Z Up Mask.",
+                        "group": "Mask - World Up"
+                    }
+                }
+            ],
+            "custom_parameter": "Invert_ZMask",
+            "ui_position": [
+                3840.0,
+                3968.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "Lerp",
+            "index": 1,
+            "ui_position": [
+                4224.0009765625,
+                3712.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "One",
+            "index": 1,
+            "ui_position": [
+                5119.99609375,
+                3584.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "Zero",
+            "index": 2,
+            "ui_position": [
+                5119.99609375,
+                3648.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "ConstantFloat3",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": [
+                        0.0,
+                        0.5,
+                        2.0
+                    ],
+                    "layout": {
+                        "priority": 40,
+                        "icon": 41,
+                        "tooltip": "Control the Projection Range (XY) and Contrast (Z) of the World Z Mask.\n[X = XY Projection] [Y = Z Projection] [Z = Contrast]\n",
+                        "group": "Mask - World Up",
+                        "range": [
+                            {
+                                "min": 0.0,
+                                "max": 1.0
+                            },
+                            {
+                                "min": 0.0,
+                                "max": 1.0
+                            },
+                            {
+                                "min": 1.0,
+                                "max": 10.0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "custom_parameter": "Mask_NormalRange",
+            "ui_position": [
+                4224.0,
+                3904.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "MultiplyConst2",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 4.0,
+                    "layout": {
+                        "range": [
+                            {
+                                "min": 1.0,
+                                "max": 5.0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "ui_position": [
+                4671.998046875,
+                3904.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "FitRangeFromInput",
+            "index": 0,
+            "ui_position": [
+                5119.99609375,
+                3712.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "Dummy",
+            "index": 9,
+            "ui_position": [
+                4671.998046875,
+                4032.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "Dummy",
+            "index": 26,
+            "ui_position": [
+                5183.9970703125,
+                4032.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "Power",
+            "index": 0,
+            "ui_position": [
+                5503.9970703125,
+                3712.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "Saturate",
+            "index": 0,
+            "ui_position": [
+                5696.0009765625,
+                3712.0
+            ],
+            "group_id": "<Group>_8"
+        },
+        {
+            "type": "Dummy3",
+            "index": 25,
+            "ui_position": [
+                2188.9990234375,
+                4448.0
+            ],
+            "group_id": "<Group>_29"
+        },
+        {
+            "type": "Dummy3",
+            "index": 24,
+            "ui_position": [
+                2172.9990234375,
+                4670.75
+            ],
+            "group_id": "<Group>_28"
+        },
+        {
+            "type": "ConstantBool",
+            "index": 4,
+            "parameters": [
+                {
+                    "layout": {
+                        "icon": 137,
+                        "priority": 50,
+                        "tooltip": "Toggle to Use World Space Position for the Gradient Mask, instead of the Default, Local Space.",
+                        "group": "Mask - Gradient"
+                    }
+                }
+            ],
+            "custom_parameter": "Use_WorldSpaceGradient",
+            "ui_position": [
+                2752.0,
+                4672.0
+            ],
+            "group_id": "<Group>_30"
+        },
+        {
+            "type": "Lerp3",
+            "index": 1,
+            "ui_position": [
+                3136.0,
+                4480.0
+            ],
+            "group_id": "<Group>_30"
+        },
+        {
+            "type": "Dummy3",
+            "index": 26,
+            "ui_position": [
+                3584.0,
+                4480.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "ConstantFloat2",
+            "index": 4,
+            "parameters": [
+                {
+                    "value": [
+                        100.0,
+                        100.0
+                    ],
+                    "layout": {
+                        "priority": 51,
+                        "icon": 41,
+                        "tooltip": "Control the Position (X) and Range (Y) of the Gradient Mask.",
+                        "group": "Mask - Gradient",
+                        "range": [
+                            {
+                                "min": -5000.0,
+                                "max": 5000.0
+                            },
+                            {
+                                "min": -5000.0,
+                                "max": 5000.0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "custom_parameter": "Mask_GradientControl",
+            "ui_position": [
+                3648.0,
+                4608.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "OneMinus",
+            "index": 3,
+            "ui_position": [
+                4096.001953125,
+                4608.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "Dummy",
+            "index": 12,
+            "ui_position": [
+                4352.00390625,
+                4608.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "Dummy",
+            "index": 13,
+            "ui_position": [
+                4352.9130859375,
+                4826.36474609375
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "Subtract",
+            "index": 4,
+            "ui_position": [
+                4672.001953125,
+                4608.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "Add",
+            "index": 2,
+            "ui_position": [
+                4672.001953125,
+                4800.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "ConstantBool",
+            "index": 3,
+            "parameters": [
+                {
+                    "layout": {
+                        "icon": 137,
+                        "priority": 52,
+                        "tooltip": "Invert the Gradient Mask Orientation. ",
+                        "group": "Mask - Gradient"
+                    }
+                }
+            ],
+            "custom_parameter": "Invert_GradientMask",
+            "ui_position": [
+                4544.0,
+                4992.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "SelectFloat",
+            "index": 3,
+            "ui_position": [
+                4992.0,
+                4608.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "SelectFloat",
+            "index": 4,
+            "ui_position": [
+                4992.0,
+                4800.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "Zero",
+            "index": 1,
+            "ui_position": [
+                5312.0009765625,
+                4352.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "One",
+            "index": 2,
+            "ui_position": [
+                5312.0009765625,
+                4416.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "FitRangeFromInput",
+            "index": 2,
+            "ui_position": [
+                5312.0009765625,
+                4480.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "Saturate",
+            "index": 6,
+            "ui_position": [
+                5632.0009765625,
+                4480.0
+            ],
+            "group_id": "<Group>_27"
+        },
+        {
+            "type": "Subtract",
+            "index": 1,
+            "ui_position": [
+                6080.0,
+                3712.0
+            ]
+        },
+        {
+            "type": "Dummy",
+            "index": 27,
+            "ui_position": [
+                6400.0,
+                3712.0
+            ],
+            "group_id": "<Group>_31"
+        },
+        {
+            "type": "Dummy",
+            "index": 10,
+            "ui_position": [
+                6719.998046875,
+                3584.0
+            ],
+            "group_id": "<Group>_31"
+        },
+        {
+            "type": "ConstantFloat2",
+            "index": 5,
+            "parameters": [
+                {
+                    "value": [
+                        0.5,
+                        0.20000000298023225
+                    ],
+                    "layout": {
+                        "priority": 63,
+                        "icon": 41,
+                        "tooltip": "Control the Position Bias (X) and Contrast (Y) of the Noise.",
+                        "group": "Noise"
+                    }
+                }
+            ],
+            "custom_parameter": "NoiseBlend_Control",
+            "ui_position": [
+                4544.00146484375,
+                5312.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "Subtract",
+            "index": 3,
+            "ui_position": [
+                4991.99853515625,
+                5312.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "Add",
+            "index": 1,
+            "ui_position": [
+                4991.99853515625,
+                5440.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "InputTexture",
+            "index": 2,
+            "parameters": [
+                {
+                    "path": "Art/Textures/General/Grunge/GrungeMap01_mask_BC4.dds",
+                    "srgb": true,
+                    "layout": {
+                        "icon": 77,
+                        "priority": 62,
+                        "tooltip": "Input for a Tileable Noise to Break Up the Blend Masks.",
+                        "group": "Noise"
+                    }
+                }
+            ],
+            "custom_parameter": "NoiseBlend_Input",
+            "ui_position": [
+                3712.0,
+                5568.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "MultiplyConst3",
+            "index": 2,
+            "parameters": [
+                {
+                    "value": 2.0,
+                    "layout": {
+                        "priority": 61,
+                        "icon": 90,
+                        "tooltip": "Control the Tileable Scale of the Noise Blend.",
+                        "group": "Noise"
+                    }
+                }
+            ],
+            "custom_parameter": "NoiseBlend_Tiling",
+            "ui_position": [
+                3327.999267578125,
+                5696.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "MultiplyConst3",
+            "index": 3,
+            "parameters": [
+                {
+                    "value": 0.0010000000474974514
+                }
+            ],
+            "ui_position": [
+                3711.998291015625,
+                5696.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "Dummy3",
+            "index": 18,
+            "ui_position": [
+                3327.999267578125,
+                5824.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "Dummy3",
+            "index": 19,
+            "ui_position": [
+                3839.998779296875,
+                5824.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "SampleInputTriplanar",
+            "index": 2,
+            "parameters": [
+                {}
+            ],
+            "ui_position": [
+                4160.00244140625,
+                5568.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "Saturate",
+            "index": 3,
+            "ui_position": [
+                4544.00244140625,
+                5568.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "Dummy",
+            "index": 16,
+            "ui_position": [
+                4991.99853515625,
+                5568.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "CheapSmoothstep",
+            "index": 0,
+            "ui_position": [
+                5311.99951171875,
+                5312.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "Saturate",
+            "index": 5,
+            "ui_position": [
+                5632.00048828125,
+                5312.0
+            ],
+            "group_id": "<Group>_16"
+        },
+        {
+            "type": "Subtract",
+            "index": 2,
+            "ui_position": [
+                6719.998046875,
+                3712.0
+            ],
+            "group_id": "<Group>_31"
+        },
+        {
+            "type": "ConstantBool",
+            "index": 5,
+            "parameters": [
+                {
+                    "layout": {
+                        "icon": 137,
+                        "priority": 60,
+                        "tooltip": "Whether or Not to Use the Input Noise Map to Break Up the Gradient and World Z Up Masks.",
+                        "group": "Noise"
+                    }
+                }
+            ],
+            "custom_parameter": "Use_NoiseBlend",
+            "ui_position": [
+                6720.0,
+                3904.0
+            ],
+            "group_id": "<Group>_31"
+        },
+        {
+            "type": "SelectFloat",
+            "index": 2,
+            "ui_position": [
+                7103.998046875,
+                3584.0
+            ],
+            "group_id": "<Group>_31"
+        },
+        {
+            "type": "Saturate",
+            "index": 2,
+            "ui_position": [
+                7359.998046875,
+                3584.0
+            ],
+            "group_id": "<Group>_31"
+        },
+        {
+            "type": "Dummy",
+            "index": 8,
+            "ui_position": [
+                7808.0,
+                3584.0
+            ]
+        },
+        {
+            "type": "Lerp4",
+            "index": 0,
+            "ui_position": [
+                9088.0,
+                640.0
+            ],
+            "group_id": "<Group>_26"
+        },
+        {
+            "type": "AlbedoColor",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputTbnNormal",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                897.3333740234375,
+                189.99998474121095
+            ]
+        },
+        {
+            "type": "Dummy3",
+            "index": 29,
+            "ui_position": [
+                6849.26806640625,
+                250.44720458984376
+            ]
+        },
+        {
+            "type": "Dummy3",
+            "index": 6,
+            "ui_position": [
+                7680.0,
+                1408.0
+            ],
+            "group_id": "<Group>_4"
+        },
+        {
+            "type": "Dummy3",
+            "index": 7,
+            "ui_position": [
+                8128.0,
+                1408.0
+            ],
+            "group_id": "<Group>_5"
+        },
+        {
+            "type": "Dummy3",
+            "index": 10,
+            "ui_position": [
+                8448.0,
+                1280.0
+            ],
+            "group_id": "<Group>_5"
+        },
+        {
+            "type": "InputTexture",
+            "index": 1,
+            "parameters": [
+                {
+                    "path": "Art/Models/Terrain/Jungle/Tiles/Jungle/Textures/JungleMoss01_normal_DXT5.dds",
+                    "srgb": false,
+                    "layout": {
+                        "icon": 77,
+                        "priority": 11,
+                        "tooltip": "Normal Texture Input",
+                        "group": "Textures"
+                    }
+                }
+            ],
+            "custom_parameter": "TextureBlend_Normal",
+            "ui_position": [
+                4095.99365234375,
+                1343.9990234375
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "One",
+            "index": 3,
+            "ui_position": [
+                4288.0,
+                1472.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "SampleTriplanarTbnMaterial",
+            "index": 0,
+            "ui_position": [
+                4544.0,
+                1344.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Dummy3",
+            "index": 20,
+            "ui_position": [
+                7680.0,
+                1728.0
+            ],
+            "group_id": "<Group>_20"
+        },
+        {
+            "type": "CombineTbnNormals",
+            "index": 0,
+            "parameters": [
+                {
+                    "layout": {
+                        "priority": 31,
+                        "icon": 109,
+                        "tooltip": "Control the Normal Intensity of Both the Base Normal and Blend Normal.",
+                        "group": "Normals",
+                        "range": [
+                            {
+                                "min": 0.0,
+                                "max": 1.0
+                            }
+                        ]
+                    }
+                },
+                {
+                    "layout": {
+                        "priority": 4,
+                        "icon": 109,
+                        "tooltip": "Control the Normal Intensity of Both the Base Normal and Blend Normal.",
+                        "range": [
+                            {
+                                "min": 0.0,
+                                "max": 1.0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "custom_parameter": "TextureBlend_NormalBlend",
+            "ui_position": [
+                8128.0,
+                1536.0
+            ],
+            "group_id": "<Group>_5"
+        },
+        {
+            "type": "Dummy",
+            "index": 21,
+            "ui_position": [
+                8320.0,
+                1664.0
+            ],
+            "group_id": "<Group>_5"
+        },
+        {
+            "type": "Lerp3",
+            "index": 0,
+            "ui_position": [
+                8704.0,
+                1408.0
+            ],
+            "group_id": "<Group>_5"
+        },
+        {
+            "type": "ConstantBool",
+            "index": 0,
+            "parameters": [
+                {
+                    "layout": {
+                        "icon": 137,
+                        "priority": 30,
+                        "tooltip": "Choose Whether or Not to Use the Tileable Normal Map.",
+                        "group": "Normals"
+                    }
+                }
+            ],
+            "custom_parameter": "Use_TextureBlend_Normal_Input",
+            "ui_position": [
+                8640.0,
+                1664.0
+            ],
+            "group_id": "<Group>_5"
+        },
+        {
+            "type": "SelectFloat3",
+            "index": 0,
+            "ui_position": [
+                9024.0,
+                1280.0
+            ],
+            "group_id": "<Group>_5"
+        },
+        {
+            "type": "TbnNormal",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputGlossiness",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                897.3333740234375,
+                189.99998474121095
+            ]
+        },
+        {
+            "type": "Dummy",
+            "index": 29,
+            "ui_position": [
+                5186.84521484375,
+                277.76519775390627
+            ]
+        },
+        {
+            "type": "Dummy",
+            "index": 5,
+            "ui_position": [
+                6400.0,
+                2111.999755859375
+            ],
+            "group_id": "<Group>_13"
+        },
+        {
+            "type": "Dummy",
+            "index": 6,
+            "ui_position": [
+                8448.0,
+                2112.0
+            ],
+            "group_id": "<Group>_7"
+        },
+        {
+            "type": "Dummy",
+            "index": 0,
+            "ui_position": [
+                8767.9990234375,
+                2112.0
+            ],
+            "group_id": "<Group>_7"
+        },
+        {
+            "type": "ConstantFloat2",
+            "index": 3,
+            "parameters": [
+                {
+                    "value": [
+                        0.0,
+                        1.0
+                    ],
+                    "layout": {
+                        "priority": 21,
+                        "icon": 54,
+                        "tooltip": "Adjust the Min and Max Range of the Tileable Gloss Map.",
+                        "group": "Roughness",
+                        "range": [
+                            {
+                                "min": 0.0
+                            },
+                            {}
+                        ]
+                    }
+                }
+            ],
+            "custom_parameter": "TextureBlend_Gloss/Roughness_Min/Max",
+            "ui_position": [
+                7424.0,
+                2304.0
+            ],
+            "group_id": "<Group>_6"
+        },
+        {
+            "type": "Dummy",
+            "index": 20,
+            "ui_position": [
+                6400.0,
+                2432.0
+            ],
+            "group_id": "<Group>_19"
+        },
+        {
+            "type": "Dummy",
+            "index": 18,
+            "ui_position": [
+                6848.0,
+                2432.0
+            ],
+            "group_id": "<Group>_6"
+        },
+        {
+            "type": "OneMinus",
+            "index": 0,
+            "ui_position": [
+                7168.0,
+                2496.0
+            ],
+            "group_id": "<Group>_6"
+        },
+        {
+            "type": "ConstantBool",
+            "index": 1,
+            "parameters": [
+                {
+                    "layout": {
+                        "icon": 137,
+                        "priority": 22,
+                        "tooltip": "Flips the Graph to Expect Roughness instead of the Default, Gloss. ",
+                        "group": "Roughness"
+                    }
+                }
+            ],
+            "custom_parameter": "Use_Roughness",
+            "ui_position": [
+                7040.0,
+                2624.0
+            ],
+            "group_id": "<Group>_6"
+        },
+        {
+            "type": "SelectFloat",
+            "index": 0,
+            "ui_position": [
+                7424.0,
+                2432.0
+            ],
+            "group_id": "<Group>_6"
+        },
+        {
+            "type": "Lerp",
+            "index": 3,
+            "ui_position": [
+                7808.0,
+                2304.0
+            ],
+            "group_id": "<Group>_6"
+        },
+        {
+            "type": "Dummy",
+            "index": 19,
+            "ui_position": [
+                8448.0,
+                2304.0
+            ],
+            "group_id": "<Group>_7"
+        },
+        {
+            "type": "Dummy",
+            "index": 17,
+            "ui_position": [
+                8448.0,
+                2432.0
+            ],
+            "group_id": "<Group>_7"
+        },
+        {
+            "type": "Lerp",
+            "index": 0,
+            "ui_position": [
+                8767.9990234375,
+                2240.0
+            ],
+            "group_id": "<Group>_7"
+        },
+        {
+            "type": "ConstantBool",
+            "index": 2,
+            "parameters": [
+                {
+                    "layout": {
+                        "icon": 137,
+                        "priority": 20,
+                        "tooltip": "Choose Whether or Not to Use the Tileable Gloss Map.",
+                        "group": "Roughness"
+                    }
+                }
+            ],
+            "custom_parameter": "Use_TextureBlend_Gloss/Roughness_Input",
+            "ui_position": [
+                8704.0,
+                1984.0
+            ],
+            "group_id": "<Group>_7"
+        },
+        {
+            "type": "SelectFloat",
+            "index": 1,
+            "ui_position": [
+                9087.9990234375,
+                2112.0
+            ],
+            "group_id": "<Group>_7"
+        },
+        {
+            "type": "Glossiness",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputIndirectColor",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                897.3333740234375,
+                189.99998474121095
+            ]
+        },
+        {
+            "type": "Dummy",
+            "index": 30,
+            "ui_position": [
+                4802.8876953125,
+                387.0555419921875
+            ]
+        },
+        {
+            "type": "Dummy",
+            "index": 22,
+            "ui_position": [
+                6400.0,
+                2944.0
+            ],
+            "group_id": "<Group>_21"
+        },
+        {
+            "type": "Dummy",
+            "index": 23,
+            "ui_position": [
+                6399.99951171875,
+                3264.0
+            ],
+            "group_id": "<Group>_22"
+        },
+        {
+            "type": "Dummy",
+            "index": 31,
+            "ui_position": [
+                8640.0,
+                3264.0
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 4,
+            "ui_position": [
+                9152.0,
+                2944.0
+            ],
+            "group_id": "<Group>_23"
+        },
+        {
+            "type": "IndirectColor",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "TbnBasis",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputWorldPos",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "WorldPos",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputAlbedoColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "AlbedoColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputHeight",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "Height",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputTbnNormal",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "TbnNormal",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputWorldNormal",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "WorldNormal",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputGlossiness",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "Glossiness",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputTbnFiberDir",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "TbnFiberDir",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputWorldFiberDir",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "WorldFiberDir",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputFiberRoughness",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "FiberRoughness",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputTangentRoughness",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "TangentRoughness",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputSpecularPower",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "SpecularPower",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputSpecularColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "SpecularColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputFresnelColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "FresnelColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputEmissiveColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "EmissiveColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputIndirectColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "IndirectColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputReflectedColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "ReflectedColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputSubsurfaceColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "SubsurfaceColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputSubsurfaceTranslucency",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "SubsurfaceTranslucency",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputSubsurfaceTranslucency3",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "SubsurfaceTranslucency3",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputSubsurfaceFrontScattering",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "SubsurfaceFrontScattering",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "InputHighlightModifier",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10368.0,
+                192.0
+            ]
+        },
+        {
+            "type": "HighlightModifier",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                10868.0,
+                192.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 0,
+            "ui_position": [
+                3264.0,
+                896.0
+            ],
+            "ui_size": [
+                1792.0,
+                704.0
+            ],
+            "title": "Input Textures",
+            "group_color": [
+                0.0,
+                0.0,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 2,
+            "ui_position": [
+                1216.0,
+                1280.0
+            ],
+            "ui_size": [
+                1024.0,
+                256.0
+            ],
+            "title": "World Normal",
+            "group_color": [
+                0.0,
+                0.0,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 4,
+            "ui_position": [
+                7616.0,
+                1344.0
+            ],
+            "ui_size": [
+                320.0,
+                191.9998779296875
+            ],
+            "title": "Base Material Normal",
+            "group_color": [
+                84.66666412353516,
+                84.66666412353516,
+                170.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 5,
+            "ui_position": [
+                8064.0,
+                1216.0
+            ],
+            "ui_size": [
+                1280.0,
+                576.0
+            ],
+            "title": "Blend Normals",
+            "group_color": [
+                85.0,
+                85.0,
+                170.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 6,
+            "ui_position": [
+                6784.0,
+                2240.0
+            ],
+            "ui_size": [
+                1472.0,
+                512.0
+            ],
+            "title": "Gloss || Roughness Toggle",
+            "group_color": [
+                170.0,
+                140.0,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 7,
+            "ui_position": [
+                8384.0,
+                1920.0
+            ],
+            "ui_size": [
+                959.998046875,
+                639.9990234375
+            ],
+            "title": "Blend Gloss",
+            "group_color": [
+                170.0,
+                140.0,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 8,
+            "ui_position": [
+                3520.0,
+                3520.0
+            ],
+            "ui_size": [
+                2432.0,
+                640.0
+            ],
+            "title": "Z Projection Mask",
+            "group_color": [
+                0.0,
+                0.0,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 13,
+            "ui_position": [
+                6336.0,
+                2048.0
+            ],
+            "ui_size": [
+                320.0,
+                191.9998779296875
+            ],
+            "title": "Base Material Gloss",
+            "group_color": [
+                170.13470458984376,
+                140.11094665527345,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 16,
+            "ui_position": [
+                3264.0,
+                5248.0
+            ],
+            "ui_size": [
+                2624.0,
+                704.0
+            ],
+            "title": "Noise Blend",
+            "description": "Triplanar Projected Noise Blend for Breaking Up Masking. ",
+            "group_color": [
+                0.0,
+                0.0,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 18,
+            "ui_position": [
+                1920.0,
+                1024.0
+            ],
+            "ui_size": [
+                320.000732421875,
+                192.000244140625
+            ],
+            "title": "World Position",
+            "group_color": [
+                0.0,
+                0.0,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 19,
+            "ui_position": [
+                6336.0,
+                2368.0
+            ],
+            "ui_size": [
+                320.0,
+                191.99951171875
+            ],
+            "title": "Blend Material Gloss",
+            "group_color": [
+                170.0,
+                140.0,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 20,
+            "ui_position": [
+                7616.0,
+                1664.0
+            ],
+            "ui_size": [
+                320.0,
+                192.000244140625
+            ],
+            "title": "Blend Material Normal",
+            "group_color": [
+                84.66666412353516,
+                84.66666412353516,
+                170.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 21,
+            "ui_position": [
+                6336.0,
+                2880.0
+            ],
+            "ui_size": [
+                320.0,
+                192.0
+            ],
+            "title": "Base Material Occlusion",
+            "group_color": [
+                0.0,
+                0.0,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 22,
+            "ui_position": [
+                6336.0,
+                3200.0
+            ],
+            "ui_size": [
+                320.0,
+                191.999267578125
+            ],
+            "title": "Blend Material Occlusion",
+            "group_color": [
+                0.0,
+                0.0,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 23,
+            "ui_position": [
+                9088.0,
+                2880.0
+            ],
+            "ui_size": [
+                255.998046875,
+                255.999267578125
+            ],
+            "title": "Blend Occlusion",
+            "group_color": [
+                0.0,
+                0.0,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 24,
+            "ui_position": [
+                8576.0,
+                896.0
+            ],
+            "ui_size": [
+                319.998046875,
+                192.0
+            ],
+            "title": "Blend Material Albedo",
+            "group_color": [
+                0.0,
+                119.99995422363281,
+                170.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 25,
+            "ui_position": [
+                8576.0,
+                576.0
+            ],
+            "ui_size": [
+                319.998046875,
+                192.0001220703125
+            ],
+            "title": "Base Material Albedo",
+            "group_color": [
+                0.0,
+                119.99995422363281,
+                170.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 26,
+            "ui_position": [
+                9024.0,
+                576.0
+            ],
+            "ui_size": [
+                320.0,
+                256.00006103515627
+            ],
+            "title": "Blend Albedo",
+            "group_color": [
+                0.0,
+                120.00000762939453,
+                170.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 27,
+            "ui_position": [
+                3520.0,
+                4288.0
+            ],
+            "ui_size": [
+                2368.0,
+                832.0
+            ],
+            "title": "Gradient",
+            "description": "Vertical Gradient for Masking the Top or Bottom of Objects.",
+            "group_color": [
+                4.766357898712158,
+                4.766357898712158,
+                4.766357898712158,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 28,
+            "ui_position": [
+                2109.0,
+                4606.75
+            ],
+            "ui_size": [
+                383.9990234375,
+                191.99951171875
+            ],
+            "title": "World Position",
+            "group_color": [
+                15.037769317626954,
+                15.037769317626954,
+                15.481099128723145,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 29,
+            "ui_position": [
+                2125.0,
+                4384.0
+            ],
+            "ui_size": [
+                383.9990234375,
+                192.00048828125
+            ],
+            "title": "Local Position",
+            "group_color": [
+                15.037769317626954,
+                15.037769317626954,
+                15.481099128723145,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 30,
+            "ui_position": [
+                2624.00048828125,
+                4416.00048828125
+            ],
+            "ui_size": [
+                767.99951171875,
+                379.62451171875
+            ],
+            "title": "Local || World Space Toggle",
+            "description": "Switch Between Local and World Space Position for the Vertical Gradient.",
+            "group_color": [
+                0.0,
+                0.0,
+                0.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 31,
+            "ui_position": [
+                6336.0,
+                3520.0
+            ],
+            "ui_size": [
+                1280.0,
+                512.0
+            ],
+            "title": "Enable Noise Blend",
+            "group_color": [
+                0.0,
+                0.0,
+                0.0,
+                255.0
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputVertexPosition",
+                "index": 0,
+                "stage": "LocalTransform",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "VertexPosition",
+                "index": 0,
+                "stage": "LocalTransform",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexPosition",
+                "index": 0,
+                "stage": "LocalTransform",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "VertexPosition",
+                "index": 0,
+                "stage": "LocalTransform",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexNormal",
+                "index": 0,
+                "stage": "LocalTransform",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "VertexNormal",
+                "index": 0,
+                "stage": "LocalTransform",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexPosition",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "VertexPosition",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexPosition",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "VertexPosition",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy4",
+                "index": 4,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy4",
+                "index": 4,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy4",
+                "index": 2,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 2,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 2,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "MultiplyConst3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst3",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst3",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 22,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Transform",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnBasis",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Transform",
+                "index": 0,
+                "variable": "inmatrix"
+            }
+        },
+        {
+            "src": {
+                "type": "Transform",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 3,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 3,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 0,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 0,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 23,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTexture",
+                "index": 0,
+                "variable": "out_texture"
+            },
+            "dst": {
+                "type": "SampleInputTriplanar",
+                "index": 0,
+                "variable": "in_texture"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 22,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "SampleInputTriplanar",
+                "index": 0,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 23,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "SampleInputTriplanar",
+                "index": 0,
+                "variable": "world_normal"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleInputTriplanar",
+                "index": 0,
+                "variable": "color"
+            },
+            "dst": {
+                "type": "Dummy4",
+                "index": 3,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexNormal",
+                "index": 0,
+                "stage": "LocalTransform",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Float3ToCoords",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Float3ToCoords",
+                "index": 0,
+                "variable": "z"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 25,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 25,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "OneMinus",
+                "index": 1,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 25,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 24,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 24,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantBool",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat3",
+                "index": 1,
+                "variable": "output",
+                "swizzle": "xy"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "One",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "in_min"
+            }
+        },
+        {
+            "src": {
+                "type": "Zero",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "in_max"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "out_min"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "out_max"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat3",
+                "index": 1,
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 9,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 9,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 26,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Power",
+                "index": 0,
+                "variable": "base"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 26,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Power",
+                "index": 0,
+                "variable": "exp"
+            }
+        },
+        {
+            "src": {
+                "type": "Power",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexPosition",
+                "index": 0,
+                "stage": "LocalTransform",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 25,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexPosition",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 24,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 25,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 24,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantBool",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 26,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat2",
+                "index": 4,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "OneMinus",
+                "index": 3,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 12,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat2",
+                "index": 4,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 13,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 12,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 4,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 13,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 4,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 12,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 13,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Subtract",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantBool",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 3,
+                "variable": "condition"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 4,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Subtract",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 4,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantBool",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 4,
+                "variable": "condition"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 26,
+                "variable": "out_value",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "SelectFloat",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "in_min"
+            }
+        },
+        {
+            "src": {
+                "type": "SelectFloat",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "in_max"
+            }
+        },
+        {
+            "src": {
+                "type": "Zero",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "out_min"
+            }
+        },
+        {
+            "src": {
+                "type": "One",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "out_max"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 6,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Subtract",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 27,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 27,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 10,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat2",
+                "index": 5,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat2",
+                "index": 5,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat2",
+                "index": 5,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat2",
+                "index": 5,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 2,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "MultiplyConst3",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst3",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 3,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 18,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 18,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 19,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTexture",
+                "index": 2,
+                "variable": "out_texture"
+            },
+            "dst": {
+                "type": "SampleInputTriplanar",
+                "index": 2,
+                "variable": "in_texture"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst3",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleInputTriplanar",
+                "index": 2,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 19,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "SampleInputTriplanar",
+                "index": 2,
+                "variable": "world_normal"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleInputTriplanar",
+                "index": 2,
+                "variable": "color",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 3,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 16,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Subtract",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "CheapSmoothstep",
+                "index": 0,
+                "variable": "min_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "CheapSmoothstep",
+                "index": 0,
+                "variable": "max_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 16,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "CheapSmoothstep",
+                "index": 0,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "CheapSmoothstep",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 5,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 27,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 10,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Subtract",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantBool",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 2,
+                "variable": "condition"
+            }
+        },
+        {
+            "src": {
+                "type": "SelectFloat",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 2,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 8,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy4",
+                "index": 2,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp4",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy4",
+                "index": 3,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp4",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 8,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp4",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp4",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp4",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 29,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 29,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 6,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 6,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 7,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 7,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 10,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTexture",
+                "index": 1,
+                "variable": "out_texture"
+            },
+            "dst": {
+                "type": "SampleTriplanarTbnMaterial",
+                "index": 0,
+                "variable": "normal_ao_gloss_tex"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 22,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "SampleTriplanarTbnMaterial",
+                "index": 0,
+                "variable": "triplanar_pos"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnBasis",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTriplanarTbnMaterial",
+                "index": 0,
+                "variable": "tbn_to_triplanar"
+            }
+        },
+        {
+            "src": {
+                "type": "One",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTriplanarTbnMaterial",
+                "index": 0,
+                "variable": "mult"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTriplanarTbnMaterial",
+                "index": 0,
+                "variable": "tbn_normal"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 20,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 6,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "CombineTbnNormals",
+                "index": 0,
+                "variable": "tbn_normal1"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 20,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "CombineTbnNormals",
+                "index": 0,
+                "variable": "tbn_normal2"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 8,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 21,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 7,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "CombineTbnNormals",
+                "index": 0,
+                "variable": "tbn_normal"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 21,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 10,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "SelectFloat3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat3",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantBool",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat3",
+                "index": 0,
+                "variable": "condition"
+            }
+        },
+        {
+            "src": {
+                "type": "SelectFloat3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "TbnNormal",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputGlossiness",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 29,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 29,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 5,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 5,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 6,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 6,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 0,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTriplanarTbnMaterial",
+                "index": 0,
+                "variable": "gloss"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 20,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 20,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 18,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 18,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "OneMinus",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 18,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantBool",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 0,
+                "variable": "condition"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat2",
+                "index": 3,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat2",
+                "index": 3,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "SelectFloat",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 3,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 19,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 8,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 17,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 6,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 19,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 17,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 0,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantBool",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat",
+                "index": 1,
+                "variable": "condition"
+            }
+        },
+        {
+            "src": {
+                "type": "SelectFloat",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Glossiness",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 30,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 30,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 22,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTriplanarTbnMaterial",
+                "index": 0,
+                "variable": "ao"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 23,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 23,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy",
+                "index": 31,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 22,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 4,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 31,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 4,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy",
+                "index": 8,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 4,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input",
+                "swizzle": "z"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnBasis",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "TbnBasis",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputHeight",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Height",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "TbnNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "WorldNormal",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputGlossiness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Glossiness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnFiberDir",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "TbnFiberDir",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldFiberDir",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "WorldFiberDir",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputFiberRoughness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FiberRoughness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTangentRoughness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "TangentRoughness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputSpecularPower",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SpecularPower",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputSpecularColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SpecularColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputFresnelColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FresnelColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputEmissiveColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "EmissiveColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputReflectedColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "ReflectedColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputSubsurfaceColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SubsurfaceColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputSubsurfaceTranslucency",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SubsurfaceTranslucency",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputSubsurfaceTranslucency3",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SubsurfaceTranslucency3",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputSubsurfaceFrontScattering",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SubsurfaceFrontScattering",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputHighlightModifier",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "HighlightModifier",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        }
+    ],
+    "unused_links": [
+        {
+            "src": {
+                "type": "InputVertexPosition",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "output",
+                "swizzle": "xyz"
+            }
+        }
+    ]
+}
