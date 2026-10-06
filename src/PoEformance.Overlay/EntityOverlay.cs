@@ -2881,6 +2881,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Load = static (read, _, key, _) => TileBookWindow.Load(read, key),
                 Ink = TileBookWindow.GroundInk,
                 Shaded = true,
+                Masked = true,
                 Tilesets = catalog,
                 Shaders = () => ShaderFiles,
                 Materials = () => MaterialFiles,
