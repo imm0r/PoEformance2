@@ -609,6 +609,46 @@ public class MeshPictureTests
         Assert.Equal(255, Channel(kept, 3));
     }
 
+    /// <summary>
+    /// A cut-out shape with a program takes its colour from the program and its edge from its texture's alpha.
+    /// </summary>
+    [Fact]
+    public void ANDACUTOUTShapeTakesItsColourFromItsProgramAndItsEdgeFromItsTexture()
+    {
+        const int Size = 64;
+        Mipmaps red = Sheet(220, 0, 0);
+        MaterialBlend[] blends = [MaterialBlend.Opaque, MaterialBlend.Cutout];
+        ShadeProgram green = Constant(0f, 0.6f, 0f);
+
+        // Clear in the texture: dropped, whatever the program says, and the red behind shows.
+        GamePicture clear = MeshPicture.Of(Layered(), Size, skins: [red, Sheet(0, 0, 200, alpha: 40)], blends: blends, shades: [null, green]);
+        Assert.True(Channel(clear, 0) > 50, $"the red behind should show through: {Channel(clear, 0)}");
+        Assert.Equal(0, Channel(clear, 1));
+
+        // Kept in the texture: the program's green, not the texture's blue.
+        GamePicture kept = MeshPicture.Of(Layered(), Size, skins: [red, Sheet(0, 0, 200, alpha: 220)], blends: blends, shades: [null, green]);
+        Assert.Equal(0, Channel(kept, 0));
+        Assert.Equal(0, Channel(kept, 2));
+        Assert.True(Channel(kept, 1) > 50, $"the program's green should cover the red: {Channel(kept, 1)}");
+    }
+
+    /// <summary>A program whose colour is one constant, in linear light, bound to nothing - it reads no texture.</summary>
+    private static ShadeProgram Constant(float r, float g, float b)
+    {
+        ShaderGraph graph = ShaderGraph.Read(System.Text.Encoding.UTF8.GetBytes(
+            $$$"""
+            {"nodes":[
+              {"type":"ConstantFloat3","index":0,"parameters":[{"value":[{{{r.ToString(System.Globalization.CultureInfo.InvariantCulture)}}},{{{g.ToString(System.Globalization.CultureInfo.InvariantCulture)}}},{{{b.ToString(System.Globalization.CultureInfo.InvariantCulture)}}}]}]},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"ConstantFloat3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
+            """));
+        ShadeCompile compiled = ShadeProgram.Compile([(new ShaderInstance("Metadata/Test.fxgraph", new Dictionary<string, ShaderValue[]>()), graph)]);
+        Assert.NotNull(compiled.Program);
+        Assert.True(compiled.Program.Bound);
+        return compiled.Program;
+    }
+
     /// <summary>The second pass stays inside its band, so any number of threads draws the same bytes.</summary>
     [Fact]
     public void TRANSLUCENCYDrawsTheSamePictureOnAnyNumberOfThreads()

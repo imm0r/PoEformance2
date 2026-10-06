@@ -1014,10 +1014,13 @@ public static class MeshPicture
             MaterialBlend blend = _blends[one];
             bool skinned = skin is not null;
 
-            // A SHADE PROGRAM WHERE THE TRIANGLE HAS ONE AND IS SOLID: a translucent or cut-out
-            // shape is drawn by its texture's own alpha, which a program's colour does not carry.
+            // A SHADE PROGRAM WHERE THE TRIANGLE HAS ONE AND IS SOLID OR CUT OUT: a translucent shape
+            // is drawn by its texture's own alpha, which a program's colour does not carry. A cut-out
+            // one takes its EDGE from the texture's alpha and its colour from the program - foliage is
+            // cut out, and a tree whose leaves are shaded by a vertex-colour graph (VertexColourAO)
+            // never ran it while cut-outs were drawn plain.
             int shadeAt = _programs.Length > 0 ? _shades[one] : -1;
-            ShadeProgram? program = shadeAt >= 0 && blend == MaterialBlend.Opaque ? _programs[shadeAt] : null;
+            ShadeProgram? program = shadeAt >= 0 && blend is MaterialBlend.Opaque or MaterialBlend.Cutout ? _programs[shadeAt] : null;
             Span<Vector4> registers = program is null ? default : stackalloc Vector4[program.Registers];
             ReadOnlySpan<float> shadeLevels = program is null
                 ? default
@@ -1100,6 +1103,13 @@ public static class MeshPicture
                     Vector3 colour = _ink;
                     if (program is not null)
                     {
+                        // THE TEXTURE STILL CUTS, before depth is written - see the plain cut-out below.
+                        if (blend == MaterialBlend.Cutout && skinned
+                            && Sample4(skin!, (first * s0) + (second * s1) + (third * s2), level).W < CutoutAlpha)
+                        {
+                            continue;
+                        }
+
                         colour = program.Colour(
                             registers,
                             (first * s0) + (second * s1) + (third * s2),
