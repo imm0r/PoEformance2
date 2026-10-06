@@ -143,14 +143,14 @@ public class ShadeProgramTests
         ShadeCompile compiled = ShadeProgram.Compile([(Instance("Metadata/Tint.fxgraph"), Graph(
             """
             {"nodes":[
-              {"type":"FromVertexColor","index":0},
+              {"type":"FromVertexLocalUV","index":0},
               {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
              "links":[
-              {"src":{"type":"FromVertexColor","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+              {"src":{"type":"FromVertexLocalUV","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
             """))]);
 
         Assert.Null(compiled.Program);
-        Assert.Equal(["FromVertexColor in Tint"], compiled.Skipped);
+        Assert.Equal(["FromVertexLocalUV in Tint"], compiled.Skipped);
     }
 
     /// <summary>A constant colour, worked in linear light, comes out as the sRGB texture of that colour would.</summary>
@@ -1597,6 +1597,59 @@ public class ShadeProgramTests
         AssertClose(
             MeshPicture.Of(Quad(), 64, skins: [Sheet(255, 255, 255)]),
             MeshPicture.Of(Quad(), 64, shades: [program]));
+    }
+
+    [Fact]
+    public void FROMVERTEXCOLORIsTheSameColourStreamWhiteWithoutOne()
+    {
+        // semanticsData.color0: white from InitSemanticsData, the mesh's stream through OutputVertexLocalColor.
+        string graph = Colouring("""{"type":"FromVertexColor","index":0,"stage":"VertexInit"}""", string.Empty, "FromVertexColor", "output", "xyz");
+        ShadeProgram program = Compile(graph);
+        Assert.True(program.UsesVertexColour);
+
+        var colours = new byte[4 * 4];
+        for (var one = 0; one < 4; one++)
+        {
+            colours[one * 4] = 128;
+            colours[(one * 4) + 1] = 64;
+            colours[(one * 4) + 2] = 255;
+            colours[(one * 4) + 3] = 255;
+        }
+
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(128f / 255f), Srgb(64f / 255f), 255)]),
+            MeshPicture.Of(Quad(colours), 64, shades: [program]));
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(255, 255, 255)]),
+            MeshPicture.Of(Quad(), 64, shades: [program]));
+    }
+
+    [Fact]
+    public void ANDFROMVERTEXCOLORIsRefusedOnceAGraphWroteTheVertexColour()
+    {
+        // OutputVertexColor sets color0 at the vertex stage, which is not run - so what it wrote is not known.
+        ShadeCompile compiled = ShadeProgram.Compile(
+        [
+            (Instance("Metadata/Paint.fxgraph"), Graph(
+                """
+                {"nodes":[
+                  {"type":"ConstantFloat4","index":0,"parameters":[{"value":[1.0,0.0,0.0,1.0]}]},
+                  {"type":"OutputVertexColor","index":0,"stage":"WorldTransform"}],
+                 "links":[
+                  {"src":{"type":"ConstantFloat4","index":0,"variable":"output"},"dst":{"type":"OutputVertexColor","index":0,"stage":"WorldTransform","variable":"input"}}]}
+                """)),
+            (Instance("Metadata/Tint.fxgraph"), Graph(
+                """
+                {"nodes":[
+                  {"type":"FromVertexColor","index":0},
+                  {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+                 "links":[
+                  {"src":{"type":"FromVertexColor","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+                """)),
+        ]);
+
+        Assert.Null(compiled.Program);
+        Assert.Equal(["FromVertexColor after Paint wrote the vertex colour in Tint"], compiled.Skipped);
     }
 
     /// <summary>One quad facing the camera, its coordinates all on the middle of the texture - with a colour per vertex, where given.</summary>

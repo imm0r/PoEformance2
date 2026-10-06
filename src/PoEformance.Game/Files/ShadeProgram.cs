@@ -86,7 +86,9 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 /// rely on zero vertex color default value", and the pixel side's <c>InitSemanticsData</c> starts
 /// <c>color0</c> at white - so the game settled it: BasicColour on a rope and on book pages with no
 /// stream is drawn with their textures, where nought would have made both black (see
-/// SkinnedMesh.Colours).
+/// SkinnedMesh.Colours). <c>FromVertexColor</c> reads the same: it is <c>semanticsData.color0</c>,
+/// white from <c>InitSemanticsData</c> and replaced only through COLOR0 - the mesh's own stream by
+/// the engine's OutputVertexLocalColor, or what a graph's OutputVertexColor wrote, which is refused.
 ///
 /// A NODE THAT READS THE CLOCK IS DRAWN ONLY WHERE THE CLOCK CANNOT SHOW. MuddleTex, MuddleTex2 and
 /// RotateUVOld multiply <c>time</c> by a parameter - a scroll, an angle per second - and with that
@@ -119,7 +121,7 @@ public sealed class ShadeProgram
     /// <summary>The vertex normal as it is interpolated, not normalised - what <c>FromVertexNormal</c> reads.</summary>
     internal const int VertexNormal = 3;
 
-    /// <summary>The vertex colour as it is interpolated, nought to one - what <c>InputVertexColor</c> reads. See SkinnedMesh.Colours.</summary>
+    /// <summary>The vertex colour as it is interpolated, nought to one - what <c>InputVertexColor</c> and <c>FromVertexColor</c> read. See SkinnedMesh.Colours.</summary>
     internal const int VertexColour = 4;
 
     /// <summary>How many registers are the mesh's own, before any a program allocates.</summary>
@@ -201,6 +203,7 @@ public sealed class ShadeProgram
             "MuddleTex", "MuddleTexFromInput", "MuddleTex2", "FromVertexVariance",
             "RGBToTbn", "ScaleUVMaya", "HardLightBlend", "Sine", "RotateUVOld",
             "FromVertexNormal", "FromVertexWorldPos", "FromVertexLocalPosition", "InputVertexPosition", "InputVertexNormal", "InputVertexColor",
+            "FromVertexColor",
             "ModelOrigin", "GroundScroll", "Transform", "LookUpTexture",
             "Noise31", "PerlinNoise31", "Vibrance", "Rotate", "RotateUV", "RadiusToPolarNorm",
         ],
@@ -434,6 +437,13 @@ public sealed class ShadeProgram
                 {
                     string by = Named(chain[link].Instance.Parent);
                     moved = node.Type == "VertexPosition" ? moved with { Position = by } : moved with { Normal = by };
+                }
+
+                // AND ONE THAT WRITES COLOR0 HAS REPLACED WHAT FromVertexColor READS: the fragment
+                // OutputVertexColor sets semanticsData.color0 at the vertex stage, which is not run.
+                if (node.Type == "OutputVertexColor" && lookups[link].Fed(node))
+                {
+                    moved = moved with { Colour = Named(chain[link].Instance.Parent) };
                 }
 
                 int at = IndexOf(node.Stage);
@@ -1595,8 +1605,8 @@ public sealed class ShadeProgram
     /// <summary>A channel's register, the components nothing set, and whether a link wrote its w - see HasAlpha.</summary>
     private readonly record struct Held(int Register, int Unset, bool Alpha = true);
 
-    /// <summary>The graphs, if any, that moved the vertices' positions and normals at a vertex stage.</summary>
-    private readonly record struct Displaced(string? Position, string? Normal);
+    /// <summary>The graphs, if any, that moved the vertices' positions and normals, or wrote their colour, at a vertex stage.</summary>
+    private readonly record struct Displaced(string? Position, string? Normal, string? Colour = null);
 
     /// <summary>One fed writer of a channel: its node, the stage it writes at, the channel, what it reads, and whether it only hands on what it read.</summary>
     private readonly record struct Writer(ShaderNode Node, int Stage, int Channel, int Reads, bool Same);
@@ -2574,6 +2584,13 @@ public sealed class ShadeProgram
                 // The mesh's own colour stream, where it has one - see the class's remarks.
                 case "InputVertexColor":
                     return VertexColour;
+
+                // semanticsData.color0, which InitSemanticsData sets to white and the vertex side replaces
+                // only through COLOR0: the engine's OutputVertexLocalColor hands the mesh's own colour stream
+                // across, a graph's OutputVertexColor whatever it wrote. So the same register as
+                // InputVertexColor - the stream, white without one - unless a graph wrote it.
+                case "FromVertexColor":
+                    return moved.Colour is { } painted ? Fail($"{node.Type} after {painted} wrote the vertex colour") : VertexColour;
 
                 case "LookUpTexture":
                     return LookedUp(node);
