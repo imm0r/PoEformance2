@@ -456,6 +456,21 @@ public static class MonsterModels
 
             if (shade.Program is { } program)
             {
+                // A PROGRAM READING THE VERTEX COLOUR NEEDS A MESH THAT HAS ONE. What the engine
+                // feeds a mesh without the stream is not settled - the sources hold nought and white
+                // both - so the shape keeps its texture and the line under the picture says so.
+                MeshShape part = model.Mesh.Shapes[shape];
+                if (program.UsesVertexColour && !(part.From < model.Mesh.Indices.Length && model.Mesh.ColourAt(model.Mesh.Indices[part.From])))
+                {
+                    string why = $"InputVertexColor for {MaterialFile.Bare(material)} on a mesh without a colour stream";
+                    if (!unshaded.Contains(why, StringComparer.Ordinal))
+                    {
+                        unshaded.Add(why);
+                    }
+
+                    continue;
+                }
+
                 shades[shape] = program;
                 drawn.Add(MaterialFile.Bare(material));
                 continue;
@@ -1413,7 +1428,7 @@ public static class MonsterModels
         }
 
         return SkinnedMesh.Of(
-            positions, normals, mesh.Indices, least, most, mesh.Coordinates, mesh.Shapes);
+            positions, normals, mesh.Indices, least, most, mesh.Coordinates, mesh.Shapes, mesh.Facts, mesh.Colours, mesh.Coloured);
     }
 
     /// <summary>

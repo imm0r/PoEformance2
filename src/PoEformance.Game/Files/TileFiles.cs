@@ -630,6 +630,6 @@ public sealed class TileMesh
             most = Vector3.Max(most, point);
         }
 
-        return SkinnedMesh.Of(block.Positions, block.Normals, block.Indices, least, most, block.Coordinates, shapes, block.Facts);
+        return SkinnedMesh.Of(block.Positions, block.Normals, block.Indices, least, most, block.Coordinates, shapes, block.Facts, block.Colours);
     }
 }

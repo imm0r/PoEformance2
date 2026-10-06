@@ -140,17 +140,17 @@ public class ShadeProgramTests
     [Fact]
     public void ANDAMaterialNoneOfWhoseColourCouldBeEvaluatedHasNoProgram()
     {
-        ShadeCompile compiled = ShadeProgram.Compile([(Instance("Metadata/BasicColour.fxgraph"), Graph(
+        ShadeCompile compiled = ShadeProgram.Compile([(Instance("Metadata/Tint.fxgraph"), Graph(
             """
             {"nodes":[
-              {"type":"InputVertexColor","index":0,"stage":"VertexInit"},
+              {"type":"FromVertexColor","index":0},
               {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
              "links":[
-              {"src":{"type":"InputVertexColor","index":0,"stage":"VertexInit","variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+              {"src":{"type":"FromVertexColor","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
             """))]);
 
         Assert.Null(compiled.Program);
-        Assert.Equal(["InputVertexColor in BasicColour"], compiled.Skipped);
+        Assert.Equal(["FromVertexColor in Tint"], compiled.Skipped);
     }
 
     /// <summary>A constant colour, worked in linear light, comes out as the sRGB texture of that colour would.</summary>
@@ -229,8 +229,8 @@ public class ShadeProgramTests
 
         Assert.NotNull(compiled.Program);
         Assert.Equal(-1, compiled.Program.Plain);
-        Assert.Equal(["Metadata/Materials/Environment/StromatoliteLedge_Blend.fxgraph"], compiled.Program.Graphs);
-        Assert.Equal(["InputVertexColor in BasicColour"], compiled.Skipped);
+        Assert.Equal(["Metadata/Effects/Graphs/General/BasicColour.fxgraph", "Metadata/Materials/Environment/StromatoliteLedge_Blend.fxgraph"], compiled.Program.Graphs);
+        Assert.Empty(compiled.Skipped);
         // THE MESHMAP IS READ AS THE MATERIAL SAYS - sRGB - over the node's own "srgb": false: an
         // instance's parameters override the graph's defaults, and the material writes true.
         Assert.Equal(
@@ -278,8 +278,8 @@ public class ShadeProgramTests
 
         Assert.NotNull(compiled.Program);
         Assert.Equal(-1, compiled.Program.Plain);
-        Assert.Equal(["Metadata/Materials/Ground/PBRGround.fxgraph"], compiled.Program.Graphs);
-        Assert.Equal(["InputVertexColor in BasicColour", "MaskedContactFade in MaskedContactFade"], compiled.Skipped);
+        Assert.Equal(["Metadata/Effects/Graphs/General/BasicColour.fxgraph", "Metadata/Materials/Ground/PBRGround.fxgraph"], compiled.Program.Graphs);
+        Assert.Equal(["MaskedContactFade in MaskedContactFade"], compiled.Skipped);
     }
 
     /// <summary>
@@ -1552,8 +1552,57 @@ public class ShadeProgramTests
         return (byte)Math.Clamp((int)MathF.Round(encoded * 255f), 0, 255);
     }
 
-    /// <summary>One quad facing the camera, its coordinates all on the middle of the texture.</summary>
-    private static SkinnedMesh Quad()
+    [Fact]
+    public void INPUTVERTEXCOLORIsTheMeshsOwnColourStream()
+    {
+        // BasicColour's shape: the texture times the vertex colour. A white sheet times a (0.5, 0.25, 1) colour on every vertex.
+        string graph = Colouring(
+            """
+              {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+              {"type":"InputVertexColor","index":0,"stage":"VertexInit"},
+              {"type":"SampleTexture","index":0,"parameters":[{"path":"Art/own.dds","srgb":true}]},
+              {"type":"Multiply4","index":0}
+            """,
+            """
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture","index":0,"variable":"uv"}},
+              {"src":{"type":"SampleTexture","index":0,"variable":"rgba"},"dst":{"type":"Multiply4","index":0,"variable":"a"}},
+              {"src":{"type":"InputVertexColor","index":0,"stage":"VertexInit","variable":"output"},"dst":{"type":"Multiply4","index":0,"variable":"b"}}
+            """,
+            "Multiply4", "output", "xyz");
+        ShadeProgram program = Bound(Compile(graph), new() { ["Art/own.dds"] = Sheet(255, 255, 255) });
+        Assert.True(program.UsesVertexColour);
+
+        var colours = new byte[4 * 4];
+        for (var one = 0; one < 4; one++)
+        {
+            colours[one * 4] = 128;
+            colours[(one * 4) + 1] = 64;
+            colours[(one * 4) + 2] = 255;
+            colours[(one * 4) + 3] = 255;
+        }
+
+        // THE BYTES ARE READ LINEAR, nought to one: 128 / 255, not the sRGB curve a texture goes through.
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(128f / 255f), Srgb(64f / 255f), 255)]),
+            MeshPicture.Of(Quad(colours), 64, shades: [program]));
+    }
+
+    [Fact]
+    public void ANDAMeshWithoutAColourStreamKeepsItsTextureUnderSuchAProgram()
+    {
+        string graph = Colouring("""{"type":"InputVertexColor","index":0,"stage":"VertexInit"}""", string.Empty, "InputVertexColor", "output", "xyz");
+        ShadeProgram program = Compile(graph);
+        Assert.True(program.UsesVertexColour);
+
+        // No stream: the program is not run, and the shape is drawn in its skin as if it had none.
+        Mipmaps skin = Sheet(Srgb(0.8f), Srgb(0.4f), Srgb(0.2f));
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [skin]),
+            MeshPicture.Of(Quad(), 64, skins: [skin], shades: [program]));
+    }
+
+    /// <summary>One quad facing the camera, its coordinates all on the middle of the texture - with a colour per vertex, where given.</summary>
+    private static SkinnedMesh Quad(byte[]? colours = null)
     {
         Vector3[] places =
         [
@@ -1568,7 +1617,7 @@ public class ShadeProgramTests
         Array.Fill(spots, new Vector2(0.5f, 0.5f));
         return SkinnedMesh.Of(
             places, normals, [0, 1, 2, 0, 2, 3], new Vector3(-10f, -1f, -10f), new Vector3(10f, 1f, 10f),
-            spots, [new MeshShape("Quad", 0, 6)]);
+            spots, [new MeshShape("Quad", 0, 6)], colours: colours);
     }
 
     /// <summary>A texture of one colour. Whether it is read as sRGB is the graph's to say, not the texture's.</summary>

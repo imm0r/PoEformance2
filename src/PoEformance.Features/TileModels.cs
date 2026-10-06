@@ -291,7 +291,8 @@ public static class TileModels
         }
 
         SkinnedMesh unwalled = SkinnedMesh.Of(
-            positions, mesh.Normals, at == into.Length ? into : into[..at], least, most, mesh.Coordinates, shapes);
+            positions, mesh.Normals, at == into.Length ? into : into[..at], least, most, mesh.Coordinates, shapes,
+            mesh.Facts, mesh.Colours, mesh.Coloured);
 
         // A FRESH RECORD RATHER THAN with, because MonsterModel keeps its blends worked out
         // from Modes in a field of its own, and with copies the field along with everything else.
@@ -409,7 +410,7 @@ public static class TileModels
             shapes[one] = mesh.Shapes[one] with { Name = Name(one) };
         }
 
-        return SkinnedMesh.Of(mesh.Positions, mesh.Normals, mesh.Indices, mesh.Least, mesh.Most, mesh.Coordinates, shapes);
+        return SkinnedMesh.Of(mesh.Positions, mesh.Normals, mesh.Indices, mesh.Least, mesh.Most, mesh.Coordinates, shapes, mesh.Facts, mesh.Colours, mesh.Coloured);
     }
 
     private static string Name(int shape) => shape.ToString(CultureInfo.InvariantCulture);
