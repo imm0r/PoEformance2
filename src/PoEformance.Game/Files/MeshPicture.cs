@@ -1106,8 +1106,11 @@ public static class MeshPicture
                     Vector3 colour = _ink;
                     if (program is not null)
                     {
-                        // THE TEXTURE STILL CUTS, before depth is written - see the plain cut-out below.
-                        if (blend == MaterialBlend.Cutout && skinned
+                        // A CUT-OUT SHAPE IS CUT ON THE ALPHA ITS GRAPHS LEAVE where they set one - the
+                        // engine's AlphaTestClipping clips on albedo_color.a - and on its texture's where
+                        // they do not. Either way before depth is written - see the plain cut-out below.
+                        bool cut = blend == MaterialBlend.Cutout;
+                        if (cut && !program.HasAlpha && skinned
                             && Sample4(skin!, (first * s0) + (second * s1) + (third * s2), level).W < CutoutAlpha)
                         {
                             continue;
@@ -1119,7 +1122,12 @@ public static class MeshPicture
                             (first * p0) + (second * p1) + (third * p2),
                             (first * n0) + (second * n1) + (third * n2),
                             shadeLevels,
+                            out float alpha,
                             tinted ? (first * v0) + (second * v1) + (third * v2) : default);
+                        if (cut && program.HasAlpha && alpha < CutoutAlpha)
+                        {
+                            continue;
+                        }
                     }
                     else if (skinned)
                     {

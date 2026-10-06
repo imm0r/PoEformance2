@@ -232,8 +232,9 @@ public sealed class ShadeProgram
 
     private ShadeProgram(
         Step[] steps, int[] constantAt, Vector4[] constants, int registers, int result,
-        ShadeTexture[] textures, int[] sampleTexture, int plain, IReadOnlyList<string> graphs, Mipmaps?[] sheets)
+        ShadeTexture[] textures, int[] sampleTexture, int plain, IReadOnlyList<string> graphs, Mipmaps?[] sheets, bool hasAlpha)
     {
+        HasAlpha = hasAlpha;
         _steps = steps;
         _constantAt = constantAt;
         _constants = constants;
@@ -363,6 +364,18 @@ public sealed class ShadeProgram
     public bool UsesVertexColour { get; }
 
     /// <summary>
+    /// Whether the graphs set the colour's alpha, which a cut-out shape is then cut on instead of its texture's.
+    /// </summary>
+    /// <remarks>
+    /// THE ENGINE CUTS ON THE FINAL ALBEDO, not on a texture: AlphaTestClipping passes
+    /// <c>albedo_color.a</c> to PerformAlphaTestClip. The case that showed it is
+    /// transparentobjectsc.mat - ForceAlphaTest over a graph that writes Zero to the colour, alpha and
+    /// all, and no texture at all - an invisible helper the game never shows, which a cut taken from
+    /// the texture alone could not drop, and drew as a black slab under the ship in Port's boss room.
+    /// </remarks>
+    public bool HasAlpha { get; }
+
+    /// <summary>
     /// Whether a graph node of this type is something the compiler can evaluate - for the graph survey.
     /// </summary>
     /// <remarks>
@@ -451,7 +464,7 @@ public sealed class ShadeProgram
                 string named = Named(instance.Parent);
                 var seen = new Dictionary<string, Held>(state, StringComparer.Ordinal);
                 var unit = new Unit(build, lookups[link], instance, seen, lost, moved);
-                var wrote = new List<(string Channel, int Register, int Unset)>();
+                var wrote = new List<(string Channel, int Register, int Unset, bool Alpha)>();
                 foreach (Writer writer in mine)
                 {
                     string channel = Channels[writer.Channel];
@@ -470,13 +483,13 @@ public sealed class ShadeProgram
                             // THE COLOUR'S W APART FROM ITS XYZ - see the class's remarks.
                             if (unit.Colour(writer.Node) is { } colour && build.Fits)
                             {
-                                wrote.Add((channel, colour.Register, colour.Unset));
+                                wrote.Add((channel, colour.Register, colour.Unset, colour.Alpha));
                                 continue;
                             }
                         }
                         else if (unit.Port(writer.Node, "input") is { } register && build.Fits && (channel == "TbnBasis") == (register == Basis))
                         {
-                            wrote.Add((channel, register, 0));
+                            wrote.Add((channel, register, 0, true));
                             continue;
                         }
 
@@ -494,12 +507,12 @@ public sealed class ShadeProgram
                     }
                     else if (writer.Channel >= FirstFollowed)
                     {
-                        wrote.Add((channel, int.MinValue, 0));
+                        wrote.Add((channel, int.MinValue, 0, true));
                     }
                 }
 
                 // IN THE GRAPH'S OWN ORDER, so a second write of one channel stands over the first.
-                foreach ((string channel, int register, int unset) in wrote)
+                foreach ((string channel, int register, int unset, bool alpha) in wrote)
                 {
                     if (register == int.MinValue)
                     {
@@ -508,7 +521,7 @@ public sealed class ShadeProgram
                         continue;
                     }
 
-                    state[channel] = new Held(register, unset);
+                    state[channel] = new Held(register, unset, alpha);
                     lost.Remove(channel);
                     if (channel == "Albedo" && !graphs.Contains(instance.Parent, StringComparer.OrdinalIgnoreCase))
                     {
@@ -536,7 +549,9 @@ public sealed class ShadeProgram
             return new ShadeCompile(null, skipped);
         }
 
-        ShadeProgram? program = Finish(build, albedo.Register, graphs);
+        // THE COLOUR'S W IS ITS ALPHA where the graphs set it - a texture's own, or a constant's - and
+        // the alpha test cuts on it: see HasAlpha.
+        ShadeProgram? program = Finish(build, albedo.Register, graphs, albedo.Alpha && (albedo.Unset & 0b1000) == 0);
         if (program is null)
         {
             skipped.Add($"more than {MostRegisters} registers in the colour");
@@ -557,7 +572,7 @@ public sealed class ShadeProgram
 
         return new ShadeProgram(
             _steps, _constantAt, _constants, Registers, _result,
-            [.. Textures], _sampleTexture, Plain, Graphs, bound);
+            [.. Textures], _sampleTexture, Plain, Graphs, bound, HasAlpha);
     }
 
     /// <summary>
@@ -582,6 +597,19 @@ public sealed class ShadeProgram
     /// <param name="vertexColour">The pixel's vertex colour, interpolated, nought to one; read only where <see cref="UsesVertexColour"/>.</param>
     internal Vector3 Colour(
         Span<Vector4> registers, Vector2 coordinates, Vector3 position, Vector3 normal, ReadOnlySpan<float> levels, Vector4 vertexColour = default)
+        => Colour(registers, coordinates, position, normal, levels, out _, vertexColour);
+
+    /// <summary>
+    /// The colour at one pixel, and the alpha the graphs left in its w - what the engine's alpha test cuts on.
+    /// </summary>
+    /// <remarks>
+    /// THE ALPHA AS THE GRAPHS LEFT IT, not encoded: the engine's AlphaTestClipping fragment hands
+    /// <c>albedo_color.a</c> to PerformAlphaTestClip, which clips on <c>alpha - cutoff</c>. Meaningful
+    /// only where <see cref="HasAlpha"/>.
+    /// </remarks>
+    internal Vector3 Colour(
+        Span<Vector4> registers, Vector2 coordinates, Vector3 position, Vector3 normal, ReadOnlySpan<float> levels,
+        out float alpha, Vector4 vertexColour = default)
     {
         registers[Coordinates] = new Vector4(coordinates, 0f, 0f);
         registers[Position] = new Vector4(position, 0f);
@@ -603,6 +631,7 @@ public sealed class ShadeProgram
         Run(registers, levels, default, -1);
 
         Vector4 colour = registers[_result];
+        alpha = colour.W;
         return new Vector3(Srgb(colour.X), Srgb(colour.Y), Srgb(colour.Z));
     }
 
@@ -944,7 +973,7 @@ public sealed class ShadeProgram
     /// nothing. Walking back from the colour keeps exactly what it reads, and the textures only the
     /// dropped steps read are never named, so never loaded.
     /// </remarks>
-    private static ShadeProgram? Finish(Builder build, int result, List<string> graphs)
+    private static ShadeProgram? Finish(Builder build, int result, List<string> graphs, bool hasAlpha)
     {
         List<Step> steps = build.Steps;
         var live = new bool[build.Next];
@@ -1050,7 +1079,7 @@ public sealed class ShadeProgram
         ShadeTexture[] named = [.. textures];
         return new ShadeProgram(
             [.. kept], [.. constantAt], [.. constants], next, map[result],
-            named, [.. sampleTextures], plain >= 0 ? textureMap[plain] : -1, graphs, new Mipmaps?[named.Length]);
+            named, [.. sampleTextures], plain >= 0 ? textureMap[plain] : -1, graphs, new Mipmaps?[named.Length], hasAlpha);
     }
 
     private static void Live(bool[] live, int register)
@@ -1563,7 +1592,8 @@ public sealed class ShadeProgram
     }
 
     /// <summary>What a channel holds: its register, and which of its components nothing has set.</summary>
-    private readonly record struct Held(int Register, int Unset);
+    /// <summary>A channel's register, the components nothing set, and whether a link wrote its w - see HasAlpha.</summary>
+    private readonly record struct Held(int Register, int Unset, bool Alpha = true);
 
     /// <summary>The graphs, if any, that moved the vertices' positions and normals at a vertex stage.</summary>
     private readonly record struct Displaced(string? Position, string? Normal);
@@ -1824,7 +1854,7 @@ public sealed class ShadeProgram
         /// but the w - marked unset, so that no later graph reads it. A writer with nothing but a w
         /// on it is refused: what its xyz are then is not written down.
         /// </remarks>
-        public (int Register, int Unset)? Colour(ShaderNode node)
+        public (int Register, int Unset, bool Alpha)? Colour(ShaderNode node)
         {
             var colour = new List<ShaderLink>();
             var alpha = new List<ShaderLink>();
@@ -1849,6 +1879,16 @@ public sealed class ShadeProgram
                 return null;
             }
 
+            // WHETHER A LINK WROTE THE W: a whole value, a swizzle naming it, or a w of its own. Every
+            // real graph that writes the colour's xyz brings InputAlbedoColor's w across beside it, which
+            // says a write replaces the whole value - so a w written is the engine's alpha, and one left
+            // to the cleared register is not known to be.
+            bool written = alpha.Count > 0;
+            foreach (ShaderLink link in colour)
+            {
+                written |= link.Target.Swizzle.Length == 0 || (Mask(link.Target.Swizzle) & 0b1000) != 0;
+            }
+
             var unset = 0;
             if (alpha.Count > 0)
             {
@@ -1862,7 +1902,7 @@ public sealed class ShadeProgram
                 }
             }
 
-            return (into, unset);
+            return (into, unset, written);
         }
 
         /// <summary>
